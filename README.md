@@ -48,7 +48,7 @@ Edit [mailtrain.conf](setup/mailtrain.conf) (update application folder) and copy
 Mailtrain uses webhooks integration to detect bounces and spam complaints. Currently supported webhooks are:
 
   * **AWS SES** – create a SNS topic for complaints and bounces and use `http://domain/webhooks/aws` as the subscriber URL for these topics
-  * **SparkPost** – use `http://domain/webhooks/aws` as the webhook URL for bounces and complaints
+  * **SparkPost** – use `http://domain/webhooks/sparkpost` as the webhook URL for bounces and complaints
   * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints
   * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints
 
