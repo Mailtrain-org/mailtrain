@@ -8,6 +8,8 @@
 
 Mailtrain supports subscriber list management, list segmentation, custom fields, email templates, large CSV list import files, etc.
 
+Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv8sAx) (uses Mailtrain obviously)
+
 ## Cons
 
   * Alpha-grade software. Might or might not work as expected
