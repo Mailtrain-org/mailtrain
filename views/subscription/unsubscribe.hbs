@@ -1,0 +1,26 @@
+<h2>Unsubscribe</h2>
+
+<p>
+    Enter your email address to unsubscribe from {{title}}
+</p>
+
+<form method="post" id="unsubscribe-form" action="/subscription/{{lcid}}/unsubscribe">
+
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="campaign" value="{{campaign}}">
+
+    <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" autofocus required>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" id="unsubscribe-button" class="btn btn-primary">Unsubscribe</button>
+    </div>
+</form>
+
+{{#if email}}
+    {{#if autosubmit}}
+        <script src="/javascript/autosubmit.js"></script>
+    {{/if}}
+{{/if}}

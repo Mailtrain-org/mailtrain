@@ -1,0 +1,97 @@
+<form method="post" action="/subscription/{{cid}}/subscribe">
+
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+    <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="first-name">First Name</label>
+        <input type="text" class="form-control" name="first-name" id="first-name" placeholder="" value="{{firstName}}">
+    </div>
+
+    <div class="form-group">
+        <label for="last-name">Last Name</label>
+        <input type="text" class="form-control" name="last-name" id="last-name" placeholder="" value="{{lastName}}">
+    </div>
+
+    {{#each customFields}}
+        <div class="form-group">
+            <label>{{name}}</label>
+
+            {{#if typeText}}
+                <input type="text" class="form-control" name="{{column}}" value="{{value}}">
+            {{/if}}
+
+            {{#if typeNumber}}
+                <input type="number" class="form-control" name="{{column}}" value="{{value}}">
+            {{/if}}
+
+            {{#if typeWebsite}}
+                <input type="url" class="form-control" name="{{column}}" value="{{value}}">
+            {{/if}}
+
+            {{#if typeDateUs}}
+                <div class="input-group date fm-date-us">
+                    <input type="text" class="form-control" name="{{column}}" placeholder="MM/DD/YYYY" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            {{/if}}
+
+            {{#if typeDateEur}}
+                <div class="input-group date fm-date-eur">
+                    <input type="text" class="form-control" name="{{column}}" placeholder="DD/MM/YYYY" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            {{/if}}
+
+            {{#if typeBirthdayUs}}
+                <div class="input-group date fm-birthday-us">
+                    <input type="text" class="form-control" name="{{column}}" placeholder="MM/DD" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            {{/if}}
+
+            {{#if typeBirthdayEur}}
+                <div class="input-group date fm-birthday-eur">
+                    <input type="text" class="form-control" name="{{column}}" placeholder="DD/MM" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            {{/if}}
+
+            {{#if typeDropdown}}
+                <select name="{{key}}" class="form-control">
+                    <option value="">
+                        –– Select ––
+                    </option>
+                    {{#each options}}
+                        <option value="{{column}}" {{#if value}} selected {{/if}}>{{name}}</option>
+                    {{/each}}
+                </select>
+            {{/if}}
+
+            {{#if typeRadio}}
+                {{#each options}}
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="{{../key}}" value="{{column}}" {{#if value}} checked {{/if}}> {{name}}
+                        </label>
+                    </div>
+                {{/each}}
+            {{/if}}
+
+            {{#if typeCheckbox}}
+                {{#each options}}
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="{{column}}" value="1" {{#if value}} checked {{/if}}> {{name}}
+                        </label>
+                    </div>
+                {{/each}}
+            {{/if}}
+
+        </div>
+    {{/each}}
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Subscribe to list</button>
+    </div>
+</form>

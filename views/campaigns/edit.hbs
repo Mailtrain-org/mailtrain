@@ -1,0 +1,173 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/campaigns">Campaigns</a></li>
+    <li><a href="/campaigns/view/{{id}}">{{name}}</a></li>
+    <li class="active">Edit Campaign</li>
+</ol>
+
+<h2>Edit Campaign <a class="btn btn-default btn-xs" href="/campaigns/view/{{id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> View campaign</a></h2>
+
+<hr>
+
+<form method="post" class="delete-form" id="campaigns-delete" action="/campaigns/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{id}}" />
+</form>
+
+<form class="form-horizontal" method="post" action="/campaigns/edit">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{id}}" />
+
+    <div>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="{{#if showGeneral}}active{{/if}}"><a href="#general" aria-controls="general" role="tab" data-toggle="tab">General</a></li>
+            <li role="presentation" class="{{#if showTemplate}}active{{/if}}"><a href="#template" aria-controls="template" role="tab" data-toggle="tab">Template</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane {{#if showGeneral}}active{{/if}}" id="general">
+
+                <p></p>
+
+                <fieldset>
+                    <legend>
+                        General Settings
+                    </legend>
+
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control input-lg" name="name" id="name" value="{{name}}" placeholder="Campaign Name" autofocus required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="col-sm-2 control-label">Description</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" name="description" id="description">{{description}}</textarea>
+                            <span class="help-block">HTML is allowed</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="list" class="col-sm-2 control-label">List</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="list" name="list" required>
+                                <option value=""> –– Select –– </option>
+                                {{#each listItems}}
+                                    <option value="{{id}}" {{#if selected}} selected {{/if}}>
+                                        {{name}} <span class="text-muted"> &mdash; {{subscribers}} subscribers</span>
+                                    </option>
+
+                                    {{#if segments}}
+                                        <optgroup label="{{name}} segments">
+                                            {{#each segments}}
+                                                <option value="{{../id}}:{{id}}" {{#if selected}} selected {{/if}}>
+                                                    {{../name}}: {{name}}
+                                                </option>
+                                            {{/each}}
+                                        </optgroup>
+                                    {{/if}}
+                                {{/each}}
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="form-group">
+                        <label for="from" class="col-sm-2 control-label">Email "from name"</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="from" id="from" value="{{from}}" placeholder="This is the name your emails will come from" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" class="col-sm-2 control-label">Email "from" address</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" name="address" id="address" value="{{address}}" placeholder="This is the address people will send replies to" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject" class="col-sm-2 control-label">Email "subject line"</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="subject" id="subject" value="{{subject}}" placeholder="Keep it relevant and non-spammy" required>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div role="tabpanel" class="tab-pane {{#if showTemplate}}active{{/if}}" id="template">
+
+                <p></p>
+
+                <fieldset>
+                    <legend>
+                        Template Settings
+                    </legend>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <a class="btn btn-default" role="button" data-toggle="collapse" href="#mergeReference" aria-expanded="false" aria-controls="mergeReference">Merge tag reference</a>
+                            <div class="collapse" id="mergeReference">
+                                <p>
+                                    Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional
+                                    text value used when <code>TAG_NAME</code> is empty.
+                                </p>
+
+                                <ul>
+                                    <li>
+                                        <code>[FIRST_NAME]</code> – first name of the subcriber
+                                    </li>
+                                    <li>
+                                        <code>[LAST_NAME]</code> – last name of the subcriber
+                                    </li>
+                                    <li>
+                                        <code>[FULL_NAME]</code> – first and last names of the subcriber joined
+                                    </li>
+                                    <li>
+                                        <code>[LINK_UNSUBSCRIBE]</code> – URL that points to the preferences page of the subscriber
+                                    </li>
+                                    <li>
+                                        <code>[LINK_PREFERENCES]</code> – URL that points to the unsubscribe page
+                                    </li>
+                                    <li>
+                                        <code>[LINK_BROWSER]</code> – URL to preview the message in a browser
+                                    </li>
+                                </ul>
+                                <p>
+                                    In addition to that any custom field can have its own merge tag.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="template-html" class="col-sm-2 control-label">Template content (HTML)</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control summernote" if="template-html" name="html" rows="8">{{html}}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="template-text" class="col-sm-2 control-label">Template content (plaintext)</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" if="template-text" name="text" rows="10">{{text}}</textarea>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="pull-right">
+                <button type="submit" form="campaigns-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Campaign</button>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+        </div>
+    </div>
+</form>

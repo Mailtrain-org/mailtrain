@@ -1,0 +1,201 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li><a href="/segments/{{list.id}}">Segments</a></li>
+    <li><a href="/segments/{{list.id}}/view/{{id}}">{{name}}</a></li>
+    <li class="active">Create Segment</li>
+</ol>
+
+<h2>{{list.name}} <small>Create Rule</small></h2>
+
+<hr>
+
+<form class="form-horizontal" method="post" action="/segments/{{list.id}}/rules/{{id}}/create">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="column" value="{{column.column}}">
+
+    <div class="form-group">
+        <label for="column" class="col-sm-2 control-label">Rule</label>
+        <div class="col-sm-10">
+            <p class="form-control-static"><strong>{{column.name}}</strong></p>
+        </div>
+    </div>
+
+    {{#if columnTypeString}}
+        <div class="form-group">
+            <label for="value" class="col-sm-2 control-label">Value</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="value" id="value" value="{{value.value}}" placeholder="Value">
+                <span class="help-block">Use % for wildcard character, eg. "%test" to match all values that end with "test"</span>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if columnTypeNumber}}
+        <div class="form-group">
+            <label for="value" class="col-sm-2 control-label">Value</label>
+            <div class="col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="" {{#unless value.range}} checked {{/unless}}> Use exact match
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-5">
+                <input type="number" class="form-control" name="value" id="value" value="{{value.value}}" placeholder="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="yes" {{#if value.range}} checked {{/if}}> Use range match
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <div class="row">
+                    <div class="col-md-1">
+                        <p class="form-control-static">From</p>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" name="start" value="{{value.start}}" placeholder="0">
+                    </div>
+                    <div class="col-md-1">
+                        <p class="form-control-static text-center">to</p>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" name="end" value="{{value.end}}" placeholder="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {{/if}}
+
+    {{#if columnTypeDate}}
+        <div class="form-group">
+            <label for="value" class="col-sm-2 control-label">Value</label>
+            <div class="col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="" {{#unless value.range}} checked {{/unless}}> Use exact match
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-5">
+                <div class="input-group date fm-date-generic">
+                    <input type="text" class="form-control" name="value" placeholder="YYYY-MM-DD" value="{{value.value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="yes" {{#if value.range}} checked {{/if}}> Use range match
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <div class="row">
+                    <div class="col-md-1">
+                        <p class="form-control-static">From</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group date fm-date-generic">
+                            <input type="text" class="form-control" name="start" placeholder="YYYY-MM-DD" value="{{value.start}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <p class="form-control-static text-center">to</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group date fm-date-generic">
+                            <input type="text" class="form-control" name="end" placeholder="YYYY-MM-DD" value="{{value.end}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if columnTypeBirthday}}
+        <div class="form-group">
+            <label for="value" class="col-sm-2 control-label">Value</label>
+            <div class="col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="" {{#unless isRange}} checked {{/unless}}> Use exact match
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-5">
+                <div class="input-group date fm-birthday-generic">
+                    <input type="text" class="form-control" name="value" placeholder="MM-DD" value="{{value.value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="yes" {{#if isRange}} checked {{/if}}> Use range match
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <div class="row">
+                    <div class="col-md-1">
+                        <p class="form-control-static">From</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group date fm-birthday-generic">
+                            <input type="text" class="form-control" name="start" placeholder="MM-DD" value="{{value.start}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <p class="form-control-static text-center">to</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group date fm-birthday-generic">
+                            <input type="text" class="form-control" name="end" placeholder="MM-DD" value="{{value.end}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if columnTypeBoolean}}
+        <div class="form-group">
+            <label for="value" class="col-sm-2 control-label">Value</label>
+            <div class="col-sm-10">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="value" value="yes" {{#if value.value}} checked {{/if}}> Selected
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="value" value="" {{#unless value.value}} checked {{/unless}}> Not selected
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    {{/if}}
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add Rule</button>
+        </div>
+    </div>
+</form>

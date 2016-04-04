@@ -1,0 +1,95 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li class="active">Custom Fields</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/fields/{{list.id}}/create" role="button"><i class="glyphicon glyphicon-plus"></i> Create Custom Field</a>
+</div>
+
+<h2>{{list.name}} <small>Custom Fields</small></h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover" data-row-sort="0,1,1,1,0,0">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                Name
+            </th>
+            <th class="col-md-2">
+                Type
+            </th>
+            <th class="col-md-2">
+                Merge tag
+            </th>
+            <th class="col-md-2">
+                Default merge tag value
+            </th>
+            <th class="col-md-1">
+                &nbsp;
+            </th>
+        </thead>
+        <tbody>
+            {{#each rows}}
+                <tr>
+                    <th scope="row">
+                        {{index}}
+                    </th>
+                    <td>
+                        <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> {{name}}
+                    </td>
+                    <td>
+                        {{type}}
+                    </td>
+                    <td>
+                        <strong>[{{key}}]</strong>
+                    </td>
+                    <td class="text-muted">
+                        {{defaultValue}}
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                        <a href="/fields/{{../list.id}}/edit/{{id}}">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+                {{#if options}}
+                    {{#each options}}
+                        <tr>
+                            <th scope="row">
+                                {{index}}
+                            </th>
+                            <td colspan="2">
+                                <span class="glyphicon glyphicon-record" aria-hidden="true"></span> {{name}}
+                            </td>
+                            <td>
+                                <strong>[{{key}}]</strong>
+                            </td>
+                            <td class="text-muted">
+                                {{defaultValue}}
+                            </td>
+                            <td>
+                                <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                                <a href="/fields/{{../../list.id}}/edit/{{id}}">Edit</a>
+                            </td>
+                        </tr>
+                    {{/each}}
+                {{/if}}
+            {{/each}}
+            {{#unless rows}}
+                <tr>
+                    <td colspan="6">
+                        No data available in table
+                    </td>
+                </tr>
+            {{/unless}}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,150 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/campaigns">Campaigns</a></li>
+    <li class="active">{{name}}</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/campaigns/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit Campaign</a>
+</div>
+
+<h2><span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> {{name}}</h2>
+
+<hr>
+
+{{#if description}}
+    <div class="well well-sm">{{{description}}}</div>
+{{/if}}
+
+<dl class="dl-horizontal">
+    <dt>List</dt>
+    <dd>
+        {{#if segment}}
+            <a href="/lists/view/{{list.id}}?segment={{segment.id}}">
+                {{list.name}}: {{segment.name}}
+            </a>
+        {{else}}
+            <a href="/lists/view/{{list.id}}">
+                {{list.name}}
+            </a>
+        {{/if}}
+    </dd>
+
+    <dt>List subscribers</dt>
+    <dd>
+        {{#if segment}}
+            {{segment.subscribers}}
+        {{else}}
+            {{list.subscribers}}
+        {{/if}}
+    </dd>
+
+    <dt>Email "from name"</dt>
+    <dd>{{from}}</dd>
+
+    <dt>Email "from" address</dt>
+    <dd>{{address}}</dd>
+
+    <dt>Email "subject line"</dt>
+    <dd>{{subject}}</dd>
+
+    {{#unless isIdling}}
+        <dt>Delivered</dt>
+        <dd>{{delivered}}</dd>
+
+        <dt>Bounced</dt>
+        <dd>{{bounced}}</dd>
+
+        <dt>Complaints</dt>
+        <dd>{{complained}}</dd>
+
+        <dt>Unsubscribed</dt>
+        <dd>{{unsubscribed}}</dd>
+
+        <dt>Opened</dt>
+        <dd>
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
+                    {{openRate}}%
+                </div>
+            </div>
+        </dd>
+
+        <dt>Clicked</dt>
+        <dd>
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
+                    {{clicksRate}}%
+                </div>
+            </div>
+        </dd>
+
+    {{/unless}}
+</dl>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        {{#if isIdling}}
+            <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                <input type="hidden" name="id" value="{{id}}" />
+
+                <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
+                    {{#if segment}}
+                        {{segment.subscribers}}
+                    {{else}}
+                        {{list.subscribers}}
+                    {{/if}} subscribers</button>
+            </form>
+        {{/if}}
+
+        {{#if isSending}}
+            <div class="pull-right">
+                <form class="form-horizontal" method="post" action="/campaigns/pause">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="id" value="{{id}}" />
+
+                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
+                    </button>
+                </form>
+            </div>
+            <h4>Sending…</h4>
+        {{/if}}
+
+        {{#if isPaused}}
+            <div class="pull-right">
+                <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="id" value="{{id}}" />
+
+                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume</a>
+                    </button>
+                </form>
+            </div>
+            <h4>Sending paused</h4>
+        {{/if}}
+
+        {{#if isFinished}}
+            <div class="pull-right">
+                <form id="continue-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="id" value="{{id}}" />
+                </form>
+
+                <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="id" value="{{id}}" />
+                </form>
+
+                <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Continue</a>
+                </button>
+
+                <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset</a>
+                </button>
+
+            </div>
+            <h4>All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers</h4>
+        {{/if}}
+
+    </div>
+</div>

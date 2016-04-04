@@ -1,0 +1,64 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Lists</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/lists/create" role="button"><i class="glyphicon glyphicon-plus"></i> Create List</a>
+</div>
+
+<h2>Lists</h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,1,0,0">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                Name
+            </th>
+            <th class="col-md-1">
+                Subscribers
+            </th>
+            <th>
+                Description
+            </th>
+            <th class="col-md-1">
+                &nbsp;
+            </th>
+        </thead>
+        {{#if rows}}
+            <tbody>
+
+                {{#each rows}}
+                    <tr>
+                        <th scope="row">
+                            {{index}}
+                        </th>
+                        <td>
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <a href="/lists/view/{{id}}">
+                            {{name}}
+                        </a>
+                        </td>
+                        <td>
+                            <p class="text-center">{{subscribers}}</p>
+                        </td>
+                        <td>
+                            <p class="text-muted">{{description}}</p>
+                        </td>
+                        <td>
+                            <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                            <a href="/lists/edit/{{id}}">
+                            Edit
+                        </a>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        {{/if}}
+    </table>
+</div>

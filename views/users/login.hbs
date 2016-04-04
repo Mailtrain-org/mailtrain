@@ -1,0 +1,38 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Sign in</li>
+</ol>
+
+<h2>Sign in</h2>
+
+<hr>
+
+<form class="form-horizontal" role="login" method="post" action="/users/login">
+    <input type="hidden" name="next" value="{{next}}" />
+    <div class="form-group">
+        <label for="usernameMain" class="col-sm-2 control-label">Username</label>
+        <div class="col-xs-4">
+            <input type="text" class="form-control" name="username" id="usernameMain" placeholder="Username" autofocus required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="passwordMain" class="col-sm-2 control-label">Password</label>
+        <div class="col-xs-4">
+            <input type="password" class="form-control" name="password" id="passwordMain" placeholder="Password" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="remember"> Remember me
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-xs-4">
+            <button type="submit" class="btn btn-primary">Sign in</button> or <a href="/users/forgot">Forgot password?</a>
+        </div>
+    </div>
+</form>

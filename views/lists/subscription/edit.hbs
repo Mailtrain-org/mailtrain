@@ -1,0 +1,138 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li class="active">Edit subscriber</li>
+</ol>
+
+<h2>{{list.name}} <small>Edit subscriber</small> <a class="btn btn-default btn-xs" href="/lists/view/{{list.id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back to list</a></h2>
+
+<hr>
+
+<form method="post" class="delete-form" id="subscriber-unsubscribe" action="/lists/subscription/unsubscribe">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="list" value="{{list.id}}">
+    <input type="hidden" name="cid" value="{{cid}}">
+</form>
+
+<form method="post" class="delete-form" id="subscriber-delete" action="/lists/subscription/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="list" value="{{list.id}}">
+    <input type="hidden" name="cid" value="{{cid}}">
+</form>
+
+<form class="form-horizontal" method="post" action="/lists/subscription/edit">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="list" value="{{list.id}}">
+    <input type="hidden" name="cid" value="{{cid}}">
+
+    <div class="form-group">
+        <label for="email" class="col-sm-2 control-label">Email address</label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control input-lg" name="email" id="email" placeholder="" value="{{email}}" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="first-name" class="col-sm-2 control-label">First Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="first-name" id="first-name" placeholder="" value="{{firstName}}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="last-name" class="col-sm-2 control-label">Last Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="last-name" id="last-name" placeholder="" value="{{lastName}}">
+        </div>
+    </div>
+
+    {{#each customFields}}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{name}}</label>
+            <div class="col-sm-10">
+                {{#if typeText}}
+                    <input type="text" class="form-control" name="{{column}}" value="{{value}}">
+                {{/if}}
+
+                {{#if typeNumber}}
+                    <input type="number" class="form-control" name="{{column}}" value="{{value}}">
+                {{/if}}
+
+                {{#if typeWebsite}}
+                    <input type="url" class="form-control" name="{{column}}" value="{{value}}">
+                {{/if}}
+
+                {{#if typeDateUs}}
+                    <div class="input-group date fm-date-us">
+                        <input type="text" class="form-control" name="{{column}}" placeholder="MM/DD/YYYY" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    </div>
+                {{/if}}
+
+                {{#if typeDateEur}}
+                    <div class="input-group date fm-date-eur">
+                        <input type="text" class="form-control" name="{{column}}" placeholder="DD/MM/YYYY" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    </div>
+                {{/if}}
+
+                {{#if typeBirthdayUs}}
+                    <div class="input-group date fm-birthday-us">
+                        <input type="text" class="form-control" name="{{column}}" placeholder="MM/DD" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    </div>
+                {{/if}}
+
+                {{#if typeBirthdayEur}}
+                    <div class="input-group date fm-birthday-eur">
+                        <input type="text" class="form-control" name="{{column}}" placeholder="DD/MM" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    </div>
+                {{/if}}
+
+                {{#if typeDropdown}}
+                    <select name="{{key}}" class="form-control">
+                        <option value="">
+                            –– Select ––
+                        </option>
+                        {{#each options}}
+                            <option value="{{column}}" {{#if value}} selected {{/if}}>{{name}}</option>
+                        {{/each}}
+                    </select>
+                {{/if}}
+
+                {{#if typeRadio}}
+                    {{#each options}}
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="{{../key}}" value="{{column}}" {{#if value}} checked {{/if}}> {{name}}
+                            </label>
+                        </div>
+                    {{/each}}
+                {{/if}}
+
+                {{#if typeCheckbox}}
+                    {{#each options}}
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="{{column}}" value="1" {{#if value}} checked {{/if}}> {{name}}
+                            </label>
+                        </div>
+                    {{/each}}
+                {{/if}}
+            </div>
+        </div>
+    {{/each}}
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="pull-right">
+                {{#if isSubscribed}}
+                    <button type="submit" form="subscriber-unsubscribe" class="btn btn-default"><i class="glyphicon glyphicon-ban-circle"></i> Unsubscribe</button>
+                {{/if}}
+                <button type="submit" form="subscriber-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Subscription</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+        </div>
+    </div>
+</form>

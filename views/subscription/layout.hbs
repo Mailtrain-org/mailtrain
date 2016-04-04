@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Self hosted email newsletter app">
+    <meta name="author" content="Andris Reinman">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>Mailtrain</title>
+
+    <!-- Bootstrap core CSS -->
+    <!--
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    -->
+
+    <!-- -->
+    <link rel="stylesheet" href="/bootstrap/themes/flatly.min.css">
+    <!-- -->
+
+    <link rel="stylesheet" href="/css/narrow.css">
+
+    <link rel="stylesheet" href="/datepicker/css/bootstrap-datepicker3.css">
+    {{#if useEditor}}
+        <link rel="stylesheet" href="/summernote/summernote.css">
+    {{/if}}
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header clearfix">
+            <h1 class="text-muted">{{title}}</h1>
+        </div>
+
+        {{flash_messages}} {{{body}}}
+
+    </div>
+
+    <script src="/javascript/jquery-2.2.1.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="/datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="/datatables/datatables.min.js"></script>
+    <script src="/moment/moment.min.js"></script>
+    <script src="/javascript/tables.js"></script>
+
+    {{#if useEditor}}
+        <script src="/summernote/summernote.min.js"></script>
+        <script src="/javascript/editor.js"></script>
+    {{/if}}
+</body>
+
+</html>

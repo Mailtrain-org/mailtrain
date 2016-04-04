@@ -1,0 +1,104 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li><a href="/fields/{{list.id}}">Custom Fields</a></li>
+    <li class="active">Edit Field</li>
+</ol>
+
+<h2>{{list.name}} <small>Edit Custom Field</small> <a class="btn btn-default btn-xs" href="/fields/{{list.id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back to fields</a></h2>
+
+<hr>
+
+<form method="post" class="delete-form" id="fields-delete" action="/fields/{{list.id}}/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{field.id}}" />
+</form>
+
+<form class="form-horizontal" method="post" action="/fields/{{list.id}}/edit">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{field.id}}" />
+
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">Field Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control input-lg" name="name" id="name" value="{{field.name}}" placeholder="Field Name" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="type" class="col-sm-2 control-label">Field Type</label>
+        <div class="col-sm-10">
+            <select class="form-control" disabled>
+                <option value="text" {{#if selectedText}} selected {{/if}}>Text</option>
+                <option value="number" {{#if selectedNumber}} selected {{/if}}>Number</option>
+                <option value="website" {{#if selectedWebsite}} selected {{/if}}>Website</option>
+                <optgroup label="Date">
+                    <option value="date-us" {{#if selectedDateUs}} selected {{/if}}>Date (MM/DD/YYYY)</option>
+                    <option value="date-eur" {{#if selectedDateEur}} selected {{/if}}>Date (DD/MM/YYYY)</option>
+                </optgroup>
+                <optgroup label="Birthday">
+                    <option value="birthday-us" {{#if selectedBirthdayUs}} selected {{/if}}>Birthday (MM/DD)</option>
+                    <option value="birthday-eur" {{#if selectedBirthdayEur}} selected {{/if}}>Birthday (DD/MM)</option>
+                </optgroup>
+                <optgroup label="Grouped">
+                    <option value="dropdown" {{#if selectedDropdown}} selected {{/if}}>Drop Downs</option>
+                    <option value="radio" {{#if selectedRadio}} selected {{/if}}>Radio Buttons</option>
+                    <option value="checkbox" {{#if selectedCheckbox}} selected {{/if}}>Checkboxes</option>
+                </optgroup>
+                <option value="option" {{#if selectedOption}} selected {{/if}}>Option for a group value</option>
+            </select>
+        </div>
+    </div>
+
+    {{#if groups}}
+
+        <div class="form-group">
+            <label for="group" class="col-sm-2 control-label">Group</label>
+            <div class="col-sm-10">
+                <select class="form-control" name="group">
+                    <option value=""> –– Select ––</option>
+                    {{#each groups}}
+                        <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                    {{/each}}
+                </select>
+                <span class="help-block">Required for group options)</span>
+            </div>
+        </div>
+
+    {{/if}}
+
+    <div class="form-group">
+        <label for="key" class="col-sm-2 control-label">Merge tag</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control text-uppercase" name="key" id="key" value="{{field.key}}" placeholder="Merge Tag">
+            <span class="help-block">Put this tag in your content: <strong>[{{#if field.key}}{{field.key}}{{else}}TAG_VALUE{{/if}}]</strong></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="default-value" class="col-sm-2 control-label">Default merge tag value</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="default-value" id="default-value" value="{{field.defaultValue}}" placeholder="Default merge tag value">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="visible" {{#if field.visible}} checked {{/if}}> Visible
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="pull-right">
+                <button type="submit" form="fields-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Field</button>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+        </div>
+    </div>
+</form>

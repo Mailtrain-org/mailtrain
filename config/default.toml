@@ -1,0 +1,36 @@
+
+[log]
+level="silly"
+
+[www]
+# HTTP port to listen on
+port=3000
+# Secret for signing the session ID cookie
+secret="a cat"
+# Session length in seconds when "remember me" is checked
+remember=2592000 # 30 days
+# logger interface
+log="dev"
+# is the server behind a proxy? true/false
+proxy=true
+
+[paging]
+size=20
+
+[mysql]
+host="localhost"
+user="mailtrain"
+password="mailtrain"
+database="mailtrain"
+charset="utf8mb4"
+
+[redis]
+# enable to use Redis session cache or disable if Redis is not installed
+enabled=false
+host="localhost"
+port=6379
+db=5
+
+[testserver]
+enabled=false
+port=5587

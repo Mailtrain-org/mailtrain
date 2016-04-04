@@ -1,0 +1,68 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li><a href="/segments/{{list.id}}">Segments</a></li>
+    <li class="active">{{name}}</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/segments/{{list.id}}/rules/{{id}}/create" role="button"><i class="glyphicon glyphicon-plus"></i> Create Rule</a>
+</div>
+
+<h2>{{list.name}} <small><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Segment {{name}}</small></h2>
+
+<hr>
+
+<div class="well well-sm">
+    <div class="pull-right">
+        <a class="btn btn-primary btn-sm" href="/segments/{{list.id}}/edit/{{id}}" role="button"><i class="glyphicon glyphicon-wrench"></i> Edit Segment</a>
+    </div>
+    Match rules: <span class="label label-default">{{type}}</span>
+    <br /> Matching subscribers: <span class="label label-default">{{subscribers}}</span> (
+    <a href="/lists/view/{{list.id}}?segment={{id}}">show</a>)
+    <br />
+    <div class="clearfix"></div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,0,0">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                Rule
+            </th>
+            <th class="col-md-2">
+                Value
+            </th>
+            <th class="col-md-1">
+                &nbsp;
+            </th>
+        </thead>
+        {{#if rules}}
+            <tbody>
+                {{#each rules}}
+                    <tr>
+                        <th scope="row">
+                            {{index}}
+                        </th>
+                        <td>
+                            {{name}}
+                        </td>
+                        <td>
+                            {{formatted}}
+                        </td>
+                        <td>
+                            <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                            <a href="/segments/{{../list.id}}/rules/{{../id}}/edit/{{id}}">
+                            Edit
+                        </a>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        {{/if}}
+    </table>
+</div>

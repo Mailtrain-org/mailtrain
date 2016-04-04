@@ -1,0 +1,183 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Settings</li>
+</ol>
+
+<h2>Settings</h2>
+
+<hr>
+
+<form method="post" id="smtp-verify" action="/settings/smtp-verify">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+</form>
+
+<form class="form-horizontal" method="post" action="/settings/update">
+
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+    <fieldset>
+        <legend>
+            General Settings
+        </legend>
+
+        <div class="form-group">
+            <label for="service-url" class="col-sm-2 control-label">Service Address (URL)</label>
+            <div class="col-sm-10">
+                <input type="url" class="form-control" name="service-url" id="service-url" placeholder="http://example.com/" value="{{serviceUrl}}" required>
+                <span class="help-block">Enter the URL this service can be reached from</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="admin-email" class="col-sm-2 control-label">Admin Email</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" name="admin-email" id="admin-email" placeholder="admin@example.com" value="{{adminEmail}}" required>
+                <span class="help-block">Enter the email address that will be used as "from" for system messages</span>
+            </div>
+        </div>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Campaign defaults
+        </legend>
+
+        <div class="form-group">
+            <label for="default-sender" class="col-sm-2 control-label">Sender name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="default-sender" id="default-sender" value="{{defaultSender}}" placeholder="Sender name, eg. &quot;My Awesome Company Ltd.&quot;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="default-postaddress" class="col-sm-2 control-label">Default address</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="default-postaddress" id="default-postaddress" value="{{defaultPostaddress}}" placeholder="Contact address to provide, eg. &quot;1234 Main Street, Anywhere, MA 01234, USA&quot;">
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <label for="default-from" class="col-sm-2 control-label">Default "from name"</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="default-from" id="default-from" value="{{defaultFrom}}" placeholder="This is the name your emails will come from" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="default-address" class="col-sm-2 control-label">Default "from" email</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" name="default-address" id="default-address" value="{{defaultAddress}}" placeholder="This is the address people will send replies to" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="default-subject" class="col-sm-2 control-label">Default "subject line"</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="default-subject" id="default-subject" value="{{defaultSubject}}" placeholder="Keep it relevant and non-spammy">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="default-homepage" class="col-sm-2 control-label">Default homepage (URL)</label>
+            <div class="col-sm-10">
+                <input type="url" class="form-control" name="default-homepage" id="default-homepage" value="{{defaultHomepage}}" placeholder="URL to redirect the subscribed users to, eg. http://example.com/">
+            </div>
+        </div>
+
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            SMTP Settings
+        </legend>
+
+        <p class="text-info">These settings are required to send out e-mail messages</p>
+
+        <div class="form-group">
+            <label for="smtp-hostname" class="col-sm-2 control-label">Hostname</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="smtp-hostname" id="smtp-hostname" placeholder="Hostname, eg. smtp.example.com" value="{{smtpHostname}}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="smtp-port" class="col-sm-2 control-label">Port</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control" name="smtp-port" id="smtp-port" placeholder="Port, eg. 465. Autodetected if left blank" value="{{smtpPort}}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="smtp-encryption" class="col-sm-2 control-label">Encryption</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="smtp-encryption" name="smtp-encryption">
+                    {{#each smtpEncryption}}
+                        <option value="{{key}}" {{#if checked}} selected {{/if}}>
+                            {{value}}
+                            {{#if description}} <span class="text-muted"> &mdash; {{description}}</span>{{/if}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="smtp-user" class="col-sm-2 control-label">Username</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="smtp-user" id="smtp-port" placeholder="Username, eg. myaccount@example.com" value="{{smtpUser}}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="smtp-pass" class="col-sm-2 control-label">Password</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" name="smtp-pass" id="smtp-pass" placeholder="Password" value="{{smtpPass}}" required>
+            </div>
+        </div>
+
+        <div class="pull-right">
+            <button type="submit" form="smtp-verify" class="btn btn-info"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Check SMTP config</button>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Advanced SMTP settings
+        </legend>
+        <div class="form-group">
+            <label for="smtp-max-connections" class="col-sm-2 control-label">Max connections</label>
+            <div class="col-sm-4">
+                <input type="number" class="form-control" name="smtp-max-connections" id="smtp-port" placeholder="The count of max connections, eg. 10" value="{{smtpMaxConnections}}">
+                <span class="help-block">The count of maximum simultaneous connections to make against the SMTP server (defaults to 5)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="smtp-max-messages" class="col-sm-2 control-label">Max messages</label>
+            <div class="col-sm-4">
+                <input type="number" class="form-control" name="smtp-max-messages" id="smtp-port" placeholder="The count of max messages, eg. 100" value="{{smtpMaxMessages}}">
+                <span class="help-block">The count of messages to send through a single connection before the connection is recreated (defaults to 100)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="smtp-log" {{#if smtpLog}} checked {{/if}}> Log SMTP transactions
+                    </label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+        </div>
+    </div>
+
+</form>

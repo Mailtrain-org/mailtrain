@@ -1,0 +1,188 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li class="active">{{name}}</li>
+</ol>
+
+<div class="pull-right">
+
+    <a class="btn btn-default" href="/subscription/{{cid}}" target="_blank" role="button"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Subscription Form</a>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            List Actions <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="/fields/{{id}}" role="button"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Custom Fields</a></li>
+            <li><a href="/segments/{{id}}" role="button"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Segments</a></li>
+            <li><a href="/lists/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit List</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/lists/subscription/{{id}}/add" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add subscriber</a></li>
+            <li><a href="/lists/subscription/{{id}}/import" role="button"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import subscribers</a></li>
+        </ul>
+    </div>
+</div>
+
+<h2><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{name}}</h2>
+
+<hr>
+
+{{#if description}}
+    <div class="well well-sm">{{{description}}}</div>
+{{/if}}
+
+<div class="well well-sm">
+    {{#if useSegment}}
+        <div class="pull-right">
+            <a class="btn btn-primary btn-sm" href="/segments/{{id}}/edit/{{segment}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit Segment</a>
+        </div>
+    {{/if}}
+    <form class="form-inline" method="get">
+        <div class="form-group">
+            <label for="exampleInputName2">Segment</label>
+            <select name="segment" class="form-control">
+                <option value="0">All subscriptions</option>
+                {{#if segments}}
+                    <optgroup label="Segments">
+                        {{#each segments}}
+                            <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                        {{/each}}
+                    </optgroup>
+                {{/if}}
+                <optgroup label="Actions">
+                    <option value="-1">Create new segment…</option>
+                </optgroup>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</button>
+    </form>
+    <div class="clearfix"></div>
+</div>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="{{#if showSubscriptions}}active{{/if}}"><a href="#subscriptions" aria-controls="subscriptions" role="tab" data-toggle="tab">Subscriptions</a></li>
+    <li role="presentation" class="{{#if showImports}}active{{/if}}"><a href="#imports" aria-controls="imports" role="tab" data-toggle="tab">Imports</a></li>
+</ul>
+
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane {{#if showSubscriptions}}active{{/if}}" id="subscriptions">
+
+        <p></p>
+
+        <div class="table-responsive">
+            <table data-list-id="{{id}}" {{#if useSegment}} data-list-args="segment={{useSegment}}" {{/if}} class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1{{customSort}},1,0">
+                <thead>
+                    <tr>
+                        <th class="col-md-1">
+                            #
+                        </th>
+                        <th>
+                            Address
+                        </th>
+                        <th>
+                            First Name
+                        </th>
+                        <th>
+                            Last Name
+                        </th>
+                        {{#each customFields}}
+                            <th>
+                                {{name}}
+                            </th>
+                        {{/each}}
+                        <th>
+                            Status
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+    </div>
+    <div role="tabpanel" class="tab-pane {{#if showImports}}active{{/if}}" id="imports">
+
+        <p></p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <th class="col-md-1">
+                        #
+                    </th>
+                    <th>
+                        Created
+                    </th>
+                    <th>
+                        Finished
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        Processed
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+
+                    </th>
+                </thead>
+                <tbody>
+                    {{#if imports}}
+                        {{#each imports}}
+                            <tr>
+                                <th scope="row">
+                                    {{index}}
+                                </th>
+
+                                <td>
+                                    <span class="datestring" data-date="{{created}}" title="{{created}}">{{created}}</span>
+                                </td>
+
+                                <td>
+                                    {{#if finished}}
+                                        <span class="datestring" data-date="{{finished}}" title="{{finished}}">{{finished}}</span>
+                                    {{else}}
+                                        No
+                                    {{/if}}
+                                </td>
+
+                                <td>
+                                    {{importType}}
+                                </td>
+                                <td>
+                                    {{processed}}
+                                </td>
+                                <td class="{{#if error}}text-danger{{/if}}">
+                                    {{#if error}}
+                                        <strong><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{importStatus}}</strong>
+                                    {{else}}
+                                        <strong>{{importStatus}}</strong>
+                                    {{/if}}
+                                </td>
+                                <td class="text-center">
+                                    <form method="post" class="confirm-submit" data-confirm-message="Are you sure? This action should only be called to resolve stalled imports" action="/lists/subscription/import-restart">
+                                        <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                                        <input type="hidden" name="list" value="{{list}}">
+                                        <input type="hidden" name="import" value="{{id}}">
+                                        <button type="submit" class="btn btn-info btn-xs"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Restart</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {{/each}}
+                    {{else}}
+                        <tr>
+                            <td colspan="7">
+                                No data available in table
+                            </td>
+                        </tr>
+                    {{/if}}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

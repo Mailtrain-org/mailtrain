@@ -1,0 +1,53 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li class="active">Import subscribers</li>
+</ol>
+
+<h2>{{list.name}} <small>Import subscribers</small></h2>
+
+<hr>
+
+<form class="form-horizontal" method="post" action="/lists/subscription/import" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="list" value="{{list.id}}">
+
+    <div class="form-group">
+        <label for="listimport" class="col-sm-2 control-label">CSV File</label>
+        <div class="col-sm-6">
+            <input type="file" class="form-control" name="listimport" id="listimport" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="delimiter" class="col-sm-2 control-label">CSV delimiter</label>
+        <div class="col-sm-1">
+            <input type="text" class="form-control" name="delimiter" id="delimiter" placeholder="" value="{{delimiter}}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Categorize the imported subscribers as:</label>
+        <div class="col-sm-6">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="type" id="type" value="subscribed" checked> Subscribed – <span class="text-muted">Regular subscriber addresses</span>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="type" id="type" value="unsubscribed"> Unsubscribed – <span class="text-muted">Suppressed emails that will be unsubscribed from your list</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> Next</button>
+        </div>
+    </div>
+</form>

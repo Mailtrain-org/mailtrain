@@ -1,0 +1,86 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/templates/">Templates</a></li>
+    <li class="active">Create Template</li>
+</ol>
+
+<h2>Create Template</h2>
+
+<hr>
+
+<form class="form-horizontal" method="post" action="/templates/create">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+    <div class="form-group">
+        <label for="template-name" class="col-sm-2 control-label">Template name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control input-lg" name="name" id="template-name" value="{{name}}" placeholder="Name for this template, eg. Newsletter">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <a class="btn btn-default" role="button" data-toggle="collapse" href="#mergeReference" aria-expanded="false" aria-controls="mergeReference">Merge tag reference</a>
+            <div class="collapse" id="mergeReference">
+                <p>
+                    Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used
+                    when <code>TAG_NAME</code> is empty.
+                </p>
+
+                <ul>
+                    <li>
+                        <code>[FIRST_NAME]</code> – first name of the subcriber
+                    </li>
+                    <li>
+                        <code>[LAST_NAME]</code> – last name of the subcriber
+                    </li>
+                    <li>
+                        <code>[FULL_NAME]</code> – first and last names of the subcriber joined
+                    </li>
+                    <li>
+                        <code>[LINK_UNSUBSCRIBE]</code> – URL that points to the preferences page of the subscriber
+                    </li>
+                    <li>
+                        <code>[LINK_PREFERENCES]</code> – URL that points to the unsubscribe page
+                    </li>
+                    <li>
+                        <code>[LINK_BROWSER]</code> – URL to preview the message in a browser
+                    </li>
+                </ul>
+                <p>
+                    In addition to that any custom field can have its own merge tag.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="template-html" class="col-sm-2 control-label">Template content (HTML)</label>
+        <div class="col-sm-10">
+            <textarea class="form-control summernote" if="template-html" name="html" rows="8">{{html}}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="template-text" class="col-sm-2 control-label">Template content (plaintext)</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" if="template-text" name="text" rows="10">{{text}}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="template-description" class="col-sm-2 control-label">Description</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" if="template-description" name="description" rows="3" placeholder="Optional comments about this template">{{description}}</textarea>
+            <span class="help-block">HTML is allowed</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Create Template</button>
+        </div>
+    </div>
+
+
+</form>

@@ -1,0 +1,54 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li class="active">Import subscribers</li>
+</ol>
+
+<h2>{{list.name}} <small>Import subscribers</small></h2>
+
+<hr>
+
+<form class="form-horizontal" method="post" action="/lists/subscription/import-confirm">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="list" value="{{list.id}}">
+    <input type="hidden" name="import" value="{{id}}">
+
+    {{#each mapping.columns}}
+
+        <div class="form-group">
+            <label for="column-{{@index}}" class="col-sm-2 control-label">{{this}}</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="column-{{@index}}" name="column-{{@index}}">
+                    <option value=""> –– Select –– </option>
+                    <option value="email">Email address</option>
+                    <option value="first_name">First Name</option>
+                    <option value="last_name">Last Name</option>
+                    {{#each ../customFields}}
+                        {{#if column}}
+                            <option value="{{column}}">{{name}}</option>
+                        {{else}}
+                        <optgroup label="{{name}}">
+                            {{#each options}}
+                                <option value="{{column}}">{{name}}</option>
+                            {{/each}}
+                        </optgroup>
+                        {{/if}}
+
+                    {{/each}}
+                </select>
+
+                <span id="helpBlock" class="help-block">Example: "{{lookup ../mapping.example @index}}"</span>
+            </div>
+        </div>
+
+    {{/each}}
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary">Start import</button>
+        </div>
+    </div>
+</form>
