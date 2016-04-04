@@ -10,19 +10,28 @@ Mailtrain supports subscriber list management, list segmentation, custom fields,
 
 ## Cons
 
-Alpha-grade software. Might or might not work as expected
+  * Alpha-grade software. Might or might not work as expected
+  * Awful code base, needs refactoring
+  * No tests
+  * No documentation
+
+## Requirements
+
+  * Nodejs v5+
+  * MySQL v5.5 or MariaDB
+  * Redis (optional, used for session storage only)
 
 ## Installation
 
-  1. Download Mailtrain sources
-  2. Run `npm install` in the mailtrain folder to install required dependencies
+  1. Download and unpack Mailtrain [sources](https://github.com/andris9/mailtrain/archive/master.zip)
+  2. Run `npm install` in the Mailtrain folder to install required dependencies
   3. Edit [default.toml](config/default.toml) and update MySQL Settings
   4. Import SQL tables by running `mysql -u MYSQL_USER -p MYSQL_DB < setup/mailtrain.sql`
   5. Run the server `npm start`
-  6. Open http://localhost:3000
+  6. Open [http://localhost:3000/](http://localhost:3000/)
   7. Authenticate as `admin`:`test`
-  8. Navigate to http://localhost:3000/settings and update service configuration
-  9. Navigate to http://localhost:3000/users/account and update user information and password
+  8. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration
+  9. Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password
 
 ### Running behind Nginx proxy
 
