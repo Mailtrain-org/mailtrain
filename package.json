@@ -15,6 +15,9 @@
   "author": "Andris Reinman",
   "license": "GPL-3.0",
   "homepage": "http://mailtrain.org",
+  "engines" : {
+    "node" : ">=5.0.0"
+  },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-cli": "^1.1.0",
