@@ -22,9 +22,10 @@ let server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
+ * Or if it's a cloud native platform like CloudFoundry, get the Port dynamically out of the env.
  */
 
-server.listen(port);
+server.listen(process.env.PORT || port);
 
 server.on('error', err => {
     if (err.syscall !== 'listen') {
