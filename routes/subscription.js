@@ -209,7 +209,8 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                     },
                     subject: list.name + ': Please Confirm Subscription'
                 }, {
-                    template: 'emails/confirm-mail.hbs',
+                    html: 'emails/confirm-html.hbs',
+                    text: 'emails/confirm-text.hbs',
                     data: {
                         title: list.name,
                         contactAddress: configItems.defaultAddress,
