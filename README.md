@@ -71,6 +71,8 @@ Mailtrain uses webhooks integration to detect bounces and spam complaints. Curre
   * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints
   * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints
 
+Additionally Mailtrain (v1.1+) is able to use VERP-based bounce handling. This would require to have a compatible SMTP relay (the services mentioned above strip out or block VERP addresses in the SMTP envelope) and you also need to set up special MX DNS name that points to your Mailtrain installation server.
+
 ## License
 
 **GPL-V3.0**
