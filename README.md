@@ -27,13 +27,32 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 
   1. Download and unpack Mailtrain [sources](https://github.com/andris9/mailtrain/archive/master.zip)
   2. Run `npm install` in the Mailtrain folder to install required dependencies
-  3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL Settings in it
+  3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL settings in it
   4. Import SQL tables by running `mysql -u MYSQL_USER -p MYSQL_DB < setup/mailtrain.sql`
   5. Run the server `NODE_ENV=production npm start`
   6. Open [http://localhost:3000/](http://localhost:3000/)
   7. Authenticate as `admin`:`test`
   8. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration
   9. Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password
+
+## Using environment variables
+
+Some servers expose custom port and hostname options through environment variables. To support these, create a new configuration file `config/local.js`:
+
+```
+module.exports = {
+    www: {
+        port: process.env.OPENSHIFT_NODEJS_PORT,
+        host: process.env.OPENSHIFT_NODEJS_IP
+    }
+};
+```
+
+Mailtrain uses [node-config](https://github.com/lorenwest/node-config) for configuration management and thus the config files are loaded in the following order:
+
+  1. default.toml
+  2. {NODE_ENV}.toml (eg. development.toml or production.toml)
+  3. local.js
 
 ### Running behind Nginx proxy
 

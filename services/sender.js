@@ -1,7 +1,7 @@
 'use strict';
 
 let log = require('npmlog');
-
+let config = require('config');
 let db = require('../lib/db');
 let tools = require('../lib/tools');
 let mailer = require('../lib/mailer');
@@ -111,10 +111,12 @@ function formatMessage(message, callback) {
                 return callback(new Error('List not found'));
             }
 
-            settings.get('serviceUrl', (err, serviceUrl) => {
+            settings.list(['serviceUrl', 'verpUse', 'verpHostname'], (err, configItems) => {
                 if (err) {
                     return callback(err);
                 }
+
+                let useVerp = config.verp.enabled && configItems.verpUse && configItems.verpHostname;
 
                 fields.list(list.id, (err, fieldList) => {
                     if (err) {
@@ -141,7 +143,7 @@ function formatMessage(message, callback) {
                         }
                     });
 
-                    links.updateLinks(campaign, list, message.subscription, serviceUrl, campaign.html, (err, html) => {
+                    links.updateLinks(campaign, list, message.subscription, configItems.serviceUrl, campaign.html, (err, html) => {
                         if (err) {
                             return callback(err);
                         }
@@ -157,43 +159,52 @@ function formatMessage(message, callback) {
                             return prefix + 'cid:' + cid;
                         });
 
+                        let campaignAddress = [campaign.cid, list.cid, message.subscription.cid].join('.');
+
                         return callback(null, {
                             from: {
                                 name: campaign.from,
                                 address: campaign.address
                             },
-                            xMailer: 'Mailtrain Mailer (+http://mailtrain.org)',
+                            xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
                             to: {
                                 name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
                                 address: message.subscription.email
                             },
+                            sender: useVerp ? campaignAddress + '@' + configItems.verpHostname : false,
+
+                            envelope: useVerp ? {
+                                from: campaignAddress + '@' + configItems.verpHostname,
+                                to: message.subscription.email
+                            } : false,
+
                             headers: {
-                                'x-fbl': [campaign.cid, list.cid, message.subscription.cid].join('.'),
+                                'x-fbl': campaignAddress,
                                 // custom header for SparkPost
                                 'x-msys-api': JSON.stringify({
-                                    campaign_id: [campaign.cid, list.cid, message.subscription.cid].join('.')
+                                    campaign_id: campaignAddress
                                 }),
                                 // custom header for SendGrid
                                 'x-smtpapi': JSON.stringify({
                                     unique_args: {
-                                        campaign_id: [campaign.cid, list.cid, message.subscription.cid].join('.')
+                                        campaign_id: campaignAddress
                                     }
                                 }),
                                 // custom header for Mailgun
                                 'x-mailgun-variables': JSON.stringify({
-                                    campaign_id: [campaign.cid, list.cid, message.subscription.cid].join('.')
+                                    campaign_id: campaignAddress
                                 }),
                                 'List-ID': {
                                     prepared: true,
-                                    value: '"' + list.name.replace(/[^a-z0-9\s'.,\-]/g, '').trim() + '" <' + list.cid + '.' + (url.parse(serviceUrl).hostname || 'localhost') + '>'
+                                    value: '"' + list.name.replace(/[^a-z0-9\s'.,\-]/g, '').trim() + '" <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
                                 }
                             },
                             list: {
-                                unsubscribe: url.resolve(serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
+                                unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
                             },
-                            subject: tools.formatMessage(serviceUrl, campaign, list, message.subscription, campaign.subject),
-                            html: tools.formatMessage(serviceUrl, campaign, list, message.subscription, html),
-                            text: tools.formatMessage(serviceUrl, campaign, list, message.subscription, campaign.text),
+                            subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
+                            html: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html),
+                            text: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.text),
 
                             attachments
                         });

@@ -10,6 +10,7 @@ let app = require('./app');
 let http = require('http');
 
 let port = config.www.port;
+let host = config.www.host;
 
 log.level = config.log.level;
 app.set('port', port);
@@ -24,7 +25,7 @@ let server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port, host);
 
 server.on('error', err => {
     if (err.syscall !== 'listen') {
@@ -56,5 +57,6 @@ server.on('listening', () => {
     // start sending loop
     require('./services/sender'); // eslint-disable-line global-require
     require('./services/importer'); // eslint-disable-line global-require
-    require('./services/testserver'); // eslint-disable-line global-require
+    require('./services/verp-server'); // eslint-disable-line global-require
+    require('./services/test-server'); // eslint-disable-line global-require
 });

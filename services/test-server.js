@@ -4,7 +4,6 @@ let log = require('npmlog');
 let config = require('config');
 let crypto = require('crypto');
 
-// Replace '../lib/smtp-server' with 'smtp-server' when running this script outside this directory
 let SMTPServer = require('smtp-server').SMTPServer;
 
 // Setup server
@@ -98,7 +97,7 @@ server.on('error', err => {
 });
 
 if (config.testserver.enabled) {
-    server.listen(config.testserver.port, () => {
+    server.listen(config.testserver.port, config.testserver.host, () => {
         log.info('TESTSERV', 'Server listening on port %s', config.testserver.port);
     });
 }
