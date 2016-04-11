@@ -4,6 +4,10 @@
 
 ![](http://mailtrain.org/mailtrain.png)
 
+## Development
+
+Current development branch is [v1.1 beta](https://github.com/andris9/mailtrain/tree/v1.1). The version in the master branch is tagged as v1.0.0.
+
 ## Features
 
 Mailtrain supports subscriber list management, list segmentation, custom fields, email templates, large CSV list import files, etc.
