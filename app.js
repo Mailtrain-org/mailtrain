@@ -122,11 +122,16 @@ cspOptions['font-src'] = '\'self\' https://fonts.gstatic.com';
 app.use(csp.getCSP(cspOptions));
 
 app.use(bodyParser.urlencoded({
-    extended: true
+    extended: true,
+    limit: config.www.max_post_size
 }));
 
-app.use(bodyParser.text());
-app.use(bodyParser.json());
+app.use(bodyParser.text({
+    limit: config.www.max_post_size
+}));
+app.use(bodyParser.json({
+    limit: config.www.max_post_size
+}));
 
 passport.setup(app);
 
