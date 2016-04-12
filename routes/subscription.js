@@ -42,7 +42,8 @@ router.get('/subscribe/:cid', (req, res, next) => {
                 res.render('subscription/subscribed', {
                     title: list.name,
                     layout: 'subscription/layout',
-                    homepage: configItems.defaultHomepage || configItems.serviceUrl
+                    homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                    preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid
                 });
             });
         });

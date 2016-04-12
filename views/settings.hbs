@@ -36,6 +36,16 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="disable-wysiwyg" {{#if disableWysiwyg}} checked {{/if}}> Disable WYSIWYG editor
+                    </label>
+                </div>
+            </div>
+        </div>
+
     </fieldset>
 
     <fieldset>
@@ -123,6 +133,16 @@
         </div>
 
         <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="smtp-disable-auth" {{#if smtpDisableAuth}} checked {{/if}}> Disable SMTP authentication
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="smtp-user" class="col-sm-2 control-label">Username</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" name="smtp-user" id="smtp-port" placeholder="Username, eg. myaccount@example.com" value="{{smtpUser}}" required>
@@ -145,6 +165,17 @@
         <legend>
             Advanced SMTP settings
         </legend>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="smtp-self-signed" {{#if smtpSelfSigned}} checked {{/if}}> Allow self-signed certificates
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="smtp-max-connections" class="col-sm-2 control-label">Max connections</label>
             <div class="col-sm-4">
@@ -170,6 +201,54 @@
                 </div>
             </div>
         </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            VERP bounce handling
+        </legend>
+
+        <p class="text-info">
+            Mailtrain is able to use <a href="https://en.wikipedia.org/wiki/Variable_envelope_return_path">VERP</a> based routing to detect bounces. In this case the message is sent to the recipient using a custom VERP address as the return path of the
+            message. If the message is not accepted a bounce email is sent to this special VERP address and thus a bounce is detected.
+        </p>
+
+        <p class="text-info">
+            To get VERP working you need to set up a DNS MX record that points to your Mailtrain hostname. You must also ensure that Mailtrain VERP interface is available from port 25 of your server (port 25 usually requires root user privileges). This way if anyone
+            tries to send email to <code>someuser@{{verpHostname}}</code> then the email should end up to this server.
+        </p>
+
+        <p class="text-warning">
+            VERP usually only works if you are using your own SMTP server. Regural relay services (SES, SparkPost, Gmail etc.) tend to remove the VERP address from the message.
+        </p>
+
+        {{#if verpEnabled}}
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-xs-4">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="verp-use" {{#if verpUse}} checked {{/if}}> Use VERP to catch bounces
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="verp-hostname" class="col-sm-2 control-label">Server hostname</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="verp-hostname" id="verp-hostname" placeholder="The VERP server hostname, eg. bounces.example.com" value="{{verpHostname}}">
+                    <span class="help-block">VERP bounce handling server hostname. This hostname is used in the SMTP envelope FROM address and the MX DNS records should point to this server</span>
+                </div>
+            </div>
+
+        {{else}}
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <p class="form-control-static">VERP bounce handling server is not enabled. Modify your server configuration file and restart server to enable it</p>
+                </div>
+            </div>
+        {{/if}}
     </fieldset>
 
     <hr />

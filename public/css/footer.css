@@ -27,3 +27,7 @@ body {
 div.jumbotron{
     margin-top: -21px;
 }
+
+.code-editor {
+    height: 400px;
+}

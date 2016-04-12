@@ -5,6 +5,8 @@ level="silly"
 [www]
 # HTTP port to listen on
 port=3000
+# HTTP interface to listen on
+host="0.0.0.0"
 # Secret for signing the session ID cookie
 secret="a cat"
 # Session length in seconds when "remember me" is checked
@@ -31,6 +33,12 @@ host="localhost"
 port=6379
 db=5
 
+[verp]
+enabled=false
+port=25
+host="0.0.0.0"
+
 [testserver]
 enabled=false
 port=5587
+host="0.0.0.0"

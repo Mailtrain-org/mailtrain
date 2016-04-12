@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0-beta.0",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -15,8 +15,8 @@
   "author": "Andris Reinman",
   "license": "GPL-3.0",
   "homepage": "http://mailtrain.org",
-  "engines" : {
-    "node" : ">=5.0.0"
+  "engines": {
+    "node": ">=5.0.0"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
@@ -27,11 +27,11 @@
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.0",
+    "bounce-handler": "^7.3.2-fork.0",
     "compression": "^1.6.1",
     "config": "^1.20.0",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.0.2",
-    "content-security-policy": "^0.2.0",
     "cookie-parser": "^1.4.1",
     "csurf": "^1.8.3",
     "csv-parse": "^1.0.4",
