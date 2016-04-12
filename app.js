@@ -9,7 +9,6 @@ let path = require('path');
 let favicon = require('serve-favicon');
 let logger = require('morgan');
 let cookieParser = require('cookie-parser');
-let csp = require('content-security-policy');
 let session = require('express-session');
 let RedisStore = require('connect-redis')(session);
 let flash = require('connect-flash');
@@ -51,7 +50,7 @@ app.disable('x-powered-by');
  * in a situation where we consume a flash messages but then comes a redirect
  * and the message is never displayed
  */
-hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer-arrow-callback
+hbs.registerHelper('flash_messages', function() { // eslint-disable-line prefer-arrow-callback
     if (typeof this.flash !== 'function') { // eslint-disable-line no-invalid-this
         return '';
     }
@@ -113,13 +112,6 @@ app.use(session({
     resave: false
 }));
 app.use(flash());
-
-// Content-Security-Policy headers
-let cspOptions = Object.create(csp.STARTER_OPTIONS);
-cspOptions['style-src'] = '\'self\' \'unsafe-inline\' https://fonts.googleapis.com';
-cspOptions['img-src'] = '\'self\' data:';
-cspOptions['font-src'] = '\'self\' https://fonts.gstatic.com';
-app.use(csp.getCSP(cspOptions));
 
 app.use(bodyParser.urlencoded({
     extended: true

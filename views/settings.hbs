@@ -36,6 +36,16 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="disable-wysiwyg" {{#if disableWysiwyg}} checked {{/if}}> Disable WYSIWYG editor
+                    </label>
+                </div>
+            </div>
+        </div>
+
     </fieldset>
 
     <fieldset>
@@ -204,7 +214,8 @@
         </p>
 
         <p class="text-info">
-            To get VERP working you need to set up a DNS MX record that points to your Mailtrain hostname. You must also ensure that Mailtrain VERP interface is available from port 25 of your server (port 25 usually requires root user privileges). This way if anyone tries to send email to <code>someuser@{{verpHostname}}</code> then the email should end up to this server.
+            To get VERP working you need to set up a DNS MX record that points to your Mailtrain hostname. You must also ensure that Mailtrain VERP interface is available from port 25 of your server (port 25 usually requires root user privileges). This way if anyone
+            tries to send email to <code>someuser@{{verpHostname}}</code> then the email should end up to this server.
         </p>
 
         <p class="text-warning">

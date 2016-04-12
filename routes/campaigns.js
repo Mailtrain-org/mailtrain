@@ -130,40 +130,47 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
     });
 });
 
-router.get('/edit/:id', passport.csrfProtection, (req, res) => {
+router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
     campaigns.get(req.params.id, false, (err, campaign) => {
         if (err || !campaign) {
             req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
             return res.redirect('/campaigns');
         }
 
-        lists.quicklist((err, listItems) => {
+        settings.list(['disableWysiwyg'], (err, configItems) => {
             if (err) {
-                req.flash('danger', err.message || err);
-                return res.redirect('/');
+                return next(err);
             }
 
-            if (Number(campaign.list)) {
-                listItems.forEach(list => {
-                    list.segments.forEach(segment => {
-                        if (segment.id === campaign.segment) {
-                            segment.selected = true;
+            lists.quicklist((err, listItems) => {
+                if (err) {
+                    req.flash('danger', err.message || err);
+                    return res.redirect('/');
+                }
+
+                if (Number(campaign.list)) {
+                    listItems.forEach(list => {
+                        list.segments.forEach(segment => {
+                            if (segment.id === campaign.segment) {
+                                segment.selected = true;
+                            }
+                        });
+                        if (list.id === campaign.list && !campaign.segment) {
+                            list.selected = true;
                         }
                     });
-                    if (list.id === campaign.list && !campaign.segment) {
-                        list.selected = true;
-                    }
-                });
-            }
+                }
 
-            campaign.csrfToken = req.csrfToken();
-            campaign.listItems = listItems;
-            campaign.useEditor = true;
+                campaign.csrfToken = req.csrfToken();
+                campaign.listItems = listItems;
+                campaign.useEditor = true;
 
-            campaign.showGeneral = req.query.tab === 'general' || !req.query.tab;
-            campaign.showTemplate = req.query.tab === 'template';
+                campaign.disableWysiwyg = configItems.disableWysiwyg;
+                campaign.showGeneral = req.query.tab === 'general' || !req.query.tab;
+                campaign.showTemplate = req.query.tab === 'template';
 
-            res.render('campaigns/edit', campaign);
+                res.render('campaigns/edit', campaign);
+            });
         });
     });
 });

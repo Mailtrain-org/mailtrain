@@ -47,7 +47,7 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
     data.csrfToken = req.csrfToken();
     data.useEditor = true;
 
-    settings.list(['defaultPostaddress', 'defaultSender'], (err, configItems) => {
+    settings.list(['defaultPostaddress', 'defaultSender', 'disableWysiwyg'], (err, configItems) => {
         if (err) {
             return next(err);
         }
@@ -64,6 +64,7 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
 
                 data.html = data.html || rendererHtml(configItems);
                 data.text = data.text || rendererText(configItems);
+                data.disableWysiwyg = configItems.disableWysiwyg;
                 res.render('templates/create', data);
             });
         });
@@ -81,15 +82,21 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
     });
 });
 
-router.get('/edit/:id', passport.csrfProtection, (req, res) => {
+router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
     templates.get(req.params.id, (err, template) => {
         if (err || !template) {
             req.flash('danger', err && err.message || err || 'Could not find template with specified ID');
             return res.redirect('/templates');
         }
-        template.csrfToken = req.csrfToken();
-        template.useEditor = true;
-        res.render('templates/edit', template);
+        settings.list(['disableWysiwyg'], (err, configItems) => {
+            if (err) {
+                return next(err);
+            }
+            template.csrfToken = req.csrfToken();
+            template.useEditor = true;
+            template.disableWysiwyg = configItems.disableWysiwyg;
+            res.render('templates/edit', template);
+        });
     });
 });
 

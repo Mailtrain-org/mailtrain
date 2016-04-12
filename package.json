@@ -32,7 +32,6 @@
     "config": "^1.20.0",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.0.2",
-    "content-security-policy": "^0.2.0",
     "cookie-parser": "^1.4.1",
     "csurf": "^1.8.3",
     "csv-parse": "^1.0.4",
