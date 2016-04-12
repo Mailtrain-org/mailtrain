@@ -13,6 +13,8 @@ remember=2592000 # 30 days
 log="dev"
 # is the server behind a proxy? true/false
 proxy=true
+# default is 100kb is too small for production
+max_post_size="20m"
 
 [paging]
 size=20
