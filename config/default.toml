@@ -15,9 +15,8 @@ remember=2592000 # 30 days
 log="dev"
 # is the server behind a proxy? true/false
 proxy=true
-
-[paging]
-size=20
+# maximum POST body size
+postsize="2MB"
 
 [mysql]
 host="localhost"

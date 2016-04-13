@@ -114,11 +114,17 @@ app.use(session({
 app.use(flash());
 
 app.use(bodyParser.urlencoded({
-    extended: true
+    extended: true,
+    limit: config.www.postsize
 }));
 
-app.use(bodyParser.text());
-app.use(bodyParser.json());
+app.use(bodyParser.text({
+    limit: config.www.postsize
+}));
+
+app.use(bodyParser.json({
+    limit: config.www.postsize
+}));
 
 passport.setup(app);
 
