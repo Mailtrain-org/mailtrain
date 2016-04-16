@@ -21,7 +21,6 @@ body {
     border-bottom: 1px solid #e5e5e5;
 }
 
-
 /* Make the masthead heading the same height as the navigation */
 
 .header h3 {
@@ -93,4 +92,8 @@ body {
     .jumbotron {
         border-bottom: 0;
     }
+}
+
+.gpg-text {
+    font-family: monospace;
 }

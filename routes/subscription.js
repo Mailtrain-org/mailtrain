@@ -12,6 +12,7 @@ let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
 let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
+let openpgp = require('openpgp');
 
 router.get('/subscribe/:cid', (req, res, next) => {
     subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
@@ -34,7 +35,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
                 return next(err);
             }
 
-            settings.list(['defaultHomepage', 'serviceUrl'], (err, configItems) => {
+            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey'], (err, configItems) => {
                 if (err) {
                     return next(err);
                 }
@@ -43,7 +44,8 @@ router.get('/subscribe/:cid', (req, res, next) => {
                     title: list.name,
                     layout: 'subscription/layout',
                     homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                    preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid
+                    preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid,
+                    hasPubkey: !!configItems.pgpPrivateKey
                 });
             });
         });
@@ -77,7 +79,13 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
             data.customFields = fields.getRow(fieldList, data);
             data.useEditor = true;
 
-            res.render('subscription/subscribe', data);
+            settings.list(['pgpPrivateKey'], (err, configItems) => {
+                if (err) {
+                    return next(err);
+                }
+                data.hasPubkey = !!configItems.pgpPrivateKey;
+                res.render('subscription/subscribe', data);
+            });
         });
     });
 });
@@ -192,35 +200,49 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
             }
 
-            settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl'], (err, configItems) => {
+            fields.list(list.id, (err, fieldList) => {
                 if (err) {
                     return next(err);
                 }
 
-                res.redirect('/subscription/' + req.params.cid + '/confirm-notice');
+                let encryptionKeys = [];
+                fields.getRow(fieldList, data).forEach(field => {
+                    if (field.type === 'gpg' && field.value) {
+                        encryptionKeys.push(field.value.trim());
+                    }
+                });
 
-                mailer.sendMail({
-                    from: {
-                        name: configItems.defaultFrom,
-                        address: configItems.defaultAddress
-                    },
-                    to: {
-                        name: [].concat(data.firstName || []).concat(data.lastName || []).join(' '),
-                        address: email
-                    },
-                    subject: list.name + ': Please Confirm Subscription'
-                }, {
-                    html: 'emails/confirm-html.hbs',
-                    text: 'emails/confirm-text.hbs',
-                    data: {
-                        title: list.name,
-                        contactAddress: configItems.defaultAddress,
-                        confirmUrl: urllib.resolve(configItems.serviceUrl, '/subscription/subscribe/' + confirmCid)
-                    }
-                }, err => {
+                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl'], (err, configItems) => {
                     if (err) {
-                        log.error('Subscription', err.stack);
+                        return next(err);
                     }
+
+                    res.redirect('/subscription/' + req.params.cid + '/confirm-notice');
+
+                    mailer.sendMail({
+                        from: {
+                            name: configItems.defaultFrom,
+                            address: configItems.defaultAddress
+                        },
+                        to: {
+                            name: [].concat(data.firstName || []).concat(data.lastName || []).join(' '),
+                            address: email
+                        },
+                        subject: list.name + ': Please Confirm Subscription',
+                        encryptionKeys
+                    }, {
+                        html: 'emails/confirm-html.hbs',
+                        text: 'emails/confirm-text.hbs',
+                        data: {
+                            title: list.name,
+                            contactAddress: configItems.defaultAddress,
+                            confirmUrl: urllib.resolve(configItems.serviceUrl, '/subscription/subscribe/' + confirmCid)
+                        }
+                    }, err => {
+                        if (err) {
+                            log.error('Subscription', err.stack);
+                        }
+                    });
                 });
             });
         });
@@ -261,7 +283,14 @@ router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
 
                 subscription.useEditor = true;
 
-                res.render('subscription/manage', subscription);
+                settings.list(['pgpPrivateKey'], (err, configItems) => {
+                    if (err) {
+                        return next(err);
+                    }
+                    subscription.hasPubkey = !!configItems.pgpPrivateKey;
+
+                    res.render('subscription/manage', subscription);
+                });
             });
         });
     });
@@ -340,6 +369,44 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
             }
             res.redirect('/subscription/' + req.params.lcid + '/unsubscribe-notice');
         });
+    });
+});
+
+router.post('/publickey', passport.parseForm, passport.csrfProtection, (req, res, next) => {
+    settings.list(['pgpPassphrase', 'pgpPrivateKey'], (err, configItems) => {
+        if (err) {
+            return next(err);
+        }
+        if (!configItems.pgpPrivateKey) {
+            err = new Error('Public key is not set');
+            err.status = 404;
+            return next(err);
+        }
+
+        let privKey;
+        try {
+            privKey = openpgp.key.readArmored(configItems.pgpPrivateKey).keys[0];
+            if (configItems.pgpPassphrase && !privKey.decrypt(configItems.pgpPassphrase)) {
+                privKey = false;
+            }
+        } catch (E) {
+            // just ignore if failed
+        }
+
+        if (!privKey) {
+            err = new Error('Public key is not set');
+            err.status = 404;
+            return next(err);
+        }
+
+        let pubkey = privKey.toPublic().armor();
+
+        res.writeHead(200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename=public.asc'
+        });
+
+        res.end(pubkey);
     });
 });
 
