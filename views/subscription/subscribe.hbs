@@ -33,6 +33,15 @@
                 <input type="url" class="form-control" name="{{column}}" value="{{value}}">
             {{/if}}
 
+            {{#if typeLongtext}}
+                <textarea class="form-control" rows="3" name="{{column}}">{{value}}</textarea>
+            {{/if}}
+
+            {{#if typeGpg}}
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}">{{value}}</textarea>
+                <span class="help-block">Insert your GPG public key here to encrypt messages sent to your address</span>
+            {{/if}}
+
             {{#if typeDateUs}}
                 <div class="input-group date fm-date-us">
                     <input type="text" class="form-control" name="{{column}}" placeholder="MM/DD/YYYY" value="{{value}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>

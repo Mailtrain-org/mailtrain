@@ -22,7 +22,7 @@
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-nodeunit": "^1.0.0",
-    "grunt-eslint": "^18.0.0"
+    "grunt-eslint": "^18.1.0"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -47,7 +47,9 @@
     "multer": "^1.1.0",
     "mysql": "^2.10.2",
     "nodemailer": "^2.3.2",
+    "nodemailer-openpgp": "^1.0.2",
     "npmlog": "^2.0.3",
+    "openpgp": "^2.2.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "request": "^2.71.0",

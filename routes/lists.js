@@ -1,5 +1,6 @@
 'use strict';
 
+let openpgp = require('openpgp');
 let passport = require('../lib/passport');
 let express = require('express');
 let router = new express.Router();
@@ -156,6 +157,26 @@ router.post('/ajax/:id', (req, res) => {
                     ].concat(fields.getRow(fieldList, row).map(cRow => {
                         if (cRow.type === 'number') {
                             return htmlescape(cRow.value && humanize.numberFormat(cRow.value, 0) || '');
+                        } else if (cRow.type === 'longtext') {
+                            let value = (cRow.value || '');
+                            if (value.length > 50) {
+                                value = value.substr(0, 47).trim() + '…';
+                            }
+                            return htmlescape(value);
+                        } else if (cRow.type === 'gpg') {
+                            let value = (cRow.value || '').trim();
+                            try {
+                                value = openpgp.key.readArmored(value);
+                                if (value) {
+                                    value = value.keys && value.keys[0] && value.keys[0].primaryKey.fingerprint;
+                                    if (value) {
+                                        value = '0x' + value.substr(-16).toUpperCase();
+                                    }
+                                }
+                            } catch (E) {
+                                value = 'parse error';
+                            }
+                            return htmlescape(value || '');
                         } else {
                             return htmlescape(cRow.value || '');
                         }

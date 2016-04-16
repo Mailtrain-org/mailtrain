@@ -130,10 +130,16 @@ function formatMessage(message, callback) {
                         FULL_NAME: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' ')
                     };
 
+                    let encryptionKeys = [];
                     fields.getRow(fieldList, message.subscription, true, true).forEach(field => {
                         if (field.mergeTag) {
                             message.subscription.mergeTags[field.mergeTag] = field.mergeValue || '';
                         }
+
+                        if (field.type === 'gpg' && field.value) {
+                            encryptionKeys.push(field.value.trim());
+                        }
+
                         if (field.options) {
                             field.options.forEach(subField => {
                                 if (subField.mergeTag) {
@@ -206,7 +212,8 @@ function formatMessage(message, callback) {
                             html: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html),
                             text: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.text),
 
-                            attachments
+                            attachments,
+                            encryptionKeys
                         });
                     });
                 });

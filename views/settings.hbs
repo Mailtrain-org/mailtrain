@@ -251,6 +251,37 @@
         {{/if}}
     </fieldset>
 
+    <fieldset>
+        <legend>
+            PGP Signing
+        </legend>
+
+        <p>
+            Only messages that are encrypted can be signed. Subsribers who have not set up a PGP public key in their profile receive normal email messages. Users with PGP key set receive encrypted messages and if you have signing key also set, the messages are signed
+            with this key.
+        </p>
+        <p class="text-warning">
+            Do not use sensitive keys here. The private key and passphrase are not encrypted in the database.
+        </p>
+
+        <div class="form-group">
+            <label for="pgp-passphrase" class="col-sm-2 control-label">Private Key Passphrase</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" name="pgp-passphrase" id="pgp-passphrase" placeholder="Passprase" value="{{pgpPassphrase}}">
+                <span class="help-block">Only fill this if your private key is encrypted with a passphrase</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="pgp-private-key" class="col-sm-2 control-label">PGP Private Key</label>
+            <div class="col-sm-10">
+                <textarea class="form-control gpg-text" rows="3" id="pgp-private-key" name="pgp-private-key">{{pgpPrivateKey}}</textarea>
+                <span class="help-block">This value is optional. if you do not provide a private key, then PGP encrypted messages are sent without signing.</span>
+            </div>
+        </div>
+
+    </fieldset>
+
     <hr />
 
     <div class="form-group">
