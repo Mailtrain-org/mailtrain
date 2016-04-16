@@ -234,4 +234,7 @@ let importLoop = () => {
     getNext();
 };
 
-importLoop();
+module.exports = callback => {
+    importLoop();
+    setImmediate(callback);
+};

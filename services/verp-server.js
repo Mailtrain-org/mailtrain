@@ -96,8 +96,13 @@ server.on('error', err => {
     log.error('VERP', err.stack);
 });
 
-if (config.verp.enabled) {
-    server.listen(config.verp.port, () => {
-        log.info('VERP', 'Server listening on port %s', config.verp.port);
-    });
-}
+module.exports = callback => {
+    if (config.verp.enabled) {
+        server.listen(config.verp.port, () => {
+            log.info('VERP', 'Server listening on port %s', config.verp.port);
+            setImmediate(callback);
+        });
+    } else {
+        setImmediate(callback);
+    }
+};

@@ -99,6 +99,8 @@
         {{/if}}
 
         {{#if isSending}}
+            <!-- Indicate that this page needs refreshing after 20s. -->
+            <div class="page-refresh" data-interval="20"></div>
             <div class="pull-right">
                 <form class="form-horizontal" method="post" action="/campaigns/pause">
                     <input type="hidden" name="_csrf" value="{{csrfToken}}">

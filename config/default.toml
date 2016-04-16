@@ -1,4 +1,12 @@
 
+# If you start out as a root user (eg. if you want to use ports lower than 1000)
+# then you can downgrade the user once all services are up and running
+#user="nobody"
+#group="nogroup"
+
+# Process title visible in monitorin logs and process listing
+title="mailtrain"
+
 [log]
 level="silly"
 

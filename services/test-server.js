@@ -96,8 +96,13 @@ server.on('error', err => {
     log.error('TESTSERV', err.stack);
 });
 
-if (config.testserver.enabled) {
-    server.listen(config.testserver.port, config.testserver.host, () => {
-        log.info('TESTSERV', 'Server listening on port %s', config.testserver.port);
-    });
-}
+module.exports = callback => {
+    if (config.testserver.enabled) {
+        server.listen(config.testserver.port, config.testserver.host, () => {
+            log.info('TESTSERV', 'Server listening on port %s', config.testserver.port);
+            setImmediate(callback);
+        });
+    } else {
+        setImmediate(callback);
+    }
+};

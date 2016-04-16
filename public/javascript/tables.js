@@ -102,3 +102,10 @@ $('.fm-birthday-generic.date').datepicker({
     weekStart: 1,
     autoclose: true
 });
+
+$('.page-refresh').each(function () {
+    var interval = Number($(this).data('interval')) || 60;
+    setTimeout(function () {
+        window.location.reload();
+    }, interval * 1000);
+});
