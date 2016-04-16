@@ -37,6 +37,18 @@
         </div>
     {{/if}}
 
+    {{#if columnTypeTextarea}}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="value" {{#if value.value}} checked {{/if}}> Value exists
+                    </label>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+
     {{#if columnTypeNumber}}
         <div class="form-group">
             <label for="value" class="col-sm-2 control-label">Value</label>
