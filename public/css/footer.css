@@ -31,3 +31,7 @@ div.jumbotron{
 .code-editor {
     height: 400px;
 }
+
+.gpg-text {
+    font-family: monospace;
+}
