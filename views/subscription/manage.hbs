@@ -48,8 +48,13 @@
             {{/if}}
 
             {{#if typeGpg}}
+                {{#if ../hasPubkey}}
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download signature verififcation key</button>
+                    </div>
+                {{/if}}
                 <textarea class="form-control gpg-text" rows="3" name="{{column}}">{{value}}</textarea>
-                <span class="help-block">(optional) Insert your GPG public key here to encrypt messages sent to your address</span>
+                <span class="help-block">Insert your GPG public key here to encrypt messages sent to your address <em>(optional)</em></span>
             {{/if}}
 
             {{#if typeDateUs}}
@@ -111,11 +116,6 @@
     {{/each}}
 
     <div class="form-group">
-        <div class="pull-right">
-            {{#if hasPubkey}}
-                <button type="submit" class="btn btn-default" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download our public GPG key</button>
-            {{/if}}
-        </div>
         <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update Profile</button> or <a href="/subscription/{{lcid}}/unsubscribe/{{cid}}">Unsubscribe</a>
     </div>
 </form>
