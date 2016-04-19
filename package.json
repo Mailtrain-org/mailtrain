@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "grunt",
-    "start": "node index.js"
+    "start": "node index.js",
+    "sql": "node setup/sql.js"
   },
   "repository": {
     "type": "git",
