@@ -12,6 +12,7 @@ let sender = require('./services/sender');
 let importer = require('./services/importer'); // eslint-disable-line global-require
 let verpServer = require('./services/verp-server'); // eslint-disable-line global-require
 let testServer = require('./services/test-server'); // eslint-disable-line global-require
+let settings = require('./lib/models/settings');
 
 let port = config.www.port;
 let host = config.www.host;
@@ -33,7 +34,20 @@ let server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port, host);
+settings.list(['db_schema_version'], (err, configItems) => {
+    if (err) {
+        throw err;
+    }
+    let dbSchemaVersion = Number(configItems.dbSchemaVersion) || 0;
+
+    if (dbSchemaVersion < config.mysql.schema_version) {
+        log.error('Database', 'Database schema outdated. Run `npm run sql` to upgrade');
+        return process.exit(1);
+    }
+
+    server.listen(port, host);
+
+});
 
 server.on('error', err => {
     if (err.syscall !== 'listen') {

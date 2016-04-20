@@ -34,6 +34,8 @@ database="mailtrain"
 charset="utf8mb4"
 # enter path for mysql command line application
 command="mysql"
+# required database schema version
+schema_version=1
 
 [redis]
 # enable to use Redis session cache or disable if Redis is not installed
