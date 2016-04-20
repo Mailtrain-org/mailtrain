@@ -28,7 +28,7 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
   1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` and open Mailtrain folder `cd mailtrain`
   2. Run `npm install` in the Mailtrain folder to install required dependencies
   3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL and any other settings in it
-  4. Import SQL tables by running `npm run sql` (invokes `mysql` command in the background, so you should have it installed). If MySQL configuration in config file is not correct then this command fails
+  4. Import SQL tables by running `npm run sql` (invokes `mysql` command in the background, so you should have it installed. If you can't use this command, then you can import the [database file](setup/sql/mailtrain.sql) yourself). If MySQL configuration in config file is not correct then this command fails.
   5. Run the server `NODE_ENV=production npm start`
   6. Open [http://localhost:3000/](http://localhost:3000/)
   7. Authenticate as `admin`:`test`

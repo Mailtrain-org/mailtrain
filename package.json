@@ -7,7 +7,9 @@
   "scripts": {
     "test": "grunt",
     "start": "node index.js",
-    "sql": "node setup/sql.js"
+    "sql": "node setup/sql/sql.js",
+    "sqldump": "node setup/sql/dump.js | sed -e '/^--.*$/d' > setup/sql/mailtrain.sql",
+    "sqldrop": "node setup/sql/drop.js"
   },
   "repository": {
     "type": "git",
@@ -53,7 +55,7 @@
     "openpgp": "^2.2.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
-    "request": "^2.71.0",
+    "request": "^2.72.0",
     "serve-favicon": "^2.3.0",
     "shortid": "^2.2.6",
     "slugify": "^0.1.1",

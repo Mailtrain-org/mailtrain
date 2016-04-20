@@ -1,8 +1,3 @@
--- MySQL dump 10.13  Distrib 5.7.11, for osx10.11 (x86_64)
---
--- Host: localhost    Database: mailtrain
--- ------------------------------------------------------
--- Server version	5.7.11
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -15,9 +10,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `campaign`
---
 
 DROP TABLE IF EXISTS `campaign`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -36,21 +28,15 @@ CREATE TABLE `campaign` (
   UNIQUE KEY `list` (`list`,`segment`,`subscription`),
   KEY `created` (`created`),
   KEY `response_id` (`response_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `campaign`
---
 
 LOCK TABLES `campaign` WRITE;
 /*!40000 ALTER TABLE `campaign` DISABLE KEYS */;
 /*!40000 ALTER TABLE `campaign` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `campaign_tracker`
---
 
 DROP TABLE IF EXISTS `campaign_tracker`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -63,21 +49,15 @@ CREATE TABLE `campaign_tracker` (
   `country` varchar(2) CHARACTER SET ascii DEFAULT NULL,
   `count` int(11) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`list`,`subscriber`,`link`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `campaign_tracker`
---
 
 LOCK TABLES `campaign_tracker` WRITE;
 /*!40000 ALTER TABLE `campaign_tracker` DISABLE KEYS */;
 /*!40000 ALTER TABLE `campaign_tracker` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `campaigns`
---
 
 DROP TABLE IF EXISTS `campaigns`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -111,18 +91,12 @@ CREATE TABLE `campaigns` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `campaigns`
---
 
 LOCK TABLES `campaigns` WRITE;
 /*!40000 ALTER TABLE `campaigns` DISABLE KEYS */;
 /*!40000 ALTER TABLE `campaigns` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `confirmations`
---
 
 DROP TABLE IF EXISTS `confirmations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -141,18 +115,12 @@ CREATE TABLE `confirmations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `confirmations`
---
 
 LOCK TABLES `confirmations` WRITE;
 /*!40000 ALTER TABLE `confirmations` DISABLE KEYS */;
 /*!40000 ALTER TABLE `confirmations` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `custom_fields`
---
 
 DROP TABLE IF EXISTS `custom_fields`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -172,21 +140,15 @@ CREATE TABLE `custom_fields` (
   UNIQUE KEY `list` (`list`,`column`),
   KEY `list_2` (`list`),
   CONSTRAINT `custom_fields_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `custom_fields`
---
 
 LOCK TABLES `custom_fields` WRITE;
 /*!40000 ALTER TABLE `custom_fields` DISABLE KEYS */;
 /*!40000 ALTER TABLE `custom_fields` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `importer`
---
 
 DROP TABLE IF EXISTS `importer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -207,21 +169,15 @@ CREATE TABLE `importer` (
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
   CONSTRAINT `importer_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `importer`
---
 
 LOCK TABLES `importer` WRITE;
 /*!40000 ALTER TABLE `importer` DISABLE KEYS */;
 /*!40000 ALTER TABLE `importer` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `links`
---
 
 DROP TABLE IF EXISTS `links`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -237,21 +193,15 @@ CREATE TABLE `links` (
   UNIQUE KEY `campaign_2` (`campaign`,`url`),
   KEY `campaign` (`campaign`),
   CONSTRAINT `links_ibfk_1` FOREIGN KEY (`campaign`) REFERENCES `campaigns` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `links`
---
 
 LOCK TABLES `links` WRITE;
 /*!40000 ALTER TABLE `links` DISABLE KEYS */;
 /*!40000 ALTER TABLE `links` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `lists`
---
 
 DROP TABLE IF EXISTS `lists`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -269,18 +219,12 @@ CREATE TABLE `lists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `lists`
---
 
 LOCK TABLES `lists` WRITE;
 /*!40000 ALTER TABLE `lists` DISABLE KEYS */;
 /*!40000 ALTER TABLE `lists` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `segment_rules`
---
 
 DROP TABLE IF EXISTS `segment_rules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -296,18 +240,12 @@ CREATE TABLE `segment_rules` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `segment_rules`
---
 
 LOCK TABLES `segment_rules` WRITE;
 /*!40000 ALTER TABLE `segment_rules` DISABLE KEYS */;
 /*!40000 ALTER TABLE `segment_rules` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `segments`
---
 
 DROP TABLE IF EXISTS `segments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -325,18 +263,12 @@ CREATE TABLE `segments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `segments`
---
 
 LOCK TABLES `segments` WRITE;
 /*!40000 ALTER TABLE `segments` DISABLE KEYS */;
 /*!40000 ALTER TABLE `segments` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `settings`
---
 
 DROP TABLE IF EXISTS `settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -350,9 +282,6 @@ CREATE TABLE `settings` (
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `settings`
---
 
 LOCK TABLES `settings` WRITE;
 /*!40000 ALTER TABLE `settings` DISABLE KEYS */;
@@ -360,9 +289,6 @@ INSERT INTO `settings` VALUES (1,'smtp_hostname','localhost'),(2,'smtp_port','46
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `subscription`
---
 
 DROP TABLE IF EXISTS `subscription`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -390,18 +316,12 @@ CREATE TABLE `subscription` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `subscription`
---
 
 LOCK TABLES `subscription` WRITE;
 /*!40000 ALTER TABLE `subscription` DISABLE KEYS */;
 /*!40000 ALTER TABLE `subscription` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `templates`
---
 
 DROP TABLE IF EXISTS `templates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -418,18 +338,12 @@ CREATE TABLE `templates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `templates`
---
 
 LOCK TABLES `templates` WRITE;
 /*!40000 ALTER TABLE `templates` DISABLE KEYS */;
 /*!40000 ALTER TABLE `templates` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `users`
---
 
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -450,9 +364,6 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `users`
---
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
@@ -468,5 +379,3 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2016-04-04 14:25:59

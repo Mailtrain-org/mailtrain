@@ -1,9 +1,9 @@
 'use strict';
 
 let config = require('config');
-let db = require('../lib/db');
+let db = require('../../lib/db');
 let spawn = require('child_process').spawn;
-let settings = require('../lib/models/settings');
+let settings = require('../../lib/models/settings');
 let log = require('npmlog');
 let fs = require('fs');
 let pathlib = require('path');
@@ -62,19 +62,19 @@ function getSchemaVersion(callback) {
 
 function listUpdates(current, callback) {
     current = current || 0;
-    fs.readdir(__dirname + '/sql', (err, list) => {
+    fs.readdir(__dirname, (err, list) => {
         if (err) {
             return callback(err);
         }
 
         let updates = [];
         [].concat(list || []).forEach(row => {
-            if (/^update-\d+\.sql$/i.test(row)) {
+            if (/^upgrade-\d+\.sql$/i.test(row)) {
                 let seq = row.match(/\d+/)[0];
                 if (seq > current) {
                     updates.push({
                         seq: Number(seq),
-                        path: pathlib.join(__dirname, 'sql', row)
+                        path: pathlib.join(__dirname, row)
                     });
                 }
             }
@@ -95,7 +95,7 @@ function getSql(path, data, callback) {
 }
 
 function runInitial(callback) {
-    let path = pathlib.join(__dirname, 'sql', 'mailtrain.sql');
+    let path = pathlib.join(__dirname, process.env.FROM_START ? 'base.sql' : 'mailtrain.sql');
     applyUpdate({
         path
     }, callback);
@@ -108,7 +108,7 @@ function runUpdates(callback) {
         }
 
         if (!tables.settings) {
-            log.info('Initial', 'SQL not set up, initializing');
+            log.info('sql', 'SQL not set up, initializing');
             return runInitial(callback);
         }
 
@@ -136,9 +136,9 @@ function runUpdates(callback) {
                             return callback(err);
                         }
                         if (status) {
-                            log.info('Update', 'Update %s applied', update.seq);
+                            log.info('sql', 'Update %s applied', update.seq);
                         } else {
-                            log.info('Update', 'Update %s not applied', update.seq);
+                            log.info('sql', 'Update %s not applied', update.seq);
                         }
 
                         runNext();
@@ -175,9 +175,9 @@ function applyUpdate(update, callback) {
 
 runUpdates(err => {
     if (err) {
-        log.error('RESULT', err);
+        log.error('sql', err);
         process.exit(1);
     }
-    log.info('RESULT', 'SQL Upgrade Completed');
+    log.info('sql', 'Database update completed');
     process.exit(0);
 });
