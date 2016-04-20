@@ -68,7 +68,7 @@
                 {{/if}}
 
                 {{#if typeGpg}}
-                    <textarea class="form-control gpg-text" rows="3" name="{{column}}">{{value}}</textarea>
+                    <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
                     <span class="help-block">Insert a GPG public key that will be used to encrypt messages sent this subscriber</span>
                 {{/if}}
 

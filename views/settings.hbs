@@ -37,10 +37,11 @@
         </div>
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-xs-4">
+            <div class="col-sm-offset-2 col-sm-10">
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" name="disable-wysiwyg" {{#if disableWysiwyg}} checked {{/if}}> Disable WYSIWYG editor
+                        <span class="help-block">If checked then message editor displays HTML code without the preview</span>
                     </label>
                 </div>
             </div>
@@ -253,11 +254,11 @@
 
     <fieldset>
         <legend>
-            PGP Signing
+            GPG Signing
         </legend>
 
         <p>
-            Only messages that are encrypted can be signed. Subsribers who have not set up a PGP public key in their profile receive normal email messages. Users with PGP key set receive encrypted messages and if you have signing key also set, the messages are signed
+            Only messages that are encrypted can be signed. Subsribers who have not set up a GPG public key in their profile receive normal email messages. Users with GPG key set receive encrypted messages and if you have signing key also set, the messages are signed
             with this key.
         </p>
         <p class="text-warning">
@@ -267,16 +268,16 @@
         <div class="form-group">
             <label for="pgp-passphrase" class="col-sm-2 control-label">Private Key Passphrase</label>
             <div class="col-sm-10">
-                <input type="password" class="form-control" name="pgp-passphrase" id="pgp-passphrase" placeholder="Passprase" value="{{pgpPassphrase}}">
+                <input type="password" class="form-control" name="pgp-passphrase" id="pgp-passphrase" placeholder="Passphrase for the key if set" value="{{pgpPassphrase}}">
                 <span class="help-block">Only fill this if your private key is encrypted with a passphrase</span>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="pgp-private-key" class="col-sm-2 control-label">PGP Private Key</label>
+            <label for="pgp-private-key" class="col-sm-2 control-label">GPG Private Key</label>
             <div class="col-sm-10">
-                <textarea class="form-control gpg-text" rows="3" id="pgp-private-key" name="pgp-private-key">{{pgpPrivateKey}}</textarea>
-                <span class="help-block">This value is optional. if you do not provide a private key, then PGP encrypted messages are sent without signing.</span>
+                <textarea class="form-control gpg-text" rows="3" id="pgp-private-key" name="pgp-private-key" placeholder="Begins with &#39;-----BEGIN PGP PRIVATE KEY BLOCK-----&#39;">{{pgpPrivateKey}}</textarea>
+                <span class="help-block">This value is optional. if you do not provide a private key GPG encrypted messages are sent without signing.</span>
             </div>
         </div>
 

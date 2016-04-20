@@ -53,7 +53,7 @@
                         <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download signature verififcation key</button>
                     </div>
                 {{/if}}
-                <textarea class="form-control gpg-text" rows="3" name="{{column}}">{{value}}</textarea>
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
                 <span class="help-block">Insert your GPG public key here to encrypt messages sent to your address <em>(optional)</em></span>
             {{/if}}
 
