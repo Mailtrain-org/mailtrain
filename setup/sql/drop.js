@@ -29,11 +29,15 @@ function createDump(callback) {
     });
 }
 
-createDump(err => {
-    if (err) {
-        log.error('sqldrop', err);
-        process.exit(1);
-    }
-    log.info('sqldrop', 'Command completed, all tables dropped from "%s"', config.mysql.database);
-    process.exit(0);
-});
+if (process.env.CONFIRM === 'Y') {
+    createDump(err => {
+        if (err) {
+            log.error('sqldrop', err);
+            process.exit(1);
+        }
+        log.info('sqldrop', 'Command completed, all tables dropped from "%s"', config.mysql.database);
+        process.exit(0);
+    });
+} else {
+    log.error('sqldrop', 'Run command as "CONFIRM=Y npm run sqldrop"');
+}
