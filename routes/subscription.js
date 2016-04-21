@@ -35,7 +35,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
                 return next(err);
             }
 
-            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey'], (err, configItems) => {
+            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultFrom'], (err, configItems) => {
                 if (err) {
                     return next(err);
                 }
@@ -46,6 +46,45 @@ router.get('/subscribe/:cid', (req, res, next) => {
                     homepage: configItems.defaultHomepage || configItems.serviceUrl,
                     preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid,
                     hasPubkey: !!configItems.pgpPrivateKey
+                });
+
+                fields.list(list.id, (err, fieldList) => {
+                    if (err) {
+                        return log.error('Fields', err);
+                    }
+
+                    let encryptionKeys = [];
+                    fields.getRow(fieldList, subscription).forEach(field => {
+                        if (field.type === 'gpg' && field.value) {
+                            encryptionKeys.push(field.value.trim());
+                        }
+                    });
+
+                    mailer.sendMail({
+                        from: {
+                            name: configItems.defaultFrom,
+                            address: configItems.defaultAddress
+                        },
+                        to: {
+                            name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
+                            address: subscription.email
+                        },
+                        subject: list.name + ': Subscription Confirmed',
+                        encryptionKeys
+                    }, {
+                        html: 'emails/subscription-confirmed-html.hbs',
+                        text: 'emails/subscription-confirmed-text.hbs',
+                        data: {
+                            title: list.name,
+                            contactAddress: configItems.defaultAddress,
+                            preferencesUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/manage/' + subscription.cid),
+                            unsubscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid)
+                        }
+                    }, err => {
+                        if (err) {
+                            log.error('Subscription', err.stack);
+                        }
+                    });
                 });
             });
         });
@@ -362,12 +401,56 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
 
         let email = req.body.email;
 
-        subscriptions.unsubscribe(list.id, email, req.body.campaign, err => {
+        subscriptions.unsubscribe(list.id, email, req.body.campaign, (err, subscription) => {
             if (err) {
                 req.flash('danger', err.message || err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
             res.redirect('/subscription/' + req.params.lcid + '/unsubscribe-notice');
+
+            fields.list(list.id, (err, fieldList) => {
+                if (err) {
+                    return log.error('Fields', err);
+                }
+
+                let encryptionKeys = [];
+                fields.getRow(fieldList, subscription).forEach(field => {
+                    if (field.type === 'gpg' && field.value) {
+                        encryptionKeys.push(field.value.trim());
+                    }
+                });
+
+                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl'], (err, configItems) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    mailer.sendMail({
+                        from: {
+                            name: configItems.defaultFrom,
+                            address: configItems.defaultAddress
+                        },
+                        to: {
+                            name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
+                            address: subscription.email
+                        },
+                        subject: list.name + ': Subscription Confirmed',
+                        encryptionKeys
+                    }, {
+                        html: 'emails/unsubscribe-confirmed-html.hbs',
+                        text: 'emails/unsubscribe-confirmed-text.hbs',
+                        data: {
+                            title: list.name,
+                            contactAddress: configItems.defaultAddress,
+                            subscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '?cid=' + subscription.cid)
+                        }
+                    }, err => {
+                        if (err) {
+                            log.error('Subscription', err.stack);
+                        }
+                    });
+                });
+            });
         });
     });
 });

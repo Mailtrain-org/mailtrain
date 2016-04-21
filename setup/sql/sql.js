@@ -178,6 +178,6 @@ runUpdates(err => {
         log.error('sql', err);
         process.exit(1);
     }
-    log.info('sql', 'Database update completed');
+    log.info('sql', 'Database check completed');
     process.exit(0);
 });

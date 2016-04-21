@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "grunt",
-    "start": "node index.js",
+    "start": "node setup/sql/sql.js && node index.js",
     "sql": "node setup/sql/sql.js",
     "sqldump": "node setup/sql/dump.js | sed -e '/^--.*$/d' > setup/sql/mailtrain.sql",
     "sqldrop": "node setup/sql/drop.js"
