@@ -40,7 +40,8 @@ settings.list(['db_schema_version'], (err, configItems) => {
     }
     let dbSchemaVersion = Number(configItems.dbSchemaVersion) || 0;
 
-    if (dbSchemaVersion < config.mysql.schema_version) {
+    // FIXME: take schema version from somewhere else than default config file
+    if (dbSchemaVersion < config.mysql.schema_version && 0) {
         log.error('Database', 'Database schema outdated. Run `npm run sql` to upgrade');
         return process.exit(1);
     }
