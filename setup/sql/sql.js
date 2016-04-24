@@ -1,6 +1,7 @@
 'use strict';
 
 let config = require('config');
+let mysql = require('mysql');
 let db = require('../../lib/db');
 let spawn = require('child_process').spawn;
 let settings = require('../../lib/models/settings');

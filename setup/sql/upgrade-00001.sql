@@ -16,7 +16,5 @@ CREATE TABLE `import_failed` (
 
 # Footer section
 LOCK TABLES `settings` WRITE;
-/*!40000 ALTER TABLE `settings` DISABLE KEYS */;
 INSERT INTO `settings` (`key`, `value`) VALUES('db_schema_version', @schema_version) ON DUPLICATE KEY UPDATE `value`=@schema_version;
-/*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;

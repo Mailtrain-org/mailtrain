@@ -1,19 +1,6 @@
+SET UNIQUE_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=0;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-
-DROP TABLE IF EXISTS `campaign`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `campaign` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `list` int(11) unsigned NOT NULL,
@@ -29,18 +16,7 @@ CREATE TABLE `campaign` (
   KEY `created` (`created`),
   KEY `response_id` (`response_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `campaign` WRITE;
-/*!40000 ALTER TABLE `campaign` DISABLE KEYS */;
-/*!40000 ALTER TABLE `campaign` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `campaign_tracker`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `campaign_tracker` (
   `list` int(11) unsigned NOT NULL,
   `subscriber` int(11) unsigned NOT NULL,
@@ -50,18 +26,7 @@ CREATE TABLE `campaign_tracker` (
   `count` int(11) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`list`,`subscriber`,`link`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `campaign_tracker` WRITE;
-/*!40000 ALTER TABLE `campaign_tracker` DISABLE KEYS */;
-/*!40000 ALTER TABLE `campaign_tracker` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `campaigns`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `campaigns` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -89,18 +54,7 @@ CREATE TABLE `campaigns` (
   KEY `name` (`name`(191)),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `campaigns` WRITE;
-/*!40000 ALTER TABLE `campaigns` DISABLE KEYS */;
-/*!40000 ALTER TABLE `campaigns` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `confirmations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `confirmations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -113,18 +67,7 @@ CREATE TABLE `confirmations` (
   KEY `list` (`list`),
   CONSTRAINT `confirmations_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `confirmations` WRITE;
-/*!40000 ALTER TABLE `confirmations` DISABLE KEYS */;
-/*!40000 ALTER TABLE `confirmations` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `custom_fields`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `custom_fields` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `list` int(11) unsigned NOT NULL,
@@ -141,18 +84,7 @@ CREATE TABLE `custom_fields` (
   KEY `list_2` (`list`),
   CONSTRAINT `custom_fields_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `custom_fields` WRITE;
-/*!40000 ALTER TABLE `custom_fields` DISABLE KEYS */;
-/*!40000 ALTER TABLE `custom_fields` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `importer`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `importer` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `list` int(11) unsigned NOT NULL,
@@ -170,18 +102,7 @@ CREATE TABLE `importer` (
   KEY `list` (`list`),
   CONSTRAINT `importer_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `importer` WRITE;
-/*!40000 ALTER TABLE `importer` DISABLE KEYS */;
-/*!40000 ALTER TABLE `importer` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `links`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `links` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT '',
@@ -194,18 +115,7 @@ CREATE TABLE `links` (
   KEY `campaign` (`campaign`),
   CONSTRAINT `links_ibfk_1` FOREIGN KEY (`campaign`) REFERENCES `campaigns` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `links` WRITE;
-/*!40000 ALTER TABLE `links` DISABLE KEYS */;
-/*!40000 ALTER TABLE `links` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `lists`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `lists` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -217,18 +127,7 @@ CREATE TABLE `lists` (
   UNIQUE KEY `cid` (`cid`),
   KEY `name` (`name`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `lists` WRITE;
-/*!40000 ALTER TABLE `lists` DISABLE KEYS */;
-/*!40000 ALTER TABLE `lists` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `segment_rules`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `segment_rules` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `segment` int(11) unsigned NOT NULL,
@@ -238,18 +137,7 @@ CREATE TABLE `segment_rules` (
   KEY `segment` (`segment`),
   CONSTRAINT `segment_rules_ibfk_1` FOREIGN KEY (`segment`) REFERENCES `segments` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `segment_rules` WRITE;
-/*!40000 ALTER TABLE `segment_rules` DISABLE KEYS */;
-/*!40000 ALTER TABLE `segment_rules` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `segments`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `segments` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `list` int(11) unsigned NOT NULL,
@@ -261,18 +149,7 @@ CREATE TABLE `segments` (
   KEY `name` (`name`),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `segments` WRITE;
-/*!40000 ALTER TABLE `segments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `segments` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `settings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `settings` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT '',
@@ -280,19 +157,11 @@ CREATE TABLE `settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 LOCK TABLES `settings` WRITE;
-/*!40000 ALTER TABLE `settings` DISABLE KEYS */;
 INSERT INTO `settings` VALUES (1,'smtp_hostname','localhost'),(2,'smtp_port','465'),(3,'smtp_encryption','TLS'),(4,'smtp_user','username'),(5,'smtp_pass','password'),(6,'service_url','http://localhost:3000/'),(7,'admin_email','admin@example.com'),(8,'smtp_max_connections','5'),(9,'smtp_max_messages','100'),(10,'smtp_log',''),(11,'default_sender','My Awesome Company'),(12,'default_postaddress','1234 Main Street'),(13,'default_from','My Awesome Company'),(14,'default_address','admin@example.com'),(15,'default_subject','Test message'),(16,'default_homepage','http://localhost:3000/');
-/*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
-DROP TABLE IF EXISTS `subscription`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -314,18 +183,7 @@ CREATE TABLE `subscription` (
   KEY `first_name` (`first_name`(191)),
   KEY `last_name` (`last_name`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `subscription` WRITE;
-/*!40000 ALTER TABLE `subscription` DISABLE KEYS */;
-/*!40000 ALTER TABLE `subscription` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `templates`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `templates` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
@@ -336,18 +194,7 @@ CREATE TABLE `templates` (
   PRIMARY KEY (`id`),
   KEY `name` (`name`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-
-LOCK TABLES `templates` WRITE;
-/*!40000 ALTER TABLE `templates` DISABLE KEYS */;
-/*!40000 ALTER TABLE `templates` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL DEFAULT '',
@@ -362,20 +209,10 @@ CREATE TABLE `users` (
   KEY `reset` (`reset_token`),
   KEY `check_reset` (`username`(191),`reset_token`,`reset_expire`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` VALUES (1,'admin','$2a$10$mzKU71G62evnGB2PvQA4k..Wf9jASk.c7a8zRMHh6qQVjYJ2r/g/K','admin@example.com',NULL,NULL,NOW());
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+SET UNIQUE_CHECKS=1;
+SET FOREIGN_KEY_CHECKS=1;
