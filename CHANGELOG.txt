@@ -1,0 +1,16 @@
+# Changelog
+
+## 1.2.0 2016-04-25
+
+  * Rewrite merge tags in links (allows using links like `http://example.com/?u=[FIRST_NAME]` in messages)
+  * Added view for Imports to list failed addresses
+  * Automatic SQL table creation on initial run (no need for the `mysql` command anymore)
+  * Automatic SQL table updates on startup
+  * Send welcome and unsubscribe confirmation emails for subscribers
+  * Added support for GPG encryption for outgoing messages (requires custom field "GPG Key" set up for the list)
+  * Added new SMTP option: allow self-signed certs
+  * Added new setting: Disable WYSIWG editor (allows better handling of complex HTML templates)
+  * Allow downgrading user when server started as root (user is downgraded once all ports are bound)
+  * Added Nitrous.io one-click install button for easy try-out
+  * Added Max Post Size option to allow larger payloads from bounce webhooks
+  * Added VERP support to catch bounces using built in VERP smtp-server (disabled by default)
