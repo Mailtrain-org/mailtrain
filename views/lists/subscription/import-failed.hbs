@@ -1,0 +1,44 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li class="active">Import status</li>
+</ol>
+
+<h2>{{list.name}} <small>Failed addresses</small> <a class="btn btn-default btn-xs" href="/lists/view/{{list.id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back to list</a></h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover display nowrap" width="100%">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                Address
+            </th>
+            <th>
+                Fail reason
+            </th>
+        </thead>
+        {{#if rows}}
+            <tbody>
+                {{#each rows}}
+                    <tr>
+                        <th scope="row">
+                            {{index}}
+                        </th>
+                        <td>
+                            <a href="mailto:{{email}}">{{email}}</a>
+                            </a>
+                        </td>
+                        <td>
+                            <span class="text-danger">{{reason}}</span>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        {{/if}}
+    </table>
+</div>

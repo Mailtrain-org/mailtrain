@@ -139,18 +139,38 @@ function processImport(data, callback) {
 
             tools.validateEmail(entry.email, true, err => {
                 if (err) {
-                    log.verbose('Import', 'Failed processing row %s: %s', entry.email, err.message);
-                    return setImmediate(processRows);
+                    let reason = (err.message || '').toString().trim().replace(/^[a-z]Error:\s*/i, '');
+                    log.verbose('Import', 'Failed processing row %s: %s', entry.email, reason);
+                    db.getConnection((err, connection) => {
+                        if (err) {
+                            log.error('Import', err.stack);
+                            return setImmediate(processRows);
+                        }
+
+                        let query = 'INSERT INTO import_failed (`import`, `email`, `reason`) VALUES(?,?,?)';
+                        connection.query(query, [data.id, entry.email, reason], err => {
+                            if (err) {
+                                connection.release();
+                                return setImmediate(processRows);
+                            }
+                            let query = 'UPDATE importer SET `failed`=`failed`+1 WHERE `id`=? LIMIT 1';
+                            connection.query(query, [data.id], () => {
+                                connection.release();
+                                return setImmediate(processRows);
+                            });
+                        });
+                    });
+                    return;
                 }
 
                 subscriptions.insert(listId, {
                     imported: data.id,
                     status: data.type
-                }, entry, (err, entryId) => {
+                }, entry, (err, response) => {
                     if (err) {
                         // ignore
                         log.error('Import', err.stack);
-                    } else if (entryId) {
+                    } else if (response.entryId) {
                         //log.verbose('Import', 'Inserted %s as %s', entry.email, entryId);
                     }
 
@@ -160,7 +180,15 @@ function processImport(data, callback) {
                             return setImmediate(processRows);
                         }
 
-                        let query = 'UPDATE importer SET `processed`=`processed`+1 WHERE `id`=? LIMIT 1';
+                        let query;
+                        if (response.inserted) {
+                            // this record did not exist before, count as new
+                            query = 'UPDATE importer SET `processed`=`processed`+1, `new`=`new`+1 WHERE `id`=? LIMIT 1';
+                        } else {
+                            // it's an existing record
+                            query = 'UPDATE importer SET `processed`=`processed`+1 WHERE `id`=? LIMIT 1';
+                        }
+
                         connection.query(query, [data.id], () => {
                             connection.release();
                             return setImmediate(processRows);

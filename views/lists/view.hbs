@@ -121,7 +121,13 @@
                         Type
                     </th>
                     <th>
-                        Processed
+                        Added
+                    </th>
+                    <th>
+                        Updated
+                    </th>
+                    <th>
+                        Failed
                     </th>
                     <th>
                         Status
@@ -154,7 +160,13 @@
                                     {{importType}}
                                 </td>
                                 <td>
-                                    {{processed}}
+                                    {{new}}
+                                </td>
+                                <td>
+                                    {{updated}}
+                                </td>
+                                <td>
+                                    {{#if failed}}<a href="/lists/subscription/{{../id}}/import/{{id}}/failed">{{failed}}</a>{{else}} 0 {{/if}}
                                 </td>
                                 <td class="{{#if error}}text-danger{{/if}}">
                                     {{#if error}}
@@ -175,7 +187,7 @@
                         {{/each}}
                     {{else}}
                         <tr>
-                            <td colspan="7">
+                            <td colspan="9">
                                 No data available in table
                             </td>
                         </tr>

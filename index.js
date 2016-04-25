@@ -9,9 +9,9 @@ let log = require('npmlog');
 let app = require('./app');
 let http = require('http');
 let sender = require('./services/sender');
-let importer = require('./services/importer'); // eslint-disable-line global-require
-let verpServer = require('./services/verp-server'); // eslint-disable-line global-require
-let testServer = require('./services/test-server'); // eslint-disable-line global-require
+let importer = require('./services/importer');
+let verpServer = require('./services/verp-server');
+let testServer = require('./services/test-server');
 let dbcheck = require('./lib/dbcheck');
 
 let port = config.www.port;

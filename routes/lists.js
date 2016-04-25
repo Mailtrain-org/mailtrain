@@ -232,6 +232,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                     }
                     entry.created = entry.created && entry.created.toISOString();
                     entry.finished = entry.finished && entry.finished.toISOString();
+                    entry.updated = entry.processed - entry.new;
                     return entry;
                 });
                 list.csrfToken = req.csrfToken();
@@ -314,13 +315,13 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
 });
 
 router.post('/subscription/add', passport.parseForm, passport.csrfProtection, (req, res) => {
-    subscriptions.insert(req.body.list, false, req.body, (err, entryId) => {
+    subscriptions.insert(req.body.list, false, req.body, (err, response) => {
         if (err) {
             req.flash('danger', err && err.message || err || 'Could not add subscription');
             return res.redirect('/lists/subscription/' + encodeURIComponent(req.body.list) + '/add?' + tools.queryParams(req.body));
         }
 
-        if (entryId) {
+        if (response.entryId) {
             req.flash('success', req.body.email + ' was successfully added to your list');
         } else {
             req.flash('warning', req.body.email + ' was not added to your list');
@@ -429,7 +430,7 @@ router.get('/subscription/:id/import/:importId', passport.csrfProtection, (req, 
         }
 
         subscriptions.getImport(req.params.id, req.params.importId, (err, data) => {
-            if (err || !list) {
+            if (err || !data) {
                 req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
                 return res.redirect('/lists');
             }
@@ -597,7 +598,9 @@ router.post('/subscription/import-restart', passport.parseForm, passport.csrfPro
             status: 1,
             error: null,
             finished: null,
-            processed: 0
+            processed: 0,
+            new: 0,
+            failed: 0
         }, (err, importer) => {
             if (err || !importer) {
                 req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
@@ -606,6 +609,37 @@ router.post('/subscription/import-restart', passport.parseForm, passport.csrfPro
 
             req.flash('success', 'Import restarted');
             res.redirect('/lists/view/' + list.id + '?tab=imports');
+        });
+    });
+});
+
+router.get('/subscription/:id/import/:importId/failed', (req, res) => {
+    let start = 0;
+    lists.get(req.params.id, (err, list) => {
+        if (err || !list) {
+            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            return res.redirect('/lists');
+        }
+
+        subscriptions.getImport(req.params.id, req.params.importId, (err, data) => {
+            if (err || !data) {
+                req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
+                return res.redirect('/lists');
+            }
+            subscriptions.getFailedImports(req.params.importId, (err, rows) => {
+                if (err) {
+                    req.flash('danger', err && err.message || err);
+                    return res.redirect('/lists');
+                }
+
+                data.rows = rows.map((row, i) => {
+                    row.index = start + i + 1;
+                    return row;
+                });
+                data.list = list;
+
+                res.render('lists/subscription/import-failed', data);
+            });
         });
     });
 });
