@@ -12,6 +12,7 @@ let sender = require('./services/sender');
 let importer = require('./services/importer'); // eslint-disable-line global-require
 let verpServer = require('./services/verp-server'); // eslint-disable-line global-require
 let testServer = require('./services/test-server'); // eslint-disable-line global-require
+let dbcheck = require('./lib/dbcheck');
 
 let port = config.www.port;
 let host = config.www.host;
@@ -29,11 +30,19 @@ app.set('port', port);
 
 let server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
 
-server.listen(port, host);
+// Check if database needs upgrading before starting the server
+dbcheck(err => {
+    if (err) {
+        log.error('DB', err);
+        return process.exit(1);
+    }
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+    server.listen(port, host);
+});
+
 
 server.on('error', err => {
     if (err.syscall !== 'listen') {
@@ -46,12 +55,10 @@ server.on('error', err => {
     switch (err.code) {
         case 'EACCES':
             log.error('Express', '%s requires elevated privileges', bind);
-            process.exit(1);
-            break;
+            return process.exit(1);
         case 'EADDRINUSE':
             log.error('Express', '%s is already in use', bind);
-            process.exit(1);
-            break;
+            return process.exit(1);
         default:
             throw err;
     }

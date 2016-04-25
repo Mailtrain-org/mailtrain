@@ -221,7 +221,7 @@ CREATE TABLE `users` (
   KEY `check_reset` (`username`(191),`reset_token`,`reset_expire`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `settings` WRITE;
+LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'admin','$2a$10$mzKU71G62evnGB2PvQA4k..Wf9jASk.c7a8zRMHh6qQVjYJ2r/g/K','admin@example.com',NULL,NULL,'2016-04-20 17:20:48');
 UNLOCK TABLES;
 
