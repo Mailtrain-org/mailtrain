@@ -34,7 +34,7 @@ let server = http.createServer(app);
 // Check if database needs upgrading before starting the server
 dbcheck(err => {
     if (err) {
-        log.error('DB', err);
+        log.error('DB', err.message || err);
         return process.exit(1);
     }
     /**
