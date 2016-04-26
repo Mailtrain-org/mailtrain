@@ -20,7 +20,7 @@ function findUnsent(callback) {
             return callback(err);
         }
 
-        let query = 'SELECT id, list, segment FROM campaigns WHERE status=? LIMIT 1';
+        let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) LIMIT 1';
         connection.query(query, [2], (err, rows) => {
             if (err) {
                 connection.release();

@@ -38,7 +38,11 @@ router.get('/', (req, res) => {
                         row.statusText = 'Idling';
                         break;
                     case 2:
-                        row.statusText = 'Sending';
+                        if (row.scheduled && row.scheduled > new Date()) {
+                            row.statusText = 'Scheduled';
+                        } else {
+                            row.statusText = 'Sending';
+                        }
                         break;
                     case 3:
                         row.statusText = 'Finished';
@@ -228,6 +232,8 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
             campaign.isFinished = campaign.status === 3;
             campaign.isPaused = campaign.status === 4;
 
+            campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();
+
             campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 100) : 0;
             campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
 
@@ -251,13 +257,31 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
 });
 
 router.post('/send', passport.parseForm, passport.csrfProtection, (req, res) => {
-    campaigns.send(req.body.id, (err, scheduled) => {
+    let delayHours = Math.max(Number(req.body['delay-hours']) || 0, 0);
+    let delayMinutes = Math.max(Number(req.body['delay-minutes']) || 0, 0);
+    let scheduled = new Date(Date.now() + delayHours * 3600 * 1000 + delayMinutes * 60 * 1000);
+
+    campaigns.send(req.body.id, scheduled, (err, scheduled) => {
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (scheduled) {
             req.flash('success', 'Scheduled sending');
         } else {
             req.flash('info', 'Could not schedule sending');
+        }
+
+        return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
+    });
+});
+
+router.post('/resume', passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.send(req.body.id, false, (err, scheduled) => {
+        if (err) {
+            req.flash('danger', err && err.message || err);
+        } else if (scheduled) {
+            req.flash('success', 'Sending resumed');
+        } else {
+            req.flash('info', 'Could not resume sending');
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
