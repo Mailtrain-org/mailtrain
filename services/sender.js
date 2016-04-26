@@ -228,9 +228,13 @@ function formatMessage(message, callback) {
                     };
 
                     if (!campaign.template && campaign.templateUrl) {
+                        let form = tools.getMessageLinks(configItems.serviceUrl, campaign, list, message.subscription);
+                        Object.keys(message.subscription.mergeTags).forEach(key => {
+                            form[key] = message.subscription.mergeTags[key];
+                        });
                         request.post({
                             url: campaign.templateUrl,
-                            form: message.subscription.mergeTags
+                            form
                         }, (err, httpResponse, body) => {
                             if (err) {
                                 return callback(err);
