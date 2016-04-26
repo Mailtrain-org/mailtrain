@@ -227,7 +227,7 @@ function formatMessage(message, callback) {
                         });
                     };
 
-                    if (!campaign.template && campaign.templateUrl) {
+                    if (campaign.templateUrl) {
                         let form = tools.getMessageLinks(configItems.serviceUrl, campaign, list, message.subscription);
                         Object.keys(message.subscription.mergeTags).forEach(key => {
                             form[key] = message.subscription.mergeTags[key];
