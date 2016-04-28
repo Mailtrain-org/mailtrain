@@ -106,60 +106,73 @@
                         Template Settings
                     </legend>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <a class="btn btn-default" role="button" data-toggle="collapse" href="#mergeReference" aria-expanded="false" aria-controls="mergeReference">Merge tag reference</a>
-                            <div class="collapse" id="mergeReference">
-                                <p>
-                                    Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional
-                                    text value used when <code>TAG_NAME</code> is empty.
-                                </p>
-
-                                <ul>
-                                    <li>
-                                        <code>[FIRST_NAME]</code> – first name of the subcriber
-                                    </li>
-                                    <li>
-                                        <code>[LAST_NAME]</code> – last name of the subcriber
-                                    </li>
-                                    <li>
-                                        <code>[FULL_NAME]</code> – first and last names of the subcriber joined
-                                    </li>
-                                    <li>
-                                        <code>[LINK_UNSUBSCRIBE]</code> – URL that points to the preferences page of the subscriber
-                                    </li>
-                                    <li>
-                                        <code>[LINK_PREFERENCES]</code> – URL that points to the unsubscribe page
-                                    </li>
-                                    <li>
-                                        <code>[LINK_BROWSER]</code> – URL to preview the message in a browser
-                                    </li>
-                                </ul>
-                                <p>
-                                    In addition to that any custom field can have its own merge tag.
-                                </p>
+                    {{#if templateUrl}}
+                        <div class="form-group">
+                            <label for="template-url" class="col-sm-2 control-label">Template URL</label>
+                            <div class="col-sm-10">
+                                <input type="url" class="form-control" name="template-url" id="template-url" value="{{templateUrl}}" placeholder="http://example.com/message-render.php">
+                                <span class="help-block">If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself</span>
                             </div>
                         </div>
-                    </div>
+                    {{else}}
 
-                    <div class="form-group">
-                        <label for="template-html" class="col-sm-2 control-label">Template content (HTML)</label>
-                        <div class="col-sm-10">
-                            {{#if disableWysiwyg}}
-                                <div class="code-editor" id="template-html">{{html}}</div>
-                                <input type="hidden" name="html">
-                            {{else}}
-                                <textarea class="form-control summernote" id="template-html" name="html" rows="8">{{html}}</textarea>
-                            {{/if}}
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="template-text" class="col-sm-2 control-label">Template content (plaintext)</label>
-                        <div class="col-sm-10">
-                            <textarea class="form-control" id="template-text" name="text" rows="10">{{text}}</textarea>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <a class="btn btn-default" role="button" data-toggle="collapse" href="#mergeReference" aria-expanded="false" aria-controls="mergeReference">Merge tag reference</a>
+                                <div class="collapse" id="mergeReference">
+                                    <p>
+                                        Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional
+                                        text value used when <code>TAG_NAME</code> is empty.
+                                    </p>
+
+                                    <ul>
+                                        <li>
+                                            <code>[FIRST_NAME]</code> – first name of the subcriber
+                                        </li>
+                                        <li>
+                                            <code>[LAST_NAME]</code> – last name of the subcriber
+                                        </li>
+                                        <li>
+                                            <code>[FULL_NAME]</code> – first and last names of the subcriber joined
+                                        </li>
+                                        <li>
+                                            <code>[LINK_UNSUBSCRIBE]</code> – URL that points to the preferences page of the subscriber
+                                        </li>
+                                        <li>
+                                            <code>[LINK_PREFERENCES]</code> – URL that points to the unsubscribe page
+                                        </li>
+                                        <li>
+                                            <code>[LINK_BROWSER]</code> – URL to preview the message in a browser
+                                        </li>
+                                    </ul>
+                                    <p>
+                                        In addition to that any custom field can have its own merge tag.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label for="template-html" class="col-sm-2 control-label">Template content (HTML)</label>
+                            <div class="col-sm-10">
+                                {{#if disableWysiwyg}}
+                                    <div class="code-editor" id="template-html">{{html}}</div>
+                                    <input type="hidden" name="html">
+                                {{else}}
+                                    <textarea class="form-control summernote" id="template-html" name="html" rows="8">{{html}}</textarea>
+                                {{/if}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="template-text" class="col-sm-2 control-label">Template content (plaintext)</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" id="template-text" name="text" rows="10">{{text}}</textarea>
+                            </div>
+                        </div>
+
+                    {{/if}}
                 </fieldset>
             </div>
         </div>

@@ -37,6 +37,7 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 ## Upgrade
 
   * Replace old files with new ones by running in the Mailtrain folder `git pull origin master`
+  * Run `npm install --production` in the Mailtrain folder
 
 ## Using environment variables
 
@@ -80,9 +81,9 @@ In the IDE, start Mailtrain via `Run > Start Mailtrain` and access your site via
 Mailtrain uses webhooks integration to detect bounces and spam complaints. Currently supported webhooks are:
 
   * **AWS SES** – create a SNS topic for complaints and bounces and use `http://domain/webhooks/aws` as the subscriber URL for these topics
-  * **SparkPost** – use `http://domain/webhooks/sparkpost` as the webhook URL for bounces and complaints
-  * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints
-  * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints
+  * **SparkPost** – use `http://domain/webhooks/sparkpost` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-SparkPost))
+  * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-SendGrid))
+  * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-Mailgun))
 
 Additionally Mailtrain (v1.1+) is able to use VERP-based bounce handling. This would require to have a compatible SMTP relay (the services mentioned above strip out or block VERP addresses in the SMTP envelope) and you also need to set up special MX DNS name that points to your Mailtrain installation server.
 
