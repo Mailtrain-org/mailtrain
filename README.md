@@ -15,18 +15,18 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
   * Alpha-grade software. Might or might not work as expected
   * Awful code base, needs refactoring
   * No tests
-  * No documentation
+  * Almost no documentation (there are some guides in the [Wiki](https://github.com/andris9/mailtrain/wiki))
 
 ## Requirements
 
   * Nodejs v5+
   * MySQL v5.5 or MariaDB
-  * Redis (optional, used for session storage only)
+  * Redis (optional, disabled by default, used only for session storage)
 
 ## Installation
 
-  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` and open Mailtrain folder `cd mailtrain`
-  2. Run `npm install` in the Mailtrain folder to install required dependencies
+  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  2. Run `npm install --production` in the Mailtrain folder to install required dependencies
   3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL and any other settings in it
   4. Run the server `NODE_ENV=production npm start`
   5. Open [http://localhost:3000/](http://localhost:3000/)
@@ -36,7 +36,7 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 
 ## Upgrade
 
-  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master`
+  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/andris9/mailtrain/archive/master.zip) and replace old ones with these
   * Run `npm install --production` in the Mailtrain folder
 
 ## Using environment variables
