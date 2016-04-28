@@ -25,6 +25,15 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 
 ## Installation
 
+### Automatic install (Ubuntu 14.04)
+
+You can download and run [install.sh](setup/install.sh) in your blank Ubuntu 14.04 VPS to set up
+Mailtrain and all required dependencies (including MySQL).
+
+If you are using DigitalOcean then you can copy the contents of the [installation script](setup/install.sh) to the User Data textarea field when creating a new VPS (select Ubuntu 14.04 as the droplet Distribution image). After your droplet is created it should already have Mailtrain up and running. Navigate to http://droplet-hostname-or-ip/ and authenticate as `admin`:`test`. Do not forget to replace your account email and set up SMTP settings.
+
+### Manual (any OS that supports Node.js)
+
   1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` and open Mailtrain folder `cd mailtrain`
   2. Run `npm install` in the Mailtrain folder to install required dependencies
   3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL and any other settings in it
