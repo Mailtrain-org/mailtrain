@@ -15,13 +15,13 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
   * Alpha-grade software. Might or might not work as expected
   * Awful code base, needs refactoring
   * No tests
-  * No documentation
+  * Almost no documentation (there are some guides in the [Wiki](https://github.com/andris9/mailtrain/wiki))
 
 ## Requirements
 
   * Nodejs v5+
   * MySQL v5.5 or MariaDB
-  * Redis (optional, used for session storage only)
+  * Redis (optional, disabled by default, used only for session storage)
 
 ## Installation
 
@@ -30,12 +30,12 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 You can download and run [install.sh](setup/install.sh) in your blank Ubuntu 14.04 VPS to set up
 Mailtrain and all required dependencies (including MySQL).
 
-If you are using DigitalOcean then you can copy the contents of the [installation script](setup/install.sh) to the User Data textarea field when creating a new VPS (select Ubuntu 14.04 as the droplet Distribution image). After your droplet is created it should already have Mailtrain up and running. Navigate to http://droplet-hostname-or-ip/ and authenticate as `admin`:`test`. Do not forget to replace your account email and set up SMTP settings.
+If you are using DigitalOcean then you can copy the contents of the [installation script](setup/install.sh) to the User Data textarea field when creating a new VPS (select Ubuntu 14.04 as the droplet Distribution image). After your droplet is created it should already have Mailtrain up and running. Navigate to http://droplet-hostname-or-ip/ and authenticate as `admin`:`test`. Do not forget to update your account information and set up SMTP settings.
 
 ### Manual (any OS that supports Node.js)
 
-  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` and open Mailtrain folder `cd mailtrain`
-  2. Run `npm install` in the Mailtrain folder to install required dependencies
+  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  2. Run `npm install --production` in the Mailtrain folder to install required dependencies
   3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL and any other settings in it
   4. Run the server `NODE_ENV=production npm start`
   5. Open [http://localhost:3000/](http://localhost:3000/)
@@ -45,7 +45,7 @@ If you are using DigitalOcean then you can copy the contents of the [installatio
 
 ## Upgrade
 
-  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master`
+  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/andris9/mailtrain/archive/master.zip) and replace old ones with these
   * Run `npm install --production` in the Mailtrain folder
 
 ## Using environment variables
