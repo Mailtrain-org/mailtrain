@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 2016-04-29
+
+  * Added option to use an URL as message source (when message needs to be rendered a POST request with Merge Tags as the POST body is made against that URL)
+  * Added option to schedule sending. You can set optional delay time when starting campaign sending. Once this time is reached sending starts automatically
+  * Show meaningful MySQL error when connection fails
+
 ## 1.2.0 2016-04-25
 
   * Rewrite merge tags in links (allows using links like `http://example.com/?u=[FIRST_NAME]` in messages)
