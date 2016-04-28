@@ -13,6 +13,8 @@ let settings = require('../lib/models/settings');
 let links = require('../lib/models/links');
 let shortid = require('shortid');
 let url = require('url');
+let htmlToText = require('html-to-text');
+let request = require('request');
 
 function findUnsent(callback) {
     db.getConnection((err, connection) => {
@@ -20,7 +22,7 @@ function findUnsent(callback) {
             return callback(err);
         }
 
-        let query = 'SELECT id, list, segment FROM campaigns WHERE status=? LIMIT 1';
+        let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) LIMIT 1';
         connection.query(query, [2], (err, rows) => {
             if (err) {
                 connection.release();
@@ -149,73 +151,102 @@ function formatMessage(message, callback) {
                         }
                     });
 
-                    links.updateLinks(campaign, list, message.subscription, configItems.serviceUrl, campaign.html, (err, html) => {
-                        if (err) {
-                            return callback(err);
-                        }
+                    let renderAndSend = (html, text, renderTags) => {
+                        links.updateLinks(campaign, list, message.subscription, configItems.serviceUrl, html, (err, html) => {
+                            if (err) {
+                                return callback(err);
+                            }
 
-                        // replace data: images with embedded attachments
-                        let attachments = [];
-                        html = html.replace(/(<img\b[^>]* src\s*=[\s"']*)(data:[^"'>\s]+)/gi, (match, prefix, dataUri) => {
-                            let cid = shortid.generate() + '-attachments@' + campaign.address.split('@').pop();
-                            attachments.push({
-                                path: dataUri,
-                                cid
+                            // replace data: images with embedded attachments
+                            let attachments = [];
+                            html = html.replace(/(<img\b[^>]* src\s*=[\s"']*)(data:[^"'>\s]+)/gi, (match, prefix, dataUri) => {
+                                let cid = shortid.generate() + '-attachments@' + campaign.address.split('@').pop();
+                                attachments.push({
+                                    path: dataUri,
+                                    cid
+                                });
+                                return prefix + 'cid:' + cid;
                             });
-                            return prefix + 'cid:' + cid;
-                        });
 
-                        let campaignAddress = [campaign.cid, list.cid, message.subscription.cid].join('.');
+                            let campaignAddress = [campaign.cid, list.cid, message.subscription.cid].join('.');
 
-                        return callback(null, {
-                            from: {
-                                name: campaign.from,
-                                address: campaign.address
-                            },
-                            xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
-                            to: {
-                                name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
-                                address: message.subscription.email
-                            },
-                            sender: useVerp ? campaignAddress + '@' + configItems.verpHostname : false,
+                            let renderedHtml = renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html) : html;
 
-                            envelope: useVerp ? {
-                                from: campaignAddress + '@' + configItems.verpHostname,
-                                to: message.subscription.email
-                            } : false,
+                            let renderedText = (text || '').trim() ? (renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, text) : text) : htmlToText.fromString(renderedHtml, {
+                                wordwrap: 130
+                            });
 
-                            headers: {
-                                'x-fbl': campaignAddress,
-                                // custom header for SparkPost
-                                'x-msys-api': JSON.stringify({
-                                    campaign_id: campaignAddress
-                                }),
-                                // custom header for SendGrid
-                                'x-smtpapi': JSON.stringify({
-                                    unique_args: {
+                            return callback(null, {
+                                from: {
+                                    name: campaign.from,
+                                    address: campaign.address
+                                },
+                                xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
+                                to: {
+                                    name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
+                                    address: message.subscription.email
+                                },
+                                sender: useVerp ? campaignAddress + '@' + configItems.verpHostname : false,
+
+                                envelope: useVerp ? {
+                                    from: campaignAddress + '@' + configItems.verpHostname,
+                                    to: message.subscription.email
+                                } : false,
+
+                                headers: {
+                                    'x-fbl': campaignAddress,
+                                    // custom header for SparkPost
+                                    'x-msys-api': JSON.stringify({
                                         campaign_id: campaignAddress
+                                    }),
+                                    // custom header for SendGrid
+                                    'x-smtpapi': JSON.stringify({
+                                        unique_args: {
+                                            campaign_id: campaignAddress
+                                        }
+                                    }),
+                                    // custom header for Mailgun
+                                    'x-mailgun-variables': JSON.stringify({
+                                        campaign_id: campaignAddress
+                                    }),
+                                    'List-ID': {
+                                        prepared: true,
+                                        value: '"' + list.name.replace(/[^a-z0-9\s'.,\-]/g, '').trim() + '" <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
                                     }
-                                }),
-                                // custom header for Mailgun
-                                'x-mailgun-variables': JSON.stringify({
-                                    campaign_id: campaignAddress
-                                }),
-                                'List-ID': {
-                                    prepared: true,
-                                    value: '"' + list.name.replace(/[^a-z0-9\s'.,\-]/g, '').trim() + '" <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
-                                }
-                            },
-                            list: {
-                                unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
-                            },
-                            subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
-                            html: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html),
-                            text: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.text),
+                                },
+                                list: {
+                                    unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
+                                },
+                                subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
+                                html: renderedHtml,
+                                text: renderedText,
 
-                            attachments,
-                            encryptionKeys
+                                attachments,
+                                encryptionKeys
+                            });
                         });
-                    });
+                    };
+
+                    if (campaign.templateUrl) {
+                        let form = tools.getMessageLinks(configItems.serviceUrl, campaign, list, message.subscription);
+                        Object.keys(message.subscription.mergeTags).forEach(key => {
+                            form[key] = message.subscription.mergeTags[key];
+                        });
+                        request.post({
+                            url: campaign.templateUrl,
+                            form
+                        }, (err, httpResponse, body) => {
+                            if (err) {
+                                return callback(err);
+                            }
+                            if (httpResponse.statusCode !== 200) {
+                                return callback(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.templateUrl));
+                            }
+                            renderAndSend(body && body.toString(), '', false);
+                        });
+                    } else {
+                        renderAndSend(campaign.html, campaign.text, true);
+                    }
                 });
             });
         });

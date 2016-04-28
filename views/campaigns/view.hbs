@@ -85,9 +85,27 @@
 <div class="panel panel-default">
     <div class="panel-body">
         {{#if isIdling}}
-            <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
+            <form class="form-inline confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <input type="hidden" name="id" value="{{id}}" />
+
+                <div class="pull-right">
+                    <div class="form-group">
+                        <p class="form-control-static">Delay sending</p>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="delay-hours" id="delay-hours" placeholder="0">
+                            <div class="input-group-addon"> hours</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="delay-minutes" id="delay-minutes" placeholder="0">
+                            <div class="input-group-addon"> minutes</div>
+                        </div>
+                    </div>
+                </div>
 
                 <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
                     {{#if segment}}
@@ -101,21 +119,34 @@
         {{#if isSending}}
             <!-- Indicate that this page needs refreshing after 20s. -->
             <div class="page-refresh" data-interval="20"></div>
-            <div class="pull-right">
-                <form class="form-horizontal" method="post" action="/campaigns/pause">
-                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                    <input type="hidden" name="id" value="{{id}}" />
+            {{#if isScheduled}}
+                <div class="pull-right">
+                    <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would reset scheduling" method="post" action="/campaigns/reset">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <input type="hidden" name="id" value="{{id}}" />
 
-                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
-                    </button>
-                </form>
-            </div>
-            <h4>Sending…</h4>
+                        <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</a>
+                        </button>
+                    </form>
+                </div>
+                <h4>Sending scheduled <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
+            {{else}}
+                <div class="pull-right">
+                    <form class="form-horizontal" method="post" action="/campaigns/pause">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <input type="hidden" name="id" value="{{id}}" />
+
+                        <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
+                        </button>
+                    </form>
+                </div>
+                <h4>Sending…</h4>
+            {{/if}}
         {{/if}}
 
         {{#if isPaused}}
             <div class="pull-right">
-                <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
+                <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <input type="hidden" name="id" value="{{id}}" />
 

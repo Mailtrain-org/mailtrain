@@ -7,6 +7,7 @@ let lists = require('../lib/models/lists');
 let subscriptions = require('../lib/models/subscriptions');
 let tools = require('../lib/tools');
 let express = require('express');
+let request = require('request');
 let router = new express.Router();
 
 router.get('/:campaign/:list/:subscription', (req, res, next) => {
@@ -64,21 +65,45 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                             return next(err);
                         }
 
-                        // rewrite links to count clicks
-                        links.updateLinks(campaign, list, subscription, serviceUrl, campaign.html, (err, html) => {
-                            if (err) {
-                                req.flash('danger', err.message || err);
-                                return res.redirect('/');
-                            }
+                        let renderAndShow = (html, renderTags) => {
 
-                            res.render('archive/view', {
-                                layout: 'archive/layout',
-                                message: tools.formatMessage(serviceUrl, campaign, list, subscription, html),
-                                campaign,
-                                list,
-                                subscription
+                            // rewrite links to count clicks
+                            links.updateLinks(campaign, list, subscription, serviceUrl, html, (err, html) => {
+                                if (err) {
+                                    req.flash('danger', err.message || err);
+                                    return res.redirect('/');
+                                }
+
+                                res.render('archive/view', {
+                                    layout: 'archive/layout',
+                                    message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
+                                    campaign,
+                                    list,
+                                    subscription
+                                });
                             });
-                        });
+                        };
+
+                        if (campaign.templateUrl) {
+                            let form = tools.getMessageLinks(serviceUrl, campaign, list, subscription);
+                            Object.keys(subscription.mergeTags).forEach(key => {
+                                form[key] = subscription.mergeTags[key];
+                            });
+                            request.post({
+                                url: campaign.templateUrl,
+                                form
+                            }, (err, httpResponse, body) => {
+                                if (err) {
+                                    return next(err);
+                                }
+                                if (httpResponse.statusCode !== 200) {
+                                    return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.templateUrl));
+                                }
+                                renderAndShow(body && body.toString(), false);
+                            });
+                        } else {
+                            renderAndShow(campaign.html, true);
+                        }
                     });
                 });
             });

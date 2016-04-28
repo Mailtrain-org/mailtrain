@@ -37,6 +37,7 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 ## Upgrade
 
   * Replace old files with new ones by running in the Mailtrain folder `git pull origin master`
+  * Run `npm install --production` in the Mailtrain folder
 
 ## Using environment variables
 
