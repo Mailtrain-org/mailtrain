@@ -209,7 +209,7 @@ router.post('/ajax', (req, res) => {
             recordsFiltered: filteredTotal,
             data: data.map((row, i) => [
                 (Number(req.body.start) || 0) + 1 + i,
-                htmlescape(row.name || ''),
+                '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> ' + htmlescape(row.name || ''),
                 htmlescape(striptags(row.description) || ''),
                 getStatusText(row),
                 '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>'
