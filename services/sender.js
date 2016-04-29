@@ -52,6 +52,11 @@ function findUnsent(callback) {
                 }
 
                 let tryNext = () => {
+
+                    // TODO: Add support for localized sending time. In this case campaign messages are
+                    //       not sent before receiver's local time reaches defined time
+                    // SELECT * FROM subscription__1 LEFT JOIN tzoffset ON tzoffset.tz=subscription__1.tz WHERE NOW() + INTERVAL IFNULL(`offset`,0) MINUTE >= localtime
+
                     let query = 'SELECT * FROM `subscription__' + campaign.list + '` subscription WHERE status=1 ' + (queryData.where ? ' AND (' + queryData.where + ')' : '') + ' AND NOT EXISTS (SELECT 1 FROM `campaign__' + campaign.id + '` campaign WHERE campaign.list = ? AND campaign.segment = ? AND campaign.subscription = subscription.id) LIMIT 1';
 
                     connection.query(query, queryData.values.concat([campaign.list, campaign.segment]), (err, rows) => {
