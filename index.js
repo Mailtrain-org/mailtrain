@@ -12,6 +12,7 @@ let sender = require('./services/sender');
 let importer = require('./services/importer');
 let verpServer = require('./services/verp-server');
 let testServer = require('./services/test-server');
+let tzupdate = require('./services/tzupdate');
 let dbcheck = require('./lib/dbcheck');
 
 let port = config.www.port;
@@ -72,25 +73,27 @@ server.on('listening', () => {
     // start additional services
     testServer(() => {
         verpServer(() => {
-            importer(() => {
-                sender(() => {
-                    log.info('Service', 'All services started');
-                    if (config.group) {
-                        try {
-                            process.setgid(config.group);
-                            log.info('Service', 'Changed group to "%s" (%s)', config.group, process.getgid());
-                        } catch (E) {
-                            log.info('Service', 'Failed changed group to "%s"', config.group);
+            tzupdate(() => {
+                importer(() => {
+                    sender(() => {
+                        log.info('Service', 'All services started');
+                        if (config.group) {
+                            try {
+                                process.setgid(config.group);
+                                log.info('Service', 'Changed group to "%s" (%s)', config.group, process.getgid());
+                            } catch (E) {
+                                log.info('Service', 'Failed changed group to "%s"', config.group);
+                            }
                         }
-                    }
-                    if (config.user) {
-                        try {
-                            process.setuid(config.user);
-                            log.info('Service', 'Changed user to "%s" (%s)', config.user, process.getuid());
-                        } catch (E) {
-                            log.info('Service', 'Failed changed user to "%s"', config.user);
+                        if (config.user) {
+                            try {
+                                process.setuid(config.user);
+                                log.info('Service', 'Changed user to "%s" (%s)', config.user, process.getuid());
+                            } catch (E) {
+                                log.info('Service', 'Failed changed user to "%s"', config.user);
+                            }
                         }
-                    }
+                    });
                 });
             });
         });

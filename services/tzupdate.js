@@ -4,8 +4,11 @@
 
 let moment = require('moment-timezone');
 let db = require('../lib/db');
+let lastCheck = false;
+let log = require('npmlog');
 
 function updateTimezoneOffsets(callback) {
+    log.verbose('UTC', 'Updating timezone offsets');
     db.getConnection((err, connection) => {
         if (err) {
             return callback(err);
@@ -29,4 +32,26 @@ function updateTimezoneOffsets(callback) {
     });
 }
 
-updateTimezoneOffsets(console.log);
+module.exports = callback => {
+    updateTimezoneOffsets(err => {
+        if (err) {
+            return callback(err);
+        }
+        let checkLoop = () => {
+            let curUtcDate = new Date().toISOString().split('T').shift();
+            if (curUtcDate !== lastCheck) {
+                updateTimezoneOffsets(err => {
+                    if (err) {
+                        log.error('UTC', err);
+                    }
+                    setTimeout(checkLoop, 60 * 60 * 1000);
+                });
+            } else {
+                setTimeout(checkLoop, 60 * 60 * 1000);
+            }
+            lastCheck = curUtcDate;
+        };
+        setTimeout(checkLoop, 60 * 60 * 1000);
+        callback(null, true);
+    });
+};
