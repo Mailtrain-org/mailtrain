@@ -12,7 +12,7 @@
 <hr>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,0,1,1,0">
+    <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,0,1,1,0">
         <thead>
             <th class="col-md-1">
                 #
@@ -33,37 +33,5 @@
                 &nbsp;
             </th>
         </thead>
-        {{#if rows}}
-            <tbody>
-                {{#each rows}}
-                    <tr>
-                        <th scope="row">
-                            {{index}}
-                        </th>
-                        <td>
-                            <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>
-                            <a href="/campaigns/view/{{id}}">
-                            {{name}}
-                        </a>
-                        </td>
-                        <td>
-                            <p class="text-muted">{{description}}</p>
-                        </td>
-                        <td>
-                            <p>{{statusText}}</p>
-                        </td>
-                        <td>
-                            <span class="datestring" data-date="{{created}}" title="{{created}}">{{createdTimestamp}}</span>
-                        </td>
-                        <td>
-                            <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-                            <a href="/campaigns/edit/{{id}}">
-                            Edit
-                        </a>
-                        </td>
-                    </tr>
-                {{/each}}
-            </tbody>
-        {{/if}}
     </table>
 </div>

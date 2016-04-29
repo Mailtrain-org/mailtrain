@@ -9,6 +9,7 @@ let settings = require('../lib/models/settings');
 let tools = require('../lib/tools');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
+let htmlescape = require('escape-html');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -20,43 +21,8 @@ router.all('/*', (req, res, next) => {
 });
 
 router.get('/', (req, res) => {
-    let limit = 999999999;
-    let start = 0;
-
-    campaigns.list(start, limit, (err, rows, total) => {
-        if (err) {
-            req.flash('danger', err.message || err);
-            return res.redirect('/');
-        }
-
-        res.render('campaigns/campaigns', {
-            rows: rows.map((row, i) => {
-                row.index = start + i + 1;
-                row.description = striptags(row.description);
-                switch (row.status) {
-                    case 1:
-                        row.statusText = 'Idling';
-                        break;
-                    case 2:
-                        if (row.scheduled && row.scheduled > new Date()) {
-                            row.statusText = 'Scheduled';
-                        } else {
-                            row.statusText = 'Sending';
-                        }
-                        break;
-                    case 3:
-                        row.statusText = 'Finished';
-                        break;
-                    case 4:
-                        row.statusText = 'Paused';
-                        break;
-                }
-                row.createdTimestamp = row.created.getTime();
-                row.created = row.created.toISOString();
-                return row;
-            }),
-            total
-        });
+    res.render('campaigns/campaigns', {
+        title: 'Campaigns'
     });
 });
 
@@ -208,6 +174,47 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         }
 
         return res.redirect('/campaigns');
+    });
+});
+
+router.post('/ajax', (req, res) => {
+    campaigns.filter(req.body, (err, data, total, filteredTotal) => {
+        if (err) {
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+
+        let getStatusText = data => {
+            switch (data.status) {
+                case 1:
+                    return 'Idling';
+                case 2:
+                    if (data.scheduled && data.scheduled > new Date()) {
+                        return 'Scheduled';
+                    }
+                    return 'Sending';
+                case 3:
+                    return 'Finished';
+                case 4:
+                    return 'Paused';
+            }
+            return 'Other';
+        };
+
+        res.json({
+            draw: req.body.draw,
+            recordsTotal: total,
+            recordsFiltered: filteredTotal,
+            data: data.map((row, i) => [
+                (Number(req.body.start) || 0) + 1 + i,
+                htmlescape(row.name || ''),
+                htmlescape(striptags(row.description) || ''),
+                getStatusText(row),
+                '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>'
+            ].concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/campaigns/edit/' + row.id + '">Edit</a>'))
+        });
     });
 });
 

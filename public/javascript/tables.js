@@ -29,8 +29,20 @@ $('.data-table').each(function () {
 $('.data-table-ajax').each(function () {
     var rowSort = $(this).data('rowSort') || false;
     var columns = false;
-    var listArgs = $(this).data('listArgs') || false;
-    var ajaxUrl = '/lists/ajax/' + $(this).data('listId') + (listArgs ? '?' + listArgs : '');
+
+    var topicUrl = $(this).data('topicUrl') || '/lists';
+    var topicArgs = $(this).data('topicArgs') || false;
+    var topicId = $(this).data('topicId') || '';
+
+    var sortColumn = Number($(this).data('sortColumn')) || 1;
+    var sortOrder = ($(this).data('sortOrder') || 'asc').toString().trim().toLowerCase();
+
+    // allow only asc and desc
+    if (sortOrder !== 'desc') {
+        sortOrder = 'asc';
+    }
+
+    var ajaxUrl = topicUrl + '/ajax/' + topicId + (topicArgs ? '?' + topicArgs : '');
 
     if (rowSort) {
         columns = rowSort.split(',').map(function (sort) {
@@ -48,11 +60,15 @@ $('.data-table-ajax').each(function () {
             type: 'POST'
         },
         order: [
-            [1, 'asc']
+            [sortColumn, sortOrder]
         ],
         columns: columns,
         pageLength: 50,
         processing: true
+    }).on('draw', function () {
+        $('.datestring').each(function () {
+            $(this).html(moment($(this).data('date')).fromNow());
+        });
     });
 });
 
