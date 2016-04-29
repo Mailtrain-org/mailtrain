@@ -18,6 +18,7 @@ let uploads = multer({
 });
 let csvparse = require('csv-parse');
 let fs = require('fs');
+let tzlist = require('../lib/tz').list;
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -278,6 +279,18 @@ router.get('/subscription/:id/add', passport.csrfProtection, (req, res) => {
             data.customFields = fields.getRow(fieldList, data, false, true);
             data.useEditor = true;
 
+            data.timezones = Object.keys(tzlist).map(tz => {
+                let selected = false;
+                if (tz.toLowerCase().trim() === (data.tz || 'UTC').toLowerCase().trim()) {
+                    selected = true;
+                }
+                return {
+                    key: tz,
+                    value: tzlist[tz],
+                    selected
+                };
+            });
+
             res.render('lists/subscription/add', data);
         });
     });
@@ -307,6 +320,27 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
                 subscription.customFields = fields.getRow(fieldList, subscription, false, true);
                 subscription.useEditor = true;
                 subscription.isSubscribed = subscription.status === 1;
+
+                let tzfound = false;
+                subscription.timezones = Object.keys(tzlist).map(tz => {
+                    let selected = false;
+                    if (tz.toLowerCase().trim() === (subscription.tz || '').toLowerCase().trim()) {
+                        selected = true;
+                        tzfound = true;
+                    }
+                    return {
+                        key: tz,
+                        value: tzlist[tz],
+                        selected
+                    };
+                });
+                if (!tzfound && subscription.tz) {
+                    subscription.timezones.push({
+                        key: subscription.tz,
+                        value: subscription.tz,
+                        selected: true
+                    });
+                }
 
                 res.render('lists/subscription/edit', subscription);
             });

@@ -130,6 +130,20 @@
         </div>
     {{/each}}
 
+    <div class="form-group">
+        <label for="tz" class="col-sm-2 control-label">Timezone</label>
+        <div class="col-sm-10">
+            <select name="tz" class="form-control">
+                <option value="">
+                    –– Select ––
+                </option>
+                {{#each timezones}}
+                    <option value="{{key}}" {{#if selected}} selected {{/if}}>{{value}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
     <hr />
 
     <div class="form-group">
