@@ -1,6 +1,6 @@
 /* eslint-env browser */
 /* eslint prefer-arrow-callback: 0, object-shorthand: 0, new-cap: 0, no-invalid-this: 0, no-var: 0*/
-/* globals $: false, moment: false, jstz: false */
+/* globals $: false, moment: false */
 
 'use strict';
 
@@ -126,12 +126,11 @@ $('.page-refresh').each(function () {
     }, interval * 1000);
 });
 
-if (typeof jstz !== 'undefined') {
+if (typeof moment.tz !== 'undefined') {
     (function () {
-        var tz = jstz.determine();
-        var tzname = tz && tz.name() || false;
-        if (tzname) {
-            $('.tz-detect').val(tzname);
+        var tz = moment.tz.guess();
+        if (tz) {
+            $('.tz-detect').val(tz);
         }
     })();
 }

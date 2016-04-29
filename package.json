@@ -47,6 +47,7 @@
     "html-to-text": "^2.1.0",
     "humanize": "0.0.9",
     "isemail": "^2.1.0",
+    "moment-timezone": "^0.5.3",
     "morgan": "^1.7.0",
     "multer": "^1.1.0",
     "mysql": "^2.10.2",

@@ -18,7 +18,7 @@ let uploads = multer({
 });
 let csvparse = require('csv-parse');
 let fs = require('fs');
-let tzlist = require('../lib/tz').list;
+let moment = require('moment-timezone');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -279,14 +279,14 @@ router.get('/subscription/:id/add', passport.csrfProtection, (req, res) => {
             data.customFields = fields.getRow(fieldList, data, false, true);
             data.useEditor = true;
 
-            data.timezones = Object.keys(tzlist).map(tz => {
+            data.timezones = moment.tz.names().map(tz => {
                 let selected = false;
                 if (tz.toLowerCase().trim() === (data.tz || 'UTC').toLowerCase().trim()) {
                     selected = true;
                 }
                 return {
                     key: tz,
-                    value: tzlist[tz],
+                    value: tz,
                     selected
                 };
             });
@@ -322,7 +322,7 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
                 subscription.isSubscribed = subscription.status === 1;
 
                 let tzfound = false;
-                subscription.timezones = Object.keys(tzlist).map(tz => {
+                subscription.timezones = moment.tz.names().map(tz => {
                     let selected = false;
                     if (tz.toLowerCase().trim() === (subscription.tz || '').toLowerCase().trim()) {
                         selected = true;
@@ -330,7 +330,7 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
                     }
                     return {
                         key: tz,
-                        value: tzlist[tz],
+                        value: tz,
                         selected
                     };
                 });
