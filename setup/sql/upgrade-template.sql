@@ -1,6 +1,6 @@
 # This file is a handlebars template
 # To modify several similar tables at once use (replace [] with {}):
-#   [[#each tablename]] ALTER TABLE `[[this]]` ... [[/each]]
+#   [[#each tables.tablename]] ALTER TABLE `[[this]]` ... [[/each]]
 # NB! as this is a handlebars file, then remember to escape any template sequences
 
 # Header section

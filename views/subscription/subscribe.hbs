@@ -8,6 +8,7 @@
 <form method="post" action="/subscription/{{cid}}/subscribe">
 
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
 
     <div class="form-group">
         <label for="email">Email address</label>

@@ -548,7 +548,7 @@ router.post('/subscription/import-confirm', passport.parseForm, passport.csrfPro
                     fieldList = [];
                 }
 
-                let allowedColumns = ['email', 'first_name', 'last_name'];
+                let allowedColumns = ['email', 'first_name', 'last_name', 'tz'];
                 fieldList.forEach(field => {
                     if (field.column) {
                         allowedColumns.push(field.column);

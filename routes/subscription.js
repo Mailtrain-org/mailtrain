@@ -13,6 +13,7 @@ let fields = require('../lib/models/fields');
 let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
 let openpgp = require('openpgp');
+let tzlist = require('../lib/tz').list;
 
 router.get('/subscribe/:cid', (req, res, next) => {
     subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
