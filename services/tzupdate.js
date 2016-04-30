@@ -1,11 +1,18 @@
 'use strict';
 
-// This script re-calculates timezone offsets once a day
+// This script re-calculates timezone offsets once a day.
+// We need this to be able to send messages using subscriber's local time
+// The best option would be to use built-in timezone data of MySQL but
+// the availability of timezone data is not guaranteed as it's an optional add on.
+// So instead we keep a list of timezone offsets in a table that we can use to
+// JOIN with subscription table. Subscription table includes timezone name for
+// a subscriber and tzoffset table includes offset from UTC in minutes
 
 let moment = require('moment-timezone');
 let db = require('../lib/db');
-let lastCheck = false;
 let log = require('npmlog');
+
+let lastCheck = false;
 
 function updateTimezoneOffsets(callback) {
     log.verbose('UTC', 'Updating timezone offsets');

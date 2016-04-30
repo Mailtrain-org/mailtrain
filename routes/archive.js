@@ -84,20 +84,20 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                             });
                         };
 
-                        if (campaign.templateUrl) {
+                        if (campaign.sourceUrl) {
                             let form = tools.getMessageLinks(serviceUrl, campaign, list, subscription);
                             Object.keys(subscription.mergeTags).forEach(key => {
                                 form[key] = subscription.mergeTags[key];
                             });
                             request.post({
-                                url: campaign.templateUrl,
+                                url: campaign.sourceUrl,
                                 form
                             }, (err, httpResponse, body) => {
                                 if (err) {
                                     return next(err);
                                 }
                                 if (httpResponse.statusCode !== 200) {
-                                    return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.templateUrl));
+                                    return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
                                 }
                                 renderAndShow(body && body.toString(), false);
                             });

@@ -22,8 +22,9 @@ function findUnsent(callback) {
             return callback(err);
         }
 
-        let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) LIMIT 1';
-        connection.query(query, [2], (err, rows) => {
+        // Find "normal" campaigns. Ignore RSS and drip campaigns at this point
+        let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) AND `type`=? LIMIT 1';
+        connection.query(query, [2, 1], (err, rows) => {
             if (err) {
                 connection.release();
                 return callback(err);
@@ -232,20 +233,20 @@ function formatMessage(message, callback) {
                         });
                     };
 
-                    if (campaign.templateUrl) {
+                    if (campaign.sourceUrl) {
                         let form = tools.getMessageLinks(configItems.serviceUrl, campaign, list, message.subscription);
                         Object.keys(message.subscription.mergeTags).forEach(key => {
                             form[key] = message.subscription.mergeTags[key];
                         });
                         request.post({
-                            url: campaign.templateUrl,
+                            url: campaign.sourceUrl,
                             form
                         }, (err, httpResponse, body) => {
                             if (err) {
                                 return callback(err);
                             }
                             if (httpResponse.statusCode !== 200) {
-                                return callback(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.templateUrl));
+                                return callback(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
                             }
                             renderAndSend(body && body.toString(), '', false);
                         });
