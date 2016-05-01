@@ -1,5 +1,10 @@
 'use strict';
 
+if (process.env.NODE_ENV === 'production') {
+    console.log('This script does not run in production'); // eslint-disable-line no-console
+    process.exit(1);
+}
+
 let config = require('config');
 let spawn = require('child_process').spawn;
 let log = require('npmlog');
@@ -29,15 +34,11 @@ function createDump(callback) {
     });
 }
 
-if (process.env.CONFIRM === 'Y') {
-    createDump(err => {
-        if (err) {
-            log.error('sqldrop', err);
-            process.exit(1);
-        }
-        log.info('sqldrop', 'Command completed, all tables dropped from "%s"', config.mysql.database);
-        process.exit(0);
-    });
-} else {
-    log.error('sqldrop', 'Run command as "CONFIRM=Y npm run sqldrop"');
-}
+createDump(err => {
+    if (err) {
+        log.error('sqldrop', err);
+        process.exit(1);
+    }
+    log.info('sqldrop', 'Command completed, all tables dropped from "%s"', config.mysql.database);
+    process.exit(0);
+});
