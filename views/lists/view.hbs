@@ -17,8 +17,8 @@
             <li><a href="/segments/{{id}}" role="button"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Segments</a></li>
             <li><a href="/lists/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit List</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="/lists/subscription/{{id}}/add" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add subscriber</a></li>
-            <li><a href="/lists/subscription/{{id}}/import" role="button"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import subscribers</a></li>
+            <li><a href="/lists/subscription/{{id}}/add" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add Subscriber</a></li>
+            <li><a href="/lists/subscription/{{id}}/import" role="button"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import Subscribers</a></li>
         </ul>
     </div>
 </div>
@@ -41,7 +41,7 @@
         <div class="form-group">
             <label for="exampleInputName2">Segment</label>
             <select name="segment" class="form-control">
-                <option value="0">All subscriptions</option>
+                <option value="0">All Subscriptions</option>
                 {{#if segments}}
                     <optgroup label="Segments">
                         {{#each segments}}
@@ -50,7 +50,7 @@
                     </optgroup>
                 {{/if}}
                 <optgroup label="Actions">
-                    <option value="-1">Create new segment…</option>
+                    <option value="-1">Create New Segment…</option>
                 </optgroup>
             </select>
         </div>
