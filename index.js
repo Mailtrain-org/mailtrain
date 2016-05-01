@@ -82,7 +82,7 @@ server.on('listening', () => {
                                 process.setgid(config.group);
                                 log.info('Service', 'Changed group to "%s" (%s)', config.group, process.getgid());
                             } catch (E) {
-                                log.info('Service', 'Failed changed group to "%s"', config.group);
+                                log.info('Service', 'Failed to change group to "%s" (%s)', config.group, E.message);
                             }
                         }
                         if (config.user) {
@@ -90,7 +90,7 @@ server.on('listening', () => {
                                 process.setuid(config.user);
                                 log.info('Service', 'Changed user to "%s" (%s)', config.user, process.getuid());
                             } catch (E) {
-                                log.info('Service', 'Failed changed user to "%s"', config.user);
+                                log.info('Service', 'Failed to change user to "%s" (%s)', config.user, E.message);
                             }
                         }
                     });
