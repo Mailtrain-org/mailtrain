@@ -4,7 +4,15 @@
 </ol>
 
 <div class="pull-right">
-    <a class="btn btn-primary" href="/campaigns/create" role="button"><i class="glyphicon glyphicon-plus"></i> Create Campaign</a>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Create Campaign <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="/campaigns/create"><i class="glyphicon glyphicon-plus"></i>  Normal Campaign</a></li>
+            <li><a href="/campaigns/create?type=rss"><i class="glyphicon glyphicon-signal"></i>  RSS Campaign</a></li>
+        </ul>
+    </div>
 </div>
 
 <h2>Campaigns</h2>

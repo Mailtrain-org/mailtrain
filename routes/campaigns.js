@@ -83,7 +83,15 @@ router.get('/create', passport.csrfProtection, (req, res) => {
                 data.address = data.address || configItems.defaultAddress;
                 data.subject = data.subject || configItems.defaultSubject;
 
-                res.render('campaigns/create', data);
+                let view;
+                switch (req.query.type) {
+                    case 'rss':
+                        view = 'campaigns/create-rss';
+                        break;
+                    default:
+                        view = 'campaigns/create';
+                }
+                res.render(view, data);
             });
         });
     });
@@ -96,7 +104,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
             return res.redirect('/campaigns/create?' + tools.queryParams(req.body));
         }
         req.flash('success', 'Campaign “' + req.body.name + '” created');
-        res.redirect('/campaigns/edit/' + id + '?tab=template');
+        res.redirect('/campaigns/view/' + id);
     });
 });
 
@@ -139,7 +147,17 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                 campaign.showGeneral = req.query.tab === 'general' || !req.query.tab;
                 campaign.showTemplate = req.query.tab === 'template';
 
-                res.render('campaigns/edit', campaign);
+                let view;
+                switch (campaign.type) {
+                    case 2: //rss
+                        view = 'campaigns/edit-rss';
+                        break;
+                    case 1:
+                    default:
+                        view = 'campaigns/edit';
+                }
+
+                res.render(view, campaign);
             });
         });
     });
@@ -209,7 +227,7 @@ router.post('/ajax', (req, res) => {
             recordsFiltered: filteredTotal,
             data: data.map((row, i) => [
                 (Number(req.body.start) || 0) + 1 + i,
-                '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> <a href="/campaigns/view/'+row.id+'">' + htmlescape(row.name || '') + '</a>',
+                '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> <a href="/campaigns/view/' + row.id + '">' + htmlescape(row.name || '') + '</a>',
                 htmlescape(striptags(row.description) || ''),
                 getStatusText(row),
                 '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>'
