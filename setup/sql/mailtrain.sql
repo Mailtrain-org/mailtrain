@@ -154,7 +154,7 @@ CREATE TABLE `segments` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
-  KEY `name` (`name`(191)),
+  KEY `name` (`name`),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `settings` (
@@ -233,7 +233,7 @@ CREATE TABLE `users` (
   KEY `reset` (`reset_token`),
   KEY `check_reset` (`username`(191),`reset_token`,`reset_expire`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `reset_token`, `reset_expire`, `created`) VALUES (1,'admin','$2a$10$mzKU71G62evnGB2PvQA4k..Wf9jASk.c7a8zRMHh6qQVjYJ2r/g/K','admin@example.com',NULL,NULL,'2016-05-01 17:15:46');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `reset_token`, `reset_expire`, `created`) VALUES (1,'admin','$2a$10$mzKU71G62evnGB2PvQA4k..Wf9jASk.c7a8zRMHh6qQVjYJ2r/g/K','admin@example.com',NULL,NULL,NOW());
 
 SET UNIQUE_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=1;

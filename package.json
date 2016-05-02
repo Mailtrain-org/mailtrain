@@ -8,7 +8,7 @@
     "test": "grunt",
     "start": "node index.js",
     "sqlinit": "node setup/sql/init.js",
-    "sqldump": "node setup/sql/dump.js | sed -e '/^\\/\\*.*\\*\\/;$/d' > setup/sql/mailtrain.sql",
+    "sqldump": "node setup/sql/dump.js | sed -e '/^\\/\\*.*\\*\\/;$/d' -e 's/.[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]./NOW()/g' > setup/sql/mailtrain.sql",
     "sqldrop": "node setup/sql/drop.js",
     "sqlgen": "npm run sqldrop && DB_FROM_START=Y npm run sqlinit && npm run sqldump"
   },
@@ -38,7 +38,7 @@
     "connect-redis": "^3.0.2",
     "cookie-parser": "^1.4.1",
     "csurf": "^1.8.3",
-    "csv-parse": "^1.0.4",
+    "csv-parse": "^1.1.0",
     "escape-html": "^1.0.3",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
@@ -62,7 +62,7 @@
     "serve-favicon": "^2.3.0",
     "shortid": "^2.2.6",
     "slugify": "^0.1.1",
-    "smtp-server": "^1.9.0",
+    "smtp-server": "^1.9.1",
     "striptags": "^2.1.1",
     "toml": "^2.3.0"
   }
