@@ -21,6 +21,7 @@ let routes = require('./routes/index');
 let users = require('./routes/users');
 let lists = require('./routes/lists');
 let settings = require('./routes/settings');
+let settingsModel = require('./lib/models/settings');
 let templates = require('./routes/templates');
 let campaigns = require('./routes/campaigns');
 let links = require('./routes/links');
@@ -50,7 +51,7 @@ app.disable('x-powered-by');
  * in a situation where we consume a flash messages but then comes a redirect
  * and the message is never displayed
  */
-hbs.registerHelper('flash_messages', function() { // eslint-disable-line prefer-arrow-callback
+hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer-arrow-callback
     if (typeof this.flash !== 'function') { // eslint-disable-line no-invalid-this
         return '';
     }
@@ -147,7 +148,16 @@ app.use((req, res, next) => {
 
     res.locals.menu = menu;
     tools.updateMenu(res);
-    next();
+
+    settingsModel.list(['ua_code'], (err, configItems) => {
+        if (err) {
+            return next(err);
+        }
+        Object.keys(configItems).forEach(key => {
+            res.locals[key] = configItems[key];
+        });
+        next();
+    });
 });
 
 app.use('/', routes);
