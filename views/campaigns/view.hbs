@@ -39,6 +39,11 @@
         {{/if}}
     </dd>
 
+    {{#if isRss}}
+        <dt>Feed URL</dt>
+        <dd><a href="{{sourceUrl}}">{{sourceUrl}}</a></dd>
+    {{/if}}
+
     <dt>Email "from name"</dt>
     <dd>{{from}}</dd>
 
@@ -48,136 +53,200 @@
     <dt>Email "subject line"</dt>
     <dd>{{subject}}</dd>
 
-    {{#unless isIdling}}
-        <dt>Delivered</dt>
-        <dd>{{delivered}}</dd>
+    {{#if isNormal}}
 
-        <dt>Bounced</dt>
-        <dd>{{bounced}}</dd>
+        {{#unless isIdling}}
+            <dt>Delivered</dt>
+            <dd>{{delivered}}</dd>
 
-        <dt>Complaints</dt>
-        <dd>{{complained}}</dd>
+            <dt>Bounced</dt>
+            <dd>{{bounced}}</dd>
 
-        <dt>Unsubscribed</dt>
-        <dd>{{unsubscribed}}</dd>
+            <dt>Complaints</dt>
+            <dd>{{complained}}</dd>
 
-        <dt>Opened</dt>
-        <dd>
-            <div class="progress">
-                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
-                    {{openRate}}%
+            <dt>Unsubscribed</dt>
+            <dd>{{unsubscribed}}</dd>
+
+            <dt>Opened</dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
+                        {{openRate}}%
+                    </div>
                 </div>
-            </div>
-        </dd>
+            </dd>
 
-        <dt>Clicked</dt>
-        <dd>
-            <div class="progress">
-                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
-                    {{clicksRate}}%
+            <dt>Clicked</dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
+                        {{clicksRate}}%
+                    </div>
                 </div>
-            </div>
-        </dd>
+            </dd>
 
-    {{/unless}}
+        {{/unless}}
+    {{/if}}
 </dl>
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        {{#if isIdling}}
-            <form class="form-inline confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
-                <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                <input type="hidden" name="id" value="{{id}}" />
+{{#if isNormal}}
 
-                <div class="pull-right">
-                    <div class="form-group">
-                        <p class="form-control-static">Delay sending</p>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="number" class="form-control" name="delay-hours" id="delay-hours" placeholder="0">
-                            <div class="input-group-addon"> hours</div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{#if isIdling}}
+                <form class="form-inline confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="id" value="{{id}}" />
+
+                    <div class="pull-right">
+                        <div class="form-group">
+                            <p class="form-control-static">Delay sending</p>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="delay-hours" id="delay-hours" placeholder="0">
+                                <div class="input-group-addon"> hours</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="delay-minutes" id="delay-minutes" placeholder="0">
+                                <div class="input-group-addon"> minutes</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="number" class="form-control" name="delay-minutes" id="delay-minutes" placeholder="0">
-                            <div class="input-group-addon"> minutes</div>
-                        </div>
+
+                    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
+                        {{#if segment}}
+                            {{segment.subscribers}}
+                        {{else}}
+                            {{list.subscribers}}
+                        {{/if}} subscribers</button>
+                </form>
+            {{/if}}
+
+            {{#if isSending}}
+                <!-- Indicate that this page needs refreshing after 20s. -->
+                <div class="page-refresh" data-interval="20"></div>
+                {{#if isScheduled}}
+                    <div class="pull-right">
+                        <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would reset scheduling" method="post" action="/campaigns/reset">
+                            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                            <input type="hidden" name="id" value="{{id}}" />
+
+                            <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</a>
+                            </button>
+                        </form>
                     </div>
-                </div>
+                    <h4>Sending scheduled <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
+                {{else}}
+                    <div class="pull-right">
+                        <form class="form-horizontal" method="post" action="/campaigns/pause">
+                            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                            <input type="hidden" name="id" value="{{id}}" />
 
-                <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
-                    {{#if segment}}
-                        {{segment.subscribers}}
-                    {{else}}
-                        {{list.subscribers}}
-                    {{/if}} subscribers</button>
-            </form>
-        {{/if}}
+                            <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
+                            </button>
+                        </form>
+                    </div>
+                    <h4>Sending…</h4>
+                {{/if}}
+            {{/if}}
 
-        {{#if isSending}}
-            <!-- Indicate that this page needs refreshing after 20s. -->
-            <div class="page-refresh" data-interval="20"></div>
-            {{#if isScheduled}}
+            {{#if isPaused}}
                 <div class="pull-right">
-                    <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would reset scheduling" method="post" action="/campaigns/reset">
+                    <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
                         <input type="hidden" name="id" value="{{id}}" />
 
-                        <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</a>
+                        <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume</a>
                         </button>
                     </form>
                 </div>
-                <h4>Sending scheduled <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
+                <h4>Sending paused</h4>
+            {{/if}}
+
+            {{#if isFinished}}
+                <div class="pull-right">
+                    <form id="continue-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <input type="hidden" name="id" value="{{id}}" />
+                    </form>
+
+                    <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <input type="hidden" name="id" value="{{id}}" />
+                    </form>
+
+                    <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Continue</a>
+                    </button>
+
+                    <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset</a>
+                    </button>
+
+                </div>
+                <h4>All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers</h4>
+            {{/if}}
+
+        </div>
+    </div>
+{{/if}}
+
+{{#if isRss}}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{#if isActive}}
+                <div class="pull-right">
+                    <form id="inactivate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would pause sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/inactivate">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <input type="hidden" name="id" value="{{id}}" />
+                    </form>
+
+                    <button type="submit" form="inactivate-sending" class="btn btn-warning"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
+                    </button>
+                </div>
+
+                Campaign status: <span class="label label-primary">ACTIVE</span>
             {{else}}
                 <div class="pull-right">
-                    <form class="form-horizontal" method="post" action="/campaigns/pause">
+                    <form id="activate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would start sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/activate">
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
                         <input type="hidden" name="id" value="{{id}}" />
-
-                        <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
-                        </button>
                     </form>
-                </div>
-                <h4>Sending…</h4>
-            {{/if}}
-        {{/if}}
 
-        {{#if isPaused}}
-            <div class="pull-right">
-                <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
-                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                    <input type="hidden" name="id" value="{{id}}" />
-
-                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume</a>
+                    <button type="submit" form="activate-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Activate</a>
                     </button>
-                </form>
-            </div>
-            <h4>Sending paused</h4>
-        {{/if}}
+                </div>
 
-        {{#if isFinished}}
-            <div class="pull-right">
-                <form id="continue-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
-                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                    <input type="hidden" name="id" value="{{id}}" />
-                </form>
-
-                <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
-                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                    <input type="hidden" name="id" value="{{id}}" />
-                </form>
-
-                <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Continue</a>
-                </button>
-
-                <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset</a>
-                </button>
-
-            </div>
-            <h4>All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers</h4>
-        {{/if}}
-
+                Campaign status: <span class="label label-default">INACTIVE</span>
+            {{/if}}
+        </div>
     </div>
-</div>
+
+    <div class="table-responsive">
+        <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" data-topic-args="parent={{id}}" width="100%" data-row-sort="0,1,0,1,1,0">
+            <thead>
+                <th class="col-md-1">
+                    #
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Created
+                </th>
+                <th class="col-md-1">
+                    &nbsp;
+                </th>
+            </thead>
+        </table>
+    </div>
+{{/if}}

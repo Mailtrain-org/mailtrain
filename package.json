@@ -48,6 +48,7 @@
     "hbs": "^4.0.0",
     "html-to-text": "^2.1.0",
     "humanize": "0.0.9",
+    "is-url": "^1.2.1",
     "isemail": "^2.1.0",
     "moment-timezone": "^0.5.3",
     "morgan": "^1.7.0",

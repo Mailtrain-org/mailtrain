@@ -32,7 +32,7 @@ user="mailtrain"
 password="mailtrain"
 database="mailtrain"
 charset="utf8mb4"
-timezone="UTC"
+timezone="local"
 
 [redis]
 # enable to use Redis session cache or disable if Redis is not installed

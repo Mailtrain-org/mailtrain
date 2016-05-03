@@ -196,7 +196,7 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
 });
 
 router.post('/ajax', (req, res) => {
-    campaigns.filter(req.body, (err, data, total, filteredTotal) => {
+    campaigns.filter(req.body, Number(req.query.parent) || false, (err, data, total, filteredTotal) => {
         if (err) {
             return res.json({
                 error: err.message || err,
@@ -217,6 +217,10 @@ router.post('/ajax', (req, res) => {
                     return 'Finished';
                 case 4:
                     return 'Paused';
+                case 5:
+                    return 'Inactive';
+                case 6:
+                    return 'Active';
             }
             return 'Other';
         };
@@ -256,6 +260,11 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
             campaign.isSending = campaign.status === 2;
             campaign.isFinished = campaign.status === 3;
             campaign.isPaused = campaign.status === 4;
+            campaign.isInactive = campaign.status === 5;
+            campaign.isActive = campaign.status === 6;
+
+            campaign.isNormal = campaign.type === 1;
+            campaign.isRss = campaign.type === 2;
 
             campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();
 
@@ -329,6 +338,34 @@ router.post('/reset', passport.parseForm, passport.csrfProtection, (req, res) =>
 
 router.post('/pause', passport.parseForm, passport.csrfProtection, (req, res) => {
     campaigns.pause(req.body.id, (err, reset) => {
+        if (err) {
+            req.flash('danger', err && err.message || err);
+        } else if (reset) {
+            req.flash('success', 'Sending paused');
+        } else {
+            req.flash('info', 'Could not pause sending');
+        }
+
+        return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
+    });
+});
+
+router.post('/activate', passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.activate(req.body.id, (err, reset) => {
+        if (err) {
+            req.flash('danger', err && err.message || err);
+        } else if (reset) {
+            req.flash('success', 'Sending activated');
+        } else {
+            req.flash('info', 'Could not activate sending');
+        }
+
+        return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
+    });
+});
+
+router.post('/inactivate', passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.inactivate(req.body.id, (err, reset) => {
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (reset) {
