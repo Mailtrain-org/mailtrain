@@ -98,7 +98,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 });
 
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
-    campaigns.create(req.body, (err, id) => {
+    campaigns.create(req.body, false, (err, id) => {
         if (err || !id) {
             req.flash('danger', err && err.message || err || 'Could not create campaign');
             return res.redirect('/campaigns/create?' + tools.queryParams(req.body));
@@ -263,7 +263,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
             campaign.isInactive = campaign.status === 5;
             campaign.isActive = campaign.status === 6;
 
-            campaign.isNormal = campaign.type === 1;
+            campaign.isNormal = campaign.type === 1 || campaign.type === 3;
             campaign.isRss = campaign.type === 2;
 
             campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();

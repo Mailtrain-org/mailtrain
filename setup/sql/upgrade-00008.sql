@@ -17,6 +17,8 @@ CREATE TABLE `rss` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ALTER TABLE `campaigns` ADD COLUMN `parent` int(11) unsigned DEFAULT NULL AFTER `type`;
 CREATE INDEX parent_index ON `campaigns` (`parent`);
+ALTER TABLE `campaigns` ADD COLUMN `last_check` timestamp NULL DEFAULT NULL AFTER `source_url`;
+CREATE INDEX check_index ON `campaigns` (`last_check`);
 
 # Footer section
 LOCK TABLES `settings` WRITE;

@@ -23,8 +23,8 @@ function findUnsent(callback) {
         }
 
         // Find "normal" campaigns. Ignore RSS and drip campaigns at this point
-        let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) AND `type`=? LIMIT 1';
-        connection.query(query, [2, 1], (err, rows) => {
+        let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) AND `type` IN (?, ?) LIMIT 1';
+        connection.query(query, [2, 1, 3], (err, rows) => {
             if (err) {
                 connection.release();
                 return callback(err);
