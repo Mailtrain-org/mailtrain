@@ -7,7 +7,7 @@ CREATE TABLE `rss` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent` int(11) unsigned NOT NULL,
   `guid` varchar(255) NOT NULL DEFAULT '',
-  `pubdate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `pubdate` timestamp NULL DEFAULT NULL,
   `campaign` int(11) unsigned DEFAULT NULL,
   `found` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -19,6 +19,7 @@ ALTER TABLE `campaigns` ADD COLUMN `parent` int(11) unsigned DEFAULT NULL AFTER 
 CREATE INDEX parent_index ON `campaigns` (`parent`);
 ALTER TABLE `campaigns` ADD COLUMN `last_check` timestamp NULL DEFAULT NULL AFTER `source_url`;
 CREATE INDEX check_index ON `campaigns` (`last_check`);
+ALTER TABLE `campaigns` ADD COLUMN `html_prepared` text AFTER `html`;
 
 # Footer section
 LOCK TABLES `settings` WRITE;

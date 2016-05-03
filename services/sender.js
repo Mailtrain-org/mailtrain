@@ -251,7 +251,7 @@ function formatMessage(message, callback) {
                             renderAndSend(body && body.toString(), '', false);
                         });
                     } else {
-                        renderAndSend(campaign.html, campaign.text, true);
+                        renderAndSend(campaign.htmlPrepared || campaign.html, campaign.text, true);
                     }
                 });
             });

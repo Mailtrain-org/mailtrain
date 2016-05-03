@@ -29,12 +29,14 @@ CREATE TABLE `campaigns` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
   `type` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `parent` int(11) unsigned DEFAULT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `description` text,
   `list` int(11) unsigned NOT NULL,
   `segment` int(11) unsigned DEFAULT NULL,
   `template` int(11) unsigned NOT NULL,
   `source_url` varchar(255) CHARACTER SET ascii DEFAULT NULL,
+  `last_check` timestamp NULL DEFAULT NULL,
   `from` varchar(255) DEFAULT '',
   `address` varchar(255) DEFAULT '',
   `subject` varchar(255) DEFAULT '',
@@ -55,7 +57,9 @@ CREATE TABLE `campaigns` (
   KEY `name` (`name`(191)),
   KEY `status` (`status`),
   KEY `schedule_index` (`scheduled`),
-  KEY `type_index` (`type`)
+  KEY `type_index` (`type`),
+  KEY `parent_index` (`parent`),
+  KEY `check_index` (`last_check`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `confirmations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -137,6 +141,18 @@ CREATE TABLE `lists` (
   UNIQUE KEY `cid` (`cid`),
   KEY `name` (`name`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `rss` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parent` int(11) unsigned NOT NULL,
+  `guid` varchar(255) NOT NULL DEFAULT '',
+  `pubdate` timestamp NULL DEFAULT NULL,
+  `campaign` int(11) unsigned DEFAULT NULL,
+  `found` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `parent_2` (`parent`,`guid`),
+  KEY `parent` (`parent`),
+  CONSTRAINT `rss_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `campaigns` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `segment_rules` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `segment` int(11) unsigned NOT NULL,
@@ -163,7 +179,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -180,7 +196,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','7');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','8');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
