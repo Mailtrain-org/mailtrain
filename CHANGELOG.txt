@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 2016-05-04
+
+  * Added support for RSS campaigns
+  * Subscribers get timezone attached to their profile
+  * Outgoing messages are preprocessed using juice
+  * Added installation script for easier setup
+
 ## 1.3.0 2016-04-29
 
   * Added option to use an URL as message source (when message needs to be rendered a POST request with Merge Tags as the POST body is made against that URL)
