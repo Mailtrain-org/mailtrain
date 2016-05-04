@@ -98,22 +98,19 @@ body {
 
 </style>
 </head>
-
 <body>
 
     <div class="container">
+        <h1>{{title}}</h1>
+        <p class="lead">Please Confirm Subscription</p>
 
-            <h1>{{title}}</h1>
-            <p class="lead">Please Confirm Subscription</p>
+        <p><a href="{{confirmUrl}}" class="btn btn-primary btn-lg">Yes, subscribe me to this list</a></p>
 
-            <p><a href="{{confirmUrl}}" class="btn btn-primary btn-lg">Yes, subscribe me to this list</a></p>
+        <p>If you received this email by mistake, simply delete it. You won't be subscribed if you don't click the confirmation link above.</p>
 
-            <p>If you received this email by mistake, simply delete it. You won't be subscribed if you don't click the confirmation link above.</p>
+        <p>For questions about this list, please contact:
+            <br/>{{contactAddress}}</p>
 
-            <p>For questions about this list, please contact:
-                <br/>{{contactAddress}}</p>
-
-        </div>
     </div>
 </body>
 

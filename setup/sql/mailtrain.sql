@@ -37,10 +37,12 @@ CREATE TABLE `campaigns` (
   `template` int(11) unsigned NOT NULL,
   `source_url` varchar(255) CHARACTER SET ascii DEFAULT NULL,
   `last_check` timestamp NULL DEFAULT NULL,
+  `check_status` varchar(255) DEFAULT NULL,
   `from` varchar(255) DEFAULT '',
   `address` varchar(255) DEFAULT '',
   `subject` varchar(255) DEFAULT '',
   `html` text,
+  `html_prepared` text,
   `text` text,
   `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
   `scheduled` timestamp NULL DEFAULT NULL,
@@ -170,7 +172,7 @@ CREATE TABLE `segments` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
-  KEY `name` (`name`),
+  KEY `name` (`name`(191)),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `settings` (
