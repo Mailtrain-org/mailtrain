@@ -15,7 +15,7 @@ function feedLoop() {
             return setTimeout(feedLoop, 15 * 1000);
         }
 
-        let query = 'SELECT `id`, `source_url`, `from`, `address`, `subject`, `list`, `segment` FROM `campaigns` WHERE `type`=2 AND `status`=6 AND (`last_check` IS NULL OR `last_check`< NOW() - INTERVAL 10 MINUTE) LIMIT 1';
+        let query = 'SELECT `id`, `source_url`, `from`, `address`, `subject`, `list`, `segment`, `html` FROM `campaigns` WHERE `type`=2 AND `status`=6 AND (`last_check` IS NULL OR `last_check`< NOW() - INTERVAL 10 MINUTE) LIMIT 1';
 
         connection.query(query, (err, rows) => {
             connection.release();
@@ -125,6 +125,13 @@ function checkEntries(parent, entries, callback) {
                 }
 
                 let entryId = result.insertId;
+                let html = (parent.html || '').toString().trim();
+
+                if (/\[RSS_ENTRY\]/i.test(html)) {
+                    html = html.replace(/\[RSS_ENTRY\]/, entry.content);
+                } else {
+                    html = entry.content + html;
+                }
 
                 let campaign = {
                     type: 'entry',
@@ -134,7 +141,7 @@ function checkEntries(parent, entries, callback) {
                     subject: entry.title || parent.subject,
                     list: parent.list,
                     segment: parent.segment,
-                    html: entry.content
+                    html
                 };
 
                 campaigns.create(campaign, {

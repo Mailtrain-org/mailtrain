@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1 2016-05-04
+
+  * Added support for RSS templates
+
 ## 1.4.0 2016-05-04
 
   * Added support for RSS campaigns
