@@ -236,7 +236,6 @@ router.get('/:list/rules/:segment/create', passport.csrfProtection, (req, res) =
 
             segment.csrfToken = req.csrfToken();
 
-            console.log(segment);
             segment.list = list;
 
             res.render('lists/segments/rule-create', segment);

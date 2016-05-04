@@ -42,6 +42,16 @@
     {{#if isRss}}
         <dt>Feed URL</dt>
         <dd><a href="{{sourceUrl}}">{{sourceUrl}}</a></dd>
+        <dt>Last check</dt>
+        <dd>
+            {{#if lastCheck}}<span class="datestring" data-date="{{lastCheck}}" title="{{lastCheck}}">{{lastCheck}}</span>{{else}}
+                Not yet checked{{/if}}
+            {{#unless isActive}}<span class="text-muted">(feed is only checked if RSS campaign is active)</span>{{/unless}}
+        </dd>
+        {{#if checkStatus}}
+            <dt>RSS status</dt>
+            <dd>{{checkStatus}}</dd>
+        {{/if}}
     {{/if}}
 
     <dt>Email "from name"</dt>

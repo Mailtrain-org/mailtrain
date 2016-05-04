@@ -152,8 +152,6 @@ router.post('/sparkpost', (req, res, next) => {
 });
 
 router.post('/sendgrid', (req, res, next) => {
-    console.log(require('util').inspect(req.body, false, 22)); // eslint-disable-line
-
     let events = [].concat(req.body || []);
     let pos = 0;
 

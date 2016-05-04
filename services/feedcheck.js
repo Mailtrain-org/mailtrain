@@ -46,7 +46,7 @@ function feedLoop() {
                             message = 'Feed error: ' + err.message;
                         } else if (result) {
                             log.verbose('Feed', 'Added %s new campaigns for %s', result, parent.id);
-                            message = 'Found ' + result + ' new campaing messages from feed';
+                            message = 'Found ' + result + ' new campaign messages from feed';
                         } else {
                             message = 'Found nothing new from the feed';
                         }
