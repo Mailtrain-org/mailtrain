@@ -14,7 +14,7 @@
     <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
 
     <div class="form-group">
-        <label for="email">Email address</label>
+        <label for="email">Email Address</label>
         <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" readonly>
     </div>
 
@@ -51,7 +51,7 @@
             {{#if typeGpg}}
                 {{#if ../hasPubkey}}
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download signature verififcation key</button>
+                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download signature verification key</button>
                     </div>
                 {{/if}}
                 <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
