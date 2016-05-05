@@ -312,6 +312,27 @@
                             </tr>
                         {{/if}}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>
+                                All links
+                            </th>
+                            <th>
+                                {{clicks}}
+                            </th>
+                            <th>
+                                {{#if clicks}}
+                                    100
+                                {{else}}
+                                    0
+                                {{/if}}
+                            </th>
+                            <th>
+                                {{clicksRate}}
+                            </th>
+                        </tr>
+                    </tfoot>
                 </table>
 
 
