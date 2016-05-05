@@ -1,6 +1,9 @@
 <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/campaigns">Campaigns</a></li>
+    {{#if parent}}
+        <li><a href="/campaigns/view/{{parent.id}}">{{parent.name}}</a></li>
+    {{/if}}
     <li class="active">{{name}}</li>
 </ol>
 
@@ -16,250 +19,320 @@
     <div class="well well-sm">{{{description}}}</div>
 {{/if}}
 
-<dl class="dl-horizontal">
-    <dt>List</dt>
-    <dd>
-        {{#if segment}}
-            <a href="/lists/view/{{list.id}}?segment={{segment.id}}">
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="{{#if showOverview}}active{{/if}}"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">Overview</a></li>
+    {{#if links}}
+        <li role="presentation" class="{{#if showLinks}}active{{/if}}"><a href="#links" aria-controls="links" role="tab" data-toggle="tab">Links</a></li>
+    {{/if}}
+</ul>
+
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane {{#if showOverview}}active{{/if}}" id="overview">
+
+        <p></p>
+
+        <dl class="dl-horizontal">
+            <dt>List</dt>
+            <dd>
+                {{#if segment}}
+                    <a href="/lists/view/{{list.id}}?segment={{segment.id}}">
                 {{list.name}}: {{segment.name}}
             </a>
-        {{else}}
-            <a href="/lists/view/{{list.id}}">
+                {{else}}
+                    <a href="/lists/view/{{list.id}}">
                 {{list.name}}
             </a>
-        {{/if}}
-    </dd>
-
-    <dt>List subscribers</dt>
-    <dd>
-        {{#if segment}}
-            {{segment.subscribers}}
-        {{else}}
-            {{list.subscribers}}
-        {{/if}}
-    </dd>
-
-    {{#if isRss}}
-        <dt>Feed URL</dt>
-        <dd><a href="{{sourceUrl}}">{{sourceUrl}}</a></dd>
-        <dt>Last check</dt>
-        <dd>
-            {{#if lastCheck}}<span class="datestring" data-date="{{lastCheck}}" title="{{lastCheck}}">{{lastCheck}}</span>{{else}}
-                Not yet checked{{/if}}
-            {{#unless isActive}}<span class="text-muted">(feed is only checked if RSS campaign is active)</span>{{/unless}}
-        </dd>
-        {{#if checkStatus}}
-            <dt>RSS status</dt>
-            <dd>{{checkStatus}}</dd>
-        {{/if}}
-    {{/if}}
-
-    <dt>Email "from name"</dt>
-    <dd>{{from}}</dd>
-
-    <dt>Email "from" address</dt>
-    <dd>{{address}}</dd>
-
-    <dt>Email "subject line"</dt>
-    <dd>{{subject}}</dd>
-
-    {{#if isNormal}}
-
-        {{#unless isIdling}}
-            <dt>Delivered</dt>
-            <dd>{{delivered}}</dd>
-
-            <dt>Bounced</dt>
-            <dd>{{bounced}}</dd>
-
-            <dt>Complaints</dt>
-            <dd>{{complained}}</dd>
-
-            <dt>Unsubscribed</dt>
-            <dd>{{unsubscribed}}</dd>
-
-            <dt>Opened</dt>
-            <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
-                        {{openRate}}%
-                    </div>
-                </div>
+                {{/if}}
             </dd>
 
-            <dt>Clicked</dt>
+            <dt>List subscribers</dt>
             <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
-                        {{clicksRate}}%
-                    </div>
-                </div>
-            </dd>
-
-        {{/unless}}
-    {{/if}}
-</dl>
-
-{{#if isNormal}}
-
-    <div class="panel panel-default">
-        <div class="panel-body">
-            {{#if isIdling}}
-                <form class="form-inline confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
-                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                    <input type="hidden" name="id" value="{{id}}" />
-
-                    <div class="pull-right">
-                        <div class="form-group">
-                            <p class="form-control-static">Delay sending</p>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <input type="number" class="form-control" name="delay-hours" id="delay-hours" placeholder="0">
-                                <div class="input-group-addon"> hours</div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <input type="number" class="form-control" name="delay-minutes" id="delay-minutes" placeholder="0">
-                                <div class="input-group-addon"> minutes</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
-                        {{#if segment}}
-                            {{segment.subscribers}}
-                        {{else}}
-                            {{list.subscribers}}
-                        {{/if}} subscribers</button>
-                </form>
-            {{/if}}
-
-            {{#if isSending}}
-                <!-- Indicate that this page needs refreshing after 20s. -->
-                <div class="page-refresh" data-interval="20"></div>
-                {{#if isScheduled}}
-                    <div class="pull-right">
-                        <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would reset scheduling" method="post" action="/campaigns/reset">
-                            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                            <input type="hidden" name="id" value="{{id}}" />
-
-                            <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</a>
-                            </button>
-                        </form>
-                    </div>
-                    <h4>Sending scheduled <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
+                {{#if segment}}
+                    {{segment.subscribers}}
                 {{else}}
-                    <div class="pull-right">
-                        <form class="form-horizontal" method="post" action="/campaigns/pause">
-                            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                            <input type="hidden" name="id" value="{{id}}" />
+                    {{list.subscribers}}
+                {{/if}}
+            </dd>
 
-                            <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
-                            </button>
-                        </form>
-                    </div>
-                    <h4>Sending…</h4>
+            {{#if isRss}}
+                <dt>Feed URL</dt>
+                <dd><a href="{{sourceUrl}}">{{sourceUrl}}</a></dd>
+                <dt>Last check</dt>
+                <dd>
+                    {{#if lastCheck}}<span class="datestring" data-date="{{lastCheck}}" title="{{lastCheck}}">{{lastCheck}}</span>{{else}}
+                        Not yet checked{{/if}}
+                    {{#unless isActive}}<span class="text-muted">(activate campaign to start checking feed for new messages)</span>{{/unless}}
+                </dd>
+                {{#if checkStatus}}
+                    <dt>RSS status</dt>
+                    <dd>{{checkStatus}}</dd>
                 {{/if}}
             {{/if}}
 
-            {{#if isPaused}}
-                <div class="pull-right">
-                    <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                        <input type="hidden" name="id" value="{{id}}" />
-
-                        <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume</a>
-                        </button>
-                    </form>
-                </div>
-                <h4>Sending paused</h4>
+            {{#if from}}
+                <dt>Email "from name"</dt>
+                <dd>{{from}}</dd>
             {{/if}}
 
-            {{#if isFinished}}
-                <div class="pull-right">
-                    <form id="continue-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                        <input type="hidden" name="id" value="{{id}}" />
-                    </form>
-
-                    <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                        <input type="hidden" name="id" value="{{id}}" />
-                    </form>
-
-                    <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Continue</a>
-                    </button>
-
-                    <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset</a>
-                    </button>
-
-                </div>
-                <h4>All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers</h4>
+            {{#if address}}
+                <dt>Email "from" address</dt>
+                <dd>{{address}}</dd>
             {{/if}}
 
-        </div>
-    </div>
-{{/if}}
-
-{{#if isRss}}
-
-    <div class="panel panel-default">
-        <div class="panel-body">
-            {{#if isActive}}
-                <div class="pull-right">
-                    <form id="inactivate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would pause sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/inactivate">
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                        <input type="hidden" name="id" value="{{id}}" />
-                    </form>
-
-                    <button type="submit" form="inactivate-sending" class="btn btn-warning"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
-                    </button>
-                </div>
-
-                Campaign status: <span class="label label-primary">ACTIVE</span>
-            {{else}}
-                <div class="pull-right">
-                    <form id="activate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would start sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/activate">
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                        <input type="hidden" name="id" value="{{id}}" />
-                    </form>
-
-                    <button type="submit" form="activate-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Activate</a>
-                    </button>
-                </div>
-
-                Campaign status: <span class="label label-default">INACTIVE</span>
+            {{#if subject}}
+                <dt>Email "subject line"</dt>
+                <dd>{{subject}}</dd>
             {{/if}}
-        </div>
-    </div>
 
-    <div class="table-responsive">
-        <div class="well text-info">
-            If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here
-        </div>
-        <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" data-topic-args="parent={{id}}" width="100%" data-row-sort="0,1,0,1,1,0">
-            <thead>
-                <th class="col-md-1">
-                    #
-                </th>
-                <th>
-                    Name
-                </th>
-                <th>
-                    Description
-                </th>
-                <th>
-                    Status
-                </th>
-                <th>
-                    Created
-                </th>
-                <th class="col-md-1">
-                    &nbsp;
-                </th>
-            </thead>
-        </table>
+            {{#if isNormal}}
+
+                {{#unless isIdling}}
+                    <dt>Delivered</dt>
+                    <dd>{{delivered}}</dd>
+
+                    <dt>Bounced</dt>
+                    <dd>{{bounced}}</dd>
+
+                    <dt>Complaints</dt>
+                    <dd>{{complained}}</dd>
+
+                    <dt>Unsubscribed</dt>
+                    <dd>{{unsubscribed}}</dd>
+
+                    <dt>Opened</dt>
+                    <dd>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
+                                {{openRate}}%
+                            </div>
+                        </div>
+                    </dd>
+
+                    <dt>Clicked</dt>
+                    <dd>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
+                                {{clicksRate}}%
+                            </div>
+                        </div>
+                    </dd>
+
+                {{/unless}}
+            {{/if}}
+        </dl>
+
+        {{#if isNormal}}
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {{#if isIdling}}
+                        <form class="form-inline confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
+                            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                            <input type="hidden" name="id" value="{{id}}" />
+
+                            <div class="pull-right">
+                                <div class="form-group">
+                                    <p class="form-control-static">Delay sending</p>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="delay-hours" id="delay-hours" placeholder="0">
+                                        <div class="input-group-addon"> hours</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="delay-minutes" id="delay-minutes" placeholder="0">
+                                        <div class="input-group-addon"> minutes</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
+                                {{#if segment}}
+                                    {{segment.subscribers}}
+                                {{else}}
+                                    {{list.subscribers}}
+                                {{/if}} subscribers</button>
+                        </form>
+                    {{/if}}
+
+                    {{#if isSending}}
+                        <!-- Indicate that this page needs refreshing after 20s. -->
+                        <div class="page-refresh" data-interval="20"></div>
+                        {{#if isScheduled}}
+                            <div class="pull-right">
+                                <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would reset scheduling" method="post" action="/campaigns/reset">
+                                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                    <input type="hidden" name="id" value="{{id}}" />
+
+                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</a>
+                                    </button>
+                                </form>
+                            </div>
+                            <h4>Sending scheduled <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
+                        {{else}}
+                            <div class="pull-right">
+                                <form class="form-horizontal" method="post" action="/campaigns/pause">
+                                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                    <input type="hidden" name="id" value="{{id}}" />
+
+                                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
+                                    </button>
+                                </form>
+                            </div>
+                            <h4>Sending…</h4>
+                        {{/if}}
+                    {{/if}}
+
+                    {{#if isPaused}}
+                        <div class="pull-right">
+                            <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                <input type="hidden" name="id" value="{{id}}" />
+
+                                <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume</a>
+                                </button>
+                            </form>
+                        </div>
+                        <h4>Sending paused</h4>
+                    {{/if}}
+
+                    {{#if isFinished}}
+                        <div class="pull-right">
+                            <form id="continue-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                <input type="hidden" name="id" value="{{id}}" />
+                            </form>
+
+                            <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                <input type="hidden" name="id" value="{{id}}" />
+                            </form>
+
+                            <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Continue</a>
+                            </button>
+
+                            <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset</a>
+                            </button>
+
+                        </div>
+                        <h4>All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers</h4>
+                    {{/if}}
+
+                </div>
+            </div>
+        {{/if}}
+
+        {{#if isRss}}
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {{#if isActive}}
+                        <div class="pull-right">
+                            <form id="inactivate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would pause sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/inactivate">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                <input type="hidden" name="id" value="{{id}}" />
+                            </form>
+
+                            <button type="submit" form="inactivate-sending" class="btn btn-warning"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause</a>
+                            </button>
+                        </div>
+
+                        Campaign status: <span class="label label-primary">ACTIVE</span>
+                    {{else}}
+                        <div class="pull-right">
+                            <form id="activate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would start sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/activate">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                <input type="hidden" name="id" value="{{id}}" />
+                            </form>
+
+                            <button type="submit" form="activate-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Activate</a>
+                            </button>
+                        </div>
+
+                        Campaign status: <span class="label label-default">INACTIVE</span>
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+
     </div>
-{{/if}}
+    {{#if links}}
+        <div role="tabpanel" class="tab-pane {{#if showLinks}}active{{/if}}" id="links">
+
+            <p></p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <th class="col-md-1">
+                            #
+                        </th>
+                        <th>
+                            URL
+                        </th>
+                        <th class="col-md-2">
+                            Clicked
+                        </th>
+                    </thead>
+                    <tbody>
+                        {{#if links}}
+                            {{#each links}}
+                                <tr>
+                                    <td>
+                                        {{index}}
+                                    </td>
+                                    <td>
+                                        <a href="{{url}}">{{url}}</a>
+                                    </td>
+                                    <td>
+                                        {{clicks}}
+                                    </td>
+                                </tr>
+                            {{/each}}
+                        {{else}}
+                            <tr>
+                                <td colspan="3">
+                                    No data available in table
+                                </td>
+                            </tr>
+                        {{/if}}
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if isRss}}
+        <div class="table-responsive">
+            <div class="well text-info">
+                If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here
+            </div>
+            <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" data-topic-args="parent={{id}}" width="100%" data-row-sort="0,1,0,1,1,0">
+                <thead>
+                    <th class="col-md-1">
+                        #
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Created
+                    </th>
+                    <th class="col-md-1">
+                        &nbsp;
+                    </th>
+                </thead>
+            </table>
+        </div>
+    {{/if}}

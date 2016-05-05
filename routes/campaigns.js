@@ -271,7 +271,19 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
             campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 100) : 0;
             campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
 
-            res.render('campaigns/view', campaign);
+            campaigns.getLinks(campaign.id, (err, links) => {
+                if (err) {
+                    // ignore
+                }
+                let index = 0;
+                campaign.links = (links || []).map(link => {
+                    link.index = ++index;
+                    return link;
+                });
+                campaign.showOverview = true;
+                res.render('campaigns/view', campaign);
+            });
+
         });
     });
 });
