@@ -273,8 +273,14 @@
                         <th>
                             URL
                         </th>
-                        <th class="col-md-2">
+                        <th class="col-md-1">
                             Clicked
+                        </th>
+                        <th class="col-md-1">
+                            % of clicks
+                        </th>
+                        <th class="col-md-1">
+                            % of messages
                         </th>
                     </thead>
                     <tbody>
@@ -285,16 +291,22 @@
                                         {{index}}
                                     </td>
                                     <td>
-                                        <a href="{{url}}">{{url}}</a>
+                                        <a href="{{url}}">{{short}}</a>
                                     </td>
                                     <td>
                                         {{clicks}}
+                                    </td>
+                                    <td>
+                                        {{relPercentage}}
+                                    </td>
+                                    <td>
+                                        {{totalPercentage}}
                                     </td>
                                 </tr>
                             {{/each}}
                         {{else}}
                             <tr>
-                                <td colspan="3">
+                                <td colspan="5">
                                     No data available in table
                                 </td>
                             </tr>

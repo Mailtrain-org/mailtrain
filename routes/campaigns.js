@@ -278,6 +278,12 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                 let index = 0;
                 campaign.links = (links || []).map(link => {
                     link.index = ++index;
+                    link.totalPercentage = campaign.delivered ? Math.round(((link.clicks / campaign.delivered) * 100) * 1000) / 1000 : 0;
+                    link.relPercentage = campaign.clicks ? Math.round(((link.clicks / campaign.clicks) * 100) * 1000) / 1000 : 0;
+                    link.short = link.url.replace(/^https?:\/\/(www.)?/i, '');
+                    if (link.short > 63) {
+                        link.short = link.short.substr(0, 60) + '…';
+                    }
                     return link;
                 });
                 campaign.showOverview = true;
