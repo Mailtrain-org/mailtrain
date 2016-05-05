@@ -1,6 +1,9 @@
 <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/campaigns">Campaigns</a></li>
+    {{#if parent}}
+        <li><a href="/campaigns/view/{{parent.id}}">{{parent.name}}</a></li>
+    {{/if}}
     <li><a href="/campaigns/view/{{id}}">{{name}}</a></li>
     <li class="active">Edit Campaign</li>
 </ol>
