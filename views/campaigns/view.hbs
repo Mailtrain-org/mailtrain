@@ -274,7 +274,7 @@
                             URL
                         </th>
                         <th class="col-md-1">
-                            Clicked
+                            Clicks
                         </th>
                         <th class="col-md-1">
                             % of clicks
@@ -316,17 +316,13 @@
                         <tr>
                             <th></th>
                             <th>
-                                All links
+                                Aggregated clicks
                             </th>
                             <th>
                                 {{clicks}}
                             </th>
                             <th>
-                                {{#if clicks}}
-                                    100%
-                                {{else}}
-                                    0%
-                                {{/if}}
+                                –
                             </th>
                             <th>
                                 CTR {{clicksRate}}%
@@ -335,6 +331,9 @@
                     </tfoot>
                 </table>
 
+                <p class="text-muted">
+                    Clicks are counted as unique subscribers that clicked on a specific link or on any link (in aggregated view)
+                </p>
 
             </div>
         </div>
