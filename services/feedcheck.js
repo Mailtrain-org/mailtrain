@@ -139,8 +139,7 @@ function checkEntries(parent, entries, callback) {
                     from: parent.from,
                     address: parent.address,
                     subject: entry.title || parent.subject,
-                    list: parent.list,
-                    segment: parent.segment,
+                    list: parent.segment ? parent.list + ':' + parent.segment : parent.list,
                     html
                 };
 

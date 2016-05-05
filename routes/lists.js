@@ -378,7 +378,7 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
                 return res.redirect('/lists/view/' + list.id);
             }
 
-            subscriptions.unsubscribe(list.id, subscription.email, err => {
+            subscriptions.unsubscribe(list.id, subscription.email, false, err => {
                 if (err) {
                     req.flash('danger', err && err.message || err || 'Could not unsubscribe user');
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
