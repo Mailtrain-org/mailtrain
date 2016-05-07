@@ -12,13 +12,16 @@
 <hr>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,1,0,0">
+    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,1,1,0,0">
         <thead>
             <th class="col-md-1">
                 #
             </th>
             <th>
                 Name
+            </th>
+            <th class="col-md-2">
+                ID
             </th>
             <th class="col-md-1">
                 Subscribers
@@ -43,6 +46,9 @@
                             <a href="/lists/view/{{id}}">
                             {{name}}
                         </a>
+                        </td>
+                        <td>
+                            <input class="click-select gpg-text" type="text" readonly value="{{cid}}">
                         </td>
                         <td>
                             <p class="text-center">{{subscribers}}</p>

@@ -69,6 +69,10 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
         Object.keys(data).forEach(key => {
             let value = data[key].trim();
             key = tools.toDbKey(key);
+            // ensure trailing slash for service home page
+            if (key === 'service_url' && value && !/\/$/.test(value)) {
+                value = value + '/';
+            }
             if (allowedKeys.indexOf(key) >= 0) {
                 keys.push(key);
                 values.push(value);

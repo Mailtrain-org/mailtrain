@@ -30,6 +30,7 @@ let segments = require('./routes/segments');
 let webhooks = require('./routes/webhooks');
 let subscription = require('./routes/subscription');
 let archive = require('./routes/archive');
+let api = require('./routes/api');
 
 let app = express();
 
@@ -172,6 +173,7 @@ app.use('/segments', segments);
 app.use('/webhooks', webhooks);
 app.use('/subscription', subscription);
 app.use('/archive', archive);
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
