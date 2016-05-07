@@ -72,7 +72,6 @@ $('.data-table-ajax').each(function () {
     });
 });
 
-
 $('.datestring').each(function () {
     $(this).html(moment($(this).data('date')).fromNow());
 });
@@ -124,6 +123,10 @@ $('.page-refresh').each(function () {
     setTimeout(function () {
         window.location.reload();
     }, interval * 1000);
+});
+
+$('.click-select').on('click', function () {
+    $(this).select();
 });
 
 if (typeof moment.tz !== 'undefined') {

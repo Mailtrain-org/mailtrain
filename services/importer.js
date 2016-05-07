@@ -165,7 +165,8 @@ function processImport(data, callback) {
 
                 subscriptions.insert(listId, {
                     imported: data.id,
-                    status: data.type
+                    status: data.type,
+                    partial: true
                 }, entry, (err, response) => {
                     if (err) {
                         // ignore

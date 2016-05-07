@@ -4,6 +4,7 @@ let passport = require('../lib/passport');
 let express = require('express');
 let router = new express.Router();
 let users = require('../lib/models/users');
+let settings = require('../lib/models/settings');
 
 router.get('/logout', (req, res) => passport.logout(req, res));
 
@@ -64,6 +65,47 @@ router.post('/reset', passport.parseForm, passport.csrfProtection, (req, res) =>
         }
 
         return res.redirect('/users/login');
+    });
+});
+
+router.all('/api', (req, res, next) => {
+    if (!req.user) {
+        req.flash('danger', 'Need to be logged in to access restricted content');
+        return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
+    }
+    next();
+});
+
+router.get('/api', passport.csrfProtection, (req, res, next) => {
+    users.get(req.user.id, (err, user) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return next(new Error('User data not found'));
+        }
+        settings.list(['serviceUrl'], (err, configItems) => {
+            if (err) {
+                return next(err);
+            }
+            user.serviceUrl = configItems.serviceUrl;
+            user.csrfToken = req.csrfToken();
+            res.render('users/api', user);
+        });
+    });
+
+});
+
+router.post('/api/reset-token', passport.parseForm, passport.csrfProtection, (req, res) => {
+    users.resetToken(Number(req.user.id), (err, success) => {
+        if (err) {
+            req.flash('danger', err.message || err);
+        } else if (success) {
+            req.flash('success', 'Access token updated');
+        } else {
+            req.flash('info', 'Access token not updated');
+        }
+        return res.redirect('/users/api');
     });
 });
 
