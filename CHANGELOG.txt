@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 2016-05-07
+
+  * Added simple API support for adding and removing list subscriptions
+
 ## 1.5.0 2016-05-05
 
   * Fixed a bug in unsubscribing through the admin interface
