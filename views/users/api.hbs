@@ -29,6 +29,20 @@
     </div>
 </div>
 
+<div class="well">
+
+    <h3>Notes about the API</h3>
+
+    <ul>
+        <li>
+            API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.
+        </li>
+        <li>
+            You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code>            is not supported.
+        </li>
+    </ul>
+</div>
+
 <h3>POST /api/subscribe/:listId – Add subscription</h3>
 
 <p>
@@ -47,13 +61,13 @@
 </p>
 <ul>
     <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)
-    <li><strong>FIRST_NAME</strong> – subscriber's first name
-    <li><strong>LAST_NAME</strong> – subscriber's last name
-    <li><strong>TIMEZONE</strong> – subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"
-    <li><strong>MERGE_TAG_VALUE</strong> – custom field value. Use yes/no for option group values (checkboxes, radios, drop downs)
-    <li>
-    <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. By default if the email was already unsubscribed then subscription status is not changed.
-    </li>
+        <li><strong>FIRST_NAME</strong> – subscriber's first name</li>
+        <li><strong>LAST_NAME</strong> – subscriber's last name</li>
+        <li><strong>TIMEZONE</strong> – subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"</li>
+        <li><strong>MERGE_TAG_VALUE</strong> – custom field value. Use yes/no for option group values (checkboxes, radios, drop downs)</li>
+        <li>
+            <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. By default if the email was already unsubscribed then subscription status is not changed.
+        </li>
 </ul>
 
 <p>
