@@ -114,26 +114,43 @@ router.post('/subscribe/:listId', (req, res) => {
                     partial: true
                 };
 
-                if (input.FORCE_SUBSCRIBE === 'yes') {
+                if (/^(yes|true|1)$/i.test(input.FORCE_SUBSCRIBE)) {
                     meta.status = 1;
                 }
 
-                subscriptions.insert(list.id, meta, subscription, (err, response) => {
-                    if (err) {
-                        res.status(500);
-                        return res.json({
-                            error: err.message || err,
-                            data: []
-                        });
-                    }
-                    res.status(200);
-                    res.json({
-                        data: {
-                            id: response.entryId,
-                            subscribed: true
+                if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
+                    subscriptions.addConfirmation(list, input.EMAIL, subscription, (err, cid) => {
+                        if (err) {
+                            res.status(500);
+                            return res.json({
+                                error: err.message || err,
+                                data: []
+                            });
                         }
+                        res.status(200);
+                        res.json({
+                            data: {
+                                id: cid
+                            }
+                        });
                     });
-                });
+                } else {
+                    subscriptions.insert(list.id, meta, subscription, (err, response) => {
+                        if (err) {
+                            res.status(500);
+                            return res.json({
+                                error: err.message || err,
+                                data: []
+                            });
+                        }
+                        res.status(200);
+                        res.json({
+                            data: {
+                                id: response.cid
+                            }
+                        });
+                    });
+                }
             });
         });
     });

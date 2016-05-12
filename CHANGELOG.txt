@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 2016-05-11
+
+  * Updated API, added new option **REQUIRE_CONFIRMATION** for subscriptions to send confirmation email before subscribing
+
 ## 1.6.0 2016-05-07
 
   * Added simple API support for adding and removing list subscriptions

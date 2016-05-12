@@ -230,7 +230,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
         });
         data = tools.convertKeys(data);
 
-        subscriptions.addConfirmation(list.id, email, data, (err, confirmCid) => {
+        subscriptions.addConfirmation(list, email, data, (err, confirmCid) => {
             if (!err && !confirmCid) {
                 err = new Error('Could not store confirmation data');
             }
@@ -239,51 +239,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
             }
 
-            fields.list(list.id, (err, fieldList) => {
-                if (err) {
-                    return next(err);
-                }
-
-                let encryptionKeys = [];
-                fields.getRow(fieldList, data).forEach(field => {
-                    if (field.type === 'gpg' && field.value) {
-                        encryptionKeys.push(field.value.trim());
-                    }
-                });
-
-                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl'], (err, configItems) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    res.redirect('/subscription/' + req.params.cid + '/confirm-notice');
-
-                    mailer.sendMail({
-                        from: {
-                            name: configItems.defaultFrom,
-                            address: configItems.defaultAddress
-                        },
-                        to: {
-                            name: [].concat(data.firstName || []).concat(data.lastName || []).join(' '),
-                            address: email
-                        },
-                        subject: list.name + ': Please Confirm Subscription',
-                        encryptionKeys
-                    }, {
-                        html: 'emails/confirm-html.hbs',
-                        text: 'emails/confirm-text.hbs',
-                        data: {
-                            title: list.name,
-                            contactAddress: configItems.defaultAddress,
-                            confirmUrl: urllib.resolve(configItems.serviceUrl, '/subscription/subscribe/' + confirmCid)
-                        }
-                    }, err => {
-                        if (err) {
-                            log.error('Subscription', err.stack);
-                        }
-                    });
-                });
-            });
+            res.redirect('/subscription/' + req.params.cid + '/confirm-notice');
         });
     });
 });

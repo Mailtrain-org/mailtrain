@@ -60,14 +60,24 @@
     <strong>POST</strong> arguments
 </p>
 <ul>
-    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)
-        <li><strong>FIRST_NAME</strong> – subscriber's first name</li>
-        <li><strong>LAST_NAME</strong> – subscriber's last name</li>
-        <li><strong>TIMEZONE</strong> – subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"</li>
-        <li><strong>MERGE_TAG_VALUE</strong> – custom field value. Use yes/no for option group values (checkboxes, radios, drop downs)</li>
-        <li>
-            <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. By default if the email was already unsubscribed then subscription status is not changed.
-        </li>
+    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)</li>
+    <li><strong>FIRST_NAME</strong> – subscriber's first name</li>
+    <li><strong>LAST_NAME</strong> – subscriber's last name</li>
+    <li><strong>TIMEZONE</strong> – subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"</li>
+    <li><strong>MERGE_TAG_VALUE</strong> – custom field value. Use yes/no for option group values (checkboxes, radios, drop downs)</li>
+</ul>
+
+<p>
+    Additional <strong>POST</strong> arguments:
+</p>
+
+<ul>
+    <li>
+        <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. If the email was already unsubscribed/blocked then subscription status is not changed by default.
+    </li>
+    <li>
+        <strong>REQUIRE_CONFIRMATION</strong> – set to "yes" if you want to send confirmation email to the subscriber before actually marking as subscribed
+    </li>
 </ul>
 
 <p>
@@ -75,7 +85,7 @@
 </p>
 
 <pre>curl -XPOST {{serviceUrl}}api/subscribe/B16uVTdW?access_token={{accessToken}}\
---data 'EMAIL=test@example.com&MERGE_CHECKBOX=yes'</pre>
+--data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
 <h3>POST /api/unsubscribe/:listId – Remove subscription</h3>
 
