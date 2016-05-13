@@ -151,7 +151,7 @@ function formatMessage(message, callback) {
                         if (field.options) {
                             field.options.forEach(subField => {
                                 if (subField.mergeTag) {
-                                    message.subscription.mergeTags[subField.mergeTag] = subField.mergeValue || '';
+                                    message.subscription.mergeTags[subField.mergeTag] = subField.value && subField.mergeValue || '';
                                 }
                             });
                         }

@@ -129,29 +129,30 @@
                                         text value used when <code>TAG_NAME</code> is empty.
                                     </p>
 
-                                    <ul>
-                                        <li>
-                                            <code>[FIRST_NAME]</code> – first name of the subscriber
-                                        </li>
-                                        <li>
-                                            <code>[LAST_NAME]</code> – last name of the subscriber
-                                        </li>
-                                        <li>
-                                            <code>[FULL_NAME]</code> – first and last names of the subscriber joined
-                                        </li>
-                                        <li>
-                                            <code>[LINK_UNSUBSCRIBE]</code> – URL that points to the preferences page of the subscriber
-                                        </li>
-                                        <li>
-                                            <code>[LINK_PREFERENCES]</code> – URL that points to the unsubscribe page
-                                        </li>
-                                        <li>
-                                            <code>[LINK_BROWSER]</code> – URL to preview the message in a browser
-                                        </li>
-                                    </ul>
-                                    <p>
-                                        In addition to that any custom field can have its own merge tag.
-                                    </p>
+                                    <table class="table table-bordered table-condensed table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Merge tag
+                                                </th>
+                                                <th>
+                                                    Description
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{#each mergeTags}}
+                                                <tr>
+                                                    <th scope="row">
+                                                        [{{key}}]
+                                                    </th>
+                                                    <td>
+                                                        {{value}}
+                                                    </td>
+                                                </tr>
+                                            {{/each}}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

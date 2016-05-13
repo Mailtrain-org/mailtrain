@@ -23,7 +23,9 @@ CREATE TABLE `campaign_tracker` (
   `ip` varchar(100) CHARACTER SET ascii DEFAULT NULL,
   `country` varchar(2) CHARACTER SET ascii DEFAULT NULL,
   `count` int(11) unsigned NOT NULL DEFAULT '1',
-  PRIMARY KEY (`list`,`subscriber`,`link`)
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`list`,`subscriber`,`link`),
+  KEY `created_index` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `campaigns` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -181,7 +183,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -198,7 +200,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','8');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','10');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -242,6 +244,7 @@ CREATE TABLE `users` (
   `username` varchar(255) NOT NULL DEFAULT '',
   `password` varchar(255) NOT NULL DEFAULT '',
   `email` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `access_token` varchar(40) DEFAULT NULL,
   `reset_token` varchar(255) CHARACTER SET ascii DEFAULT NULL,
   `reset_expire` timestamp NULL DEFAULT NULL,
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -249,9 +252,10 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`),
   KEY `username` (`username`(191)),
   KEY `reset` (`reset_token`),
-  KEY `check_reset` (`username`(191),`reset_token`,`reset_expire`)
+  KEY `check_reset` (`username`(191),`reset_token`,`reset_expire`),
+  KEY `token_index` (`access_token`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `reset_token`, `reset_expire`, `created`) VALUES (1,'admin','$2a$10$mzKU71G62evnGB2PvQA4k..Wf9jASk.c7a8zRMHh6qQVjYJ2r/g/K','admin@example.com',NULL,NULL,NOW());
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `access_token`, `reset_token`, `reset_expire`, `created`) VALUES (1,'admin','$2a$10$mzKU71G62evnGB2PvQA4k..Wf9jASk.c7a8zRMHh6qQVjYJ2r/g/K','admin@example.com',NULL,NULL,NULL,NOW());
 
 SET UNIQUE_CHECKS=1;
 SET FOREIGN_KEY_CHECKS=1;
