@@ -348,6 +348,31 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
     });
 });
 
+router.get('/opened/:id', passport.csrfProtection, (req, res) => {
+    campaigns.get(req.params.id, true, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+
+        lists.get(campaign.list, (err, list) => {
+            if (err || !campaign) {
+                req.flash('danger', err && err.message || err);
+                return res.redirect('/campaigns');
+            }
+
+            campaign.csrfToken = req.csrfToken();
+            campaign.list = list;
+
+            // show only messages that weren't bounced as delivered
+            campaign.delivered = campaign.delivered - campaign.bounced;
+            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
+
+            res.render('campaigns/opened', campaign);
+        });
+    });
+});
+
 router.get('/clicked/:id/:linkId', passport.csrfProtection, (req, res) => {
     campaigns.get(req.params.id, true, (err, campaign) => {
         if (err || !campaign) {
@@ -366,26 +391,33 @@ router.get('/clicked/:id/:linkId', passport.csrfProtection, (req, res) => {
 
             // show only messages that weren't bounced as delivered
             campaign.delivered = campaign.delivered - campaign.bounced;
+            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
 
-            campaigns.getLinks(campaign.id, req.params.linkId, (err, links) => {
-                if (err) {
-                    // ignore
-                }
-                let index = 0;
-                campaign.link = (links || []).map(link => {
-                    link.index = ++index;
-                    link.totalPercentage = campaign.delivered ? Math.round(((link.clicks / campaign.delivered) * 100) * 1000) / 1000 : 0;
-                    link.relPercentage = campaign.clicks ? Math.round(((link.clicks / campaign.clicks) * 100) * 1000) / 1000 : 0;
-                    link.short = link.url.replace(/^https?:\/\/(www.)?/i, '');
-                    if (link.short > 63) {
-                        link.short = link.short.substr(0, 60) + '…';
-                    }
-                    return link;
-                }).shift();
-                campaign.showOverview = true;
+            if (req.params.linkId === 'all') {
+                campaign.aggregated = true;
+                campaign.link = {
+                    id: 0
+                };
                 res.render('campaigns/clicked', campaign);
-            });
-
+            } else {
+                campaigns.getLinks(campaign.id, req.params.linkId, (err, links) => {
+                    if (err) {
+                        // ignore
+                    }
+                    let index = 0;
+                    campaign.link = (links || []).map(link => {
+                        link.index = ++index;
+                        link.totalPercentage = campaign.delivered ? Math.round(((link.clicks / campaign.delivered) * 100) * 1000) / 1000 : 0;
+                        link.relPercentage = campaign.clicks ? Math.round(((link.clicks / campaign.clicks) * 100) * 1000) / 1000 : 0;
+                        link.short = link.url.replace(/^https?:\/\/(www.)?/i, '');
+                        if (link.short > 63) {
+                            link.short = link.short.substr(0, 60) + '…';
+                        }
+                        return link;
+                    }).shift();
+                    res.render('campaigns/clicked', campaign);
+                });
+            }
         });
     });
 });

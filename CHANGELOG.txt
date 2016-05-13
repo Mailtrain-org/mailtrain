@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.2 2016-05-13
+
+  * Added missing views for subscribers who clicked on any link and subscribers who opened the message
+
 ## 1.8.1 2016-05-13
 
   * Fixed an issue in API

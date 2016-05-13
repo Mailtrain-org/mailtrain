@@ -100,7 +100,7 @@
                     <dt>Unsubscribed</dt>
                     <dd>{{unsubscribed}}</dd>
 
-                    <dt>Opened</dt>
+                    <dt>Opened  <a href="/campaigns/opened/{{id}}" title="List subscribers who opened this message"><span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span></a></dt>
                     <dd>
                         <div class="progress">
                             <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
@@ -109,7 +109,7 @@
                         </div>
                     </dd>
 
-                    <dt>Clicked</dt>
+                    <dt>Clicked <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span></a></dt>
                     <dd>
                         <div class="progress">
                             <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
@@ -322,6 +322,9 @@
                                 Aggregated clicks
                             </th>
                             <th>
+                                <div class="pull-right">
+                                    <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span></a>
+                                </div>
                                 {{clicks}}
                             </th>
                             <th>
