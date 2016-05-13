@@ -339,8 +339,8 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                     }
                     return link;
                 });
-                campaign.showOverview = !req.query.tab || req.query.tab==='overview';
-                campaign.showLinks = req.query.tab==='links';
+                campaign.showOverview = !req.query.tab || req.query.tab === 'overview';
+                campaign.showLinks = req.query.tab === 'links';
                 res.render('campaigns/view', campaign);
             });
 
@@ -419,7 +419,7 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
                     htmlescape(row.email || ''),
                     htmlescape(row.firstName || ''),
                     htmlescape(row.lastName || ''),
-                    '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
+                    row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
                     row.count
                 ])
             });
