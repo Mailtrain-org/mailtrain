@@ -6,6 +6,7 @@ let fields = require('../lib/models/fields');
 let subscriptions = require('../lib/models/subscriptions');
 let tools = require('../lib/tools');
 let express = require('express');
+let log = require('npmlog');
 let router = new express.Router();
 
 router.all('/*', (req, res, next) => {
@@ -44,6 +45,7 @@ router.post('/subscribe/:listId', (req, res) => {
     });
     lists.getByCid(req.params.listId, (err, list) => {
         if (err) {
+            log.error('API', err);
             res.status(500);
             return res.json({
                 error: err.message || err,
@@ -66,6 +68,7 @@ router.post('/subscribe/:listId', (req, res) => {
         }
         tools.validateEmail(input.EMAIL, false, err => {
             if (err) {
+                log.error('API', err);
                 res.status(400);
                 return res.json({
                     error: err.message || err,
@@ -121,6 +124,7 @@ router.post('/subscribe/:listId', (req, res) => {
                 if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
                     subscriptions.addConfirmation(list, input.EMAIL, subscription, (err, cid) => {
                         if (err) {
+                            log.error('API', err);
                             res.status(500);
                             return res.json({
                                 error: err.message || err,
@@ -137,6 +141,7 @@ router.post('/subscribe/:listId', (req, res) => {
                 } else {
                     subscriptions.insert(list.id, meta, subscription, (err, response) => {
                         if (err) {
+                            log.error('API', err);
                             res.status(500);
                             return res.json({
                                 error: err.message || err,
