@@ -3,6 +3,7 @@
 let express = require('express');
 let router = new express.Router();
 let lists = require('../lib/models/lists');
+let fields = require('../lib/models/fields');
 let templates = require('../lib/models/templates');
 let campaigns = require('../lib/models/campaigns');
 let settings = require('../lib/models/settings');
@@ -157,7 +158,56 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                         view = 'campaigns/edit';
                 }
 
-                res.render(view, campaign);
+                lists.get(campaign.list, (err, list) => {
+                    if (err) {
+                        req.flash('danger', err.message || err);
+                        return res.redirect('/');
+                    }
+                    if (!list) {
+                        req.flash('danger', 'Selected list does not exist');
+                        res.render(view, campaign);
+                        return;
+                    }
+
+                    fields.list(list.id, (err, fieldList) => {
+                        if (err && !fieldList) {
+                            fieldList = [];
+                        }
+
+                        let mergeTags = [
+                            // indent
+                            {
+                                key: 'LINK_UNSUBSCRIBE',
+                                value: 'URL that points to the preferences page of the subscriber'
+                            }, {
+                                key: 'LINK_PREFERENCES',
+                                value: 'URL that points to the unsubscribe page'
+                            }, {
+                                key: 'LINK_BROWSER',
+                                value: 'URL to preview the message in a browser'
+                            }, {
+                                key: 'FIRST_NAME',
+                                value: 'First name'
+                            }, {
+                                key: 'LAST_NAME',
+                                value: 'Last name'
+                            }, {
+                                key: 'FULL_NAME',
+                                value: 'Full name (first and last name combined)'
+                            }
+                        ];
+
+                        fieldList.forEach(field => {
+                            mergeTags.push({
+                                key: field.key,
+                                value: field.name
+                            });
+                        });
+
+                        campaign.mergeTags = mergeTags;
+                        res.render(view, campaign);
+                    });
+                });
             });
         });
     });
@@ -268,6 +318,9 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
             campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();
 
+            // show only messages that weren't bounced as delivered
+            campaign.delivered = campaign.delivered - campaign.bounced;
+
             campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 100) : 0;
             campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
 
@@ -286,10 +339,90 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                     }
                     return link;
                 });
-                campaign.showOverview = true;
+                campaign.showOverview = !req.query.tab || req.query.tab==='overview';
+                campaign.showLinks = req.query.tab==='links';
                 res.render('campaigns/view', campaign);
             });
 
+        });
+    });
+});
+
+router.get('/clicked/:id/:linkId', passport.csrfProtection, (req, res) => {
+    campaigns.get(req.params.id, true, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+
+        lists.get(campaign.list, (err, list) => {
+            if (err || !campaign) {
+                req.flash('danger', err && err.message || err);
+                return res.redirect('/campaigns');
+            }
+
+            campaign.csrfToken = req.csrfToken();
+            campaign.list = list;
+
+            // show only messages that weren't bounced as delivered
+            campaign.delivered = campaign.delivered - campaign.bounced;
+
+            campaigns.getLinks(campaign.id, req.params.linkId, (err, links) => {
+                if (err) {
+                    // ignore
+                }
+                let index = 0;
+                campaign.link = (links || []).map(link => {
+                    link.index = ++index;
+                    link.totalPercentage = campaign.delivered ? Math.round(((link.clicks / campaign.delivered) * 100) * 1000) / 1000 : 0;
+                    link.relPercentage = campaign.clicks ? Math.round(((link.clicks / campaign.clicks) * 100) * 1000) / 1000 : 0;
+                    link.short = link.url.replace(/^https?:\/\/(www.)?/i, '');
+                    if (link.short > 63) {
+                        link.short = link.short.substr(0, 60) + '…';
+                    }
+                    return link;
+                }).shift();
+                campaign.showOverview = true;
+                res.render('campaigns/clicked', campaign);
+            });
+
+        });
+    });
+});
+
+router.post('/clicked/ajax/:id/:linkId', (req, res) => {
+    let linkId = Number(req.params.linkId) || 0;
+
+    campaigns.get(req.params.id, true, (err, campaign) => {
+        if (err || !campaign) {
+            return res.json({
+                error: err && err.message || err || 'Campaign not found',
+                data: []
+            });
+        }
+
+        let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '`.`created', 'count'];
+        campaigns.filterClickedSubscribers(campaign, linkId, req.body, columns, (err, data, total, filteredTotal) => {
+            if (err) {
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+
+            res.json({
+                draw: req.body.draw,
+                recordsTotal: total,
+                recordsFiltered: filteredTotal,
+                data: data.map((row, i) => [
+                    (Number(req.body.start) || 0) + 1 + i,
+                    htmlescape(row.email || ''),
+                    htmlescape(row.firstName || ''),
+                    htmlescape(row.lastName || ''),
+                    '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
+                    row.count
+                ])
+            });
         });
     });
 });

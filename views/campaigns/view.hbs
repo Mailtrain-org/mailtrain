@@ -294,6 +294,9 @@
                                         <a href="{{url}}">{{short}}</a>
                                     </td>
                                     <td>
+                                        <div class="pull-right">
+                                            <a href="/campaigns/clicked/{{../id}}/{{id}}" title="List subscribers who clicked this link"><span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span></a>
+                                        </div>
                                         {{clicks}}
                                     </td>
                                     <td>
@@ -339,32 +342,34 @@
         </div>
     {{/if}}
 
-    {{#if isRss}}
-        <div class="table-responsive">
-            <div class="well text-info">
-                If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here
-            </div>
-            <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" data-topic-args="parent={{id}}" width="100%" data-row-sort="0,1,0,1,1,0">
-                <thead>
-                    <th class="col-md-1">
-                        #
-                    </th>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Description
-                    </th>
-                    <th>
-                        Status
-                    </th>
-                    <th>
-                        Created
-                    </th>
-                    <th class="col-md-1">
-                        &nbsp;
-                    </th>
-                </thead>
-            </table>
+</div>
+
+{{#if isRss}}
+    <div class="table-responsive">
+        <div class="well text-info">
+            If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here
         </div>
-    {{/if}}
+        <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" data-topic-args="parent={{id}}" width="100%" data-row-sort="0,1,0,1,1,0">
+            <thead>
+                <th class="col-md-1">
+                    #
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Created
+                </th>
+                <th class="col-md-1">
+                    &nbsp;
+                </th>
+            </thead>
+        </table>
+    </div>
+{{/if}}
