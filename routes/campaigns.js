@@ -420,7 +420,8 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
                     htmlescape(row.firstName || ''),
                     htmlescape(row.lastName || ''),
                     row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
-                    row.count
+                    row.count,
+                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
                 ])
             });
         });

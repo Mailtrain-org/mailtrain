@@ -33,7 +33,7 @@
             </th>
         </thead>
         <tbody>
-            <tr>
+            <tr class="success">
                 <td>
                     <a href="{{link.url}}">{{link.short}}</a>
                 </td>
@@ -50,34 +50,37 @@
         </tbody>
     </table>
 
-    <h3>Subscribers that clicked on <a href="{{link.url}}">{{link.short}}</a></h3>
-    <hr />
-
-    <div class="table-responsive">
-        <table data-topic-url="/campaigns/clicked" data-topic-id="{{id}}/{{link.id}}" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,1,1">
-            <thead>
-                <tr>
-                    <th class="col-md-1">
-                        #
-                    </th>
-                    <th>
-                        Address
-                    </th>
-                    <th>
-                        First Name
-                    </th>
-                    <th>
-                        Last Name
-                    </th>
-                    <th>
-                        First click
-                    </th>
-                    <th>
-                        Click count
-                    </th>
-                </tr>
-            </thead>
-        </table>
+    <div class="panel panel-info">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Subscribers who clicked on this link:</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table data-topic-url="/campaigns/clicked" data-topic-id="{{id}}/{{link.id}}" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,1,1,0">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">
+                                #
+                            </th>
+                            <th>
+                                Address
+                            </th>
+                            <th>
+                                First Name
+                            </th>
+                            <th>
+                                Last Name
+                            </th>
+                            <th>
+                                First click
+                            </th>
+                            <th>
+                                Click count
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
     </div>
-
 </div>
