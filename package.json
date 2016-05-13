@@ -32,7 +32,7 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.1",
     "bounce-handler": "^7.3.2-fork.0",
-    "compression": "^1.6.1",
+    "compression": "^1.6.2",
     "config": "^1.20.1",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.0.2",
