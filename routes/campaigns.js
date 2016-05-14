@@ -321,8 +321,11 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
             // show only messages that weren't bounced as delivered
             campaign.delivered = campaign.delivered - campaign.bounced;
 
-            campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 100) : 0;
-            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
+            campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 10000)/100 : 0;
+            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 10000)/100 : 0;
+            campaign.bounceRate = campaign.delivered ? Math.round((campaign.bounced / campaign.delivered) * 10000)/100 : 0;
+            campaign.complaintRate = campaign.delivered ? Math.round((campaign.complained / campaign.delivered) * 10000)/100 : 0;
+            campaign.unsubscribeRate = campaign.delivered ? Math.round((campaign.unsubscribed / campaign.delivered) * 10000)/100 : 0;
 
             campaigns.getLinks(campaign.id, (err, links) => {
                 if (err) {
@@ -369,6 +372,52 @@ router.get('/opened/:id', passport.csrfProtection, (req, res) => {
             campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
 
             res.render('campaigns/opened', campaign);
+        });
+    });
+});
+
+router.get('/status/:id/:status', passport.csrfProtection, (req, res) => {
+    let id = Number(req.params.id) || 0;
+    let status;
+    switch (req.params.status) {
+        case 'delivered':
+            status = 1;
+            break;
+        case 'unsubscribed':
+            status = 2;
+            break;
+        case 'bounced':
+            status = 3;
+            break;
+        case 'complained':
+            status = 4;
+            break;
+        default:
+            req.flash('danger', 'Unknown status selector');
+            return res.redirect('/campaigns');
+    }
+
+    campaigns.get(id, true, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+
+        lists.get(campaign.list, (err, list) => {
+            if (err || !campaign) {
+                req.flash('danger', err && err.message || err);
+                return res.redirect('/campaigns');
+            }
+
+            campaign.csrfToken = req.csrfToken();
+            campaign.list = list;
+
+            // show only messages that weren't bounced as delivered
+            campaign.delivered = campaign.delivered - campaign.bounced;
+            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 100) : 0;
+            campaign.status = status;
+
+            res.render('campaigns/' + req.params.status, campaign);
         });
     });
 });
@@ -453,6 +502,44 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
                     htmlescape(row.lastName || ''),
                     row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
                     row.count,
+                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
+                ])
+            });
+        });
+    });
+});
+
+router.post('/status/ajax/:id/:status', (req, res) => {
+    let status = Number(req.params.status) || 0;
+
+    campaigns.get(req.params.id, true, (err, campaign) => {
+        if (err || !campaign) {
+            return res.json({
+                error: err && err.message || err || 'Campaign not found',
+                data: []
+            });
+        }
+
+        let columns = ['#', 'email', 'first_name', 'last_name', 'campaign__' + campaign.id + '`.`updated'];
+        campaigns.filterStatusSubscribers(campaign, status, req.body, columns, (err, data, total, filteredTotal) => {
+            if (err) {
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+
+            res.json({
+                draw: req.body.draw,
+                recordsTotal: total,
+                recordsFiltered: filteredTotal,
+                data: data.map((row, i) => [
+                    (Number(req.body.start) || 0) + 1 + i,
+                    htmlescape(row.email || ''),
+                    htmlescape(row.firstName || ''),
+                    htmlescape(row.lastName || ''),
+                    htmlescape(row.response || ''),
+                    row.updated && row.created.toISOString ? '<span class="datestring" data-date="' + row.updated.toISOString() + '" title="' + row.updated.toISOString() + '">' + row.updated.toISOString() + '</span>' : 'N/A',
                     '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
                 ])
             });

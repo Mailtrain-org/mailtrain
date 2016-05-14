@@ -88,37 +88,59 @@
             {{#if isNormal}}
 
                 {{#unless isIdling}}
-                    <dt>Delivered</dt>
+                    <dt>Delivered <a href="/campaigns/status/{{id}}/delivered" title="List subscribers who received this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                     <dd>{{delivered}}</dd>
 
-                    <dt>Bounced</dt>
-                    <dd>{{bounced}}</dd>
+        </dl>
+        <hr />
+        <dl class="dl-horizontal">
 
-                    <dt>Complaints</dt>
-                    <dd>{{complained}}</dd>
+            <dt>Bounced <a href="/campaigns/status/{{id}}/bounced" title="List subscribers who bounced"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{bounceRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{bounceRate}}%;">
+                        {{bounced}}&nbsp;({{bounceRate}}%)
+                    </div>
+                </div>
+            </dd>
 
-                    <dt>Unsubscribed</dt>
-                    <dd>{{unsubscribed}}</dd>
+            <dt>Complaints <a href="/campaigns/status/{{id}}/complained" title="List subscribers who complained for this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{complaintRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{complaintRate}}%;">
+                        {{complained}}&nbsp;({{complaintRate}}%)
+                    </div>
+                </div>
+            </dd>
 
-                    <dt><a href="/campaigns/opened/{{id}}" title="List subscribers who opened this message">Opened <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></dt>
-                    <dd>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{openRate}}%;">
-                                {{openRate}}%
-                            </div>
-                        </div>
-                    </dd>
+            <dt>Unsubscribed <a href="/campaigns/status/{{id}}/unsubscribed" title="List subscribers who unsubscribed after this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{unsubscribeRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{unsubscribeRate}}%;">
+                        {{unsubscribed}}&nbsp;({{unsubscribeRate}}%)
+                    </div>
+                </div>
+            </dd>
 
-                    <dt><a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link">Clicked  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></dt>
-                    <dd>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{clicksRate}}%;">
-                                {{clicksRate}}%
-                            </div>
-                        </div>
-                    </dd>
+            <dt>Opened <a href="/campaigns/opened/{{id}}" title="List subscribers who opened this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{openRate}}%;">
+                        {{opened}}&nbsp;({{openRate}}%)
+                    </div>
+                </div>
+            </dd>
 
-                {{/unless}}
+            <dt>Clicked <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dd>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{clicksRate}}%;">
+                        {{clicks}}&nbsp;({{clicksRate}}%)
+                    </div>
+                </div>
+            </dd>
+
+            {{/unless}}
             {{/if}}
         </dl>
 
@@ -295,7 +317,7 @@
                                     </td>
                                     <td>
                                         <div class="pull-right">
-                                            <a href="/campaigns/clicked/{{../id}}/{{id}}" title="List subscribers who clicked this link"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a>
+                                            <a href="/campaigns/clicked/{{../id}}/{{id}}" title="List subscribers who clicked this link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
                                         </div>
                                         {{clicks}}
                                     </td>
@@ -323,7 +345,7 @@
                             </th>
                             <th>
                                 <div class="pull-right">
-                                    <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a>
+                                    <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
                                 </div>
                                 {{clicks}}
                             </th>
