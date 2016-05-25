@@ -212,7 +212,6 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
                 list.imports = imports.map((entry, i) => {
                     entry.index = i + 1;
-                    entry.processed = humanize.numberFormat(entry.processed, 0);
                     entry.importType = entry.type === 1 ? 'Subscribe' : 'Unsubscribe';
                     switch (entry.status) {
                         case 0:
@@ -234,6 +233,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                     entry.created = entry.created && entry.created.toISOString();
                     entry.finished = entry.finished && entry.finished.toISOString();
                     entry.updated = entry.processed - entry.new;
+                    entry.processed = humanize.numberFormat(entry.processed, 0);
                     return entry;
                 });
                 list.csrfToken = req.csrfToken();

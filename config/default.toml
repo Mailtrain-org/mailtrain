@@ -51,3 +51,6 @@ host="0.0.0.0"
 enabled=false
 port=5587
 host="0.0.0.0"
+username="testuser"
+password="testpass"
+logger=false
