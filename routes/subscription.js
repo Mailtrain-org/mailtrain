@@ -305,6 +305,7 @@ router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, 
         subscriptions.update(list.id, req.body.cid, req.body, false, err => {
             if (err) {
                 req.flash('danger', err.message || err);
+                log.error('Subscription', err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
             res.redirect('/subscription/' + req.params.lcid + '/updated-notice');
@@ -324,7 +325,7 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
         }
 
         subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-            if (!err && !list) {
+            if (!err && !subscription) {
                 err = new Error('Subscription not found from this list');
                 err.status = 404;
             }
@@ -360,6 +361,7 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
         subscriptions.unsubscribe(list.id, email, req.body.campaign, (err, subscription) => {
             if (err) {
                 req.flash('danger', err.message || err);
+                log.error('Subscription', err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
             res.redirect('/subscription/' + req.params.lcid + '/unsubscribe-notice');
