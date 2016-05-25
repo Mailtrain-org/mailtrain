@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.0 2016-05-25
+
+  * Fetch multiple unsent messages at once to speed up delivery
+  * Fixed a bug of counting unsubscribers correctly
+  * Use LONGTEXT for template text fields (messages might include inlined images which are larger than 64kB)
+
 ## 1.9.0 2016-05-16
 
   * New look

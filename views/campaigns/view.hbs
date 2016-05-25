@@ -210,13 +210,21 @@
 
                     {{#if isPaused}}
                         <div class="pull-right">
-                            <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
+                            <form id="resume-sending" class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
-
-                                <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume
-                                </button>
                             </form>
+
+                            <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                <input type="hidden" name="id" value="{{id}}" />
+                            </form>
+
+                            <button type="submit" form="resume-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume
+                            </button>
+
+                            <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset
+                            </button>
                         </div>
                         <h4>Sending paused</h4>
                     {{/if}}

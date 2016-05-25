@@ -14,7 +14,9 @@ CREATE TABLE `campaign` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `list` (`list`,`segment`,`subscription`),
   KEY `created` (`created`),
-  KEY `response_id` (`response_id`)
+  KEY `response_id` (`response_id`),
+  KEY `status_index` (`status`),
+  KEY `subscription_index` (`subscription`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `campaign_tracker` (
   `list` int(11) unsigned NOT NULL,
@@ -43,9 +45,9 @@ CREATE TABLE `campaigns` (
   `from` varchar(255) DEFAULT '',
   `address` varchar(255) DEFAULT '',
   `subject` varchar(255) DEFAULT '',
-  `html` text,
-  `html_prepared` text,
-  `text` text,
+  `html` longtext,
+  `html_prepared` longtext,
+  `text` longtext,
   `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
   `scheduled` timestamp NULL DEFAULT NULL,
   `status_change` timestamp NULL DEFAULT NULL,
@@ -174,7 +176,7 @@ CREATE TABLE `segments` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
-  KEY `name` (`name`(191)),
+  KEY `name` (`name`),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `settings` (
@@ -183,7 +185,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -200,7 +202,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','10');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','13');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -228,8 +230,8 @@ CREATE TABLE `templates` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `description` text,
-  `html` text,
-  `text` text,
+  `html` longtext,
+  `text` longtext,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `name` (`name`(191))

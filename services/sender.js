@@ -15,9 +15,7 @@ let shortid = require('shortid');
 let url = require('url');
 let htmlToText = require('html-to-text');
 let request = require('request');
-
-// to speed things up fetch several unsent messages and store these into a cache
-let fetchCache = [];
+let caches = require('../lib/caches');
 
 function findUnsent(callback) {
 
@@ -49,8 +47,8 @@ function findUnsent(callback) {
         });
     };
 
-    if (fetchCache.length) {
-        let cached = fetchCache.shift();
+    if (caches.cache.has('sender queue')) {
+        let cached = caches.shift('sender queue');
         return returnUnsent(cached.row, cached.campaign);
     }
 
@@ -125,7 +123,7 @@ function findUnsent(callback) {
                         connection.release();
 
                         rows.forEach(row => {
-                            fetchCache.push({
+                            caches.push('sender queue', {
                                 row,
                                 campaign
                             });
