@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.1 2016-05-26
+
+  * Fix a bug with SMTP transport instance where campaign sending stalled until server was restarted
+
 ## 1.10.0 2016-05-25
 
   * Fetch multiple unsent messages at once to speed up delivery

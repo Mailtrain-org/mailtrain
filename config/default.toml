@@ -8,7 +8,7 @@
 title="mailtrain"
 
 [log]
-level="silly"
+level="verbose"
 
 [www]
 # HTTP port to listen on

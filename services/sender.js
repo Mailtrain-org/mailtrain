@@ -18,7 +18,6 @@ let request = require('request');
 let caches = require('../lib/caches');
 
 function findUnsent(callback) {
-
     let returnUnsent = (row, campaign) => {
         db.getConnection((err, connection) => {
             if (err) {
@@ -59,7 +58,6 @@ function findUnsent(callback) {
 
         // Find "normal" campaigns. Ignore RSS and drip campaigns at this point
         let query = 'SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `status`=? AND (`scheduled` IS NULL OR `scheduled` <= NOW()) AND `type` IN (?, ?) LIMIT 1';
-
         connection.query(query, [2, 1, 3], (err, rows) => {
             connection.release();
             if (err) {
@@ -79,6 +77,7 @@ function findUnsent(callback) {
                         values: []
                     });
                 }
+
                 segments.getQuery(segmentId, 'subscription', next);
             };
 
@@ -100,14 +99,15 @@ function findUnsent(callback) {
                     let values;
 
                     // NOT IN
-                    query = 'SELECT * FROM `subscription__' + campaign.list + '` AS subscription WHERE status=1 ' + (queryData.where ? ' AND (' + queryData.where + ')' : '') + ' AND id NOT IN (SELECT subscription FROM `campaign__' + campaign.id + '` campaign WHERE campaign.list = ? AND campaign.segment = ? AND campaign.subscription = subscription.id) LIMIT 100';
+                    query = 'SELECT * FROM `subscription__' + campaign.list + '` AS subscription WHERE status=1 ' + (queryData.where ? ' AND (' + queryData.where + ')' : '') + ' AND id NOT IN (SELECT subscription FROM `campaign__' + campaign.id + '` campaign WHERE campaign.list = ? AND campaign.segment = ? AND campaign.subscription = subscription.id) LIMIT 150';
                     values = queryData.values.concat([campaign.list, campaign.segment]);
 
                     // LEFT JOIN / IS NULL
-                    //query = 'SELECT subscription.* FROM `subscription__' + campaign.list + '` AS subscription LEFT JOIN `campaign__' + campaign.id + '` AS campaign ON campaign.list = ? AND campaign.segment = ? AND campaign.subscription = subscription.id WHERE subscription.status=1 ' + (queryData.where ? 'AND (' + queryData.where + ') ' : '') + 'AND campaign.id IS NULL LIMIT 100';
+                    //query = 'SELECT subscription.* FROM `subscription__' + campaign.list + '` AS subscription LEFT JOIN `campaign__' + campaign.id + '` AS campaign ON campaign.list = ? AND campaign.segment = ? AND campaign.subscription = subscription.id WHERE subscription.status=1 ' + (queryData.where ? 'AND (' + queryData.where + ') ' : '') + 'AND campaign.id IS NULL LIMIT 150';
                     //values = [campaign.list, campaign.segment].concat(queryData.values);
 
                     connection.query(query, values, (err, rows) => {
+
                         if (err) {
                             connection.release();
                             return callback(err);
@@ -146,7 +146,6 @@ function formatMessage(message, callback) {
         if (!campaign) {
             return callback(new Error('Campaign not found'));
         }
-
         lists.get(message.listId, (err, list) => {
             if (err) {
                 return callback(err);
@@ -161,7 +160,6 @@ function formatMessage(message, callback) {
                 }
 
                 let useVerp = config.verp.enabled && configItems.verpUse && configItems.verpHostname;
-
                 fields.list(list.id, (err, fieldList) => {
                     if (err) {
                         return callback(err);
@@ -274,6 +272,7 @@ function formatMessage(message, callback) {
                         Object.keys(message.subscription.mergeTags).forEach(key => {
                             form[key] = message.subscription.mergeTags[key];
                         });
+
                         request.post({
                             url: campaign.sourceUrl,
                             form
@@ -321,7 +320,6 @@ let sendLoop = () => {
                 }
 
                 //log.verbose('Mail', 'Found new message to be delivered: %s', message.subscription.cid);
-
                 // format message to nodemailer message format
                 formatMessage(message, (err, mail) => {
                     if (err) {
