@@ -127,7 +127,7 @@ router.get('/:list/view/:id', (req, res) => {
                     break;
             }
 
-            segments.subscribers(req.params.id, false, (err, subscribers) => {
+            segments.subscribers(req.params.id, true, (err, subscribers) => {
                 if (err) {
                     // ignore
                 }
