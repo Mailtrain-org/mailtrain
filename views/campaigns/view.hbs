@@ -87,6 +87,31 @@
 
             {{#if isNormal}}
 
+                <dt>Preview campaign as</dt>
+                <dd>
+                    <form method="post" action="/campaigns/preview/{{id}}" class="form-inline">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <input type="hidden" name="campaign" value="{{cid}}">
+                        <input type="hidden" name="list" value="{{list.cid}}">
+                        <input type="hidden" name="listId" value="{{list.id}}">
+                        <div class="form-group">
+                            <select name="subscriber" class="form-control" required>
+                                {{#each testUsers}}
+                                    <option value="{{cid}}">{{displayName}}</option>
+                                {{/each}}
+                                {{#if testUsers}}
+                                    <optgroup label="Actions">
+                                        <option value="_create">Add new test user ...</option>
+                                    </optgroup>
+                                {{else}}
+                                    <option value="_create">No test users yet, create one here ...</option>
+                                {{/if}}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-default">Go</button>
+                    </form>
+                </dd>
+
                 {{#unless isIdling}}
                     <dt>Delivered <a href="/campaigns/status/{{id}}/delivered" title="List subscribers who received this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                     <dd>{{delivered}}</dd>

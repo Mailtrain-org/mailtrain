@@ -185,7 +185,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -202,7 +202,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','13');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','14');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -212,6 +212,7 @@ CREATE TABLE `subscription` (
   `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,
   `imported` int(11) unsigned DEFAULT NULL,
   `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `is_test` tinyint(4) unsigned NOT NULL DEFAULT '0',
   `status_change` timestamp NULL DEFAULT NULL,
   `latest_open` timestamp NULL DEFAULT NULL,
   `latest_click` timestamp NULL DEFAULT NULL,
@@ -224,7 +225,8 @@ CREATE TABLE `subscription` (
   KEY `status` (`status`),
   KEY `first_name` (`first_name`(191)),
   KEY `last_name` (`last_name`(191)),
-  KEY `subscriber_tz` (`tz`)
+  KEY `subscriber_tz` (`tz`),
+  KEY `is_test` (`is_test`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `templates` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,

@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.10.1",
+  "version": "1.11.0",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -36,8 +36,8 @@
     "config": "^1.20.4",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.0.2",
-    "cookie-parser": "^1.4.2",
-    "csurf": "^1.8.3",
+    "cookie-parser": "^1.4.3",
+    "csurf": "^1.9.0",
     "csv-parse": "^1.1.0",
     "escape-html": "^1.0.3",
     "express": "^4.13.4",
@@ -51,7 +51,7 @@
     "humanize": "0.0.9",
     "is-url": "^1.2.1",
     "isemail": "^2.1.2",
-    "jsdom": "^9.2.0",
+    "jsdom": "^9.2.1",
     "juice": "^2.0.0",
     "moment-timezone": "^0.5.4",
     "morgan": "^1.7.0",

@@ -59,7 +59,7 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                             return res.redirect('/');
                         }
 
-                        if (!mail) {
+                        if (!mail && !req.user) {
                             err = new Error('Not Found');
                             err.status = 404;
                             return next(err);

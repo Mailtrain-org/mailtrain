@@ -6,6 +6,7 @@ let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
 let templates = require('../lib/models/templates');
 let campaigns = require('../lib/models/campaigns');
+let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
 let tools = require('../lib/tools');
 let striptags = require('striptags');
@@ -306,49 +307,68 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
             campaign.csrfToken = req.csrfToken();
             campaign.list = list;
 
-            campaign.isIdling = campaign.status === 1;
-            campaign.isSending = campaign.status === 2;
-            campaign.isFinished = campaign.status === 3;
-            campaign.isPaused = campaign.status === 4;
-            campaign.isInactive = campaign.status === 5;
-            campaign.isActive = campaign.status === 6;
-
-            campaign.isNormal = campaign.type === 1 || campaign.type === 3;
-            campaign.isRss = campaign.type === 2;
-
-            campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();
-
-            // show only messages that weren't bounced as delivered
-            campaign.delivered = campaign.delivered - campaign.bounced;
-
-            campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 10000)/100 : 0;
-            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 10000)/100 : 0;
-            campaign.bounceRate = campaign.delivered ? Math.round((campaign.bounced / campaign.delivered) * 10000)/100 : 0;
-            campaign.complaintRate = campaign.delivered ? Math.round((campaign.complained / campaign.delivered) * 10000)/100 : 0;
-            campaign.unsubscribeRate = campaign.delivered ? Math.round((campaign.unsubscribed / campaign.delivered) * 10000)/100 : 0;
-
-            campaigns.getLinks(campaign.id, (err, links) => {
-                if (err) {
-                    // ignore
+            subscriptions.listTestUsers(list.id, (err, testUsers) => {
+                if (err || !testUsers) {
+                    testUsers = [];
                 }
-                let index = 0;
-                campaign.links = (links || []).map(link => {
-                    link.index = ++index;
-                    link.totalPercentage = campaign.delivered ? Math.round(((link.clicks / campaign.delivered) * 100) * 1000) / 1000 : 0;
-                    link.relPercentage = campaign.clicks ? Math.round(((link.clicks / campaign.clicks) * 100) * 1000) / 1000 : 0;
-                    link.short = link.url.replace(/^https?:\/\/(www.)?/i, '');
-                    if (link.short > 63) {
-                        link.short = link.short.substr(0, 60) + '…';
-                    }
-                    return link;
-                });
-                campaign.showOverview = !req.query.tab || req.query.tab === 'overview';
-                campaign.showLinks = req.query.tab === 'links';
-                res.render('campaigns/view', campaign);
-            });
 
+                campaign.testUsers = testUsers;
+                campaign.isIdling = campaign.status === 1;
+                campaign.isSending = campaign.status === 2;
+                campaign.isFinished = campaign.status === 3;
+                campaign.isPaused = campaign.status === 4;
+                campaign.isInactive = campaign.status === 5;
+                campaign.isActive = campaign.status === 6;
+
+                campaign.isNormal = campaign.type === 1 || campaign.type === 3;
+                campaign.isRss = campaign.type === 2;
+
+                campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();
+
+                // show only messages that weren't bounced as delivered
+                campaign.delivered = campaign.delivered - campaign.bounced;
+
+                campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 10000) / 100 : 0;
+                campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 10000) / 100 : 0;
+                campaign.bounceRate = campaign.delivered ? Math.round((campaign.bounced / campaign.delivered) * 10000) / 100 : 0;
+                campaign.complaintRate = campaign.delivered ? Math.round((campaign.complained / campaign.delivered) * 10000) / 100 : 0;
+                campaign.unsubscribeRate = campaign.delivered ? Math.round((campaign.unsubscribed / campaign.delivered) * 10000) / 100 : 0;
+
+                campaigns.getLinks(campaign.id, (err, links) => {
+                    if (err) {
+                        // ignore
+                    }
+                    let index = 0;
+                    campaign.links = (links || []).map(link => {
+                        link.index = ++index;
+                        link.totalPercentage = campaign.delivered ? Math.round(((link.clicks / campaign.delivered) * 100) * 1000) / 1000 : 0;
+                        link.relPercentage = campaign.clicks ? Math.round(((link.clicks / campaign.clicks) * 100) * 1000) / 1000 : 0;
+                        link.short = link.url.replace(/^https?:\/\/(www.)?/i, '');
+                        if (link.short > 63) {
+                            link.short = link.short.substr(0, 60) + '…';
+                        }
+                        return link;
+                    });
+                    campaign.showOverview = !req.query.tab || req.query.tab === 'overview';
+                    campaign.showLinks = req.query.tab === 'links';
+                    res.render('campaigns/view', campaign);
+                });
+            });
         });
     });
+});
+
+router.post('/preview/:id', passport.parseForm, passport.csrfProtection, (req, res) => {
+    let campaign = req.body.campaign;
+    let list = req.body.list;
+    let listId = req.body.listId;
+    let subscription = req.body.subscriber;
+
+    if (subscription === '_create') {
+        return res.redirect('/lists/subscription/' + encodeURIComponent(listId) + '/add/?is-test=true');
+    }
+
+    res.redirect('/archive/' + encodeURIComponent(campaign) + '/' + encodeURIComponent(list) + '/' + encodeURIComponent(subscription));
 });
 
 router.get('/opened/:id', passport.csrfProtection, (req, res) => {
