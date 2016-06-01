@@ -12,7 +12,6 @@ curl -sL https://deb.nodesource.com/setup_6.x | bash -
 apt-get -q -y install mysql-server pwgen redis-server nodejs git ufw
 apt-get clean
 
-HOSTNAME=$(curl -s http://169.254.169.254/metadata/v1/hostname)
 MYSQL_PASSWORD=`pwgen -1`
 
 # Setup MySQL user for Mailtrain
