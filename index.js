@@ -32,7 +32,6 @@ app.set('port', port);
 
 let server = http.createServer(app);
 
-
 // Check if database needs upgrading before starting the server
 dbcheck(err => {
     if (err) {

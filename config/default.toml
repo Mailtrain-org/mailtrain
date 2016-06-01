@@ -41,6 +41,7 @@ enabled=false
 host="localhost"
 port=6379
 db=5
+# password=""
 
 [verp]
 enabled=false

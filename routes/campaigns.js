@@ -263,7 +263,7 @@ router.post('/ajax', (req, res) => {
                     if (data.scheduled && data.scheduled > new Date()) {
                         return 'Scheduled';
                     }
-                    return 'Sending';
+                    return '<span class="glyphicon glyphicon-refresh spinning"></span> Sending…';
                 case 3:
                     return 'Finished';
                 case 4:
