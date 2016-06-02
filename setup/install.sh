@@ -68,7 +68,7 @@ cat <<EOM > /etc/logrotate.d/mailtrain
 }
 EOM
 
-if [ -d "/usr/lib/systemd" ]; then
+if [ -d "/run/systemd/system" ]; then
     # Set up systemd service script
     cp setup/mailtrain.service /etc/systemd/system/
     systemctl enable mailtrain.service
