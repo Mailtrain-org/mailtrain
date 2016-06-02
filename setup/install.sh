@@ -16,7 +16,7 @@ MYSQL_PASSWORD=`pwgen -1`
 
 # Setup MySQL user for Mailtrain
 mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
-mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'%' WITH GRANT OPTION;"
+mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';"
 mysql -u mailtrain --password="$MYSQL_PASSWORD" -e "CREATE database mailtrain;"
 
 # Enable firewall, allow connections to SSH, HTTP, HTTPS and SMTP
