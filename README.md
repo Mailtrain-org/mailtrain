@@ -27,9 +27,9 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 
 ## Installation
 
-### Automatic install (Ubuntu 14.04)
+### Automatic install (Ubuntu)
 
-You can download and run [install.sh](setup/install.sh) in your blank Ubuntu 14.04 VPS to set up
+You can download and run [install.sh](setup/install.sh) in your blank Ubuntu VPS to set up
 Mailtrain and all required dependencies (including MySQL).
 
 If you like living on the edge and feel adventurous you can run the installation script directly from your command line as root:
