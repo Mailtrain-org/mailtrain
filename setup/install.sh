@@ -48,7 +48,7 @@ password="$MYSQL_PASSWORD"
 [redis]
 enabled=true
 [verp]
-enabled=true
+enabled=false
 EOT
 
 # Install required node packages
