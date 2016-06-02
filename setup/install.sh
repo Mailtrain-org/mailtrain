@@ -27,9 +27,9 @@ ufw allow 25/tcp
 ufw --force enable
 
 # Fetch Mailtrain files
-cd /opt
-git clone git://github.com/andris9/mailtrain.git
-cd mailtrain
+mkdir -p /opt/mailtrain
+cd /opt/mailtrain
+git clone git://github.com/andris9/mailtrain.git .
 
 # Set up upstart service script
 cp setup/mailtrain.conf /etc/init
