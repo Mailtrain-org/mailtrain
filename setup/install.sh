@@ -31,9 +31,6 @@ mkdir -p /opt/mailtrain
 cd /opt/mailtrain
 git clone git://github.com/andris9/mailtrain.git .
 
-# Set up upstart service script
-cp setup/mailtrain.conf /etc/init
-
 # Add new user for the daemon to run as
 useradd mailtrain || true
 
@@ -70,6 +67,15 @@ cat <<EOM > /etc/logrotate.d/mailtrain
     nomail
 }
 EOM
+
+if [ -d "/usr/lib/systemd" ]; then
+    # Set up systemd service script
+    cp setup/mailtrain.service /etc/systemd/system/
+    systemctl enable mailtrain.service
+else
+    # Set up upstart service script
+    cp setup/mailtrain.conf /etc/init/
+fi
 
 # Start the service
 service mailtrain start
