@@ -58,13 +58,13 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                             req.flash('danger', err.message || err);
                             return res.redirect('/');
                         }
-
+/*
                         if (!mail && !req.user) {
                             err = new Error('Not Found');
                             err.status = 404;
                             return next(err);
                         }
-
+*/
                         let renderAndShow = (html, renderTags) => {
 
                             // rewrite links to count clicks

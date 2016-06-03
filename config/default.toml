@@ -25,13 +25,15 @@ log="dev"
 proxy=true
 # maximum POST body size
 postsize="2MB"
+# Uncomment to set uploads folder location for temporary data. Defaults to os.tmpdir()
+#tmpdir=/tmp
 
 [mysql]
 host="localhost"
 user="mailtrain"
 password="mailtrain"
 database="mailtrain"
-port=3306 # some installations, eg. MAMP can use a different port (8889). MAMP users should turn on "Allow network access to MySQL" 
+port=3306 # some installations, eg. MAMP can use a different port (8889). MAMP users should turn on "Allow network access to MySQL"
 charset="utf8mb4"
 timezone="local"
 

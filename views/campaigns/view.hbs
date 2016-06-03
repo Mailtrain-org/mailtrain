@@ -33,27 +33,25 @@
         <p></p>
 
         <dl class="dl-horizontal">
-            <dt>List</dt>
-            <dd>
-                {{#if segment}}
-                    <a href="/lists/view/{{list.id}}?segment={{segment.id}}">
-                {{list.name}}: {{segment.name}}
-            </a>
-                {{else}}
-                    <a href="/lists/view/{{list.id}}">
-                {{list.name}}
-            </a>
-                {{/if}}
-            </dd>
+            {{#if list}}
+                <dt>List</dt>
+                <dd>
+                    {{#if segment}}
+                        <a href="/lists/view/{{list.id}}?segment={{segment.id}}">{{list.name}}: {{segment.name}}</a>
+                    {{else}}
+                        <a href="/lists/view/{{list.id}}">{{list.name}}</a>
+                    {{/if}}
+                </dd>
 
-            <dt>List subscribers</dt>
-            <dd>
-                {{#if segment}}
-                    {{segment.subscribers}}
-                {{else}}
-                    {{list.subscribers}}
-                {{/if}}
-            </dd>
+                <dt>List subscribers</dt>
+                <dd>
+                    {{#if segment}}
+                        {{segment.subscribers}}
+                    {{else}}
+                        {{list.subscribers}}
+                    {{/if}}
+                </dd>
+            {{/if}}
 
             {{#if isRss}}
                 <dt>Feed URL</dt>
@@ -85,7 +83,7 @@
                 <dd>{{subject}}</dd>
             {{/if}}
 
-            {{#if isNormal}}
+            {{#unless isRss}}
 
                 <dt>Preview campaign as</dt>
                 <dd>
@@ -166,7 +164,7 @@
             </dd>
 
             {{/unless}}
-            {{/if}}
+            {{/unless}}
         </dl>
 
         {{#if isNormal}}
@@ -309,6 +307,14 @@
 
                         Campaign status: <span class="label label-default">INACTIVE</span>
                     {{/if}}
+                </div>
+            </div>
+        {{/if}}
+
+        {{#if isTriggered}}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    This is a <a href="/triggers">triggered</a> campaign. Messages are only sent to subscribers that hit some trigger that invokes this campaign
                 </div>
             </div>
         {{/if}}
