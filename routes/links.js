@@ -36,6 +36,18 @@ router.get('/:campaign/:list/:subscription/:link', (req, res, next) => {
             req.flash('danger', err.message || err);
             return res.redirect('/');
         }
+        if (!linkId || !url) {
+            log.error('Redirect', 'Unresolved URL: <%s>', req.url);
+            res.status(404);
+            return res.render('archive/view', {
+                layout: 'archive/layout',
+                message: 'Oops, we couldn\'t find a link for the URL you clicked',
+                campaign: {
+                    subject: 'Error 404'
+                }
+            });
+
+        }
         links.countClick(req.ip, req.params.campaign, req.params.list, req.params.subscription, linkId, (err, status) => {
             if (err) {
                 log.error('Redirect', err.stack || err);
