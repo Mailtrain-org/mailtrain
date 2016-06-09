@@ -30,23 +30,27 @@ router.get('/:campaign/:list/:subscription', (req, res) => {
     res.end(trackImg);
 });
 
-router.get('/:campaign/:list/:subscription/:link', (req, res, next) => {
-    links.resolve(req.params.campaign, req.params.link, (err, linkId, url) => {
+router.get('/:campaign/:list/:subscription/:link', (req, res) => {
+
+    let notFound = () => {
+        res.status(404);
+        return res.render('archive/view', {
+            layout: 'archive/layout',
+            message: 'Oops, we couldn\'t find a link for the URL you clicked',
+            campaign: {
+                subject: 'Error 404'
+            }
+        });
+    };
+
+    links.resolve(req.params.link, (err, linkId, url) => {
         if (err) {
             req.flash('danger', err.message || err);
             return res.redirect('/');
         }
         if (!linkId || !url) {
             log.error('Redirect', 'Unresolved URL: <%s>', req.url);
-            res.status(404);
-            return res.render('archive/view', {
-                layout: 'archive/layout',
-                message: 'Oops, we couldn\'t find a link for the URL you clicked',
-                campaign: {
-                    subject: 'Error 404'
-                }
-            });
-
+            return notFound();
         }
         links.countClick(req.ip, req.params.campaign, req.params.list, req.params.subscription, linkId, (err, status) => {
             if (err) {
@@ -70,9 +74,8 @@ router.get('/:campaign/:list/:subscription/:link', (req, res, next) => {
             }
 
             if (!list) {
-                err = new Error('Not Found');
-                err.status = 404;
-                return next(err);
+                log.error('Redirect', 'Could not resolve list for merge tags: <%s>', req.url);
+                return notFound();
             }
 
             settings.get('serviceUrl', (err, serviceUrl) => {
@@ -88,9 +91,8 @@ router.get('/:campaign/:list/:subscription/:link', (req, res, next) => {
                     }
 
                     if (!subscription) {
-                        err = new Error('Not Found');
-                        err.status = 404;
-                        return next(err);
+                        log.error('Redirect', 'Could not resolve subscription for merge tags: <%s>', req.url);
+                        return notFound();
                     }
 
                     url = tools.formatMessage(serviceUrl, {
