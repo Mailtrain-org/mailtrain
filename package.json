@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
-    "body-parser": "^1.15.1",
+    "body-parser": "^1.15.2",
     "bounce-handler": "^7.3.2-fork.0",
     "compression": "^1.6.2",
     "config": "^1.21.0",
@@ -51,7 +51,7 @@
     "html-to-text": "^2.1.0",
     "humanize": "0.0.9",
     "is-url": "^1.2.1",
-    "isemail": "^2.1.2",
+    "isemail": "^2.2.0",
     "jsdom": "^9.2.1",
     "juice": "^2.0.0",
     "mkdirp": "^0.5.1",
