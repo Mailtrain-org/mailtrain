@@ -419,14 +419,21 @@ router.post('/subscription/delete', passport.parseForm, passport.csrfProtection,
             return res.redirect('/lists');
         }
 
-        subscriptions.delete(list.id, req.body.cid, (err, email) => {
-            if (err || !email) {
+        subscriptions.get(list.id, req.body.cid, (err, subscription) => {
+            if (err || !subscription) {
                 req.flash('danger', err && err.message || err || 'Could not find subscriber with specified ID');
                 return res.redirect('/lists/view/' + list.id);
             }
 
-            req.flash('success', email + ' was successfully removed from your list');
-            res.redirect('/lists/view/' + list.id);
+            subscriptions.delete(list.id, subscription.email, (err, subscription) => {
+                if (err || !subscription) {
+                    req.flash('danger', err && err.message || err || 'Could not find subscriber with specified ID');
+                    return res.redirect('/lists/view/' + list.id);
+                }
+
+                req.flash('success', subscription.email + ' was successfully removed from your list');
+                res.redirect('/lists/view/' + list.id);
+            });
         });
     });
 });
