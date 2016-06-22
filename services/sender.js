@@ -46,6 +46,61 @@ function findUnsent(callback) {
         });
     };
 
+    // get next subscriber from trigger queue
+    let checkQueued = () => {
+        db.getConnection((err, connection) => {
+            if (err) {
+                return callback(err);
+            }
+            connection.query('SELECT * FROM `queued` ORDER BY `created` ASC LIMIT 1', (err, rows) => {
+                if (err) {
+                    connection.release();
+                    return callback(err);
+                }
+                if (!rows || !rows.length) {
+                    connection.release();
+                    return callback(null, false);
+                }
+
+                let queued = tools.convertKeys(rows[0]);
+
+                // delete queued element
+                connection.query('DELETE FROM `queued` WHERE `campaign`=? AND `list`=? AND `subscriber`=? LIMIT 1', [queued.campaign, queued.list, queued.subscriber], err => {
+                    if (err) {
+                        connection.release();
+                        return callback(err);
+                    }
+
+                    // get campaign
+                    connection.query('SELECT `id`, `list`, `segment` FROM `campaigns` WHERE `id`=? LIMIT 1', [queued.campaign], (err, rows) => {
+                        if (err) {
+                            connection.release();
+                            return callback(err);
+                        }
+                        if (!rows || !rows.length) {
+                            connection.release();
+                            return callback(null, false);
+                        }
+
+                        let campaign = tools.convertKeys(rows[0]);
+
+                        // get subscription
+                        connection.query('SELECT * FROM `subscription__' + queued.list + '` WHERE `id`=? AND `status`=1 LIMIT 1', [queued.subscriber], (err, rows) => {
+                            connection.release();
+                            if (err) {
+                                return callback(err);
+                            }
+                            if (!rows || !rows.length) {
+                                return callback(null, false);
+                            }
+                            return returnUnsent(rows[0], campaign);
+                        });
+                    });
+                });
+            });
+        });
+    };
+
     if (caches.cache.has('sender queue')) {
         let cached = caches.shift('sender queue');
         return returnUnsent(cached.row, cached.campaign);
@@ -64,7 +119,7 @@ function findUnsent(callback) {
                 return callback(err);
             }
             if (!rows || !rows.length) {
-                return callback(null, false);
+                return checkQueued();
             }
 
             let campaign = tools.convertKeys(rows[0]);
@@ -115,10 +170,11 @@ function findUnsent(callback) {
 
                         if (!rows || !rows.length) {
                             // everything already processed for this campaign
-                            return connection.query('UPDATE campaigns SET `status`=3, `status_change`=NOW() WHERE id=? LIMIT 1', [campaign.id], () => {
+                            connection.query('UPDATE campaigns SET `status`=3, `status_change`=NOW() WHERE id=? LIMIT 1', [campaign.id], () => {
                                 connection.release();
                                 return callback(null, false);
                             });
+                            return;
                         }
                         connection.release();
 

@@ -108,11 +108,11 @@
     {{#if indexPage}}
         <div class="jumbotron">
             <div class="container">
-                <div class="pull-right hidden-xs">
-                    <img class="img-responsive" src="/mailtrain.png">
+                <div class="pull-right col-md-4">
+                    {{{shoutout}}}
                 </div>
 
-                <h1>Mailtrain</h1>
+                <h1><img class="img-responsive" src="/mailtrain-header.png"></h1>
                 <p>Self hosted newsletter app built on top of <a href="http://nodemailer.com">Nodemailer</a></p>
                 <p>
                     <a class="btn btn-info btn-md" href="https://github.com/andris9/mailtrain" role="button"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Source on GitHub</a>
@@ -121,9 +121,6 @@
                 </p>
                 <div class="clearfix"></div>
 
-                <div class="visible-xs-block ">
-                    <img class="img-responsive" src="/mailtrain.png">
-                </div>
             </div>
         </div>
     {{/if}}

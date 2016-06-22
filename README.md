@@ -4,8 +4,6 @@
 
 ![](http://mailtrain.org/mailtrain.png)
 
-> **NB!** I'm running an IndieGoGo campaign to help fund developing first class automation support into Mailtrain. See all details here: [https://igg.me/at/mailtrain/8720095](https://igg.me/at/mailtrain/8720095)
-
 ## Features
 
 Mailtrain supports subscriber list management, list segmentation, custom fields, email templates, large CSV list import files, etc.

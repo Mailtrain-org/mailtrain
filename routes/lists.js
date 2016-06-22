@@ -1,5 +1,6 @@
 'use strict';
 
+let config = require('config');
 let openpgp = require('openpgp');
 let passport = require('../lib/passport');
 let express = require('express');
@@ -13,9 +14,30 @@ let htmlescape = require('escape-html');
 let multer = require('multer');
 let os = require('os');
 let humanize = require('humanize');
-let uploads = multer({
-    dest: os.tmpdir()
+let mkdirp = require('mkdirp');
+let pathlib = require('path');
+let log = require('npmlog');
+
+let uploadStorage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        log.verbose('tmpdir', os.tmpdir());
+        let tmp = config.www.tmpdir || os.tmpdir();
+        let dir = pathlib.join(tmp, 'mailtrain');
+        mkdirp(dir, err => {
+            if (err) {
+                log.error('Upload', err);
+                log.verbose('Upload', 'Storing upload to <%s>', tmp);
+                return callback(null, tmp);
+            }
+            log.verbose('Upload', 'Storing upload to <%s>', dir);
+            callback(null, dir);
+        });
+    }
 });
+let uploads = multer({
+    storage: uploadStorage
+});
+
 let csvparse = require('csv-parse');
 let fs = require('fs');
 let moment = require('moment-timezone');

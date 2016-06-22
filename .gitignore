@@ -1,5 +1,6 @@
 node_modules
 npm-debug.log
 .DS_Store
-development.toml
+config/development.*
+config/production.*
 dump.rdb

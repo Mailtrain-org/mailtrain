@@ -1,0 +1,162 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/triggers/">Automation Triggers</a></li>
+    <li class="active">Create Trigger</li>
+</ol>
+
+<h2>Create Trigger</h2>
+
+<hr>
+
+<form class="form-horizontal" method="post" action="/triggers/create">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="list" value="{{list.id}}">
+
+    <div class="form-group">
+        <label for="trigger-name" class="col-sm-2 control-label">Trigger name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control input-lg" name="name" id="trigger-name" value="{{name}}" placeholder="Name for this trigger, eg. &quot;Inactive subscribers&quot;" required autofocus>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="trigger-description" class="col-sm-2 control-label">Description</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" id="trigger-description" name="description" rows="3" placeholder="Optional comments about this trigger">{{description}}</textarea>
+            <span class="help-block">HTML is allowed</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">List</label>
+        <div class="col-sm-10">
+            <p class="form-control-static"><a href="/lists/view/{{list.id}}">{{list.name}}</a> <span class="text-muted"> – {{list.subscribers}} subscribers</span></p>
+        </div>
+    </div>
+
+    <fieldset>
+        <legend>
+            Trigger rule
+        </legend>
+
+        <div class="form-group">
+            <label for="trigger-days" class="col-sm-2 control-label">Trigger fires</label>
+            <div class="col-sm-1">
+                <input type="number" class="form-control" name="days" id="trigger-days" value="{{days}}" placeholder="1" required>
+            </div>
+            <div class="col-sm-1">
+                <p class="form-control-static">days after:</p>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-2 panel panel-default">
+            <div class="panel-heading">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rule" value="subscription" {{#if isSubscription}} checked {{/if}}> Subscription
+                    </label>
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="column" class="col-sm-2 control-label">Event</label>
+                    <div class="col-sm-10">
+                        <select name="column" class="form-control">
+                            <option value="">
+                                –– Select ––
+                            </option>
+                            {{#each columns}}
+                                <option value="{{column}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-2 panel panel-default">
+            <div class="panel-heading">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="rule" value="campaign" {{#if isCampaign}} checked {{/if}}> Campaign
+                    </label>
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="source-campaign" class="col-sm-2 control-label">Campaign</label>
+                    <div class="col-sm-10">
+                        <select name="source-campaign" class="form-control">
+                            <option value="">
+                                –– Select ––
+                            </option>
+                            {{#each sourceCampaigns}}
+                                <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign-option" class="col-sm-2 control-label">Event</label>
+                    <div class="col-sm-10">
+                        <select name="campaign-option" id="campaign-option" class="form-control">
+                            <option value="">
+                                –– Select ––
+                            </option>
+                            {{#each campaignOptions}}
+                                <option value="{{option}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Trigger action
+        </legend>
+
+        <div class="col-sm-offset-2 panel panel-default">
+            <div class="panel-heading">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="action" value="send" {{#if isSend}} checked {{/if}}> Send campaign
+                    </label>
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="dest-campaign" class="col-sm-2 control-label">Campaign</label>
+                    <div class="col-sm-10">
+                        <select name="dest-campaign" class="form-control" required>
+                            <option value="">
+                                –– Select ––
+                            </option>
+                            {{#each destCampaigns}}
+                                <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </fieldset>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Create Trigger</button>
+        </div>
+    </div>
+
+
+</form>
