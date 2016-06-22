@@ -170,10 +170,11 @@ function findUnsent(callback) {
 
                         if (!rows || !rows.length) {
                             // everything already processed for this campaign
-                            return connection.query('UPDATE campaigns SET `status`=3, `status_change`=NOW() WHERE id=? LIMIT 1', [campaign.id], () => {
+                            connection.query('UPDATE campaigns SET `status`=3, `status_change`=NOW() WHERE id=? LIMIT 1', [campaign.id], () => {
                                 connection.release();
                                 return callback(null, false);
                             });
+                            return;
                         }
                         connection.release();
 

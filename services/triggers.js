@@ -68,12 +68,14 @@ function fireTrigger(trigger, callback) {
             }
 
             if (!rows || !rows.length) {
+                connection.release();
                 return callback(null, trigger.id);
             }
 
             let pos = 0;
             let insertNext = () => {
                 if (pos >= rows.length) {
+                    connection.release();
                     return callback(null, trigger.id);
                 }
                 let subscriber = rows[pos++].id;
