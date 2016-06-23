@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0 2016-06-22
+
+  * Automation support. Create triggers that send a campaign once fired
+  * Fixed an issue with unresolved URL redirects
+  * Added support for relative date ranges in segments
+
 ## 1.11.0 2016-05-31
 
   * Retry transactional mail if failed with soft error (4xx)
