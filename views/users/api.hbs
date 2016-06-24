@@ -113,3 +113,30 @@
 
 <pre>curl -XPOST {{serviceUrl}}api/unsubscribe/B16uVTdW?access_token={{accessToken}}\
 --data 'EMAIL=test@example.com'</pre>
+
+<h3>POST /api/delete/:listId – Delete subscription</h3>
+
+<p>
+    This API call deletes a subscription
+</p>
+
+<p>
+    <strong>GET</strong> arguments
+</p>
+<ul>
+    <li><strong>access_token</strong> – your personal access token
+</ul>
+
+<p>
+    <strong>POST</strong> arguments
+</p>
+<ul>
+    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)
+</ul>
+
+<p>
+    <strong>Example</strong>
+</p>
+
+<pre>curl -XPOST {{serviceUrl}}api/delete/B16uVTdW?access_token={{accessToken}}\
+--data 'EMAIL=test@example.com'</pre>
