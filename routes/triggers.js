@@ -9,6 +9,7 @@ let fields = require('../lib/models/fields');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
 let tools = require('../lib/tools');
+let htmlescape = require('escape-html');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -231,5 +232,53 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
     });
 });
 
+router.get('/status/:id', passport.csrfProtection, (req, res) => {
+    let id = Number(req.params.id) || 0;
+
+    triggers.get(id, (err, trigger) => {
+        if (err || !trigger) {
+            req.flash('danger', err && err.message || err || 'Could not find trigger with specified ID');
+            return res.redirect('/triggers');
+        }
+
+        trigger.csrfToken = req.csrfToken();
+        res.render('triggers/triggered', trigger);
+    });
+});
+
+router.post('/status/ajax/:id', (req, res) => {
+    triggers.get(req.params.id, (err, trigger) => {
+        if (err || !trigger) {
+            return res.json({
+                error: err && err.message || err || 'Trigger not found',
+                data: []
+            });
+        }
+
+        let columns = ['#', 'email', 'first_name', 'last_name', 'trigger__' + trigger.id + '`.`created'];
+        triggers.filterSubscribers(trigger, req.body, columns, (err, data, total, filteredTotal) => {
+            if (err) {
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+
+            res.json({
+                draw: req.body.draw,
+                recordsTotal: total,
+                recordsFiltered: filteredTotal,
+                data: data.map((row, i) => [
+                    (Number(req.body.start) || 0) + 1 + i,
+                    htmlescape(row.email || ''),
+                    htmlescape(row.firstName || ''),
+                    htmlescape(row.lastName || ''),
+                    '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
+                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + trigger.list + '/edit/' + row.cid + '">Edit</a>'
+                ])
+            });
+        });
+    });
+});
 
 module.exports = router;

@@ -99,7 +99,10 @@ function fireTrigger(trigger, callback) {
                             connection.release();
                             return callback(err);
                         }
-                        return setImmediate(insertNext);
+                        // update counter
+                        let query = 'UPDATE `triggers` SET `count`=`count`+1 WHERE id=?';
+                        let values = [trigger.id];
+                        connection.query(query, values, () => setImmediate(insertNext));
                     });
                 });
             };

@@ -194,7 +194,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -211,7 +211,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','15');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','16');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -267,6 +267,7 @@ CREATE TABLE `triggers` (
   `column` varchar(255) CHARACTER SET ascii DEFAULT NULL,
   `seconds` int(11) NOT NULL DEFAULT '0',
   `dest_campaign` int(11) unsigned DEFAULT NULL,
+  `count` int(11) unsigned NOT NULL DEFAULT '0',
   `last_check` timestamp NULL DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
