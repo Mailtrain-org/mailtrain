@@ -147,6 +147,15 @@ CREATE TABLE `lists` (
   UNIQUE KEY `cid` (`cid`),
   KEY `name` (`name`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `queued` (
+  `campaign` int(11) unsigned NOT NULL,
+  `list` int(11) unsigned NOT NULL,
+  `subscriber` int(11) unsigned NOT NULL,
+  `source` varchar(255) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`campaign`,`list`,`subscriber`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 CREATE TABLE `rss` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent` int(11) unsigned NOT NULL,
@@ -176,7 +185,7 @@ CREATE TABLE `segments` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
-  KEY `name` (`name`),
+  KEY `name` (`name`(191)),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `settings` (
@@ -226,7 +235,10 @@ CREATE TABLE `subscription` (
   KEY `first_name` (`first_name`(191)),
   KEY `last_name` (`last_name`(191)),
   KEY `subscriber_tz` (`tz`),
-  KEY `is_test` (`is_test`)
+  KEY `is_test` (`is_test`),
+  KEY `latest_open` (`latest_open`),
+  KEY `latest_click` (`latest_click`),
+  KEY `created` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `templates` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -248,12 +260,14 @@ CREATE TABLE `triggers` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `description` text,
+  `enabled` tinyint(4) unsigned NOT NULL DEFAULT '1',
   `list` int(11) unsigned NOT NULL,
   `source_campaign` int(11) unsigned DEFAULT NULL,
   `rule` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT 'column',
   `column` varchar(255) CHARACTER SET ascii DEFAULT NULL,
   `seconds` int(11) NOT NULL DEFAULT '0',
   `dest_campaign` int(11) unsigned DEFAULT NULL,
+  `last_check` timestamp NULL DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `name` (`name`(191)),
@@ -261,6 +275,8 @@ CREATE TABLE `triggers` (
   KEY `dest_campaign` (`dest_campaign`),
   KEY `list` (`list`),
   KEY `column` (`column`),
+  KEY `active` (`enabled`),
+  KEY `last_check` (`last_check`),
   CONSTRAINT `triggers_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `tzoffset` (
