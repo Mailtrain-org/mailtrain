@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.13.0 2016-06-23
+
+  * Added API method to delete subscribers
+  * Added a counter to triggers with a view to list all subscribers that caused this trigger to fire
+
+## 1.12.1 2016-06-23
+
+  * Fixed invalid base SQL dump
+
 ## 1.12.0 2016-06-22
 
   * Automation support. Create triggers that send a campaign once fired
