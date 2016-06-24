@@ -207,4 +207,73 @@ router.post('/unsubscribe/:listId', (req, res) => {
     });
 });
 
+router.post('/delete/:listId', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+        if (!input.EMAIL) {
+            res.status(400);
+            return res.json({
+                error: 'Missing EMAIL',
+                data: []
+            });
+        }
+        subscriptions.getByEmail(list.id, input.EMAIL, (err, subscription) => {
+            if (err) {
+                res.status(500);
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+            if (!subscription) {
+                res.status(404);
+                return res.json({
+                    error: 'Subscription not found',
+                    data: []
+                });
+            }
+            subscriptions.delete(list.id, subscription.cid, (err, subscription) => {
+                if (err) {
+                    res.status(500);
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
+                }
+                if (!subscription) {
+                    res.status(404);
+                    return res.json({
+                        error: 'Subscription not found',
+                        data: []
+                    });
+                }
+                res.status(200);
+                res.json({
+                    data: {
+                        id: subscription.id,
+                        deleted: true
+                    }
+                });
+            });
+        });
+    });
+});
+
 module.exports = router;
