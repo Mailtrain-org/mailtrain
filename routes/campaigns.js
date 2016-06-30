@@ -191,6 +191,9 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                                     key: 'LINK_BROWSER',
                                     value: 'URL to preview the message in a browser'
                                 }, {
+                                    key: 'EMAIL',
+                                    value: 'Email address'
+                                }, {
                                     key: 'FIRST_NAME',
                                     value: 'First name'
                                 }, {

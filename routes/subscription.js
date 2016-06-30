@@ -35,7 +35,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
                 return next(err);
             }
 
-            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultFrom'], (err, configItems) => {
+            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultFrom', 'disableConfirmations'], (err, configItems) => {
                 if (err) {
                     return next(err);
                 }
@@ -47,6 +47,10 @@ router.get('/subscribe/:cid', (req, res, next) => {
                     preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid,
                     hasPubkey: !!configItems.pgpPrivateKey
                 });
+
+                if (configItems.disableConfirmations) {
+                    return;
+                }
 
                 fields.list(list.id, (err, fieldList) => {
                     if (err) {
@@ -378,9 +382,13 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                     }
                 });
 
-                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl'], (err, configItems) => {
+                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl', 'disableConfirmations'], (err, configItems) => {
                     if (err) {
-                        return next(err);
+                        return log.error('Settings', err);
+                    }
+
+                    if (configItems.disableConfirmations) {
+                        return;
                     }
 
                     mailer.sendMail({

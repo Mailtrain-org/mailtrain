@@ -48,6 +48,17 @@
         </div>
 
         <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="disable-confirmations" {{#if disableConfirmations}} checked {{/if}}> Disable subscription confirmation messages
+                        <span class="help-block">If checked then do not send a confirmation message that states the subscriber is now subscribed or unsubscribed. This does not disable double opt-in messages.</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="ua-code" class="col-sm-2 control-label">Tracking ID</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" name="ua-code" id="ua-code-url" placeholder="UA-XXXXX-XX" value="{{uaCode}}">
