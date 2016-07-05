@@ -26,7 +26,7 @@
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-nodeunit": "^1.0.0",
-    "grunt-eslint": "^18.1.0"
+    "grunt-eslint": "^19.0.0"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -41,7 +41,7 @@
     "csv-parse": "^1.1.1",
     "escape-html": "^1.0.3",
     "express": "^4.14.0",
-    "express-session": "^1.13.0",
+    "express-session": "^1.14.0",
     "faker": "^3.1.0",
     "feedparser": "^1.1.4",
     "geoip-ultralight": "^0.1.4",
@@ -52,7 +52,7 @@
     "humanize": "0.0.9",
     "is-url": "^1.2.1",
     "isemail": "^2.2.0",
-    "jsdom": "^9.3.0",
+    "jsdom": "^9.4.0",
     "juice": "^2.0.0",
     "mkdirp": "^0.5.1",
     "moment-timezone": "^0.5.4",

@@ -430,12 +430,12 @@ let sendLoop = () => {
                         });
                     };
                     setImmediate(trySend);
-                    setImmediate(getNext);
+                    setImmediate(() => mailer.transport.checkThrottling(getNext));
                 });
             });
         };
 
-        mailer.transport.on('idle', getNext);
+        mailer.transport.on('idle', () => mailer.transport.checkThrottling(getNext));
     });
 };
 

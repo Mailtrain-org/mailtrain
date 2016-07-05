@@ -22,6 +22,7 @@
         <div class="col-sm-offset-2 col-sm-10">
             <a class="btn btn-default" role="button" data-toggle="collapse" href="#mergeReference" aria-expanded="false" aria-controls="mergeReference">Merge tag reference</a>
             <div class="collapse" id="mergeReference">
+
                 <p>
                     Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used
                     when <code>TAG_NAME</code> is empty.
@@ -69,12 +70,14 @@
     <div class="form-group">
         <label for="template-html" class="col-sm-2 control-label">Template content (HTML)</label>
         <div class="col-sm-10">
+
             {{#if disableWysiwyg}}
                 <div class="code-editor" id="template-html">{{html}}</div>
                 <input type="hidden" name="html">
             {{else}}
                 <textarea class="form-control summernote" id="template-html" name="html" rows="8">{{html}}</textarea>
             {{/if}}
+
         </div>
     </div>
 
