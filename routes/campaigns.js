@@ -407,7 +407,7 @@ router.post('/preview/:id', passport.parseForm, passport.csrfProtection, (req, r
         return res.redirect('/lists/subscription/' + encodeURIComponent(listId) + '/add/?is-test=true');
     }
 
-    res.redirect('/archive/' + encodeURIComponent(campaign) + '/' + encodeURIComponent(list) + '/' + encodeURIComponent(subscription));
+    res.redirect('/archive/' + encodeURIComponent(campaign) + '/' + encodeURIComponent(list) + '/' + encodeURIComponent(subscription) + '?track=no');
 });
 
 router.get('/opened/:id', passport.csrfProtection, (req, res) => {
@@ -564,29 +564,40 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
                 data: []
             });
         }
-
-        let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '`.`created', 'count'];
-        campaigns.filterClickedSubscribers(campaign, linkId, req.body, columns, (err, data, total, filteredTotal) => {
+        lists.get(campaign.list, (err, list) => {
             if (err) {
                 return res.json({
-                    error: err.message || err,
+                    error: err && err.message || err,
                     data: []
                 });
             }
 
-            res.json({
-                draw: req.body.draw,
-                recordsTotal: total,
-                recordsFiltered: filteredTotal,
-                data: data.map((row, i) => [
-                    (Number(req.body.start) || 0) + 1 + i,
-                    htmlescape(row.email || ''),
-                    htmlescape(row.firstName || ''),
-                    htmlescape(row.lastName || ''),
-                    row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
-                    row.count,
-                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
-                ])
+            let campaignCid = campaign.cid;
+            let listCid = list.cid;
+
+            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '`.`created', 'count'];
+            campaigns.filterClickedSubscribers(campaign, linkId, req.body, columns, (err, data, total, filteredTotal) => {
+                if (err) {
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
+                }
+
+                res.json({
+                    draw: req.body.draw,
+                    recordsTotal: total,
+                    recordsFiltered: filteredTotal,
+                    data: data.map((row, i) => [
+                        '<a href="/archive/' + encodeURIComponent(campaignCid) + '/' + encodeURIComponent(listCid) + '/' + encodeURIComponent(row.cid) + '?track=no">' + ((Number(req.body.start) || 0) + 1 + i) + '</a>',
+                        htmlescape(row.email || ''),
+                        htmlescape(row.firstName || ''),
+                        htmlescape(row.lastName || ''),
+                        row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
+                        row.count,
+                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
+                    ])
+                });
             });
         });
     });
@@ -603,28 +614,40 @@ router.post('/status/ajax/:id/:status', (req, res) => {
             });
         }
 
-        let columns = ['#', 'email', 'first_name', 'last_name', 'campaign__' + campaign.id + '`.`updated'];
-        campaigns.filterStatusSubscribers(campaign, status, req.body, columns, (err, data, total, filteredTotal) => {
+        lists.get(campaign.list, (err, list) => {
             if (err) {
                 return res.json({
-                    error: err.message || err,
+                    error: err && err.message || err,
                     data: []
                 });
             }
 
-            res.json({
-                draw: req.body.draw,
-                recordsTotal: total,
-                recordsFiltered: filteredTotal,
-                data: data.map((row, i) => [
-                    (Number(req.body.start) || 0) + 1 + i,
-                    htmlescape(row.email || ''),
-                    htmlescape(row.firstName || ''),
-                    htmlescape(row.lastName || ''),
-                    htmlescape(row.response || ''),
-                    row.updated && row.created.toISOString ? '<span class="datestring" data-date="' + row.updated.toISOString() + '" title="' + row.updated.toISOString() + '">' + row.updated.toISOString() + '</span>' : 'N/A',
-                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
-                ])
+            let campaignCid = campaign.cid;
+            let listCid = list.cid;
+
+            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign__' + campaign.id + '`.`updated'];
+            campaigns.filterStatusSubscribers(campaign, status, req.body, columns, (err, data, total, filteredTotal) => {
+                if (err) {
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
+                }
+
+                res.json({
+                    draw: req.body.draw,
+                    recordsTotal: total,
+                    recordsFiltered: filteredTotal,
+                    data: data.map((row, i) => [
+                        '<a href="/archive/' + encodeURIComponent(campaignCid) + '/' + encodeURIComponent(listCid) + '/' + encodeURIComponent(row.cid) + '?track=no">' + ((Number(req.body.start) || 0) + 1 + i) + '</a>',
+                        htmlescape(row.email || ''),
+                        htmlescape(row.firstName || ''),
+                        htmlescape(row.lastName || ''),
+                        htmlescape(row.response || ''),
+                        row.updated && row.created.toISOString ? '<span class="datestring" data-date="' + row.updated.toISOString() + '" title="' + row.updated.toISOString() + '">' + row.updated.toISOString() + '</span>' : 'N/A',
+                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
+                    ])
+                });
             });
         });
     });

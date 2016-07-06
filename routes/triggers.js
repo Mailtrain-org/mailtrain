@@ -264,19 +264,41 @@ router.post('/status/ajax/:id', (req, res) => {
                 });
             }
 
-            res.json({
-                draw: req.body.draw,
-                recordsTotal: total,
-                recordsFiltered: filteredTotal,
-                data: data.map((row, i) => [
-                    (Number(req.body.start) || 0) + 1 + i,
-                    htmlescape(row.email || ''),
-                    htmlescape(row.firstName || ''),
-                    htmlescape(row.lastName || ''),
-                    '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
-                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + trigger.list + '/edit/' + row.cid + '">Edit</a>'
-                ])
+            campaigns.get(trigger.destCampaign, false, (err, campaign) => {
+                if (err) {
+                    return res.json({
+                        error: err && err.message || err,
+                        data: []
+                    });
+                }
+                lists.get(trigger.list, (err, list) => {
+                    if (err) {
+                        return res.json({
+                            error: err && err.message || err,
+                            data: []
+                        });
+                    }
+
+                    let campaignCid = campaign && campaign.cid;
+                    let listCid = list && list.cid;
+
+                    res.json({
+                        draw: req.body.draw,
+                        recordsTotal: total,
+                        recordsFiltered: filteredTotal,
+                        data: data.map((row, i) => [
+                            '<a href="/archive/' + encodeURIComponent(campaignCid) + '/' + encodeURIComponent(listCid) + '/' + encodeURIComponent(row.cid) + '?track=no">' + ((Number(req.body.start) || 0) + 1 + i) + '</a>',
+                            htmlescape(row.email || ''),
+                            htmlescape(row.firstName || ''),
+                            htmlescape(row.lastName || ''),
+                            '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
+                            '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + trigger.list + '/edit/' + row.cid + '">Edit</a>'
+                        ])
+                    });
+                });
             });
+
+
         });
     });
 });

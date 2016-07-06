@@ -53,58 +53,50 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                         return next(err);
                     }
 
-                    campaigns.getMail(campaign.id, list.id, subscription.id, (err, mail) => {
-                        if (err) {
-                            req.flash('danger', err.message || err);
-                            return res.redirect('/');
-                        }
-/*
-                        if (!mail && !req.user) {
-                            err = new Error('Not Found');
-                            err.status = 404;
-                            return next(err);
-                        }
-*/
-                        let renderAndShow = (html, renderTags) => {
+                    let renderHtml = (html, renderTags) => {
+                        res.render('archive/view', {
+                            layout: 'archive/layout',
+                            message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
+                            campaign,
+                            list,
+                            subscription
+                        });
+                    };
 
-                            // rewrite links to count clicks
-                            links.updateLinks(campaign, list, subscription, serviceUrl, html, (err, html) => {
-                                if (err) {
-                                    req.flash('danger', err.message || err);
-                                    return res.redirect('/');
-                                }
-
-                                res.render('archive/view', {
-                                    layout: 'archive/layout',
-                                    message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
-                                    campaign,
-                                    list,
-                                    subscription
-                                });
-                            });
-                        };
-
-                        if (campaign.sourceUrl) {
-                            let form = tools.getMessageLinks(serviceUrl, campaign, list, subscription);
-                            Object.keys(subscription.mergeTags).forEach(key => {
-                                form[key] = subscription.mergeTags[key];
-                            });
-                            request.post({
-                                url: campaign.sourceUrl,
-                                form
-                            }, (err, httpResponse, body) => {
-                                if (err) {
-                                    return next(err);
-                                }
-                                if (httpResponse.statusCode !== 200) {
-                                    return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
-                                }
-                                renderAndShow(body && body.toString(), false);
-                            });
-                        } else {
-                            renderAndShow(campaign.html, true);
+                    let renderAndShow = (html, renderTags) => {
+                        if (req.query.track === 'no') {
+                            return renderHtml(html, renderTags);
                         }
-                    });
+                        // rewrite links to count clicks
+                        links.updateLinks(campaign, list, subscription, serviceUrl, html, (err, html) => {
+                            if (err) {
+                                req.flash('danger', err.message || err);
+                                return res.redirect('/');
+                            }
+                            renderHtml(html, renderTags);
+                        });
+                    };
+
+                    if (campaign.sourceUrl) {
+                        let form = tools.getMessageLinks(serviceUrl, campaign, list, subscription);
+                        Object.keys(subscription.mergeTags).forEach(key => {
+                            form[key] = subscription.mergeTags[key];
+                        });
+                        request.post({
+                            url: campaign.sourceUrl,
+                            form
+                        }, (err, httpResponse, body) => {
+                            if (err) {
+                                return next(err);
+                            }
+                            if (httpResponse.statusCode !== 200) {
+                                return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
+                            }
+                            renderAndShow(body && body.toString(), false);
+                        });
+                    } else {
+                        renderAndShow(campaign.html, true);
+                    }
                 });
             });
         });
