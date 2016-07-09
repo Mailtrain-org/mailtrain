@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.14.0 2016-07-09
+
+  * Fixed ANY match segments with range queries
+  * Added an option to disable un/subscribe confirmation messages
+  * Added support for throttling when sending messages
+  * Added preview links in message lists
+
 ## 1.13.0 2016-06-23
 
   * Added API method to delete subscribers
