@@ -8,6 +8,8 @@ let tools = require('../lib/tools');
 let nodemailer = require('nodemailer');
 let mailer = require('../lib/mailer');
 let url = require('url');
+let multer = require('multer');
+let upload = multer();
 
 let settings = require('../lib/models/settings');
 
@@ -104,61 +106,74 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
     storeSettings();
 });
 
-router.post('/smtp-verify', passport.parseForm, passport.csrfProtection, (req, res) => {
-    settings.list((err, configItems) => {
-        if (err) {
-            req.flash('danger', err.message || err);
-            return res.redirect('/settings');
+router.post('/smtp-verify', upload.array(), passport.parseForm, passport.csrfProtection, (req, res) => {
+
+    let data = tools.convertKeys(req.body);
+
+    // checkboxs are not included in value listing if left unchecked
+    ['smtpLog', 'smtpSelfSigned', 'smtpDisableAuth'].forEach(key => {
+        if (!data.hasOwnProperty(key)) {
+            data[key] = false;
+        } else {
+            data[key] = true;
         }
-
-        let transport = nodemailer.createTransport({
-            host: configItems.smtpHostname,
-            port: Number(configItems.smtpPort) || false,
-            secure: configItems.smtpEncryption === 'TLS',
-            ignoreTLS: configItems.smtpEncryption === 'NONE',
-            auth: configItems.smtpDisableAuth ? false : {
-                user: configItems.smtpUser,
-                pass: configItems.smtpPass
-            },
-            tls: {
-                rejectUnauthorized: !configItems.smtpSelfSigned
-            }
-        });
-
-        transport.verify(err => {
-            if (err) {
-                let message = '';
-                switch (err.code) {
-                    case 'ECONNREFUSED':
-                        message = 'Connection refused, check hostname and port.';
-                        break;
-                    case 'ETIMEDOUT':
-                        if ((err.message || '').indexOf('Greeting never received') === 0) {
-                            if (configItems.smtpEncryption !== 'TLS') {
-                                message = 'Did not receive greeting message from server. This might happen when connecting to a TLS port without using TLS.';
-                            } else {
-                                message = 'Did not receive greeting message from server.';
-                            }
-                        } else {
-                            message = 'Connection timed out. Check your firewall settings, destination port is probably blocked.';
-                        }
-                        break;
-                    case 'EAUTH':
-                        if (/\b5\.7\.0\b/.test(err.message) && configItems.smtpEncryption !== 'STARTTLS') {
-                            message = 'Authentication not accepted, server expects STARTTLS to be used.';
-                        } else {
-                            message = 'Authentication failed, check username and password.';
-                        }
-
-                        break;
-                }
-                req.flash('warning', (message || 'Failed SMTP verification.') + (err.response ? ' Server responded with: "' + err.response + '"' : ''));
-            } else {
-                req.flash('info', 'SMTP settings verified, ready to send some mail!');
-            }
-            return res.redirect('/settings');
-        });
     });
+
+    let transport = nodemailer.createTransport({
+        host: data.smtpHostname,
+        port: Number(data.smtpPort) || false,
+        secure: data.smtpEncryption === 'TLS',
+        ignoreTLS: data.smtpEncryption === 'NONE',
+        auth: data.smtpDisableAuth ? false : {
+            user: data.smtpUser,
+            pass: data.smtpPass
+        },
+        tls: {
+            rejectUnauthorized: !data.smtpSelfSigned
+        }
+    });
+
+    transport.verify(err => {
+        if (err) {
+            let message = '';
+            switch (err.code) {
+                case 'ECONNREFUSED':
+                    message = 'Connection refused, check hostname and port.';
+                    break;
+                case 'ETIMEDOUT':
+                    if ((err.message || '').indexOf('Greeting never received') === 0) {
+                        if (data.smtpEncryption !== 'TLS') {
+                            message = 'Did not receive greeting message from server. This might happen when connecting to a TLS port without using TLS.';
+                        } else {
+                            message = 'Did not receive greeting message from server.';
+                        }
+                    } else {
+                        message = 'Connection timed out. Check your firewall settings, destination port is probably blocked.';
+                    }
+                    break;
+                case 'EAUTH':
+                    if (/\b5\.7\.0\b/.test(err.message) && data.smtpEncryption !== 'STARTTLS') {
+                        message = 'Authentication not accepted, server expects STARTTLS to be used.';
+                    } else {
+                        message = 'Authentication failed, check username and password.';
+                    }
+
+                    break;
+            }
+            if (!message && err.reason) {
+                message = err.reason;
+            }
+
+            res.json({
+                error: (message || 'Failed SMTP verification.') + (err.response ? ' Server responded with: "' + err.response + '"' : '')
+            });
+        } else {
+            res.json({
+                message: 'SMTP settings verified, ready to send some mail!'
+            });
+        }
+    });
+
 });
 
 module.exports = router;

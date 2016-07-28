@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.15.0 2016-07-28
+
+  * Check SMTP settings using AJAX instead of posting entire form
+
 ## 1.14.0 2016-07-09
 
   * Fixed ANY match segments with range queries

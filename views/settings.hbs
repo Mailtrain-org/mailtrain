@@ -11,7 +11,7 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 </form>
 
-<form class="form-horizontal" method="post" action="/settings/update">
+<form class="form-horizontal" id="settings-form" method="post" action="/settings/update">
 
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
@@ -185,7 +185,7 @@
         </div>
 
         <div class="pull-right">
-            <button type="submit" form="smtp-verify" class="btn btn-info"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Check SMTP config</button>
+            <button type="submit" id="verify-button" form="smtp-verify" class="btn btn-info" data-loading-text="Checking..." ><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Check SMTP config</button>
         </div>
     </fieldset>
 
