@@ -10,6 +10,14 @@ Mailtrain supports subscriber list management, list segmentation, custom fields,
 
 Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv8sAx) (uses Mailtrain obviously)
 
+## Official partners
+
+### iRedMail
+
+![](https://mailtrain.org/images/iredmail-logo-red-114.png)
+
+[iRedMail](http://www.iredmail.org/) Free, open source mail server solution
+
 ## Cons
 
   * Alpha-grade software. Might or might not work as expected
