@@ -16,6 +16,7 @@ let url = require('url');
 let htmlToText = require('html-to-text');
 let request = require('request');
 let caches = require('../lib/caches');
+let libmime = require('libmime');
 
 function findUnsent(callback) {
     let returnUnsent = (row, campaign) => {
@@ -307,7 +308,7 @@ function formatMessage(message, callback) {
                                     }),
                                     'List-ID': {
                                         prepared: true,
-                                        value: '"' + list.name.replace(/[^a-z0-9\s'.,\-]/g, '').trim() + '" <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
+                                        value: libmime.encodeWords(list.name) + ' <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
                                     }
                                 },
                                 list: {

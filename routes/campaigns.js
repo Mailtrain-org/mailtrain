@@ -171,7 +171,9 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                             return callback(err);
                         }
                         if (!list) {
-                            return callback(new Error('Selected list not found'));
+                            list = {
+                                id: listId
+                            };
                         }
 
                         fields.list(list.id, (err, fieldList) => {
@@ -330,7 +332,9 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                     return callback(err);
                 }
                 if (!list) {
-                    return callback(new Error('Selected list not found'));
+                    list = {
+                        id: listId
+                    };
                 }
                 subscriptions.listTestUsers(listId, (err, testUsers) => {
                     if (err || !testUsers) {
@@ -468,7 +472,9 @@ router.get('/status/:id/:status', passport.csrfProtection, (req, res) => {
                     return callback(err);
                 }
                 if (!list) {
-                    return callback(new Error('Selected list not found'));
+                    list = {
+                        id: listId
+                    };
                 }
                 return callback(null, list);
             });
@@ -506,7 +512,9 @@ router.get('/clicked/:id/:linkId', passport.csrfProtection, (req, res) => {
                     return callback(err);
                 }
                 if (!list) {
-                    return callback(new Error('Selected list not found'));
+                    list = {
+                        id: listId
+                    };
                 }
                 return callback(null, list);
             });
