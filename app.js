@@ -135,6 +135,10 @@ passport.setup(app);
 app.use((req, res, next) => {
     res.locals.flash = req.flash.bind(req);
     res.locals.user = req.user;
+    res.locals.ldap = {
+        enabled: config.ldap.enabled,
+        passwordresetlink: config.ldap.passwordresetlink
+    };
 
     let menu = [{
         title: 'Home',
