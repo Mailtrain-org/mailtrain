@@ -74,7 +74,14 @@ let server = new SMTPServer({
             let body = Buffer.concat(chunks, chunklen).toString();
 
             let bh = new BounceHandler();
-            let bounceResult = [].concat(bh.parse_email(body) || []).shift();
+            let bounceResult;
+
+            try {
+                bounceResult = [].concat(bh.parse_email(body) || []).shift();
+            } catch (E) {
+                log.error('Bounce', 'Failed parsing bounce message');
+                log.error('Bounce', JSON.stringify(body));
+            }
 
             if (!bounceResult || ['failed', 'transient'].indexOf(bounceResult.action) < 0) {
                 return callback(null, 'Message accepted');

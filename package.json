@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.15.0",
+  "version": "1.15.1",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.2",
-    "bounce-handler": "^7.3.2-fork.0",
+    "bounce-handler": "^7.3.2-fork.1",
     "compression": "^1.6.2",
     "config": "^1.21.0",
     "connect-flash": "^0.1.1",
@@ -52,7 +52,7 @@
     "humanize": "0.0.9",
     "is-url": "^1.2.2",
     "isemail": "^2.2.1",
-    "jsdom": "^9.4.1",
+    "jsdom": "^9.4.2",
     "juice": "^2.0.0",
     "libmime": "^2.0.3",
     "mkdirp": "^0.5.1",
@@ -63,14 +63,14 @@
     "nodemailer": "^2.5.0",
     "nodemailer-openpgp": "^1.0.2",
     "npmlog": "^4.0.0",
-    "openpgp": "^2.3.2",
+    "openpgp": "^2.3.3",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "request": "^2.74.0",
     "serve-favicon": "^2.3.0",
     "shortid": "^2.2.6",
     "slugify": "^1.0.2",
-    "smtp-server": "^1.14.0",
+    "smtp-server": "^1.14.1",
     "striptags": "^2.1.1",
     "toml": "^2.3.0"
   }
