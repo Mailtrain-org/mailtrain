@@ -51,7 +51,7 @@ postsize="2MB"
 #tmpdir="/tmp"
 
 [mysql]
-host="localhost"
+host="mysql"
 user="mailtrain"
 password="mailtrain"
 database="mailtrain"
@@ -63,7 +63,7 @@ timezone="local"
 
 [redis]
 # enable to use Redis session cache or disable if Redis is not installed
-enabled=false
+enabled=true
 host="localhost"
 port=6379
 db=5
