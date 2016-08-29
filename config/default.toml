@@ -87,3 +87,12 @@ host="0.0.0.0"
 username="testuser"
 password="testpass"
 logger=false
+
+[ldap]
+# enable to use ldap user backend
+enabled=false
+host="localhost"
+port=3002
+baseDN="ou=users,dc=company"
+filter="(|(username={{username}})(mail={{username}}))"
+passwordresetlink=""

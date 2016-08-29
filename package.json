@@ -65,6 +65,7 @@
     "npmlog": "^4.0.0",
     "openpgp": "^2.3.3",
     "passport": "^0.3.2",
+    "passport-ldapjs": "^1.0.2",
     "passport-local": "^1.0.0",
     "request": "^2.74.0",
     "serve-favicon": "^2.3.0",
