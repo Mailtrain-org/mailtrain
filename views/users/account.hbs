@@ -9,9 +9,9 @@
 
 {{#if ldap.enabled}}
     <p>
-        This account is managed through LDAP.<br/>
+        This account is managed through LDAP.
         <br/>
-        Associated Email Address: <a href="mailto:{{email}}">{{email}}</a>
+        <br/> Associated Email Address: <a href="mailto:{{email}}">{{email}}</a>
     </p>
 {{else}}
     <form class="form-horizontal" method="post" action="/users/account">

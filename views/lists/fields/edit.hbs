@@ -64,7 +64,7 @@
                         <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
                     {{/each}}
                 </select>
-                <span class="help-block">Required for group options)</span>
+                <span class="help-block">Required for group options</span>
             </div>
         </div>
 
@@ -78,12 +78,24 @@
         </div>
     </div>
 
-    <div class="form-group">
-        <label for="default-value" class="col-sm-2 control-label">Default merge tag value</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" name="default-value" id="default-value" value="{{field.defaultValue}}" placeholder="Default merge tag value">
+    {{#if field.isGroup}}
+
+        <div class="form-group">
+            <label for="group-template" class="col-sm-2 control-label">Group template</label>
+            <div class="col-sm-10">
+                <textarea class="form-control gpg-text" rows="3" name="group-template" id="description">{{field.groupTemplate}}</textarea>
+                <span class="help-block">For group elements like checkboxes you can control the appearance of the merge tag with an optional template. The template uses handlebars syntax and you can find all values from <code>\{{values}}</code> array, for example <code>\{{#each values}} \{{this}} \{{/each}}</code>. If template is not defined then multiple values are joined with commas.</span>
+            </div>
         </div>
-    </div>
+
+    {{else}}
+        <div class="form-group">
+            <label for="default-value" class="col-sm-2 control-label">Default merge tag value</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="default-value" id="default-value" value="{{field.defaultValue}}" placeholder="Default merge tag value">
+            </div>
+        </div>
+    {{/if}}
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-xs-4">

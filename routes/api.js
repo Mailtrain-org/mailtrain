@@ -303,6 +303,7 @@ router.post('/field/:listId', (req, res) => {
             defaultValue: (input.DEFAULT || '').toString().trim() || null,
             type: (input.TYPE || '').toString().toLowerCase().trim(),
             group: Number(input.GROUP) || null,
+            groupTemplate: (input.GROUP_TEMPLATE || '').toString().toLowerCase().trim(),
             visible: !['false', 'no', '0', ''].includes((input.VISIBLE || '').toString().toLowerCase().trim())
         };
 

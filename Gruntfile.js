@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         eslint: {
-            all: ['lib/**/*.js', 'test/**/*.js', 'config/**/*.js', 'Gruntfile.js', 'app.js', 'index.js', '.eslintrc.js']
+            all: ['lib/**/*.js', 'test/**/*.js', 'config/**/*.js', 'Gruntfile.js', 'app.js', 'index.js']
         },
 
         nodeunit: {
