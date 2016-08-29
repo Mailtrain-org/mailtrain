@@ -276,4 +276,52 @@ router.post('/delete/:listId', (req, res) => {
     });
 });
 
+router.post('/field/:listId', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            log.error('API', err);
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+
+        let field = {
+            name: (input.NAME || '').toString().trim(),
+            defaultValue: (input.DEFAULT || '').toString().trim() || null,
+            type: (input.TYPE || '').toString().toLowerCase().trim(),
+            group: Number(input.GROUP) || null,
+            visible: !['false', 'no', '0', ''].includes((input.VISIBLE || '').toString().toLowerCase().trim())
+        };
+
+        fields.create(list.id, field, (err, id) => {
+            if (err) {
+                res.status(500);
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+            res.status(200);
+            res.json({
+                data: {
+                    id
+                }
+            });
+        });
+    });
+});
+
 module.exports = router;
