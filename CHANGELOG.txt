@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.0 2016-08-29
+
+  * Added new custom field for JSON data that is rendered using Handlebars when included in an email
+
 ## 1.16.0 2016-08-29
 
   * Render list values using Handlebars templates
