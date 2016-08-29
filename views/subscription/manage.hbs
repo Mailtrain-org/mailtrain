@@ -48,6 +48,10 @@
                 <textarea class="form-control" rows="3" name="{{column}}">{{value}}</textarea>
             {{/if}}
 
+            {{#if typeJson}}
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="{&quot;data&quot;:&quot;value&quot;}">{{value}}</textarea>
+            {{/if}}
+
             {{#if typeGpg}}
                 {{#if ../hasPubkey}}
                     <div class="pull-right">
