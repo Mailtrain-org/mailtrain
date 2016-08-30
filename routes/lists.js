@@ -405,7 +405,7 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
                     req.flash('danger', err && err.message || err || 'Could not unsubscribe user');
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
                 }
-                req.flash('success', subscription.email + ' was successfully subscribed from your list');
+                req.flash('success', subscription.email + ' was successfully unsubscribed from your list');
                 res.redirect('/lists/view/' + list.id);
             });
         });
