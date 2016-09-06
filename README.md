@@ -18,6 +18,10 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 
 [iRedMail](http://www.iredmail.org/) Free, open source mail server solution
 
+### ZoneMTA
+
+Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self hosted MTA
+
 ## Cons
 
   * Alpha-grade software. Might or might not work as expected
