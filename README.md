@@ -37,6 +37,14 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 
 ## Installation
 
+### Docker (evaluation-only, not production grade)
+
+  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  2. Launch the container build `docker-compose up -d`
+  3. No step 3. Follow the "manual install" instructions from step #6 
+
+NB: the Docker installation comes with Mailcatcher, a fake smtp server listening on port `1025` (unauthenticated, uncrypted), with a nice web frontend on  [http://localhost:1080/](http://localhost:1080/)
+
 ### Automatic install (Ubuntu)
 
 You can download and run [install.sh](setup/install.sh) in your blank Ubuntu VPS to set up

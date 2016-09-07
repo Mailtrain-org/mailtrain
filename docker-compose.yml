@@ -1,0 +1,29 @@
+version : '2'
+
+services:
+  mailtrain:
+    build: .
+    depends_on:
+      - mysql
+      - redis
+      - smtp
+    ports:
+      - 3000:3000
+  mysql:
+    image: mysql:5.7.10
+    volumes:
+      - ./setup/sql/mailtrain.sql:/docker-entrypoint-initdb.d/mailtrain.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=mailtrain
+      - MYSQL_DATABASE=mailtrain
+      - MYSQL_USER=mailtrain
+      - MYSQL_PASSWORD=mailtrain
+  redis:
+    image: redis:3-alpine
+  smtp:
+    image: schickling/mailcatcher
+    ports:
+      - 1025
+      - 1080:1080
+volumes:
+  setup:
