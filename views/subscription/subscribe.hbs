@@ -10,6 +10,9 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
 
+    <input type="hidden" name="address" value="">
+    <input type="hidden" name="sub" id="sub" value="">
+
     <div class="form-group">
         <label for="email">Email Address</label>
         <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" required>
@@ -121,3 +124,7 @@
         <button type="submit" class="btn btn-primary">Subscribe to list</button>
     </div>
 </form>
+
+<script>
+    document.getElementById('sub').value = new Date().getTime();
+</script>

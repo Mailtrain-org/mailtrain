@@ -216,6 +216,11 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
 
+    let subTime = Number(req.body.sub) || 0;
+    let subTest = !!(subTime > Date.now() - 3600 * 1000 && subTime < Date.now() + 3600 * 1000);
+    let addressTest = !req.body.address;
+    let testsPass = subTest && addressTest;
+
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
             err = new Error('Selected list not found');
@@ -232,6 +237,9 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                 data[key] = (req.body[key] || '').toString().trim();
             }
         });
+        data._address = req.body.address;
+        data._sub = req.body.sub;
+        data._skip = !testsPass;
         data = tools.convertKeys(data);
 
         subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
