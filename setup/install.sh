@@ -27,6 +27,7 @@ HOSTNAME="${HOSTNAME:-`hostname`}"
 
 MYSQL_PASSWORD=`pwgen 12 -1`
 DKIM_API_KEY=`pwgen 12 -1`
+SMTP_PASS=`pwgen 12 -1`
 
 # Setup MySQL user for Mailtrain
 mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
@@ -53,7 +54,9 @@ mysql -u mailtrain -p"$MYSQL_PASSWORD" mailtrain <<EOT
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('admin_email','admin@$HOSTNAME') ON DUPLICATE KEY UPDATE \`value\`='admin@$HOSTNAME';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_address','admin@$HOSTNAME') ON DUPLICATE KEY UPDATE \`value\`='admin@$HOSTNAME';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_hostname','localhost') ON DUPLICATE KEY UPDATE \`value\`='localhost';
-INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_disable_auth','on') ON DUPLICATE KEY UPDATE \`value\`='on';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_disable_auth','') ON DUPLICATE KEY UPDATE \`value\`='';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_user','mailtrain') ON DUPLICATE KEY UPDATE \`value\`='mailtrain';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_pass','$SMTP_PASS') ON DUPLICATE KEY UPDATE \`value\`='$SMTP_PASS';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_encryption','NONE') ON DUPLICATE KEY UPDATE \`value\`='NONE';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','587') ON DUPLICATE KEY UPDATE \`value\`='587';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_homepage','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
@@ -125,7 +128,10 @@ cat >> config/production.json <<EOT
         "db": "/var/data/mailtrain"
     },
     "feeder": {
-        "port": 587
+        "port": 587,
+        "authentication": true,
+        "user": "mailtrain",
+        "pass": "$SMTP_PASS"
     },
     "log": {
         "level": "info"
