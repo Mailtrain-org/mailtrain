@@ -4,6 +4,7 @@ let express = require('express');
 let router = new express.Router();
 let request = require('request');
 let campaigns = require('../lib/models/campaigns');
+let settings = require('../lib/models/settings');
 let log = require('npmlog');
 let multer = require('multer');
 let uploads = multer();
@@ -283,6 +284,46 @@ router.post('/zone-mta', (req, res, next) => {
 
     res.json({
         success: true
+    });
+});
+
+router.post('/zone-mta/sender-config', (req, res) => {
+    if (!req.query.api_token) {
+        return res.json({
+            error: 'api_token value not set'
+        });
+    }
+    settings.list(['dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain'], (err, configItems) => {
+        if (err) {
+            return res.json({
+                error: err.message
+            });
+        }
+
+        if (configItems.dkimApiKey !== req.query.api_token) {
+            return res.json({
+                error: 'invalid api_token value'
+            });
+        }
+
+        configItems.dkimSelector = (configItems.dkimSelector || '').trim();
+        configItems.dkimPrivateKey = (configItems.dkimPrivateKey || '').trim();
+
+        if (!configItems.dkimSelector || !configItems.dkimPrivateKey) {
+            // empty response
+            return res.json({});
+        }
+
+        let from = (req.body.from || '').trim();
+        let domain = from.split('@').pop().toLowerCase().trim();
+
+        res.json({
+            keys: {
+                domainName: configItems.dkimDomain || domain,
+                keySelector: configItems.dkimSelector,
+                privateKey: configItems.dkimPrivateKey
+            }
+        });
     });
 });
 

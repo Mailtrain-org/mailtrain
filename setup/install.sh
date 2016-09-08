@@ -26,6 +26,7 @@ fi
 HOSTNAME="${HOSTNAME:-`hostname`}"
 
 MYSQL_PASSWORD=`pwgen -1`
+DKIM_API_KEY=`pwgen -1`
 
 # Setup MySQL user for Mailtrain
 mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
@@ -57,6 +58,7 @@ INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_encryption','NONE') 
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','587') ON DUPLICATE KEY UPDATE \`value\`='587';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_homepage','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('service_url','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('dkim_api_key','http://$DKIM_API_KEY/') ON DUPLICATE KEY UPDATE \`value\`='http://$DKIM_API_KEY/';
 EOT
 
 # Add new user for the mailtrain daemon to run as
@@ -131,6 +133,13 @@ cat >> config/production.json <<EOT
     "bounces": {
         "enabled": false,
         "url": "http://localhost/webhooks/zone-mta"
+    },
+    "getSenderConfig": 'http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY',
+    "zones": {
+        "transactional": {
+            "processes": 1,
+            "connections": 1
+        }
     }
 }
 EOT
