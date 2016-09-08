@@ -134,7 +134,7 @@ cat >> config/production.json <<EOT
         "enabled": false,
         "url": "http://localhost/webhooks/zone-mta"
     },
-    "getSenderConfig": 'http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY',
+    "getSenderConfig": "http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY",
     "zones": {
         "transactional": {
             "processes": 1,
