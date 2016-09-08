@@ -5,6 +5,14 @@
     </form>
 {{/if}}
 
+<div class="alert alert-warning alert-dismissible" role="alert" id="js-warning">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Warning!</strong> JavaScript must be enabled in order for the subscription form to work
+</div>
+<script>
+    document.getElementById('js-warning').style.display = 'none';
+</script>
+
 <form method="post" action="/subscription/{{cid}}/subscribe">
 
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
@@ -120,9 +128,12 @@
         </div>
     {{/each}}
 
-    <div class="form-group">
+    <div class="form-group" id="js-subscribe" style="display: none">
         <button type="submit" class="btn btn-primary">Subscribe to list</button>
     </div>
+    <script>
+        document.getElementById('js-subscribe').style.display = 'block';
+    </script>
 </form>
 
 <script>
