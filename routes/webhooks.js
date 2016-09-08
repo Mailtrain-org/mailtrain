@@ -318,10 +318,12 @@ router.post('/zone-mta/sender-config', (req, res) => {
         let domain = from.split('@').pop().toLowerCase().trim();
 
         res.json({
-            keys: {
-                domainName: configItems.dkimDomain || domain,
-                keySelector: configItems.dkimSelector,
-                privateKey: configItems.dkimPrivateKey
+            dkim: {
+                keys: {
+                    domainName: configItems.dkimDomain || domain,
+                    keySelector: configItems.dkimSelector,
+                    privateKey: configItems.dkimPrivateKey
+                }
             }
         });
     });
