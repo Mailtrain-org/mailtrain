@@ -33,7 +33,7 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 
 ## Installation
 
-### Automatic install (Ubuntu)
+### Simple install (Ubuntu)
 
 You can download and run [install.sh](setup/install.sh) in your blank Ubuntu VPS to set up
 Mailtrain and all required dependencies (including MySQL). The installation script assumes a somewhat blank server, so if this is a machine you are already using for something else, you might want to skip the automatic install and proceed manually.
@@ -50,13 +50,51 @@ Install script installs and sets up the following:
   * **MySQL** (platform default)
   * **Mailtrain** (from the master branch) on port 80
   * **UFW** firewall that blocks everything besides ports 22, 25, 80, 443
+  * **[ZoneMTA](https://github.com/zone-eu/zone-mta)** to queue and deliver messages
   * **Redis** server for session cache
   * **logrotate** to rotate Mailtrain log files
   * **upstart** or **systemd** init script to automatically start and manage Mailtrain process
 
-If you are using DigitalOcean then you can copy the contents of the [installation script](setup/install.sh) to the User Data textarea field when creating a new VPS (select Ubuntu 14.04 as the droplet Distribution image). After your droplet is created it should already have Mailtrain up and running. Navigate to http://droplet-hostname-or-ip/ and authenticate as `admin`:`test`. Do not forget to update your account information and set up SMTP settings.
+After the install script has finished and you see a success message then you should have a Mailtrain instance running at http://yourdomain.com
 
-### Manual (any OS that supports Node.js)
+#### Next steps after installation
+
+##### 1. Change admin password
+
+Navigate to http://yourdomain.com where yourdomain.com is the address of your server. Click on the Sign In link in the right top corner of the page. Authenticate with the following credentials:
+
+  * Username: **admin**
+  * Password: **test**
+
+Once authenticated, click on your username in the right top corner of the page and select "Account". Now you should be able to change your default password.
+
+##### 2. Update page configuration
+
+If signed in navigate to http://yourdomain.com/settings and check that all email addresses and domain names are correct. Mailtrain default installation comes bundled with [ZoneMTA](https://github.com/zone-eu/zone-mta), so you should be able to send out messages right away. ZoneMTA even handles a lot of bounces (not all kind of bounces though) automatically so you do not have to change anything in the SMTP settings to get going.
+
+##### 3. Set up SPF
+
+If you are using the bundled ZoneMTA then you need to add your Mailtrain host to the SPF DNS record of your sending domain. So if you are sending messages as "info@example.com" then the domain "example.com" should have a SPF DNS record that points to the IP address or hostname of your Mailtrain host. Everything should work without the SPF record but setting it up correctly improves the deliverability a lot.
+
+##### 4. Set up DKIM
+
+If you are using the bundled ZoneMTA then you can provide a DKIM key to sign all outgoing messages. If you have a DKIM key set for domain "example.com" with selector "mailtrain", then store the private key to folder /opt/zone-mta/keys as "example.com.mailtrain.pem" (thats sending hostname + "." + seclector + ".pem"). Everything should work without the DKIM signatures but setting it up correctly improves the deliverability a lot.
+
+##### 4. Set up VERP
+
+The bundled ZoneMTA can already handle a large amount of bounces if you use it to deliver messages but not all - namely such bounces that happen *after* the recipient MX accepts the message for local delivery. This might happen for example when a user exists, so the MX accepts the message but the quota for that user is checked only when actually storing the message to users' mailbox. Then a bounce message is generated and sent to the original sender which in your case is the mail address you are sending your list messages from. You can catch these messages and mark such recipients manually as bounced but alternatively you can set up a VERP based bounce handler that does this automatically. In this case the sender on the message envelope would not be your actual address but a rewritten bounce address that points to your Mailtrain installation.
+
+To set it up you need to create an additonal DNS MX entry for a bounce domain, eg "bounces.example.com" if you are sending from "example.com". This entry should point to your Mailtrain server IP address. Next you should enable the VERP handling in Mailtrain Settings page.
+
+> As ZoneMTA uses envelope sender as the default for DKIM addresses, then if using VERP you need to set up DKIM to your bounce domain instead of sender domain and also store the DKIM key as "bouncedomain.selector.pem" in the ZoneMTA key folder.
+
+If you do not use VERP with ZoneMTA then you should get notified most of the bounces so everything should mostly work without it
+
+##### 4. Set up proper PTR record
+
+If you are using the bundled ZoneMTA then you should make sure you are using a proper PTR record for your server. For example if you use DigitalOcean then PTR is set automatically (it's the droplet name, so make sure your droplet name is the same as the domain name you are running Mailtrain from). If you use AWS then you can request setting up PTR records using [this form](https://portal.aws.amazon.com/gp/aws/html-forms-controller/contactus/ec2-email-limit-rdns-request) (requires authentication). Everything should work without the PTR record but setting it up correctly improves the deliverability a lot.
+
+### Manual install (any OS that supports Node.js)
 
   1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `npm install --production` in the Mailtrain folder to install required dependencies

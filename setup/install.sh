@@ -1,6 +1,12 @@
 #!/bin/bash
 
-# This installation script works on Ubuntu 14.04
+# This installation script works on Ubuntu 14.04 and 16.04
+# Run as root!
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
 
 set -e
 
@@ -9,8 +15,15 @@ export DEBIAN_FRONTEND=noninteractive
 apt-add-repository -y ppa:chris-lea/redis-server
 
 curl -sL https://deb.nodesource.com/setup_6.x | bash -
-apt-get -q -y install mysql-server pwgen redis-server nodejs git ufw
+apt-get -q -y install mariadb-server pwgen redis-server nodejs git ufw build-essential dnsutils
 apt-get clean
+
+PUBLIC_IP=`curl -s https://api.ipify.org`
+if [ ! -z "$PUBLIC_IP" ]; then
+    HOSTNAME=`dig +short -x $PUBLIC_IP | sed 's/\.$//'`
+    HOSTNAME="${HOSTNAME:-$PUBLIC_IP}"
+fi
+HOSTNAME="${HOSTNAME:-`hostname`}"
 
 MYSQL_PASSWORD=`pwgen -1`
 
@@ -31,7 +44,22 @@ mkdir -p /opt/mailtrain
 cd /opt/mailtrain
 git clone git://github.com/andris9/mailtrain.git .
 
-# Add new user for the daemon to run as
+# Normally we would let Mailtrain itself to import the initial SQL data but in this case
+# we need to modify it, before we start Mailtrain
+mysql -u mailtrain -p"$MYSQL_PASSWORD" mailtrain < setup/sql/mailtrain.sql
+
+mysql -u mailtrain -p"$MYSQL_PASSWORD" mailtrain <<EOT
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('admin_email','admin@$HOSTNAME') ON DUPLICATE KEY UPDATE \`value\`='admin@$HOSTNAME';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_address','admin@$HOSTNAME') ON DUPLICATE KEY UPDATE \`value\`='admin@$HOSTNAME';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_hostname','localhost') ON DUPLICATE KEY UPDATE \`value\`='localhost';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_disable_auth','on') ON DUPLICATE KEY UPDATE \`value\`='on';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_encryption','NONE') ON DUPLICATE KEY UPDATE \`value\`='NONE';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','587') ON DUPLICATE KEY UPDATE \`value\`='587';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_homepage','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('service_url','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
+EOT
+
+# Add new user for the mailtrain daemon to run as
 useradd mailtrain || true
 
 # Setup installation configuration
@@ -48,11 +76,12 @@ password="$MYSQL_PASSWORD"
 [redis]
 enabled=true
 [verp]
-enabled=false
+enabled=true
 EOT
 
 # Install required node packages
 npm install --no-progress --production
+chown -R mailtrain:mailtrain .
 
 # Setup log rotation to not spend up entire storage on logs
 cat <<EOM > /etc/logrotate.d/mailtrain
@@ -77,7 +106,66 @@ else
     cp setup/mailtrain.conf /etc/init/
 fi
 
+# Fetch ZoneMTA files
+mkdir -p /opt/zone-mta
+cd /opt/zone-mta
+git clone git://github.com/zone-eu/zone-mta.git .
+
+# Ensure queue folder
+mkdir -p /var/data/mailtrain
+
+# Setup installation configuration
+cat >> config/production.json <<EOT
+{
+    "user": "mailtrain",
+    "group": "mailtrain",
+    "queue": {
+        "db": "/var/data/mailtrain"
+    },
+    "feeder": {
+        "port": 587
+    },
+    "log": {
+        "level": "info"
+    },
+    "bounces": {
+        "enabled": false,
+        "url": "http://localhost/webhooks/zone-mta"
+    }
+}
+EOT
+
+# Install required node packages
+npm install --no-progress --production
+
+# Setup log rotation to not spend up entire storage on logs
+cat <<EOM > /etc/logrotate.d/zone-mta
+/var/log/zone-mta.log {
+    daily
+    rotate 12
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    nomail
+}
+EOM
+
+chown -R mailtrain:mailtrain .
+chown -R mailtrain:mailtrain /var/data/mailtrain
+
+if [ -d "/run/systemd/system" ]; then
+    # Set up systemd service script
+    cp setup/zone-mta.service /etc/systemd/system/
+    systemctl enable zone-mta.service
+else
+    # Set up upstart service script
+    cp setup/zone-mta.conf /etc/init/
+fi
+
 # Start the service
+service zone-mta start
 service mailtrain start
 
-echo "Success!";
+echo "Success! Open http://$HOSTNAME/ and log in as admin:test";

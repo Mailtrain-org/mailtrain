@@ -257,4 +257,33 @@ router.post('/mailgun', uploads.any(), (req, res) => {
     });
 });
 
+router.post('/zone-mta', (req, res, next) => {
+    if (typeof req.body === 'string') {
+        try {
+            req.body = JSON.parse(req.body);
+        } catch (E) {
+            return next(new Error('Could not parse input'));
+        }
+    }
+
+    if (req.body.id) {
+        campaigns.findMailByResponse(req.body.id, (err, message) => {
+            if (err || !message) {
+                return;
+            }
+            campaigns.updateMessage(message, 'bounced', true, (err, updated) => {
+                if (err) {
+                    log.error('ZoneMTA', 'Failed updating message: %s', err.stack);
+                } else if (updated) {
+                    log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+                }
+            });
+        });
+    }
+
+    res.json({
+        success: true
+    });
+});
+
 module.exports = router;
