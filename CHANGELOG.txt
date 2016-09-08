@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.0 2016-09-08
+
+  * Updated installation script to bundle ZoneMTA as the default sending engine
+  * Added new option to disable clicked and opened tracking
+  * Store remote IP for subscription confirmations
+
 ## 1.17.0 2016-08-29
 
   * Added new custom field for JSON data that is rendered using Handlebars when included in an email

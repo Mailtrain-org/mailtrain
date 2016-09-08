@@ -145,24 +145,27 @@
                 </div>
             </dd>
 
-            <dt>Opened <a href="/campaigns/opened/{{id}}" title="List subscribers who opened this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
-            <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{openRate}}%;">
-                        {{opened}}&nbsp;({{openRate}}%)
-                    </div>
-                </div>
-            </dd>
+            {{#unless trackingDisabled}}
 
-            <dt>Clicked <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
-            <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{clicksRate}}%;">
-                        {{clicks}}&nbsp;({{clicksRate}}%)
+                <dt>Opened <a href="/campaigns/opened/{{id}}" title="List subscribers who opened this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dd>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{openRate}}%;">
+                            {{opened}}&nbsp;({{openRate}}%)
+                        </div>
                     </div>
-                </div>
-            </dd>
+                </dd>
 
+                <dt>Clicked <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dd>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{clicksRate}}%;">
+                            {{clicks}}&nbsp;({{clicksRate}}%)
+                        </div>
+                    </div>
+                </dd>
+
+            {{/unless}}
             {{/unless}}
             {{/unless}}
         </dl>
@@ -321,89 +324,91 @@
 
     </div>
     {{#if links}}
-        <div role="tabpanel" class="tab-pane {{#if showLinks}}active{{/if}}" id="links">
+        {{#unless trackingDisabled}}
+            <div role="tabpanel" class="tab-pane {{#if showLinks}}active{{/if}}" id="links">
 
-            <p></p>
+                <p></p>
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <th class="col-md-1">
-                            #
-                        </th>
-                        <th>
-                            URL
-                        </th>
-                        <th class="col-md-1">
-                            Clicks
-                        </th>
-                        <th class="col-md-1">
-                            % of clicks
-                        </th>
-                        <th class="col-md-1">
-                            % of messages
-                        </th>
-                    </thead>
-                    <tbody>
-                        {{#if links}}
-                            {{#each links}}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <th class="col-md-1">
+                                #
+                            </th>
+                            <th>
+                                URL
+                            </th>
+                            <th class="col-md-1">
+                                Clicks
+                            </th>
+                            <th class="col-md-1">
+                                % of clicks
+                            </th>
+                            <th class="col-md-1">
+                                % of messages
+                            </th>
+                        </thead>
+                        <tbody>
+                            {{#if links}}
+                                {{#each links}}
+                                    <tr>
+                                        <td>
+                                            {{index}}
+                                        </td>
+                                        <td>
+                                            <a href="{{url}}">{{short}}</a>
+                                        </td>
+                                        <td>
+                                            <div class="pull-right">
+                                                <a href="/campaigns/clicked/{{../id}}/{{id}}" title="List subscribers who clicked this link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
+                                            </div>
+                                            {{clicks}}
+                                        </td>
+                                        <td>
+                                            {{relPercentage}}
+                                        </td>
+                                        <td>
+                                            {{totalPercentage}}
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            {{else}}
                                 <tr>
-                                    <td>
-                                        {{index}}
-                                    </td>
-                                    <td>
-                                        <a href="{{url}}">{{short}}</a>
-                                    </td>
-                                    <td>
-                                        <div class="pull-right">
-                                            <a href="/campaigns/clicked/{{../id}}/{{id}}" title="List subscribers who clicked this link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
-                                        </div>
-                                        {{clicks}}
-                                    </td>
-                                    <td>
-                                        {{relPercentage}}
-                                    </td>
-                                    <td>
-                                        {{totalPercentage}}
+                                    <td colspan="5">
+                                        No data available in table
                                     </td>
                                 </tr>
-                            {{/each}}
-                        {{else}}
+                            {{/if}}
+                        </tbody>
+                        <tfoot>
                             <tr>
-                                <td colspan="5">
-                                    No data available in table
-                                </td>
+                                <th></th>
+                                <th>
+                                    Aggregated clicks
+                                </th>
+                                <th>
+                                    <div class="pull-right">
+                                        <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
+                                    </div>
+                                    {{clicks}}
+                                </th>
+                                <th>
+                                    –
+                                </th>
+                                <th>
+                                    CTR {{clicksRate}}%
+                                </th>
                             </tr>
-                        {{/if}}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th></th>
-                            <th>
-                                Aggregated clicks
-                            </th>
-                            <th>
-                                <div class="pull-right">
-                                    <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
-                                </div>
-                                {{clicks}}
-                            </th>
-                            <th>
-                                –
-                            </th>
-                            <th>
-                                CTR {{clicksRate}}%
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
 
-                <p class="text-muted">
-                    Clicks are counted as unique subscribers that clicked on a specific link or on any link (in aggregated view)
-                </p>
+                    <p class="text-muted">
+                        Clicks are counted as unique subscribers that clicked on a specific link or on any link (in aggregated view)
+                    </p>
 
+                </div>
             </div>
-        </div>
+        {{/unless}}
     {{/if}}
 
 </div>

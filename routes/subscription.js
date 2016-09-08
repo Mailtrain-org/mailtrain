@@ -234,7 +234,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
         });
         data = tools.convertKeys(data);
 
-        subscriptions.addConfirmation(list, email, data, (err, confirmCid) => {
+        subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
             if (!err && !confirmCid) {
                 err = new Error('Could not store confirmation data');
             }

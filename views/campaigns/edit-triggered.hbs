@@ -99,6 +99,15 @@
                             <input type="text" class="form-control" name="subject" id="subject" value="{{subject}}" placeholder="Keep it relevant and non-spammy" required>
                         </div>
                     </div>
+
+                    <div class="col-sm-offset-2">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="tracking-disabled" value="1" {{#if trackingDisabled}} checked {{/if}}> Disable clicked/opened tracking
+                            </label>
+                        </div>
+                    </div>
+
                 </fieldset>
             </div>
             <div role="tabpanel" class="tab-pane {{#if showTemplate}}active{{/if}}" id="template">

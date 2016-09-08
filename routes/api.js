@@ -122,7 +122,7 @@ router.post('/subscribe/:listId', (req, res) => {
                 }
 
                 if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
-                    subscriptions.addConfirmation(list, input.EMAIL, subscription, (err, cid) => {
+                    subscriptions.addConfirmation(list, input.EMAIL, req.ip, subscription, (err, cid) => {
                         if (err) {
                             log.error('API', err);
                             res.status(500);

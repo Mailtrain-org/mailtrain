@@ -233,7 +233,6 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                         req.flash('danger', err.message || err);
                         return res.redirect('/');
                     }
-
                     campaign.mergeTags = mergeTags;
                     res.render(view, campaign);
                 });

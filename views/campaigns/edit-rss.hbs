@@ -153,6 +153,15 @@
                 <input type="email" class="form-control" name="address" id="address" value="{{address}}" placeholder="This is the address people will send replies to" required>
             </div>
         </div>
+
+        <div class="col-sm-offset-2">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="tracking-disabled" value="1" {{#if trackingDisabled}} checked {{/if}}> Disable clicked/opened tracking
+                </label>
+            </div>
+        </div>
+
     </fieldset>
 
     <hr />
