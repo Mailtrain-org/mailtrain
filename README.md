@@ -51,7 +51,7 @@ curl https://raw.githubusercontent.com/andris9/mailtrain/master/setup/install.sh
 Install script installs and sets up the following:
 
   * **Node.js** (version 6.x)
-  * **MySQL** (platform default)
+  * **MariaDB** (the default version from apt-get)
   * **Mailtrain** (from the master branch) on port 80
   * **UFW** firewall that blocks everything besides ports 22, 25, 80, 443
   * **[ZoneMTA](https://github.com/zone-eu/zone-mta)** to queue and deliver messages (**NB!** using ZoneMTA assumes that outgoing port 25 is open which might not be the case on some hosts like on the Google Cloud)
@@ -163,6 +163,7 @@ Mailtrain uses webhooks integration to detect bounces and spam complaints. Curre
   * **SparkPost** – use `http://domain/webhooks/sparkpost` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-SparkPost))
   * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-SendGrid))
   * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-Mailgun))
+  * **ZoneMTA** – use `http://domain/webhooks/zone-mta` as the webhook URL for bounces. If you install Mailtrain with the included installation script then this route gets set up automatically during the installation process
 
 Additionally Mailtrain (v1.1+) is able to use VERP-based bounce handling. This would require to have a compatible SMTP relay (the services mentioned above strip out or block VERP addresses in the SMTP envelope) and you also need to set up special MX DNS name that points to your Mailtrain installation server.
 
