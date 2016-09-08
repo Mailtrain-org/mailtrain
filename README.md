@@ -84,7 +84,7 @@ If you are using the bundled ZoneMTA then you need to add your Mailtrain host to
 
 If you are using the bundled ZoneMTA then you can provide a DKIM key to sign all outgoing messages. If you have a DKIM key set for domain "example.com" with selector "mailtrain", then store the private key to folder /opt/zone-mta/keys as "example.com.mailtrain.pem" (thats sending hostname + "." + seclector + ".pem"). Everything should work without the DKIM signatures but setting it up correctly improves the deliverability a lot.
 
-##### 4. Set up VERP
+##### 5. Set up VERP
 
 The bundled ZoneMTA can already handle a large amount of bounces if you use it to deliver messages but not all - namely such bounces that happen *after* the recipient MX accepts the message for local delivery. This might happen for example when a user exists, so the MX accepts the message but the quota for that user is checked only when actually storing the message to users' mailbox. Then a bounce message is generated and sent to the original sender which in your case is the mail address you are sending your list messages from. You can catch these messages and mark such recipients manually as bounced but alternatively you can set up a VERP based bounce handler that does this automatically. In this case the sender on the message envelope would not be your actual address but a rewritten bounce address that points to your Mailtrain installation.
 
@@ -94,9 +94,13 @@ To set it up you need to create an additonal DNS MX entry for a bounce domain, e
 
 If you do not use VERP with ZoneMTA then you should get notified most of the bounces so everything should mostly work without it
 
-##### 4. Set up proper PTR record
+##### 6. Set up proper PTR record
 
-If you are using the bundled ZoneMTA then you should make sure you are using a proper PTR record for your server. For example if you use DigitalOcean then PTR is set automatically (it's the droplet name, so make sure your droplet name is the same as the domain name you are running Mailtrain from). If you use AWS then you can request setting up PTR records using [this form](https://portal.aws.amazon.com/gp/aws/html-forms-controller/contactus/ec2-email-limit-rdns-request) (requires authentication). Everything should work without the PTR record but setting it up correctly improves the deliverability a lot.
+If you are using the bundled ZoneMTA then you should make sure you are using a proper PTR record for your server. For example if you use DigitalOcean then PTR is set automatically (it's the droplet name, so make sure your droplet name is the same as the domain name you are running Mailtrain from). If you use AWS then you can request setting up PTR records using [this form](https://portal.aws.amazon.com/gp/aws/html-forms-controller/contactus/ec2-email-limit-rdns-request) (requires authentication). Otherwise you would have to check from your service provider, hot to get the PTR record changed. Everything should work without the PTR record but setting it up correctly improves the deliverability a lot.
+
+##### 7. Ready to send!
+
+With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect 10/10 score out from [MailTester](https://www.mail-tester.com/) when sending a campaign message to a MailTester test address. I did not have VERP turned on, so the sender address matched return path address.
 
 ### Manual install (any OS that supports Node.js)
 
