@@ -237,10 +237,12 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                 data[key] = (req.body[key] || '').toString().trim();
             }
         });
+
+        data = tools.convertKeys(data);
+
         data._address = req.body.address;
         data._sub = req.body.sub;
         data._skip = !testsPass;
-        data = tools.convertKeys(data);
 
         subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
             if (!err && !confirmCid) {
