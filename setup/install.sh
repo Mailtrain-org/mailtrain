@@ -25,8 +25,8 @@ if [ ! -z "$PUBLIC_IP" ]; then
 fi
 HOSTNAME="${HOSTNAME:-`hostname`}"
 
-MYSQL_PASSWORD=`pwgen -1`
-DKIM_API_KEY=`pwgen -1`
+MYSQL_PASSWORD=`pwgen 12 -1`
+DKIM_API_KEY=`pwgen 12 -1`
 
 # Setup MySQL user for Mailtrain
 mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
@@ -58,7 +58,7 @@ INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_encryption','NONE') 
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','587') ON DUPLICATE KEY UPDATE \`value\`='587';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_homepage','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('service_url','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
-INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('dkim_api_key','http://$DKIM_API_KEY/') ON DUPLICATE KEY UPDATE \`value\`='http://$DKIM_API_KEY/';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('dkim_api_key','http://$DKIM_API_KEY/') ON DUPLICATE KEY UPDATE \`value\`='$DKIM_API_KEY';
 EOT
 
 # Add new user for the mailtrain daemon to run as
