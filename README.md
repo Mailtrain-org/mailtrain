@@ -54,7 +54,7 @@ Install script installs and sets up the following:
   * **MySQL** (platform default)
   * **Mailtrain** (from the master branch) on port 80
   * **UFW** firewall that blocks everything besides ports 22, 25, 80, 443
-  * **[ZoneMTA](https://github.com/zone-eu/zone-mta)** to queue and deliver messages
+  * **[ZoneMTA](https://github.com/zone-eu/zone-mta)** to queue and deliver messages (**NB!** using ZoneMTA assumes that outgoing port 25 is open which might not be the case on some hosts like on the Google Cloud)
   * **Redis** server for session cache
   * **logrotate** to rotate Mailtrain log files
   * **upstart** or **systemd** init script to automatically start and manage Mailtrain process
