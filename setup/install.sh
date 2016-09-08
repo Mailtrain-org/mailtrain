@@ -61,7 +61,7 @@ INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_encryption','NONE') 
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','587') ON DUPLICATE KEY UPDATE \`value\`='587';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_homepage','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('service_url','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
-INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('dkim_api_key','http://$DKIM_API_KEY/') ON DUPLICATE KEY UPDATE \`value\`='$DKIM_API_KEY';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('dkim_api_key','$DKIM_API_KEY') ON DUPLICATE KEY UPDATE \`value\`='$DKIM_API_KEY';
 EOT
 
 # Add new user for the mailtrain daemon to run as
