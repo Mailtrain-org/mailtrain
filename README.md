@@ -82,7 +82,7 @@ If you are using the bundled ZoneMTA then you need to add your Mailtrain host to
 
 ##### 4. Set up DKIM
 
-If you are using the bundled ZoneMTA then you can provide a DKIM key to sign all outgoing messages. If you have a DKIM key set for domain "example.com" with selector "mailtrain", then store the private key to folder /opt/zone-mta/keys as "example.com.mailtrain.pem" (thats sending hostname + "." + seclector + ".pem"). Everything should work without the DKIM signatures but setting it up correctly improves the deliverability a lot.
+If you are using the bundled ZoneMTA then you can provide a DKIM key to sign all outgoing messages. You can provide the DKIM private key in Mailtrain Settings page. This key is only used by ZoneMTA, so if you are using some other provider then you check your providers' documentation to see how to set up DKIM. In case of ZoneMTA you only need to open Mailtrain Settings page, scroll to DKIM config section and fill the fields for DKIM selector and DKIM private key. Everything should work without the DKIM signatures but setting it up correctly improves the deliverability a lot.
 
 ##### 5. Set up VERP
 
