@@ -828,7 +828,7 @@ router.post('/attachment/download', passport.parseForm, passport.csrfProtection,
                 req.flash('danger', err && err.message || err);
                 return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
             } else if (!attachment) {
-                req.flash('success', 'Attachment uploaded');
+                req.flash('warning', 'Attachment not found');
                 return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
             }
 

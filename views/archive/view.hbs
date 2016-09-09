@@ -1,2 +1,19 @@
+ {{{message}}}
 
-{{{message}}}
+{{#if attachments}}
+    <ul class="list-group">
+        {{#each attachments}}
+            <li class="list-group-item">
+                <span class="badge">{{size}}</span>
+                <form method="post" action="/archive/attachment/download">
+                    <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                    <input type="hidden" name="campaign" value="{{../campaign.cid}}" />
+                    <input type="hidden" name="list" value="{{../list.cid}}" />
+                    <input type="hidden" name="subscription" value="{{../subscription.cid}}" />
+                    <input type="hidden" name="attachment" value="{{id}}" />
+                    <button type="submit" class="btn btn-link btn-xs"><i class="glyphicon glyphicon-cloud-download"></i> {{filename}}</button>
+                </form>
+            </li>
+        {{/each}}
+    </ul>
+{{/if}}

@@ -9,8 +9,9 @@ let tools = require('../lib/tools');
 let express = require('express');
 let request = require('request');
 let router = new express.Router();
+let passport = require('../lib/passport');
 
-router.get('/:campaign/:list/:subscription', (req, res, next) => {
+router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res, next) => {
     settings.get('serviceUrl', (err, serviceUrl) => {
         if (err) {
             req.flash('danger', err.message || err);
@@ -53,52 +54,84 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                         return next(err);
                     }
 
-                    let renderHtml = (html, renderTags) => {
-                        res.render('archive/view', {
-                            layout: 'archive/layout',
-                            message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
-                            campaign,
-                            list,
-                            subscription
-                        });
-                    };
-
-                    let renderAndShow = (html, renderTags) => {
-                        if (req.query.track === 'no') {
-                            return renderHtml(html, renderTags);
+                    campaigns.getAttachments(campaign.id, (err, attachments) => {
+                        if (err) {
+                            req.flash('danger', err.message || err);
+                            return res.redirect('/');
                         }
-                        // rewrite links to count clicks
-                        links.updateLinks(campaign, list, subscription, serviceUrl, html, (err, html) => {
-                            if (err) {
-                                req.flash('danger', err.message || err);
-                                return res.redirect('/');
-                            }
-                            renderHtml(html, renderTags);
-                        });
-                    };
 
-                    if (campaign.sourceUrl) {
-                        let form = tools.getMessageLinks(serviceUrl, campaign, list, subscription);
-                        Object.keys(subscription.mergeTags).forEach(key => {
-                            form[key] = subscription.mergeTags[key];
-                        });
-                        request.post({
-                            url: campaign.sourceUrl,
-                            form
-                        }, (err, httpResponse, body) => {
-                            if (err) {
-                                return next(err);
+                        let renderHtml = (html, renderTags) => {
+                            res.render('archive/view', {
+                                layout: 'archive/layout',
+                                message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
+                                campaign,
+                                list,
+                                subscription,
+                                attachments,
+                                csrfToken: req.csrfToken()
+                            });
+                        };
+
+                        let renderAndShow = (html, renderTags) => {
+                            if (req.query.track === 'no') {
+                                return renderHtml(html, renderTags);
                             }
-                            if (httpResponse.statusCode !== 200) {
-                                return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
-                            }
-                            renderAndShow(body && body.toString(), false);
-                        });
-                    } else {
-                        renderAndShow(campaign.html, true);
-                    }
+                            // rewrite links to count clicks
+                            links.updateLinks(campaign, list, subscription, serviceUrl, html, (err, html) => {
+                                if (err) {
+                                    req.flash('danger', err.message || err);
+                                    return res.redirect('/');
+                                }
+                                renderHtml(html, renderTags);
+                            });
+                        };
+
+                        if (campaign.sourceUrl) {
+                            let form = tools.getMessageLinks(serviceUrl, campaign, list, subscription);
+                            Object.keys(subscription.mergeTags).forEach(key => {
+                                form[key] = subscription.mergeTags[key];
+                            });
+                            request.post({
+                                url: campaign.sourceUrl,
+                                form
+                            }, (err, httpResponse, body) => {
+                                if (err) {
+                                    return next(err);
+                                }
+                                if (httpResponse.statusCode !== 200) {
+                                    return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
+                                }
+                                renderAndShow(body && body.toString(), false);
+                            });
+                        } else {
+                            renderAndShow(campaign.html, true);
+                        }
+                    });
                 });
             });
+        });
+    });
+});
+
+router.post('/attachment/download', passport.parseForm, passport.csrfProtection, (req, res) => {
+    let url = '/archive/' + encodeURIComponent(req.body.campaign || '') + '/' + encodeURIComponent(req.body.list || '') + '/' + encodeURIComponent(req.body.subscription || '');
+    campaigns.getByCid(req.body.campaign, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect(url);
+        }
+        campaigns.getAttachment(campaign.id, Number(req.body.attachment), (err, attachment) => {
+            if (err) {
+                req.flash('danger', err && err.message || err);
+                return res.redirect(url);
+            } else if (!attachment) {
+                req.flash('warning', 'Attachment not found');
+                return res.redirect(url);
+            }
+
+            res.set('Content-Disposition', 'attachment; filename="' + encodeURIComponent(attachment.filename).replace(/['()]/g, escape) + '"');
+            res.set('Content-Type', attachment.contentType);
+            res.send(attachment.content);
         });
     });
 });

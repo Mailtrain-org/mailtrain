@@ -18,6 +18,9 @@ let request = require('request');
 let caches = require('../lib/caches');
 let libmime = require('libmime');
 
+let attachmentCache = new Map();
+let attachmentCacheSize = 0;
+
 function findUnsent(callback) {
     let returnUnsent = (row, campaign) => {
         db.getConnection((err, connection) => {
@@ -195,6 +198,54 @@ function findUnsent(callback) {
     });
 }
 
+function getAttachments(campaign, callback) {
+    campaigns.getAttachments(campaign.id, (err, attachments) => {
+        if (err) {
+            return callback(err);
+        }
+        if (!attachments) {
+            return callback(null, []);
+        }
+
+        let response = [];
+        let pos = 0;
+        let getNextAttachment = () => {
+            if (pos >= attachments.length) {
+                return callback(null, response);
+            }
+            let attachment = attachments[pos++];
+            let aid = campaign.id + ':' + attachment.id;
+            if (attachmentCache.has(aid)) {
+                response.push(attachmentCache.get(aid));
+                return setImmediate(getNextAttachment);
+            }
+            campaigns.getAttachment(campaign.id, attachment.id, (err, attachment) => {
+                if (err) {
+                    return callback(err);
+                }
+                if (!attachment || !attachment.content) {
+                    return setImmediate(getNextAttachment);
+                }
+
+                response.push(attachment);
+
+                // make sure we do not cache more buffers than 30MB
+                if (attachmentCacheSize + attachment.content.length > 30 * 1024 * 1024) {
+                    attachmentCacheSize = 0;
+                    attachmentCache.clear();
+                }
+
+                attachmentCache.set(aid, attachment);
+                attachmentCacheSize += attachment.content.length;
+
+                return setImmediate(getNextAttachment);
+            });
+        };
+
+        getNextAttachment();
+    });
+}
+
 function formatMessage(message, callback) {
     campaigns.get(message.campaignId, false, (err, campaign) => {
         if (err) {
@@ -255,71 +306,76 @@ function formatMessage(message, callback) {
                             }
 
                             // replace data: images with embedded attachments
-                            let attachments = [];
-                            html = html.replace(/(<img\b[^>]* src\s*=[\s"']*)(data:[^"'>\s]+)/gi, (match, prefix, dataUri) => {
-                                let cid = shortid.generate() + '-attachments@' + campaign.address.split('@').pop();
-                                attachments.push({
-                                    path: dataUri,
-                                    cid
+                            getAttachments(campaign, (err, attachments) => {
+                                if (err) {
+                                    return callback(err);
+                                }
+
+                                html = html.replace(/(<img\b[^>]* src\s*=[\s"']*)(data:[^"'>\s]+)/gi, (match, prefix, dataUri) => {
+                                    let cid = shortid.generate() + '-attachments@' + campaign.address.split('@').pop();
+                                    attachments.push({
+                                        path: dataUri,
+                                        cid
+                                    });
+                                    return prefix + 'cid:' + cid;
                                 });
-                                return prefix + 'cid:' + cid;
-                            });
 
-                            let campaignAddress = [campaign.cid, list.cid, message.subscription.cid].join('.');
+                                let campaignAddress = [campaign.cid, list.cid, message.subscription.cid].join('.');
 
-                            let renderedHtml = renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html) : html;
+                                let renderedHtml = renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html) : html;
 
-                            let renderedText = (text || '').trim() ? (renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, text) : text) : htmlToText.fromString(renderedHtml, {
-                                wordwrap: 130
-                            });
+                                let renderedText = (text || '').trim() ? (renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, text) : text) : htmlToText.fromString(renderedHtml, {
+                                    wordwrap: 130
+                                });
 
-                            return callback(null, {
-                                from: {
-                                    name: campaign.from,
-                                    address: campaign.address
-                                },
-                                xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
-                                to: {
-                                    name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
-                                    address: message.subscription.email
-                                },
-                                sender: useVerp ? campaignAddress + '@' + configItems.verpHostname : false,
+                                return callback(null, {
+                                    from: {
+                                        name: campaign.from,
+                                        address: campaign.address
+                                    },
+                                    xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
+                                    to: {
+                                        name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
+                                        address: message.subscription.email
+                                    },
+                                    sender: useVerp ? campaignAddress + '@' + configItems.verpHostname : false,
 
-                                envelope: useVerp ? {
-                                    from: campaignAddress + '@' + configItems.verpHostname,
-                                    to: message.subscription.email
-                                } : false,
+                                    envelope: useVerp ? {
+                                        from: campaignAddress + '@' + configItems.verpHostname,
+                                        to: message.subscription.email
+                                    } : false,
 
-                                headers: {
-                                    'x-fbl': campaignAddress,
-                                    // custom header for SparkPost
-                                    'x-msys-api': JSON.stringify({
-                                        campaign_id: campaignAddress
-                                    }),
-                                    // custom header for SendGrid
-                                    'x-smtpapi': JSON.stringify({
-                                        unique_args: {
+                                    headers: {
+                                        'x-fbl': campaignAddress,
+                                        // custom header for SparkPost
+                                        'x-msys-api': JSON.stringify({
                                             campaign_id: campaignAddress
+                                        }),
+                                        // custom header for SendGrid
+                                        'x-smtpapi': JSON.stringify({
+                                            unique_args: {
+                                                campaign_id: campaignAddress
+                                            }
+                                        }),
+                                        // custom header for Mailgun
+                                        'x-mailgun-variables': JSON.stringify({
+                                            campaign_id: campaignAddress
+                                        }),
+                                        'List-ID': {
+                                            prepared: true,
+                                            value: libmime.encodeWords(list.name) + ' <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
                                         }
-                                    }),
-                                    // custom header for Mailgun
-                                    'x-mailgun-variables': JSON.stringify({
-                                        campaign_id: campaignAddress
-                                    }),
-                                    'List-ID': {
-                                        prepared: true,
-                                        value: libmime.encodeWords(list.name) + ' <' + list.cid + '.' + (url.parse(configItems.serviceUrl).hostname || 'localhost') + '>'
-                                    }
-                                },
-                                list: {
-                                    unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
-                                },
-                                subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
-                                html: renderedHtml,
-                                text: renderedText,
+                                    },
+                                    list: {
+                                        unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
+                                    },
+                                    subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
+                                    html: renderedHtml,
+                                    text: renderedText,
 
-                                attachments,
-                                encryptionKeys
+                                    attachments,
+                                    encryptionKeys
+                                });
                             });
                         });
                     };
