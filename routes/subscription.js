@@ -216,6 +216,15 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
 
+    // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
+    // the subsciber has JavaScript turned on and thats it. If Mailtrain gets more targeted then this
+    // simple check should be replaced with an actual captcha
+    let subTime = Number(req.body.sub) || 0;
+    // allow clock skew 24h in the past and 24h to the future
+    let subTimeTest = !!(subTime > Date.now() - 24 * 3600 * 1000 && subTime < Date.now() + 24 * 3600 * 1000);
+    let addressTest = !req.body.address;
+    let testsPass = subTimeTest && addressTest;
+
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
             err = new Error('Selected list not found');
@@ -232,7 +241,12 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                 data[key] = (req.body[key] || '').toString().trim();
             }
         });
+
         data = tools.convertKeys(data);
+
+        data._address = req.body.address;
+        data._sub = req.body.sub;
+        data._skip = !testsPass;
 
         subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
             if (!err && !confirmCid) {
