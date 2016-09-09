@@ -12,6 +12,11 @@ let tools = require('../lib/tools');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
 let htmlescape = require('escape-html');
+let multer = require('multer');
+let uploadStorage = multer.memoryStorage();
+let uploads = multer({
+    storage: uploadStorage
+});
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -120,121 +125,129 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
             return res.redirect('/campaigns');
         }
 
-        settings.list(['disableWysiwyg'], (err, configItems) => {
+        campaigns.getAttachments(campaign.id, (err, attachments) => {
             if (err) {
                 return next(err);
             }
+            campaign.attachments = attachments;
 
-            lists.quicklist((err, listItems) => {
+            settings.list(['disableWysiwyg'], (err, configItems) => {
                 if (err) {
-                    req.flash('danger', err.message || err);
-                    return res.redirect('/');
+                    return next(err);
                 }
 
-                if (Number(campaign.list)) {
-                    listItems.forEach(list => {
-                        list.segments.forEach(segment => {
-                            if (segment.id === campaign.segment) {
-                                segment.selected = true;
-                            }
-                        });
-                        if (list.id === campaign.list && !campaign.segment) {
-                            list.selected = true;
-                        }
-                    });
-                }
-
-                campaign.csrfToken = req.csrfToken();
-                campaign.listItems = listItems;
-                campaign.useEditor = true;
-
-                campaign.disableWysiwyg = configItems.disableWysiwyg;
-                campaign.showGeneral = req.query.tab === 'general' || !req.query.tab;
-                campaign.showTemplate = req.query.tab === 'template';
-
-                let view;
-                switch (campaign.type) {
-                    case 4: //triggered
-                        view = 'campaigns/edit-triggered';
-                        break;
-                    case 2: //rss
-                        view = 'campaigns/edit-rss';
-                        break;
-                    case 1:
-                    default:
-                        view = 'campaigns/edit';
-                }
-
-                let getList = (listId, callback) => {
-                    lists.get(listId, (err, list) => {
-                        if (err) {
-                            return callback(err);
-                        }
-                        if (!list) {
-                            list = {
-                                id: listId
-                            };
-                        }
-
-                        fields.list(list.id, (err, fieldList) => {
-                            if (err && !fieldList) {
-                                fieldList = [];
-                            }
-
-                            let mergeTags = [
-                                // keep indentation
-                                {
-                                    key: 'LINK_UNSUBSCRIBE',
-                                    value: 'URL that points to the preferences page of the subscriber'
-                                }, {
-                                    key: 'LINK_PREFERENCES',
-                                    value: 'URL that points to the unsubscribe page'
-                                }, {
-                                    key: 'LINK_BROWSER',
-                                    value: 'URL to preview the message in a browser'
-                                }, {
-                                    key: 'EMAIL',
-                                    value: 'Email address'
-                                }, {
-                                    key: 'FIRST_NAME',
-                                    value: 'First name'
-                                }, {
-                                    key: 'LAST_NAME',
-                                    value: 'Last name'
-                                }, {
-                                    key: 'FULL_NAME',
-                                    value: 'Full name (first and last name combined)'
-                                }, {
-                                    key: 'SUBSCRIPTION_ID',
-                                    value: 'Unique ID that identifies the recipient'
-                                }, {
-                                    key: 'LIST_ID',
-                                    value: 'Unique ID that identifies the list used for this campaign'
-                                }, {
-                                    key: 'CAMPAIGN_ID',
-                                    value: 'Unique ID that identifies current campaign'
-                                }
-                            ];
-
-                            fieldList.forEach(field => {
-                                mergeTags.push({
-                                    key: field.key,
-                                    value: field.name
-                                });
-                            });
-
-                            return callback(null, list, mergeTags);
-                        });
-                    });
-                };
-
-                getList(campaign.list, (err, list, mergeTags) => {
+                lists.quicklist((err, listItems) => {
                     if (err) {
                         req.flash('danger', err.message || err);
                         return res.redirect('/');
                     }
-                    campaign.mergeTags = mergeTags;
-                    res.render(view, campaign);
+
+                    if (Number(campaign.list)) {
+                        listItems.forEach(list => {
+                            list.segments.forEach(segment => {
+                                if (segment.id === campaign.segment) {
+                                    segment.selected = true;
+                                }
+                            });
+                            if (list.id === campaign.list && !campaign.segment) {
+                                list.selected = true;
+                            }
+                        });
+                    }
+
+                    campaign.csrfToken = req.csrfToken();
+                    campaign.listItems = listItems;
+                    campaign.useEditor = true;
+
+                    campaign.disableWysiwyg = configItems.disableWysiwyg;
+                    campaign.showGeneral = req.query.tab === 'general' || !req.query.tab;
+                    campaign.showTemplate = req.query.tab === 'template';
+                    campaign.showAttachments = req.query.tab === 'attachments';
+
+                    let view;
+                    switch (campaign.type) {
+                        case 4: //triggered
+                            view = 'campaigns/edit-triggered';
+                            break;
+                        case 2: //rss
+                            view = 'campaigns/edit-rss';
+                            break;
+                        case 1:
+                        default:
+                            view = 'campaigns/edit';
+                    }
+
+                    let getList = (listId, callback) => {
+                        lists.get(listId, (err, list) => {
+                            if (err) {
+                                return callback(err);
+                            }
+                            if (!list) {
+                                list = {
+                                    id: listId
+                                };
+                            }
+
+                            fields.list(list.id, (err, fieldList) => {
+                                if (err && !fieldList) {
+                                    fieldList = [];
+                                }
+
+                                let mergeTags = [
+                                    // keep indentation
+                                    {
+                                        key: 'LINK_UNSUBSCRIBE',
+                                        value: 'URL that points to the preferences page of the subscriber'
+                                    }, {
+                                        key: 'LINK_PREFERENCES',
+                                        value: 'URL that points to the unsubscribe page'
+                                    }, {
+                                        key: 'LINK_BROWSER',
+                                        value: 'URL to preview the message in a browser'
+                                    }, {
+                                        key: 'EMAIL',
+                                        value: 'Email address'
+                                    }, {
+                                        key: 'FIRST_NAME',
+                                        value: 'First name'
+                                    }, {
+                                        key: 'LAST_NAME',
+                                        value: 'Last name'
+                                    }, {
+                                        key: 'FULL_NAME',
+                                        value: 'Full name (first and last name combined)'
+                                    }, {
+                                        key: 'SUBSCRIPTION_ID',
+                                        value: 'Unique ID that identifies the recipient'
+                                    }, {
+                                        key: 'LIST_ID',
+                                        value: 'Unique ID that identifies the list used for this campaign'
+                                    }, {
+                                        key: 'CAMPAIGN_ID',
+                                        value: 'Unique ID that identifies current campaign'
+                                    }
+                                ];
+
+                                fieldList.forEach(field => {
+                                    mergeTags.push({
+                                        key: field.key,
+                                        value: field.name
+                                    });
+                                });
+
+                                return callback(null, list, mergeTags);
+                            });
+                        });
+                    };
+
+                    getList(campaign.list, (err, list, mergeTags) => {
+                        if (err) {
+                            req.flash('danger', err.message || err);
+                            return res.redirect('/');
+                        }
+                        campaign.mergeTags = mergeTags;
+                        res.render(view, campaign);
+                    });
                 });
             });
         });
@@ -761,5 +774,81 @@ router.post('/inactivate', passport.parseForm, passport.csrfProtection, (req, re
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
     });
 });
+
+router.post('/attachment', uploads.single('attachment'), passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.get(req.body.id, false, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+        campaigns.addAttachment(campaign.id, {
+            filename: req.file.originalname,
+            contentType: req.file.mimetype,
+            content: req.file.buffer
+        }, (err, attachmentId) => {
+            if (err) {
+                req.flash('danger', err && err.message || err);
+            } else if (attachmentId) {
+                req.flash('success', 'Attachment uploaded');
+            } else {
+                req.flash('info', 'Could not store attachment');
+            }
+            return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
+        });
+    });
+});
+
+router.post('/attachment/delete', passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.get(req.body.id, false, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+        campaigns.deleteAttachment(campaign.id, Number(req.body.attachment), (err, deleted) => {
+            if (err) {
+                req.flash('danger', err && err.message || err);
+            } else if (deleted) {
+                req.flash('success', 'Attachment deleted');
+            } else {
+                req.flash('info', 'Could not delete attachment');
+            }
+            return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
+        });
+    });
+});
+
+router.post('/attachment/download', passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.get(req.body.id, false, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+        campaigns.getAttachment(campaign.id, Number(req.body.attachment), (err, attachment) => {
+            if (err) {
+                req.flash('danger', err && err.message || err);
+                return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
+            } else if (!attachment) {
+                req.flash('success', 'Attachment uploaded');
+                return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
+            }
+
+            res.set('Content-Disposition', 'attachment; filename="' + encodeURIComponent(attachment.filename).replace(/['()]/g, escape) + '"');
+            res.set('Content-Type', attachment.contentType);
+            res.send(attachment.content);
+        });
+    });
+});
+
+router.get('/attachment/:campaign', passport.csrfProtection, (req, res) => {
+    campaigns.get(req.params.campaign, false, (err, campaign) => {
+        if (err || !campaign) {
+            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            return res.redirect('/campaigns');
+        }
+        campaign.csrfToken = req.csrfToken();
+        res.render('campaigns/upload-attachment', campaign);
+    });
+});
+
 
 module.exports = router;

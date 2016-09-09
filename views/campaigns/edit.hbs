@@ -17,16 +17,29 @@
     <input type="hidden" name="id" value="{{id}}" />
 </form>
 
+{{#each attachments}}
+    <form method="post" id="attachment-download-{{id}}" action="/campaigns/attachment/download">
+        <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+        <input type="hidden" name="id" value="{{../id}}" />
+        <input type="hidden" name="attachment" value="{{id}}" />
+    </form>
+    <form method="post" class="delete-form" id="attachment-delete-{{id}}" action="/campaigns/attachment/delete">
+        <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+        <input type="hidden" name="id" value="{{../id}}" />
+        <input type="hidden" name="attachment" value="{{id}}" />
+    </form>
+{{/each}}
+
 <form class="form-horizontal" method="post" action="/campaigns/edit">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" name="id" value="{{id}}" />
 
     <div>
-
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="{{#if showGeneral}}active{{/if}}"><a href="#general" aria-controls="general" role="tab" data-toggle="tab">General</a></li>
             <li role="presentation" class="{{#if showTemplate}}active{{/if}}"><a href="#template" aria-controls="template" role="tab" data-toggle="tab">Template</a></li>
+            <li role="presentation" class="{{#if showAttachments}}active{{/if}}"><a href="#attachments" aria-controls="attachments" role="tab" data-toggle="tab">Attachments{{#if attachments}} <span class="badge">{{attachments.length}}</span>{{/if}}</a></li>
         </ul>
 
         <div class="tab-content">
@@ -109,7 +122,6 @@
                 </fieldset>
             </div>
             <div role="tabpanel" class="tab-pane {{#if showTemplate}}active{{/if}}" id="template">
-
                 <p></p>
 
                 <fieldset>
@@ -187,17 +199,78 @@
                     {{/if}}
                 </fieldset>
             </div>
-        </div>
-    </div>
 
-    <hr />
+            <div role="tabpanel" class="tab-pane {{#if showAttachments}}active{{/if}}" id="attachments">
 
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <div class="pull-right">
-                <button type="submit" form="campaigns-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Campaign</button>
+                <p></p>
+
+
+                <fieldset>
+                    <legend>
+                        Attachments
+                    </legend>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <th class="col-md-1">
+                                    #
+                                </th>
+                                <th>
+                                    File
+                                </th>
+                                <th class="col-md-1">
+                                    Size
+                                </th>
+                                <th class="col-md-1">
+                                    &nbsp;
+                                </th>
+                            </thead>
+                            <tbody>
+                                {{#if attachments}}
+                                    {{#each attachments}}
+                                        <tr>
+                                            <td>
+                                                {{index}}
+                                            </td>
+                                            <td>
+                                                <button type="submit" form="attachment-download-{{id}}" class="btn btn-link btn-xs"><i class="glyphicon glyphicon-cloud-download"></i> {{filename}}</button>
+                                            </td>
+                                            <td>
+                                                {{size}}
+                                            </td>
+                                            <td>
+                                                <button type="submit" form="attachment-delete-{{id}}" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i> Delete</button>
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                {{else}}
+                                    <tr>
+                                        <td colspan="4">
+                                            No data available in table
+                                        </td>
+                                    </tr>
+                                {{/if}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pull-right">
+                        <a class="btn btn-info btn-sm" href="/campaigns/attachment/{{id}}" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Attachment</a>
+                    </div>
+                </fieldset>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+
+        </div>
+
+        <hr/>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <div class="pull-right">
+                    <button type="submit" form="campaigns-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Campaign</button>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+            </div>
         </div>
     </div>
 </form>
