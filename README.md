@@ -183,4 +183,5 @@ This command generates a CSV file with 100 000 subscriber accounts
 
 ## License
 
-**GPL-V3.0**
+  * Versions 1.19.0 and up: **MIT**
+  * Up to versions 1.18.0 **GPL-V3.0**

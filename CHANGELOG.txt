@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.19.0 2016-09-15
+
+  * Changed license from GPL-V3 to MIT
+
 ## 1.18.0 2016-09-08
 
   * Updated installation script to bundle ZoneMTA as the default sending engine

@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.18.0",
+  "version": "1.19.0",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "url": "git://github.com/andris9/mailtrain.git"
   },
   "author": "Andris Reinman",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "homepage": "http://mailtrain.org",
   "engines": {
     "node": ">=5.0.0"
@@ -38,6 +38,7 @@
     "connect-redis": "^3.1.0",
     "cookie-parser": "^1.4.3",
     "csurf": "^1.9.0",
+    "csv-generate": "^1.0.0",
     "csv-parse": "^1.1.7",
     "escape-html": "^1.0.3",
     "express": "^4.14.0",
