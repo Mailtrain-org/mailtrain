@@ -155,6 +155,14 @@ You can quickly create a free development environment for this Mailtrain project
 
 In the IDE, start Mailtrain via `Run > Start Mailtrain` and access your site via `Preview > 3000`.
 
+## Cloudron
+
+You can easily install and self-host Mailtrain on the Cloudron to send newsletters from your custom domain:
+
+[![Install](https://cloudron.io/img/button.svg)](https://cloudron.io/button.html?app=org.mailtrain.cloudronapp)
+
+The source code for the Cloudron app is [here](https://git.cloudron.io/cloudron/mailtrain-app).
+
 ## Bounce handling
 
 Mailtrain uses webhooks integration to detect bounces and spam complaints. Currently supported webhooks are:
