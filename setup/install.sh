@@ -115,6 +115,7 @@ fi
 mkdir -p /opt/zone-mta
 cd /opt/zone-mta
 git clone git://github.com/zone-eu/zone-mta.git .
+git checkout cf429f07
 
 # Ensure queue folder
 mkdir -p /var/data/mailtrain
@@ -129,16 +130,30 @@ cat >> config/production.json <<EOT
     },
     "feeder": {
         "port": 587,
-        "authentication": true,
+        "authentication": true
+    },
+    "api": {
+        "maildrop": false,
         "user": "mailtrain",
         "pass": "$SMTP_PASS"
     },
     "log": {
         "level": "info"
     },
-    "bounces": {
-        "enabled": false,
-        "url": "http://localhost/webhooks/zone-mta"
+    "plugins": {
+        "core/email-bounce": false,
+        "core/http-bounce": {
+            "enabled": true,
+            "url": "http://localhost/webhooks/zone-mta"
+        },
+        "core/http-auth": {
+            "enabled": true,
+            "url": "http://localhost:8080/test-auth"
+        },
+        "core/default-headers": {
+            "futureDate": false,
+            "xOriginatingIP": false
+        }
     },
     "getSenderConfig": "http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY",
     "zones": {
