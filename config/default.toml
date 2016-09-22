@@ -96,3 +96,12 @@ port=3002
 baseDN="ou=users,dc=company"
 filter="(|(username={{username}})(mail={{username}}))"
 passwordresetlink=""
+
+[postfixbounce]
+# Enable to allow writing Postfix bounce log to Mailtrain listener
+# If enabled, tail mail.log to Mailtrain with the following command:
+#     tail -f -n +0 /var/log/mail.log | nc localhost 5699 -
+enabled=false
+port=5699
+# allow connections from localhost only
+host="127.0.0.1"
