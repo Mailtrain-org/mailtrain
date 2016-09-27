@@ -15,7 +15,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-add-repository -y ppa:chris-lea/redis-server
 
 curl -sL https://deb.nodesource.com/setup_6.x | bash -
-apt-get -q -y install mariadb-server pwgen redis-server nodejs git ufw build-essential dnsutils
+apt-get -q -y install mariadb-server pwgen redis-server nodejs git ufw build-essential dnsutils python
 apt-get clean
 
 PUBLIC_IP=`curl -s https://api.ipify.org`
@@ -58,7 +58,7 @@ INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_disable_auth','') ON
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_user','mailtrain') ON DUPLICATE KEY UPDATE \`value\`='mailtrain';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_pass','$SMTP_PASS') ON DUPLICATE KEY UPDATE \`value\`='$SMTP_PASS';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_encryption','NONE') ON DUPLICATE KEY UPDATE \`value\`='NONE';
-INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','587') ON DUPLICATE KEY UPDATE \`value\`='587';
+INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('smtp_port','2525') ON DUPLICATE KEY UPDATE \`value\`='2525';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('default_homepage','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('service_url','http://$HOSTNAME/') ON DUPLICATE KEY UPDATE \`value\`='http://$HOSTNAME/';
 INSERT INTO \`settings\` (\`key\`, \`value\`) VALUES ('dkim_api_key','$DKIM_API_KEY') ON DUPLICATE KEY UPDATE \`value\`='$DKIM_API_KEY';
@@ -66,6 +66,7 @@ EOT
 
 # Add new user for the mailtrain daemon to run as
 useradd mailtrain || true
+useradd zone-mta || true
 
 # Setup installation configuration
 cat >> config/production.toml <<EOT
@@ -115,22 +116,25 @@ fi
 mkdir -p /opt/zone-mta
 cd /opt/zone-mta
 git clone git://github.com/zone-eu/zone-mta.git .
-git checkout cf429f07
+git checkout v0.1.0-alpha.5
 
 # Ensure queue folder
-mkdir -p /var/data/mailtrain
+mkdir -p /var/data/zone-mta/mailtrain
 
 # Setup installation configuration
 cat >> config/production.json <<EOT
 {
-    "user": "mailtrain",
-    "group": "mailtrain",
+    "user": "zone-mta",
+    "group": "zone-mta",
     "queue": {
-        "db": "/var/data/mailtrain"
+        "db": "/var/data/zone-mta/mailtrain"
     },
-    "feeder": {
-        "port": 587,
-        "authentication": true
+    "smtpInterfaces": {
+        "feeder": {
+            "enabled": true,
+            "port": 2525,
+            "authentication": true
+        }
     },
     "api": {
         "maildrop": false,
@@ -138,7 +142,8 @@ cat >> config/production.json <<EOT
         "pass": "$SMTP_PASS"
     },
     "log": {
-        "level": "info"
+        "level": "info",
+        "syslog": true
     },
     "plugins": {
         "core/email-bounce": false,
@@ -153,13 +158,31 @@ cat >> config/production.json <<EOT
         "core/default-headers": {
             "futureDate": false,
             "xOriginatingIP": false
-        }
+        },
+        "core/http-config": {
+            "enabled": true,
+            "url": "http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY"
+        },
+        "core/rcpt-mx": false
     },
-    "getSenderConfig": "http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY",
     "zones": {
+        "default": {
+            "pool": [
+                {
+                    "address": "0.0.0.0",
+                    "name": "$HOSTNAME"
+                }
+            ]
+        },
         "transactional": {
             "processes": 1,
-            "connections": 1
+            "connections": 1,
+            "pool": [
+                {
+                    "address": "0.0.0.0",
+                    "name": "$HOSTNAME"
+                }
+            ]
         }
     }
 }
@@ -168,22 +191,8 @@ EOT
 # Install required node packages
 npm install --no-progress --production
 
-# Setup log rotation to not spend up entire storage on logs
-cat <<EOM > /etc/logrotate.d/zone-mta
-/var/log/zone-mta.log {
-    daily
-    rotate 12
-    compress
-    delaycompress
-    missingok
-    notifempty
-    copytruncate
-    nomail
-}
-EOM
-
-chown -R mailtrain:mailtrain .
-chown -R mailtrain:mailtrain /var/data/mailtrain
+# Ensure queue folder is owned by MTA user
+chown -R zone-mta:zone-mta /var/data/zone-mta/mailtrain
 
 if [ -d "/run/systemd/system" ]; then
     # Set up systemd service script
