@@ -116,7 +116,7 @@ fi
 mkdir -p /opt/zone-mta
 cd /opt/zone-mta
 git clone git://github.com/zone-eu/zone-mta.git .
-git checkout v0.1.0-alpha.5
+git checkout 1c07b2c6
 
 # Ensure queue folder
 mkdir -p /var/data/zone-mta/mailtrain
@@ -133,6 +133,7 @@ cat >> config/production.json <<EOT
         "feeder": {
             "enabled": true,
             "port": 2525,
+            "processes": 2,
             "authentication": true
         }
     },
@@ -156,6 +157,7 @@ cat >> config/production.json <<EOT
             "url": "http://localhost:8080/test-auth"
         },
         "core/default-headers": {
+            "enabled": ["main", "sender"],
             "futureDate": false,
             "xOriginatingIP": false
         },
@@ -167,22 +169,26 @@ cat >> config/production.json <<EOT
     },
     "zones": {
         "default": {
-            "pool": [
-                {
-                    "address": "0.0.0.0",
-                    "name": "$HOSTNAME"
-                }
-            ]
+            "processes": 2,
+            "connections": 5,
+            "throttling": false,
+            "pool": [{
+                "address": "0.0.0.0",
+                "name": "$HOSTNAME"
+            }]
         },
         "transactional": {
             "processes": 1,
             "connections": 1,
-            "pool": [
-                {
-                    "address": "0.0.0.0",
-                    "name": "$HOSTNAME"
-                }
-            ]
+            "pool": [{
+                "address": "0.0.0.0",
+                "name": "$HOSTNAME"
+            }]
+        }
+    },
+    "domainConfig": {
+        "default": {
+            "maxConnections": 2
         }
     }
 }
