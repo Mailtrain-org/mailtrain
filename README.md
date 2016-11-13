@@ -145,16 +145,6 @@ Edit [mailtrain.nginx](setup/mailtrain.nginx) (update `server_name` directive) a
 
 Edit [mailtrain.conf](setup/mailtrain.conf) (update application folder) and copy it to `/etc/init`
 
-## Nitrous Quickstart
-
-You can quickly create a free development environment for this Mailtrain project in the cloud on www.nitrous.io:
-
-<a href="https://www.nitrous.io/quickstart">
-  <img src="https://nitrous-image-icons.s3.amazonaws.com/quickstart.png" alt="Nitrous Quickstart" width=142 height=34>
-</a>
-
-In the IDE, start Mailtrain via `Run > Start Mailtrain` and access your site via `Preview > 3000`.
-
 ## Cloudron
 
 You can easily install and self-host Mailtrain on the Cloudron to send newsletters from your custom domain:
