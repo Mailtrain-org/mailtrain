@@ -4,7 +4,7 @@ Requires=After=mysql.service
 [Service]
 Environment="NODE_ENV=production"
 WorkingDirectory=/opt/mailtrain
-ExecStart=/usr/bin/node index.js >> /var/log/mailtrain.log 2>&1
+ExecStart=/usr/bin/node index.js
 Type=simple
 Restart=always
 RestartSec=10
