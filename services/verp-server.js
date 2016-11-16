@@ -123,8 +123,9 @@ module.exports = callback => {
         if (pos >= hosts.length) {
             return setImmediate(callback);
         }
-        server.listen(config.verp.port, () => {
-            log.info('VERP', 'Server listening on %s:%s', config.verp.host || '*', config.verp.port);
+        let host = hosts[pos++];
+        server.listen(config.verp.port, host, () => {
+            log.info('VERP', 'Server listening on %s:%s', host || '*', config.verp.port);
             setImmediate(startNextHost);
         });
     };
