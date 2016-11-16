@@ -101,15 +101,33 @@ let server = new SMTPServer({
 
 server.on('error', err => {
     log.error('VERP', err.stack);
+    server.close();
 });
 
 module.exports = callback => {
-    if (config.verp.enabled) {
-        server.listen(config.verp.port, () => {
-            log.info('VERP', 'Server listening on port %s', config.verp.port);
-            setImmediate(callback);
-        });
-    } else {
-        setImmediate(callback);
+    if (!config.verp.enabled) {
+        return setImmediate(callback);
     }
+    let hosts;
+    if (typeof config.verp.host === 'string' && config.verp.host) {
+        hosts = config.verp.host.trim().split(',').map(host => host.trim()).filter(host => host.trim());
+        if (hosts.includes('*') || hosts.includes('all')) {
+            hosts = [false];
+        }
+    } else {
+        hosts = [false];
+    }
+
+    let pos = 0;
+    let startNextHost = () => {
+        if (pos >= hosts.length) {
+            return setImmediate(callback);
+        }
+        server.listen(config.verp.port, () => {
+            log.info('VERP', 'Server listening on %s:%s', config.verp.host || '*', config.verp.port);
+            setImmediate(startNextHost);
+        });
+    };
+
+    startNextHost();
 };
