@@ -88,6 +88,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 
                 data.from = data.from || configItems.defaultFrom;
                 data.address = data.address || configItems.defaultAddress;
+                data.replyTo = data.replyTo || '';
                 data.subject = data.subject || configItems.defaultSubject;
 
                 let view;
