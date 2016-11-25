@@ -12,3 +12,15 @@
     from { -webkit-transform: rotate(0deg); }
     to { -webkit-transform: rotate(360deg); }
 }
+
+/* Supporting wider description lists */
+
+@media screen and (min-width: 768px) {
+    .dl-horizontal dt {
+        width: 200px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 220px;
+    }
+}
