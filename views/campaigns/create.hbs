@@ -91,7 +91,13 @@
     <div class="form-group">
         <label for="address" class="col-sm-2 control-label">Email "from" address</label>
         <div class="col-sm-10">
-            <input type="email" class="form-control" name="address" id="address" value="{{address}}" placeholder="This is the address people will send replies to" required>
+            <input type="email" class="form-control" name="address" id="address" value="{{address}}" placeholder="This is the address people will send replies to unless reply-to address is set" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="address" class="col-sm-2 control-label">Email "reply-to" address</label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control" name="reply-to" id="reply-to" value="{{replyTo}}" placeholder="If set, this is the address people will send replies to">
         </div>
     </div>
     <div class="form-group">
