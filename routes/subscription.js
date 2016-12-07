@@ -331,6 +331,59 @@ router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, 
     });
 });
 
+router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, next) => {
+    lists.getByCid(req.params.lcid, (err, list) => {
+        if (!err && !list) {
+            err = new Error('Selected list not found');
+            err.status = 404;
+        }
+
+        if (err) {
+            return next(err);
+        }
+
+        subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
+            if (!err && !subscription) {
+                err = new Error('Subscription not found from this list');
+                err.status = 404;
+            }
+
+            subscription.lcid = req.params.lcid;
+            subscription.title = list.name;
+            subscription.csrfToken = req.csrfToken();
+            subscription.layout = 'subscription/layout';
+            subscription.useEditor = true;
+
+            res.render('subscription/manage-address', subscription);
+        });
+    });
+});
+
+
+router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, (req, res, next) => {
+    lists.getByCid(req.params.lcid, (err, list) => {
+        if (!err && !list) {
+            err = new Error('Selected list not found');
+            err.status = 404;
+        }
+
+        if (err) {
+            return next(err);
+        }
+
+        subscriptions.updateAddress(list, req.body.cid, req.body, req.ip, err => {
+            if (err) {
+                req.flash('danger', err.message || err);
+                log.error('Subscription', err);
+                return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage-address/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
+            }
+
+            req.flash('info', 'Email address updated, check your mailbox for verification instructions');
+            res.redirect('/subscription/' + req.params.lcid + '/manage/' + req.body.cid);
+        });
+    });
+});
+
 router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {

@@ -201,7 +201,7 @@ CREATE TABLE `segments` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
-  KEY `name` (`name`),
+  KEY `name` (`name`(191)),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `settings` (
