@@ -333,6 +333,7 @@ function formatMessage(message, callback) {
                                         name: campaign.from,
                                         address: campaign.address
                                     },
+                                    replyTo: campaign.replyTo,
                                     xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
                                     to: {
                                         name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
