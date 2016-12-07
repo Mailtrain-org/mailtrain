@@ -105,3 +105,7 @@ enabled=false
 port=5699
 # allow connections from localhost only
 host="127.0.0.1"
+
+# extra options for nodemailer
+[nodemailer]
+#textEncoding="base64"
