@@ -111,7 +111,7 @@ module.exports = callback => {
     let hosts;
     if (typeof config.verp.host === 'string' && config.verp.host) {
         hosts = config.verp.host.trim().split(',').map(host => host.trim()).filter(host => host.trim());
-        if (hosts.includes('*') || hosts.includes('all')) {
+        if (hosts.indexOf('*') >= 0 || hosts.indexOf('all') >= 0) {
             hosts = [false];
         }
     } else {
