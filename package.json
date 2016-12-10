@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.19.1",
+  "version": "1.20.0",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -67,6 +67,8 @@
     "openpgp": "^2.3.5",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
+    "redfour": "^1.0.0",
+    "redis": "^2.6.3",
     "request": "^2.79.0",
     "serve-favicon": "^2.3.2",
     "shortid": "^2.2.6",

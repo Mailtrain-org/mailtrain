@@ -218,7 +218,7 @@
             <label for="smtp-max-connections" class="col-sm-2 control-label">Max connections</label>
             <div class="col-sm-6">
                 <input type="number" class="form-control" name="smtp-max-connections" id="smtp-max-connections" placeholder="The count of max connections, eg. 10" value="{{smtpMaxConnections}}">
-                <span class="help-block">The count of maximum simultaneous connections to make against the SMTP server (defaults to 5)</span>
+                <span class="help-block">The count of maximum simultaneous connections to make against the SMTP server (defaults to 5). This limit is per sending process.</span>
             </div>
         </div>
 
@@ -234,7 +234,7 @@
             <label for="smtp-throttling" class="col-sm-2 control-label">Throttling</label>
             <div class="col-sm-6">
                 <input type="number" class="form-control" name="smtp-throttling" id="smtp-throttling" placeholder="Messages per hour eg. 1000" value="{{smtpThrottling}}">
-                <span class="help-block">Maximum number of messages to send in an hour. Leave empty or zero for no throttling. If your provider uses a different speed limit (<em>messages/minute</em> or <em>messages/second</em>) then convert this limit into <em>messages/hour</em> (1m/s => 3600m/h).</span>
+                <span class="help-block">Maximum number of messages to send in an hour. Leave empty or zero for no throttling. If your provider uses a different speed limit (<em>messages/minute</em> or <em>messages/second</em>) then convert this limit into <em>messages/hour</em> (1m/s => 3600m/h). This limit is per sending process.</span>
             </div>
         </div>
     </fieldset>

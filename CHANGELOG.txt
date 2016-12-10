@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.20.0 2016-12-11
+
+  * Added option to distribute sending queue between multiple processes to speed up delivery
+
 ## 1.19.0 2016-09-15
 
   * Changed license from GPL-V3 to MIT

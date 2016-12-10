@@ -112,5 +112,5 @@ host="127.0.0.1"
 
 [queue]
 # How many parallel sender processes to spawn
-# Do not use more than 1 for now as it would create race conditions
+# You can use more than 1 process only if you have Redis enabled
 processes=1

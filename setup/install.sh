@@ -116,7 +116,7 @@ fi
 mkdir -p /opt/zone-mta
 cd /opt/zone-mta
 git clone git://github.com/zone-eu/zone-mta.git .
-git checkout 1c07b2c6
+git checkout 6964091273
 
 # Ensure queue folder
 mkdir -p /var/data/zone-mta/mailtrain
@@ -124,6 +124,7 @@ mkdir -p /var/data/zone-mta/mailtrain
 # Setup installation configuration
 cat >> config/production.json <<EOT
 {
+    "name": "Mailtrain",
     "user": "zone-mta",
     "group": "zone-mta",
     "queue": {
@@ -149,46 +150,46 @@ cat >> config/production.json <<EOT
     "plugins": {
         "core/email-bounce": false,
         "core/http-bounce": {
-            "enabled": true,
+            "enabled": "main",
             "url": "http://localhost/webhooks/zone-mta"
         },
         "core/http-auth": {
-            "enabled": true,
+            "enabled": ["receiver", "main"],
             "url": "http://localhost:8080/test-auth"
         },
         "core/default-headers": {
-            "enabled": ["main", "sender"],
+            "enabled": ["receiver", "main", "sender"],
             "futureDate": false,
             "xOriginatingIP": false
         },
         "core/http-config": {
-            "enabled": true,
+            "enabled": ["main", "receiver"],
             "url": "http://localhost/webhooks/zone-mta/sender-config?api_token=$DKIM_API_KEY"
         },
         "core/rcpt-mx": false
     },
+    "pools": {
+        "default": [{
+            "address": "0.0.0.0",
+            "name": "$HOSTNAME"
+        }]
+    },
     "zones": {
         "default": {
-            "processes": 2,
+            "processes": 3,
             "connections": 5,
             "throttling": false,
-            "pool": [{
-                "address": "0.0.0.0",
-                "name": "$HOSTNAME"
-            }]
+            "pool": "default"
         },
         "transactional": {
             "processes": 1,
             "connections": 1,
-            "pool": [{
-                "address": "0.0.0.0",
-                "name": "$HOSTNAME"
-            }]
+            "pool": "default"
         }
     },
     "domainConfig": {
         "default": {
-            "maxConnections": 2
+            "maxConnections": 4
         }
     }
 }
@@ -196,6 +197,7 @@ EOT
 
 # Install required node packages
 npm install --no-progress --production
+npm install leveldown
 
 # Ensure queue folder is owned by MTA user
 chown -R zone-mta:zone-mta /var/data/zone-mta/mailtrain

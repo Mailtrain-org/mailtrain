@@ -24,16 +24,14 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 
 ## Cons
 
-  * Alpha-grade software. Might or might not work as expected
-  * Awful code base, needs refactoring
-  * No tests
+  * Beta-grade software. Might or might not work as expected. There are several users with list sizes between 100k and 1M and Mailtrain seems to work for them but YMMV
   * Almost no documentation (there are some guides in the [Wiki](https://github.com/andris9/mailtrain/wiki))
 
 ## Requirements
 
-  * Nodejs v5+
+  * Nodejs v6+
   * MySQL v5.5 or MariaDB
-  * Redis (optional, disabled by default, used only for session storage)
+  * Redis. Optional, disabled by default. Used for session storage and for caching state between multiple processes. If you do not have Redis enabled then you can only use a single sender process
 
 ## Installation
 

@@ -72,6 +72,11 @@ function spawnSenders(callback) {
     let spawned = 0;
     let returned = false;
 
+    if (processes > 1 && !config.redis.enabled) {
+        log.error('Queue', '%s processes requested but Redis is not enabled, spawning 1 process', processes);
+        processes = 1;
+    }
+
     let spawnSender = function () {
         if (spawned >= processes) {
             if (!returned) {
