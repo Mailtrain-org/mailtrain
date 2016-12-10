@@ -83,6 +83,8 @@ password="$MYSQL_PASSWORD"
 enabled=true
 [verp]
 enabled=true
+[queue]
+processes=5
 EOT
 
 # Install required node packages
