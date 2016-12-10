@@ -8,7 +8,7 @@ let config = require('config');
 let log = require('npmlog');
 let app = require('./app');
 let http = require('http');
-let sender = require('./services/sender');
+let fork = require('child_process').fork;
 let triggers = require('./services/triggers');
 let importer = require('./services/importer');
 let verpServer = require('./services/verp-server');
@@ -67,6 +67,37 @@ server.on('error', err => {
     }
 });
 
+function spawnSenders(callback) {
+    let processes = Math.max(Number(config.queue.processes) || 1, 1);
+    let spawned = 0;
+    let returned = false;
+
+    let spawnSender = function () {
+        if (spawned >= processes) {
+            if (!returned) {
+                returned = true;
+                return callback();
+            }
+            return false;
+        }
+
+        let child = fork(__dirname + '/services/sender.js', []);
+        let pid = child.pid;
+
+        child.on('close', (code, signal) => {
+            spawned--;
+            log.error('Child', 'Sender process %s exited with %s', pid, code || signal);
+            // Respawn after 5 seconds
+            setTimeout(() => spawnSender(), 5 * 1000).unref();
+        });
+
+        spawned++;
+        setImmediate(spawnSender);
+    };
+
+    spawnSender();
+}
+
 server.on('listening', () => {
     let addr = server.address();
     let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
@@ -78,7 +109,7 @@ server.on('listening', () => {
             tzupdate(() => {
                 importer(() => {
                     triggers(() => {
-                        sender(() => {
+                        spawnSenders(() => {
                             feedcheck(() => {
                                 postfixBounceServer(() => {
                                     log.info('Service', 'All services started');

@@ -497,7 +497,4 @@ let sendLoop = () => {
     });
 };
 
-module.exports = callback => {
-    sendLoop();
-    setImmediate(callback);
-};
+sendLoop();
