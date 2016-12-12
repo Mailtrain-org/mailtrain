@@ -48,7 +48,7 @@ router.post('/aws', (req, res, next) => {
 
                         switch (req.body.Message.notificationType) {
                             case 'Bounce':
-                                campaigns.updateMessage(message, 'bounced', ['Undetermined', 'Permanent'].indexOf(req.body.Message.bounce.bounceType) >= 0, (err, updated) => {
+                                campaigns.updateMessage(message, 'bounced', req.body.Message.bounce.bounceType === 'Permanent', (err, updated) => {
                                     if (err) {
                                         log.error('AWS', 'Failed updating message: %s', err.stack);
                                     } else if (updated) {
