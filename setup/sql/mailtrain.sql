@@ -211,11 +211,11 @@ CREATE TABLE `settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','smtp-pulse.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (4,'smtp_user','username');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (5,'smtp_pass','password');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (4,'smtp_user','');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (5,'smtp_pass','');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (6,'service_url','http://localhost:3000/');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (7,'admin_email','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (8,'smtp_max_connections','5');
