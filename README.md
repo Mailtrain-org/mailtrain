@@ -137,7 +137,7 @@ Mailtrain uses [node-config](https://github.com/lorenwest/node-config) for confi
 
 ### Running behind Nginx proxy
 
-Edit [mailtrain.nginx](setup/mailtrain.nginx) (update `server_name` directive) and copy it to `/etc/nginx/sites-enabled`
+Edit [mailtrain.nginx](setup/mailtrain-nginx.conf) (update `server_name` directive) and copy it to `/etc/nginx/sites-enabled`
 
 ### Running as an Upstart service in Ubuntu 14.04
 
