@@ -87,6 +87,11 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
     let storeSettings = () => {
         if (i >= keys.length) {
             mailer.update();
+            tools.workers.forEach(worker => {
+                worker.send({
+                    reload: true
+                });
+            });
             req.flash('success', 'Settings updated');
             return res.redirect('/settings');
         }

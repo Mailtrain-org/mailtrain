@@ -544,3 +544,10 @@ let sendLoop = () => {
 };
 
 sendLoop();
+
+process.on('message', m => {
+    if (m && m.reload) {
+        log.info('Sender/' + process.pid, 'Reloading mailer config');
+        mailer.update();
+    }
+});
