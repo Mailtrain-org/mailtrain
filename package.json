@@ -38,7 +38,6 @@
     "connect-redis": "^3.2.0",
     "cookie-parser": "^1.4.3",
     "csurf": "^1.9.0",
-    "csv-generate": "^1.0.0",
     "csv-parse": "^1.1.7",
     "escape-html": "^1.0.3",
     "express": "^4.14.0",
