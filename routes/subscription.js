@@ -35,7 +35,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
                 return next(err);
             }
 
-            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultFrom'], (err, configItems) => {
+            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultFrom', 'disableConfirmations'], (err, configItems) => {
                 if (err) {
                     return next(err);
                 }
@@ -47,6 +47,10 @@ router.get('/subscribe/:cid', (req, res, next) => {
                     preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid,
                     hasPubkey: !!configItems.pgpPrivateKey
                 });
+
+                if (configItems.disableConfirmations) {
+                    return;
+                }
 
                 fields.list(list.id, (err, fieldList) => {
                     if (err) {
@@ -212,6 +216,15 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
 
+    // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
+    // the subsciber has JavaScript turned on and thats it. If Mailtrain gets more targeted then this
+    // simple check should be replaced with an actual captcha
+    let subTime = Number(req.body.sub) || 0;
+    // allow clock skew 24h in the past and 24h to the future
+    let subTimeTest = !!(subTime > Date.now() - 24 * 3600 * 1000 && subTime < Date.now() + 24 * 3600 * 1000);
+    let addressTest = !req.body.address;
+    let testsPass = subTimeTest && addressTest;
+
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
             err = new Error('Selected list not found');
@@ -228,9 +241,14 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
                 data[key] = (req.body[key] || '').toString().trim();
             }
         });
+
         data = tools.convertKeys(data);
 
-        subscriptions.addConfirmation(list, email, data, (err, confirmCid) => {
+        data._address = req.body.address;
+        data._sub = req.body.sub;
+        data._skip = !testsPass;
+
+        subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
             if (!err && !confirmCid) {
                 err = new Error('Could not store confirmation data');
             }
@@ -305,9 +323,63 @@ router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, 
         subscriptions.update(list.id, req.body.cid, req.body, false, err => {
             if (err) {
                 req.flash('danger', err.message || err);
+                log.error('Subscription', err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
             res.redirect('/subscription/' + req.params.lcid + '/updated-notice');
+        });
+    });
+});
+
+router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, next) => {
+    lists.getByCid(req.params.lcid, (err, list) => {
+        if (!err && !list) {
+            err = new Error('Selected list not found');
+            err.status = 404;
+        }
+
+        if (err) {
+            return next(err);
+        }
+
+        subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
+            if (!err && !subscription) {
+                err = new Error('Subscription not found from this list');
+                err.status = 404;
+            }
+
+            subscription.lcid = req.params.lcid;
+            subscription.title = list.name;
+            subscription.csrfToken = req.csrfToken();
+            subscription.layout = 'subscription/layout';
+            subscription.useEditor = true;
+
+            res.render('subscription/manage-address', subscription);
+        });
+    });
+});
+
+
+router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, (req, res, next) => {
+    lists.getByCid(req.params.lcid, (err, list) => {
+        if (!err && !list) {
+            err = new Error('Selected list not found');
+            err.status = 404;
+        }
+
+        if (err) {
+            return next(err);
+        }
+
+        subscriptions.updateAddress(list, req.body.cid, req.body, req.ip, err => {
+            if (err) {
+                req.flash('danger', err.message || err);
+                log.error('Subscription', err);
+                return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage-address/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
+            }
+
+            req.flash('info', 'Email address updated, check your mailbox for verification instructions');
+            res.redirect('/subscription/' + req.params.lcid + '/manage/' + req.body.cid);
         });
     });
 });
@@ -324,7 +396,7 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
         }
 
         subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-            if (!err && !list) {
+            if (!err && !subscription) {
                 err = new Error('Subscription not found from this list');
                 err.status = 404;
             }
@@ -360,6 +432,7 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
         subscriptions.unsubscribe(list.id, email, req.body.campaign, (err, subscription) => {
             if (err) {
                 req.flash('danger', err.message || err);
+                log.error('Subscription', err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
             res.redirect('/subscription/' + req.params.lcid + '/unsubscribe-notice');
@@ -376,9 +449,13 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                     }
                 });
 
-                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl'], (err, configItems) => {
+                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl', 'disableConfirmations'], (err, configItems) => {
                     if (err) {
-                        return next(err);
+                        return log.error('Settings', err);
+                    }
+
+                    if (configItems.disableConfirmations) {
+                        return;
                     }
 
                     mailer.sendMail({

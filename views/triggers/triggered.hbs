@@ -1,0 +1,47 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/triggers">Automation Triggers</a></li>
+    <li class="active">Triggered {{name}}</li>
+</ol>
+
+<h2><span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> {{name}} <small>Triggered subscribers</small></h2>
+
+<hr>
+
+{{#if description}}
+    <div class="well well-sm">{{{description}}}</div>
+{{/if}}
+
+<div class="table-responsive">
+
+    <div class="panel panel-info">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Subscribers who caused this trigger to fire:</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table data-topic-url="/triggers/status" data-topic-id="{{id}}" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,1,0">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">
+                                #
+                            </th>
+                            <th>
+                                Address
+                            </th>
+                            <th>
+                                First Name
+                            </th>
+                            <th>
+                                Last Name
+                            </th>
+                            <th>
+                                Triggered
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

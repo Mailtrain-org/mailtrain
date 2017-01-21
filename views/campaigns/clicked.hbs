@@ -34,25 +34,40 @@
         </thead>
         <tbody>
             <tr class="success">
-                <td>
-                    <a href="{{link.url}}">{{link.short}}</a>
-                </td>
-                <td>
-                    {{link.clicks}}
-                </td>
-                <td>
-                    {{link.relPercentage}}
-                </td>
-                <td>
-                    {{link.totalPercentage}}
-                </td>
+                {{#if aggregated}}
+                    <th>
+                        Aggregated clicks
+                    </th>
+                    <th>
+                        {{clicks}}
+                    </th>
+                    <th>
+                        –
+                    </th>
+                    <th>
+                        CTR {{clicksRate}}%
+                    </th>
+                {{else}}
+                    <td>
+                        <a href="{{link.url}}">{{link.short}}</a>
+                    </td>
+                    <td>
+                        {{link.clicks}}
+                    </td>
+                    <td>
+                        {{link.relPercentage}}
+                    </td>
+                    <td>
+                        {{link.totalPercentage}}
+                    </td>
+                {{/if}}
             </tr>
         </tbody>
     </table>
 
     <div class="panel panel-info">
         <!-- Default panel contents -->
-        <div class="panel-heading">Subscribers who clicked on this link:</div>
+        <div class="panel-heading">{{#if aggregated}}Subscribers who clicked on a link:{{else}}Subscribers who clicked on this link:{{/if}}</div>
         <div class="panel-body">
             <div class="table-responsive">
                 <table data-topic-url="/campaigns/clicked" data-topic-id="{{id}}/{{link.id}}" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,1,1,0">

@@ -1,0 +1,89 @@
+<ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Automation Triggers</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/triggers/create-select" role="button"><i class="glyphicon glyphicon-plus"></i> Create Trigger</a>
+</div>
+
+<h2>Automation Triggers</h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,1,0,1,0,1,1,0">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                List
+            </th>
+            <th>
+                Trigger
+            </th>
+            <th>
+                Target Campaign
+            </th>
+            <th>
+                Triggered
+            </th>
+            <th class="col-md-1">
+                &nbsp;
+            </th>
+        </thead>
+        {{#if rows}}
+            <tbody>
+
+                {{#each rows}}
+                    <tr>
+                        <th scope="row">
+                            {{index}}
+                        </th>
+                        <td>
+                            <span class="glyphicon glyphicon-console" aria-hidden="true"></span> {{name}}
+                        </td>
+                        <td>
+                            {{#if enabled}}
+                                <span class="label label-success">Enabled</span>
+                            {{else}}
+                                <span class="label label-default">Disabled</span>
+                            {{/if}}
+                        </td>
+                        <td class="text-muted">
+                            {{description}}
+                        </td>
+                        <td class="text-info">
+                            <a href="/lists/view/{{list}}">{{listName}}</a>
+                        </td>
+                        <td class="text-info">
+                            {{{formatted}}}
+                        </td>
+                        <td class="text-info">
+                            <a href="/campaigns/view/{{destCampaign}}">{{destCampaignName}}</a>
+                        </td>
+                        <td>
+                            <a href="/triggers/status/{{id}}">{{count}}</a>
+                        </td>
+                        <td>
+                            <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                            <a href="/triggers/edit/{{id}}">
+                            Edit
+                        </a>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        {{/if}}
+    </table>
+</div>

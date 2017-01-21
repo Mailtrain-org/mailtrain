@@ -1,9 +1,0 @@
-{
-  "template": "nodejs",
-  "ports": [3000],
-  "name": "Mailtrain",
-  "description": "Self hosted newsletter app.",
-  "scripts": {
-    "Start Mailtrain": "cd ~/code/mailtrain && NODE_ENV=production npm start"
-  }
-}

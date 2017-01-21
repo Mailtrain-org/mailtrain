@@ -15,7 +15,10 @@
 
     <div class="form-group">
         <label for="email">Email Address</label>
-        <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" readonly>
+        <div class="input-group">
+            <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" readonly>
+            <div class="input-group-addon"><a href="/subscription/{{lcid}}/manage-address/{{cid}}">want to change it?</a></div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -46,6 +49,10 @@
 
             {{#if typeLongtext}}
                 <textarea class="form-control" rows="3" name="{{column}}">{{value}}</textarea>
+            {{/if}}
+
+            {{#if typeJson}}
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="{&quot;data&quot;:&quot;value&quot;}">{{value}}</textarea>
             {{/if}}
 
             {{#if typeGpg}}

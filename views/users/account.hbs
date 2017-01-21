@@ -7,58 +7,66 @@
 
 <hr>
 
-<form class="form-horizontal" method="post" action="/users/account">
+{{#if ldap.enabled}}
+    <p>
+        This account is managed through LDAP.
+        <br/>
+        <br/> Associated Email Address: <a href="mailto:{{email}}">{{email}}</a>
+    </p>
+{{else}}
+    <form class="form-horizontal" method="post" action="/users/account">
 
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-    <fieldset>
-        <legend>
-            General Settings
-        </legend>
+        <fieldset>
+            <legend>
+                General Settings
+            </legend>
+
+            <div class="form-group">
+                <label for="email" class="col-sm-2 control-label">Email Address</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" name="email" id="email" value="{{email}}" placeholder="Your e-mail address" required>
+                    <span class="help-block">This address is used for account recovery in case you loose your password</span>
+                </div>
+            </div>
+
+        </fieldset>
+        <fieldset>
+            <legend>
+                Password change
+            </legend>
+
+            <p>
+                You only need to fill out this form if you want to change your current password
+            </p>
+
+            <div class="form-group">
+                <label for="currentPassword" class="col-sm-2 control-label">Current Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" name="currentPassword" id="currentPassword" placeholder="Current Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="col-sm-2 control-label">New Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="New Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password2" class="col-sm-2 control-label">Confirm Password</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" name="password2" id="password2" placeholder="Confirm New Password">
+                </div>
+            </div>
+
+        </fieldset>
 
         <div class="form-group">
-            <label for="email" class="col-sm-2 control-label">Email Address</label>
-            <div class="col-sm-10">
-                <input type="email" class="form-control" name="email" id="email" value="{{email}}" placeholder="Your e-mail address" required>
-                <span class="help-block">This address is used for account recovery in case you loose your password</span>
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
             </div>
         </div>
 
-    </fieldset>
-    <fieldset>
-        <legend>
-            Password change
-        </legend>
-
-        <p>
-            You only need to fill out this form if you want to change your current password
-        </p>
-
-        <div class="form-group">
-            <label for="currentPassword" class="col-sm-2 control-label">Current Password</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" name="currentPassword" id="currentPassword" placeholder="Current Password">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="password" class="col-sm-2 control-label">New Password</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" name="password" id="password" placeholder="New Password">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="password2" class="col-sm-2 control-label">Confirm Password</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" name="password2" id="password2" placeholder="Confirm New Password">
-            </div>
-        </div>
-
-    </fieldset>
-
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
-        </div>
-    </div>
-
-</form>
+    </form>
+{{/if}}

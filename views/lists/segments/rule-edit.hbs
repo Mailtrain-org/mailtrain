@@ -86,7 +86,7 @@
             <label for="value" class="col-sm-2 control-label">Value</label>
             <div class="col-sm-10 radio">
                 <label>
-                    <input type="radio" name="range" value="" {{#unless value.range}} checked {{/unless}}> Use exact match
+                    <input type="radio" name="range" value="" {{#unless value.range}} {{#unless value.relativeRange}} checked {{/unless}} {{/unless}}> Use exact match
                 </label>
             </div>
         </div>
@@ -114,7 +114,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="input-group date fm-date-generic">
-                            <input type="text" class="form-control" name="start" placeholder="YYYY-MM-DD" value="{{value.start}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                            <input type="text" class="form-control" name="start" placeholder="YYYY-MM-DD" {{#if value.range}} value="{{value.start}}" {{/if}}><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
                         </div>
                     </div>
                     <div class="col-md-1">
@@ -122,7 +122,60 @@
                     </div>
                     <div class="col-md-3">
                         <div class="input-group date fm-date-generic">
-                            <input type="text" class="form-control" name="end" placeholder="YYYY-MM-DD" value="{{value.end}}"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                            <input type="text" class="form-control" name="end" placeholder="YYYY-MM-DD" {{#if value.range}} value="{{value.end}}" {{/if}}><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <label>
+                    <input type="radio" name="range" value="relative" {{#if value.relativeRange}} checked {{/if}}> Use relative range match
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <div class="row">
+                    <div class="col-md-1">
+                        <p class="form-control-static">From</p>
+                    </div>
+                    <div class="col-md-4 form-inline">
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="start-relative" placeholder="0" {{#if value.relativeRange}} value="{{value.start}}" {{/if}}>
+                            <div class="input-group-addon">
+                                days
+                                <select name="start-direction">
+                                    <option value="0">
+                                        before today
+                                    </option>
+                                    <option value="1" {{#if value.startDirection}} selected {{/if}}>
+                                        after today
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <p class="form-control-static text-center">to</p>
+                    </div>
+                    <div class="col-md-4 form-inline">
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="end-relative" placeholder="0" {{#if value.relativeRange}} value="{{value.end}}" {{/if}}>
+                            <div class="input-group-addon">
+                                days
+                                <select name="end-direction">
+                                    <option value="0">
+                                        before today
+                                    </option>
+                                    <option value="1" {{#if value.endDirection}} selected {{/if}}>
+                                        after today
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -135,7 +188,7 @@
             <label for="value" class="col-sm-2 control-label">Value</label>
             <div class="col-sm-10 radio">
                 <label>
-                    <input type="radio" name="range" value="" {{#unless isRange}} checked {{/unless}}> Use exact match
+                    <input type="radio" name="range" value="" {{#unless value.range}} checked {{/unless}}> Use exact match
                 </label>
             </div>
         </div>
@@ -150,7 +203,7 @@
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10 radio">
                 <label>
-                    <input type="radio" name="range" value="yes" {{#if isRange}} checked {{/if}}> Use range match
+                    <input type="radio" name="range" value="yes" {{#if value.range}} checked {{/if}}> Use range match
                 </label>
             </div>
         </div>

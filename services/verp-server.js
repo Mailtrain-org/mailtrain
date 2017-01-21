@@ -74,7 +74,14 @@ let server = new SMTPServer({
             let body = Buffer.concat(chunks, chunklen).toString();
 
             let bh = new BounceHandler();
-            let bounceResult = [].concat(bh.parse_email(body) || []).shift();
+            let bounceResult;
+
+            try {
+                bounceResult = [].concat(bh.parse_email(body) || []).shift();
+            } catch (E) {
+                log.error('Bounce', 'Failed parsing bounce message');
+                log.error('Bounce', JSON.stringify(body));
+            }
 
             if (!bounceResult || ['failed', 'transient'].indexOf(bounceResult.action) < 0) {
                 return callback(null, 'Message accepted');
@@ -94,15 +101,34 @@ let server = new SMTPServer({
 
 server.on('error', err => {
     log.error('VERP', err.stack);
+    server.close();
 });
 
 module.exports = callback => {
-    if (config.verp.enabled) {
-        server.listen(config.verp.port, () => {
-            log.info('VERP', 'Server listening on port %s', config.verp.port);
-            setImmediate(callback);
-        });
-    } else {
-        setImmediate(callback);
+    if (!config.verp.enabled) {
+        return setImmediate(callback);
     }
+    let hosts;
+    if (typeof config.verp.host === 'string' && config.verp.host) {
+        hosts = config.verp.host.trim().split(',').map(host => host.trim()).filter(host => host.trim());
+        if (hosts.indexOf('*') >= 0 || hosts.indexOf('all') >= 0) {
+            hosts = [false];
+        }
+    } else {
+        hosts = [false];
+    }
+
+    let pos = 0;
+    let startNextHost = () => {
+        if (pos >= hosts.length) {
+            return setImmediate(callback);
+        }
+        let host = hosts[pos++];
+        server.listen(config.verp.port, host, () => {
+            log.info('VERP', 'Server listening on %s:%s', host || '*', config.verp.port);
+            setImmediate(startNextHost);
+        });
+    };
+
+    startNextHost();
 };

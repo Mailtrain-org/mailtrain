@@ -4,6 +4,7 @@ let express = require('express');
 let router = new express.Router();
 let request = require('request');
 let campaigns = require('../lib/models/campaigns');
+let settings = require('../lib/models/settings');
 let log = require('npmlog');
 let multer = require('multer');
 let uploads = multer();
@@ -47,7 +48,7 @@ router.post('/aws', (req, res, next) => {
 
                         switch (req.body.Message.notificationType) {
                             case 'Bounce':
-                                campaigns.updateMessage(message, 'bounced', ['Undetermined', 'Permanent'].indexOf(req.body.Message.bounce.bounceType) >= 0, (err, updated) => {
+                                campaigns.updateMessage(message, 'bounced', req.body.Message.bounce.bounceType === 'Permanent', (err, updated) => {
                                     if (err) {
                                         log.error('AWS', 'Failed updating message: %s', err.stack);
                                     } else if (updated) {
@@ -254,6 +255,77 @@ router.post('/mailgun', uploads.any(), (req, res) => {
 
     return res.json({
         success: true
+    });
+});
+
+router.post('/zone-mta', (req, res, next) => {
+    if (typeof req.body === 'string') {
+        try {
+            req.body = JSON.parse(req.body);
+        } catch (E) {
+            return next(new Error('Could not parse input'));
+        }
+    }
+
+    if (req.body.id) {
+        campaigns.findMailByResponse(req.body.id, (err, message) => {
+            if (err || !message) {
+                return;
+            }
+            campaigns.updateMessage(message, 'bounced', true, (err, updated) => {
+                if (err) {
+                    log.error('ZoneMTA', 'Failed updating message: %s', err.stack);
+                } else if (updated) {
+                    log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+                }
+            });
+        });
+    }
+
+    res.json({
+        success: true
+    });
+});
+
+router.post('/zone-mta/sender-config', (req, res) => {
+    if (!req.query.api_token) {
+        return res.json({
+            error: 'api_token value not set'
+        });
+    }
+    settings.list(['dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain'], (err, configItems) => {
+        if (err) {
+            return res.json({
+                error: err.message
+            });
+        }
+
+        if (configItems.dkimApiKey !== req.query.api_token) {
+            return res.json({
+                error: 'invalid api_token value'
+            });
+        }
+
+        configItems.dkimSelector = (configItems.dkimSelector || '').trim();
+        configItems.dkimPrivateKey = (configItems.dkimPrivateKey || '').trim();
+
+        if (!configItems.dkimSelector || !configItems.dkimPrivateKey) {
+            // empty response
+            return res.json({});
+        }
+
+        let from = (req.body.from || '').trim();
+        let domain = from.split('@').pop().toLowerCase().trim();
+
+        res.json({
+            dkim: {
+                keys: {
+                    domainName: configItems.dkimDomain || domain,
+                    keySelector: configItems.dkimSelector,
+                    privateKey: configItems.dkimPrivateKey
+                }
+            }
+        });
     });
 });
 

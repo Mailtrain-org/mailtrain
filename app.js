@@ -27,6 +27,7 @@ let campaigns = require('./routes/campaigns');
 let links = require('./routes/links');
 let fields = require('./routes/fields');
 let segments = require('./routes/segments');
+let triggers = require('./routes/triggers');
 let webhooks = require('./routes/webhooks');
 let subscription = require('./routes/subscription');
 let archive = require('./routes/archive');
@@ -134,6 +135,10 @@ passport.setup(app);
 app.use((req, res, next) => {
     res.locals.flash = req.flash.bind(req);
     res.locals.user = req.user;
+    res.locals.ldap = {
+        enabled: config.ldap.enabled,
+        passwordresetlink: config.ldap.passwordresetlink
+    };
 
     let menu = [{
         title: 'Home',
@@ -150,7 +155,7 @@ app.use((req, res, next) => {
     res.locals.menu = menu;
     tools.updateMenu(res);
 
-    settingsModel.list(['ua_code'], (err, configItems) => {
+    settingsModel.list(['ua_code', 'shoutout'], (err, configItems) => {
         if (err) {
             return next(err);
         }
@@ -170,6 +175,7 @@ app.use('/settings', settings);
 app.use('/links', links);
 app.use('/fields', fields);
 app.use('/segments', segments);
+app.use('/triggers', triggers);
 app.use('/webhooks', webhooks);
 app.use('/subscription', subscription);
 app.use('/archive', archive);
@@ -211,6 +217,5 @@ app.use((err, req, res, next) => {
         error: {}
     });
 });
-
 
 module.exports = app;

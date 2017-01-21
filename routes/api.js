@@ -6,6 +6,7 @@ let fields = require('../lib/models/fields');
 let subscriptions = require('../lib/models/subscriptions');
 let tools = require('../lib/tools');
 let express = require('express');
+let log = require('npmlog');
 let router = new express.Router();
 
 router.all('/*', (req, res, next) => {
@@ -44,6 +45,7 @@ router.post('/subscribe/:listId', (req, res) => {
     });
     lists.getByCid(req.params.listId, (err, list) => {
         if (err) {
+            log.error('API', err);
             res.status(500);
             return res.json({
                 error: err.message || err,
@@ -66,6 +68,7 @@ router.post('/subscribe/:listId', (req, res) => {
         }
         tools.validateEmail(input.EMAIL, false, err => {
             if (err) {
+                log.error('API', err);
                 res.status(400);
                 return res.json({
                     error: err.message || err,
@@ -119,8 +122,9 @@ router.post('/subscribe/:listId', (req, res) => {
                 }
 
                 if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
-                    subscriptions.addConfirmation(list, input.EMAIL, subscription, (err, cid) => {
+                    subscriptions.addConfirmation(list, input.EMAIL, req.ip, subscription, (err, cid) => {
                         if (err) {
+                            log.error('API', err);
                             res.status(500);
                             return res.json({
                                 error: err.message || err,
@@ -137,6 +141,7 @@ router.post('/subscribe/:listId', (req, res) => {
                 } else {
                     subscriptions.insert(list.id, meta, subscription, (err, response) => {
                         if (err) {
+                            log.error('API', err);
                             res.status(500);
                             return res.json({
                                 error: err.message || err,
@@ -196,6 +201,125 @@ router.post('/unsubscribe/:listId', (req, res) => {
                 data: {
                     id: subscription.id,
                     unsubscribed: true
+                }
+            });
+        });
+    });
+});
+
+router.post('/delete/:listId', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+        if (!input.EMAIL) {
+            res.status(400);
+            return res.json({
+                error: 'Missing EMAIL',
+                data: []
+            });
+        }
+        subscriptions.getByEmail(list.id, input.EMAIL, (err, subscription) => {
+            if (err) {
+                res.status(500);
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+            if (!subscription) {
+                res.status(404);
+                return res.json({
+                    error: 'Subscription not found',
+                    data: []
+                });
+            }
+            subscriptions.delete(list.id, subscription.cid, (err, subscription) => {
+                if (err) {
+                    res.status(500);
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
+                }
+                if (!subscription) {
+                    res.status(404);
+                    return res.json({
+                        error: 'Subscription not found',
+                        data: []
+                    });
+                }
+                res.status(200);
+                res.json({
+                    data: {
+                        id: subscription.id,
+                        deleted: true
+                    }
+                });
+            });
+        });
+    });
+});
+
+router.post('/field/:listId', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            log.error('API', err);
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+
+        let field = {
+            name: (input.NAME || '').toString().trim(),
+            defaultValue: (input.DEFAULT || '').toString().trim() || null,
+            type: (input.TYPE || '').toString().toLowerCase().trim(),
+            group: Number(input.GROUP) || null,
+            groupTemplate: (input.GROUP_TEMPLATE || '').toString().toLowerCase().trim(),
+            visible: ['false', 'no', '0', ''].indexOf((input.VISIBLE || '').toString().toLowerCase().trim()) < 0
+        };
+
+        fields.create(list.id, field, (err, id, tag) => {
+            if (err) {
+                res.status(500);
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            }
+            res.status(200);
+            res.json({
+                data: {
+                    id,
+                    tag
                 }
             });
         });

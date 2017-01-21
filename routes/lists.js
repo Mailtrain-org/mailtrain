@@ -1,5 +1,6 @@
 'use strict';
 
+let config = require('config');
 let openpgp = require('openpgp');
 let passport = require('../lib/passport');
 let express = require('express');
@@ -13,9 +14,30 @@ let htmlescape = require('escape-html');
 let multer = require('multer');
 let os = require('os');
 let humanize = require('humanize');
-let uploads = multer({
-    dest: os.tmpdir()
+let mkdirp = require('mkdirp');
+let pathlib = require('path');
+let log = require('npmlog');
+
+let uploadStorage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        log.verbose('tmpdir', os.tmpdir());
+        let tmp = config.www.tmpdir || os.tmpdir();
+        let dir = pathlib.join(tmp, 'mailtrain');
+        mkdirp(dir, err => {
+            if (err) {
+                log.error('Upload', err);
+                log.verbose('Upload', 'Storing upload to <%s>', tmp);
+                return callback(null, tmp);
+            }
+            log.verbose('Upload', 'Storing upload to <%s>', dir);
+            callback(null, dir);
+        });
+    }
 });
+let uploads = multer({
+    storage: uploadStorage
+});
+
 let csvparse = require('csv-parse');
 let fs = require('fs');
 let moment = require('moment-timezone');
@@ -212,7 +234,6 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
                 list.imports = imports.map((entry, i) => {
                     entry.index = i + 1;
-                    entry.processed = humanize.numberFormat(entry.processed, 0);
                     entry.importType = entry.type === 1 ? 'Subscribe' : 'Unsubscribe';
                     switch (entry.status) {
                         case 0:
@@ -234,6 +255,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                     entry.created = entry.created && entry.created.toISOString();
                     entry.finished = entry.finished && entry.finished.toISOString();
                     entry.updated = entry.processed - entry.new;
+                    entry.processed = humanize.numberFormat(entry.processed, 0);
                     return entry;
                 });
                 list.csrfToken = req.csrfToken();
@@ -383,7 +405,7 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
                     req.flash('danger', err && err.message || err || 'Could not unsubscribe user');
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
                 }
-                req.flash('success', subscription.email + ' was successfully subscribed from your list');
+                req.flash('success', subscription.email + ' was successfully unsubscribed from your list');
                 res.redirect('/lists/view/' + list.id);
             });
         });
@@ -410,6 +432,7 @@ router.post('/subscription/delete', passport.parseForm, passport.csrfProtection,
 });
 
 router.post('/subscription/edit', passport.parseForm, passport.csrfProtection, (req, res) => {
+    req.body['is-test'] = req.body['is-test'] ? '1' : '0';
     subscriptions.update(req.body.list, req.body.cid, req.body, true, (err, updated) => {
 
         if (err) {

@@ -3,14 +3,18 @@
 let log = require('npmlog');
 let config = require('config');
 let crypto = require('crypto');
+let humanize = require('humanize');
 
 let SMTPServer = require('smtp-server').SMTPServer;
+
+let totalMessages = 0;
+let received = 0;
 
 // Setup server
 let server = new SMTPServer({
 
     // log to console
-    logger: false,
+    logger: config.testserver.logger,
 
     // not required but nice-to-have
     banner: 'Welcome to My Awesome SMTP Server',
@@ -19,25 +23,18 @@ let server = new SMTPServer({
     disabledCommands: ['STARTTLS'],
 
     // By default only PLAIN and LOGIN are enabled
-    authMethods: ['PLAIN', 'LOGIN', 'CRAM-MD5'],
+    authMethods: ['PLAIN', 'LOGIN'],
 
     // Accept messages up to 10 MB
     size: 10 * 1024 * 1024,
 
     // Setup authentication
-    // Allow only users with username 'testuser' and password 'testpass'
     onAuth: (auth, session, callback) => {
-        let username = 'testuser';
-        let password = 'testpass';
+        let username = config.testserver.username;
+        let password = config.testserver.password;
 
         // check username and password
-        if (auth.username === username &&
-            (
-                auth.method === 'CRAM-MD5' ?
-                auth.validatePassword(password) : // if cram-md5, validate challenge response
-                auth.password === password // for other methods match plaintext passwords
-            )
-        ) {
+        if (auth.username === username && auth.password === password) {
             return callback(null, {
                 user: 'userdata' // value could be an user id, or an user object etc. This value can be accessed from session.user afterwards
             });
@@ -87,19 +84,34 @@ let server = new SMTPServer({
                 err.responseCode = 552;
                 return callback(err);
             }
+            received++;
             callback(null, 'Message queued as ' + hash.digest('hex')); // accept the message once the stream is ended
         });
     }
 });
 
 server.on('error', err => {
-    log.error('TESTSERV', err.stack);
+    log.error('Test SMTP', err.stack);
 });
 
 module.exports = callback => {
     if (config.testserver.enabled) {
         server.listen(config.testserver.port, config.testserver.host, () => {
-            log.info('TESTSERV', 'Server listening on port %s', config.testserver.port);
+            log.info('Test SMTP', 'Server listening on port %s', config.testserver.port);
+
+            setInterval(() => {
+                if (received) {
+                    totalMessages += received;
+                    log.verbose(
+                        'Test SMTP',
+                        'Received %s new message%s in last 60 sec. (total %s messages)',
+                        humanize.numberFormat(received, 0), received === 1 ? '' : 's',
+                        humanize.numberFormat(totalMessages, 0)
+                    );
+                    received = 0;
+                }
+            }, 60 * 1000);
+
             setImmediate(callback);
         });
     } else {

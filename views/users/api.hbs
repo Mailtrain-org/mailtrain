@@ -73,7 +73,8 @@
 
 <ul>
     <li>
-        <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. If the email was already unsubscribed/blocked then subscription status is not changed by default.
+        <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. If the email was already unsubscribed/blocked then subscription status is not changed
+        by default.
     </li>
     <li>
         <strong>REQUIRE_CONFIRMATION</strong> – set to "yes" if you want to send confirmation email to the subscriber before actually marking as subscribed
@@ -84,7 +85,7 @@
     <strong>Example</strong>
 </p>
 
-<pre>curl -XPOST {{serviceUrl}}api/subscribe/B16uVTdW?access_token={{accessToken}}\
+<pre>curl -XPOST {{serviceUrl}}api/subscribe/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
 <h3>POST /api/unsubscribe/:listId – Remove subscription</h3>
@@ -111,5 +112,71 @@
     <strong>Example</strong>
 </p>
 
-<pre>curl -XPOST {{serviceUrl}}api/unsubscribe/B16uVTdW?access_token={{accessToken}}\
+<pre>curl -XPOST {{serviceUrl}}api/unsubscribe/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com'</pre>
+
+<h3>POST /api/delete/:listId – Delete subscription</h3>
+
+<p>
+    This API call deletes a subscription
+</p>
+
+<p>
+    <strong>GET</strong> arguments
+</p>
+<ul>
+    <li><strong>access_token</strong> – your personal access token
+</ul>
+
+<p>
+    <strong>POST</strong> arguments
+</p>
+<ul>
+    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)
+</ul>
+
+<p>
+    <strong>Example</strong>
+</p>
+
+<pre>curl -XPOST {{serviceUrl}}api/delete/B16uVTdW?access_token={{accessToken}} \
+--data 'EMAIL=test@example.com'</pre>
+
+<h3>POST /api/field/:listId – Add new custom field</h3>
+
+<p>
+    This API call creates a new custom field for a list.
+</p>
+
+<p>
+    <strong>GET</strong> arguments
+</p>
+<ul>
+    <li><strong>access_token</strong> – your personal access token
+</ul>
+
+<p>
+    <strong>POST</strong> arguments
+</p>
+<ul>
+    <li><strong>NAME</strong> – field name (<em>required</em>)</li>
+    <li><strong>TYPE</strong> – one of the following types:
+        <ul>
+            {{#each allowedTypes}}
+                <li>
+                    <strong>{{type}}</strong> {{description}}
+                </li>
+            {{/each}}
+        </ul>
+    </li>
+    <li><strong>GROUP</strong> – If the type is 'option' then you also need to specify the parent element ID</li>
+    <li><strong>GROUP_TEMPLATE</strong> – Template for the group element. If not set, then values of the elements are joined with commas</li>
+    <li><strong>VISIBLE</strong> – yes/no, if not visible then the subscriber can not view or modify this value at the profile page</li>
+</ul>
+
+<p>
+    <strong>Example</strong>
+</p>
+
+<pre>curl -XPOST {{serviceUrl}}api/field/B16uVTdW?access_token={{accessToken}} \
+--data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>

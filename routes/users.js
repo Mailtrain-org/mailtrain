@@ -4,6 +4,7 @@ let passport = require('../lib/passport');
 let express = require('express');
 let router = new express.Router();
 let users = require('../lib/models/users');
+let fields = require('../lib/models/fields');
 let settings = require('../lib/models/settings');
 
 router.get('/logout', (req, res) => passport.logout(req, res));
@@ -90,6 +91,10 @@ router.get('/api', passport.csrfProtection, (req, res, next) => {
             }
             user.serviceUrl = configItems.serviceUrl;
             user.csrfToken = req.csrfToken();
+            user.allowedTypes = Object.keys(fields.types).map(key => ({
+                type: key,
+                description: fields.types[key]
+            }));
             res.render('users/api', user);
         });
     });

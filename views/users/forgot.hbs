@@ -8,22 +8,31 @@
 
 <hr>
 
-<p>Please provide the username or email address that you used when you signed up for your Mailtrain account.</p>
-<p>We will send you an email that will allow you to reset your password.</p>
+{{#if ldap.enabled}}
+    <p>
+        Accounts are managed through LDAP.
+        <br/>
+        <br/>
+        <a href="{{ldap.passwordresetlink}}">Reset Password</a>
+    </p>
+{{else}}
+    <p>Please provide the username or email address that you used when you signed up for your Mailtrain account.</p>
+    <p>We will send you an email that will allow you to reset your password.</p>
 
-<form class="form-horizontal" role="login" method="post" action="/users/forgot">
+    <form class="form-horizontal" role="login" method="post" action="/users/forgot">
 
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-    <div class="form-group">
-        <label for="usernameMain" class="col-sm-2 control-label">Username</label>
-        <div class="col-xs-4">
-            <input type="text" class="form-control" name="username" id="usernameMain" placeholder="Username or email address" autofocus required>
+        <div class="form-group">
+            <label for="usernameMain" class="col-sm-2 control-label">Username</label>
+            <div class="col-xs-4">
+                <input type="text" class="form-control" name="username" id="usernameMain" placeholder="Username or email address" autofocus required>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-xs-4">
-            <button type="submit" class="btn btn-primary">Send verification email</button>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-xs-4">
+                <button type="submit" class="btn btn-primary">Send verification email</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+{{/if}}

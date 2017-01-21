@@ -5,10 +5,21 @@
     </form>
 {{/if}}
 
+<div class="alert alert-warning alert-dismissible" role="alert" id="js-warning">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Warning!</strong> JavaScript must be enabled in order for the subscription form to work
+</div>
+<script>
+    document.getElementById('js-warning').style.display = 'none';
+</script>
+
 <form method="post" action="/subscription/{{cid}}/subscribe">
 
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
+
+    <input type="hidden" name="address" value="">
+    <input type="hidden" name="sub" id="sub" value="">
 
     <div class="form-group">
         <label for="email">Email Address</label>
@@ -43,6 +54,10 @@
 
             {{#if typeLongtext}}
                 <textarea class="form-control" rows="3" name="{{column}}">{{value}}</textarea>
+            {{/if}}
+
+            {{#if typeJson}}
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="{&quot;data&quot;:&quot;value&quot;}">{{value}}</textarea>
             {{/if}}
 
             {{#if typeGpg}}
@@ -113,7 +128,14 @@
         </div>
     {{/each}}
 
-    <div class="form-group">
+    <div class="form-group" id="js-subscribe" style="display: none">
         <button type="submit" class="btn btn-primary">Subscribe to list</button>
     </div>
+    <script>
+        document.getElementById('js-subscribe').style.display = 'block';
+    </script>
 </form>
+
+<script>
+    document.getElementById('sub').value = new Date().getTime();
+</script>

@@ -137,3 +137,32 @@ if (typeof moment.tz !== 'undefined') {
         }
     })();
 }
+
+// setup SMTP check
+var smtpForm = document.querySelector('form#smtp-verify');
+if (smtpForm) {
+    smtpForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var form = document.getElementById('settings-form');
+        var formData = new FormData(form);
+        var result = fetch('/settings/smtp-verify', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        });
+
+        var $btn = $('#verify-button').button('loading');
+
+        result.then(function (res) {
+            return res.json();
+        }).then(function (data) {
+            alert(data.error ? 'Invalid SMTP settings\n' + data.error : data.message);
+            $btn.button('reset');
+        }).catch(function (err) {
+            alert(err.message);
+            $btn.button('reset');
+        });
+
+    });
+}

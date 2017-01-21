@@ -65,6 +65,7 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
                 data.html = data.html || rendererHtml(configItems);
                 data.text = data.text || rendererText(configItems);
                 data.disableWysiwyg = configItems.disableWysiwyg;
+
                 res.render('templates/create', data);
             });
         });
