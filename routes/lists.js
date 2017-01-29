@@ -191,6 +191,20 @@ router.post('/ajax/:id', (req, res) => {
                             try {
                                 value = openpgp.key.readArmored(value);
                                 if (value) {
+
+                                    let keys = value.keys;
+                                    for (let i = 0; i < keys.length; i++) {
+                                        let key = keys[i];
+                                        switch (key.verifyPrimaryKey()) {
+                                            case 0:
+                                                return 'Invalid key';
+                                            case 1:
+                                                return 'Expired key';
+                                            case 2:
+                                                return 'Revoked key';
+                                        }
+                                    }
+
                                     value = value.keys && value.keys[0] && value.keys[0].primaryKey.fingerprint;
                                     if (value) {
                                         value = '0x' + value.substr(-16).toUpperCase();
