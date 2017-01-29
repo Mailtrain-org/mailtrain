@@ -10,6 +10,7 @@ let express = require('express');
 let request = require('request');
 let router = new express.Router();
 let passport = require('../lib/passport');
+let marked = require('marked');
 
 router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res, next) => {
     settings.get('serviceUrl', (err, serviceUrl) => {
@@ -104,7 +105,13 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                                 renderAndShow(body && body.toString(), false);
                             });
                         } else {
-                            renderAndShow(campaign.html || (campaign.text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\n/g,'<br />'), true);
+                            renderAndShow(campaign.html || marked(campaign.text, {
+                                breaks: true,
+                                sanitize: true,
+                                gfm: true,
+                                tables: true,
+                                smartypants: true
+                            }), true);
                         }
                     });
                 });
