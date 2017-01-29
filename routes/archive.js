@@ -104,7 +104,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                                 renderAndShow(body && body.toString(), false);
                             });
                         } else {
-                            renderAndShow(campaign.html, true);
+                            renderAndShow(campaign.html || (campaign.text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\n/g,'<br />'), true);
                         }
                     });
                 });
