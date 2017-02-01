@@ -461,6 +461,7 @@ let sendLoop = () => {
         }
 
         let getNext = () => {
+            const mailing_timeout = 5 * 1000;
             if (!mailer.transport.isIdle()) {
                 // only retrieve new messages if there are free slots in the mailer queue
                 return;
@@ -470,11 +471,11 @@ let sendLoop = () => {
             findUnsent((err, message) => {
                 if (err) {
                     log.error('Mail', err.stack);
-                    setTimeout(getNext, 5 * 1000);
+                    setTimeout(getNext, mailing_timeout);
                     return;
                 }
                 if (!message) {
-                    setTimeout(getNext, 5 * 1000);
+                    setTimeout(getNext, mailing_timeout);
                     return;
                 }
 
@@ -483,7 +484,7 @@ let sendLoop = () => {
                 formatMessage(message, (err, mail) => {
                     if (err) {
                         log.error('Mail', err.stack);
-                        setTimeout(getNext, 5 * 1000);
+                        setTimeout(getNext, mailing_timeout);
                         return;
                     }
 

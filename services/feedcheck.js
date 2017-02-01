@@ -10,9 +10,10 @@ let campaigns = require('../lib/models/campaigns');
 function feedLoop() {
 
     db.getConnection((err, connection) => {
+        const feed_timeout = 15 * 1000;
         if (err) {
             log.error('Feed', err.stack);
-            return setTimeout(feedLoop, 15 * 1000);
+            return setTimeout(feedLoop, feed_timeout);
         }
 
         let query = 'SELECT `id`, `source_url`, `from`, `address`, `subject`, `list`, `segment`, `html` FROM `campaigns` WHERE `type`=2 AND `status`=6 AND (`last_check` IS NULL OR `last_check`< NOW() - INTERVAL 10 MINUTE) LIMIT 1';
@@ -21,22 +22,23 @@ function feedLoop() {
             connection.release();
             if (err) {
                 log.error('Feed', err);
-                return setTimeout(feedLoop, 15 * 1000);
+                return setTimeout(feedLoop, feed_timeout);
             }
 
             if (!rows || !rows.length) {
-                return setTimeout(feedLoop, 15 * 1000);
+                return setTimeout(feedLoop, feed_timeout);
             }
 
             let parent = tools.convertKeys(rows[0]);
 
             updateRssInfo(parent.id, true, false, () => {
+                const rss_timeout = 1 * 1000;
                 log.verbose('Feed', 'Checking feed %s (%s)', parent.sourceUrl, parent.id);
                 feed.fetch(parent.sourceUrl, (err, entries) => {
                     if (err) {
                         log.error('Feed', err);
                         return updateRssInfo(parent.id, false, 'Feed error: ' + err.message, () => {
-                            setTimeout(feedLoop, 1 * 1000);
+                            setTimeout(feedLoop, rss_timeout);
                         });
                     }
                     checkEntries(parent, entries, (err, result) => {
@@ -51,7 +53,7 @@ function feedLoop() {
                             message = 'Found nothing new from the feed';
                         }
                         return updateRssInfo(parent.id, false, message, () => {
-                            setTimeout(feedLoop, 1 * 1000);
+                            setTimeout(feedLoop, rss_timeout);
                         });
                     });
                 });
