@@ -221,15 +221,16 @@ function processImport(data, callback) {
 
 let importLoop = () => {
     let getNext = () => {
+        const process_timout = 5 * 1000;
         // find an unsent message
         findUnprocessed((err, data) => {
             if (err) {
                 log.error('Import', err.stack);
-                setTimeout(getNext, 5 * 1000);
+                setTimeout(getNext, process_timout);
                 return;
             }
             if (!data) {
-                setTimeout(getNext, 5 * 1000);
+                setTimeout(getNext, process_timout);
                 return;
             }
 
@@ -246,7 +247,7 @@ let importLoop = () => {
                 db.getConnection((err, connection) => {
                     if (err) {
                         log.error('Import', err.stack);
-                        return setTimeout(getNext, 5 * 1000);
+                        return setTimeout(getNext, process_timout);
                     }
 
                     let query = 'UPDATE importer SET `status`=?, `error`=?, `finished`=NOW() WHERE `id`=? AND `status`=2 LIMIT 1';

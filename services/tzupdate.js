@@ -45,20 +45,21 @@ module.exports = callback => {
             return callback(err);
         }
         let checkLoop = () => {
+            const timezone_timeout = 60 * 60 * 1000;
             let curUtcDate = new Date().toISOString().split('T').shift();
             if (curUtcDate !== lastCheck) {
                 updateTimezoneOffsets(err => {
                     if (err) {
                         log.error('UTC', err);
                     }
-                    setTimeout(checkLoop, 60 * 60 * 1000);
+                    setTimeout(checkLoop, timezone_timeout);
                 });
             } else {
-                setTimeout(checkLoop, 60 * 60 * 1000);
+                setTimeout(checkLoop, timezone_timeout);
             }
             lastCheck = curUtcDate;
         };
-        setTimeout(checkLoop, 60 * 60 * 1000);
+        setTimeout(checkLoop, timezone_timeout);
         callback(null, true);
     });
 };
