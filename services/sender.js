@@ -20,6 +20,8 @@ let libmime = require('libmime');
 let attachmentCache = new Map();
 let attachmentCacheSize = 0;
 
+const mailing_timeout = 5 * 1000;
+
 function findUnsent(callback) {
     let returnUnsent = (row, campaign) => {
         db.getConnection((err, connection) => {
@@ -461,7 +463,6 @@ let sendLoop = () => {
         }
 
         let getNext = () => {
-            const mailing_timeout = 5 * 1000;
             if (!mailer.transport.isIdle()) {
                 // only retrieve new messages if there are free slots in the mailer queue
                 return;

@@ -7,10 +7,12 @@ let tools = require('../lib/tools');
 let feed = require('../lib/feed');
 let campaigns = require('../lib/models/campaigns');
 
+const feed_timeout = 15 * 1000;
+const rss_timeout = 1 * 1000;
+
 function feedLoop() {
 
     db.getConnection((err, connection) => {
-        const feed_timeout = 15 * 1000;
         if (err) {
             log.error('Feed', err.stack);
             return setTimeout(feedLoop, feed_timeout);
@@ -32,7 +34,6 @@ function feedLoop() {
             let parent = tools.convertKeys(rows[0]);
 
             updateRssInfo(parent.id, true, false, () => {
-                const rss_timeout = 1 * 1000;
                 log.verbose('Feed', 'Checking feed %s (%s)', parent.sourceUrl, parent.id);
                 feed.fetch(parent.sourceUrl, (err, entries) => {
                     if (err) {

@@ -10,6 +10,8 @@ let subscriptions = require('../lib/models/subscriptions');
 let fs = require('fs');
 let csvparse = require('csv-parse');
 
+const process_timout = 5 * 1000;
+
 function findUnprocessed(callback) {
     db.getConnection((err, connection) => {
         if (err) {
@@ -221,7 +223,6 @@ function processImport(data, callback) {
 
 let importLoop = () => {
     let getNext = () => {
-        const process_timout = 5 * 1000;
         // find an unsent message
         findUnprocessed((err, data) => {
             if (err) {

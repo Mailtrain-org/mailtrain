@@ -11,8 +11,9 @@
 let moment = require('moment-timezone');
 let db = require('../lib/db');
 let log = require('npmlog');
-
 let lastCheck = false;
+
+const timezone_timeout = 60 * 60 * 1000;
 
 function updateTimezoneOffsets(callback) {
     log.verbose('UTC', 'Updating timezone offsets');
@@ -45,7 +46,6 @@ module.exports = callback => {
             return callback(err);
         }
         let checkLoop = () => {
-            const timezone_timeout = 60 * 60 * 1000;
             let curUtcDate = new Date().toISOString().split('T').shift();
             if (curUtcDate !== lastCheck) {
                 updateTimezoneOffsets(err => {
