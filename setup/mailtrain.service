@@ -13,4 +13,4 @@ RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
-Alias=mailtrain.service
+# Alias=mailtrain.service
