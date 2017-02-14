@@ -1,5 +1,7 @@
+[Unit]
 Description=Mailtrain server
-Requires=After=mysql.service
+Requires=mysql.service
+After=syslog.target network.target
 
 [Service]
 Environment="NODE_ENV=production"
@@ -11,3 +13,4 @@ RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
+Alias=mailtrain.service
