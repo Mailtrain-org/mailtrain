@@ -127,66 +127,132 @@
 
     <fieldset>
         <legend>
-            SMTP Settings
+            Mailer Settings
         </legend>
 
         <p class="text-info">These settings are required to send out e-mail messages</p>
 
-        <div class="form-group">
-            <label for="smtp-hostname" class="col-sm-2 control-label">Hostname</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="smtp-hostname" id="smtp-hostname" placeholder="Hostname, eg. smtp.example.com" value="{{smtpHostname}}" required>
-            </div>
-        </div>
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="{{#if useSMTP}} active {{/if}}"><a href="#smtp-settings" aria-controls="smtp-settings" role="tab" data-toggle="tab">SMTP</a></li>
+                <li role="presentation" class="{{#if useSES}} active {{/if}}"><a href="#aws-ses" aria-controls="aws-ses" role="tab" data-toggle="tab">AWS SES</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane {{#if useSMTP}} active {{/if}}" id="smtp-settings">
+                    <p></p>
 
-        <div class="form-group">
-            <label for="smtp-port" class="col-sm-2 control-label">Port</label>
-            <div class="col-sm-10">
-                <input type="number" class="form-control" name="smtp-port" id="smtp-port" placeholder="Port, eg. 465. Autodetected if left blank" value="{{smtpPort}}">
-            </div>
-        </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-xs-4">
+                            <div class="radio">
+                                <label>
+                        <input type="radio" name="mail-transport" id="transport-smtp" value="smtp" {{#if useSMTP}} checked {{/if}}>
+                        Use SMTP for sending mail
+                      </label>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="form-group">
-            <label for="smtp-encryption" class="col-sm-2 control-label">Encryption</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="smtp-encryption" name="smtp-encryption">
-                    {{#each smtpEncryption}}
-                        <option value="{{key}}" {{#if checked}} selected {{/if}}>
-                            {{value}}
-                            {{#if description}} <span class="text-muted"> &mdash; {{description}}</span>{{/if}}
-                        </option>
-                    {{/each}}
-                </select>
-            </div>
-        </div>
+                    <div class="form-group">
+                        <label for="smtp-hostname" class="col-sm-2 control-label">Hostname</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="smtp-hostname" id="smtp-hostname" placeholder="Hostname, eg. smtp.example.com" value="{{smtpHostname}}" required>
+                        </div>
+                    </div>
 
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-xs-4">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="smtp-disable-auth" {{#if smtpDisableAuth}} checked {{/if}}> Disable SMTP authentication
-                    </label>
+                    <div class="form-group">
+                        <label for="smtp-port" class="col-sm-2 control-label">Port</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" name="smtp-port" id="smtp-port" placeholder="Port, eg. 465. Autodetected if left blank" value="{{smtpPort}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="smtp-encryption" class="col-sm-2 control-label">Encryption</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="smtp-encryption" name="smtp-encryption">
+                            {{#each smtpEncryption}}
+                                <option value="{{key}}" {{#if checked}} selected {{/if}}>
+                                    {{value}}
+                                    {{#if description}} <span class="text-muted"> &mdash; {{description}}</span>{{/if}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-xs-4">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="smtp-disable-auth" {{#if smtpDisableAuth}} checked {{/if}}> Disable SMTP authentication
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="smtp-user" class="col-sm-2 control-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="smtp-user" id="smtp-user" placeholder="Username, eg. myaccount@example.com" value="{{smtpUser}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="smtp-pass" class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" name="smtp-pass" id="smtp-pass" placeholder="Password" value="{{smtpPass}}">
+                        </div>
+                    </div>
+
+                </div>
+                <div role="tabpanel" class="tab-pane {{#if useSES}} active {{/if}}" id="aws-ses">
+                    <p></p>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-xs-4">
+                            <div class="radio">
+                                <label>
+                        <input type="radio" name="mail-transport" id="transport-ses" value="ses" {{#if useSES}} checked {{/if}}>
+                        Use SES API for sending mail
+                      </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ses-key" class="col-sm-2 control-label">Access Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="ses-key" id="ses-key" placeholder="AWS Access Key Id" value="{{sesKey}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ses-secret" class="col-sm-2 control-label">Secret Key</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" name="ses-secret" id="ses-secret" placeholder="AES Secret Access Key" value="{{sesSecret}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ses-region" class="col-sm-2 control-label">Region</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="ses-region" name="ses-region">
+                            {{#each sesRegion}}
+                                <option value="{{key}}" {{#if checked}} selected {{/if}}>
+                                    {{value}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="smtp-user" class="col-sm-2 control-label">Username</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="smtp-user" id="smtp-port" placeholder="Username, eg. myaccount@example.com" value="{{smtpUser}}">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="smtp-pass" class="col-sm-2 control-label">Password</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" name="smtp-pass" id="smtp-pass" placeholder="Password" value="{{smtpPass}}">
-            </div>
-        </div>
 
         <div class="form-group">
             <div class="pull-right">
-                <button type="submit" id="verify-button" form="smtp-verify" class="btn btn-info" data-loading-text="Checking..."><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Check SMTP config</button>
+                <button type="submit" id="verify-button" form="smtp-verify" class="btn btn-info" data-loading-text="Checking..."><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Check Mailer config</button>
             </div>
             <div class="col-sm-offset-2 col-xs-6">
                 <p class="form-control-static">Don't have an SMTP account yet? Create a free SendPulse account <a href="https://sendpulse.com/?utm_source=mailtrain&utm_medium=settings">here</a></p>
@@ -196,7 +262,7 @@
 
     <fieldset>
         <legend>
-            Advanced SMTP settings
+            Advanced Mailer settings
         </legend>
 
         <div class="form-group">

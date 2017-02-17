@@ -75,7 +75,7 @@ db=5
 # In most cases you do not want to use it
 # Requires root privileges
 enabled=false
-port=25
+port=2525
 host="0.0.0.0"
 
 [testserver]

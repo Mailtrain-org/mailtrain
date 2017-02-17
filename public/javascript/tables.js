@@ -157,7 +157,7 @@ if (smtpForm) {
         result.then(function (res) {
             return res.json();
         }).then(function (data) {
-            alert(data.error ? 'Invalid SMTP settings\n' + data.error : data.message);
+            alert(data.error ? 'Invalid Mailer settings\n' + data.error : data.message);
             $btn.button('reset');
         }).catch(function (err) {
             alert(err.message);

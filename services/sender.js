@@ -504,7 +504,7 @@ let sendLoop = () => {
                             }
 
                             let status = err ? 2 : 1;
-                            let response = err && (err.response || err.message) || info.response;
+                            let response = err && (err.response || err.message) || info.response || info.messageId;
                             let responseId = response.split(/\s+/).pop();
 
                             db.getConnection((err, connection) => {

@@ -10,10 +10,11 @@ let mailer = require('../lib/mailer');
 let url = require('url');
 let multer = require('multer');
 let upload = multer();
+let aws = require('aws-sdk');
 
 let settings = require('../lib/models/settings');
 
-let allowedKeys = ['service_url', 'smtp_hostname', 'smtp_port', 'smtp_encryption', 'smtp_disable_auth', 'smtp_user', 'smtp_pass', 'admin_email', 'smtp_log', 'smtp_max_connections', 'smtp_max_messages', 'smtp_self_signed', 'default_from', 'default_address', 'default_subject', 'default_homepage', 'default_postaddress', 'default_sender', 'verp_hostname', 'verp_use', 'disable_wysiwyg', 'pgp_private_key', 'pgp_passphrase', 'ua_code', 'shoutout', 'disable_confirmations', 'smtp_throttling', 'dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain'];
+let allowedKeys = ['service_url', 'smtp_hostname', 'smtp_port', 'smtp_encryption', 'smtp_disable_auth', 'smtp_user', 'smtp_pass', 'admin_email', 'smtp_log', 'smtp_max_connections', 'smtp_max_messages', 'smtp_self_signed', 'default_from', 'default_address', 'default_subject', 'default_homepage', 'default_postaddress', 'default_sender', 'verp_hostname', 'verp_use', 'disable_wysiwyg', 'pgp_private_key', 'pgp_passphrase', 'ua_code', 'shoutout', 'disable_confirmations', 'smtp_throttling', 'dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain', 'mail_transport', 'ses_key', 'ses_secret', 'ses_region'];
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -45,6 +46,23 @@ router.get('/', passport.csrfProtection, (req, res, next) => {
             key: 'NONE',
             value: 'Do not use encryption'
         }];
+
+        configItems.sesRegion = [{
+            checked: configItems.sesRegion === 'us-east-1' || !configItems.sesRegion,
+            key: 'us-east-1',
+            value: 'US-EAST-1'
+        }, {
+            checked: configItems.sesRegion === 'us-west-2',
+            key: 'us-west-2',
+            value: 'US-WEST-2'
+        }, {
+            checked: configItems.sesRegion === 'eu-west-1',
+            key: 'eu-west-1',
+            value: 'EU-WEST-1'
+        }];
+
+        configItems.useSMTP = configItems.mailTransport === 'smtp' || !configItems.mailTransport;
+        configItems.useSES = configItems.mailTransport === 'ses';
 
         let urlparts = url.parse(configItems.serviceUrl);
         configItems.verpHostname = configItems.verpHostname || 'bounces.' + (urlparts.hostname || 'localhost');
@@ -124,24 +142,48 @@ router.post('/smtp-verify', upload.array(), passport.parseForm, passport.csrfPro
         }
     });
 
-    let transport = nodemailer.createTransport({
-        host: data.smtpHostname,
-        port: Number(data.smtpPort) || false,
-        secure: data.smtpEncryption === 'TLS',
-        ignoreTLS: data.smtpEncryption === 'NONE',
-        auth: data.smtpDisableAuth ? false : {
-            user: data.smtpUser,
-            pass: data.smtpPass
-        },
-        tls: {
-            rejectUnauthorized: !data.smtpSelfSigned
-        }
-    });
+    let transportOptions;
+    if (data.mailTransport === 'smtp') {
+        transportOptions = {
+            host: data.smtpHostname,
+            port: Number(data.smtpPort) || false,
+            secure: data.smtpEncryption === 'TLS',
+            ignoreTLS: data.smtpEncryption === 'NONE',
+            auth: data.smtpDisableAuth ? false : {
+                user: data.smtpUser,
+                pass: data.smtpPass
+            },
+            tls: {
+                rejectUnauthorized: !data.smtpSelfSigned
+            }
+        };
+    } else if (data.mailTransport === 'ses') {
+        transportOptions = {
+            SES: new aws.SES({
+                apiVersion: '2010-12-01',
+                accessKeyId: data.sesKey,
+                secretAccessKey: data.sesSecret,
+                region: data.sesRegion
+            })
+        };
+    } else {
+        return res.json({
+            error: 'Invalid mail transport type'
+        });
+    }
+
+    let transport = nodemailer.createTransport(transportOptions);
 
     transport.verify(err => {
         if (err) {
             let message = '';
             switch (err.code) {
+                case 'InvalidClientTokenId':
+                    message = 'Invalid Access Key';
+                    break;
+                case 'SignatureDoesNotMatch':
+                    message = 'Invalid AWS credentials';
+                    break;
                 case 'ECONNREFUSED':
                     message = 'Connection refused, check hostname and port.';
                     break;
@@ -170,11 +212,11 @@ router.post('/smtp-verify', upload.array(), passport.parseForm, passport.csrfPro
             }
 
             res.json({
-                error: (message || 'Failed SMTP verification.') + (err.response ? ' Server responded with: "' + err.response + '"' : '')
+                error: (message || 'Failed Mailer verification.') + (err.response ? ' Server responded with: "' + err.response + '"' : '')
             });
         } else {
             res.json({
-                message: 'SMTP settings verified, ready to send some mail!'
+                message: 'Mailer settings verified, ready to send some mail!'
             });
         }
     });
