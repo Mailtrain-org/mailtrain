@@ -12,10 +12,12 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
-apt-add-repository -y ppa:chris-lea/redis-server
-
 curl -sL https://deb.nodesource.com/setup_6.x | bash -
-apt-get -q -y install mariadb-server pwgen redis-server nodejs git ufw build-essential dnsutils python
+apt-get -q -y install mariadb-server pwgen nodejs git ufw build-essential dnsutils python software-properties-common
+
+apt-add-repository -y ppa:chris-lea/redis-server
+apt-get -q -y install redis-server
+
 apt-get clean
 
 PUBLIC_IP=`curl -s https://api.ipify.org`
