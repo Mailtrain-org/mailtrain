@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.22.0 2017-03-02
+
+  * Reverted license back to GPL-v3 to support Mosaico
+
 ## 1.21.0 2017-02-17
 
   * Changed license from MIT to EUPL-1.1

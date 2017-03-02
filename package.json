@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.21.0",
+  "version": "1.22.0",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "url": "git://github.com/andris9/mailtrain.git"
   },
   "author": "Andris Reinman",
-  "license": "EUPL-1.1",
+  "license": "GPL-3.0",
   "homepage": "https://mailtrain.org/",
   "engines": {
     "node": ">=5.0.0"
