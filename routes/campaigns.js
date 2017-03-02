@@ -1,5 +1,6 @@
 'use strict';
 
+let config = require('config');
 let express = require('express');
 let router = new express.Router();
 let lists = require('../lib/models/lists');
@@ -115,7 +116,10 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
             return res.redirect('/campaigns/create?' + tools.queryParams(req.body));
         }
         req.flash('success', 'Campaign “' + req.body.name + '” created');
-        res.redirect('/campaigns/view/' + id);
+        res.redirect((req.body.type === 'rss')
+            ? '/campaigns/edit/' + id
+            : '/campaigns/edit/' + id + '?tab=template'
+        );
     });
 });
 
@@ -159,6 +163,8 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                     campaign.csrfToken = req.csrfToken();
                     campaign.listItems = listItems;
                     campaign.useEditor = true;
+                    campaign.editorName = campaign.editorName || 'summernote';
+                    campaign.editorConfig = config[campaign.editorName];
 
                     campaign.disableWysiwyg = configItems.disableWysiwyg;
                     campaign.showGeneral = req.query.tab === 'general' || !req.query.tab;

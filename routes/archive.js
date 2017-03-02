@@ -62,8 +62,12 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                         }
 
                         let renderHtml = (html, renderTags) => {
-                            res.render('archive/view', {
-                                layout: 'archive/layout',
+                            let sfx = '';
+                            if (campaign.editorName !== 'summernote' && campaign.editorName !== 'codeeditor') {
+                                sfx = '-raw';
+                            }
+                            res.render('archive/view' + sfx, {
+                                layout: 'archive/layout' + sfx,
                                 message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
                                 campaign,
                                 list,

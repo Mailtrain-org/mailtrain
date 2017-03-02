@@ -1,0 +1,80 @@
+<style>
+    body.noscroll {
+        overflow: hidden;
+    }
+    #editor-frame,
+    #editor-frame-spinner {
+        border: none;
+        position: fixed;
+        z-index: 10000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    #editor-frame-spinner {
+        z-index: 10001;
+        background: white;
+    }
+    #editor-frame-spinner div {
+        width: 120px;
+        height: 120px;
+        margin-top: -60px;
+        margin-left: -60px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+    #editor-frame-spinner span:before {
+        font-size: 120px;
+        color: #efefef;
+    }
+</style>
+
+<div id="editor-frame-spinner" style="display: none;">
+    <div><span class="glyphicon glyphicon-refresh spinning"></span></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // campaign or template
+        var type = window.location.pathname.split('/')[1].slice(0, -1);
+
+        var editorWindow;
+
+        var $editorFrame = $('<iframe id="editor-frame"/>')
+            .attr('src', '/{{editorName}}/editor?id={{id}}&type=' + type)
+            .on('load', function() {
+                editorWindow = $editorFrame[0].contentWindow;
+                editorWindow.bridge || (editorWindow.bridge = {});
+                editorWindow.bridge.exit = function() {
+                    closeEditor();
+                }
+                setTimeout(function() {
+                    $('#editor-frame-spinner').hide();
+                }, 200);
+            });
+
+        var openEditor = function() {
+            $('body').addClass('noscroll');
+            $('#editor-frame-spinner').show();
+            $editorFrame.appendTo($('body'));
+        }
+
+        var closeEditor = function() {
+            $('body').removeClass('noscroll');
+            $editorFrame = $editorFrame.detach();
+            if (editorWindow.bridge.lastSavedHtml) {
+                $('#template-html').val(editorWindow.bridge.lastSavedHtml);
+                $('#html-preview-frame').attr('srcdoc', editorWindow.bridge.lastSavedHtml);
+                $('#html-preview').show(); // it's hidden when there's no html
+            }
+            // Reload to discard unsaved changes
+            $editorFrame.attr('src', '/{{editorName}}/editor?id={{id}}&type=' + type + '&cb=' + Math.random());
+        }
+
+        $('#btn-open-{{editorName}}').on('click', function() {
+            openEditor();
+        });
+    });
+</script>

@@ -47,6 +47,8 @@ if (config.www.proxy) {
 // Do not expose software used
 app.disable('x-powered-by');
 
+hbs.registerPartials(__dirname + '/views/partials');
+
 /**
  * We need this helper to make sure that we consume flash messages only
  * when we are able to actually display these. Otherwise we might end up
