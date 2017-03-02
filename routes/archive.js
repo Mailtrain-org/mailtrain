@@ -62,6 +62,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                         }
 
                         let renderHtml = (html, renderTags) => {
+                            campaign.editorName = campaign.editorName || 'summernote';
                             let sfx = '';
                             if (campaign.editorName !== 'summernote' && campaign.editorName !== 'codeeditor') {
                                 sfx = '-raw';
