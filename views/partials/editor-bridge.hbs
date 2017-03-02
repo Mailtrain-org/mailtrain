@@ -46,7 +46,7 @@
             .attr('src', '/{{editorName}}/editor?id={{id}}&type=' + type)
             .on('load', function() {
                 editorWindow = $editorFrame[0].contentWindow;
-                editorWindow.bridge || (editorWindow.bridge = {});
+                editorWindow.bridge = editorWindow.bridge || {};
                 editorWindow.bridge.exit = function() {
                     closeEditor();
                 }
