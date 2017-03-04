@@ -184,76 +184,25 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                             view = 'campaigns/edit';
                     }
 
-                    let getList = (listId, callback) => {
-                        lists.get(listId, (err, list) => {
-                            if (err) {
-                                return callback(err);
-                            }
-                            if (!list) {
-                                list = {
-                                    id: listId
-                                };
-                            }
-
-                            fields.list(list.id, (err, fieldList) => {
-                                if (err && !fieldList) {
-                                    fieldList = [];
-                                }
-
-                                let mergeTags = [
-                                    // keep indentation
-                                    {
-                                        key: 'LINK_UNSUBSCRIBE',
-                                        value: 'URL that points to the preferences page of the subscriber'
-                                    }, {
-                                        key: 'LINK_PREFERENCES',
-                                        value: 'URL that points to the unsubscribe page'
-                                    }, {
-                                        key: 'LINK_BROWSER',
-                                        value: 'URL to preview the message in a browser'
-                                    }, {
-                                        key: 'EMAIL',
-                                        value: 'Email address'
-                                    }, {
-                                        key: 'FIRST_NAME',
-                                        value: 'First name'
-                                    }, {
-                                        key: 'LAST_NAME',
-                                        value: 'Last name'
-                                    }, {
-                                        key: 'FULL_NAME',
-                                        value: 'Full name (first and last name combined)'
-                                    }, {
-                                        key: 'SUBSCRIPTION_ID',
-                                        value: 'Unique ID that identifies the recipient'
-                                    }, {
-                                        key: 'LIST_ID',
-                                        value: 'Unique ID that identifies the list used for this campaign'
-                                    }, {
-                                        key: 'CAMPAIGN_ID',
-                                        value: 'Unique ID that identifies current campaign'
-                                    }
-                                ];
-
-                                fieldList.forEach(field => {
-                                    mergeTags.push({
-                                        key: field.key,
-                                        value: field.name
-                                    });
-                                });
-
-                                return callback(null, list, mergeTags);
-                            });
-                        });
-                    };
-
-                    getList(campaign.list, (err, list, mergeTags) => {
+                    tools.getDefaultMergeTags((err, defaultMergeTags) => {
                         if (err) {
                             req.flash('danger', err.message || err);
                             return res.redirect('/');
                         }
-                        campaign.mergeTags = mergeTags;
-                        res.render(view, campaign);
+
+                        tools.getListMergeTags(campaign.list, (err, listMergeTags) => {
+                            if (err) {
+                                req.flash('danger', err.message || err);
+                                return res.redirect('/');
+                            }
+
+                            campaign.mergeTags = defaultMergeTags.concat(listMergeTags);
+                            campaign.type === 2 && campaign.mergeTags.push({
+                                key: 'RSS_ENTRY',
+                                value: 'content from an RSS entry'
+                            });
+                            res.render(view, campaign);
+                        });
                     });
                 });
             });

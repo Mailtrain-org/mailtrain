@@ -1,0 +1,43 @@
+{{#if mergeTags}}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <a class="btn btn-default" role="button" data-toggle="collapse" href="#mergeReference" aria-expanded="false" aria-controls="mergeReference">Merge tag reference</a>
+            <div class="collapse" id="mergeReference">
+                <p style="margin-top: .8em;">
+                    Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value
+                    used when <code>TAG_NAME</code> is empty.
+                </p>
+
+                <table class="table table-bordered table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                Merge tag
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each mergeTags}}
+                            <tr>
+                                <th scope="row">
+                                    [{{key}}]
+                                </th>
+                                <td>
+                                    {{value}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+
+                {{#if mergeTagReferenceFooterText}}
+                    <p>{{mergeTagReferenceFooterText}}</p>
+                {{/if}}
+
+            </div>
+        </div>
+    </div>
+{{/if}}
