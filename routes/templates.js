@@ -6,6 +6,7 @@ let router = new express.Router();
 let templates = require('../lib/models/templates');
 let settings = require('../lib/models/settings');
 let tools = require('../lib/tools');
+let helpers = require('../lib/helpers');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
 let mailer = require('../lib/mailer');
@@ -112,7 +113,7 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                 return next(err);
             }
 
-            tools.getDefaultMergeTags((err, defaultMergeTags) => {
+            helpers.getDefaultMergeTags((err, defaultMergeTags) => {
                 if (err) {
                     req.flash('danger', err.message || err);
                     return res.redirect('/templates');
