@@ -4,7 +4,6 @@ let config = require('config');
 let express = require('express');
 let router = new express.Router();
 let lists = require('../lib/models/lists');
-let fields = require('../lib/models/fields');
 let templates = require('../lib/models/templates');
 let campaigns = require('../lib/models/campaigns');
 let subscriptions = require('../lib/models/subscriptions');
