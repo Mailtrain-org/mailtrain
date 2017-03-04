@@ -1,5 +1,6 @@
 'use strict';
 
+let config = require('config');
 let express = require('express');
 let router = new express.Router();
 let templates = require('../lib/models/templates');
@@ -66,6 +67,23 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
                 data.text = data.text || rendererText(configItems);
                 data.disableWysiwyg = configItems.disableWysiwyg;
 
+                data.editors = config.editors || [['summernote', 'Summernote']];
+                data.editors = data.editors.map(ed => {
+                    let editor = {
+                        name: ed[0],
+                        label: ed[1],
+                    };
+                    if (config[editor.name] && config[editor.name].templates) {
+                        editor.templates = config[editor.name].templates.map(tmpl => {
+                            return {
+                                name: tmpl[0],
+                                label: tmpl[1],
+                            }
+                        });
+                    }
+                    return editor;
+                });
+
                 res.render('templates/create', data);
             });
         });
@@ -79,7 +97,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
             return res.redirect('/templates/create?' + tools.queryParams(req.body));
         }
         req.flash('success', 'Template created');
-        res.redirect('/templates');
+        res.redirect('/templates/edit/' + id);
     });
 });
 
@@ -95,6 +113,8 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
             }
             template.csrfToken = req.csrfToken();
             template.useEditor = true;
+            template.editorName = template.editorName || 'summernote';
+            template.editorConfig = config[template.editorName];
             template.disableWysiwyg = configItems.disableWysiwyg;
             res.render('templates/edit', template);
         });

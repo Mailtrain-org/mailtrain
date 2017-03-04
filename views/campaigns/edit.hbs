@@ -183,24 +183,13 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="template-html" class="col-sm-2 control-label">Template content (HTML)</label>
-                            <div class="col-sm-10">
-                                {{#if disableWysiwyg}}
-                                    <div class="code-editor" id="template-html">{{html}}</div>
-                                    <input type="hidden" name="html">
-                                {{else}}
-                                    <textarea class="form-control summernote" id="template-html" name="html" rows="8">{{html}}</textarea>
-                                {{/if}}
-                            </div>
-                        </div>
+                        {{> plaintext}}
 
-                        <div class="form-group">
-                            <label for="template-text" class="col-sm-2 control-label">Template content (plaintext)</label>
-                            <div class="col-sm-10">
-                                <textarea class="form-control" id="template-text" name="text" rows="10">{{text}}</textarea>
-                            </div>
-                        </div>
+                        {{#if disableWysiwyg}}
+                            {{> codeeditor}}
+                        {{else}}
+                            {{> (lookup . 'editorName') }}
+                        {{/if}}
 
                     {{/if}}
                 </fieldset>
