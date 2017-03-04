@@ -9,6 +9,7 @@ let campaigns = require('../lib/models/campaigns');
 let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
 let tools = require('../lib/tools');
+let helpers = require('../lib/helpers');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
 let htmlescape = require('escape-html');
@@ -183,13 +184,13 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                             view = 'campaigns/edit';
                     }
 
-                    tools.getDefaultMergeTags((err, defaultMergeTags) => {
+                    helpers.getDefaultMergeTags((err, defaultMergeTags) => {
                         if (err) {
                             req.flash('danger', err.message || err);
                             return res.redirect('/');
                         }
 
-                        tools.getListMergeTags(campaign.list, (err, listMergeTags) => {
+                        helpers.getListMergeTags(campaign.list, (err, listMergeTags) => {
                             if (err) {
                                 req.flash('danger', err.message || err);
                                 return res.redirect('/');
