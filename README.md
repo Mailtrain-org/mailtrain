@@ -210,15 +210,11 @@ Enclose translatable strings to `{{#translate}}` tags
 
 ### Managing translations
 
-Translations are loaded from Gettext MO files. In order to generate such files you need a Gettext translations editor. [POEdit](https://poedit.net/) is a great choice.
-
-To update the translation catalog ([mailtrain.pot](,/languages/mailtrain.pot)) run `grunt` from command line. This fetches all translatable strings from JavaScript and Handlebars files and merges these into the translation catalog
-
-To add a new language use this catalog file as source. Once you want to update your translation file from the updated catalog, then select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This would merge all new translations from the POT file to your PO file.
-
-If you have saved the PO file in [./languages](./langauges) then POEdit should auto generate required MO file whenever you hit save for the PO file.
-
-Once you have a correct MO file in the languages folder, then edit Mailtrain config and set "language" option to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
+* Translations are loaded from Gettext MO files. In order to generate such files you need a Gettext translations editor. [POEdit](https://poedit.net/) is a great choice.
+* To update the translation catalog ([mailtrain.pot](,/languages/mailtrain.pot)) run `grunt` from command line. This fetches all translatable strings from JavaScript and Handlebars files and merges these into the translation catalog
+* To add a new language use this catalog file as source. Once you want to update your translation file from the updated catalog, then select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This would merge all new translations from the POT file to your PO file.
+ *If you have saved the PO file in [./languages](./langauges) then POEdit should auto generate required MO file whenever you hit save for the PO file.
+* Once you have a correct MO file in the languages folder, then edit Mailtrain config and set ["language" option](https://github.com/andris9/mailtrain/blob/ba8bd1212335cb9bd7ba094beb7b5400f35cae6c/config/default.toml#L30-L31) to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
 
 > **NB!** For now translation settings are global, so if you have set a translation in config then this applies to all users. An user can't select another translation than the default even if there is a translation file. This is because current Mailtrain code does not provide request context to functions and the functions generating strings do not know which language to use.
 
