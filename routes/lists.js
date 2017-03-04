@@ -151,7 +151,7 @@ router.post('/ajax/:id', (req, res) => {
                 fieldList = [];
             }
 
-            let columns = ['#', 'email', 'first_name', 'last_name'].concat(fieldList.filter(field => field.visible).map(field => field.column)).concat('status');
+            let columns = ['#', 'email', 'first_name', 'last_name'].concat(fieldList.filter(field => field.visible).map(field => field.column)).concat(['status', 'created']);
 
             subscriptions.filter(list.id, req.body, columns, req.query.segment, (err, data, total, filteredTotal) => {
                 if (err) {
@@ -217,7 +217,7 @@ router.post('/ajax/:id', (req, res) => {
                         } else {
                             return htmlescape(cRow.value || '');
                         }
-                    })).concat(statuses[row.status]).concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">Edit</a>'))
+                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">Edit</a>'))
                 });
             });
         });
