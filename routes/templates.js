@@ -111,12 +111,21 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
             if (err) {
                 return next(err);
             }
-            template.csrfToken = req.csrfToken();
-            template.useEditor = true;
-            template.editorName = template.editorName || 'summernote';
-            template.editorConfig = config[template.editorName];
-            template.disableWysiwyg = configItems.disableWysiwyg;
-            res.render('templates/edit', template);
+
+            tools.getDefaultMergeTags((err, defaultMergeTags) => {
+                if (err) {
+                    req.flash('danger', err.message || err);
+                    return res.redirect('/templates');
+                }
+
+                template.mergeTags = defaultMergeTags;
+                template.csrfToken = req.csrfToken();
+                template.useEditor = true;
+                template.editorName = template.editorName || 'summernote';
+                template.editorConfig = config[template.editorName];
+                template.disableWysiwyg = configItems.disableWysiwyg;
+                res.render('templates/edit', template);
+            });
         });
     });
 });
