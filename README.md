@@ -220,6 +220,8 @@ If you have saved the PO file in [./languages](./langauges) then POEdit should a
 
 Once you have a correct MO file in the languages folder, then edit Mailtrain config and set "language" option to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
 
+> **NB!** For now translation settings are global, so if you have set a translation in config then this applies to all users. An user can't select another translation than the default even if there is a translation file. This is because current Mailtrain code does not provide request context to functions and the functions generating strings do not know which language to use.
+
 ## License
 
   * Versions 1.22.0 and up **GPL-V3.0**
