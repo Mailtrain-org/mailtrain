@@ -27,6 +27,9 @@ editors=[
   ["codeeditor", "Code Editor"]
 ]
 
+# Default language to use
+language="en"
+
 # If you start out as a root user (eg. if you want to use ports lower than 1000)
 # then you can downgrade the user once all services are up and running
 #user="nobody"

@@ -3,6 +3,9 @@
 let config = require('config');
 let log = require('npmlog');
 
+let translate = require('./lib/translate');
+let util = require('util');
+
 let express = require('express');
 let bodyParser = require('body-parser');
 let path = require('path');
@@ -93,6 +96,21 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
     );
 });
 
+// {{#translate}}abc{{/translate}} 
+hbs.registerHelper('translate', function (context, options) { // eslint-disable-line prefer-arrow-callback
+    if (typeof options === 'undefined' && context) {
+        options = context;
+        context = false;
+    }
+
+    let result = translate._(options.fn(this)); // eslint-disable-line no-invalid-this
+
+    if (Array.isArray(context)) {
+        result = util.format(result, ...context);
+    }
+    return new hbs.handlebars.SafeString(result);
+});
+
 app.use(compression());
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
@@ -117,6 +135,11 @@ app.use(session({
     resave: false
 }));
 app.use(flash());
+
+app.use((req, res, next) => {
+    req._ = str => translate._(str);
+    next();
+});
 
 app.use(bodyParser.urlencoded({
     extended: true,

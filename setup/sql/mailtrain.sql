@@ -52,6 +52,8 @@ CREATE TABLE `campaigns` (
   `segment` int(11) unsigned DEFAULT NULL,
   `template` int(11) unsigned NOT NULL,
   `source_url` varchar(255) CHARACTER SET ascii DEFAULT NULL,
+  `editor_name` varchar(50) DEFAULT '',
+  `editor_data` longtext,
   `last_check` timestamp NULL DEFAULT NULL,
   `check_status` varchar(255) DEFAULT NULL,
   `from` varchar(255) DEFAULT '',
@@ -201,7 +203,7 @@ CREATE TABLE `segments` (
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `list` (`list`),
-  KEY `name` (`name`(191)),
+  KEY `name` (`name`),
   CONSTRAINT `segments_ibfk_1` FOREIGN KEY (`list`) REFERENCES `lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `settings` (
@@ -210,7 +212,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','smtp-pulse.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -227,7 +229,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','20');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','21');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -260,6 +262,8 @@ CREATE TABLE `templates` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `description` text,
+  `editor_name` varchar(50) DEFAULT '',
+  `editor_data` longtext,
   `html` longtext,
   `text` longtext,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

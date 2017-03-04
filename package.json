@@ -10,7 +10,10 @@
     "sqlinit": "node setup/sql/init.js",
     "sqldump": "node setup/sql/dump.js | sed -e '/^\\/\\*.*\\*\\/;$/d' -e 's/.[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]./NOW()/g' > setup/sql/mailtrain.sql",
     "sqldrop": "node setup/sql/drop.js",
-    "sqlgen": "npm run sqldrop && DB_FROM_START=Y npm run sqlinit && npm run sqldump"
+    "sqlgen": "npm run sqldrop && DB_FROM_START=Y npm run sqlinit && npm run sqldump",
+    "langs:hbs": "jsxgettext -L handlebars -k translate -o langs/hbs.pot views/layout.hbs views/index.hbs",
+    "langs:js": "jsxgettext -o languages/js.pot routes/index.js",
+    "langs": "npm run langs:hbs && npm run langs:js"
   },
   "repository": {
     "type": "git",
@@ -23,15 +26,17 @@
     "node": ">=5.0.0"
   },
   "devDependencies": {
+    "gettext-parser": "^1.2.2",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-nodeunit": "^1.0.0",
-    "grunt-eslint": "^19.0.0"
+    "grunt-eslint": "^19.0.0",
+    "jsxgettext-andris": "^0.9.0-patch.1"
   },
   "dependencies": {
-    "aws-sdk": "^2.15.0",
+    "aws-sdk": "^2.22.0",
     "bcrypt-nodejs": "0.0.3",
-    "body-parser": "^1.16.1",
+    "body-parser": "^1.17.0",
     "bounce-handler": "^7.3.2-fork.2",
     "compression": "^1.6.2",
     "config": "^1.25.1",
@@ -42,15 +47,15 @@
     "csv-generate": "^1.0.0",
     "csv-parse": "^1.2.0",
     "escape-html": "^1.0.3",
-    "express": "^4.14.1",
+    "express": "^4.15.0",
     "express-session": "^1.15.1",
-    "faker": "^3.1.0",
+    "faker": "^4.1.0",
     "feedparser": "^2.1.0",
-    "geoip-ultralight": "^0.1.4",
+    "geoip-ultralight": "^0.1.5",
     "handlebars": "^4.0.6",
     "hbs": "^4.0.1",
     "he": "^1.1.1",
-    "html-to-text": "^3.1.0",
+    "html-to-text": "^3.2.0",
     "humanize": "0.0.9",
     "is-url": "^1.2.2",
     "isemail": "^2.2.1",
@@ -63,20 +68,21 @@
     "morgan": "^1.8.1",
     "multer": "^1.3.0",
     "mysql": "^2.13.0",
-    "nodemailer": "^3.1.3",
+    "nodemailer": "^3.1.4",
     "nodemailer-openpgp": "^1.0.2",
     "npmlog": "^4.0.2",
-    "openpgp": "^2.3.7",
+    "openpgp": "^2.3.8",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "redfour": "^1.0.0",
     "redis": "^2.6.5",
-    "request": "^2.79.0",
-    "serve-favicon": "^2.3.2",
+    "request": "^2.80.0",
+    "serve-favicon": "^2.4.1",
     "shortid": "^2.2.6",
     "slugify": "^1.1.0",
     "smtp-server": "^2.0.2",
     "striptags": "^3.0.1",
-    "toml": "^2.3.1"
+    "toml": "^2.3.2",
+    "node-gettext": "^2.0.0-rc.0"
   }
 }
