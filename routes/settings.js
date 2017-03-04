@@ -11,6 +11,8 @@ let url = require('url');
 let multer = require('multer');
 let upload = multer();
 let aws = require('aws-sdk');
+let util = require('util');
+let _ = require('../lib/translate')._;
 
 let settings = require('../lib/models/settings');
 
@@ -18,7 +20,7 @@ let allowedKeys = ['service_url', 'smtp_hostname', 'smtp_port', 'smtp_encryption
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('/settings');
@@ -34,17 +36,17 @@ router.get('/', passport.csrfProtection, (req, res, next) => {
         configItems.smtpEncryption = [{
             checked: configItems.smtpEncryption === 'TLS' || !configItems.smtpEncryption,
             key: 'TLS',
-            value: 'Use TLS',
-            description: 'usually selected for port 465'
+            value: _('Use TLS'),
+            description: _('usually selected for port 465')
         }, {
             checked: configItems.smtpEncryption === 'STARTTLS',
             key: 'STARTTLS',
-            value: 'Use STARTTLS',
-            description: 'usually selected for port 587 and 25'
+            value: _('Use STARTTLS'),
+            description: _('usually selected for port 587 and 25')
         }, {
             checked: configItems.smtpEncryption === 'NONE',
             key: 'NONE',
-            value: 'Do not use encryption'
+            value: _('Do not use encryption')
         }];
 
         configItems.sesRegion = [{
@@ -110,7 +112,7 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
                     reload: true
                 });
             });
-            req.flash('success', 'Settings updated');
+            req.flash('success', _('Settings updated'));
             return res.redirect('/settings');
         }
         let key = keys[i];
@@ -168,7 +170,7 @@ router.post('/smtp-verify', upload.array(), passport.parseForm, passport.csrfPro
         };
     } else {
         return res.json({
-            error: 'Invalid mail transport type'
+            error: _('Invalid mail transport type')
         });
     }
 
@@ -179,30 +181,30 @@ router.post('/smtp-verify', upload.array(), passport.parseForm, passport.csrfPro
             let message = '';
             switch (err.code) {
                 case 'InvalidClientTokenId':
-                    message = 'Invalid Access Key';
+                    message = _('Invalid Access Key');
                     break;
                 case 'SignatureDoesNotMatch':
-                    message = 'Invalid AWS credentials';
+                    message = _('Invalid AWS credentials');
                     break;
                 case 'ECONNREFUSED':
-                    message = 'Connection refused, check hostname and port.';
+                    message = _('Connection refused, check hostname and port.');
                     break;
                 case 'ETIMEDOUT':
                     if ((err.message || '').indexOf('Greeting never received') === 0) {
                         if (data.smtpEncryption !== 'TLS') {
-                            message = 'Did not receive greeting message from server. This might happen when connecting to a TLS port without using TLS.';
+                            message = _('Did not receive greeting message from server. This might happen when connecting to a TLS port without using TLS.');
                         } else {
-                            message = 'Did not receive greeting message from server.';
+                            message = _('Did not receive greeting message from server.');
                         }
                     } else {
-                        message = 'Connection timed out. Check your firewall settings, destination port is probably blocked.';
+                        message = _('Connection timed out. Check your firewall settings, destination port is probably blocked.');
                     }
                     break;
                 case 'EAUTH':
                     if (/\b5\.7\.0\b/.test(err.message) && data.smtpEncryption !== 'STARTTLS') {
-                        message = 'Authentication not accepted, server expects STARTTLS to be used.';
+                        message = _('Authentication not accepted, server expects STARTTLS to be used.');
                     } else {
-                        message = 'Authentication failed, check username and password.';
+                        message = _('Authentication failed, check username and password.');
                     }
 
                     break;
@@ -212,11 +214,11 @@ router.post('/smtp-verify', upload.array(), passport.parseForm, passport.csrfPro
             }
 
             res.json({
-                error: (message || 'Failed Mailer verification.') + (err.response ? ' Server responded with: "' + err.response + '"' : '')
+                error: (message || _('Failed Mailer verification.')) + (err.response ? ' ' + util.format(_('Server responded with: "%s"'), err.response) : '')
             });
         } else {
             res.json({
-                message: 'Mailer settings verified, ready to send some mail!'
+                message: _('Mailer settings verified, ready to send some mail!')
             });
         }
     });

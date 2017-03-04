@@ -1,0 +1,106 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-04 18:00+0200\n"
+"PO-Revision-Date: 2017-03-04 18:00+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: et\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views/index.hbs:1
+msgid "Official Mailtrain Partners"
+msgstr "Ametlikud Mailtraini partnerid"
+
+#: views/layout.hbs:1 routes/index.js:11
+msgid "Self hosted email newsletter app"
+msgstr "Enda majutatud e-posti uudiskirjade rakendus"
+
+#: routes/settings.js:23
+msgid "Need to be logged in to access restricted content"
+msgstr "Pead olema sisse logitud, et näha peidetud sisu"
+
+#: routes/settings.js:39
+msgid "Use TLS"
+msgstr "Kasuta TLSi"
+
+#: routes/settings.js:40
+msgid "usually selected for port 465"
+msgstr "tavaliselt valitakse, kui port on 465"
+
+#: routes/settings.js:44
+msgid "Use STARTTLS"
+msgstr "Kasuta STARTTLSi"
+
+#: routes/settings.js:45
+msgid "usually selected for port 587 and 25"
+msgstr "tavaliselt valitakse, kui port on 587 või 25"
+
+#: routes/settings.js:49
+msgid "Do not use encryption"
+msgstr "Ära kasuta ühenduse krüpteerimist"
+
+#: routes/settings.js:115
+msgid "Settings updated"
+msgstr "Seaded uuendatud"
+
+#: routes/settings.js:173
+msgid "Invalid mail transport type"
+msgstr "Viga maili transpordi tüüp"
+
+#: routes/settings.js:184
+msgid "Invalid Access Key"
+msgstr "Vigae ligipääsuvõti"
+
+#: routes/settings.js:187
+msgid "Invalid AWS credentials"
+msgstr "VIgased AWS võtmed"
+
+#: routes/settings.js:190
+msgid "Connection refused, check hostname and port."
+msgstr "Ühendusest keelduti, kontrolli domeeninime ja porti"
+
+#: routes/settings.js:195
+msgid ""
+"Did not receive greeting message from server. This might happen when "
+"connecting to a TLS port without using TLS."
+msgstr ""
+"Ei saanud serverilt vastust, see juhtub tavaliselt kui ühendus TLS "
+"serverisse ilma TLS kasutamata"
+
+#: routes/settings.js:197
+msgid "Did not receive greeting message from server."
+msgstr "Ei saanud serverilt vastust"
+
+#: routes/settings.js:200
+msgid ""
+"Connection timed out. Check your firewall settings, destination port is "
+"probably blocked."
+msgstr ""
+"Ühendus aegus. Kontrolli oma tulemüüri seadeid, tõenäoliselt on serveir port "
+"blokeeritud"
+
+#: routes/settings.js:205
+msgid "Authentication not accepted, server expects STARTTLS to be used."
+msgstr "Autentimist ei lubatud, server nõuab STARTTLS kasutamist"
+
+#: routes/settings.js:207
+msgid "Authentication failed, check username and password."
+msgstr "Autentimine ebaõnnestus, kontrolli kasutajanime ja parooli"
+
+#: routes/settings.js:217
+msgid "Failed Mailer verification."
+msgstr "E-posti seadistuse kontroll ebaõnnestus"
+
+#: routes/settings.js:217
+msgid "Server responded with: \"%s\""
+msgstr "Server vastas \"%s\""
+
+#: routes/settings.js:221
+msgid "Mailer settings verified, ready to send some mail!"
+msgstr "E-posti seaded on kontrollitud, võid hakata kirju saatma"
