@@ -147,12 +147,12 @@
 
                         {{> merge_tag_reference}}
 
-                        {{> plaintext}}
+{{> plaintext}}
 
                         {{#if disableWysiwyg}}
-                            {{> codeeditor}}
+{{> codeeditor}}
                         {{else}}
-                            {{> (lookup . 'editorName') }}
+{{> (lookup . 'editorName') }}
                         {{/if}}
 
                     {{/if}}
