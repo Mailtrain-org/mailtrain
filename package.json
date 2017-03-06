@@ -26,7 +26,6 @@
     "node": ">=5.0.0"
   },
   "devDependencies": {
-    "gettext-parser": "^1.2.2",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-nodeunit": "^1.0.0",
@@ -52,6 +51,7 @@
     "faker": "^4.1.0",
     "feedparser": "^2.1.0",
     "geoip-ultralight": "^0.1.5",
+    "gettext-parser": "^1.2.2",
     "handlebars": "^4.0.6",
     "hbs": "^4.0.1",
     "he": "^1.1.1",
