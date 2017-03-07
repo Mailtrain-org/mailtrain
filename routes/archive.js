@@ -64,20 +64,26 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                         }
 
                         let renderHtml = (html, renderTags) => {
-                            campaign.editorName = campaign.editorName || 'summernote';
-                            let sfx = '';
-                            if (campaign.editorName !== 'summernote' && campaign.editorName !== 'codeeditor') {
-                                sfx = '-raw';
+                            let render = (view, layout) => {
+                                res.render(view, {
+                                    layout,
+                                    message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
+                                    campaign,
+                                    list,
+                                    subscription,
+                                    attachments,
+                                    csrfToken: req.csrfToken()
+                                });
+                            };
+
+                            if (campaign.editorName && campaign.editorName !== 'summernote' && campaign.editorName !== 'codeeditor') {
+                                res.render('partials/tracking-scripts', { layout: 'archive/layout-raw' }, (err, scripts) => {
+                                    html = scripts ? html.replace(/<\/body\b/i, match => scripts + match) : html;
+                                    render('archive/view-raw', 'archive/layout-raw');
+                                });
+                            } else {
+                                render('archive/view', 'archive/layout');
                             }
-                            res.render('archive/view' + sfx, {
-                                layout: 'archive/layout' + sfx,
-                                message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
-                                campaign,
-                                list,
-                                subscription,
-                                attachments,
-                                csrfToken: req.csrfToken()
-                            });
                         };
 
                         let renderAndShow = (html, renderTags) => {
