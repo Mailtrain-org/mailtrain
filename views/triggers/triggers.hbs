@@ -1,13 +1,13 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li class="active">Automation Triggers</li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li class="active">{{#translate}}Automation Triggers{{/translate}}</li>
 </ol>
 
 <div class="pull-right">
-    <a class="btn btn-primary" href="/triggers/create-select" role="button"><i class="glyphicon glyphicon-plus"></i> Create Trigger</a>
+    <a class="btn btn-primary" href="/triggers/create-select" role="button"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Trigger{{/translate}}</a>
 </div>
 
-<h2>Automation Triggers</h2>
+<h2>{{#translate}}Automation Triggers{{/translate}}</h2>
 
 <hr>
 
@@ -18,25 +18,25 @@
                 #
             </th>
             <th>
-                Name
+                {{#translate}}Name{{/translate}}
             </th>
             <th>
-                Status
+                {{#translate}}Status{{/translate}}
             </th>
             <th>
-                Description
+                {{#translate}}Description{{/translate}}
             </th>
             <th>
-                List
+                {{#translate}}List{{/translate}}
             </th>
             <th>
-                Trigger
+                {{#translate}}Trigger{{/translate}}
             </th>
             <th>
-                Target Campaign
+                {{#translate}}Target Campaign{{/translate}}
             </th>
             <th>
-                Triggered
+                {{#translate}}Triggered count{{/translate}}
             </th>
             <th class="col-md-1">
                 &nbsp;
@@ -55,9 +55,9 @@
                         </td>
                         <td>
                             {{#if enabled}}
-                                <span class="label label-success">Enabled</span>
+                                <span class="label label-success">{{#translate}}Enabled{{/translate}}</span>
                             {{else}}
-                                <span class="label label-default">Disabled</span>
+                                <span class="label label-default">{{#translate}}Disabled{{/translate}}</span>
                             {{/if}}
                         </td>
                         <td class="text-muted">
@@ -78,7 +78,7 @@
                         <td>
                             <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
                             <a href="/triggers/edit/{{id}}">
-                            Edit
+                            {{#translate}}Edit{{/translate}}
                         </a>
                         </td>
                     </tr>

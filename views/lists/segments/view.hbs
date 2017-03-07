@@ -1,26 +1,26 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
     <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
-    <li><a href="/segments/{{list.id}}">Segments</a></li>
+    <li><a href="/segments/{{list.id}}">{{#translate}}Segments{{/translate}}</a></li>
     <li class="active">{{name}}</li>
 </ol>
 
 <div class="pull-right">
-    <a class="btn btn-primary" href="/segments/{{list.id}}/rules/{{id}}/create" role="button"><i class="glyphicon glyphicon-plus"></i> Create Rule</a>
+    <a class="btn btn-primary" href="/segments/{{list.id}}/rules/{{id}}/create" role="button"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Rule{{/translate}}</a>
 </div>
 
-<h2>{{list.name}} <small><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Segment {{name}}</small></h2>
+<h2>{{list.name}} <small><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> {{#translate}}Segment{{/translate}} {{name}}</small></h2>
 
 <hr>
 
 <div class="well well-sm">
     <div class="pull-right">
-        <a class="btn btn-primary btn-sm" href="/segments/{{list.id}}/edit/{{id}}" role="button"><i class="glyphicon glyphicon-wrench"></i> Edit Segment</a>
+        <a class="btn btn-primary btn-sm" href="/segments/{{list.id}}/edit/{{id}}" role="button"><i class="glyphicon glyphicon-wrench"></i> {{#translate}}Edit Segment{{/translate}}</a>
     </div>
-    Match rules: <span class="label label-default">{{type}}</span>
-    <br /> Matching subscribers: <span class="label label-default">{{subscribers}}</span> (
-    <a href="/lists/view/{{list.id}}?segment={{id}}">show</a>)
+    {{#translate}}Match rules{{/translate}}: <span class="label label-default">{{type}}</span>
+    <br /> {{#translate}}Matching subscribers{{/translate}}: <span class="label label-default">{{subscribers}}</span> (
+    <a href="/lists/view/{{list.id}}?segment={{id}}">{{#translate}}show{{/translate}}</a>)
     <br />
     <div class="clearfix"></div>
 </div>
@@ -32,10 +32,10 @@
                 #
             </th>
             <th>
-                Rule
+                {{#translate}}Rule{{/translate}}
             </th>
             <th class="col-md-2">
-                Value
+                {{#translate}}Value{{/translate}}
             </th>
             <th class="col-md-1">
                 &nbsp;
@@ -57,7 +57,7 @@
                         <td>
                             <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
                             <a href="/segments/{{../list.id}}/rules/{{../id}}/edit/{{id}}">
-                            Edit
+                            {{#translate}}Edit{{/translate}}
                         </a>
                         </td>
                     </tr>

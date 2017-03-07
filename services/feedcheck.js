@@ -6,6 +6,8 @@ let db = require('../lib/db');
 let tools = require('../lib/tools');
 let feed = require('../lib/feed');
 let campaigns = require('../lib/models/campaigns');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 const feed_timeout = 15 * 1000;
 const rss_timeout = 1 * 1000;
@@ -46,12 +48,12 @@ function feedLoop() {
                         let message;
                         if (err) {
                             log.error('Feed', err);
-                            message = 'Feed error: ' + err.message;
+                            message = util.format(_('Feed error: %s'), err.message);
                         } else if (result) {
                             log.verbose('Feed', 'Added %s new campaigns for %s', result, parent.id);
-                            message = 'Found ' + result + ' new campaign messages from feed';
+                            message = util.format(_('Found %s new campaign messages from feed'), result);
                         } else {
-                            message = 'Found nothing new from the feed';
+                            message = _('Found nothing new from the feed');
                         }
                         return updateRssInfo(parent.id, false, message, () => {
                             setTimeout(feedLoop, rss_timeout);
@@ -138,7 +140,7 @@ function checkEntries(parent, entries, callback) {
 
                 let campaign = {
                     type: 'entry',
-                    name: entry.title || 'RSS entry ' + (entry.guid.substr(0, 67)),
+                    name: entry.title || util.format(_('RSS entry %s'), entry.guid.substr(0, 67)),
                     from: parent.from,
                     address: parent.address,
                     subject: entry.title || parent.subject,

@@ -1,15 +1,15 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/campaigns">Campaigns</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/campaigns">{{#translate}}Campaigns{{/translate}}</a></li>
     {{#if parent}}
         <li><a href="/campaigns/view/{{parent.id}}">{{parent.name}}</a></li>
     {{/if}}
     <li><a href="/campaigns/view/{{id}}">{{name}}</a></li>
-    <li><a href="/campaigns/edit/{{id}}?tab=attachments">Edit Campaign</a></li>
-    <li class="active">Add Attachment</li>
+    <li><a href="/campaigns/edit/{{id}}?tab=attachments">{{#translate}}Edit Campaign{{/translate}}</a></li>
+    <li class="active">{{#translate}}Add Attachment{{/translate}}</li>
 </ol>
 
-<h2>Edit Campaign <a class="btn btn-default btn-xs" href="/campaigns/view/{{id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> View campaign</a></h2>
+<h2>{{#translate}}Edit Campaign{{/translate}} <a class="btn btn-default btn-xs" href="/campaigns/view/{{id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}View campaign{{/translate}}</a></h2>
 
 <hr>
 
@@ -25,7 +25,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-cloud-upload"></i> Upload</button>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-cloud-upload"></i> {{#translate}}Upload{{/translate}}</button>
         </div>
     </div>
 </form>

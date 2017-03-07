@@ -1,10 +1,10 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/templates/">Templates</a></li>
-    <li class="active">Create Template</li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/templates/">{{#translate}}Templates{{/translate}}</a></li>
+    <li class="active">{{#translate}}Create Template{{/translate}}</li>
 </ol>
 
-<h2>Create Template</h2>
+<h2>{{#translate}}Create Template{{/translate}}</h2>
 
 <hr>
 
@@ -12,17 +12,17 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
     <div class="form-group">
-        <label for="template-name" class="col-sm-2 control-label">Template name</label>
+        <label for="template-name" class="col-sm-2 control-label">{{#translate}}Template name{{/translate}}</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control input-lg" name="name" id="template-name" value="{{name}}" placeholder="Name for this template, eg. Newsletter">
+            <input type="text" class="form-control input-lg" name="name" id="template-name" value="{{name}}" placeholder="{{#translate}}Name for this template, eg. Newsletter{{/translate}}">
         </div>
     </div>
 
     <div class="form-group">
-        <label for="editor_name" class="col-sm-2 control-label">HTML Editor</label>
+        <label for="editor_name" class="col-sm-2 control-label">{{#translate}}HTML Editor{{/translate}}</label>
         <div class="col-sm-10">
             <select class="form-control" id="editor_name" name="editor_name">
-                <option value=""> –– Select –– </option>
+                <option value=""> –– {{#translate}}Select{{/translate}} –– </option>
                 {{#each editors}}
                     <option value="{{name}}">{{label}}</option>
                 {{/each}}
@@ -38,16 +38,16 @@
     </div>
 
     <div class="form-group">
-        <label for="template-description" class="col-sm-2 control-label">Description</label>
+        <label for="template-description" class="col-sm-2 control-label">{{#translate}}Description{{/translate}}</label>
         <div class="col-sm-10">
-            <textarea class="form-control" id="template-description" name="description" rows="3" placeholder="Optional comments about this template">{{description}}</textarea>
-            <span class="help-block">HTML is allowed</span>
+            <textarea class="form-control" id="template-description" name="description" rows="3" placeholder="{{#translate}}Optional comments about this template{{/translate}}">{{description}}</textarea>
+            <span class="help-block">{{#translate}}HTML is allowed{{/translate}}</span>
         </div>
     </div>
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Create Template</button>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Template{{/translate}}</button>
         </div>
     </div>
 
@@ -57,7 +57,7 @@
     {{#each editors}}
         {{#if templates}}
             <div class="form-group" id="{{name}}-template">
-                <label for="editor_data_{{name}}" class="col-sm-2 control-label">{{label}} Template</label>
+                <label for="editor_data_{{name}}" class="col-sm-2 control-label">{{label}} {{#translate}}Template{{/translate}}</label>
                 <div class="col-sm-10">
                     <select class="form-control" id="editor_data_{{name}}" name="editor_data">
                         {{#each templates}}

@@ -1,11 +1,11 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
     <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
-    <li class="active">Import subscribers</li>
+    <li class="active">{{#translate}}Import subscribers{{/translate}}</li>
 </ol>
 
-<h2>{{list.name}} <small>Import subscribers</small></h2>
+<h2>{{list.name}} <small>{{#translate}}Import subscribers{{/translate}}</small></h2>
 
 <hr>
 
@@ -14,30 +14,30 @@
     <input type="hidden" name="list" value="{{list.id}}">
 
     <div class="form-group">
-        <label for="listimport" class="col-sm-2 control-label">CSV File</label>
+        <label for="listimport" class="col-sm-2 control-label">{{#translate}}CSV File{{/translate}}</label>
         <div class="col-sm-6">
             <input type="file" class="form-control" name="listimport" id="listimport" required>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="delimiter" class="col-sm-2 control-label">CSV delimiter</label>
+        <label for="delimiter" class="col-sm-2 control-label">{{#translate}}CSV delimiter{{/translate}}</label>
         <div class="col-sm-1">
             <input type="text" class="form-control" name="delimiter" id="delimiter" placeholder="" value="{{delimiter}}">
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Categorize the imported subscribers as:</label>
+        <label class="col-sm-2 control-label">{{#translate}}Categorize the imported subscribers as{{/translate}}:</label>
         <div class="col-sm-6">
             <div class="radio">
                 <label>
-                    <input type="radio" name="type" id="type" value="subscribed" checked> Subscribed – <span class="text-muted">Regular subscriber addresses</span>
+                    <input type="radio" name="type" id="type" value="subscribed" checked> {{#translate}}Subscribed{{/translate}} – <span class="text-muted">{{#translate}}Regular subscriber addresses{{/translate}}</span>
                 </label>
             </div>
             <div class="radio">
                 <label>
-                    <input type="radio" name="type" id="type" value="unsubscribed"> Unsubscribed – <span class="text-muted">Suppressed emails that will be unsubscribed from your list</span>
+                    <input type="radio" name="type" id="type" value="unsubscribed"> {{#translate}}Unsubscribed{{/translate}} – <span class="text-muted">{{#translate}}Suppressed emails that will be unsubscribed from your list{{/translate}}</span>
                 </label>
             </div>
         </div>
@@ -47,7 +47,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> Next</button>
+            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> {{#translate}}Next{{/translate}}</button>
         </div>
     </div>
 </form>

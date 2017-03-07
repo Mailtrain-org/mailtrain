@@ -6,10 +6,11 @@ let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
 let tools = require('../lib/tools');
 let passport = require('../lib/passport');
+let _ = require('../lib/translate')._;
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('lists');
@@ -24,7 +25,7 @@ router.get('/:list', (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -60,7 +61,7 @@ router.get('/:list/create', passport.csrfProtection, (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -98,7 +99,7 @@ router.get('/:list/create', passport.csrfProtection, (req, res) => {
 router.post('/:list/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     fields.create(req.params.list, req.body, (err, id) => {
         if (err || !id) {
-            req.flash('danger', err && err.message || err || 'Could not create custom field');
+            req.flash('danger', err && err.message || err || _('Could not create custom field'));
             return res.redirect('/fields/' + encodeURIComponent(req.params.list) + '/create?' + tools.queryParams(req.body));
         }
         req.flash('success', 'Custom field created');
@@ -114,7 +115,7 @@ router.get('/:list/edit/:field', passport.csrfProtection, (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -125,7 +126,7 @@ router.get('/:list/edit/:field', passport.csrfProtection, (req, res) => {
             }
 
             if (!field) {
-                req.flash('danger', 'Selected field not found');
+                req.flash('danger', _('Selected field not found'));
                 return res.redirect('/fields/' + encodeURIComponent(req.params.list));
             }
 
@@ -161,9 +162,9 @@ router.post('/:list/edit', passport.parseForm, passport.csrfProtection, (req, re
         if (err) {
             req.flash('danger', err.message || err);
         } else if (updated) {
-            req.flash('success', 'Field settings updated');
+            req.flash('success', _('Field settings updated'));
         } else {
-            req.flash('info', 'Field settings not updated');
+            req.flash('info', _('Field settings not updated'));
         }
 
         if (req.body.id) {
@@ -179,9 +180,9 @@ router.post('/:list/delete', passport.parseForm, passport.csrfProtection, (req, 
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Custom field deleted');
+            req.flash('success', _('Custom field deleted'));
         } else {
-            req.flash('info', 'Could not delete specified field');
+            req.flash('info', _('Could not delete specified field'));
         }
 
         return res.redirect('/fields/' + encodeURIComponent(req.params.list));

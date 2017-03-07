@@ -5,6 +5,7 @@ let settings = require('../lib/models/settings');
 let lists = require('../lib/models/lists');
 let subscriptions = require('../lib/models/subscriptions');
 let tools = require('../lib/tools');
+let _ = require('../lib/translate')._;
 
 let log = require('npmlog');
 let express = require('express');
@@ -36,7 +37,7 @@ router.get('/:campaign/:list/:subscription/:link', (req, res) => {
         res.status(404);
         return res.render('archive/view', {
             layout: 'archive/layout',
-            message: 'Oops, we couldn\'t find a link for the URL you clicked',
+            message: _('Oops, we couldn\'t find a link for the URL you clicked'),
             campaign: {
                 subject: 'Error 404'
             }

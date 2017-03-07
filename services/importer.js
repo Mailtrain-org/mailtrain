@@ -4,6 +4,7 @@ let log = require('npmlog');
 
 let db = require('../lib/db');
 let tools = require('../lib/tools');
+let _ = require('../lib/translate')._;
 
 let fields = require('../lib/models/fields');
 let subscriptions = require('../lib/models/subscriptions');
@@ -239,7 +240,7 @@ let importLoop = () => {
                 let failed = null;
                 if (err) {
                     if (err.code === 'ENOENT') {
-                        failed = 'Could not access import file';
+                        failed = _('Could not access import file');
                     } else {
                         failed = err.message || err;
                     }

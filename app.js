@@ -3,7 +3,7 @@
 let config = require('config');
 let log = require('npmlog');
 
-let translate = require('./lib/translate');
+let _ = require('./lib/translate')._;
 let util = require('util');
 
 let express = require('express');
@@ -96,14 +96,14 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
     );
 });
 
-// {{#translate}}abc{{/translate}} 
+// {{#translate}}abc{{/translate}}
 hbs.registerHelper('translate', function (context, options) { // eslint-disable-line prefer-arrow-callback
     if (typeof options === 'undefined' && context) {
         options = context;
         context = false;
     }
 
-    let result = translate._(options.fn(this)); // eslint-disable-line no-invalid-this
+    let result = _(options.fn(this)); // eslint-disable-line no-invalid-this
 
     if (Array.isArray(context)) {
         result = util.format(result, ...context);
@@ -137,7 +137,7 @@ app.use(session({
 app.use(flash());
 
 app.use((req, res, next) => {
-    req._ = str => translate._(str);
+    req._ = str => _(str);
     next();
 });
 
@@ -166,7 +166,7 @@ app.use((req, res, next) => {
     };
 
     let menu = [{
-        title: 'Home',
+        title: _('Home'),
         url: '/',
         selected: true
     }];
@@ -208,7 +208,7 @@ app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
-    let err = new Error('Not Found');
+    let err = new Error(_('Not Found'));
     err.status = 404;
     next(err);
 });

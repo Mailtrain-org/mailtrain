@@ -1,10 +1,10 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/triggers/">Automation Triggers</a></li>
-    <li class="active">Edit Trigger</li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/triggers/">{{#translate}}Automation Triggers{{/translate}}</a></li>
+    <li class="active">{{#translate}}Edit Trigger{{/translate}}</li>
 </ol>
 
-<h2>Edit Trigger <a class="btn btn-default btn-xs" href="/triggers/" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back to triggers</a></h2>
+<h2>{{#translate}}Edit Trigger{{/translate}} <a class="btn btn-default btn-xs" href="/triggers/" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}Back to triggers{{/translate}}</a></h2>
 
 <hr>
 
@@ -18,47 +18,47 @@
     <input type="hidden" name="id" value="{{id}}" />
 
     <div class="form-group">
-        <label for="trigger-name" class="col-sm-2 control-label">Trigger name</label>
+        <label for="trigger-name" class="col-sm-2 control-label">{{#translate}}Trigger name{{/translate}}</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control input-lg" name="name" id="trigger-name" value="{{name}}" placeholder="Name for this trigger, eg. &quot;Inactive subscribers&quot;" required autofocus>
+            <input type="text" class="form-control input-lg" name="name" id="trigger-name" value="{{name}}" placeholder="{{#translate}}Name for this trigger, eg. Inactive subscribers{{/translate}}" required autofocus>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="trigger-description" class="col-sm-2 control-label">Description</label>
+        <label for="trigger-description" class="col-sm-2 control-label">{{#translate}}Description{{/translate}}</label>
         <div class="col-sm-10">
-            <textarea class="form-control" id="trigger-description" name="description" rows="3" placeholder="Optional comments about this trigger">{{description}}</textarea>
-            <span class="help-block">HTML is allowed</span>
+            <textarea class="form-control" id="trigger-description" name="description" rows="3" placeholder="{{#translate}}Optional comments about this trigger{{/translate}}">{{description}}</textarea>
+            <span class="help-block">{{#translate}}HTML is allowed{{/translate}}</span>
         </div>
     </div>
 
     <div class="col-sm-offset-2">
         <div class="checkbox">
             <label>
-                <input type="checkbox" name="enabled" value="1" {{#if enabled}} checked {{/if}}> Trigger is enabled
+                <input type="checkbox" name="enabled" value="1" {{#if enabled}} checked {{/if}}> {{#translate}}Trigger is enabled{{/translate}}
             </label>
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">List</label>
+        <label class="col-sm-2 control-label">{{#translate}}List{{/translate}}</label>
         <div class="col-sm-10">
-            <p class="form-control-static"><a href="/lists/view/{{list.id}}">{{list.name}}</a> <span class="text-muted"> – {{list.subscribers}} subscribers</span></p>
+            <p class="form-control-static"><a href="/lists/view/{{list.id}}">{{list.name}}</a> <span class="text-muted"> – {{list.subscribers}} {{#translate}}subscribers{{/translate}}</span></p>
         </div>
     </div>
 
     <fieldset>
         <legend>
-            Trigger rule
+            {{#translate}}Trigger rule{{/translate}}
         </legend>
 
         <div class="form-group">
-            <label for="trigger-days" class="col-sm-2 control-label">Trigger fires</label>
+            <label for="trigger-days" class="col-sm-2 control-label">{{#translate}}Trigger fires{{/translate}}</label>
             <div class="col-sm-1">
                 <input type="number" class="form-control" name="days" id="trigger-days" value="{{days}}" placeholder="1" required>
             </div>
             <div class="col-sm-1">
-                <p class="form-control-static">days after:</p>
+                <p class="form-control-static">{{#translate}}days after:{{/translate}}</p>
             </div>
         </div>
 
@@ -66,18 +66,18 @@
             <div class="panel-heading">
                 <div class="radio">
                     <label>
-                        <input type="radio" name="rule" value="subscription" {{#if isSubscription}} checked {{/if}}> Subscription
+                        <input type="radio" name="rule" value="subscription" {{#if isSubscription}} checked {{/if}}> {{#translate}}Subscription{{/translate}}
                     </label>
                 </div>
             </div>
             <div class="panel-body">
 
                 <div class="form-group">
-                    <label for="column" class="col-sm-2 control-label">Event</label>
+                    <label for="column" class="col-sm-2 control-label">{{#translate}}Event{{/translate}}</label>
                     <div class="col-sm-10">
                         <select name="column" class="form-control">
                             <option value="">
-                                –– Select ––
+                                –– {{#translate}}Select{{/translate}} ––
                             </option>
                             {{#each columns}}
                                 <option value="{{column}}" {{#if selected}} selected {{/if}}>{{name}}</option>
@@ -92,18 +92,18 @@
             <div class="panel-heading">
                 <div class="radio">
                     <label>
-                        <input type="radio" name="rule" value="campaign" {{#if isCampaign}} checked {{/if}}> Campaign
+                        <input type="radio" name="rule" value="campaign" {{#if isCampaign}} checked {{/if}}> {{#translate}}Campaign{{/translate}}
                     </label>
                 </div>
             </div>
             <div class="panel-body">
 
                 <div class="form-group">
-                    <label for="source-campaign" class="col-sm-2 control-label">Campaign</label>
+                    <label for="source-campaign" class="col-sm-2 control-label">{{#translate}}Campaign{{/translate}}</label>
                     <div class="col-sm-10">
                         <select name="source-campaign" class="form-control">
                             <option value="">
-                                –– Select ––
+                                –– {{#translate}}Select{{/translate}} ––
                             </option>
                             {{#each sourceCampaigns}}
                                 <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
@@ -113,11 +113,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="campaign-option" class="col-sm-2 control-label">Event</label>
+                    <label for="campaign-option" class="col-sm-2 control-label">{{#translate}}Event{{/translate}}</label>
                     <div class="col-sm-10">
                         <select name="campaign-option" id="campaign-option" class="form-control">
                             <option value="">
-                                –– Select ––
+                                –– {{#translate}}Select{{/translate}} ––
                             </option>
                             {{#each campaignOptions}}
                                 <option value="{{option}}" {{#if selected}} selected {{/if}}>{{name}}</option>
@@ -133,25 +133,25 @@
 
     <fieldset>
         <legend>
-            Trigger action
+            {{#translate}}Trigger action{{/translate}}
         </legend>
 
         <div class="col-sm-offset-2 panel panel-default">
             <div class="panel-heading">
                 <div class="radio">
                     <label>
-                        <input type="radio" name="action" value="send" {{#if isSend}} checked {{/if}}> Send campaign
+                        <input type="radio" name="action" value="send" {{#if isSend}} checked {{/if}}> {{#translate}}Send campaign{{/translate}}
                     </label>
                 </div>
             </div>
             <div class="panel-body">
 
                 <div class="form-group">
-                    <label for="dest-campaign" class="col-sm-2 control-label">Campaign</label>
+                    <label for="dest-campaign" class="col-sm-2 control-label">{{#translate}}Campaign{{/translate}}</label>
                     <div class="col-sm-10">
                         <select name="dest-campaign" class="form-control" required>
                             <option value="">
-                                –– Select ––
+                                –– {{#translate}}Select{{/translate}} ––
                             </option>
                             {{#each destCampaigns}}
                                 <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
@@ -167,9 +167,9 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <div class="pull-right">
-                <button type="submit" form="triggers-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Trigger</button>
+                <button type="submit" form="triggers-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> {{#translate}}Delete Trigger{{/translate}}</button>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update{{/translate}}</button>
         </div>
     </div>
 

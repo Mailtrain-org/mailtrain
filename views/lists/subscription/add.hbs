@@ -1,11 +1,13 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
     <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
-    <li class="active">Add subscriber</li>
+    <li class="active">
+        {{#translate}}Add subscriber{{/translate}}
+    </li>
 </ol>
 
-<h2>{{list.name}} <small>Add subscriber</small></h2>
+<h2>{{list.name}} <small>{{#translate}}Add subscriber{{/translate}}</small></h2>
 
 <hr>
 
@@ -14,21 +16,21 @@
     <input type="hidden" name="list" value="{{list.id}}">
 
     <div class="form-group">
-        <label for="email" class="col-sm-2 control-label">Email Address</label>
+        <label for="email" class="col-sm-2 control-label">{{#translate}}Email Address{{/translate}}</label>
         <div class="col-sm-10">
             <input type="email" class="form-control input-lg" name="email" id="email" placeholder="" value="{{email}}" required>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="first-name" class="col-sm-2 control-label">First Name</label>
+        <label for="first-name" class="col-sm-2 control-label">{{#translate}}First Name{{/translate}}</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" name="first-name" id="first-name" placeholder="" value="{{firstName}}">
         </div>
     </div>
 
     <div class="form-group">
-        <label for="last-name" class="col-sm-2 control-label">Last Name</label>
+        <label for="last-name" class="col-sm-2 control-label">{{#translate}}Last Name{{/translate}}</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" name="last-name" id="last-name" placeholder="" value="{{lastName}}">
         </div>
@@ -59,8 +61,8 @@
                 {{/if}}
 
                 {{#if typeGpg}}
-                    <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
-                    <span class="help-block">Insert a GPG public key that will be used to encrypt messages sent this subscriber</span>
+                    <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="{{#translate}}Begins with{{/translate}} &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
+                    <span class="help-block">{{#translate}}Insert a GPG public key that will be used to encrypt messages sent this subscriber{{/translate}}</span>
                 {{/if}}
 
                 {{#if typeDateUs}}
@@ -90,7 +92,7 @@
                 {{#if typeDropdown}}
                     <select name="{{key}}" class="form-control">
                         <option value="">
-                            –– Select ––
+                            –– {{#translate}}Select{{/translate}} ––
                         </option>
                         {{#each options}}
                             <option value="{{column}}" {{#if value}} selected {{/if}}>{{name}}</option>
@@ -122,11 +124,11 @@
     {{/each}}
 
     <div class="form-group">
-        <label for="tz" class="col-sm-2 control-label">Timezone</label>
+        <label for="tz" class="col-sm-2 control-label">{{#translate}}Timezone{{/translate}}</label>
         <div class="col-sm-10">
             <select name="tz" class="form-control">
                 <option value="">
-                    –– Select ––
+                    –– {{#translate}}Select{{/translate}} ––
                 </option>
                 {{#each timezones}}
                     <option value="{{key}}" {{#if selected}} selected {{/if}}>{{value}}</option>
@@ -139,8 +141,8 @@
         <div class="col-sm-offset-2 col-sm-10">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="is-test" {{#if isTest}} checked {{/if}}> Test user?
-                    <span class="help-block">If checked then this subscription can be used for previewing campaign messages</span>
+                    <input type="checkbox" name="is-test" {{#if isTest}} checked {{/if}}> {{#translate}}Test user?{{/translate}}
+                    <span class="help-block">{{#translate}}If checked then this subscription can be used for previewing campaign messages{{/translate}}</span>
                 </label>
             </div>
         </div>
@@ -151,10 +153,10 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <p class="text-warning">
-                This person will not receive a confirmation email so make sure that you have permission to email them.
+                {{#translate}}This person will not receive a confirmation email so make sure that you have permission to email them.{{/translate}}
             </p>
 
-            <button type="submit" class="btn btn-primary">Subscribe</button>
+            <button type="submit" class="btn btn-primary">{{#translate}}Subscribe{{/translate}}</button>
         </div>
     </div>
 </form>

@@ -1,14 +1,14 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/campaigns">Campaigns</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/campaigns">{{#translate}}Campaigns{{/translate}}</a></li>
     {{#if parent}}
         <li><a href="/campaigns/view/{{parent.id}}">{{parent.name}}</a></li>
     {{/if}}
     <li><a href="/campaigns/view/{{id}}">{{name}}</a></li>
-    <li class="active">Link info</li>
+    <li class="active">{{#translate}}Link info{{/translate}}</li>
 </ol>
 
-<h2><span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> {{name}} <small>Link info</small> <a class="btn btn-default btn-xs" href="/campaigns/view/{{id}}?tab=links" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> View campaign</a></h2>
+<h2><span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> {{name}} <small>{{#translate}}Link info{{/translate}}</small> <a class="btn btn-default btn-xs" href="/campaigns/view/{{id}}?tab=links" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}View campaign{{/translate}}</a></h2>
 
 <hr>
 
@@ -20,23 +20,23 @@
     <table class="table table-bordered table-hover">
         <thead>
             <th>
-                URL
+                {{#translate}}URL{{/translate}}
             </th>
             <th class="col-md-1">
-                Clicks
+                {{#translate}}Clicks{{/translate}}
             </th>
             <th class="col-md-1">
-                % of clicks
+                {{#translate}}% of clicks{{/translate}}
             </th>
             <th class="col-md-1">
-                % of messages
+                {{#translate}}% of messages{{/translate}}
             </th>
         </thead>
         <tbody>
             <tr class="success">
                 {{#if aggregated}}
                     <th>
-                        Aggregated clicks
+                        {{#translate}}Aggregated clicks{{/translate}}
                     </th>
                     <th>
                         {{clicks}}
@@ -67,7 +67,7 @@
 
     <div class="panel panel-info">
         <!-- Default panel contents -->
-        <div class="panel-heading">{{#if aggregated}}Subscribers who clicked on a link:{{else}}Subscribers who clicked on this link:{{/if}}</div>
+        <div class="panel-heading">{{#if aggregated}}{{#translate}}Subscribers who clicked on a link:{{/translate}}{{else}}{{#translate}}Subscribers who clicked on this link:{{/translate}}{{/if}}</div>
         <div class="panel-body">
             <div class="table-responsive">
                 <table data-topic-url="/campaigns/clicked" data-topic-id="{{id}}/{{link.id}}" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,1,1,0">
@@ -77,19 +77,19 @@
                                 #
                             </th>
                             <th>
-                                Address
+                                {{#translate}}Address{{/translate}}
                             </th>
                             <th>
-                                First Name
+                                {{#translate}}First Name{{/translate}}
                             </th>
                             <th>
-                                Last Name
+                                {{#translate}}Last Name{{/translate}}
                             </th>
                             <th>
-                                First click
+                                {{#translate}}First click time{{/translate}}
                             </th>
                             <th>
-                                Click count
+                                {{#translate}}Click count{{/translate}}
                             </th>
                             <th></th>
                         </tr>

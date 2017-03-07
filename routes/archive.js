@@ -11,6 +11,8 @@ let request = require('request');
 let router = new express.Router();
 let passport = require('../lib/passport');
 let marked = require('marked');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res, next) => {
     settings.get('serviceUrl', (err, serviceUrl) => {
@@ -26,7 +28,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
             }
 
             if (!campaign) {
-                err = new Error('Not Found');
+                err = new Error(_('Not Found'));
                 err.status = 404;
                 return next(err);
             }
@@ -38,7 +40,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                 }
 
                 if (!list) {
-                    err = new Error('Not Found');
+                    err = new Error(_('Not Found'));
                     err.status = 404;
                     return next(err);
                 }
@@ -50,7 +52,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                     }
 
                     if (!subscription) {
-                        err = new Error('Not Found');
+                        err = new Error(_('Not Found'));
                         err.status = 404;
                         return next(err);
                     }
@@ -105,7 +107,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                                     return next(err);
                                 }
                                 if (httpResponse.statusCode !== 200) {
-                                    return next(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
+                                    return next(new Error(util.format(_('Received status code %s from %s'), httpResponse.statusCode, campaign.sourceUrl)));
                                 }
                                 renderAndShow(body && body.toString(), false);
                             });
@@ -129,7 +131,7 @@ router.post('/attachment/download', passport.parseForm, passport.csrfProtection,
     let url = '/archive/' + encodeURIComponent(req.body.campaign || '') + '/' + encodeURIComponent(req.body.list || '') + '/' + encodeURIComponent(req.body.subscription || '');
     campaigns.getByCid(req.body.campaign, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect(url);
         }
         campaigns.getAttachment(campaign.id, Number(req.body.attachment), (err, attachment) => {
@@ -137,7 +139,7 @@ router.post('/attachment/download', passport.parseForm, passport.csrfProtection,
                 req.flash('danger', err && err.message || err);
                 return res.redirect(url);
             } else if (!attachment) {
-                req.flash('warning', 'Attachment not found');
+                req.flash('warning', _('Attachment not found'));
                 return res.redirect(url);
             }
 

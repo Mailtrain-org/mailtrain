@@ -1,4 +1,4 @@
-<h2>Update your Email Address</h2>
+<h2>{{#translate}}Update your Email Address{{/translate}}</h2>
 
 <form method="post" action="/subscription/{{lcid}}/manage-address">
 
@@ -6,20 +6,20 @@
     <input type="hidden" name="cid" value="{{cid}}">
 
     <div class="form-group">
-        <label for="email">Existing Email Address</label>
+        <label for="email">{{#translate}}Existing Email Address{{/translate}}</label>
         <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" readonly>
     </div>
 
     <div class="form-group">
-        <label for="email-new">New Email Address</label>
-        <input type="email" class="form-control" name="email-new" id="email-new" placeholder="Your new email address" value="{{email}}">
+        <label for="email-new">{{#translate}}New Email Address{{/translate}}</label>
+        <input type="email" class="form-control" name="email-new" id="email-new" placeholder="{{#translate}}Your new email address{{/translate}}" value="{{email}}">
     </div>
 
     <p>
-        <small>You will receive a confirmation request to your new email address that you need to accept before your email is actually changed</small>
+        <small>{{#translate}}You will receive a confirmation request to your new email address that you need to accept before your email is actually changed{{/translate}}</small>
     </p>
 
     <div class="form-group">
-        <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update Email Address</button>
+        <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update Email Address{{/translate}}</button>
     </div>
 </form>

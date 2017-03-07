@@ -6,10 +6,11 @@ let passport = require('../lib/passport');
 let lists = require('../lib/models/lists');
 let segments = require('../lib/models/segments');
 let tools = require('../lib/tools');
+let _ = require('../lib/translate')._;
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('lists');
@@ -24,7 +25,7 @@ router.get('/:list', (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -55,7 +56,7 @@ router.get('/:list/create', passport.csrfProtection, (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -82,10 +83,10 @@ router.get('/:list/create', passport.csrfProtection, (req, res) => {
 router.post('/:list/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     segments.create(req.params.list, req.body, (err, id) => {
         if (err || !id) {
-            req.flash('danger', err && err.message || err || 'Could not create segment');
+            req.flash('danger', err && err.message || err || _('Could not create segment'));
             return res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/create?' + tools.queryParams(req.body));
         }
-        req.flash('success', 'Segment created');
+        req.flash('success', _('Segment created'));
         res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/view/' + id);
     });
 });
@@ -98,7 +99,7 @@ router.get('/:list/view/:id', (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -109,7 +110,7 @@ router.get('/:list/view/:id', (req, res) => {
             }
 
             if (!segment) {
-                req.flash('danger', 'Selected segment ID not found');
+                req.flash('danger', _('Selected segment ID not found'));
                 return res.redirect('/');
             }
 
@@ -147,7 +148,7 @@ router.get('/:list/edit/:segment', passport.csrfProtection, (req, res) => {
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -184,9 +185,9 @@ router.post('/:list/edit', passport.parseForm, passport.csrfProtection, (req, re
         if (err) {
             req.flash('danger', err.message || err);
         } else if (updated) {
-            req.flash('success', 'Segment settings updated');
+            req.flash('success', _('Segment settings updated'));
         } else {
-            req.flash('info', 'Segment settings not updated');
+            req.flash('info', _('Segment settings not updated'));
         }
 
         if (req.body.id) {
@@ -202,9 +203,9 @@ router.post('/:list/delete', passport.parseForm, passport.csrfProtection, (req, 
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Segment deleted');
+            req.flash('success', _('Segment deleted'));
         } else {
-            req.flash('info', 'Could not delete specified segment');
+            req.flash('info', _('Could not delete specified segment'));
         }
 
         return res.redirect('/segments/' + encodeURIComponent(req.params.list));
@@ -219,7 +220,7 @@ router.get('/:list/rules/:segment/create', passport.csrfProtection, (req, res) =
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -251,7 +252,7 @@ router.post('/:list/rules/:segment/next', passport.parseForm, passport.csrfProte
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -262,13 +263,13 @@ router.post('/:list/rules/:segment/next', passport.parseForm, passport.csrfProte
             }
 
             if (!segment) {
-                req.flash('danger', 'Selected segment not found');
+                req.flash('danger', _('Selected segment not found'));
                 return res.redirect('/segments/' + encodeURIComponent(req.params.list));
             }
 
             let column = segment.columns.filter(column => column.column === req.body.column).pop();
             if (!column) {
-                req.flash('danger', 'Invalid rule type');
+                req.flash('danger', _('Invalid rule type'));
                 return res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/rules/' + segment.id + '/create?' + tools.queryParams(req.body));
             }
 
@@ -285,7 +286,7 @@ router.get('/:list/rules/:segment/configure', passport.csrfProtection, (req, res
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -296,13 +297,13 @@ router.get('/:list/rules/:segment/configure', passport.csrfProtection, (req, res
             }
 
             if (!segment) {
-                req.flash('danger', 'Selected segment not found');
+                req.flash('danger', _('Selected segment not found'));
                 return res.redirect('/segments/' + encodeURIComponent(req.params.list));
             }
 
             let column = segment.columns.filter(column => column.column === req.query.column).pop();
             if (!column) {
-                req.flash('danger', 'Invalid rule type');
+                req.flash('danger', _('Invalid rule type'));
                 return res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/rules/' + segment.id + '/create?' + tools.queryParams(req.body));
             }
 
@@ -332,16 +333,16 @@ router.post('/:list/rules/:segment/create', passport.parseForm, passport.csrfPro
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
         segments.createRule(req.params.segment, req.body, (err, id) => {
             if (err || !id) {
-                req.flash('danger', err && err.message || err || 'Could not create rule');
+                req.flash('danger', err && err.message || err || _('Could not create rule'));
                 return res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/rules/' + encodeURIComponent(req.params.segment) + '/configure?' + tools.queryParams(req.body));
             }
-            req.flash('success', 'Rule created');
+            req.flash('success', _('Rule created'));
             res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/view/' + encodeURIComponent(req.params.segment));
         });
     });
@@ -355,7 +356,7 @@ router.get('/:list/rules/:segment/edit/:rule', passport.csrfProtection, (req, re
         }
 
         if (!list) {
-            req.flash('danger', 'Selected list ID not found');
+            req.flash('danger', _('Selected list ID not found'));
             return res.redirect('/');
         }
 
@@ -366,7 +367,7 @@ router.get('/:list/rules/:segment/edit/:rule', passport.csrfProtection, (req, re
             }
 
             if (!segment) {
-                req.flash('danger', 'Selected segment not found');
+                req.flash('danger', _('Selected segment not found'));
                 return res.redirect('/segments/' + encodeURIComponent(req.params.list));
             }
 
@@ -377,13 +378,13 @@ router.get('/:list/rules/:segment/edit/:rule', passport.csrfProtection, (req, re
                 }
 
                 if (!segment) {
-                    req.flash('danger', 'Selected segment not found');
+                    req.flash('danger', _('Selected segment not found'));
                     return res.redirect('/segments/' + encodeURIComponent(req.params.list));
                 }
 
                 let column = segment.columns.filter(column => column.column === rule.column).pop();
                 if (!column) {
-                    req.flash('danger', 'Invalid rule type');
+                    req.flash('danger', _('Invalid rule type'));
                     return res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/view/' + segment.id);
                 }
 
@@ -406,9 +407,9 @@ router.post('/:list/rules/:segment/edit', passport.parseForm, passport.csrfProte
         if (err) {
             req.flash('danger', err.message || err);
         } else if (updated) {
-            req.flash('success', 'Rule settings updated');
+            req.flash('success', _('Rule settings updated'));
         } else {
-            req.flash('info', 'Rule settings not updated');
+            req.flash('info', _('Rule settings not updated'));
         }
 
         if (req.params.segment) {
@@ -424,9 +425,9 @@ router.post('/:list/rules/:segment/delete', passport.parseForm, passport.csrfPro
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Rule deleted');
+            req.flash('success', _('Rule deleted'));
         } else {
-            req.flash('info', 'Could not delete specified rule');
+            req.flash('info', _('Could not delete specified rule'));
         }
 
         return res.redirect('/segments/' + encodeURIComponent(req.params.list) + '/view/' + encodeURIComponent(req.params.segment));

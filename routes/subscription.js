@@ -13,11 +13,13 @@ let fields = require('../lib/models/fields');
 let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
 let openpgp = require('openpgp');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 router.get('/subscribe/:cid', (req, res, next) => {
     subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
         if (!err && !subscription) {
-            err = new Error('Selected subscription not found');
+            err = new Error(_('Selected subscription not found'));
             err.status = 404;
         }
 
@@ -27,7 +29,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
 
         lists.get(subscription.list, (err, list) => {
             if (!err && !list) {
-                err = new Error('Selected list not found');
+                err = new Error(_('Selected list not found'));
                 err.status = 404;
             }
 
@@ -73,7 +75,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
                             name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
                             address: subscription.email
                         },
-                        subject: list.name + ': Subscription Confirmed',
+                        subject: util.format(_('%s: Subscription Confirmed'), list.name),
                         encryptionKeys
                     }, {
                         html: 'emails/subscription-confirmed-html.hbs',
@@ -98,7 +100,7 @@ router.get('/subscribe/:cid', (req, res, next) => {
 router.get('/:cid', passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -136,7 +138,7 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
 router.get('/:cid/confirm-notice', (req, res, next) => {
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -161,7 +163,7 @@ router.get('/:cid/confirm-notice', (req, res, next) => {
 router.get('/:cid/updated-notice', (req, res, next) => {
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -186,7 +188,7 @@ router.get('/:cid/updated-notice', (req, res, next) => {
 router.get('/:cid/unsubscribe-notice', (req, res, next) => {
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -212,7 +214,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
     let email = (req.body.email || '').toString().trim();
 
     if (!email) {
-        req.flash('danger', 'Email address not set');
+        req.flash('danger', _('Email address not set'));
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
 
@@ -227,7 +229,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
 
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -250,7 +252,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
 
         subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
             if (!err && !confirmCid) {
-                err = new Error('Could not store confirmation data');
+                err = new Error(_('Could not store confirmation data'));
             }
             if (err) {
                 req.flash('danger', err.message || err);
@@ -265,7 +267,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
 router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -279,7 +281,7 @@ router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
             }
             subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
                 if (!err && !subscription) {
-                    err = new Error('Subscription not found from this list');
+                    err = new Error(_('Subscription not found from this list'));
                     err.status = 404;
                 }
 
@@ -312,7 +314,7 @@ router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
 router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -334,7 +336,7 @@ router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, 
 router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -344,7 +346,7 @@ router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, ne
 
         subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
             if (!err && !subscription) {
-                err = new Error('Subscription not found from this list');
+                err = new Error(_('Subscription not found from this list'));
                 err.status = 404;
             }
 
@@ -363,7 +365,7 @@ router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, ne
 router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -378,7 +380,7 @@ router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage-address/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
 
-            req.flash('info', 'Email address updated, check your mailbox for verification instructions');
+            req.flash('info', _('Email address updated, check your mailbox for verification instructions'));
             res.redirect('/subscription/' + req.params.lcid + '/manage/' + req.body.cid);
         });
     });
@@ -387,7 +389,7 @@ router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection
 router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -397,7 +399,7 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
 
         subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
             if (!err && !subscription) {
-                err = new Error('Subscription not found from this list');
+                err = new Error(_('Subscription not found from this list'));
                 err.status = 404;
             }
 
@@ -419,7 +421,7 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
 router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
-            err = new Error('Selected list not found');
+            err = new Error(_('Selected list not found'));
             err.status = 404;
         }
 
@@ -467,7 +469,7 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                             name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
                             address: subscription.email
                         },
-                        subject: list.name + ': Subscription Confirmed',
+                        subject: util.format(_('%s: Subscription Confirmed'), list.name),
                         encryptionKeys
                     }, {
                         html: 'emails/unsubscribe-confirmed-html.hbs',
@@ -494,7 +496,7 @@ router.post('/publickey', passport.parseForm, passport.csrfProtection, (req, res
             return next(err);
         }
         if (!configItems.pgpPrivateKey) {
-            err = new Error('Public key is not set');
+            err = new Error(_('Public key is not set'));
             err.status = 404;
             return next(err);
         }
@@ -510,7 +512,7 @@ router.post('/publickey', passport.parseForm, passport.csrfProtection, (req, res
         }
 
         if (!privKey) {
-            err = new Error('Public key is not set');
+            err = new Error(_('Public key is not set'));
             err.status = 404;
             return next(err);
         }

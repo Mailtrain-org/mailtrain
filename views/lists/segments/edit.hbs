@@ -1,12 +1,12 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
     <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
-    <li><a href="/segments/{{list.id}}">Segments</a></li>
-    <li class="active">Edit Segment</li>
+    <li><a href="/segments/{{list.id}}">{{#translate}}Segments{{/translate}}</a></li>
+    <li class="active">{{#translate}}Edit Segment{{/translate}}</li>
 </ol>
 
-<h2>{{list.name}} <small>Edit Segment</small> <a class="btn btn-default btn-xs" href="/segments/{{list.id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back to segments</a></h2>
+<h2>{{list.name}} <small>{{#translate}}Edit Segment{{/translate}}</small> <a class="btn btn-default btn-xs" href="/segments/{{list.id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}Back to segments{{/translate}}</a></h2>
 
 <hr>
 
@@ -20,19 +20,19 @@
     <input type="hidden" name="id" value="{{id}}" />
 
     <div class="form-group">
-        <label for="name" class="col-sm-2 control-label">Segment Name</label>
+        <label for="name" class="col-sm-2 control-label">{{#translate}}Segment Name{{/translate}}</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control input-lg" name="name" id="name" value="{{name}}" placeholder="Segment Name" required>
+            <input type="text" class="form-control input-lg" name="name" id="name" value="{{name}}" placeholder="{{#translate}}Segment Name{{/translate}}" required>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="group" class="col-sm-2 control-label">Rule match</label>
+        <label for="group" class="col-sm-2 control-label">{{#translate}}Rule match{{/translate}}</label>
         <div class="col-sm-10">
             <select class="form-control" name="type">
-                <option value=""> –– Select ––</option>
-                <option value="1" {{#if matchAll}} selected {{/if}}>All rules must match</option>
-                <option value="2" {{#if matchAny}} selected {{/if}}>Any rule can match</option>
+                <option value=""> –– {{#translate}}Select{{/translate}} ––</option>
+                <option value="1" {{#if matchAll}} selected {{/if}}>{{#translate}}All rules must match{{/translate}}</option>
+                <option value="2" {{#if matchAny}} selected {{/if}}>{{#translate}}Any rule can match{{/translate}}</option>
             </select>
         </div>
     </div>
@@ -40,9 +40,9 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <div class="pull-right">
-                <button type="submit" form="segments-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> Delete Segment</button>
+                <button type="submit" form="segments-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> {{#translate}}Delete Segment{{/translate}}</button>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update</button>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update{{/translate}}</button>
         </div>
     </div>
 </form>

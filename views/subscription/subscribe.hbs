@@ -7,7 +7,8 @@
 
 <div class="alert alert-warning alert-dismissible" role="alert" id="js-warning">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    <strong>Warning!</strong> JavaScript must be enabled in order for the subscription form to work
+    <strong>{{#translate}}Warning!{{/translate}}</strong>
+    {{#translate}}JavaScript must be enabled in order for the subscription form to work{{/translate}}
 </div>
 <script>
     document.getElementById('js-warning').style.display = 'none';
@@ -22,17 +23,17 @@
     <input type="hidden" name="sub" id="sub" value="">
 
     <div class="form-group">
-        <label for="email">Email Address</label>
+        <label for="email">{{#translate}}Email Address{{/translate}}</label>
         <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" required>
     </div>
 
     <div class="form-group">
-        <label for="first-name">First Name</label>
+        <label for="first-name">{{#translate}}First Name{{/translate}}</label>
         <input type="text" class="form-control" name="first-name" id="first-name" placeholder="" value="{{firstName}}">
     </div>
 
     <div class="form-group">
-        <label for="last-name">Last Name</label>
+        <label for="last-name">{{#translate}}Last Name{{/translate}}</label>
         <input type="text" class="form-control" name="last-name" id="last-name" placeholder="" value="{{lastName}}">
     </div>
 
@@ -63,11 +64,11 @@
             {{#if typeGpg}}
                 {{#if ../hasPubkey}}
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download signature verification key</button>
+                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> {{#translate}}Download signature verification key{{/translate}}</button>
                     </div>
                 {{/if}}
-                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
-                <span class="help-block">Insert your GPG public key here to encrypt messages sent to your address <em>(optional)</em></span>
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="{{#translate}}Begins with{{/translate}} &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
+                <span class="help-block">{{#translate}}Insert your GPG public key here to encrypt messages sent to your address{{/translate}} <em>({{#translate}}optional{{/translate}})</em></span>
             {{/if}}
 
             {{#if typeDateUs}}
@@ -97,7 +98,7 @@
             {{#if typeDropdown}}
                 <select name="{{key}}" class="form-control">
                     <option value="">
-                        –– Select ––
+                        –– {{#translate}}Select{{/translate}} ––
                     </option>
                     {{#each options}}
                         <option value="{{column}}" {{#if value}} selected {{/if}}>{{name}}</option>
@@ -129,7 +130,7 @@
     {{/each}}
 
     <div class="form-group" id="js-subscribe" style="display: none">
-        <button type="submit" class="btn btn-primary">Subscribe to list</button>
+        <button type="submit" class="btn btn-primary">{{#translate}}Subscribe to list{{/translate}}</button>
     </div>
     <script>
         document.getElementById('js-subscribe').style.display = 'block';

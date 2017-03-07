@@ -180,7 +180,15 @@ This command generates a CSV file with 100 000 subscriber accounts
 
 ## Translations
 
-Mailtrain is currently not translated but it supports translations. To add translations you first need to add translation support for the translatable strings
+Mailtrain is currently not translated but it supports translations. To add translations you first need to add translation support for the translatable strings. To test if strings are translatable or not, use a fake language with code "zz"
+
+```toml
+language="zz"
+```
+
+This would modify all input strings. If a string is not modified then it does not support translations.
+
+![](https://cldup.com/qXxAbaq2F1.png)
 
 ### Translating JavaScript files
 

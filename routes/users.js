@@ -6,6 +6,7 @@ let router = new express.Router();
 let users = require('../lib/models/users');
 let fields = require('../lib/models/fields');
 let settings = require('../lib/models/settings');
+let _ = require('../lib/translate')._;
 
 router.get('/logout', (req, res) => passport.logout(req, res));
 
@@ -28,7 +29,7 @@ router.post('/forgot', passport.parseForm, passport.csrfProtection, (req, res) =
             req.flash('danger', err.message || err);
             return res.redirect('/users/forgot');
         } else {
-            req.flash('success', 'An email with password reset instructions has been sent to your email address, if it exists on our system.');
+            req.flash('success', _('An email with password reset instructions has been sent to your email address, if it exists on our system.'));
         }
         return res.redirect('/users/login');
     });
@@ -42,7 +43,7 @@ router.get('/reset', passport.csrfProtection, (req, res) => {
         }
 
         if (!status) {
-            req.flash('danger', 'Unknown or expired reset token');
+            req.flash('danger', _('Unknown or expired reset token'));
             return res.redirect('/users/login');
         }
 
@@ -60,9 +61,9 @@ router.post('/reset', passport.parseForm, passport.csrfProtection, (req, res) =>
             req.flash('danger', err.message || err);
             return res.redirect('/users/reset?username=' + encodeURIComponent(req.body.username) + '&token=' + encodeURIComponent(req.body['reset-token']));
         } else if (!status) {
-            req.flash('danger', 'Unknown or expired reset token');
+            req.flash('danger', _('Unknown or expired reset token'));
         } else {
-            req.flash('success', 'Your password has been changed successfully');
+            req.flash('success', _('Your password has been changed successfully'));
         }
 
         return res.redirect('/users/login');
@@ -71,7 +72,7 @@ router.post('/reset', passport.parseForm, passport.csrfProtection, (req, res) =>
 
 router.all('/api', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     next();
@@ -83,7 +84,7 @@ router.get('/api', passport.csrfProtection, (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return next(new Error('User data not found'));
+            return next(new Error(_('User data not found')));
         }
         settings.list(['serviceUrl'], (err, configItems) => {
             if (err) {
@@ -106,9 +107,9 @@ router.post('/api/reset-token', passport.parseForm, passport.csrfProtection, (re
         if (err) {
             req.flash('danger', err.message || err);
         } else if (success) {
-            req.flash('success', 'Access token updated');
+            req.flash('success', _('Access token updated'));
         } else {
-            req.flash('info', 'Access token not updated');
+            req.flash('info', _('Access token not updated'));
         }
         return res.redirect('/users/api');
     });
@@ -116,7 +117,7 @@ router.post('/api/reset-token', passport.parseForm, passport.csrfProtection, (re
 
 router.all('/account', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     next();
@@ -135,9 +136,9 @@ router.post('/account', passport.parseForm, passport.csrfProtection, (req, res) 
         if (err) {
             req.flash('danger', err.message || err);
         } else if (success) {
-            req.flash('success', 'Account information updated');
+            req.flash('success', _('Account information updated'));
         } else {
-            req.flash('info', 'Account information not updated');
+            req.flash('info', _('Account information not updated'));
         }
         return res.redirect('/users/account');
     });

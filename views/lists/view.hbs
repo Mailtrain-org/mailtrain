@@ -1,25 +1,25 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/lists/">Lists</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
     <li class="active">{{name}}</li>
 </ol>
 
 <div class="pull-right">
 
-    <a class="btn btn-default" href="/subscription/{{cid}}" target="_blank" role="button"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Subscription Form</a>
+    <a class="btn btn-default" href="/subscription/{{cid}}" target="_blank" role="button"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> {{#translate}}Subscription Form{{/translate}}</a>
 
     <div class="btn-group">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            List Actions <span class="caret"></span>
+            {{#translate}}List Actions{{/translate}} <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="/fields/{{id}}" role="button"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Custom Fields</a></li>
-            <li><a href="/segments/{{id}}" role="button"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Segments</a></li>
-            <li><a href="/lists/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit List</a></li>
-            <li><a href="/triggers/{{id}}/create" role="button"><span class="glyphicon glyphicon-console" aria-hidden="true"></span> Create Trigger</a></li>
+            <li><a href="/fields/{{id}}" role="button"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> {{#translate}}Custom Fields{{/translate}}</a></li>
+            <li><a href="/segments/{{id}}" role="button"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> {{#translate}}Segments{{/translate}}</a></li>
+            <li><a href="/lists/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{#translate}}Edit List{{/translate}}</a></li>
+            <li><a href="/triggers/{{id}}/create" role="button"><span class="glyphicon glyphicon-console" aria-hidden="true"></span> {{#translate}}Create Trigger{{/translate}}</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="/lists/subscription/{{id}}/add" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add Subscriber</a></li>
-            <li><a href="/lists/subscription/{{id}}/import" role="button"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import Subscribers</a></li>
+            <li><a href="/lists/subscription/{{id}}/add" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> {{#translate}}Add Subscriber{{/translate}}</a></li>
+            <li><a href="/lists/subscription/{{id}}/import" role="button"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> {{#translate}}Import Subscribers{{/translate}}</a></li>
         </ul>
     </div>
 </div>
@@ -35,35 +35,35 @@
 <div class="well well-sm">
     {{#if useSegment}}
         <div class="pull-right">
-            <a class="btn btn-primary btn-sm" href="/segments/{{id}}/edit/{{segment}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit Segment</a>
+            <a class="btn btn-primary btn-sm" href="/segments/{{id}}/edit/{{segment}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{#translate}}Edit Segment{{/translate}}</a>
         </div>
     {{/if}}
     <form class="form-inline" method="get">
         <div class="form-group">
-            <label for="exampleInputName2">Segment</label>
+            <label for="exampleInputName2">{{#translate}}Segment{{/translate}}</label>
             <select name="segment" class="form-control">
                 <option value="0">All Subscriptions</option>
                 {{#if segments}}
-                    <optgroup label="Segments">
+                    <optgroup label="{{#translate}}Segments{{/translate}}">
                         {{#each segments}}
                             <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
                         {{/each}}
                     </optgroup>
                 {{/if}}
                 <optgroup label="Actions">
-                    <option value="-1">Create New Segment…</option>
+                    <option value="-1">{{#translate}}Create New Segment{{/translate}}…</option>
                 </optgroup>
             </select>
         </div>
-        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</button>
+        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> {{#translate}}Filter{{/translate}}</button>
     </form>
     <div class="clearfix"></div>
 </div>
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="{{#if showSubscriptions}}active{{/if}}"><a href="/lists/view/{{id}}" aria-controls="subscriptions" role="tab">Subscriptions</a></li>
-    <li role="presentation" class="{{#if showImports}}active{{/if}}"><a href="/lists/view/{{id}}?tab=imports" aria-controls="imports" role="tab">Imports</a></li>
+    <li role="presentation" class="{{#if showSubscriptions}}active{{/if}}"><a href="/lists/view/{{id}}" aria-controls="subscriptions" role="tab">{{#translate}}Subscriptions{{/translate}}</a></li>
+    <li role="presentation" class="{{#if showImports}}active{{/if}}"><a href="/lists/view/{{id}}?tab=imports" aria-controls="imports" role="tab">{{#translate}}Imports{{/translate}}</a></li>
 </ul>
 
 <div class="tab-content">
@@ -79,13 +79,13 @@
                                 #
                             </th>
                             <th>
-                                Address
+                                {{#translate}}Address{{/translate}}
                             </th>
                             <th>
-                                First Name
+                                {{#translate}}First Name{{/translate}}
                             </th>
                             <th>
-                                Last Name
+                                {{#translate}}Last Name{{/translate}}
                             </th>
                             {{#each customFields}}
                                 <th>
@@ -93,10 +93,10 @@
                                 </th>
                             {{/each}}
                             <th>
-                                Status
+                                {{#translate}}Status{{/translate}}
                             </th>
                             <th>
-                                Created
+                                {{#translate}}Created{{/translate}}
                             </th>
                             <th></th>
                         </tr>
@@ -117,25 +117,25 @@
                             #
                         </th>
                         <th>
-                            Created
+                            {{#translate}}Created{{/translate}}
                         </th>
                         <th>
-                            Finished
+                            {{#translate}}Finished{{/translate}}
                         </th>
                         <th>
-                            Type
+                            {{#translate}}Type{{/translate}}
                         </th>
                         <th>
-                            Added
+                            {{#translate}}Added{{/translate}}
                         </th>
                         <th>
-                            Updated
+                            {{#translate}}Updated{{/translate}}
                         </th>
                         <th>
-                            Failed
+                            {{#translate}}Failed{{/translate}}
                         </th>
                         <th>
-                            Status
+                            {{#translate}}Status{{/translate}}
                         </th>
                         <th>
 
@@ -181,11 +181,11 @@
                                         {{/if}}
                                     </td>
                                     <td class="text-center">
-                                        <form method="post" class="confirm-submit" data-confirm-message="Are you sure? This action should only be called to resolve stalled imports" action="/lists/subscription/import-restart">
+                                        <form method="post" class="confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action should only be called to resolve stalled imports{{/translate}}" action="/lists/subscription/import-restart">
                                             <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                                             <input type="hidden" name="list" value="{{list}}">
                                             <input type="hidden" name="import" value="{{id}}">
-                                            <button type="submit" class="btn btn-info btn-xs"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Restart</button>
+                                            <button type="submit" class="btn btn-info btn-xs"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> {{#translate}}Restart{{/translate}}</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -193,7 +193,7 @@
                         {{else}}
                             <tr>
                                 <td colspan="9">
-                                    No data available in table
+                                    {{#translate}}No data available in table{{/translate}}
                                 </td>
                             </tr>
                         {{/if}}

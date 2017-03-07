@@ -10,10 +10,11 @@ let helpers = require('../lib/helpers');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
 let mailer = require('../lib/mailer');
+let _ = require('../lib/translate')._;
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('templates');
@@ -68,19 +69,19 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
                 data.text = data.text || rendererText(configItems);
                 data.disableWysiwyg = configItems.disableWysiwyg;
 
-                data.editors = config.editors || [['summernote', 'Summernote']];
+                data.editors = config.editors || [
+                    ['summernote', 'Summernote']
+                ];
                 data.editors = data.editors.map(ed => {
                     let editor = {
                         name: ed[0],
-                        label: ed[1],
+                        label: ed[1]
                     };
                     if (config[editor.name] && config[editor.name].templates) {
-                        editor.templates = config[editor.name].templates.map(tmpl => {
-                            return {
-                                name: tmpl[0],
-                                label: tmpl[1],
-                            }
-                        });
+                        editor.templates = config[editor.name].templates.map(tmpl => ({
+                            name: tmpl[0],
+                            label: tmpl[1]
+                        }));
                     }
                     return editor;
                 });
@@ -94,10 +95,10 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     templates.create(req.body, (err, id) => {
         if (err || !id) {
-            req.flash('danger', err && err.message || err || 'Could not create template');
+            req.flash('danger', err && err.message || err || _('Could not create template'));
             return res.redirect('/templates/create?' + tools.queryParams(req.body));
         }
-        req.flash('success', 'Template created');
+        req.flash('success', _('Template created'));
         res.redirect('/templates/edit/' + id);
     });
 });
@@ -105,7 +106,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
 router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
     templates.get(req.params.id, (err, template) => {
         if (err || !template) {
-            req.flash('danger', err && err.message || err || 'Could not find template with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find template with specified ID'));
             return res.redirect('/templates');
         }
         settings.list(['disableWysiwyg'], (err, configItems) => {
@@ -136,9 +137,9 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
         if (err) {
             req.flash('danger', err.message || err);
         } else if (updated) {
-            req.flash('success', 'Template settings updated');
+            req.flash('success', _('Template settings updated'));
         } else {
-            req.flash('info', 'Template settings not updated');
+            req.flash('info', _('Template settings not updated'));
         }
 
         if (req.body.id) {
@@ -154,9 +155,9 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Template deleted');
+            req.flash('success', _('Template deleted'));
         } else {
-            req.flash('info', 'Could not delete specified template');
+            req.flash('info', _('Could not delete specified template'));
         }
 
         return res.redirect('/templates');

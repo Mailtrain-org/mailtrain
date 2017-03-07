@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/campaigns">Campaigns</a></li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/campaigns">{{#translate}}Campaigns{{/translate}}</a></li>
     {{#if parent}}
         <li><a href="/campaigns/view/{{parent.id}}">{{parent.name}}</a></li>
     {{/if}}
@@ -8,7 +8,7 @@
 </ol>
 
 <div class="pull-right">
-    <a class="btn btn-primary" href="/campaigns/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit Campaign</a>
+    <a class="btn btn-primary" href="/campaigns/edit/{{id}}" role="button"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{#translate}}Edit Campaign{{/translate}}</a>
 </div>
 
 <h2><span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> {{name}}</h2>
@@ -21,9 +21,9 @@
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="{{#if showOverview}}active{{/if}}"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">Overview</a></li>
+    <li role="presentation" class="{{#if showOverview}}active{{/if}}"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">{{#translate}}Overview{{/translate}}</a></li>
     {{#if links}}
-        <li role="presentation" class="{{#if showLinks}}active{{/if}}"><a href="#links" aria-controls="links" role="tab" data-toggle="tab">Links</a></li>
+        <li role="presentation" class="{{#if showLinks}}active{{/if}}"><a href="#links" aria-controls="links" role="tab" data-toggle="tab">{{#translate}}Links{{/translate}}</a></li>
     {{/if}}
 </ul>
 
@@ -34,7 +34,7 @@
 
         <dl class="dl-horizontal">
             {{#if list}}
-                <dt>List</dt>
+                <dt>{{#translate}}List{{/translate}}</dt>
                 <dd>
                     {{#if segment}}
                         <a href="/lists/view/{{list.id}}?segment={{segment.id}}">{{list.name}}: {{segment.name}}</a>
@@ -54,43 +54,43 @@
             {{/if}}
 
             {{#if isRss}}
-                <dt>Feed URL</dt>
+                <dt>{{#translate}}Feed URL{{/translate}}</dt>
                 <dd><a href="{{sourceUrl}}">{{sourceUrl}}</a></dd>
-                <dt>Last check</dt>
+                <dt>{{#translate}}Last check{{/translate}}</dt>
                 <dd>
                     {{#if lastCheck}}<span class="datestring" data-date="{{lastCheck}}" title="{{lastCheck}}">{{lastCheck}}</span>{{else}}
-                        Not yet checked{{/if}}
-                    {{#unless isActive}}<span class="text-muted">(activate campaign to start checking feed for new messages)</span>{{/unless}}
+                        {{#translate}}Not yet checked{{/translate}}{{/if}}
+                    {{#unless isActive}}<span class="text-muted">({{#translate}}activate campaign to start checking feed for new messages{{/translate}})</span>{{/unless}}
                 </dd>
                 {{#if checkStatus}}
-                    <dt>RSS status</dt>
+                    <dt>{{#translate}}RSS status{{/translate}}</dt>
                     <dd>{{checkStatus}}</dd>
                 {{/if}}
             {{/if}}
 
             {{#if from}}
-                <dt>Email "from name"</dt>
+                <dt>{{#translate}}Email "from name"{{/translate}}</dt>
                 <dd>{{from}}</dd>
             {{/if}}
 
             {{#if address}}
-                <dt>Email "from" address</dt>
+                <dt>{{#translate}}Email "from" address{{/translate}}</dt>
                 <dd>{{address}}</dd>
             {{/if}}
 
             {{#if replyTo}}
-                <dt>Email "reply-to" address</dt>
+                <dt>{{#translate}}Email "reply-to" address{{/translate}}</dt>
                 <dd>{{replyTo}}</dd>
             {{/if}}
 
             {{#if subject}}
-                <dt>Email "subject line"</dt>
+                <dt>{{#translate}}Email "subject line"{{/translate}}</dt>
                 <dd>{{subject}}</dd>
             {{/if}}
 
             {{#unless isRss}}
 
-                <dt>Preview campaign as</dt>
+                <dt>{{#translate}}Preview campaign as{{/translate}}</dt>
                 <dd>
                     <form method="post" action="/campaigns/preview/{{id}}" class="form-inline">
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
@@ -104,26 +104,26 @@
                                 {{/each}}
                                 {{#if testUsers}}
                                     <optgroup label="Actions">
-                                        <option value="_create">Add new test user ...</option>
+                                        <option value="_create">{{#translate}}Add new test user{{/translate}}…</option>
                                     </optgroup>
                                 {{else}}
-                                    <option value="_create">No test users yet, create one here ...</option>
+                                    <option value="_create">{{#translate}}No test users yet, create one here{{/translate}}…</option>
                                 {{/if}}
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-default">Go</button>
+                        <button type="submit" class="btn btn-default">{{#translate}}Go{{/translate}}</button>
                     </form>
                 </dd>
 
                 {{#unless isIdling}}
-                    <dt>Delivered <a href="/campaigns/status/{{id}}/delivered" title="List subscribers who received this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                    <dt>{{#translate}}Delivered{{/translate}} <a href="/campaigns/status/{{id}}/delivered" title="{{#translate}}List subscribers who received this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                     <dd>{{delivered}}</dd>
 
         </dl>
         <hr />
         <dl class="dl-horizontal">
 
-            <dt>Bounced <a href="/campaigns/status/{{id}}/bounced" title="List subscribers who bounced"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dt>{{#translate}}Bounced{{/translate}} <a href="/campaigns/status/{{id}}/bounced" title="{{#translate}}List subscribers who bounced{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
             <dd>
                 <div class="progress">
                     <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{bounceRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{bounceRate}}%;">
@@ -132,7 +132,7 @@
                 </div>
             </dd>
 
-            <dt>Complaints <a href="/campaigns/status/{{id}}/complained" title="List subscribers who complained for this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dt>{{#translate}}Complaints{{/translate}} <a href="/campaigns/status/{{id}}/complained" title="{{#translate}}List subscribers who complained for this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
             <dd>
                 <div class="progress">
                     <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{complaintRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{complaintRate}}%;">
@@ -141,7 +141,7 @@
                 </div>
             </dd>
 
-            <dt>Unsubscribed <a href="/campaigns/status/{{id}}/unsubscribed" title="List subscribers who unsubscribed after this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+            <dt>{{#translate}}Unsubscribed{{/translate}} <a href="/campaigns/status/{{id}}/unsubscribed" title="{{#translate}}List subscribers who unsubscribed after this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
             <dd>
                 <div class="progress">
                     <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{unsubscribeRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{unsubscribeRate}}%;">
@@ -152,7 +152,7 @@
 
             {{#unless trackingDisabled}}
 
-                <dt>Opened <a href="/campaigns/opened/{{id}}" title="List subscribers who opened this message"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dt>{{#translate}}Opened{{/translate}} <a href="/campaigns/opened/{{id}}" title="{{#translate}}List subscribers who opened this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                 <dd>
                     <div class="progress">
                         <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{openRate}}%;">
@@ -161,7 +161,7 @@
                     </div>
                 </dd>
 
-                <dt>Clicked <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dt>{{#translate}}Clicked{{/translate}} <a href="/campaigns/clicked/{{id}}/all" title="{{#translate}}List subscribers who clicked on a link{{/translate}}"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                 <dd>
                     <div class="progress">
                         <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{clicksRate}}%;">
@@ -180,34 +180,34 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     {{#if isIdling}}
-                        <form class="form-inline confirm-submit" data-confirm-message="Are you sure? This action would start sending messages to the selected list" method="post" action="/campaigns/send">
+                        <form class="form-inline confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would start sending messages to the selected list{{/translate}}" method="post" action="/campaigns/send">
                             <input type="hidden" name="_csrf" value="{{csrfToken}}">
                             <input type="hidden" name="id" value="{{id}}" />
 
                             <div class="pull-right">
                                 <div class="form-group">
-                                    <p class="form-control-static">Delay sending</p>
+                                    <p class="form-control-static">{{#translate}}Delay sending{{/translate}}</p>
                                 </div>
                                 <div class="form-group">
                                     <div class="input-group">
                                         <input type="number" class="form-control" name="delay-hours" id="delay-hours" placeholder="0">
-                                        <div class="input-group-addon"> hours</div>
+                                        <div class="input-group-addon"> {{#translate}}hours{{/translate}}</div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="input-group">
                                         <input type="number" class="form-control" name="delay-minutes" id="delay-minutes" placeholder="0">
-                                        <div class="input-group-addon"> minutes</div>
+                                        <div class="input-group-addon"> {{#translate}}minutes{{/translate}}</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send to
+                            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> {{#translate}}Send to subscribers:{{/translate}}
                                 {{#if segment}}
                                     {{segment.subscribers}}
                                 {{else}}
                                     {{list.subscribers}}
-                                {{/if}} subscribers</button>
+                                {{/if}}</button>
                         </form>
                     {{/if}}
 
@@ -216,45 +216,45 @@
                         <div class="page-refresh" data-interval="20"></div>
                         {{#if isScheduled}}
                             <div class="pull-right">
-                                <form class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would reset scheduling" method="post" action="/campaigns/reset">
+                                <form class="form-horizontal confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would reset scheduling{{/translate}}" method="post" action="/campaigns/reset">
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                     <input type="hidden" name="id" value="{{id}}" />
 
-                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {{#translate}}Cancel{{/translate}}
                                     </button>
                                 </form>
                             </div>
-                            <h4>Sending scheduled <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
+                            <h4>{{#translate}}Sending scheduled{{/translate}} <span class="datestring text-info" data-date="{{scheduled}}" title="{{scheduled}}">{{scheduled}}</span></h4>
                         {{else}}
                             <div class="pull-right">
                                 <form class="form-horizontal" method="post" action="/campaigns/pause">
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                     <input type="hidden" name="id" value="{{id}}" />
 
-                                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause
+                                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> {{#translate}}Pause{{/translate}}
                                     </button>
                                 </form>
                             </div>
-                            <h4><span class="glyphicon glyphicon-refresh spinning"></span> Sending…</h4>
+                            <h4><span class="glyphicon glyphicon-refresh spinning"></span> {{#translate}}Sending{{/translate}}…</h4>
                         {{/if}}
                     {{/if}}
 
                     {{#if isPaused}}
                         <div class="pull-right">
-                            <form id="resume-sending" class="form-horizontal confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/resume">
+                            <form id="resume-sending" class="form-horizontal confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would resume sending messages to the selected list{{/translate}}" method="post" action="/campaigns/resume">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
                             </form>
 
-                            <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
+                            <form id="reset-sending" class="confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would reset all stats about current progress{{/translate}}" method="post" action="/campaigns/reset">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
                             </form>
 
-                            <button type="submit" form="resume-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Resume
+                            <button type="submit" form="resume-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> {{#translate}}Resume{{/translate}}
                             </button>
 
-                            <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset
+                            <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> {{#translate}}Reset{{/translate}}
                             </button>
                         </div>
                         <h4>Sending paused</h4>
@@ -262,24 +262,24 @@
 
                     {{#if isFinished}}
                         <div class="pull-right">
-                            <form id="continue-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would resume sending messages to the selected list" method="post" action="/campaigns/send">
+                            <form id="continue-sending" class="confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would resume sending messages to the selected list{{/translate}}" method="post" action="/campaigns/send">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
                             </form>
 
-                            <form id="reset-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would reset all stats about current progress" method="post" action="/campaigns/reset">
+                            <form id="reset-sending" class="confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would reset all stats about current progress{{/translate}}" method="post" action="/campaigns/reset">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
                             </form>
 
-                            <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Continue
+                            <button type="submit" form="continue-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> {{#translate}}Continue{{/translate}}
                             </button>
 
-                            <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset
+                            <button type="submit" form="reset-sending" class="btn btn-danger"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> {{#translate}}Reset{{/translate}}
                             </button>
 
                         </div>
-                        <h4>All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers</h4>
+                        <h4>{{#translate}}All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers{{/translate}}</h4>
                     {{/if}}
 
                 </div>
@@ -292,28 +292,28 @@
                 <div class="panel-body">
                     {{#if isActive}}
                         <div class="pull-right">
-                            <form id="inactivate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would pause sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/inactivate">
+                            <form id="inactivate-sending" class="confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would pause sending new entries in RSS feed as email messages to the selected list{{/translate}}" method="post" action="/campaigns/inactivate">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
                             </form>
 
-                            <button type="submit" form="inactivate-sending" class="btn btn-warning"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause
+                            <button type="submit" form="inactivate-sending" class="btn btn-warning"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> {{#translate}}Pause{{/translate}}
                             </button>
                         </div>
 
-                        Campaign status: <span class="label label-primary">ACTIVE</span>
+                        {{#translate}}Campaign status:{{/translate}} <span class="label label-primary">{{#translate}}ACTIVE{{/translate}}</span>
                     {{else}}
                         <div class="pull-right">
-                            <form id="activate-sending" class="confirm-submit" data-confirm-message="Are you sure? This action would start sending new entries in RSS feed as email messages to the selected list" method="post" action="/campaigns/activate">
+                            <form id="activate-sending" class="confirm-submit" data-confirm-message="{{#translate}}Are you sure? This action would start sending new entries in RSS feed as email messages to the selected list{{/translate}}" method="post" action="/campaigns/activate">
                                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 <input type="hidden" name="id" value="{{id}}" />
                             </form>
 
-                            <button type="submit" form="activate-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Activate
+                            <button type="submit" form="activate-sending" class="btn btn-info"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> {{#translate}}Activate{{/translate}}
                             </button>
                         </div>
 
-                        Campaign status: <span class="label label-default">INACTIVE</span>
+                        {{#translate}}Campaign status:{{/translate}} <span class="label label-default">{{#translate}}INACTIVE{{/translate}}</span>
                     {{/if}}
                 </div>
             </div>
@@ -322,7 +322,7 @@
         {{#if isTriggered}}
             <div class="panel panel-default">
                 <div class="panel-body">
-                    This is a <a href="/triggers">triggered</a> campaign. Messages are only sent to subscribers that hit some trigger that invokes this campaign
+                    {{#translate}}This is a triggered campaign. Messages are only sent to subscribers that hit some trigger that invokes this campaign{{/translate}} (<a href="/triggers">{{#translate}}see more{{/translate}}</a>)
                 </div>
             </div>
         {{/if}}
@@ -341,16 +341,16 @@
                                 #
                             </th>
                             <th>
-                                URL
+                                {{#translate}}URL{{/translate}}
                             </th>
                             <th class="col-md-1">
-                                Clicks
+                                {{#translate}}Clicks{{/translate}}
                             </th>
                             <th class="col-md-1">
-                                % of clicks
+                                {{#translate}}% of clicks{{/translate}}
                             </th>
                             <th class="col-md-1">
-                                % of messages
+                                {{#translate}}% of messages{{/translate}}
                             </th>
                         </thead>
                         <tbody>
@@ -365,7 +365,7 @@
                                         </td>
                                         <td>
                                             <div class="pull-right">
-                                                <a href="/campaigns/clicked/{{../id}}/{{id}}" title="List subscribers who clicked this link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
+                                                <a href="/campaigns/clicked/{{../id}}/{{id}}" title="{{#translate}}List subscribers who clicked this link{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
                                             </div>
                                             {{clicks}}
                                         </td>
@@ -380,7 +380,7 @@
                             {{else}}
                                 <tr>
                                     <td colspan="5">
-                                        No data available in table
+                                        {{#translate}}No data available in table{{/translate}}
                                     </td>
                                 </tr>
                             {{/if}}
@@ -389,11 +389,11 @@
                             <tr>
                                 <th></th>
                                 <th>
-                                    Aggregated clicks
+                                    {{#translate}}Aggregated clicks{{/translate}}
                                 </th>
                                 <th>
                                     <div class="pull-right">
-                                        <a href="/campaigns/clicked/{{id}}/all" title="List subscribers who clicked on a link"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
+                                        <a href="/campaigns/clicked/{{id}}/all" title="{{#translate}}List subscribers who clicked on a link{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>
                                     </div>
                                     {{clicks}}
                                 </th>
@@ -408,7 +408,7 @@
                     </table>
 
                     <p class="text-muted">
-                        Clicks are counted as unique subscribers that clicked on a specific link or on any link (in aggregated view)
+                        {{#translate}}Clicks are counted as unique subscribers that clicked on a specific link or on any link (in aggregated view){{/translate}}
                     </p>
 
                 </div>
@@ -421,7 +421,7 @@
 {{#if isRss}}
     <div class="table-responsive">
         <div class="well text-info">
-            If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here
+            {{#translate}}If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here{{/translate}}
         </div>
         <table data-topic-url="/campaigns" data-sort-column="4" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" data-topic-args="parent={{id}}" width="100%" data-row-sort="0,1,0,1,1,0">
             <thead>
@@ -429,16 +429,16 @@
                     #
                 </th>
                 <th>
-                    Name
+                    {{#translate}}Name{{/translate}}
                 </th>
                 <th>
-                    Description
+                    {{#translate}}Description{{/translate}}
                 </th>
                 <th>
-                    Status
+                    {{#translate}}Status{{/translate}}
                 </th>
                 <th>
-                    Created
+                    {{#translate}}Created{{/translate}}
                 </th>
                 <th class="col-md-1">
                     &nbsp;

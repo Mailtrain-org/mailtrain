@@ -16,6 +16,8 @@ let url = require('url');
 let htmlToText = require('html-to-text');
 let request = require('request');
 let libmime = require('libmime');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 let attachmentCache = new Map();
 let attachmentCacheSize = 0;
@@ -299,14 +301,14 @@ function formatMessage(message, callback) {
             return callback(err);
         }
         if (!campaign) {
-            return callback(new Error('Campaign not found'));
+            return callback(new Error(_('Campaign not found')));
         }
         lists.get(message.listId, (err, list) => {
             if (err) {
                 return callback(err);
             }
             if (!list) {
-                return callback(new Error('List not found'));
+                return callback(new Error(_('List not found')));
             }
 
             settings.list(['serviceUrl', 'verpUse', 'verpHostname'], (err, configItems) => {
@@ -442,7 +444,7 @@ function formatMessage(message, callback) {
                                 return callback(err);
                             }
                             if (httpResponse.statusCode !== 200) {
-                                return callback(new Error('Received status code ' + httpResponse.statusCode + ' from ' + campaign.sourceUrl));
+                                return callback(new Error(util.format(_('Received status code %s from %s'), httpResponse.statusCode, campaign.sourceUrl)));
                             }
                             renderAndSend(body && body.toString(), '', false);
                         });

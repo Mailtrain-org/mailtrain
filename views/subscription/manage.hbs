@@ -1,4 +1,4 @@
-<h2>Update your preferences</h2>
+<h2>{{#translate}}Update your preferences{{/translate}}</h2>
 
 {{#if hasPubkey}}
     <form method="post" id="download-pubkey" action="/subscription/publickey">
@@ -14,20 +14,20 @@
     <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
 
     <div class="form-group">
-        <label for="email">Email Address</label>
+        <label for="email">{{#translate}}Email Address{{/translate}}</label>
         <div class="input-group">
             <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{email}}" readonly>
-            <div class="input-group-addon"><a href="/subscription/{{lcid}}/manage-address/{{cid}}">want to change it?</a></div>
+            <div class="input-group-addon"><a href="/subscription/{{lcid}}/manage-address/{{cid}}">{{#translate}}want to change it?{{/translate}}</a></div>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="first-name">First Name</label>
+        <label for="first-name">{{#translate}}First Name{{/translate}}</label>
         <input type="text" class="form-control" name="first-name" id="first-name" placeholder="" value="{{firstName}}">
     </div>
 
     <div class="form-group">
-        <label for="last-name">Last Name</label>
+        <label for="last-name">{{#translate}}Last Name{{/translate}}</label>
         <input type="text" class="form-control" name="last-name" id="last-name" placeholder="" value="{{lastName}}">
     </div>
 
@@ -58,11 +58,11 @@
             {{#if typeGpg}}
                 {{#if ../hasPubkey}}
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Download signature verification key</button>
+                        <button type="submit" class="btn btn-link btn-xs" form="download-pubkey"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> {{#translate}}Download signature verification key{{/translate}}</button>
                     </div>
                 {{/if}}
-                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
-                <span class="help-block">Insert your GPG public key here to encrypt messages sent to your address <em>(optional)</em></span>
+                <textarea class="form-control gpg-text" rows="3" name="{{column}}" placeholder="{{#translate}}Begins with{{/translate}} &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
+                <span class="help-block">{{#translate}}Insert your GPG public key here to encrypt messages sent to your address{{/translate}} <em>({{#translate}}optional{{/translate}})</em></span>
             {{/if}}
 
             {{#if typeDateUs}}
@@ -92,7 +92,7 @@
             {{#if typeDropdown}}
                 <select name="{{key}}" class="form-control">
                     <option value="">
-                        –– Select ––
+                        –– {{#translate}}Select{{/translate}} ––
                     </option>
                     {{#each options}}
                         <option value="{{column}}" {{#if value}} selected {{/if}}>{{name}}</option>
@@ -124,6 +124,6 @@
     {{/each}}
 
     <div class="form-group">
-        <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Update Profile</button> or <a href="/subscription/{{lcid}}/unsubscribe/{{cid}}">Unsubscribe</a>
+        <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update Profile{{/translate}}</button> or <a href="/subscription/{{lcid}}/unsubscribe/{{cid}}">{{#translate}}Unsubscribe{{/translate}}</a>
     </div>
 </form>

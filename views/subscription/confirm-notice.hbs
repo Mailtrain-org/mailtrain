@@ -1,17 +1,17 @@
 <div class="alert alert-warning alert-dismissible" role="alert" id="js-warning">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    <strong>Warning!</strong> If JavaScript was not enabled then no confirmation message was sent
+    <strong>{{#translate}}Warning!{{/translate}}</strong> {{#translate}}If JavaScript was not enabled then no confirmation message was sent{{/translate}}
 </div>
 <script>
     document.getElementById('js-warning').style.display = 'none';
 </script>
 
-<h2>Almost finished.</h2>
+<h2>{{#translate}}Almost finished.{{/translate}}</h2>
 
-<p>We need to confirm your email address. To complete the subscription process, please click the link in the email we just sent you.</p>
+<p>{{#translate}}We need to confirm your email address. To complete the subscription process, please click the link in the email we just sent you.{{/translate}}</p>
 
 <p>
     <a class="btn btn-primary" href="{{homepage}}" role="button">
-        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> return to our website
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}return to our website{{/translate}}
     </a>
 </p>

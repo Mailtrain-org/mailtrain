@@ -1,166 +1,166 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li class="active">API</li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li class="active">{{#translate}}API{{/translate}}</li>
 </ol>
 
-<h2>API</h2>
+<h2>{{#translate}}API{{/translate}}</h2>
 
 <hr>
 
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="pull-right">
-            <form class="form-horizontal confirm-submit" {{#if accessToken}} data-confirm-message="Are you sure? Resetting would invalidate the currently existing token." {{else}} data-confirm-message="Are you sure?" {{/if}} method="post" action="/users/api/reset-token">
+            <form class="form-horizontal confirm-submit" {{#if accessToken}} data-confirm-message="{{#translate}}Are you sure? Resetting would invalidate the currently existing token.{{/translate}}" {{else}} data-confirm-message="{{#translate}}Are you sure?{{/translate}}" {{/if}} method="post" action="/users/api/reset-token">
                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
                     {{#if accessToken}}
-                        Reset Access Token
+                        {{#translate}}Reset Access Token{{/translate}}
                     {{else}}
-                        Generate Access Token
+                        {{#translate}}Generate Access Token{{/translate}}
                     {{/if}}
                 </button>
             </form>
         </div>
         {{#if accessToken}}
-            Personal access token: <code>{{accessToken}}</code>
+            {{#translate}}Personal access token:{{/translate}} <code>{{accessToken}}</code>
         {{else}}
-            Access token not yet generated
+            {{#translate}}Access token not yet generated{{/translate}}
         {{/if}}
     </div>
 </div>
 
 <div class="well">
 
-    <h3>Notes about the API</h3>
+    <h3>{{#translate}}Notes about the API{{/translate}}</h3>
 
     <ul>
         <li>
-            API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.
+            {{#translate}}API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.{{/translate}}
         </li>
         <li>
-            You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code>            is not supported.
+            {{#translate}}You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code> is not supported.{{/translate}}
         </li>
     </ul>
 </div>
 
-<h3>POST /api/subscribe/:listId – Add subscription</h3>
+<h3>POST /api/subscribe/:listId – {{#translate}}Add subscription{{/translate}}</h3>
 
 <p>
-    This API call either inserts a new subscription or updates existing. Fields not included are left as is, so if you update only LAST_NAME value, then FIRST_NAME is kept untouched for an existing subscription.
+    {{#translate}}This API call either inserts a new subscription or updates existing. Fields not included are left as is, so if you update only LAST_NAME value, then FIRST_NAME is kept untouched for an existing subscription.{{/translate}}
 </p>
 
 <p>
-    <strong>GET</strong> arguments
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>access_token</strong> – your personal access token
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
 </ul>
 
 <p>
-    <strong>POST</strong> arguments
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)</li>
-    <li><strong>FIRST_NAME</strong> – subscriber's first name</li>
-    <li><strong>LAST_NAME</strong> – subscriber's last name</li>
-    <li><strong>TIMEZONE</strong> – subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"</li>
-    <li><strong>MERGE_TAG_VALUE</strong> – custom field value. Use yes/no for option group values (checkboxes, radios, drop downs)</li>
+    <li><strong>EMAIL</strong> – {{#translate}}subscriber's email address{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)</li>
+    <li><strong>FIRST_NAME</strong> – {{#translate}}subscriber's first name{{/translate}}</li>
+    <li><strong>LAST_NAME</strong> – {{#translate}}subscriber's last name{{/translate}}</li>
+    <li><strong>TIMEZONE</strong> – {{#translate}}subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"{{/translate}}</li>
+    <li><strong>MERGE_TAG_VALUE</strong> – {{#translate}}custom field value. Use yes/no for option group values (checkboxes, radios, drop downs){{/translate}}</li>
 </ul>
 
 <p>
-    Additional <strong>POST</strong> arguments:
+    {{#translate}}Additional POST arguments{{/translate}}:
 </p>
 
 <ul>
     <li>
-        <strong>FORCE_SUBSCRIBE</strong> – set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. If the email was already unsubscribed/blocked then subscription status is not changed
+        <strong>FORCE_SUBSCRIBE</strong> – {{#translate}}set to "yes" if you want to make sure the email is marked as subscribed even if it was previously marked as unsubscribed. If the email was already unsubscribed/blocked then subscription status is not changed{{/translate}}
         by default.
     </li>
     <li>
-        <strong>REQUIRE_CONFIRMATION</strong> – set to "yes" if you want to send confirmation email to the subscriber before actually marking as subscribed
+        <strong>REQUIRE_CONFIRMATION</strong> – {{#translate}}set to "yes" if you want to send confirmation email to the subscriber before actually marking as subscribed{{/translate}}
     </li>
 </ul>
 
 <p>
-    <strong>Example</strong>
+    <strong>{{#translate}}Example{{/translate}}</strong>
 </p>
 
 <pre>curl -XPOST {{serviceUrl}}api/subscribe/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
-<h3>POST /api/unsubscribe/:listId – Remove subscription</h3>
+<h3>POST /api/unsubscribe/:listId – {{#translate}}Remove subscription{{/translate}}</h3>
 
 <p>
-    This API call marks a subscription as unsubscribed
+    {{#translate}}This API call marks a subscription as unsubscribed{{/translate}}
 </p>
 
 <p>
-    <strong>GET</strong> arguments
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>access_token</strong> – your personal access token
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
 </ul>
 
 <p>
-    <strong>POST</strong> arguments
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)
+    <li><strong>EMAIL</strong> – {{#translate}}subscriber's email address{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)
 </ul>
 
 <p>
-    <strong>Example</strong>
+    <strong>{{#translate}}Example{{/translate}}</strong>
 </p>
 
 <pre>curl -XPOST {{serviceUrl}}api/unsubscribe/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com'</pre>
 
-<h3>POST /api/delete/:listId – Delete subscription</h3>
+<h3>POST /api/delete/:listId – {{#translate}}Delete subscription{{/translate}}</h3>
 
 <p>
-    This API call deletes a subscription
+    {{#translate}}This API call deletes a subscription{{/translate}}
 </p>
 
 <p>
-    <strong>GET</strong> arguments
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>access_token</strong> – your personal access token
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
 </ul>
 
 <p>
-    <strong>POST</strong> arguments
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>EMAIL</strong> – subscriber's email address (<em>required</em>)
+    <li><strong>EMAIL</strong> – {{#translate}}subscriber's email address{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)
 </ul>
 
 <p>
-    <strong>Example</strong>
+    <strong>{{#translate}}Example{{/translate}}</strong>
 </p>
 
 <pre>curl -XPOST {{serviceUrl}}api/delete/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com'</pre>
 
-<h3>POST /api/field/:listId – Add new custom field</h3>
+<h3>POST /api/field/:listId – {{#translate}}Add new custom field{{/translate}}</h3>
 
 <p>
-    This API call creates a new custom field for a list.
+    {{#translate}}This API call creates a new custom field for a list.{{/translate}}
 </p>
 
 <p>
-    <strong>GET</strong> arguments
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>access_token</strong> – your personal access token
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
 </ul>
 
 <p>
-    <strong>POST</strong> arguments
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
 </p>
 <ul>
-    <li><strong>NAME</strong> – field name (<em>required</em>)</li>
-    <li><strong>TYPE</strong> – one of the following types:
+    <li><strong>NAME</strong> – {{#translate}}field name{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)</li>
+    <li><strong>TYPE</strong> – {{#translate}}one of the following types:{{/translate}}
         <ul>
             {{#each allowedTypes}}
                 <li>
@@ -169,13 +169,13 @@
             {{/each}}
         </ul>
     </li>
-    <li><strong>GROUP</strong> – If the type is 'option' then you also need to specify the parent element ID</li>
-    <li><strong>GROUP_TEMPLATE</strong> – Template for the group element. If not set, then values of the elements are joined with commas</li>
-    <li><strong>VISIBLE</strong> – yes/no, if not visible then the subscriber can not view or modify this value at the profile page</li>
+    <li><strong>GROUP</strong> – {{#translate}}If the type is 'option' then you also need to specify the parent element ID{{/translate}}</li>
+    <li><strong>GROUP_TEMPLATE</strong> – {{#translate}}Template for the group element. If not set, then values of the elements are joined with commas{{/translate}}</li>
+    <li><strong>VISIBLE</strong> – yes/no, {{#translate}}if not visible then the subscriber can not view or modify this value at the profile page{{/translate}}</li>
 </ul>
 
 <p>
-    <strong>Example</strong>
+    <strong>{{#translate}}Example{{/translate}}</strong>
 </p>
 
 <pre>curl -XPOST {{serviceUrl}}api/field/B16uVTdW?access_token={{accessToken}} \

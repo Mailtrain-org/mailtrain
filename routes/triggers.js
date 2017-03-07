@@ -10,10 +10,12 @@ let striptags = require('striptags');
 let passport = require('../lib/passport');
 let tools = require('../lib/tools');
 let htmlescape = require('escape-html');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('triggers');
@@ -57,7 +59,7 @@ router.get('/create-select', passport.csrfProtection, (req, res, next) => {
 
 router.post('/create-select', passport.parseForm, passport.csrfProtection, (req, res) => {
     if (!req.body.list) {
-        req.flash('danger', 'Could not find selected list');
+        req.flash('danger', _('Could not find selected list'));
         return res.redirect('/triggers/create-select');
     }
     res.redirect('/triggers/' + encodeURIComponent(req.body.list) + '/create');
@@ -74,7 +76,7 @@ router.get('/:listId/create', passport.csrfProtection, (req, res, next) => {
 
     lists.get(req.params.listId, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find selected list');
+            req.flash('danger', err && err.message || err || _('Could not find selected list'));
             return res.redirect('/triggers/create-select');
         }
         fields.list(list.id, (err, fieldList) => {
@@ -126,14 +128,14 @@ router.get('/:listId/create', passport.csrfProtection, (req, res, next) => {
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     triggers.create(req.body, (err, id) => {
         if (err || !id) {
-            req.flash('danger', err && err.message || err || 'Could not create trigger');
+            req.flash('danger', err && err.message || err || _('Could not create trigger'));
             if (req.body.list) {
                 return res.redirect('/triggers/' + encodeURIComponent(req.body.list) + '/create?' + tools.queryParams(req.body));
             } else {
                 return res.redirect('/triggers');
             }
         }
-        req.flash('success', 'Trigger “' + req.body.name + '” created');
+        req.flash('success', util.format(_('Trigger “%s” created'), req.body.name));
         res.redirect('/triggers');
     });
 });
@@ -141,7 +143,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
 router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
     triggers.get(req.params.id, (err, trigger) => {
         if (err || !trigger) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
         trigger.csrfToken = req.csrfToken();
@@ -149,7 +151,7 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
 
         lists.get(trigger.list, (err, list) => {
             if (err || !list) {
-                req.flash('danger', err && err.message || err || 'Could not find selected list');
+                req.flash('danger', err && err.message || err || _('Could not find selected list'));
                 return res.redirect('/triggers');
             }
             fields.list(list.id, (err, fieldList) => {
@@ -209,9 +211,9 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
             req.flash('danger', err.message || err);
             return res.redirect('/triggers/edit/' + encodeURIComponent(req.body.id));
         } else if (updated) {
-            req.flash('success', 'Trigger settings updated');
+            req.flash('success', _('Trigger settings updated'));
         } else {
-            req.flash('info', 'Trigger settings not updated');
+            req.flash('info', _('Trigger settings not updated'));
         }
 
         return res.redirect('/triggers');
@@ -223,9 +225,9 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Trigger deleted');
+            req.flash('success', _('Trigger deleted'));
         } else {
-            req.flash('info', 'Could not delete specified trigger');
+            req.flash('info', _('Could not delete specified trigger'));
         }
 
         return res.redirect('/triggers');
@@ -237,7 +239,7 @@ router.get('/status/:id', passport.csrfProtection, (req, res) => {
 
     triggers.get(id, (err, trigger) => {
         if (err || !trigger) {
-            req.flash('danger', err && err.message || err || 'Could not find trigger with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find trigger with specified ID'));
             return res.redirect('/triggers');
         }
 
@@ -250,7 +252,7 @@ router.post('/status/ajax/:id', (req, res) => {
     triggers.get(req.params.id, (err, trigger) => {
         if (err || !trigger) {
             return res.json({
-                error: err && err.message || err || 'Trigger not found',
+                error: err && err.message || err || _('Trigger not found'),
                 data: []
             });
         }
@@ -292,7 +294,7 @@ router.post('/status/ajax/:id', (req, res) => {
                             htmlescape(row.firstName || ''),
                             htmlescape(row.lastName || ''),
                             '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
-                            '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + trigger.list + '/edit/' + row.cid + '">Edit</a>'
+                            '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + trigger.list + '/edit/' + row.cid + '">' + _('Edit') + '</a>'
                         ])
                     });
                 });

@@ -1,13 +1,13 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li class="active">Templates</li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li class="active">{{#translate}}Templates{{/translate}}</li>
 </ol>
 
 <div class="pull-right">
-    <a class="btn btn-primary" href="/templates/create" role="button"><i class="glyphicon glyphicon-plus"></i> Create Template</a>
+    <a class="btn btn-primary" href="/templates/create" role="button"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Template{{/translate}}</a>
 </div>
 
-<h2>Templates</h2>
+<h2>{{#translate}}Templates{{/translate}}</h2>
 
 <hr>
 
@@ -18,10 +18,10 @@
                 #
             </th>
             <th>
-                Name
+                {{#translate}}Name{{/translate}}
             </th>
             <th>
-                Description
+                {{#translate}}Description{{/translate}}
             </th>
             <th class="col-md-1">
                 &nbsp;
@@ -43,7 +43,7 @@
                         <td>
                             <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
                             <a href="/templates/edit/{{id}}">
-                            Edit
+                            {{#translate}}Edit{{/translate}}
                         </a>
                         </td>
                     </tr>

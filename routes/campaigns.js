@@ -14,6 +14,8 @@ let striptags = require('striptags');
 let passport = require('../lib/passport');
 let htmlescape = require('escape-html');
 let multer = require('multer');
+let _ = require('../lib/translate')._;
+let util = require('util');
 let uploadStorage = multer.memoryStorage();
 let uploads = multer({
     storage: uploadStorage
@@ -21,7 +23,7 @@ let uploads = multer({
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('campaigns');
@@ -30,7 +32,7 @@ router.all('/*', (req, res, next) => {
 
 router.get('/', (req, res) => {
     res.render('campaigns/campaigns', {
-        title: 'Campaigns'
+        title: _('Campaigns')
     });
 });
 
@@ -112,13 +114,13 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     campaigns.create(req.body, false, (err, id) => {
         if (err || !id) {
-            req.flash('danger', err && err.message || err || 'Could not create campaign');
+            req.flash('danger', err && err.message || err || _('Could not create campaign'));
             return res.redirect('/campaigns/create?' + tools.queryParams(req.body));
         }
-        req.flash('success', 'Campaign “' + req.body.name + '” created');
-        res.redirect((req.body.type === 'rss')
-            ? '/campaigns/edit/' + id
-            : '/campaigns/edit/' + id + '?tab=template'
+        req.flash('success', util.format(_('Campaign “%s” created'), req.body.name));
+        res.redirect((req.body.type === 'rss') ?
+            '/campaigns/edit/' + id :
+            '/campaigns/edit/' + id + '?tab=template'
         );
     });
 });
@@ -126,7 +128,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
 router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
     campaigns.get(req.params.id, false, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
 
@@ -199,7 +201,7 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                             campaign.mergeTags = defaultMergeTags.concat(listMergeTags);
                             campaign.type === 2 && campaign.mergeTags.push({
                                 key: 'RSS_ENTRY',
-                                value: 'content from an RSS entry'
+                                value: _('content from an RSS entry')
                             });
                             res.render(view, campaign);
                         });
@@ -215,9 +217,9 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
         if (err) {
             req.flash('danger', err.message || err);
         } else if (updated) {
-            req.flash('success', 'Campaign settings updated');
+            req.flash('success', _('Campaign settings updated'));
         } else {
-            req.flash('info', 'Campaign settings not updated');
+            req.flash('info', _('Campaign settings not updated'));
         }
 
         if (req.body.id) {
@@ -233,9 +235,9 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Campaign deleted');
+            req.flash('success', _('Campaign deleted'));
         } else {
-            req.flash('info', 'Could not delete specified campaign');
+            req.flash('info', _('Could not delete specified campaign'));
         }
 
         return res.redirect('/campaigns');
@@ -254,22 +256,22 @@ router.post('/ajax', (req, res) => {
         let getStatusText = data => {
             switch (data.status) {
                 case 1:
-                    return 'Idling';
+                    return _('Idling');
                 case 2:
                     if (data.scheduled && data.scheduled > new Date()) {
-                        return 'Scheduled';
+                        return _('Scheduled');
                     }
-                    return '<span class="glyphicon glyphicon-refresh spinning"></span> Sending…';
+                    return '<span class="glyphicon glyphicon-refresh spinning"></span> ' + _('Sending') + '…';
                 case 3:
-                    return 'Finished';
+                    return _('Finished');
                 case 4:
-                    return 'Paused';
+                    return _('Paused');
                 case 5:
-                    return 'Inactive';
+                    return _('Inactive');
                 case 6:
-                    return 'Active';
+                    return _('Active');
             }
-            return 'Other';
+            return _('Other');
         };
 
         res.json({
@@ -282,7 +284,7 @@ router.post('/ajax', (req, res) => {
                 htmlescape(striptags(row.description) || ''),
                 getStatusText(row),
                 '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>'
-            ].concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/campaigns/edit/' + row.id + '">Edit</a>'))
+            ].concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/campaigns/edit/' + row.id + '">' + _('Edit') + '</a>'))
         });
     });
 });
@@ -290,7 +292,7 @@ router.post('/ajax', (req, res) => {
 router.get('/view/:id', passport.csrfProtection, (req, res) => {
     campaigns.get(req.params.id, true, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
 
@@ -385,7 +387,7 @@ router.post('/preview/:id', passport.parseForm, passport.csrfProtection, (req, r
 router.get('/opened/:id', passport.csrfProtection, (req, res) => {
     campaigns.get(req.params.id, true, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
 
@@ -424,13 +426,13 @@ router.get('/status/:id/:status', passport.csrfProtection, (req, res) => {
             status = 4;
             break;
         default:
-            req.flash('danger', 'Unknown status selector');
+            req.flash('danger', _('Unknown status selector'));
             return res.redirect('/campaigns');
     }
 
     campaigns.get(id, true, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
 
@@ -470,7 +472,7 @@ router.get('/status/:id/:status', passport.csrfProtection, (req, res) => {
 router.get('/clicked/:id/:linkId', passport.csrfProtection, (req, res) => {
     campaigns.get(req.params.id, true, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
 
@@ -536,7 +538,7 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
     campaigns.get(req.params.id, true, (err, campaign) => {
         if (err || !campaign) {
             return res.json({
-                error: err && err.message || err || 'Campaign not found',
+                error: err && err.message || err || _('Campaign not found'),
                 data: []
             });
         }
@@ -571,7 +573,7 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
                         htmlescape(row.lastName || ''),
                         row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
                         row.count,
-                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
+                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">' + _('Edit') + '</a>'
                     ])
                 });
             });
@@ -585,7 +587,7 @@ router.post('/status/ajax/:id/:status', (req, res) => {
     campaigns.get(req.params.id, true, (err, campaign) => {
         if (err || !campaign) {
             return res.json({
-                error: err && err.message || err || 'Campaign not found',
+                error: err && err.message || err || _('Campaign not found'),
                 data: []
             });
         }
@@ -621,7 +623,7 @@ router.post('/status/ajax/:id/:status', (req, res) => {
                         htmlescape(row.lastName || ''),
                         htmlescape(row.response || ''),
                         row.updated && row.created.toISOString ? '<span class="datestring" data-date="' + row.updated.toISOString() + '" title="' + row.updated.toISOString() + '">' + row.updated.toISOString() + '</span>' : 'N/A',
-                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">Edit</a>'
+                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">' + _('Edit') + '</a>'
                     ])
                 });
             });
@@ -634,9 +636,9 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'Campaign deleted');
+            req.flash('success', _('Campaign deleted'));
         } else {
-            req.flash('info', 'Could not delete specified campaign');
+            req.flash('info', _('Could not delete specified campaign'));
         }
 
         return res.redirect('/campaigns');
@@ -652,9 +654,9 @@ router.post('/send', passport.parseForm, passport.csrfProtection, (req, res) => 
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (scheduled) {
-            req.flash('success', 'Scheduled sending');
+            req.flash('success', _('Scheduled sending'));
         } else {
-            req.flash('info', 'Could not schedule sending');
+            req.flash('info', _('Could not schedule sending'));
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
@@ -666,9 +668,9 @@ router.post('/resume', passport.parseForm, passport.csrfProtection, (req, res) =
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (scheduled) {
-            req.flash('success', 'Sending resumed');
+            req.flash('success', _('Sending resumed'));
         } else {
-            req.flash('info', 'Could not resume sending');
+            req.flash('info', _('Could not resume sending'));
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
@@ -680,9 +682,9 @@ router.post('/reset', passport.parseForm, passport.csrfProtection, (req, res) =>
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (reset) {
-            req.flash('success', 'Sending reset');
+            req.flash('success', _('Sending reset'));
         } else {
-            req.flash('info', 'Could not reset sending');
+            req.flash('info', _('Could not reset sending'));
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
@@ -694,9 +696,9 @@ router.post('/pause', passport.parseForm, passport.csrfProtection, (req, res) =>
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (reset) {
-            req.flash('success', 'Sending paused');
+            req.flash('success', _('Sending paused'));
         } else {
-            req.flash('info', 'Could not pause sending');
+            req.flash('info', _('Could not pause sending'));
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
@@ -708,9 +710,9 @@ router.post('/activate', passport.parseForm, passport.csrfProtection, (req, res)
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (reset) {
-            req.flash('success', 'Sending activated');
+            req.flash('success', _('Sending activated'));
         } else {
-            req.flash('info', 'Could not activate sending');
+            req.flash('info', _('Could not activate sending'));
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
@@ -722,9 +724,9 @@ router.post('/inactivate', passport.parseForm, passport.csrfProtection, (req, re
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (reset) {
-            req.flash('success', 'Sending paused');
+            req.flash('success', _('Sending paused'));
         } else {
-            req.flash('info', 'Could not pause sending');
+            req.flash('info', _('Could not pause sending'));
         }
 
         return res.redirect('/campaigns/view/' + encodeURIComponent(req.body.id));
@@ -734,7 +736,7 @@ router.post('/inactivate', passport.parseForm, passport.csrfProtection, (req, re
 router.post('/attachment', uploads.single('attachment'), passport.parseForm, passport.csrfProtection, (req, res) => {
     campaigns.get(req.body.id, false, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
         campaigns.addAttachment(campaign.id, {
@@ -745,9 +747,9 @@ router.post('/attachment', uploads.single('attachment'), passport.parseForm, pas
             if (err) {
                 req.flash('danger', err && err.message || err);
             } else if (attachmentId) {
-                req.flash('success', 'Attachment uploaded');
+                req.flash('success', _('Attachment uploaded'));
             } else {
-                req.flash('info', 'Could not store attachment');
+                req.flash('info', _('Could not store attachment'));
             }
             return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
         });
@@ -757,16 +759,16 @@ router.post('/attachment', uploads.single('attachment'), passport.parseForm, pas
 router.post('/attachment/delete', passport.parseForm, passport.csrfProtection, (req, res) => {
     campaigns.get(req.body.id, false, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
         campaigns.deleteAttachment(campaign.id, Number(req.body.attachment), (err, deleted) => {
             if (err) {
                 req.flash('danger', err && err.message || err);
             } else if (deleted) {
-                req.flash('success', 'Attachment deleted');
+                req.flash('success', _('Attachment deleted'));
             } else {
-                req.flash('info', 'Could not delete attachment');
+                req.flash('info', _('Could not delete attachment'));
             }
             return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
         });
@@ -776,7 +778,7 @@ router.post('/attachment/delete', passport.parseForm, passport.csrfProtection, (
 router.post('/attachment/download', passport.parseForm, passport.csrfProtection, (req, res) => {
     campaigns.get(req.body.id, false, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
         campaigns.getAttachment(campaign.id, Number(req.body.attachment), (err, attachment) => {
@@ -784,7 +786,7 @@ router.post('/attachment/download', passport.parseForm, passport.csrfProtection,
                 req.flash('danger', err && err.message || err);
                 return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
             } else if (!attachment) {
-                req.flash('warning', 'Attachment not found');
+                req.flash('warning', _('Attachment not found'));
                 return res.redirect('/campaigns/edit/' + campaign.id + '?tab=attachments');
             }
 
@@ -798,7 +800,7 @@ router.post('/attachment/download', passport.parseForm, passport.csrfProtection,
 router.get('/attachment/:campaign', passport.csrfProtection, (req, res) => {
     campaigns.get(req.params.campaign, false, (err, campaign) => {
         if (err || !campaign) {
-            req.flash('danger', err && err.message || err || 'Could not find campaign with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find campaign with specified ID'));
             return res.redirect('/campaigns');
         }
         campaign.csrfToken = req.csrfToken();

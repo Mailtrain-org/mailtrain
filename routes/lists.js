@@ -17,6 +17,8 @@ let humanize = require('humanize');
 let mkdirp = require('mkdirp');
 let pathlib = require('path');
 let log = require('npmlog');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 let uploadStorage = multer.diskStorage({
     destination: (req, file, callback) => {
@@ -44,7 +46,7 @@ let moment = require('moment-timezone');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
-        req.flash('danger', 'Need to be logged in to access restricted content');
+        req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('lists');
@@ -85,10 +87,10 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.create(req.body, (err, id) => {
         if (err || !id) {
-            req.flash('danger', err && err.message || err || 'Could not create list');
+            req.flash('danger', err && err.message || err || _('Could not create list'));
             return res.redirect('/lists/create?' + tools.queryParams(req.body));
         }
-        req.flash('success', 'List created');
+        req.flash('success', _('List created'));
         res.redirect('/lists/view/' + id);
     });
 });
@@ -96,7 +98,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
 router.get('/edit/:id', passport.csrfProtection, (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
         list.csrfToken = req.csrfToken();
@@ -110,9 +112,9 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
         if (err) {
             req.flash('danger', err.message || err);
         } else if (updated) {
-            req.flash('success', 'List settings updated');
+            req.flash('success', _('List settings updated'));
         } else {
-            req.flash('info', 'List settings not updated');
+            req.flash('info', _('List settings not updated'));
         }
 
         if (req.body.id) {
@@ -128,9 +130,9 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         if (err) {
             req.flash('danger', err && err.message || err);
         } else if (deleted) {
-            req.flash('success', 'List deleted');
+            req.flash('success', _('List deleted'));
         } else {
-            req.flash('info', 'Could not delete specified list');
+            req.flash('info', _('Could not delete specified list'));
         }
 
         return res.redirect('/lists');
@@ -141,7 +143,7 @@ router.post('/ajax/:id', (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
             return res.json({
-                error: err && err.message || err || 'List not found',
+                error: err && err.message || err || _('List not found'),
                 data: []
             });
         }
@@ -166,7 +168,7 @@ router.post('/ajax/:id', (req, res) => {
                     row.customFields = fields.getRow(fieldList, row);
                 });
 
-                let statuses = ['Unknown', 'Subscribed', 'Unsubscribed', 'Bounced', 'Complained'];
+                let statuses = [_('Unknown'), _('Subscribed'), _('Unsubscribed'), _('Bounced'), _('Complained')];
 
                 res.json({
                     draw: req.body.draw,
@@ -197,11 +199,11 @@ router.post('/ajax/:id', (req, res) => {
                                         let key = keys[i];
                                         switch (key.verifyPrimaryKey()) {
                                             case 0:
-                                                return 'Invalid key';
+                                                return _('Invalid key');
                                             case 1:
-                                                return 'Expired key';
+                                                return _('Expired key');
                                             case 2:
-                                                return 'Revoked key';
+                                                return _('Revoked key');
                                         }
                                     }
 
@@ -217,7 +219,7 @@ router.post('/ajax/:id', (req, res) => {
                         } else {
                             return htmlescape(cRow.value || '');
                         }
-                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">Edit</a>'))
+                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>'))
                 });
             });
         });
@@ -231,7 +233,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
@@ -248,22 +250,22 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
                 list.imports = imports.map((entry, i) => {
                     entry.index = i + 1;
-                    entry.importType = entry.type === 1 ? 'Subscribe' : 'Unsubscribe';
+                    entry.importType = entry.type === 1 ? _('Subscribe') : _('Unsubscribe');
                     switch (entry.status) {
                         case 0:
-                            entry.importStatus = 'Initializing';
+                            entry.importStatus = _('Initializing');
                             break;
                         case 1:
-                            entry.importStatus = 'Initialized';
+                            entry.importStatus = _('Initialized');
                             break;
                         case 2:
-                            entry.importStatus = 'Importing...';
+                            entry.importStatus = _('Importing') + '…';
                             break;
                         case 3:
-                            entry.importStatus = 'Finished';
+                            entry.importStatus = _('Finished');
                             break;
                         default:
-                            entry.importStatus = 'Errored' + (entry.error ? ' (' + entry.error + ')' : '');
+                            entry.importStatus = _('Errored') + (entry.error ? ' (' + entry.error + ')' : '');
                             entry.error = true;
                     }
                     entry.created = entry.created && entry.created.toISOString();
@@ -296,7 +298,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 router.get('/subscription/:id/add', passport.csrfProtection, (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
@@ -335,13 +337,13 @@ router.get('/subscription/:id/add', passport.csrfProtection, (req, res) => {
 router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
         subscriptions.get(list.id, req.params.cid, (err, subscription) => {
             if (err || !subscription) {
-                req.flash('danger', err && err.message || err || 'Could not find subscriber with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find subscriber with specified ID'));
                 return res.redirect('/lists/view/' + req.params.id);
             }
 
@@ -387,14 +389,14 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
 router.post('/subscription/add', passport.parseForm, passport.csrfProtection, (req, res) => {
     subscriptions.insert(req.body.list, false, req.body, (err, response) => {
         if (err) {
-            req.flash('danger', err && err.message || err || 'Could not add subscription');
+            req.flash('danger', err && err.message || err || _('Could not add subscription'));
             return res.redirect('/lists/subscription/' + encodeURIComponent(req.body.list) + '/add?' + tools.queryParams(req.body));
         }
 
         if (response.entryId) {
-            req.flash('success', req.body.email + ' was successfully added to your list');
+            req.flash('success', util.format(_('%s was successfully added to your list'), req.body.email));
         } else {
-            req.flash('warning', req.body.email + ' was not added to your list');
+            req.flash('warning', util.format(_('%s was not added to your list'), req.body.email));
         }
 
         res.redirect('/lists/subscription/' + encodeURIComponent(req.body.list) + '/add');
@@ -404,22 +406,22 @@ router.post('/subscription/add', passport.parseForm, passport.csrfProtection, (r
 router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.get(req.body.list, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
         subscriptions.get(list.id, req.body.cid, (err, subscription) => {
             if (err || !subscription) {
-                req.flash('danger', err && err.message || err || 'Could not find subscriber with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find subscriber with specified ID'));
                 return res.redirect('/lists/view/' + list.id);
             }
 
             subscriptions.unsubscribe(list.id, subscription.email, false, err => {
                 if (err) {
-                    req.flash('danger', err && err.message || err || 'Could not unsubscribe user');
+                    req.flash('danger', err && err.message || err || _('Could not unsubscribe user'));
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
                 }
-                req.flash('success', subscription.email + ' was successfully unsubscribed from your list');
+                req.flash('success', util.format(_('%s was successfully unsubscribed from your list'), subscription.email));
                 res.redirect('/lists/view/' + list.id);
             });
         });
@@ -429,17 +431,17 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
 router.post('/subscription/delete', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.get(req.body.list, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
         subscriptions.delete(list.id, req.body.cid, (err, email) => {
             if (err || !email) {
-                req.flash('danger', err && err.message || err || 'Could not find subscriber with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find subscriber with specified ID'));
                 return res.redirect('/lists/view/' + list.id);
             }
 
-            req.flash('success', email + ' was successfully removed from your list');
+            req.flash('success', util.format(_('%s was successfully removed from your list'), email));
             res.redirect('/lists/view/' + list.id);
         });
     });
@@ -451,16 +453,16 @@ router.post('/subscription/edit', passport.parseForm, passport.csrfProtection, (
 
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
-                req.flash('danger', 'Another subscriber with email address ' + req.body.email + ' already exists');
+                req.flash('danger', util.format(_('Another subscriber with email address %s already exists'), req.body.email));
                 return res.redirect('/lists/subscription/' + encodeURIComponent(req.body.list) + '/edit/' + req.body.cid);
             } else {
                 req.flash('danger', err.message || err);
             }
 
         } else if (updated) {
-            req.flash('success', 'Subscription settings updated');
+            req.flash('success', _('Subscription settings updated'));
         } else {
-            req.flash('info', 'Subscription settings not updated');
+            req.flash('info', _('Subscription settings not updated'));
         }
 
         if (req.body.list) {
@@ -474,7 +476,7 @@ router.post('/subscription/edit', passport.parseForm, passport.csrfProtection, (
 router.get('/subscription/:id/import', passport.csrfProtection, (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
@@ -496,13 +498,13 @@ router.get('/subscription/:id/import', passport.csrfProtection, (req, res) => {
 router.get('/subscription/:id/import/:importId', passport.csrfProtection, (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
         subscriptions.getImport(req.params.id, req.params.importId, (err, data) => {
             if (err || !data) {
-                req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find import data with specified ID'));
                 return res.redirect('/lists');
             }
 
@@ -525,7 +527,7 @@ router.get('/subscription/:id/import/:importId', passport.csrfProtection, (req, 
 router.post('/subscription/import', uploads.single('listimport'), passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.get(req.body.list, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
@@ -533,7 +535,7 @@ router.post('/subscription/import', uploads.single('listimport'), passport.parse
 
         getPreview(req.file.path, req.file.size, delimiter, (err, rows) => {
             if (err) {
-                req.flash('danger', err && err.message || err || 'Could not process CSV');
+                req.flash('danger', err && err.message || err || _('Could not process CSV'));
                 return res.redirect('/lists');
             } else {
 
@@ -542,7 +544,7 @@ router.post('/subscription/import', uploads.single('listimport'), passport.parse
                     example: rows[1] || []
                 }, (err, importId) => {
                     if (err) {
-                        req.flash('danger', err && err.message || err || 'Could not create importer');
+                        req.flash('danger', err && err.message || err || _('Could not create importer'));
                         return res.redirect('/lists');
                     }
 
@@ -593,7 +595,7 @@ function getPreview(path, size, delimiter, callback) {
                     // just ignore
                 });
                 if (!data || !data.length) {
-                    return callback(null, new Error('Empty file'));
+                    return callback(null, new Error(_('Empty file')));
                 }
                 callback(err, data);
             });
@@ -604,13 +606,13 @@ function getPreview(path, size, delimiter, callback) {
 router.post('/subscription/import-confirm', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.get(req.body.list, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
         subscriptions.getImport(list.id, req.body.import, (err, data) => {
             if (err || !list) {
-                req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find import data with specified ID'));
                 return res.redirect('/lists');
             }
 
@@ -646,11 +648,11 @@ router.post('/subscription/import-confirm', passport.parseForm, passport.csrfPro
                     mapping: JSON.stringify(data.mapping)
                 }, (err, importer) => {
                     if (err || !importer) {
-                        req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
+                        req.flash('danger', err && err.message || err || _('Could not find import data with specified ID'));
                         return res.redirect('/lists');
                     }
 
-                    req.flash('success', 'Import started');
+                    req.flash('success', _('Import started'));
                     res.redirect('/lists/view/' + list.id + '?tab=imports');
                 });
             });
@@ -661,7 +663,7 @@ router.post('/subscription/import-confirm', passport.parseForm, passport.csrfPro
 router.post('/subscription/import-restart', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.get(req.body.list, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
@@ -674,11 +676,11 @@ router.post('/subscription/import-restart', passport.parseForm, passport.csrfPro
             failed: 0
         }, (err, importer) => {
             if (err || !importer) {
-                req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find import data with specified ID'));
                 return res.redirect('/lists');
             }
 
-            req.flash('success', 'Import restarted');
+            req.flash('success', _('Import restarted'));
             res.redirect('/lists/view/' + list.id + '?tab=imports');
         });
     });
@@ -688,13 +690,13 @@ router.get('/subscription/:id/import/:importId/failed', (req, res) => {
     let start = 0;
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
-            req.flash('danger', err && err.message || err || 'Could not find list with specified ID');
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
 
         subscriptions.getImport(req.params.id, req.params.importId, (err, data) => {
             if (err || !data) {
-                req.flash('danger', err && err.message || err || 'Could not find import data with specified ID');
+                req.flash('danger', err && err.message || err || _('Could not find import data with specified ID'));
                 return res.redirect('/lists');
             }
             subscriptions.getFailedImports(req.params.importId, (err, rows) => {

@@ -1,10 +1,10 @@
 <ol class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li><a href="/triggers/">Automation Triggers</a></li>
-    <li class="active">Create Trigger</li>
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/triggers/">{{#translate}}Automation Triggers{{/translate}}</a></li>
+    <li class="active">{{#translate}}Create Trigger{{/translate}}</li>
 </ol>
 
-<h2>Create Trigger <small>Select a list for the trigger</small></h2>
+<h2>{{#translate}}Create Trigger{{/translate}} <small>{{#translate}}Select a list for the trigger{{/translate}}</small></h2>
 
 <hr>
 
@@ -12,13 +12,13 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
     <div class="form-group">
-        <label for="group" class="col-sm-2 control-label">List</label>
+        <label for="group" class="col-sm-2 control-label">{{#translate}}List{{/translate}}</label>
         <div class="col-sm-10">
             <select class="form-control" name="list" required>
-                <option value=""> –– Select ––</option>
+                <option value=""> –– {{#translate}}Select{{/translate}} ––</option>
                 {{#each listItems}}
                     <option value="{{id}}">
-                        {{name}} <span class="text-muted"> &mdash; {{subscribers}} subscribers</span>
+                        {{name}} <span class="text-muted"> &mdash; {{subscribers}} {{#translate}}subscribers{{/translate}}</span>
                     </option>
                 {{/each}}
             </select>
@@ -27,7 +27,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-triangle-right"></i> Next</button>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-triangle-right"></i> {{#translate}}Next{{/translate}}</button>
         </div>
     </div>
 </form>

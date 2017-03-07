@@ -4,6 +4,8 @@ let log = require('npmlog');
 let db = require('../lib/db');
 let tools = require('../lib/tools');
 let triggers = require('../lib/models/triggers');
+let _ = require('../lib/translate')._;
+let util = require('util');
 
 function triggerLoop() {
     checkTrigger((err, triggerId) => {
@@ -46,7 +48,7 @@ function checkTrigger(callback) {
                         return callback(err);
                     }
                     if (!query) {
-                        return callback(new Error('Unknown trigger type ' + trigger.id));
+                        return callback(new Error(util.format(_('Unknown trigger type %s'), trigger.id)));
                     }
                     trigger.query = query;
                     fireTrigger(trigger, callback);
