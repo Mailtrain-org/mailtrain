@@ -26,12 +26,12 @@
 
     {{> merge_tag_reference mergeTagReferenceFooterText='In addition to that any custom field can have its own merge tag.'}}
 
-    {{> plaintext}}
+{{> plaintext}}
 
     {{#if disableWysiwyg}}
-        {{> codeeditor}}
+{{> codeeditor}}
     {{else}}
-        {{> (lookup . 'editorName') }}
+{{> (lookup . 'editorName') }}
     {{/if}}
 
     <div class="form-group">
