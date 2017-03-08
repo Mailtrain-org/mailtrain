@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-07 15:46+0200\n"
-"PO-Revision-Date: 2017-03-07 16:02+0200\n"
+"POT-Creation-Date: 2017-03-07 21:44+0200\n"
+"PO-Revision-Date: 2017-03-07 21:56+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: et\n"
@@ -55,11 +55,11 @@ msgstr "Esileht"
 #: views/campaigns/upload-attachment.hbs:2 views/campaigns/view.hbs:2
 #: lib/tools.js:119 routes/campaigns.js:35
 msgid "Campaigns"
-msgstr ""
+msgstr "Kampaaniad"
 
 #: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
 msgid "Bounced info"
-msgstr ""
+msgstr "Tagasipõrgete info"
 
 #: views/campaigns/bounced.hbs:5 views/campaigns/clicked.hbs:5
 #: views/campaigns/complained.hbs:5 views/campaigns/delivered.hbs:5
@@ -67,63 +67,66 @@ msgstr ""
 #: views/campaigns/edit.hbs:5 views/campaigns/opened.hbs:5
 #: views/campaigns/unsubscribed.hbs:5 views/campaigns/upload-attachment.hbs:6
 msgid "View campaign"
-msgstr ""
+msgstr "Vaata kampaaniat"
 
 #: views/campaigns/bounced.hbs:6
 msgid "Subscribers who bounced and were unsubscribed:"
-msgstr ""
+msgstr "Liikmed, kes põrkusid tagasi:"
 
 #: views/campaigns/bounced.hbs:7 views/campaigns/clicked.hbs:13
 #: views/campaigns/complained.hbs:7 views/campaigns/delivered.hbs:7
 #: views/campaigns/opened.hbs:7 views/campaigns/unsubscribed.hbs:7
-#: views/lists/subscription/import-failed.hbs:9
+#: views/lists/subscription/import-failed.hbs:9 views/lists/view.hbs:18
+#: views/triggers/triggered.hbs:6
 msgid "Address"
-msgstr ""
+msgstr "Aadress"
 
 #: views/campaigns/bounced.hbs:8 views/campaigns/clicked.hbs:14
 #: views/campaigns/complained.hbs:8 views/campaigns/delivered.hbs:8
 #: views/campaigns/opened.hbs:8 views/campaigns/unsubscribed.hbs:8
 #: views/lists/subscription/add.hbs:6 views/lists/subscription/edit.hbs:7
-#: views/lists/subscription/import-preview.hbs:7
+#: views/lists/subscription/import-preview.hbs:7 views/lists/view.hbs:19
 #: views/subscription/manage.hbs:4 views/subscription/subscribe.hbs:4
+#: views/triggers/triggered.hbs:7
 msgid "First Name"
-msgstr ""
+msgstr "Eesnimi"
 
 #: views/campaigns/bounced.hbs:9 views/campaigns/clicked.hbs:15
 #: views/campaigns/complained.hbs:9 views/campaigns/delivered.hbs:9
 #: views/campaigns/opened.hbs:9 views/campaigns/unsubscribed.hbs:9
 #: views/lists/subscription/add.hbs:7 views/lists/subscription/edit.hbs:8
-#: views/lists/subscription/import-preview.hbs:8
+#: views/lists/subscription/import-preview.hbs:8 views/lists/view.hbs:20
 #: views/subscription/manage.hbs:5 views/subscription/subscribe.hbs:5
+#: views/triggers/triggered.hbs:8
 msgid "Last Name"
-msgstr ""
+msgstr "Perekonnanimi"
 
 #: views/campaigns/bounced.hbs:10 views/campaigns/complained.hbs:10
 #: views/campaigns/delivered.hbs:10 views/campaigns/unsubscribed.hbs:10
 msgid "SMTP response"
-msgstr ""
+msgstr "SMTP vastus"
 
 #: views/campaigns/bounced.hbs:11
 msgid "Bounce time"
-msgstr ""
+msgstr "Tagasipõrke aeg"
 
 #: views/campaigns/campaigns.hbs:3 views/campaigns/create-triggered.hbs:24
 #: views/campaigns/create.hbs:3 views/campaigns/create.hbs:4
 #: views/campaigns/create.hbs:27
 msgid "Create Campaign"
-msgstr ""
+msgstr "Loo kampaania"
 
 #: views/campaigns/campaigns.hbs:4
 msgid "Regular Campaign"
-msgstr ""
+msgstr "Tavaline kampaania"
 
 #: views/campaigns/campaigns.hbs:5
 msgid "RSS Campaign"
-msgstr ""
+msgstr "RSS kampaania"
 
 #: views/campaigns/campaigns.hbs:6
 msgid "Triggered Campaign"
-msgstr ""
+msgstr "Automaatkampaania"
 
 #: views/campaigns/campaigns.hbs:8 views/campaigns/create-rss.hbs:6
 #: views/campaigns/create-triggered.hbs:5 views/campaigns/create.hbs:5
@@ -132,8 +135,9 @@ msgstr ""
 #: views/lists/create.hbs:5 views/lists/edit.hbs:6
 #: views/lists/fields/fields.hbs:6 views/lists/lists.hbs:5
 #: views/lists/segments/segments.hbs:6 views/templates/templates.hbs:5
+#: views/triggers/triggers.hbs:5
 msgid "Name"
-msgstr ""
+msgstr "Nimi"
 
 #: views/campaigns/campaigns.hbs:9 views/campaigns/create-rss.hbs:8
 #: views/campaigns/create-triggered.hbs:7 views/campaigns/create.hbs:7
@@ -142,73 +146,78 @@ msgstr ""
 #: views/lists/create.hbs:7 views/lists/edit.hbs:10 views/lists/lists.hbs:8
 #: views/partials/merge-tag-reference.hbs:4 views/templates/create.hbs:9
 #: views/templates/edit.hbs:8 views/templates/templates.hbs:6
+#: views/triggers/create.hbs:7 views/triggers/edit.hbs:8
+#: views/triggers/triggers.hbs:7
 msgid "Description"
-msgstr ""
+msgstr "Kirjeldus"
 
 #: views/campaigns/campaigns.hbs:10 views/campaigns/view.hbs:73
+#: views/lists/view.hbs:21 views/lists/view.hbs:29
+#: views/triggers/triggers.hbs:6
 msgid "Status"
-msgstr ""
+msgstr "Staatus"
 
 #: views/campaigns/campaigns.hbs:11 views/campaigns/view.hbs:74
+#: views/lists/view.hbs:22 views/lists/view.hbs:23
 msgid "Created"
-msgstr ""
+msgstr "Loodud"
 
 #: views/campaigns/clicked.hbs:3 views/campaigns/clicked.hbs:4
 msgid "Link info"
-msgstr ""
+msgstr "Lingi info"
 
 #: views/campaigns/clicked.hbs:6 views/campaigns/view.hbs:61
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:62
 msgid "Clicks"
-msgstr ""
+msgstr "Klikke"
 
 #: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:63
 msgid "% of clicks"
-msgstr ""
+msgstr "% klikkidest"
 
 #: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:64
 msgid "% of messages"
-msgstr ""
+msgstr "% kirjadest"
 
 #: views/campaigns/clicked.hbs:10 views/campaigns/view.hbs:67
 msgid "Aggregated clicks"
-msgstr ""
+msgstr "Agregeeritud klikid"
 
 #: views/campaigns/clicked.hbs:11
 msgid "Subscribers who clicked on a link:"
-msgstr ""
+msgstr "Liikmes, kes klikkisid lingile"
 
 #: views/campaigns/clicked.hbs:12
 msgid "Subscribers who clicked on this link:"
-msgstr ""
+msgstr "Liikmed, kes klikkisid sellele lingile"
 
 #: views/campaigns/clicked.hbs:16
 msgid "First click time"
-msgstr ""
+msgstr "Esimese kliki aeg"
 
 #: views/campaigns/clicked.hbs:17
 msgid "Click count"
-msgstr ""
+msgstr "Klikkide arv"
 
 #: views/campaigns/complained.hbs:3 views/campaigns/complained.hbs:4
 msgid "Complained info"
-msgstr ""
+msgstr "Kaebuste info"
 
 #: views/campaigns/complained.hbs:6
 msgid "Subscribers who complained and were unsubscribed:"
-msgstr ""
+msgstr "Liikmed, kes kaebasid ja kes eemaldati listist:"
 
 #: views/campaigns/complained.hbs:11
 msgid "Complain time"
-msgstr ""
+msgstr "Kaebuse aeg"
 
 #: views/campaigns/create-rss.hbs:3 views/campaigns/create-rss.hbs:4
 #: views/campaigns/create-rss.hbs:20
 msgid "Create RSS Campaign"
-msgstr ""
+msgstr "Loo RSS kampaania"
 
 #: views/campaigns/create-rss.hbs:5 views/campaigns/edit-rss.hbs:6
 msgid ""
@@ -228,13 +237,16 @@ msgstr ""
 #: views/campaigns/edit-triggered.hbs:12 views/campaigns/edit.hbs:13
 #: views/lists/create.hbs:8 views/lists/edit.hbs:11
 #: views/templates/create.hbs:11 views/templates/edit.hbs:10
+#: views/triggers/create.hbs:9 views/triggers/edit.hbs:10
 msgid "HTML is allowed"
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:10 views/campaigns/create-triggered.hbs:9
 #: views/campaigns/create.hbs:9 views/campaigns/edit-rss.hbs:12
 #: views/campaigns/edit-triggered.hbs:13 views/campaigns/edit.hbs:14
-#: views/campaigns/view.hbs:6
+#: views/campaigns/view.hbs:6 views/triggers/create-select.hbs:6
+#: views/triggers/create.hbs:10 views/triggers/edit.hbs:12
+#: views/triggers/triggers.hbs:8
 msgid "List"
 msgstr ""
 
@@ -248,13 +260,19 @@ msgstr ""
 #: views/lists/subscription/add.hbs:12 views/lists/subscription/edit.hbs:11
 #: views/lists/subscription/import-preview.hbs:5
 #: views/subscription/manage.hbs:10 views/subscription/subscribe.hbs:10
-#: views/templates/create.hbs:8
+#: views/templates/create.hbs:8 views/triggers/create-select.hbs:7
+#: views/triggers/create.hbs:17 views/triggers/create.hbs:20
+#: views/triggers/create.hbs:22 views/triggers/create.hbs:26
+#: views/triggers/edit.hbs:19 views/triggers/edit.hbs:22
+#: views/triggers/edit.hbs:24 views/triggers/edit.hbs:28
 msgid "Select"
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:12 views/campaigns/create-triggered.hbs:11
 #: views/campaigns/create.hbs:11 views/campaigns/edit-rss.hbs:14
 #: views/campaigns/edit-triggered.hbs:15 views/campaigns/edit.hbs:16
+#: views/triggers/create-select.hbs:8 views/triggers/create.hbs:11
+#: views/triggers/edit.hbs:13
 msgid "subscribers"
 msgstr ""
 
@@ -375,14 +393,14 @@ msgid "Edit RSS Campaign"
 msgstr ""
 
 #: views/campaigns/edit-rss.hbs:7 views/campaigns/edit-triggered.hbs:8
-#: views/campaigns/edit.hbs:9 views/settings.hbs:4
+#: views/campaigns/edit.hbs:9 views/settings.hbs:4 views/users/account.hbs:6
 msgid "General Settings"
 msgstr ""
 
 #: views/campaigns/edit-rss.hbs:17
 msgid ""
-"Use special merge tag <code>[RSS_ENTRY]</code> to mark the position for the "
-"RSS post content. Additionally you can use any valid merge tag as well."
+"Use special merge tag [RSS_ENTRY] to mark the position for the RSS post "
+"content. Additionally you can use any valid merge tag as well."
 msgstr ""
 
 #: views/campaigns/edit-rss.hbs:23 views/campaigns/edit-triggered.hbs:26
@@ -394,7 +412,8 @@ msgstr ""
 #: views/campaigns/edit.hbs:35 views/lists/edit.hbs:13
 #: views/lists/fields/edit.hbs:39 views/lists/segments/edit.hbs:14
 #: views/lists/segments/rule-edit.hbs:38 views/lists/subscription/edit.hbs:17
-#: views/settings.hbs:99 views/templates/edit.hbs:12
+#: views/settings.hbs:99 views/templates/edit.hbs:12 views/triggers/edit.hbs:30
+#: views/users/account.hbs:18
 msgid "Update"
 msgstr ""
 
@@ -437,7 +456,7 @@ msgid "Size"
 msgstr ""
 
 #: views/campaigns/edit.hbs:32 views/campaigns/view.hbs:66
-#: views/lists/fields/fields.hbs:12
+#: views/lists/fields/fields.hbs:12 views/lists/view.hbs:32
 msgid "No data available in table"
 msgstr ""
 
@@ -792,7 +811,7 @@ msgstr ""
 
 #: views/emails/subscription-confirmed-html.hbs:5
 #: views/emails/subscription-confirmed-text.hbs:5
-#: views/subscription/subscribed.hbs:5
+#: views/subscription/subscribed.hbs:5 views/users/login.hbs:10
 msgid "or"
 msgstr ""
 
@@ -826,6 +845,172 @@ msgstr ""
 msgid "Official Mailtrain Partners"
 msgstr "Ametlikud Mailtraini partnerid"
 
+#: views/index.hbs:2
+msgid "Free, open source mail server solution"
+msgstr ""
+
+#: views/index.hbs:3
+msgid ""
+"A reliable SMTP server, easy integration, and 12,000 messages a month free"
+msgstr ""
+
+#: views/index.hbs:4
+msgid "List management"
+msgstr ""
+
+#: views/index.hbs:5
+msgid ""
+"Mailtrain allows you to easily manage even very large lists. Million "
+"subscribers? Not a problem. You can add subscribers manually, through the "
+"API or import from a CSV file. All lists come with support for custom fields "
+"and merge tags as well."
+msgstr ""
+
+#: views/index.hbs:6
+msgid "Custom fields"
+msgstr ""
+
+#: views/index.hbs:7
+msgid ""
+"Text fields, numbers, drop downs or checkboxes, Mailtrain has them all. "
+"Every custom field can be included in the generated newsletters through "
+"merge tags."
+msgstr ""
+
+#: views/index.hbs:8
+msgid "List segmentation"
+msgstr ""
+
+#: views/index.hbs:9
+msgid ""
+"Send messages only to list subscribers that match predefined segmentation "
+"rules. No need to create separate lists with small differences."
+msgstr ""
+
+#: views/index.hbs:10
+msgid "Donate to author"
+msgstr ""
+
+#: views/index.hbs:11
+msgid ""
+"If you really like Mailtrain or your business benefits from it financially "
+"then I would really appreciate a small donation to keep the Mailtrain "
+"development engines running. You can either use Bitcoin or PayPal for "
+"donations. My Bitcoin wallet is <code>15Z8ADxhssKUiwP3jbbqJwA21744KMCfTM</"
+"code>"
+msgstr ""
+
+#: views/index.hbs:12
+msgid "or donate using PayPal"
+msgstr ""
+
+#: views/index.hbs:13
+msgid "RSS Campaigns"
+msgstr ""
+
+#: views/index.hbs:14
+msgid ""
+"Setup Mailtrain to track RSS feeds and if a new entry is detected in a feed "
+"then Mailtrain auto-generates a new campaign using entry data as message "
+"contents and sends it to selected subscribers."
+msgstr ""
+
+#: views/index.hbs:15
+msgid "GPG Encryption"
+msgstr ""
+
+#: views/index.hbs:16
+msgid ""
+"If a list has a custom field for a GPG Public Key set then subscribers can "
+"upload their GPG public key to receive encrypted messages from the list."
+msgstr ""
+
+#: views/index.hbs:17
+msgid "Click stats"
+msgstr ""
+
+#: views/index.hbs:18
+msgid ""
+"After a campaign is sent, check individual click statistics for every link "
+"included in the message."
+msgstr ""
+
+#: views/index.hbs:19
+msgid "Open source"
+msgstr ""
+
+#: views/index.hbs:20
+msgid "Mailtrain is available under GPLv3 license and completely open source."
+msgstr ""
+
+#: views/index.hbs:21
+msgid "Send via any provider"
+msgstr ""
+
+#: views/index.hbs:22
+msgid ""
+"Mailtrain recommends <a href=\"https://sendpulse.com/?"
+"utm_source=mailtrain&utm_medium=providerlist\">SendPulse</a> even though you "
+"can use any provider that supports SMTP protocol to send out your "
+"newsletters. Bounce and complaints handling via webhooks is supported for "
+"SES, SparkPost, SendGrid and Mailgun, also for Postfix and ZoneMTA."
+msgstr ""
+
+#: views/index.hbs:23
+msgid "Trigger based automation"
+msgstr ""
+
+#: views/index.hbs:24
+msgid ""
+"Define automation triggers to send specific messages when a user activates "
+"the trigger."
+msgstr ""
+
+#: views/layout.hbs:2
+msgid "Toggle navigation"
+msgstr ""
+
+#: views/layout.hbs:3
+msgid "Wiki"
+msgstr ""
+
+#: views/layout.hbs:4
+msgid "Blog"
+msgstr ""
+
+#: views/layout.hbs:5 views/users/account.hbs:2 views/users/account.hbs:3
+msgid "Account"
+msgstr ""
+
+#: views/layout.hbs:6 views/settings.hbs:2 views/settings.hbs:3
+msgid "Settings"
+msgstr ""
+
+#: views/layout.hbs:7 views/users/api.hbs:2 views/users/api.hbs:3
+msgid "API"
+msgstr ""
+
+#: views/layout.hbs:8
+msgid "Log out"
+msgstr ""
+
+#: views/layout.hbs:9 views/users/forgot.hbs:2 views/users/login.hbs:2
+#: views/users/login.hbs:3 views/users/login.hbs:9 views/users/reset.hbs:2
+msgid "Sign in"
+msgstr ""
+
+#: views/layout.hbs:10
+msgid "Self hosted newsletter app built on top of Nodemailer"
+msgstr ""
+
+#: views/layout.hbs:11 views/layout.hbs:13
+msgid "Source on GitHub"
+msgstr ""
+
+#: views/layout.hbs:12
+msgid "Subscribe to our newsletter"
+msgstr ""
+
 #: views/lists/create.hbs:2 views/lists/edit.hbs:2
 #: views/lists/fields/create.hbs:2 views/lists/fields/edit.hbs:2
 #: views/lists/fields/fields.hbs:2 views/lists/lists.hbs:2
@@ -850,7 +1035,7 @@ msgstr ""
 msgid "List Name"
 msgstr ""
 
-#: views/lists/edit.hbs:3 views/lists/edit.hbs:4
+#: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:7
 msgid "Edit List"
 msgstr ""
 
@@ -872,6 +1057,7 @@ msgstr ""
 
 #: views/lists/fields/create.hbs:3 views/lists/fields/edit.hbs:3
 #: views/lists/fields/fields.hbs:3 views/lists/fields/fields.hbs:5
+#: views/lists/view.hbs:5
 msgid "Custom Fields"
 msgstr ""
 
@@ -1032,15 +1218,16 @@ msgstr ""
 msgid "Delete Field"
 msgstr ""
 
-#: views/lists/fields/fields.hbs:7
+#: views/lists/fields/fields.hbs:7 views/lists/view.hbs:25
 msgid "Type"
 msgstr ""
 
 #: views/lists/fields/fields.hbs:10 views/lists/fields/fields.hbs:11
 #: views/lists/lists.hbs:9 views/lists/segments/segments.hbs:8
 #: views/lists/segments/view.hbs:12 views/templates/templates.hbs:7
-#: routes/campaigns.js:287 routes/campaigns.js:576 routes/campaigns.js:626
-#: routes/lists.js:222 routes/triggers.js:297
+#: views/triggers/triggers.hbs:14 routes/campaigns.js:287
+#: routes/campaigns.js:576 routes/campaigns.js:626 routes/lists.js:222
+#: routes/triggers.js:297
 msgid "Edit"
 msgstr ""
 
@@ -1056,7 +1243,8 @@ msgstr ""
 #: views/lists/segments/rule-configure.hbs:3
 #: views/lists/segments/rule-create.hbs:3 views/lists/segments/rule-edit.hbs:3
 #: views/lists/segments/segments.hbs:3 views/lists/segments/segments.hbs:5
-#: views/lists/segments/view.hbs:3
+#: views/lists/segments/view.hbs:3 views/lists/view.hbs:6
+#: views/lists/view.hbs:13
 msgid "Segments"
 msgstr ""
 
@@ -1089,7 +1277,7 @@ msgid "Add Segment"
 msgstr ""
 
 #: views/lists/segments/edit.hbs:4 views/lists/segments/edit.hbs:5
-#: views/lists/segments/view.hbs:6
+#: views/lists/segments/view.hbs:6 views/lists/view.hbs:11
 msgid "Edit Segment"
 msgstr ""
 
@@ -1203,7 +1391,7 @@ msgid "Add Rule"
 msgstr ""
 
 #: views/lists/segments/rule-create.hbs:8
-#: views/lists/subscription/import.hbs:12
+#: views/lists/subscription/import.hbs:12 views/triggers/create-select.hbs:9
 msgid "Next"
 msgstr ""
 
@@ -1215,7 +1403,7 @@ msgstr ""
 msgid "Match"
 msgstr ""
 
-#: views/lists/segments/view.hbs:5
+#: views/lists/segments/view.hbs:5 views/lists/view.hbs:12
 msgid "Segment"
 msgstr ""
 
@@ -1236,7 +1424,7 @@ msgid "Add subscriber"
 msgstr ""
 
 #: views/lists/subscription/add.hbs:5 views/subscription/manage.hbs:2
-#: views/subscription/subscribe.hbs:3
+#: views/subscription/subscribe.hbs:3 views/users/account.hbs:7
 msgid "Email Address"
 msgstr ""
 
@@ -1315,7 +1503,8 @@ msgstr ""
 msgid "Import subscribers"
 msgstr ""
 
-#: views/lists/subscription/import-preview.hbs:10
+#: views/lists/subscription/import-preview.hbs:10 views/users/api.hbs:27
+#: views/users/api.hbs:35 views/users/api.hbs:43 views/users/api.hbs:55
 msgid "Example"
 msgstr ""
 
@@ -1347,6 +1536,70 @@ msgstr ""
 msgid "Suppressed emails that will be unsubscribed from your list"
 msgstr ""
 
+#: views/lists/view.hbs:3
+msgid "Subscription Form"
+msgstr ""
+
+#: views/lists/view.hbs:4
+msgid "List Actions"
+msgstr ""
+
+#: views/lists/view.hbs:8 views/triggers/create-select.hbs:3
+#: views/triggers/create-select.hbs:4 views/triggers/create.hbs:3
+#: views/triggers/create.hbs:4 views/triggers/create.hbs:27
+#: views/triggers/triggers.hbs:3
+msgid "Create Trigger"
+msgstr ""
+
+#: views/lists/view.hbs:9
+msgid "Add Subscriber"
+msgstr ""
+
+#: views/lists/view.hbs:10
+msgid "Import Subscribers"
+msgstr ""
+
+#: views/lists/view.hbs:14
+msgid "Create New Segment"
+msgstr ""
+
+#: views/lists/view.hbs:15
+msgid "Filter"
+msgstr ""
+
+#: views/lists/view.hbs:16
+msgid "Subscriptions"
+msgstr ""
+
+#: views/lists/view.hbs:17
+msgid "Imports"
+msgstr ""
+
+#: views/lists/view.hbs:24 routes/campaigns.js:266 routes/lists.js:265
+msgid "Finished"
+msgstr ""
+
+#: views/lists/view.hbs:26
+msgid "Added"
+msgstr ""
+
+#: views/lists/view.hbs:27
+msgid "Updated"
+msgstr ""
+
+#: views/lists/view.hbs:28
+msgid "Failed"
+msgstr ""
+
+#: views/lists/view.hbs:30
+msgid ""
+"Are you sure? This action should only be called to resolve stalled imports"
+msgstr ""
+
+#: views/lists/view.hbs:31
+msgid "Restart"
+msgstr ""
+
 #: views/partials/codeeditor.hbs:1 views/partials/summernote.hbs:1
 msgid "Template content (HTML)"
 msgstr ""
@@ -1369,10 +1622,6 @@ msgstr ""
 
 #: views/partials/plaintext.hbs:1
 msgid "Template content (plaintext)"
-msgstr ""
-
-#: views/settings.hbs:2 views/settings.hbs:3
-msgid "Settings"
 msgstr ""
 
 #: views/settings.hbs:5
@@ -1508,7 +1757,8 @@ msgstr ""
 msgid "Disable SMTP authentication"
 msgstr ""
 
-#: views/settings.hbs:40
+#: views/settings.hbs:40 views/users/forgot.hbs:9 views/users/login.hbs:4
+#: views/users/login.hbs:5
 msgid "Username"
 msgstr ""
 
@@ -1516,7 +1766,8 @@ msgstr ""
 msgid "Username, eg. myaccount@example.com"
 msgstr ""
 
-#: views/settings.hbs:42 views/settings.hbs:43
+#: views/settings.hbs:42 views/settings.hbs:43 views/users/login.hbs:6
+#: views/users/login.hbs:7
 msgid "Password"
 msgstr ""
 
@@ -1918,6 +2169,369 @@ msgstr ""
 
 #: views/templates/edit.hbs:11
 msgid "Delete Template"
+msgstr ""
+
+#: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2
+#: views/triggers/edit.hbs:2 views/triggers/triggered.hbs:2
+#: views/triggers/triggers.hbs:2 views/triggers/triggers.hbs:4
+msgid "Automation Triggers"
+msgstr ""
+
+#: views/triggers/create-select.hbs:5
+msgid "Select a list for the trigger"
+msgstr ""
+
+#: views/triggers/create.hbs:5 views/triggers/edit.hbs:6
+msgid "Trigger name"
+msgstr ""
+
+#: views/triggers/create.hbs:6 views/triggers/edit.hbs:7
+msgid "Name for this trigger, eg. Inactive subscribers"
+msgstr ""
+
+#: views/triggers/create.hbs:8 views/triggers/edit.hbs:9
+msgid "Optional comments about this trigger"
+msgstr ""
+
+#: views/triggers/create.hbs:12 views/triggers/edit.hbs:14
+msgid "Trigger rule"
+msgstr ""
+
+#: views/triggers/create.hbs:13 views/triggers/edit.hbs:15
+msgid "Trigger fires"
+msgstr ""
+
+#: views/triggers/create.hbs:14 views/triggers/edit.hbs:16
+msgid "days after:"
+msgstr ""
+
+#: views/triggers/create.hbs:15 views/triggers/edit.hbs:17
+msgid "Subscription"
+msgstr ""
+
+#: views/triggers/create.hbs:16 views/triggers/create.hbs:21
+#: views/triggers/edit.hbs:18 views/triggers/edit.hbs:23
+msgid "Event"
+msgstr ""
+
+#: views/triggers/create.hbs:18 views/triggers/create.hbs:19
+#: views/triggers/create.hbs:25 views/triggers/edit.hbs:20
+#: views/triggers/edit.hbs:21 views/triggers/edit.hbs:27
+msgid "Campaign"
+msgstr ""
+
+#: views/triggers/create.hbs:23 views/triggers/edit.hbs:25
+msgid "Trigger action"
+msgstr ""
+
+#: views/triggers/create.hbs:24 views/triggers/edit.hbs:26
+msgid "Send campaign"
+msgstr ""
+
+#: views/triggers/edit.hbs:3 views/triggers/edit.hbs:4
+msgid "Edit Trigger"
+msgstr ""
+
+#: views/triggers/edit.hbs:5
+msgid "Back to triggers"
+msgstr ""
+
+#: views/triggers/edit.hbs:11
+msgid "Trigger is enabled"
+msgstr ""
+
+#: views/triggers/edit.hbs:29
+msgid "Delete Trigger"
+msgstr ""
+
+#: views/triggers/triggered.hbs:3
+msgid "Triggered"
+msgstr ""
+
+#: views/triggers/triggered.hbs:4
+msgid "Triggered subscribers"
+msgstr ""
+
+#: views/triggers/triggered.hbs:5
+msgid "Subscribers who caused this trigger to fire"
+msgstr ""
+
+#: views/triggers/triggered.hbs:9
+msgid "Triggered time"
+msgstr ""
+
+#: views/triggers/triggers.hbs:9
+msgid "Trigger"
+msgstr ""
+
+#: views/triggers/triggers.hbs:10
+msgid "Target Campaign"
+msgstr ""
+
+#: views/triggers/triggers.hbs:11
+msgid "Triggered count"
+msgstr ""
+
+#: views/triggers/triggers.hbs:12
+msgid "Enabled"
+msgstr ""
+
+#: views/triggers/triggers.hbs:13
+msgid "Disabled"
+msgstr ""
+
+#: views/users/account.hbs:4
+msgid "This account is managed through LDAP."
+msgstr ""
+
+#: views/users/account.hbs:5
+msgid "Associated Email Address"
+msgstr ""
+
+#: views/users/account.hbs:8
+msgid "Your e-mail address"
+msgstr ""
+
+#: views/users/account.hbs:9
+msgid ""
+"This address is used for account recovery in case you loose your password"
+msgstr ""
+
+#: views/users/account.hbs:10
+msgid "Password change"
+msgstr ""
+
+#: views/users/account.hbs:11
+msgid ""
+"You only need to fill out this form if you want to change your current "
+"password"
+msgstr ""
+
+#: views/users/account.hbs:12 views/users/account.hbs:13
+msgid "Current Password"
+msgstr ""
+
+#: views/users/account.hbs:14 views/users/account.hbs:15
+#: views/users/reset.hbs:6 views/users/reset.hbs:7
+msgid "New Password"
+msgstr ""
+
+#: views/users/account.hbs:16
+msgid "Confirm Password"
+msgstr ""
+
+#: views/users/account.hbs:17 views/users/reset.hbs:8
+msgid "Confirm New Password"
+msgstr ""
+
+#: views/users/api.hbs:4
+msgid "Are you sure? Resetting would invalidate the currently existing token."
+msgstr ""
+
+#: views/users/api.hbs:5
+msgid "Are you sure?"
+msgstr ""
+
+#: views/users/api.hbs:6
+msgid "Reset Access Token"
+msgstr ""
+
+#: views/users/api.hbs:7
+msgid "Generate Access Token"
+msgstr ""
+
+#: views/users/api.hbs:8
+msgid "Personal access token:"
+msgstr ""
+
+#: views/users/api.hbs:9
+msgid "Access token not yet generated"
+msgstr ""
+
+#: views/users/api.hbs:10
+msgid "Notes about the API"
+msgstr ""
+
+#: views/users/api.hbs:11
+msgid ""
+"API response is a JSON structure with <code>error</code> and <code>data</"
+"code> properties. If the response <code>error</code> has a value set then "
+"the request failed."
+msgstr ""
+
+#: views/users/api.hbs:12
+msgid ""
+"You need to define proper <code>Content-Type</code> when making a request. "
+"You can either use <code>application/x-www-form-urlencoded</code> for normal "
+"form data or <code>application/json</code> for a JSON payload. Using "
+"<code>multipart/form-data</code> is not supported."
+msgstr ""
+
+#: views/users/api.hbs:13
+msgid "Add subscription"
+msgstr ""
+
+#: views/users/api.hbs:14
+msgid ""
+"This API call either inserts a new subscription or updates existing. Fields "
+"not included are left as is, so if you update only LAST_NAME value, then "
+"FIRST_NAME is kept untouched for an existing subscription."
+msgstr ""
+
+#: views/users/api.hbs:15 views/users/api.hbs:17 views/users/api.hbs:30
+#: views/users/api.hbs:32 views/users/api.hbs:38 views/users/api.hbs:40
+#: views/users/api.hbs:46 views/users/api.hbs:48
+msgid "arguments"
+msgstr ""
+
+#: views/users/api.hbs:16 views/users/api.hbs:31 views/users/api.hbs:39
+#: views/users/api.hbs:47
+msgid "your personal access token"
+msgstr ""
+
+#: views/users/api.hbs:18 views/users/api.hbs:33 views/users/api.hbs:41
+msgid "subscriber's email address"
+msgstr ""
+
+#: views/users/api.hbs:19 views/users/api.hbs:34 views/users/api.hbs:42
+#: views/users/api.hbs:50
+msgid "required"
+msgstr ""
+
+#: views/users/api.hbs:20
+msgid "subscriber's first name"
+msgstr ""
+
+#: views/users/api.hbs:21
+msgid "subscriber's last name"
+msgstr ""
+
+#: views/users/api.hbs:22
+msgid ""
+"subscriber's timezone (eg. \"Europe/Tallinn\", \"PST\" or \"UTC\"). If not "
+"set defaults to \"UTC\""
+msgstr ""
+
+#: views/users/api.hbs:23
+msgid ""
+"custom field value. Use yes/no for option group values (checkboxes, radios, "
+"drop downs)"
+msgstr ""
+
+#: views/users/api.hbs:24
+msgid "Additional POST arguments"
+msgstr ""
+
+#: views/users/api.hbs:25
+msgid ""
+"set to \"yes\" if you want to make sure the email is marked as subscribed "
+"even if it was previously marked as unsubscribed. If the email was already "
+"unsubscribed/blocked then subscription status is not changed"
+msgstr ""
+
+#: views/users/api.hbs:26
+msgid ""
+"set to \"yes\" if you want to send confirmation email to the subscriber "
+"before actually marking as subscribed"
+msgstr ""
+
+#: views/users/api.hbs:28
+msgid "Remove subscription"
+msgstr ""
+
+#: views/users/api.hbs:29
+msgid "This API call marks a subscription as unsubscribed"
+msgstr ""
+
+#: views/users/api.hbs:36
+msgid "Delete subscription"
+msgstr ""
+
+#: views/users/api.hbs:37
+msgid "This API call deletes a subscription"
+msgstr ""
+
+#: views/users/api.hbs:44
+msgid "Add new custom field"
+msgstr ""
+
+#: views/users/api.hbs:45
+msgid "This API call creates a new custom field for a list."
+msgstr ""
+
+#: views/users/api.hbs:49
+msgid "field name"
+msgstr ""
+
+#: views/users/api.hbs:51
+msgid "one of the following types:"
+msgstr ""
+
+#: views/users/api.hbs:52
+msgid ""
+"If the type is 'option' then you also need to specify the parent element ID"
+msgstr ""
+
+#: views/users/api.hbs:53
+msgid ""
+"Template for the group element. If not set, then values of the elements are "
+"joined with commas"
+msgstr ""
+
+#: views/users/api.hbs:54
+msgid ""
+"if not visible then the subscriber can not view or modify this value at the "
+"profile page"
+msgstr ""
+
+#: views/users/forgot.hbs:3 views/users/reset.hbs:3
+msgid "Password Reset"
+msgstr ""
+
+#: views/users/forgot.hbs:4
+msgid "Reset your password?"
+msgstr ""
+
+#: views/users/forgot.hbs:5
+msgid "Accounts are managed through LDAP."
+msgstr ""
+
+#: views/users/forgot.hbs:6 views/users/reset.hbs:10
+msgid "Reset Password"
+msgstr ""
+
+#: views/users/forgot.hbs:7
+msgid ""
+"Please provide the username or email address that you used when you signed "
+"up for your Mailtrain account."
+msgstr ""
+
+#: views/users/forgot.hbs:8
+msgid "We will send you an email that will allow you to reset your password."
+msgstr ""
+
+#: views/users/forgot.hbs:10
+msgid "Username or email address"
+msgstr ""
+
+#: views/users/forgot.hbs:11
+msgid "Send verification email"
+msgstr ""
+
+#: views/users/login.hbs:8
+msgid "Remember me"
+msgstr ""
+
+#: views/users/login.hbs:11 views/users/login.hbs:12
+msgid "Forgot password?"
+msgstr ""
+
+#: views/users/reset.hbs:4
+msgid "Choose your new password"
+msgstr ""
+
+#: views/users/reset.hbs:5
+msgid "Please enter a new password."
 msgstr ""
 
 #: lib/feed.js:31
@@ -2393,10 +3007,6 @@ msgstr ""
 
 #: routes/campaigns.js:262
 msgid "Scheduled"
-msgstr ""
-
-#: routes/campaigns.js:266 routes/lists.js:265
-msgid "Finished"
 msgstr ""
 
 #: routes/campaigns.js:268
