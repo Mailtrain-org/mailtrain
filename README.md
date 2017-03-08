@@ -10,7 +10,22 @@ Mailtrain supports subscriber list management, list segmentation, custom fields,
 
 Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv8sAx) (uses Mailtrain obviously)
 
-## Official partners
+
+## Contents
+
+* [Official Partners](#official-partners)
+* [Cons](#cons)
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Upgrade](#upgrade)
+* [Using Environment Variables](#using-environment-variables)
+* [Cloudron](#cloudron)
+* [Bounce Handling](#bounce-handling)
+* [Testing](#testing)
+* [Translations](#translations)
+* [License](#license)
+
+## Official Partners
 
 ### iRedMail
 
@@ -35,7 +50,7 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 
 ## Installation
 
-### Simple install (Ubuntu)
+### Simple Install (Ubuntu)
 
 You can download and run [install.sh](setup/install.sh) in your blank Ubuntu VPS to set up
 Mailtrain and all required dependencies (including MySQL). The installation script assumes a somewhat blank server, so if this is a machine you are already using for something else, you might want to skip the automatic install and proceed manually.
@@ -100,7 +115,7 @@ If you are using the bundled ZoneMTA then you should make sure you are using a p
 
 With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect 10/10 score out from [MailTester](https://www.mail-tester.com/) when sending a campaign message to a MailTester test address. I did not have VERP turned on, so the sender address matched return path address.
 
-### Manual install (any OS that supports Node.js)
+### Manual Install (any OS that supports Node.js)
 
   1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `npm install --production` in the Mailtrain folder to install required dependencies
@@ -116,7 +131,7 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
   * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/andris9/mailtrain/archive/master.zip) and replace old ones with these
   * Run `npm install --production` in the Mailtrain folder
 
-## Using environment variables
+## Using Environment Variables
 
 Some servers expose custom port and hostname options through environment variables. To support these, create a new configuration file `config/local.js`:
 
@@ -135,11 +150,11 @@ Mailtrain uses [node-config](https://github.com/lorenwest/node-config) for confi
   2. {NODE_ENV}.toml (eg. development.toml or production.toml)
   3. local.js
 
-### Running behind Nginx proxy
+### Running Behind Nginx Proxy
 
 Edit [mailtrain.nginx](setup/mailtrain-nginx.conf) (update `server_name` directive) and copy it to `/etc/nginx/sites-enabled`
 
-### Running as an Upstart service in Ubuntu 14.04
+### Running as an Upstart Service in Ubuntu 14.04
 
 Edit [mailtrain.conf](setup/mailtrain.conf) (update application folder) and copy it to `/etc/init`
 
@@ -151,7 +166,7 @@ You can easily install and self-host Mailtrain on the Cloudron to send newslette
 
 The source code for the Cloudron app is [here](https://git.cloudron.io/cloudron/mailtrain-app).
 
-## Bounce handling
+## Bounce Handling
 
 Mailtrain uses webhooks integration to detect bounces and spam complaints. Currently supported webhooks are:
 
@@ -190,7 +205,7 @@ This would modify all input strings. If a string is not modified then it does no
 
 ![](https://cldup.com/qXxAbaq2F1.png)
 
-### Translating JavaScript files
+### Translating JavaScript Files
 
 To translate JavaScript strings you need to make sure that you have loaded the translating function `_` from *'./lib/translate.js'*. If you want to use variables in strings then you also need the *'util'* module.
 
@@ -206,7 +221,7 @@ let str1 = _('This string will be translated');
 let str2 = util.format( _('My name is "%s"'), 'Mailtrain');
 ```
 
-### Translating Handlebars files
+### Translating Handlebars Files
 
 Enclose translatable strings to `{{#translate}}` tags
 
@@ -216,12 +231,15 @@ Enclose translatable strings to `{{#translate}}` tags
 </p>
 ```
 
-### Managing translations
+### Managing Translations
 
 * Translations are loaded from Gettext MO files. In order to generate such files you need a Gettext translations editor. [POEdit](https://poedit.net/) is a great choice.
+
 * To update the translation catalog ([mailtrain.pot](./languages/mailtrain.pot)) run `grunt` from command line. This fetches all translatable strings from JavaScript and Handlebars files and merges these into the translation catalog
+
 * To add a new language use this catalog file as source. Once you want to update your translation file from the updated catalog, then select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This would merge all new translations from the POT file to your PO file.
  *If you have saved the PO file in [./languages](./languages) then POEdit should auto generate required MO file whenever you hit save for the PO file.
+
 * Once you have a correct MO file in the languages folder, then edit Mailtrain config and set ["language" option](https://github.com/andris9/mailtrain/blob/ba8bd1212335cb9bd7ba094beb7b5400f35cae6c/config/default.toml#L30-L31) to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
 
 > **NB!** For now translation settings are global, so if you have set a translation in config then this applies to all users. An user can't select another translation than the default even if there is a translation file. This is because current Mailtrain code does not provide request context to functions and the functions generating strings do not know which language to use.
