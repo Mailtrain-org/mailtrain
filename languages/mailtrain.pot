@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-07 14:28+0000\n"
+"POT-Creation-Date: 2017-03-07 19:52+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
@@ -1089,8 +1089,7 @@ msgid ""
 "If you really like Mailtrain or your business benefits from it financially "
 "then I would really appreciate a small donation to keep the Mailtrain "
 "development engines running. You can either use Bitcoin or PayPal for "
-"donations. My Bitcoin wallet is "
-"<code>15Z8ADxhssKUiwP3jbbqJwA21744KMCfTM</code>"
+"donations. My Bitcoin wallet is"
 msgstr ""
 
 #: views/index.hbs:12
@@ -3369,12 +3368,12 @@ msgstr ""
 msgid "Not Found"
 msgstr ""
 
-#: routes/archive.js:110
+#: routes/archive.js:116
 #: services/sender.js:447
 msgid "Received status code %s from %s"
 msgstr ""
 
-#: routes/archive.js:134
+#: routes/archive.js:140
 #: routes/campaigns.js:131
 #: routes/campaigns.js:295
 #: routes/campaigns.js:390
@@ -3388,7 +3387,7 @@ msgstr ""
 msgid "Could not find campaign with specified ID"
 msgstr ""
 
-#: routes/archive.js:142
+#: routes/archive.js:148
 #: routes/campaigns.js:789
 msgid "Attachment not found"
 msgstr ""
