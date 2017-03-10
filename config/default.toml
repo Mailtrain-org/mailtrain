@@ -135,8 +135,8 @@ processes=1
 [mosaico]
 # Installed templates
 templates=[["versafix-1", "Versafix One"]]
-# Inject custom scripts from public/mosaico/custom/
-# customscripts=["some-lib.js", "my-mosaico-plugin.js"]
+# Inject custom scripts
+# customscripts=["/mosaico/custom/my-mosaico-plugin.js"]
 
 [grapejs]
 # Installed templates
