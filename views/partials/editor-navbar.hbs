@@ -1,0 +1,44 @@
+<style>
+    #mt-navbar {
+        background: #DE4320;
+        overflow: hidden;
+        height: 34px;
+    }
+    .mt-logo {
+        height: 24px;
+        padding: 5px 0 5px 35px;
+        -webkit-filter: brightness(0) invert(1);
+        filter: brightness(0) invert(1);
+    }
+    .mt-btn {
+        display: block;
+        float: right;
+        width: 150px;
+        line-height: 34px;
+        text-align: center;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+        cursor: pointer;
+        border-left: 1px solid #972E15;
+    }
+    .mt-btn:hover {
+        background: #972E15;
+    }
+    #mt-save span:after {
+        content: '{{#translate}}SAVE{{/translate}}';
+    }
+    #mt-save.busy span:after {
+        content: '{{#translate}}SAVING{{/translate}}';
+    }
+    #mt-save.busy {
+        background: #972E15;
+    }
+</style>
+
+<div id="mt-navbar">
+    <img class="mt-logo" src="/mailtrain-header.png">
+    <a id="mt-close" class="mt-btn">{{#translate}}CLOSE{{/translate}}</a>
+    <a id="mt-save" class="mt-btn"><span></span></a>
+</div>
