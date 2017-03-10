@@ -17,7 +17,9 @@ let multiparty = require('multiparty');
 let fileType = require('file-type');
 let escapeStringRegexp = require('escape-string-regexp');
 let jqueryFileUpload = require('jquery-file-upload-middleware');
-let gm = require('gm').subClass({ imageMagick: true });
+let gm = require('gm').subClass({
+    imageMagick: true
+});
 let url = require('url');
 let htmlToText = require('html-to-text');
 let premailerApi = require('premailer-api');
@@ -68,7 +70,11 @@ let listImages = (dir, dirURL, callback) => {
     });
 };
 
-let getStaticImageUrl = ({ dynamicUrl, staticDir, staticDirUrl }, callback) => {
+let getStaticImageUrl = ({
+    dynamicUrl,
+    staticDir,
+    staticDirUrl
+}, callback) => {
     mkdirp(staticDir, err => {
         if (err) {
             return callback(dynamicUrl);
@@ -94,33 +100,36 @@ let getStaticImageUrl = ({ dynamicUrl, staticDir, staticDirUrl }, callback) => {
             }
 
             fetch(dynamicUrl, {
-                headers
-            })
-            .then(res => {
-                return res.buffer();
-            })
-            .then(buffer => {
-                let ft = fileType(buffer);
-                if (!ft) {
-                    return callback(dynamicUrl);
-                }
-                if (['image/jpeg', 'image/png', 'image/gif'].includes(ft.mime)) {
-                    fs.writeFile(path.join(staticDir, hash + '.' + ft.ext), buffer, err => {
-                        if (err) {
-                            return callback(dynamicUrl);
-                        }
-                        let staticUrl = staticDirUrl + '/' + hash + '.' + ft.ext;
-                        callback(staticUrl);
-                    });
-                } else {
-                    callback(dynamicUrl);
-                }
-            });
+                    headers
+                })
+                .then(res => {
+                    return res.buffer();
+                })
+                .then(buffer => {
+                    let ft = fileType(buffer);
+                    if (!ft) {
+                        return callback(dynamicUrl);
+                    }
+                    if (['image/jpeg', 'image/png', 'image/gif'].includes(ft.mime)) {
+                        fs.writeFile(path.join(staticDir, hash + '.' + ft.ext), buffer, err => {
+                            if (err) {
+                                return callback(dynamicUrl);
+                            }
+                            let staticUrl = staticDirUrl + '/' + hash + '.' + ft.ext;
+                            callback(staticUrl);
+                        });
+                    } else {
+                        callback(dynamicUrl);
+                    }
+                });
         });
     });
 };
 
-let prepareHtml = ({ editorName, html }, callback) => {
+let prepareHtml = ({
+    editorName,
+    html
+}, callback) => {
     settings.get('serviceUrl', (err, serviceUrl) => {
         if (err) {
             return callback(err.message || err);
@@ -163,7 +172,10 @@ let prepareHtml = ({ editorName, html }, callback) => {
     });
 };
 
-let placeholderImage = (req, res, { width, height }) => {
+let placeholderImage = (req, res, {
+    width,
+    height
+}) => {
     let magick = gm(width, height, '#707070');
     let x = 0;
     let y = 0;
@@ -190,7 +202,12 @@ let placeholderImage = (req, res, { width, height }) => {
     magick.stream('png').pipe(res);
 };
 
-let resizedImage = (req, res, { src, method, width, height }) => {
+let resizedImage = (req, res, {
+    src,
+    method,
+    width,
+    height
+}) => {
     let magick = gm(src);
     magick.format((err, format) => {
         if (err) {
@@ -229,19 +246,31 @@ router.get('/img', passport.csrfProtection, (req, res) => {
             return res.status(500).send(err.message || err);
         }
 
-        let { src, method, params = '600,null' } = req.query;
-        let width  = params.split(',')[0];
+        let {
+            src,
+            method,
+            params = '600,null'
+        } = req.query;
+        let width = params.split(',')[0];
         let height = params.split(',')[1];
-        width  = (width  === 'null') ? null : Number(width);
+        width = (width === 'null') ? null : Number(width);
         height = (height === 'null') ? null : Number(height);
 
         switch (method) {
             case 'placeholder':
-                return placeholderImage(req, res, { width, height });
+                return placeholderImage(req, res, {
+                    width,
+                    height
+                });
             case 'resize':
             case 'cover':
                 src = /^https?:\/\/|^\/\//i.test(src) ? src : url.resolve(serviceUrl, src);
-                return resizedImage(req, res, { src, method, width, height });
+                return resizedImage(req, res, {
+                    src,
+                    method,
+                    width,
+                    height
+                });
             default:
                 return res.status(501).send(_('Method not supported'));
         }
@@ -249,7 +278,10 @@ router.get('/img', passport.csrfProtection, (req, res) => {
 });
 
 router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) => {
-    prepareHtml({ editorName: req.query.editor, html: req.body.html }, (err, html) => {
+    prepareHtml({
+        editorName: req.query.editor,
+        html: req.body.html
+    }, (err, html) => {
         if (err) {
             return res.status(500).send(err.message || err);
         }
@@ -297,20 +329,24 @@ router.get('/upload', passport.csrfProtection, (req, res) => {
 
             if (req.query.type === 'campaign' && Number(req.query.id) > 0) {
                 listImages(path.join(baseDir, req.query.id), baseDirUrl + '/' + req.query.id, (err, campaignImages) => {
-                    err ? res.status(500).send(err.message || err)
-                        : res.json({ files: sharedImages.concat(campaignImages) });
+                    err ? res.status(500).send(err.message || err) :
+                        res.json({
+                            files: sharedImages.concat(campaignImages)
+                        });
                 });
             } else {
-                res.json({ files: sharedImages });
+                res.json({
+                    files: sharedImages
+                });
             }
         });
     });
 });
 
 router.post('/upload', passport.csrfProtection, (req, res) => {
-    let dirName = req.query.type === 'template' ? '0'
-        : req.query.type === 'campaign' && Number(req.query.id) > 0 ? req.query.id
-            : null;
+    let dirName = req.query.type === 'template' ? '0' :
+        req.query.type === 'campaign' && Number(req.query.id) > 0 ? req.query.id :
+        null;
 
     if (dirName === null) {
         return res.status(500).send(_('Invalid resource type or ID'));
@@ -318,10 +354,15 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
 
     let opts = {
         tmpDir: config.www.tmpdir || os.tmpdir(),
-        imageVersions:  req.query.editor === 'mosaico' ? { thumbnail: { width: 90, height: 90 } } : {},
+        imageVersions: req.query.editor === 'mosaico' ? {
+            thumbnail: {
+                width: 90,
+                height: 90
+            }
+        } : {},
         uploadDir: path.join(__dirname, '..', 'public', req.query.editor, 'uploads', dirName),
         uploadUrl: '/' + req.query.editor + '/uploads/' + dirName, // must be root relative
-        acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i,
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
     };
 
     let mockres = httpMocks.createResponse({
@@ -332,9 +373,13 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
         if (req.query.editor === 'grapejs') {
             let data = [];
             JSON.parse(mockres._getData()).files.forEach(file => {
-                data.push({ src: file.url });
+                data.push({
+                    src: file.url
+                });
             });
-            res.json({ data });
+            res.json({
+                data
+            });
         } else {
             res.send(mockres._getData());
         }
@@ -344,7 +389,10 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
 });
 
 router.post('/download', passport.csrfProtection, (req, res) => {
-    prepareHtml({ editorName: req.query.editor, html: req.body.html }, (err, html) => {
+    prepareHtml({
+        editorName: req.query.editor,
+        html: req.body.html
+    }, (err, html) => {
         if (err) {
             return res.status(500).send(err.message || err);
         }
@@ -369,27 +417,36 @@ let parseGrapejsMultipartTestForm = (req, res, next) => {
 };
 
 router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (req, res) => {
-    prepareHtml({ editorName: req.query.editor, html: req.body.html }, (err, html) => {
+    prepareHtml({
+        editorName: req.query.editor,
+        html: req.body.html
+    }, (err, html) => {
         if (err) {
-            req.query.editor === 'grapejs'
-                ? res.status(500).json({ errors: err.message || err })
-                : res.status(500).send(err.message || err);
+            req.query.editor === 'grapejs' ?
+                res.status(500).json({
+                    errors: err.message || err
+                }) :
+                res.status(500).send(err.message || err);
             return;
         }
 
         settings.list(['defaultAddress', 'defaultFrom'], (err, configItems) => {
             if (err) {
-                req.query.editor === 'grapejs'
-                    ? res.status(500).json({ errors: err.message || err })
-                    : res.status(500).send(err.message || err);
+                req.query.editor === 'grapejs' ?
+                    res.status(500).json({
+                        errors: err.message || err
+                    }) :
+                    res.status(500).send(err.message || err);
                 return;
             }
 
             mailer.getMailer((err, transport) => {
                 if (err) {
-                    req.query.editor === 'grapejs'
-                        ? res.status(500).json({ errors: err.message || err })
-                        : res.status(500).send(err.message || err);
+                    req.query.editor === 'grapejs' ?
+                        res.status(500).json({
+                            errors: err.message || err
+                        }) :
+                        res.status(500).send(err.message || err);
                     return;
                 }
 
@@ -400,21 +457,27 @@ router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (re
                     },
                     to: req.body.email,
                     subject: req.body.subject,
-                    text: htmlToText.fromString(html, { wordwrap: 100 }),
+                    text: htmlToText.fromString(html, {
+                        wordwrap: 100
+                    }),
                     html,
                 };
 
                 transport.sendMail(opts, (err, info) => {
                     if (err) {
-                        req.query.editor === 'grapejs'
-                            ? res.status(500).json({ errors: err.message || err })
-                            : res.status(500).send(err.message || err);
+                        req.query.editor === 'grapejs' ?
+                            res.status(500).json({
+                                errors: err.message || err
+                            }) :
+                            res.status(500).send(err.message || err);
                         return;
                     }
 
-                    req.query.editor === 'grapejs'
-                        ? res.json({ data: 'ok' })
-                        : res.send('ok');
+                    req.query.editor === 'grapejs' ?
+                        res.json({
+                            data: 'ok'
+                        }) :
+                        res.send('ok');
                 });
             });
         });
@@ -422,7 +485,10 @@ router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (re
 });
 
 router.post('/html-to-text', passport.parseForm, passport.csrfProtection, (req, res) => {
-    premailerApi.prepare({ html: req.body.html, fetchHTML: false }, (err, email) => {
+    premailerApi.prepare({
+        html: req.body.html,
+        fetchHTML: false
+    }, (err, email) => {
         if (err) {
             return res.status(500).send(err.message || err);
         }

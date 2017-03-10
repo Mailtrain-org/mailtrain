@@ -25,7 +25,7 @@ router.get('/editor', passport.csrfProtection, (req, res) => {
         }
 
         let getLanguageStrings = language => {
-            if (!language || language === 'en') {
+            if (!language ||  language === 'en') {
                 return null;
             }
             language = language.split('_')[0];
@@ -37,10 +37,12 @@ router.get('/editor', passport.csrfProtection, (req, res) => {
             }
         }
 
-        resource.editorName = resource.editorName || 'mosaico';
-        resource.editorData = !resource.editorData
-            ? { template: req.query.template || 'versafix-1' }
-            : JSON.parse(resource.editorData);
+        resource.editorName = resource.editorName ||  'mosaico';
+        resource.editorData = !resource.editorData ?
+            {
+                template: req.query.template || 'versafix-1'
+            } :
+            JSON.parse(resource.editorData);
 
         res.render('mosaico/editor', {
             layout: 'mosaico/layout-editor',

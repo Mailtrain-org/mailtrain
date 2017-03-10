@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-10 08:57+0000\n"
+"POT-Creation-Date: 2017-03-10 12:12+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
@@ -1773,7 +1773,7 @@ msgstr ""
 #: views/lists/subscription/edit.hbs:6
 #: views/lists/subscription/import-preview.hbs:6
 #: views/subscription/unsubscribe.hbs:3
-#: lib/helpers.js:26
+#: lib/helpers.js:25
 #: lib/models/segments.js:11
 msgid "Email address"
 msgstr ""
@@ -2969,7 +2969,7 @@ msgid "Could not find template with specified ID"
 msgstr ""
 
 #: lib/editor-helpers.js:32
-#: routes/archive.js:140
+#: routes/archive.js:142
 #: routes/campaigns.js:131
 #: routes/campaigns.js:295
 #: routes/campaigns.js:390
@@ -2984,7 +2984,7 @@ msgid "Could not find campaign with specified ID"
 msgstr ""
 
 #: lib/editor-helpers.js:46
-#: routes/editorapi.js:276
+#: routes/editorapi.js:308
 msgid "Invalid resource type"
 msgstr ""
 
@@ -2992,41 +2992,41 @@ msgstr ""
 msgid "Bad status code %s"
 msgstr ""
 
-#: lib/helpers.js:17
+#: lib/helpers.js:16
 msgid "URL that points to the unsubscribe page"
 msgstr ""
 
-#: lib/helpers.js:20
+#: lib/helpers.js:19
 msgid "URL that points to the preferences page of the subscriber"
 msgstr ""
 
-#: lib/helpers.js:23
+#: lib/helpers.js:22
 msgid "URL to preview the message in a browser"
 msgstr ""
 
-#: lib/helpers.js:29
+#: lib/helpers.js:28
 #: lib/models/segments.js:31
 msgid "First name"
 msgstr ""
 
-#: lib/helpers.js:32
+#: lib/helpers.js:31
 #: lib/models/segments.js:35
 msgid "Last name"
 msgstr ""
 
-#: lib/helpers.js:35
+#: lib/helpers.js:34
 msgid "Full name (first and last name combined)"
 msgstr ""
 
-#: lib/helpers.js:38
+#: lib/helpers.js:37
 msgid "Unique ID that identifies the recipient"
 msgstr ""
 
-#: lib/helpers.js:41
+#: lib/helpers.js:40
 msgid "Unique ID that identifies the list used for this campaign"
 msgstr ""
 
-#: lib/helpers.js:44
+#: lib/helpers.js:43
 msgid "Unique ID that identifies current campaign"
 msgstr ""
 
@@ -3465,18 +3465,18 @@ msgstr ""
 msgid "Not Found"
 msgstr ""
 
-#: routes/archive.js:116
+#: routes/archive.js:118
 #: services/sender.js:451
 msgid "Received status code %s from %s"
 msgstr ""
 
-#: routes/archive.js:148
+#: routes/archive.js:150
 #: routes/campaigns.js:789
 msgid "Attachment not found"
 msgstr ""
 
 #: routes/campaigns.js:26
-#: routes/editorapi.js:33
+#: routes/editorapi.js:35
 #: routes/fields.js:13
 #: routes/grapejs.js:13
 #: routes/lists.js:49
@@ -3606,16 +3606,16 @@ msgstr ""
 msgid "Could not delete attachment"
 msgstr ""
 
-#: routes/editorapi.js:39
+#: routes/editorapi.js:41
 msgid "Invalid editor name"
 msgstr ""
 
-#: routes/editorapi.js:220
-#: routes/editorapi.js:246
+#: routes/editorapi.js:237
+#: routes/editorapi.js:275
 msgid "Method not supported"
 msgstr ""
 
-#: routes/editorapi.js:316
+#: routes/editorapi.js:352
 msgid "Invalid resource type or ID"
 msgstr ""
 

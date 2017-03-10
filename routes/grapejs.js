@@ -23,10 +23,12 @@ router.get('/editor', passport.csrfProtection, (req, res) => {
             return res.redirect('/');
         }
 
-        resource.editorName = resource.editorName || 'grapejs';
-        resource.editorData = !resource.editorData
-            ? { template: req.query.template || 'demo' }
-            : JSON.parse(resource.editorData);
+        resource.editorName = resource.editorName ||  'grapejs';
+        resource.editorData = !resource.editorData ?
+            {
+                template: req.query.template || 'demo'
+            } :
+            JSON.parse(resource.editorData);
 
         if (!resource.html && !resource.editorData.html) {
             try {
