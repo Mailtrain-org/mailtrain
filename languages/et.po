@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-03-07 21:44+0200\n"
-"PO-Revision-Date: 2017-03-07 21:56+0200\n"
+"PO-Revision-Date: 2017-03-08 20:25+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: et\n"
@@ -225,12 +225,14 @@ msgid ""
 "new entry is found from this feed it is sent to selected list as an email "
 "message."
 msgstr ""
+"RSS kampaania seab üles träkkeri RSS aadressi pihta. Kui sellest leitakse "
+"uus postitus, siis see saadetakse valitud listile uue kirjana"
 
 #: views/campaigns/create-rss.hbs:7 views/campaigns/create-triggered.hbs:6
 #: views/campaigns/create.hbs:6 views/campaigns/edit-rss.hbs:9
 #: views/campaigns/edit-triggered.hbs:10 views/campaigns/edit.hbs:11
 msgid "Campaign Name"
-msgstr ""
+msgstr "Kampaania nimi"
 
 #: views/campaigns/create-rss.hbs:9 views/campaigns/create-triggered.hbs:8
 #: views/campaigns/create.hbs:8 views/campaigns/edit-rss.hbs:11
@@ -239,7 +241,7 @@ msgstr ""
 #: views/templates/create.hbs:11 views/templates/edit.hbs:10
 #: views/triggers/create.hbs:9 views/triggers/edit.hbs:10
 msgid "HTML is allowed"
-msgstr ""
+msgstr "HTML kasutamine on lubatud"
 
 #: views/campaigns/create-rss.hbs:10 views/campaigns/create-triggered.hbs:9
 #: views/campaigns/create.hbs:9 views/campaigns/edit-rss.hbs:12
@@ -248,7 +250,7 @@ msgstr ""
 #: views/triggers/create.hbs:10 views/triggers/edit.hbs:12
 #: views/triggers/triggers.hbs:8
 msgid "List"
-msgstr ""
+msgstr "List"
 
 #: views/campaigns/create-rss.hbs:11 views/campaigns/create-triggered.hbs:10
 #: views/campaigns/create-triggered.hbs:13 views/campaigns/create.hbs:10
@@ -266,7 +268,7 @@ msgstr ""
 #: views/triggers/edit.hbs:19 views/triggers/edit.hbs:22
 #: views/triggers/edit.hbs:24 views/triggers/edit.hbs:28
 msgid "Select"
-msgstr ""
+msgstr "Vali"
 
 #: views/campaigns/create-rss.hbs:12 views/campaigns/create-triggered.hbs:11
 #: views/campaigns/create.hbs:11 views/campaigns/edit-rss.hbs:14
@@ -274,69 +276,70 @@ msgstr ""
 #: views/triggers/create-select.hbs:8 views/triggers/create.hbs:11
 #: views/triggers/edit.hbs:13
 msgid "subscribers"
-msgstr ""
+msgstr "liiget"
 
 #: views/campaigns/create-rss.hbs:13 views/campaigns/edit-rss.hbs:15
 msgid "RSS Feed Url"
-msgstr ""
+msgstr "RSS voo aadress"
 
 #: views/campaigns/create-rss.hbs:14 views/campaigns/edit-rss.hbs:16
 msgid ""
 "New entries from this RSS URL are sent out to list subscribers as email "
 "messages"
 msgstr ""
+"Uued postitused sellest RSS voost saadetakse listi liikmete uue kirjana"
 
 #: views/campaigns/create-rss.hbs:15 views/campaigns/create-triggered.hbs:17
 #: views/campaigns/create.hbs:18 views/campaigns/edit-rss.hbs:18
 #: views/campaigns/edit-triggered.hbs:16 views/campaigns/edit.hbs:17
 #: views/campaigns/view.hbs:12
 msgid "Email \"from name\""
-msgstr ""
+msgstr "E-posti “saatja nimi”"
 
 #: views/campaigns/create-rss.hbs:16 views/campaigns/create-triggered.hbs:18
 #: views/campaigns/create.hbs:19 views/campaigns/edit-rss.hbs:19
 #: views/campaigns/edit.hbs:18 views/settings.hbs:23
 msgid "This is the name your emails will come from"
-msgstr ""
+msgstr "Seda nime näidatakse kirja saatja nimena"
 
 #: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:19
 #: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
 #: views/campaigns/edit-triggered.hbs:18 views/campaigns/edit.hbs:19
 #: views/campaigns/view.hbs:13
 msgid "Email \"from\" address"
-msgstr ""
+msgstr "E-posti “saatja” aadress"
 
 #: views/campaigns/create-rss.hbs:18 views/campaigns/create-triggered.hbs:20
 #: views/campaigns/edit-rss.hbs:21 views/campaigns/edit-triggered.hbs:19
 #: views/settings.hbs:25
 msgid "This is the address people will send replies to"
-msgstr ""
+msgstr "Sellele aadressile saadavad inimesed vastuseid"
 
 #: views/campaigns/create-rss.hbs:19 views/campaigns/create-triggered.hbs:23
 #: views/campaigns/create.hbs:26 views/campaigns/edit-rss.hbs:22
 #: views/campaigns/edit-triggered.hbs:22 views/campaigns/edit.hbs:25
 msgid "Disable clicked/opened tracking"
-msgstr ""
+msgstr "Lülita välja klikkide ja avamiste träkkimine"
 
 #: views/campaigns/create-triggered.hbs:3
 #: views/campaigns/create-triggered.hbs:4
 msgid "Create Triggered Campaign"
-msgstr ""
+msgstr "Loo automaatkampaania"
 
 #: views/campaigns/create-triggered.hbs:12 views/campaigns/create.hbs:12
 #: views/campaigns/edit-triggered.hbs:7 views/campaigns/edit.hbs:7
 #: views/lists/fields/create.hbs:31 views/lists/fields/edit.hbs:33
 #: views/templates/create.hbs:13
 msgid "Template"
-msgstr ""
+msgstr "Templiit"
 
 #: views/campaigns/create-triggered.hbs:14 views/campaigns/create.hbs:15
 msgid "Selecting a template creates a campaign specific copy from it"
-msgstr ""
+msgstr "Templiidi valimine tekitab sellest kampaania jaoks eraldi koopia"
 
 #: views/campaigns/create-triggered.hbs:15 views/campaigns/create.hbs:16
 msgid "Or alternatively use an URL as the message content source:"
-msgstr ""
+msgstr "Või alternatiivselt kasuta veebiaadressi kirja sisu jaoks"
 
 #: views/campaigns/create-triggered.hbs:16 views/campaigns/create.hbs:17
 #: views/campaigns/edit-triggered.hbs:25 views/campaigns/edit.hbs:28
@@ -344,6 +347,9 @@ msgid ""
 "If a message is sent then this URL will be POSTed to using Merge Tags as "
 "POST body. Use this if you want to generate the HTML message yourself"
 msgstr ""
+"Kirja saatmiselt tehakse selle aadressi pihta POST päring koos "
+"täiteväljadega. Kasuta seda võimalust, kui soovid HTML sisu  genereerida "
+"omaenda skriptiga"
 
 #: views/campaigns/create-triggered.hbs:21 views/campaigns/create.hbs:24
 #: views/campaigns/edit-triggered.hbs:20 views/campaigns/edit.hbs:23
