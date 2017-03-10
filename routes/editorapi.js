@@ -417,37 +417,32 @@ let parseGrapejsMultipartTestForm = (req, res, next) => {
 };
 
 router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (req, res) => {
+    let sendError = err => {
+        if (req.query.editor === 'grapejs') {
+            res.status(500).json({
+                errors: err.message || err
+            });
+        } else {
+            res.status(500).send(err.message || err);
+        }
+    };
+
     prepareHtml({
         editorName: req.query.editor,
         html: req.body.html
     }, (err, html) => {
         if (err) {
-            req.query.editor === 'grapejs' ?
-                res.status(500).json({
-                    errors: err.message || err
-                }) :
-                res.status(500).send(err.message || err);
-            return;
+            return sendError(err);
         }
 
         settings.list(['defaultAddress', 'defaultFrom'], (err, configItems) => {
             if (err) {
-                req.query.editor === 'grapejs' ?
-                    res.status(500).json({
-                        errors: err.message || err
-                    }) :
-                    res.status(500).send(err.message || err);
-                return;
+                return sendError(err);
             }
 
             mailer.getMailer((err, transport) => {
                 if (err) {
-                    req.query.editor === 'grapejs' ?
-                        res.status(500).json({
-                            errors: err.message || err
-                        }) :
-                        res.status(500).send(err.message || err);
-                    return;
+                    return sendError(err);
                 }
 
                 let opts = {
@@ -465,12 +460,7 @@ router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (re
 
                 transport.sendMail(opts, (err, info) => {
                     if (err) {
-                        req.query.editor === 'grapejs' ?
-                            res.status(500).json({
-                                errors: err.message || err
-                            }) :
-                            res.status(500).send(err.message || err);
-                        return;
+                        return sendError(err);
                     }
 
                     req.query.editor === 'grapejs' ?

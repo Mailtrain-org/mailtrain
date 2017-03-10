@@ -19,6 +19,9 @@
     }
 
     #toast-container {
+        top: auto !important;
+        bottom: 5px;
+        right: 325px;
         font-size: 13px;
         font-weight: lighter;
     }
@@ -177,7 +180,7 @@
                 var encodedSrc = (s && s[1]) || encodeURIComponent(src);
                 var dynamicSrc = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + $(this).width() + '%2C' + $(this).height();
                 imgs.push({
-                    cls: $(this).attr('class'),
+                    cls: $(this).attr('class').split(' ')[0],
                     dynamicSrc: dynamicSrc,
                     src: src,
                 });
@@ -245,10 +248,12 @@
                 statusFormElC.style.opacity = '0';
                 statusFormEl.removeAttribute('data-tooltip');
                 md.close();
+                toastr.success('Testmail sent');
             } else if (res.errors) {
                 statusFormEl.className = 'fa fa-exclamation-circle';
                 statusFormEl.setAttribute('data-tooltip', res.errors);
                 statusFormElC.className = 'form-status text-danger';
+                toastr.error(res.errors);
             }
         });
 
@@ -357,9 +362,10 @@
             }, null, 'html')
                 .success(function() {
                     window.bridge.lastSavedHtml = html;
+                    toastr.success('Sucessfully saved');
                 })
                 .fail(function(data) {
-                    alert(data.responseText || 'An error occured while saving the document');
+                    toastr.error(data.responseText || 'An error occured while saving the document');
                 })
                 .always(function() {
                     setTimeout(function() {
