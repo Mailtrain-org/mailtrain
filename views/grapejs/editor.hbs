@@ -1,0 +1,371 @@
+<style>
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    iframe {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    #gjs-wrapper {
+        position: absolute;
+        top: 34px;
+        bottom: 0;
+        width: 100%;
+    }
+
+    #toast-container {
+        font-size: 13px;
+        font-weight: lighter;
+    }
+    #toast-container > div,
+    #toast-container > div:hover {
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        font-family: Helvetica, sans-serif;
+    }
+    #toast-container > div {
+        opacity: 0.95;
+    }
+    #merge-tag-reference-container {
+        text-align: left;
+        font-size: 14px;
+    }
+    #merge-tag-reference-container table th {
+        padding: 5px 20px 5px 0;
+    }
+
+    /* Fixed width sidebar */
+    #gjs > .gjs-editor > .gjs-cv-canvas { width: 100% !important; padding-right: 300px !important; }
+    #gjs-pn-views, #gjs-pn-views-container { width: 300px !important; }
+    #gjs-pn-options { right: 300px !important; }
+    #gjs-pn-commands { width: 100% !important; padding-right: 310px !important; }
+
+    /* Hide the fullscreen button - doesn't work from within our iFrame */
+    #gjs-pn-options .gjs-pn-btn.fa.fa-arrows-alt { display: none !important; }
+</style>
+
+
+{{> editor_navbar}}
+
+
+<div id="gjs-wrapper">
+    <div id="gjs" style="height:0px; overflow:hidden">
+        {{#if resource.editorData.html}}
+            <style>{{{resource.editorData.css}}}</style>
+            {{{resource.editorData.html}}}
+        {{else}}
+            {{{resource.html}}}
+        {{/if}}
+    </div>
+</div>
+
+
+<!-- Test Newsletter Form -->
+
+<form id="test-form" class="test-form" action="/editorapi/test?editor=grapejs" method="post" style="display: none">
+    <div class="putsmail-c">
+        <div class="gjs-sm-property" style="font-size: 10px">
+            Hello! I'm a placerholder message.
+            <span class="form-status" style="opacity: 0">
+                <i class="fa fa-refresh anim-spin" aria-hidden="true"></i>
+            </span>
+        </div>
+    </div>
+    <div class="gjs-sm-property">
+        <div class="gjs-field">
+            <span id="gjs-sm-input-holder">
+                <input type="email" name="email" placeholder="Email" required>
+            </span>
+        </div>
+    </div>
+    <div class="gjs-sm-property">
+        <div class="gjs-field">
+            <span id="gjs-sm-input-holder">
+                <input type="text" name="subject" placeholder="Subject" required value="Test {{resource.name}}">
+            </span>
+        </div>
+    </div>
+    <input type="hidden" name="html">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <button class="gjs-btn-prim gjs-btn-import" style="width: 100%">SEND</button>
+</form>
+
+
+<!-- Merge Tag Reference -->
+
+{{#if resource.mergeTags}}
+    <div id="merge-tag-reference-container" style="display: none">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>
+                        Merge tag
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each resource.mergeTags}}
+                    <tr>
+                        <th>
+                            [{{key}}]
+                        </th>
+                        <td>
+                            {{value}}
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/if}}
+
+
+<script>
+    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } });
+
+    var editor = grapesjs.init({
+        height: '100%',
+        storageManager: {
+            type: 'none'
+        },
+        assetManager: {
+            assets: [],
+            upload: '/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{resource.editorName}}',
+            uploadText: 'Drop images here or click to upload',
+        },
+        container : '#gjs',
+        fromElement: true,
+        plugins: ['gjs-preset-newsletter'],
+        pluginsOpts: {
+            'gjs-preset-newsletter': {
+                modalLabelImport: 'Paste all your code here below and click import',
+                modalLabelExport: 'Copy the code and use it wherever you want',
+                codeViewerTheme: 'material',
+                importPlaceholder: '<table class="table"><tr><td class="cell">Hello world!</td></tr></table>',
+                cellStyle: {
+                    'font-size': '12px',
+                    'font-weight': 300,
+                    'vertical-align': 'top',
+                    color: 'rgb(111, 119, 125)',
+                    margin: 0,
+                    padding: 0,
+                }
+            }
+        }
+    });
+
+    $.getJSON('/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{resource.editorName}}', function(data) {
+        editor.AssetManager.add(data.files);
+    });
+
+    function getPreparedHtml() {
+        var imgs = [];
+        $('.gjs-pn-buttons > .gjs-pn-btn.fa.fa-desktop').click();
+        $('.gjs-editor > .gjs-cv-canvas > iframe.gjs-frame')
+            .contents()
+            .find('img')
+            .each(function() {
+                var src = $(this).attr('src');
+                var s = src.match(/\/editorapi\/img\?src=([^&]*)/);
+                var encodedSrc = (s && s[1]) || encodeURIComponent(src);
+                var dynamicSrc = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + $(this).width() + '%2C' + $(this).height();
+                imgs.push({
+                    cls: $(this).attr('class'),
+                    dynamicSrc: dynamicSrc,
+                    src: src,
+                });
+        });
+        var html = editor.runCommand('gjs-get-inlined-html');
+        imgs.forEach(function(img) {
+            html = html.replace(
+                '<img class="' + img.cls + '" src="' + img.src,
+                '<img class="' + img.cls + '" src="' + img.dynamicSrc
+            );
+        });
+
+        html = '<!doctype html><html><head><meta charset="utf-8"><title>{{resource.name}}</title></head><body>' + html + '</body></html>';
+
+        return html;
+    }
+
+    var mdlClass = 'gjs-mdl-dialog-sm';
+    var pnm = editor.Panels;
+    var cmdm = editor.Commands;
+    var testContainer = document.getElementById("test-form");
+    var contentEl = testContainer.querySelector('input[name=html]');
+    var md = editor.Modal;
+
+    cmdm.add('send-test', {
+        run(editor, sender) {
+            sender.set('active', 0);
+            var modalContent = md.getContentEl();
+            var mdlDialog = document.querySelector('.gjs-mdl-dialog');
+            // var cmdGetCode = cmdm.get('gjs-get-inlined-html');
+            // contentEl.value = cmdGetCode && cmdGetCode.run(editor);
+            contentEl.value = getPreparedHtml();
+            mdlDialog.className += ' ' + mdlClass;
+            testContainer.style.display = 'block';
+            md.setTitle('Test your Newsletter');
+            md.setContent(testContainer);
+            md.open();
+            md.getModel().once('change:open', function() {
+                mdlDialog.className = mdlDialog.className.replace(mdlClass, '');
+                //clean status
+            })
+        }
+    });
+
+    pnm.addButton('options', {
+        id: 'send-test',
+        className: 'fa fa-paper-plane',
+        command: 'send-test',
+        attributes: {
+            'title': 'Test Newsletter',
+            'data-tooltip-pos': 'bottom',
+        },
+    });
+
+    var statusFormElC = document.querySelector('.form-status');
+    var statusFormEl = document.querySelector('.form-status i');
+    var ajaxTest = ajaxable(testContainer, { headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } })
+        .onStart(function() {
+            statusFormEl.className = 'fa fa-refresh anim-spin';
+            statusFormElC.style.opacity = '1';
+            statusFormElC.className = 'form-status';
+        })
+        .onResponse(function(res) {
+            if (res.data) {
+                statusFormElC.style.opacity = '0';
+                statusFormEl.removeAttribute('data-tooltip');
+                md.close();
+            } else if (res.errors) {
+                statusFormEl.className = 'fa fa-exclamation-circle';
+                statusFormEl.setAttribute('data-tooltip', res.errors);
+                statusFormElC.className = 'form-status text-danger';
+            }
+        });
+
+    cmdm.add('tlb-edit', {
+        run: function(ed) {
+            alert('No image editor installed');
+        },
+    });
+
+    // Add Merge Tag Reference command
+    var mergeTagReferenceContainer = document.getElementById('merge-tag-reference-container');
+    cmdm.add('open-merge-tag-reference', {
+        run(editor, sender) {
+            sender.set('active', 0);
+            var mdlDialog = document.querySelector('.gjs-mdl-dialog');
+            mdlDialog.className += ' gjs-mdl-dialog-lg';
+            mergeTagReferenceContainer.style.display = 'block';
+            md.setTitle('Merge tag reference');
+            md.setContent(mergeTagReferenceContainer);
+            md.open();
+            md.getModel().once('change:open', function() {
+                mdlDialog.className = mdlDialog.className.replace('gjs-mdl-dialog-lg', '');
+            });
+        }
+    });
+
+    pnm.addButton('options', {
+        id: 'view-merge-tag-reference',
+        className: 'fa fa-tags',
+        command: 'open-merge-tag-reference',
+        attributes: {
+            'title': 'Merge tag reference',
+            'data-tooltip-pos': 'bottom',
+        },
+    });
+
+    // Simple warn notifier
+    var origWarn = console.warn;
+    toastr.options = {
+        closeButton: true,
+        preventDuplicates: true,
+        showDuration: 250,
+        hideDuration: 150
+    };
+    console.warn = function(msg) {
+        toastr.warning(msg);
+        origWarn(msg);
+    };
+
+    $(document).ready(function() {
+        // Beautify tooltips
+        $('*[title]').each(function() {
+            var el = $(this);
+            var title = el.attr('title').trim();
+            if (title) {
+                el.attr('data-tooltip', el.attr('title'));
+                el.attr('title', '');
+            }
+        });
+
+        // Remember testmail address
+        var isValidEmail = function(email) {
+            return /\S+@\S+\.\S+/.test(email);
+        };
+        var email = localStorage.getItem('testemail');
+        isValidEmail(email) && $('#test-form input[name=email]').val(email);
+
+        $(document).on('submit', '#test-form', function() {
+            var email = $('#test-form input[name=email]').val();
+            isValidEmail(email) && localStorage.setItem('testemail', email);
+        });
+
+
+        // Save and Close Buttons
+
+        window.bridge = window.bridge || {};
+
+        $('#mt-close').on('click', function() {
+            if (confirm('Unsaved changes will be lost. Close now?') === true) {
+                window.bridge.exit
+                    ? window.bridge.exit()
+                    : window.location.href = '/{{type}}s/edit/{{resource.id}}?tab=template';
+            }
+        });
+
+        $('#mt-save').on('click', function() {
+            if ($(this).hasClass('busy')) {
+                return;
+            }
+            $(this).addClass('busy');
+
+            var html = getPreparedHtml();
+
+            $.post('/editorapi/update?type={{type}}&editor={{resource.editorName}}', {
+                id: {{resource.id}},
+                name: '{{resource.name}}',
+                {{#if resource.list}} list: {{resource.list}}, {{/if}}
+                html: html,
+                editorData: JSON.stringify({
+                    template: '{{resource.editorData.template}}',
+                    css: editor.getCss(),
+                    html: editor.getHtml(),
+                    style: editor.getStyle(),
+                    components: editor.getComponents(),
+                }),
+            }, null, 'html')
+                .success(function() {
+                    window.bridge.lastSavedHtml = html;
+                })
+                .fail(function(data) {
+                    alert(data.responseText || 'An error occured while saving the document');
+                })
+                .always(function() {
+                    setTimeout(function() {
+                        $(this).removeClass('busy');
+                    }.bind(this), 500); // Don't save too fast
+                }.bind(this));
+        });
+    });
+</script>
