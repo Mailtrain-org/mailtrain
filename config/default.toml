@@ -24,6 +24,8 @@ title="mailtrain"
 # Enabled HTML editors
 editors=[
   ["summernote", "Summernote"],
+  ["grapejs", "GrapeJS"],
+  ["mosaico", "Mosaico"],
   ["codeeditor", "Code Editor"]
 ]
 
@@ -123,3 +125,13 @@ host="127.0.0.1"
 # How many parallel sender processes to spawn
 # You can use more than 1 process only if you have Redis enabled
 processes=1
+
+[mosaico]
+# Installed templates
+templates=[["versafix-1", "Versafix One"]]
+# Inject custom scripts from public/mosaico/custom/
+# customscripts=["some-lib.js", "my-mosaico-plugin.js"]
+
+[grapejs]
+# Installed templates
+templates=[["demo", "Demo Template"]]

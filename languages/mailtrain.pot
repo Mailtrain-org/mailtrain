@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-07 19:52+0000\n"
+"POT-Creation-Date: 2017-03-10 08:57+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
@@ -65,7 +65,7 @@ msgstr ""
 #: views/users/forgot.hbs:1
 #: views/users/login.hbs:1
 #: views/users/reset.hbs:1
-#: app.js:169
+#: app.js:172
 msgid "Home"
 msgstr ""
 
@@ -118,7 +118,7 @@ msgstr ""
 #: views/campaigns/delivered.hbs:7
 #: views/campaigns/opened.hbs:7
 #: views/campaigns/unsubscribed.hbs:7
-#: views/lists/subscription/import-failed.hbs:9
+#: views/lists/subscription/import-failed.hbs:8
 #: views/lists/view.hbs:18
 #: views/triggers/triggered.hbs:6
 msgid "Address"
@@ -216,6 +216,7 @@ msgstr ""
 #: views/lists/create.hbs:7
 #: views/lists/edit.hbs:10
 #: views/lists/lists.hbs:8
+#: views/mosaico/editor.hbs:3
 #: views/partials/merge-tag-reference.hbs:4
 #: views/templates/create.hbs:9
 #: views/templates/edit.hbs:8
@@ -1451,6 +1452,7 @@ msgstr ""
 
 #: views/lists/fields/edit.hbs:30
 #: views/lists/fields/fields.hbs:8
+#: views/mosaico/editor.hbs:2
 #: views/partials/merge-tag-reference.hbs:3
 msgid "Merge tag"
 msgstr ""
@@ -1789,10 +1791,17 @@ msgid "Failed addresses"
 msgstr ""
 
 #: views/lists/subscription/import-failed.hbs:6
+msgid ""
+"Role-based addresses like postmaster@example.com are blocked when "
+"importing. Subscribers with role-based email addresses can join your list "
+"using the subscription form"
+msgstr ""
+
+#: views/lists/subscription/import-failed.hbs:7
 msgid "see here"
 msgstr ""
 
-#: views/lists/subscription/import-failed.hbs:10
+#: views/lists/subscription/import-failed.hbs:9
 msgid "Fail reason"
 msgstr ""
 
@@ -1908,17 +1917,76 @@ msgstr ""
 msgid "Restart"
 msgstr ""
 
+#: views/mosaico/editor.hbs:1
+#: views/partials/merge-tag-reference.hbs:1
+msgid "Merge tag reference"
+msgstr ""
+
+#: views/mosaico/editor.hbs:4
+msgid "MOSAICO Responsive Email Designer"
+msgstr ""
+
+#: views/mosaico/editor.hbs:5
+msgid "Sucessfully saved"
+msgstr ""
+
+#: views/mosaico/editor.hbs:6
+msgid "An error occured while saving the document"
+msgstr ""
+
+#: views/mosaico/editor.hbs:7
+msgid "Unsaved changes will be lost. Close now?"
+msgstr ""
+
+#: views/mosaico/editor.hbs:8
+#: views/mosaico/editor.hbs:9
+msgid "Tags"
+msgstr ""
+
 #: views/partials/codeeditor.hbs:1
+#: views/partials/grapejs.hbs:1
+#: views/partials/mosaico.hbs:1
 #: views/partials/summernote.hbs:1
 msgid "Template content (HTML)"
+msgstr ""
+
+#: views/partials/editor-navbar.hbs:1
+msgid "SAVE"
+msgstr ""
+
+#: views/partials/editor-navbar.hbs:2
+msgid "SAVING"
+msgstr ""
+
+#: views/partials/editor-navbar.hbs:3
+msgid "CLOSE"
+msgstr ""
+
+#: views/partials/grapejs.hbs:2
+msgid "Open GrapeJS"
 msgstr ""
 
 #: views/partials/html-preview.hbs:1
 msgid "Toggle HTML preview"
 msgstr ""
 
-#: views/partials/merge-tag-reference.hbs:1
-msgid "Merge tag reference"
+#: views/partials/html-to-text.hbs:1
+msgid ""
+"To extract the text from HTML click <a id=\"html-to-plaintext-btn\" "
+"role=\"button\">here</a>."
+msgstr ""
+
+#: views/partials/html-to-text.hbs:2
+msgid ""
+"Please note that your existing plaintext in the field above will be "
+"overwritten. This feature uses the <a "
+"href=\"http://premailer.dialect.ca/api\" target=\"_blank\" "
+"rel=\"noreferrer\">Premailer API</a>, a third party service. Their Terms of "
+"Service and Privacy Policy apply."
+msgstr ""
+
+#: views/partials/html-to-text.hbs:3
+msgid "An error occurred while talking to the server"
 msgstr ""
 
 #: views/partials/merge-tag-reference.hbs:2
@@ -1927,6 +1995,10 @@ msgid ""
 "format of the merge tag is the following: <code>[TAG_NAME]</code> or "
 "<code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional "
 "text value used when <code>TAG_NAME</code> is empty."
+msgstr ""
+
+#: views/partials/mosaico.hbs:2
+msgid "Open Mosaico"
 msgstr ""
 
 #: views/partials/plaintext.hbs:1
@@ -2891,6 +2963,31 @@ msgstr ""
 msgid "Please enter a new password."
 msgstr ""
 
+#: lib/editor-helpers.js:16
+#: routes/templates.js:109
+msgid "Could not find template with specified ID"
+msgstr ""
+
+#: lib/editor-helpers.js:32
+#: routes/archive.js:140
+#: routes/campaigns.js:131
+#: routes/campaigns.js:295
+#: routes/campaigns.js:390
+#: routes/campaigns.js:435
+#: routes/campaigns.js:475
+#: routes/campaigns.js:739
+#: routes/campaigns.js:762
+#: routes/campaigns.js:781
+#: routes/campaigns.js:803
+#: routes/triggers.js:146
+msgid "Could not find campaign with specified ID"
+msgstr ""
+
+#: lib/editor-helpers.js:46
+#: routes/editorapi.js:276
+msgid "Invalid resource type"
+msgstr ""
+
 #: lib/feed.js:31
 msgid "Bad status code %s"
 msgstr ""
@@ -3364,27 +3461,13 @@ msgstr ""
 #: routes/archive.js:31
 #: routes/archive.js:43
 #: routes/archive.js:55
-#: app.js:211
+#: app.js:217
 msgid "Not Found"
 msgstr ""
 
 #: routes/archive.js:116
-#: services/sender.js:447
+#: services/sender.js:451
 msgid "Received status code %s from %s"
-msgstr ""
-
-#: routes/archive.js:140
-#: routes/campaigns.js:131
-#: routes/campaigns.js:295
-#: routes/campaigns.js:390
-#: routes/campaigns.js:435
-#: routes/campaigns.js:475
-#: routes/campaigns.js:739
-#: routes/campaigns.js:762
-#: routes/campaigns.js:781
-#: routes/campaigns.js:803
-#: routes/triggers.js:146
-msgid "Could not find campaign with specified ID"
 msgstr ""
 
 #: routes/archive.js:148
@@ -3393,8 +3476,11 @@ msgid "Attachment not found"
 msgstr ""
 
 #: routes/campaigns.js:26
+#: routes/editorapi.js:33
 #: routes/fields.js:13
+#: routes/grapejs.js:13
 #: routes/lists.js:49
+#: routes/mosaico.js:14
 #: routes/segments.js:13
 #: routes/settings.js:23
 #: routes/templates.js:17
@@ -3518,6 +3604,19 @@ msgstr ""
 
 #: routes/campaigns.js:771
 msgid "Could not delete attachment"
+msgstr ""
+
+#: routes/editorapi.js:39
+msgid "Invalid editor name"
+msgstr ""
+
+#: routes/editorapi.js:220
+#: routes/editorapi.js:246
+msgid "Method not supported"
+msgstr ""
+
+#: routes/editorapi.js:316
+msgid "Invalid resource type or ID"
 msgstr ""
 
 #: routes/fields.js:28
@@ -3889,10 +3988,6 @@ msgstr ""
 
 #: routes/templates.js:101
 msgid "Template created"
-msgstr ""
-
-#: routes/templates.js:109
-msgid "Could not find template with specified ID"
 msgstr ""
 
 #: routes/templates.js:140

@@ -35,6 +35,9 @@ let webhooks = require('./routes/webhooks');
 let subscription = require('./routes/subscription');
 let archive = require('./routes/archive');
 let api = require('./routes/api');
+let editorapi = require('./routes/editorapi');
+let grapejs = require('./routes/grapejs');
+let mosaico = require('./routes/mosaico');
 
 let app = express();
 
@@ -205,6 +208,9 @@ app.use('/webhooks', webhooks);
 app.use('/subscription', subscription);
 app.use('/archive', archive);
 app.use('/api', api);
+app.use('/editorapi', editorapi);
+app.use('/grapejs', grapejs);
+app.use('/mosaico', mosaico);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
