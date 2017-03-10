@@ -25,6 +25,14 @@
         <link rel="stylesheet" href="/summernote/summernote.css">
     {{/if}}
 
+    {{#each customStyles}}
+        <link rel="stylesheet" href="{{this}}">
+    {{/each}}
+
+    {{#each customScripts}}
+        <script src="{{this}}"></script>
+    {{/each}}
+
 </head>
 
 <body>
