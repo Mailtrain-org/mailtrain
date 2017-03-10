@@ -177,7 +177,7 @@
                 var encodedSrc = (s && s[1]) || encodeURIComponent(src);
                 var dynamicSrc = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + $(this).width() + '%2C' + $(this).height();
                 imgs.push({
-                    cls: $(this).attr('class'),
+                    cls: $(this).attr('class').split(' ')[0],
                     dynamicSrc: dynamicSrc,
                     src: src,
                 });
