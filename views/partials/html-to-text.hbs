@@ -1,0 +1,41 @@
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <span class="help-block">
+            {{#translate}}To extract the text from HTML click <a id="html-to-plaintext-btn" role="button">here</a>.{{/translate}}
+            <span id="html-to-plaintext-spinner" class="glyphicon glyphicon-refresh spinning hidden"></span>
+            {{#translate}}Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api" target="_blank" rel="noreferrer">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.{{/translate}}
+        <span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } });
+        var $spinner = $('#html-to-plaintext-spinner');
+
+        $('#html-to-plaintext-btn').on('click', function() {
+            var html = $('#template-html').val();
+
+            if (!html) {
+                alert('Missing HTML content');
+                return;
+            }
+
+            if (!$spinner.hasClass('hidden')) {
+                return;
+            }
+            $spinner.removeClass('hidden');
+
+            $.post('/editorapi/html-to-text?editor={{editorName}}', { html: html }, null, 'html')
+                .success(function(data) {
+                    $('#template-text').val(data);
+                })
+                .fail(function(data) {
+                    alert(data.responseText || '{{#translate}}An error occurred while talking to the server{{/translate}}');
+                })
+                .always(function() {
+                    $spinner.addClass('hidden');
+                });
+        });
+    });
+</script>

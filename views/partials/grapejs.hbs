@@ -1,0 +1,27 @@
+<style>
+    #btn-open-grapejs {
+        background-color: #4E6A8A;
+        border-color: #4E6A8A;
+        padding-left: 36px;
+        padding-right: 36px;
+    }
+    #btn-open-grapejs:hover {
+        background-color: #394C61;
+        border-color: #394C61;
+    }
+</style>
+
+{{> html_to_text}}
+
+<input type="hidden" id="template-html" value="{{html}}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{#translate}}Template content (HTML){{/translate}}</label>
+    <div class="col-sm-10">
+        <a class="btn btn-lg btn-success" role="button" id="btn-open-grapejs">{{#translate}}Open GrapeJS{{/translate}}</a>
+    </div>
+</div>
+
+{{> html_preview}}
+
+{{> editor_bridge}}

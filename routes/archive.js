@@ -77,7 +77,9 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                             };
 
                             if (campaign.editorName && campaign.editorName !== 'summernote' && campaign.editorName !== 'codeeditor') {
-                                res.render('partials/tracking-scripts', { layout: 'archive/layout-raw' }, (err, scripts) => {
+                                res.render('partials/tracking-scripts', {
+                                    layout: 'archive/layout-raw'
+                                }, (err, scripts) => {
                                     html = scripts ? html.replace(/<\/body\b/i, match => scripts + match) : html;
                                     render('archive/view-raw', 'archive/layout-raw');
                                 });

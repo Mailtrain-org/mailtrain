@@ -1,0 +1,87 @@
+---------------------
+Built-in Dependencies
+---------------------
+
+These dependencies are included in the distributed Mosaico library 
+  dist/mosaico.min.js and dist/mosaico.min.css
+by an aggregator process named "Browserify"
+
+Browserify (Library "Assembler" targeting the browser):
+  MIT License, Copyright Joyent, Inc. and other Node contributors.
+> os-browserify:
+  MIT License, Copyright (c) 2014 Drew Young 
+> assert:
+  MIT License, Copyright (c) shtylman <shtylman@gmail.com>
+> util:
+  MIT License, Copyright (c) Joyent (http://www.joyent.com)
+> inherit:
+  ISC License, Copyright (c) Isaac Z. Schlueter 
+> process:
+  MIT License, Copyright (c) 2013 Roman Shtylman <shtylman@gmail.com> 
+> console-browserify:
+  MIT License, Copyright (c) 2012 Raynos <raynos2@gmail.com>
+
+Knockout-Sortable (Knockout Bindings to jQueryUI Sortable):
+  MIT License, Copyright (c) 2015 Ryan Niemeyer 
+
+Knockout-UndoManager (Undo Library):
+  MIT License, Copyright (c) 2015 Stefano Bagnara
+
+Knockout-Reactor (Knockout value tracking used by Knockout-UndoManager):
+  MIT License, Copyright (c) Ziad Jeeroburkhan
+
+TinyColor (Color manipulation library):
+  MIT License, Copyright (c) Brian Grinstead <briangrinstead@gmail.com>
+                             (http://briangrinstead.com)", 
+
+Toastr (Toast notifications):
+  MIT License, Copyright (c) 2012-2015  John Papa, Hans Fjällemark, and Tim Ferrell
+
+Evol-Colorpicker (Color picker):
+  MIT License, Copyright (c) 2015 Olivier Giulieri
+
+Juice (CSS Inliner):
+  MIT License, Copyright (c) Guillermo Rauch, Arian Stolwijk, Pawel Marzec, 
+                             Andrew Kelley, Francois-Guillaume Ribreau
+
+Slick (selector parser used by Juice):
+  MIT License, Copyright (c) Shashank Mehta <me@shashankmehta.in>
+                             (http://shashankmehta.in)
+
+JSEP (expression engine):
+  MIT License, Copyright (c) Stephen Oney <swloney@gmail.com> (http://from.so/)
+
+Mensch (CSS parser used by Mosaico and Juice):
+  MIT License, Copyright (c) Brett Stimmerman <brettstimmerman@gmail.com>
+
+-----------------------------
+Runtime External Dependencies
+-----------------------------
+
+These dependencies are not included in Mosaico but are used at runtime and are 
+expected to be found in the running environment (browser)
+
+jQuery, jQueryUI:
+- MIT License
+
+Knockout:
+- MIT License
+
+Knockout-jQueryUI:
+- MIT License
+
+jQuery-File-Upload:
+- MIT License
+
+--------------------------------------
+Runtime External Optional Dependencies
+--------------------------------------
+
+Font NotoSans (in order to enable "Material style" font face):
+- Apache License, version 2.0
+
+jQuery UI Touch Punch (to support touch events in addition to mouse events):
+- MIT License
+
+TinyMCE v4.x (to support WYSIWYG contextual editing of text):
+- LGPL v2.1
