@@ -119,6 +119,7 @@
             <label for="default-homepage" class="col-sm-2 control-label">{{#translate}}Default homepage (URL){{/translate}}</label>
             <div class="col-sm-10">
                 <input type="url" class="form-control" name="default-homepage" id="default-homepage" value="{{defaultHomepage}}" placeholder="{{#translate}}URL to redirect the subscribed users to, eg. http://example.com/{{/translate}}">
+                <span class="help-block">&nbsp;</span>
             </div>
         </div>
 
@@ -287,7 +288,7 @@
 
         <div class="form-group">
             <label for="smtp-max-connections" class="col-sm-2 control-label">{{#translate}}Max connections{{/translate}}</label>
-            <div class="col-sm-6">
+            <div class="col-sm-10">
                 <input type="number" class="form-control" name="smtp-max-connections" id="smtp-max-connections" placeholder="{{#translate}}The count of max connections, eg. 10{{/translate}}" value="{{smtpMaxConnections}}">
                 <span class="help-block">{{#translate}}The count of maximum simultaneous connections to make against the SMTP server (defaults to 5). This limit is per sending process.{{/translate}}</span>
             </div>
@@ -295,7 +296,7 @@
 
         <div class="form-group">
             <label for="smtp-max-messages" class="col-sm-2 control-label">{{#translate}}Max messages{{/translate}}</label>
-            <div class="col-sm-6">
+            <div class="col-sm-10">
                 <input type="number" class="form-control" name="smtp-max-messages" id="smtp-max-messages" placeholder="{{#translate}}The count of max messages, eg. 100{{/translate}}" value="{{smtpMaxMessages}}">
                 <span class="help-block">{{#translate}}The number of messages to send through a single connection before the connection is closed and reopened (defaults to 100){{/translate}}</span>
             </div>
@@ -303,7 +304,7 @@
 
         <div class="form-group">
             <label for="smtp-throttling" class="col-sm-2 control-label">{{#translate}}Throttling{{/translate}}</label>
-            <div class="col-sm-6">
+            <div class="col-sm-10">
                 <input type="number" class="form-control" name="smtp-throttling" id="smtp-throttling" placeholder="{{#translate}}Messages per hour eg. 1000{{/translate}}" value="{{smtpThrottling}}">
                 <span class="help-block">{{#translate}}Maximum number of messages to send in an hour. Leave empty or zero for no throttling. If your provider uses a different speed limit (messages/minute or messages/second) then convert this limit into messages/hour (1m/s => 3600m/h). This limit is per sending process.{{/translate}}</span>
             </div>
