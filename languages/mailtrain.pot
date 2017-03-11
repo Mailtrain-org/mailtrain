@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-10 12:12+0000\n"
+"POT-Creation-Date: 2017-03-11 12:28+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
@@ -168,7 +168,7 @@ msgid "Bounce time"
 msgstr ""
 
 #: views/campaigns/campaigns.hbs:3
-#: views/campaigns/create-triggered.hbs:24
+#: views/campaigns/create-triggered.hbs:25
 #: views/campaigns/create.hbs:3
 #: views/campaigns/create.hbs:4
 #: views/campaigns/create.hbs:27
@@ -355,7 +355,7 @@ msgstr ""
 
 #: views/campaigns/create-rss.hbs:11
 #: views/campaigns/create-triggered.hbs:10
-#: views/campaigns/create-triggered.hbs:13
+#: views/campaigns/create-triggered.hbs:14
 #: views/campaigns/create.hbs:10
 #: views/campaigns/create.hbs:14
 #: views/campaigns/edit-rss.hbs:13
@@ -410,7 +410,7 @@ msgid ""
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:15
-#: views/campaigns/create-triggered.hbs:17
+#: views/campaigns/create-triggered.hbs:18
 #: views/campaigns/create.hbs:18
 #: views/campaigns/edit-rss.hbs:18
 #: views/campaigns/edit-triggered.hbs:16
@@ -420,16 +420,17 @@ msgid "Email \"from name\""
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:16
-#: views/campaigns/create-triggered.hbs:18
+#: views/campaigns/create-triggered.hbs:19
 #: views/campaigns/create.hbs:19
 #: views/campaigns/edit-rss.hbs:19
+#: views/campaigns/edit-triggered.hbs:17
 #: views/campaigns/edit.hbs:18
 #: views/settings.hbs:23
 msgid "This is the name your emails will come from"
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:17
-#: views/campaigns/create-triggered.hbs:19
+#: views/campaigns/create-triggered.hbs:20
 #: views/campaigns/create.hbs:20
 #: views/campaigns/edit-rss.hbs:20
 #: views/campaigns/edit-triggered.hbs:18
@@ -439,7 +440,7 @@ msgid "Email \"from\" address"
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:18
-#: views/campaigns/create-triggered.hbs:20
+#: views/campaigns/create-triggered.hbs:21
 #: views/campaigns/edit-rss.hbs:21
 #: views/campaigns/edit-triggered.hbs:19
 #: views/settings.hbs:25
@@ -447,7 +448,7 @@ msgid "This is the address people will send replies to"
 msgstr ""
 
 #: views/campaigns/create-rss.hbs:19
-#: views/campaigns/create-triggered.hbs:23
+#: views/campaigns/create-triggered.hbs:24
 #: views/campaigns/create.hbs:26
 #: views/campaigns/edit-rss.hbs:22
 #: views/campaigns/edit-triggered.hbs:22
@@ -470,17 +471,22 @@ msgstr ""
 msgid "Template"
 msgstr ""
 
-#: views/campaigns/create-triggered.hbs:14
+#: views/campaigns/create-triggered.hbs:13
+#: views/campaigns/create.hbs:13
+msgid "Select a template:"
+msgstr ""
+
+#: views/campaigns/create-triggered.hbs:15
 #: views/campaigns/create.hbs:15
 msgid "Selecting a template creates a campaign specific copy from it"
 msgstr ""
 
-#: views/campaigns/create-triggered.hbs:15
+#: views/campaigns/create-triggered.hbs:16
 #: views/campaigns/create.hbs:16
 msgid "Or alternatively use an URL as the message content source:"
 msgstr ""
 
-#: views/campaigns/create-triggered.hbs:16
+#: views/campaigns/create-triggered.hbs:17
 #: views/campaigns/create.hbs:17
 #: views/campaigns/edit-triggered.hbs:25
 #: views/campaigns/edit.hbs:28
@@ -489,7 +495,7 @@ msgid ""
 "POST body. Use this if you want to generate the HTML message yourself"
 msgstr ""
 
-#: views/campaigns/create-triggered.hbs:21
+#: views/campaigns/create-triggered.hbs:22
 #: views/campaigns/create.hbs:24
 #: views/campaigns/edit-triggered.hbs:20
 #: views/campaigns/edit.hbs:23
@@ -497,16 +503,12 @@ msgstr ""
 msgid "Email \"subject line\""
 msgstr ""
 
-#: views/campaigns/create-triggered.hbs:22
+#: views/campaigns/create-triggered.hbs:23
 #: views/campaigns/create.hbs:25
 #: views/campaigns/edit-triggered.hbs:21
 #: views/campaigns/edit.hbs:24
 #: views/settings.hbs:27
 msgid "Keep it relevant and non-spammy"
-msgstr ""
-
-#: views/campaigns/create.hbs:13
-msgid "Select a template:"
 msgstr ""
 
 #: views/campaigns/create.hbs:21
@@ -588,10 +590,6 @@ msgstr ""
 #: views/campaigns/edit-triggered.hbs:6
 #: views/campaigns/edit.hbs:6
 msgid "General"
-msgstr ""
-
-#: views/campaigns/edit-triggered.hbs:17
-msgid "his is the name your emails will come from"
 msgstr ""
 
 #: views/campaigns/edit-triggered.hbs:23
@@ -2230,7 +2228,7 @@ msgstr ""
 
 #: views/settings.hbs:62
 msgid ""
-"he number of messages to send through a single connection before the "
+"The number of messages to send through a single connection before the "
 "connection is closed and reopened (defaults to 100)"
 msgstr ""
 
@@ -2732,11 +2730,12 @@ msgid "New Password"
 msgstr ""
 
 #: views/users/account.hbs:16
+#: views/users/reset.hbs:8
 msgid "Confirm Password"
 msgstr ""
 
 #: views/users/account.hbs:17
-#: views/users/reset.hbs:8
+#: views/users/reset.hbs:9
 msgid "Confirm New Password"
 msgstr ""
 
@@ -3461,7 +3460,7 @@ msgstr ""
 #: routes/archive.js:31
 #: routes/archive.js:43
 #: routes/archive.js:55
-#: app.js:217
+#: app.js:220
 msgid "Not Found"
 msgstr ""
 
