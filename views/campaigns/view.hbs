@@ -115,63 +115,69 @@
                     </form>
                 </dd>
 
-                {{#unless isIdling}}
-                    <dt>{{#translate}}Delivered{{/translate}} <a href="/campaigns/status/{{id}}/delivered" title="{{#translate}}List subscribers who received this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
-                    <dd>{{delivered}}</dd>
-
+            {{/unless}}
         </dl>
+
         <hr />
+
         <dl class="dl-horizontal">
+            {{#unless isIdling}}
 
-            <dt>{{#translate}}Bounced{{/translate}} <a href="/campaigns/status/{{id}}/bounced" title="{{#translate}}List subscribers who bounced{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
-            <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{bounceRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{bounceRate}}%;">
-                        {{bounced}}&nbsp;({{bounceRate}}%)
+                <dt>{{#translate}}Delivered{{/translate}} <a href="/campaigns/status/{{id}}/delivered" title="{{#translate}}List subscribers who received this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dd>
+                    <div style="margin-bottom: 20px;">
+                        {{delivered}}
                     </div>
-                </div>
-            </dd>
+                </dd>
 
-            <dt>{{#translate}}Complaints{{/translate}} <a href="/campaigns/status/{{id}}/complained" title="{{#translate}}List subscribers who complained for this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
-            <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{complaintRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{complaintRate}}%;">
-                        {{complained}}&nbsp;({{complaintRate}}%)
-                    </div>
-                </div>
-            </dd>
-
-            <dt>{{#translate}}Unsubscribed{{/translate}} <a href="/campaigns/status/{{id}}/unsubscribed" title="{{#translate}}List subscribers who unsubscribed after this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
-            <dd>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{unsubscribeRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{unsubscribeRate}}%;">
-                        {{unsubscribed}}&nbsp;({{unsubscribeRate}}%)
-                    </div>
-                </div>
-            </dd>
-
-            {{#unless trackingDisabled}}
-
-                <dt>{{#translate}}Opened{{/translate}} <a href="/campaigns/opened/{{id}}" title="{{#translate}}List subscribers who opened this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dt>{{#translate}}Bounced{{/translate}} <a href="/campaigns/status/{{id}}/bounced" title="{{#translate}}List subscribers who bounced{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                 <dd>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{openRate}}%;">
-                            {{opened}}&nbsp;({{openRate}}%)
+                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{bounceRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{bounceRate}}%;">
+                            {{bounced}}&nbsp;({{bounceRate}}%)
                         </div>
                     </div>
                 </dd>
 
-                <dt>{{#translate}}Clicked{{/translate}} <a href="/campaigns/clicked/{{id}}/all" title="{{#translate}}List subscribers who clicked on a link{{/translate}}"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dt>{{#translate}}Complaints{{/translate}} <a href="/campaigns/status/{{id}}/complained" title="{{#translate}}List subscribers who complained for this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                 <dd>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{clicksRate}}%;">
-                            {{clicks}}&nbsp;({{clicksRate}}%)
+                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{complaintRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{complaintRate}}%;">
+                            {{complained}}&nbsp;({{complaintRate}}%)
                         </div>
                     </div>
                 </dd>
 
-            {{/unless}}
-            {{/unless}}
+                <dt>{{#translate}}Unsubscribed{{/translate}} <a href="/campaigns/status/{{id}}/unsubscribed" title="{{#translate}}List subscribers who unsubscribed after this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                <dd>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{unsubscribeRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{unsubscribeRate}}%;">
+                            {{unsubscribed}}&nbsp;({{unsubscribeRate}}%)
+                        </div>
+                    </div>
+                </dd>
+
+                {{#unless trackingDisabled}}
+
+                    <dt>{{#translate}}Opened{{/translate}} <a href="/campaigns/opened/{{id}}" title="{{#translate}}List subscribers who opened this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                    <dd>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{openRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{openRate}}%;">
+                                {{opened}}&nbsp;({{openRate}}%)
+                            </div>
+                        </div>
+                    </dd>
+
+                    <dt>{{#translate}}Clicked{{/translate}} <a href="/campaigns/clicked/{{id}}/all" title="{{#translate}}List subscribers who clicked on a link{{/translate}}"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
+                    <dd>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{clicksRate}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 6em; width: {{clicksRate}}%;">
+                                {{clicks}}&nbsp;({{clicksRate}}%)
+                            </div>
+                        </div>
+                    </dd>
+
+                {{/unless}}
             {{/unless}}
         </dl>
 
