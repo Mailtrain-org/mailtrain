@@ -8,12 +8,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-11 12:28+0000\n"
+"POT-Creation-Date: 2017-03-12 00:22+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
 #: views/subscription/layout.hbs:1
-#: routes/index.js:11
 msgid "Self hosted email newsletter app"
 msgstr ""
 
@@ -1035,22 +1034,10 @@ msgid "Subscribe"
 msgstr ""
 
 #: views/index.hbs:1
-msgid "Official Mailtrain Partners"
+msgid "List Management"
 msgstr ""
 
 #: views/index.hbs:2
-msgid "Free, open source mail server solution"
-msgstr ""
-
-#: views/index.hbs:3
-msgid "A reliable SMTP server, easy integration, and 12,000 messages a month free"
-msgstr ""
-
-#: views/index.hbs:4
-msgid "List management"
-msgstr ""
-
-#: views/index.hbs:5
 msgid ""
 "Mailtrain allows you to easily manage even very large lists. Million "
 "subscribers? Not a problem. You can add subscribers manually, through the "
@@ -1058,87 +1045,91 @@ msgid ""
 "fields and merge tags as well."
 msgstr ""
 
+#: views/index.hbs:3
 #: views/index.hbs:6
-msgid "Custom fields"
+#: views/index.hbs:9
+#: views/index.hbs:12
+#: views/index.hbs:15
+#: views/index.hbs:18
+#: views/index.hbs:21
+#: views/index.hbs:24
+#: views/index.hbs:27
+msgid "Show more"
 msgstr ""
 
-#: views/index.hbs:7
+#: views/index.hbs:4
+#: views/lists/fields/create.hbs:3
+#: views/lists/fields/edit.hbs:3
+#: views/lists/fields/fields.hbs:3
+#: views/lists/fields/fields.hbs:5
+#: views/lists/view.hbs:5
+msgid "Custom Fields"
+msgstr ""
+
+#: views/index.hbs:5
 msgid ""
 "Text fields, numbers, drop downs or checkboxes, Mailtrain has them all. "
 "Every custom field can be included in the generated newsletters through "
 "merge tags."
 msgstr ""
 
-#: views/index.hbs:8
-msgid "List segmentation"
+#: views/index.hbs:7
+msgid "List Segmentation"
 msgstr ""
 
-#: views/index.hbs:9
+#: views/index.hbs:8
 msgid ""
 "Send messages only to list subscribers that match predefined segmentation "
 "rules. No need to create separate lists with small differences."
 msgstr ""
 
 #: views/index.hbs:10
-msgid "Donate to author"
-msgstr ""
-
-#: views/index.hbs:11
-msgid ""
-"If you really like Mailtrain or your business benefits from it financially "
-"then I would really appreciate a small donation to keep the Mailtrain "
-"development engines running. You can either use Bitcoin or PayPal for "
-"donations. My Bitcoin wallet is"
-msgstr ""
-
-#: views/index.hbs:12
-msgid "or donate using PayPal"
-msgstr ""
-
-#: views/index.hbs:13
 msgid "RSS Campaigns"
 msgstr ""
 
-#: views/index.hbs:14
+#: views/index.hbs:11
 msgid ""
 "Setup Mailtrain to track RSS feeds and if a new entry is detected in a feed "
 "then Mailtrain auto-generates a new campaign using entry data as message "
 "contents and sends it to selected subscribers."
 msgstr ""
 
-#: views/index.hbs:15
+#: views/index.hbs:13
 msgid "GPG Encryption"
 msgstr ""
 
-#: views/index.hbs:16
+#: views/index.hbs:14
 msgid ""
 "If a list has a custom field for a GPG Public Key set then subscribers can "
 "upload their GPG public key to receive encrypted messages from the list."
 msgstr ""
 
-#: views/index.hbs:17
-msgid "Click stats"
+#: views/index.hbs:16
+msgid "Click Stats"
 msgstr ""
 
-#: views/index.hbs:18
+#: views/index.hbs:17
 msgid ""
 "After a campaign is sent, check individual click statistics for every link "
 "included in the message."
 msgstr ""
 
 #: views/index.hbs:19
-msgid "Open source"
+msgid "Template Editors"
 msgstr ""
 
 #: views/index.hbs:20
-msgid "Mailtrain is available under GPLv3 license and completely open source."
-msgstr ""
-
-#: views/index.hbs:21
-msgid "Send via any provider"
+msgid ""
+"Mailtrain ships with GrapeJS and Mosaico built in, two advanced template "
+"editors. Mailtrain also offers a code editor if you prefer to handcraft the "
+"HTML yourself."
 msgstr ""
 
 #: views/index.hbs:22
+msgid "Send via Any Provider"
+msgstr ""
+
+#: views/index.hbs:23
 msgid ""
 "Mailtrain recommends <a "
 "href=\"https://sendpulse.com/?utm_source=mailtrain&utm_medium=providerlist\""
@@ -1148,14 +1139,47 @@ msgid ""
 "Postfix and ZoneMTA."
 msgstr ""
 
-#: views/index.hbs:23
-msgid "Trigger based automation"
+#: views/index.hbs:25
+#: lib/tools.js:123
+msgid "Automation"
 msgstr ""
 
-#: views/index.hbs:24
+#: views/index.hbs:26
 msgid ""
 "Define automation triggers to send specific messages when a user activates "
 "the trigger."
+msgstr ""
+
+#: views/index.hbs:28
+msgid "Donate to Author"
+msgstr ""
+
+#: views/index.hbs:29
+msgid "Mailtrain is available under GPLv3 license and completely open source."
+msgstr ""
+
+#: views/index.hbs:30
+msgid ""
+"If you really like Mailtrain or your business benefits from it financially "
+"then I would really appreciate a small donation to keep the Mailtrain "
+"development engines running. You can either use Bitcoin or PayPal for "
+"donations. My Bitcoin wallet is"
+msgstr ""
+
+#: views/index.hbs:31
+msgid "Or Donate Using Paypal"
+msgstr ""
+
+#: views/index.hbs:32
+msgid "Official Mailtrain Partners"
+msgstr ""
+
+#: views/index.hbs:33
+msgid "A reliable SMTP server, easy integration, and 12,000 messages a month free"
+msgstr ""
+
+#: views/index.hbs:34
+msgid "Free, open source mail server solution"
 msgstr ""
 
 #: views/layout.hbs:2
@@ -1202,7 +1226,7 @@ msgid "Sign in"
 msgstr ""
 
 #: views/layout.hbs:10
-msgid "Self hosted newsletter app built on top of Nodemailer"
+msgid "Self Hosted Newsletter App Built on Top of Nodemailer"
 msgstr ""
 
 #: views/layout.hbs:11
@@ -1211,7 +1235,7 @@ msgid "Source on GitHub"
 msgstr ""
 
 #: views/layout.hbs:12
-msgid "Subscribe to our newsletter"
+msgid "Subscribe to Our Newsletter"
 msgstr ""
 
 #: views/lists/create.hbs:2
@@ -1270,14 +1294,6 @@ msgstr ""
 
 #: views/lists/edit.hbs:12
 msgid "Delete List"
-msgstr ""
-
-#: views/lists/fields/create.hbs:3
-#: views/lists/fields/edit.hbs:3
-#: views/lists/fields/fields.hbs:3
-#: views/lists/fields/fields.hbs:5
-#: views/lists/view.hbs:5
-msgid "Custom Fields"
 msgstr ""
 
 #: views/lists/fields/create.hbs:4
@@ -1993,6 +2009,10 @@ msgid ""
 "format of the merge tag is the following: <code>[TAG_NAME]</code> or "
 "<code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional "
 "text value used when <code>TAG_NAME</code> is empty."
+msgstr ""
+
+#: views/partials/modal-carousel.hbs:1
+msgid "{{title}}"
 msgstr ""
 
 #: views/partials/mosaico.hbs:2
@@ -3433,10 +3453,6 @@ msgstr ""
 msgid "Incorrect username or password"
 msgstr ""
 
-#: lib/tools.js:123
-msgid "Automation"
-msgstr ""
-
 #: lib/tools.js:133
 msgid "Blocked email address \"%s\""
 msgstr ""
@@ -3655,6 +3671,10 @@ msgstr ""
 
 #: routes/fields.js:185
 msgid "Could not delete specified field"
+msgstr ""
+
+#: routes/index.js:11
+msgid "Self Hosted Newsletter App"
 msgstr ""
 
 #: routes/links.js:40

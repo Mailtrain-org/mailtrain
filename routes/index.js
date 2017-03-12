@@ -6,9 +6,9 @@ let _ = require('../lib/translate')._;
 
 /* GET home page. */
 router.get('/', (req, res) => {
-    res.render('index-2', {
+    res.render('index', {
         indexPage: true,
-        title: _('Self hosted email newsletter app')
+        title: _('Self Hosted Newsletter App')
     });
 });
 

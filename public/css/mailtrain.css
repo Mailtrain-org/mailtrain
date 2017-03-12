@@ -24,3 +24,10 @@
         margin-left: 220px;
     }
 }
+
+h2 .glyphicon {
+    font-size: .75em;
+}
+h3 .glyphicon {
+    font-size: .8em;
+}
