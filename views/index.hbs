@@ -1,61 +1,40 @@
 <div class="row">
     <div class="col-md-4">
-        <h3>{{#translate}}Official Mailtrain Partners{{/translate}}</h3>
-        <div class="media">
-            <div class="media-left">
-                <a href="http://www.iredmail.org/">
-                    <img class="media-object" src="/images/iredmail-logo-red-114.png" alt="iRedMail">
-                </a>
-            </div>
-            <div class="media-body">
-                <h4 class="media-heading"><a href="http://www.iredmail.org/">iRedMail</a></h4> {{#translate}}Free, open source mail server solution{{/translate}}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <h3>&nbsp;</h3>
-        <div class="media">
-            <div class="media-left">
-                <a href="https://sendpulse.com/?utm_source=mailtrain&utm_medium=logo">
-                    <img class="media-object" src="/images/sendpulse.jpg" alt="SendPulse">
-                </a>
-            </div>
-            <div class="media-body">
-                <h4 class="media-heading"><a href="https://sendpulse.com/?utm_source=mailtrain&utm_medium=logo">SendPulse</a></h4> {{#translate}}A reliable SMTP server, easy integration, and 12,000 messages a month free{{/translate}}
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h2>{{#translate}}List management{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-list-alt"></span> {{#translate}}List Management{{/translate}}</h2>
         <p>{{#translate}}Mailtrain allows you to easily manage even very large lists. Million subscribers? Not a problem. You can add subscribers manually, through the API or import from a CSV file. All lists come with support for custom fields and merge tags as well.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-list-management">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='List Management'
+                cls='modal-list-management'
+                img01='/images/screenshots/lists/lists.png'
+                img02='/images/screenshots/lists/view.png'
+                img03='/images/screenshots/lists/subscription/edit.png'
+                img04='/images/screenshots/subscription/create.png'
+        }}
     </div>
     <div class="col-md-4">
-        <h2>{{#translate}}Custom fields{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-tasks"></span> {{#translate}}Custom Fields{{/translate}}</h2>
         <p>{{#translate}}Text fields, numbers, drop downs or checkboxes, Mailtrain has them all. Every custom field can be included in the generated newsletters through merge tags.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-custom-fields">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='Custom Fields'
+                cls='modal-custom-fields'
+                img01='/images/screenshots/fields/edit.png'
+                img02='/images/screenshots/fields/view.png'
+        }}
     </div>
-
     <div class="col-md-4">
-        <h2>{{#translate}}List segmentation{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-filter"></span> {{#translate}}List Segmentation{{/translate}}</h2>
         <p>{{#translate}}Send messages only to list subscribers that match predefined segmentation rules. No need to create separate lists with small differences.{{/translate}}</p>
-    </div>
-</div>
-
-<hr />
-<div class="row">
-
-    <div class="col-md-8">
-        <h3>{{#translate}}Donate to author{{/translate}}</h3>
-        <p>{{#translate}}If you really like Mailtrain or your business benefits from it financially then I would really appreciate a small donation to keep the Mailtrain development engines running. You can either use Bitcoin or PayPal for donations. My Bitcoin wallet is{{/translate}} <code>15Z8ADxhssKUiwP3jbbqJwA21744KMCfTM</code></p>
-
-        <p>
-            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=DB26KWR2BQX5W" class="btn btn-info">{{#translate}}or donate using PayPal{{/translate}}</a>
-        </p>
-
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-list-segmentation">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='List Segmentation'
+                cls='modal-list-segmentation'
+                img01='/images/screenshots/segments/create.png'
+                img02='/images/screenshots/segments/rules/create.png'
+                img03='/images/screenshots/segments/rules/configure.png'
+                img04='/images/screenshots/segments/view.png'
+        }}
     </div>
 </div>
 
@@ -63,92 +42,121 @@
 
 <div class="row">
     <div class="col-md-4">
-        <h2>{{#translate}}RSS Campaigns{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-star"></span> {{#translate}}RSS Campaigns{{/translate}}</h2>
         <p>{{#translate}}Setup Mailtrain to track RSS feeds and if a new entry is detected in a feed then Mailtrain auto-generates a new campaign using entry data as message contents and sends it to selected subscribers.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-rss-campaigns">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='RSS Campaigns'
+                cls='modal-rss-campaigns'
+                img01='/images/screenshots/campaigns/create-rss.png'
+                img02='/images/screenshots/campaigns/view-rss.png'
+                img03='/images/screenshots/campaigns/campaigns.png'
+        }}
     </div>
     <div class="col-md-4">
-        <h2>{{#translate}}GPG Encryption{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-lock"></span> {{#translate}}GPG Encryption{{/translate}}</h2>
         <p>{{#translate}}If a list has a custom field for a GPG Public Key set then subscribers can upload their GPG public key to receive encrypted messages from the list.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-gpg-encryption">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='GPG Encryption'
+                cls='modal-gpg-encryption'
+                img01='/images/screenshots/subscription/create.png'
+                img02='/images/screenshots/settings.png'
+        }}
     </div>
     <div class="col-md-4">
-        <h2>{{#translate}}Click stats{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-stats"></span> {{#translate}}Click Stats{{/translate}}</h2>
         <p>{{#translate}}After a campaign is sent, check individual click statistics for every link included in the message.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-click-stats">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='Click Stats'
+                cls='modal-click-stats'
+                img01='/images/screenshots/campaigns/view.png'
+                img02='/images/screenshots/campaigns/view-links.png'
+                img03='/images/screenshots/campaigns/clicked/view.png'
+        }}
     </div>
 </div>
 
+<hr />
+
 <div class="row">
     <div class="col-md-4">
-        <h2>{{#translate}}Open source{{/translate}}</h2>
-        <p>{{#translate}}Mailtrain is available under GPLv3 license and completely open source.{{/translate}}</p>
+        <h2><span class="glyphicon glyphicon-edit"></span> {{#translate}}Template Editors{{/translate}}</h2>
+        <p>{{#translate}}Mailtrain ships with GrapeJS and Mosaico built in, two advanced template editors. Mailtrain also offers a code editor if you prefer to handcraft the HTML yourself.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-editors">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='Template Editors'
+                cls='modal-editors'
+                img01='/images/screenshots/templates/create.png'
+                img02='/images/screenshots/templates/edit/grapejs.png'
+                img03='/images/screenshots/grapejs/editor-1.png'
+                img04='/images/screenshots/grapejs/editor-2.png'
+                img05='/images/screenshots/grapejs/editor-3.png'
+                img06='/images/screenshots/templates/edit/mosaico.png'
+                img07='/images/screenshots/mosaico/editor-1.png'
+                img08='/images/screenshots/mosaico/editor-2.png'
+                img09='/images/screenshots/mosaico/editor-3.png'
+        }}
     </div>
     <div class="col-md-4">
-        <h2>{{#translate}}Send via any provider{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-send"></span> {{#translate}}Send via Any Provider{{/translate}}</h2>
         <p>{{#translate}}Mailtrain recommends <a href="https://sendpulse.com/?utm_source=mailtrain&utm_medium=providerlist">SendPulse</a> even though you can use any provider that supports SMTP protocol to send out your newsletters. Bounce and complaints handling via webhooks is supported for SES, SparkPost, SendGrid and Mailgun, also for Postfix and ZoneMTA.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-send-via-any-provider">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='Send via Any Provider'
+                cls='modal-send-via-any-provider'
+                img01='/images/screenshots/settings.png'
+        }}
     </div>
     <div class="col-md-4">
-        <h2>{{#translate}}Trigger based automation{{/translate}}</h2>
+        <h2><span class="glyphicon glyphicon-cog"></span> {{#translate}}Automation{{/translate}}</h2>
         <p>{{#translate}}Define automation triggers to send specific messages when a user activates the trigger.{{/translate}}</p>
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target=".modal-automation">{{#translate}}Show more{{/translate}}</button>
+        {{> modal_carousel
+                title='Automation'
+                cls='modal-automation'
+                img01='/images/screenshots/triggers/create-select.png'
+                img02='/images/screenshots/triggers/create.png'
+                img03='/images/screenshots/users/api.png'
+        }}
     </div>
 </div>
 
-<p></p>
+<p><br></p>
+
+<div class="row" style="background: #eee;">
+    <div class="col-md-8">
+        <h3>{{#translate}}Donate to Author{{/translate}}</h3>
+        <p>{{#translate}}Mailtrain is available under GPLv3 license and completely open source.{{/translate}}</p>
+        <p>{{#translate}}If you really like Mailtrain or your business benefits from it financially then I would really appreciate a small donation to keep the Mailtrain development engines running. You can either use Bitcoin or PayPal for donations. My Bitcoin wallet is{{/translate}}: <code>15Z8ADxhssKUiwP3jbbqJwA21744KMCfTM</code></p>
+        <p style="margin-bottom: 20px;"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=DB26KWR2BQX5W" class="btn btn-info">{{#translate}}Or Donate Using Paypal{{/translate}}</a></p>
+    </div>
+</div>
+
+<p><br></p>
 
 <div class="row">
-    <div class="col-md-1"></div>
-    <div class="col-md-10">
-
-        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-            <!-- Indicators -->
-            <ol class="carousel-indicators">
-                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
-                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
-            </ol>
-
-            <!-- Wrapper for slides -->
-            <div class="carousel-inner" role="listbox">
-                <div class="item active">
-                    <img src="/images/img01.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img02.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img03.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img04.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img05.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img06.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img07.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img08.png">
-                </div>
-                <div class="item">
-                    <img src="/images/img09.png">
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
-                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
-                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-
+    <div class="col-md-12">
+        <h3>{{#translate}}Official Mailtrain Partners{{/translate}}</h3>
+        <hr />
     </div>
-    <div class="col-md-1"></div>
+    <div class="col-md-4">
+        <p>
+            <a href="https://sendpulse.com/?utm_source=mailtrain&utm_medium=logo">
+                <img class="media-object" src="/images/sendpulse-logo.png" alt="SendPulse">
+            </a>
+        </p>
+        <p>{{#translate}}A reliable SMTP server, easy integration, and 12,000 messages a month free{{/translate}}</p>
+    </div>
+    <div class="col-md-4">
+        <p>
+            <a href="http://www.iredmail.org/">
+                <img class="media-object" src="/images/iredmail-logo.png" alt="iRedMail">
+            </a>
+        </p>
+        <p>{{#translate}}Free, open source mail server solution{{/translate}}</p>
+    </div>
 </div>
 
-<p></p>
+<p><br><br><br></p>
