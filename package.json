@@ -82,7 +82,6 @@
     "npmlog": "^4.0.2",
     "openpgp": "^2.4.0",
     "passport": "^0.3.2",
-    "passport-ldapjs": "^1.0.2",
     "passport-local": "^1.0.0",
     "premailer-api": "^1.0.4",
     "redfour": "^1.0.0",
