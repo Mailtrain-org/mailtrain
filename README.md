@@ -115,6 +115,77 @@ If you are using the bundled ZoneMTA then you should make sure you are using a p
 
 With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect 10/10 score out from [MailTester](https://www.mail-tester.com/) when sending a campaign message to a MailTester test address. I did not have VERP turned on, so the sender address matched return path address.
 
+### Simple Install (Docker)
+##### Requirements:
+    * Docker
+    * docker-compose
+  
+  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  2. Run `sudo docker build -t mailtrain-node:latest .`
+  3. Copy default.toml to production.toml. Run `sudo mkdir -p /etc/mailtrain && sudo cp config/default.toml /etc/mailtrain/production.toml`
+  4. Create `/etc/docker-compose.yml`. Example (dont forget change MYSQL_ROOT_PASS and MYSQL_USER_PASSWORD to your passwords):
+  ```
+  version: '2'
+  services:
+    mailtrain-mysql:
+        image: mysql:latest
+        ports:
+          - "3306:3306"
+        container_name: "mailtrain-mysql"
+        restart: always
+        environment:
+           MYSQL_ROOT_PASSWORD: "MYSQL_ROOT_PASS"
+           MYSQL_DATABASE: "mailtrain"
+           MYSQL_USER: "mailtrain"
+           MYSQL_PASSWORD: "MYSQL_USER_PASSWORD"
+        volumes:
+           - mailtrain-mysq-data:/var/lib/mysql
+
+    mailtrain-redis:
+        image: redis:3.0
+        container_name: "mailtrain-redis"
+        volumes:
+           - mailtrain-redis-data:/data
+
+    mailtrain-node:
+      image: mailtrain-node:latest
+      container_name: "mailtrain-node"
+      links:
+        - "mailtrain-mysql:mailtrain-mysql"
+        - "mailtrain-redis:mailtrain-redis"
+      ports:
+        - "3000:3000"
+      volumes:
+        - "/etc/mailtrain/production.toml:/app/config/production.toml"
+  volumes:
+    mailtrain-mysq-data: {}
+    mailtrain-redis-data: {}
+
+  ```
+  5. Update MySQL and Redis credintial in `/etc/mailtrain/production.toml` like this:
+  ```
+  [mysql]
+  host="mailtrain-mysql"
+  user="mailtrain"
+  password="MYSQL_USER_PASSWORD"
+  database="mailtrain"
+  port=3306
+  charset="utf8mb4"
+  timezone="UTC"
+
+  [redis]
+  enabled=true
+  host="mailtrain-redis"
+  port=6379
+  db=5
+  ```
+  6. Run docker container with command `sudo docker-compose -f /etc/docker-compose.yml up -d`
+  7. Open [http://localhost:3000/](http://localhost:3000/)
+  8. Authenticate as `admin`:`test`
+  9. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration
+  10. Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password
+
+
 ### Manual Install (any OS that supports Node.js)
 
   1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
