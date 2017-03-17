@@ -157,9 +157,12 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
         - "3000:3000"
       volumes:
         - "/etc/mailtrain/production.toml:/app/config/production.toml"
+        - "mailtrain-node-data:/app/public/grapejs/uploads"
+        - "mailtrain-node-data:/app/public/mosaico/uploads"
   volumes:
     mailtrain-mysq-data: {}
     mailtrain-redis-data: {}
+    mailtrain-node-data: {}
 
   ```
   5. Update MySQL and Redis credintial in `/etc/mailtrain/production.toml` like this:
