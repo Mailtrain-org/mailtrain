@@ -2,9 +2,9 @@
 
 ## 1.23.0 2017-03-19
 
-  * Fixed security issue where description tags were able to include script tags. Reported by Andreas Lindh. Fixed with [ae6affda]
-  * Fixed security issue where templates that looked like file paths loaded content from arbitrary files. Reported by Andreas Lindh. Fixed with [0879fa41]
-  * Fixed security issue where users were able to use html tags in subscription values. Reported by Andreas Lindh. Fixed with [9d5fb816]
+  * Fixed security issue where description tags were able to include script tags. Reported by Andreas Lindh. Fixed with [ae6affda](https://github.com/andris9/mailtrain/commit/ae6affda8193f034e06f7e095ee23821a83d5190)
+  * Fixed security issue where templates that looked like file paths loaded content from arbitrary files. Reported by Andreas Lindh. Fixed with [0879fa41](https://github.com/andris9/mailtrain/commit/0879fa412a2d4a417aeca5cd5092a8f86531e7ef)
+  * Fixed security issue where users were able to use html tags in subscription values. Reported by Andreas Lindh. Fixed with [9d5fb816](https://github.com/andris9/mailtrain/commit/9d5fb816c937114966d4f589e1ad4e164ff3a187)
   * Support for multiple HTML editors (Mosaico, GrapeJS, Summernote, HTML code)
 
 ## 1.22.0 2017-03-02
