@@ -47,6 +47,7 @@
     "csurf": "^1.9.0",
     "csv-generate": "^1.0.0",
     "csv-parse": "^1.2.0",
+    "dompurify": "^0.8.5",
     "escape-html": "^1.0.3",
     "express": "^4.15.2",
     "express-session": "^1.15.1",
