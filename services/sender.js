@@ -371,7 +371,7 @@ function formatMessage(message, callback) {
 
                                 let campaignAddress = [campaign.cid, list.cid, message.subscription.cid].join('.');
 
-                                let renderedHtml = renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html) : html;
+                                let renderedHtml = renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, html, false, true) : html;
 
                                 let renderedText = (text || '').trim() ? (renderTags ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, text) : text) : htmlToText.fromString(renderedHtml, {
                                     wordwrap: 130

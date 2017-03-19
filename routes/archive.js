@@ -67,7 +67,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                             let render = (view, layout) => {
                                 res.render(view, {
                                     layout,
-                                    message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html) : html,
+                                    message: renderTags ? tools.formatMessage(serviceUrl, campaign, list, subscription, html, false, true) : html,
                                     campaign,
                                     list,
                                     subscription,
@@ -80,6 +80,9 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                                 res.render('partials/tracking-scripts', {
                                     layout: 'archive/layout-raw'
                                 }, (err, scripts) => {
+                                    if (err) {
+                                        return next(err);
+                                    }
                                     html = scripts ? html.replace(/<\/body\b/i, match => scripts + match) : html;
                                     render('archive/view-raw', 'archive/layout-raw');
                                 });
