@@ -1,0 +1,143 @@
+{{#each customFields}}
+
+    {{#if typeSubsciptionEmail}}
+        <div class="form-group email">
+            <label for="email">{{#translate}}Email Address{{/translate}}</label>
+            {{#if ../isManagePreferences}}
+                <div class="input-group">
+                    <input type="email" name="email" id="email" placeholder="" value="{{../email}}" readonly>
+                    <div class="input-group-addon"><a href="/subscription/{{../lcid}}/manage-address/{{../cid}}">{{#translate}}want to change it?{{/translate}}</a></div>
+                </div>
+            {{else}}
+                <input type="email" name="email" id="email" placeholder="" value="{{../email}}" required>
+            {{/if}}
+        </div>
+    {{/if}}
+
+    {{#if typeFirstName}}
+        <div class="form-group first-name">
+            <label for="first-name">{{#translate}}First Name{{/translate}}</label>
+            <input type="text" name="first-name" id="first-name" placeholder="" value="{{../firstName}}">
+        </div>
+    {{/if}}
+
+    {{#if typeLastName}}
+        <div class="form-group last-name">
+            <label for="last-name">{{#translate}}Last Name{{/translate}}</label>
+            <input type="text" name="last-name" id="last-name" placeholder="" value="{{../lastName}}">
+        </div>
+    {{/if}}
+
+    {{#if typeText}}
+        <div class="form-group text {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="text" name="{{column}}" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeNumber}}
+        <div class="form-group number {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="number" name="{{column}}" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeWebsite}}
+        <div class="form-group url {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="url" name="{{column}}" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeLongtext}}
+        <div class="form-group longtext {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <textarea rows="3" name="{{column}}">{{value}}</textarea>
+        </div>
+    {{/if}}
+
+    {{#if typeJson}}
+        <div class="form-group json {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <textarea class="gpg-text" rows="3" name="{{column}}" placeholder="{&quot;data&quot;:&quot;value&quot;}">{{value}}</textarea>
+        </div>
+    {{/if}}
+
+    {{#if typeGpg}}
+        <div class="form-group gpg {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            {{#if ../hasPubkey}}
+                <button class="btn-download-pubkey" type="submit" form="download-pubkey">{{#translate}}Download signature verification key{{/translate}}</button>
+            {{/if}}
+            <textarea class="form-control gpg-text" rows="4" name="{{column}}" placeholder="{{#translate}}Begins with{{/translate}} &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
+            <span class="help-block">
+                {{#translate}}Insert your GPG public key here to encrypt messages sent to your address{{/translate}} <em>({{#translate}}optional{{/translate}})</em>
+            </span>
+        </div>
+    {{/if}}
+
+    {{#if typeDateUs}}
+        <div class="form-group date fm-date-us {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="text" name="{{column}}" placeholder="MM/DD/YYYY" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeDateEur}}
+        <div class="form-group date fm-date-eur {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="text" name="{{column}}" placeholder="DD/MM/YYYY" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeBirthdayUs}}
+        <div class="form-group date fm-birthday-us {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="text" name="{{column}}" placeholder="MM/DD" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeBirthdayEur}}
+        <div class="form-group date fm-birthday-eur {{column}}">
+            <label for="{{column}}">{{name}}</label>
+            <input type="text" name="{{column}}" placeholder="DD/MM" value="{{value}}">
+        </div>
+    {{/if}}
+
+    {{#if typeDropdown}}
+        <div class="form-group dropdown {{key}}">
+            <label for="{{key}}">{{name}}</label>
+            <select name="{{key}}" class="form-control">
+                <option value="">
+                    –– {{#translate}}Select{{/translate}} ––
+                </option>
+                {{#each options}}
+                    <option value="{{column}}" {{#if value}} selected {{/if}}>{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+    {{/if}}
+
+    {{#if typeRadio}}
+        <div class="form-group radio {{key}}">
+            <label for="{{key}}">{{name}}</label>
+            {{#each options}}
+                <label class="label-radio">
+                    <input type="radio" name="{{../key}}" value="{{column}}" {{#if value}} checked {{/if}}> {{name}}
+                </label>
+            {{/each}}
+        </div>
+    {{/if}}
+
+    {{#if typeCheckbox}}
+        <div class="form-group checkbox">
+            <label>{{name}}</label>
+            {{#each options}}
+                <label class="label-checkbox">
+                    <input type="checkbox" name="{{column}}" value="1" {{#if value}} checked {{/if}}> {{name}}
+                </label>
+            {{/each}}
+        </div>
+    {{/if}}
+
+{{/each}}

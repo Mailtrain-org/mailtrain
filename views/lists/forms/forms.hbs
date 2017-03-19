@@ -1,0 +1,87 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li class="active">{{#translate}}Custom Forms{{/translate}}</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/forms/{{list.id}}/create" role="button"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Custom Form{{/translate}}</a>
+</div>
+
+<h2>{{list.name}} <small>{{#translate}}Custom Forms{{/translate}}</small></h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <th style="width: auto;" class="text-right">
+                #
+            </th>
+            <th style="width: 30%;">
+                {{#translate}}Name{{/translate}}
+            </th>
+            <th style="width: 60%;">
+                {{#translate}}Description{{/translate}}
+            </th>
+            <th>
+                &nbsp;
+            </th>
+        </thead>
+        <tbody>
+            {{#each customForms}}
+                <tr>
+                    <th scope="row" class="text-right">
+                        {{index}}
+                    </th>
+                    <td>
+                        {{#if isDefaultForm}}
+                            <span class="glyphicon glyphicon-star" style="color: #DE4320; font-size: .8em; font-weight: bold; padding-right: 2px;"></span>
+                        {{else}}
+                            <span class="glyphicon glyphicon-star-empty" style="color: #ccc; font-size: .8em; padding-right: 2px;"></span>
+                        {{/if}}
+                        {{name}}
+                    </td>
+                    <td class="text-muted">
+                        {{description}}
+                    </td>
+                    <td class="text-center">
+                        <a href="/forms/{{../list.id}}/edit/{{id}}">
+                            {{#translate}}Edit{{/translate}}
+                        </a>
+                    </td>
+                </tr>
+            {{/each}}
+            {{#unless customForms}}
+                <tr>
+                    <td colspan="6">
+                        {{#translate}}No data available in table{{/translate}}
+                    </td>
+                </tr>
+            {{/unless}}
+        </tbody>
+    </table>
+</div>
+
+
+<form class="form-inline" method="post" action="/lists/edit?next=%2Fforms%2F{{list.id}}">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{list.id}}" />
+    <input type="hidden" name="name" value="{{list.name}}" />
+
+    <div class="form-group">
+        <label for="default_form" class="control-label" style="color: #666; font-weight: normal;">{{#translate}}The default form for this list is:{{/translate}}</label>
+        &nbsp;
+        <select class="form-control input-sm" id="default_form" name="default_form">
+            <option value="0">{{#translate}}Default Mailtrain Form{{/translate}}</option>
+            {{#each customForms}}
+                <option value="{{id}}" {{#if isDefaultForm}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+        </select>
+        <button type="submit" class="btn btn-default btn-sm">{{#translate}}Update{{/translate}}</button>
+    </div>
+</form>
+
+
+<p><br></p>
