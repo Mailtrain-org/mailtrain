@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.23.0 2017-03-19
+
+  * Fixed security issue where description tags were able to include script tags. Reported by Andreas Lindh. Fixed with [ae6affda]
+  * Fixed security issue where templates that looked like file paths loaded content from arbitrary files. Reported by Andreas Lindh. Fixed with [0879fa41]
+  * Fixed security issue where users were able to use html tags in subscription values. Reported by Andreas Lindh. Fixed with [9d5fb816]
+  * Support for multiple HTML editors (Mosaico, GrapeJS, Summernote, HTML code)
+
 ## 1.22.0 2017-03-02
 
   * Reverted license back to GPL-v3 to support Mosaico
