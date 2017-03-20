@@ -73,7 +73,6 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab">{{#translate}}Templates{{/translate}}</a></li>
                 <li role="presentation"><a href="#fields" aria-controls="fields" role="tab" data-toggle="tab">{{#translate}}Fields{{/translate}}</a></li>
-                <li role="presentation"><a href="#help" aria-controls="help" role="tab" data-toggle="tab">{{#translate}}Help{{/translate}}</a></li>
             </ul>
         </div>
     </div>
@@ -121,6 +120,9 @@
                 {{#each opts}}
                     <div class="form-group template {{name}}" {{#unless isLayout}}style="display: none;"{{/unless}}>
                         <div class="col-sm-offset-2 col-sm-10">
+                            <div class="help-block" style="margin-top: -8px;">
+                                <small>{{#if help}}{{{help}}}{{else}}&nbsp;{{/if}}</small>
+                            </div>
                             <div class="code-editor-{{type}}" style="height: 700px; border: 1px solid #ccc;"></div>
                             <input type="hidden" name="{{name}}" value="{{value}}">
                         </div>
@@ -238,16 +240,6 @@
             </div>
         </div>
 
-        <div role="tabpanel" class="tab-pane" id="help">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <p>
-                        {{#translate}}The MJML Documentation can be found <a href="https://mjml.io/documentation/" rel="noreferrer" target="_blank">here</a>.{{/translate}}
-                    </p>
-                </div>
-            </div>
-        </div>
-
     </div><!-- end .tab-content -->
 
     <hr>
@@ -281,6 +273,11 @@
         $('#templateSelect').on('change', function() {
             Cookies.set('tmpl', $(this).val(), { expires: 7, path: '' });
         });
+
+        $('a.mjml-documentation')
+            .attr('href', 'https://mjml.io/documentation/')
+            .attr('target', '_blank')
+            .attr('rel', 'noreferrer')
 
     });
 </script>

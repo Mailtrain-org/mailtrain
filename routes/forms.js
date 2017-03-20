@@ -133,83 +133,104 @@ router.get('/:list/edit/:form', passport.csrfProtection, (req, res) => {
                     fieldsHiddenOnManage = helpers.filterCustomFields(customFields, form.fieldsShownOnManage, 'exclude');
                 }
 
+                let helpEmailText = _('The plaintext version for this email');
+                let helpMjmlBase = _('Custom forms use MJML for formatting');
+                let helpMjmlDocLink = _('See the MJML documentation <a class="mjml-documentation">here</a>');
+                let helpMjmlGeneral = helpMjmlBase + ' ' + helpMjmlDocLink;
+
                 let templateOptgroups = [
                     {
-                        label: 'General',
+                        label: _('General'),
                         opts: [{
                             name: 'layout',
                             label: _('Layout'),
                             type: 'mjml',
+                            help: helpMjmlGeneral,
                             isLayout: true
                         }, {
                             name: 'form_input_style',
                             label: _('Form Input Style'),
-                            type: 'css'
+                            type: 'css',
+                            help: _('This CSS stylesheet defines the appearance of form input elements and alerts')
                         }]
                     }, {
                         label: _('Subscribe'),
                         opts: [{
                             name: 'web_subscribe',
                             label: _('Web - Subscribe'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'web_confirm_notice',
                             label: _('Web - Confirm Notice'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'mail_confirm_html',
                             label: _('Mail - Confirm Subscription (MJML)'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'mail_confirm_text',
                             label: _('Mail - Confirm Subscription (Text)'),
-                            type: 'text'
+                            type: 'text',
+                            help: helpEmailText
                         }, {
                             name: 'web_subscribed',
                             label: _('Web - Subscribed Notice'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'mail_subscription_confirmed_html',
                             label: _('Mail - Subscription Confirmed (MJML)'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'mail_subscription_confirmed_text',
                             label: _('Mail - Subscription Confirmed (Text)'),
-                            type: 'text'
+                            type: 'text',
+                            help: helpEmailText
                         }]
                     }, {
-                        label: 'Manage',
+                        label: _('Manage'),
                         opts: [{
                             name: 'web_manage',
                             label: _('Web - Manage Preferences'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'web_manage_address',
                             label: _('Web - Manage Address'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'web_updated_notice',
                             label: _('Web - Updated Notice'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }]
                     }, {
-                        label: 'Unsubscribe',
+                        label: _('Unsubscribe'),
                         opts: [{
                             name: 'web_unsubscribe',
                             label: _('Web - Unsubscribe'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'web_unsubscribe_notice',
                             label: _('Web - Unsubscribe Notice'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'mail_unsubscribe_confirmed_html',
                             label: _('Mail - Unsubscribe Confirmed (MJML)'),
-                            type: 'mjml'
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }, {
                             name: 'mail_unsubscribe_confirmed_text',
                             label: _('Mail - Unsubscribe Confirmed (Text)'),
-                            type: 'text'
+                            type: 'text',
+                            help: helpEmailText
                         }]
                     }
                 ];
