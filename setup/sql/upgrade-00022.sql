@@ -6,8 +6,7 @@ SET @schema_version = '22';
 
 # Create ALTER TABLE PROCEDURE
 DROP PROCEDURE IF EXISTS `alterbyregexp`;
-DELIMITER //
-CREATE PROCEDURE alterbyregexp(`table_regexp` VARCHAR(255), `altertext` VARCHAR(255))
+CREATE PROCEDURE `alterbyregexp` (`table_regexp` VARCHAR(255), `altertext` VARCHAR(255))
 BEGIN
 DECLARE done INT DEFAULT FALSE;
 DECLARE tbl VARCHAR(255);
@@ -27,8 +26,6 @@ DEALLOCATE PREPARE stmt;
 END LOOP;
 CLOSE curs;
 END;
-//
-DELIMITER ;
 
 # Add field device_type to campaign_tracker
 CALL alterbyregexp('campaign\_tracker%', 'ADD COLUMN `device_type` varchar(50) DEFAULT NULL AFTER `ip`');
