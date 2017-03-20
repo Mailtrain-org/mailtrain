@@ -69,7 +69,7 @@
         <!-- Default panel contents -->
         <div class="panel-heading">{{#if aggregated}}{{#translate}}Subscribers who clicked on a link:{{/translate}}{{else}}{{#translate}}Subscribers who clicked on this link:{{/translate}}{{/if}}</div>
         <div class="panel-body">
-            {{#if aggregated}}{{else}}
+            {{#unless aggregated}}
             <div class="table-responsive">
               <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
               <table class="table table-bordered table-hover data-piechart-ajax display nowrap">
@@ -93,7 +93,7 @@
                 </thead>
               </table>
             </div>
-            {{/if}}
+            {{/unless}}
             <div class="table-responsive">
                 <table data-topic-url="/campaigns/clicked" data-topic-id="{{id}}/{{link.id}}" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,1,1,0">
                     <thead>
