@@ -72,6 +72,31 @@ $('.data-table-ajax').each(function () {
     });
 });
 
+$('.data-stats-pie-chart').each(function () {
+    var column = $(this).data('column') || 'country';
+    var limit = $(this).data('limit') || 20;
+    var topicId = $(this).data('topicId');
+    var topicUrl = $(this).data('topicUrl') || '/campaigns/clicked';
+    var ajaxUrl = topicUrl + '/ajax/' + topicId + '/stats';
+    var self = $(this);
+
+    $.post(ajaxUrl, {column: column, limit: limit}, function(data) {
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var gTable = new google.visualization.DataTable();
+        gTable.addColumn('string', 'Column');
+        gTable.addColumn('number', 'Value');
+        gTable.addRows(data.data);
+
+        var options = {'width':500, 'height':400};
+        var chart = new google.visualization.PieChart(self[0]);
+        chart.draw(gTable, options);
+      }
+    });
+});
+
 $('.datestring').each(function () {
     $(this).html(moment($(this).data('date')).fromNow());
 });
