@@ -41,7 +41,7 @@ router.post('/aws', (req, res, next) => {
                 }
 
                 if (req.body.Message.mail && req.body.Message.mail.messageId) {
-                    campaigns.findMailByResponse(req.body.Message.mail.messageId, (err, message) => {
+                    campaigns.findMailByResponse('<'+req.body.Message.mail.messageId+'@email.amazonses.com>', (err, message) => {
                         if (err || !message) {
                             return;
                         }

@@ -210,7 +210,7 @@ router.get('/:cid/unsubscribe-notice', (req, res, next) => {
     });
 });
 
-router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req, res, next) => {
+router.post('/:cid/subscribe', passport.parseForm, (req, res, next) => {
     let email = (req.body.email || '').toString().trim();
 
     if (!email) {
