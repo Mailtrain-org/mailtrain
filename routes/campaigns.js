@@ -581,6 +581,45 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
     });
 });
 
+router.post('/clicked/ajax/:id/:linkId/stats', (req, res) => {
+    let linkId = Number(req.params.linkId) || 0;
+    campaigns.get(req.params.id, true, (err, campaign) => {
+        if (err || !campaign) {
+            return res.json({
+                error: err && err.message || err || _('Campaign not found'),
+                data: []
+            });
+        }
+        lists.get(campaign.list, (err, list) => {
+            if (err) {
+                return res.json({
+                    error: err && err.message || err,
+                    data: []
+                });
+            }
+
+            let column = req.body.column;
+            let limit = req.body.limit;
+
+            campaigns.statsClickedSubscribersByColumn(campaign, linkId, req.body, column, limit, (err, data, total) => {
+                if (err) {
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
+                }
+
+                res.json({
+                    draw: req.body.draw,
+                    total: total,
+                    data: data
+                });
+            });
+        });
+    });
+});
+
+
 router.post('/status/ajax/:id/:status', (req, res) => {
     let status = Number(req.params.status) || 0;
 

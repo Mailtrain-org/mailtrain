@@ -18,8 +18,7 @@ router.get('/:campaign/:list/:subscription', (req, res) => {
         'Content-Type': 'image/gif',
         'Content-Length': trackImg.length
     });
-
-    links.countOpen(req.ip, req.params.campaign, req.params.list, req.params.subscription, (err, opened) => {
+    links.countOpen(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, (err, opened) => {
         if (err) {
             log.error('Redirect', err.stack || err);
         }
@@ -53,7 +52,7 @@ router.get('/:campaign/:list/:subscription/:link', (req, res) => {
             log.error('Redirect', 'Unresolved URL: <%s>', req.url);
             return notFound();
         }
-        links.countClick(req.ip, req.params.campaign, req.params.list, req.params.subscription, linkId, (err, status) => {
+        links.countClick(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, linkId, (err, status) => {
             if (err) {
                 log.error('Redirect', err.stack || err);
             }
