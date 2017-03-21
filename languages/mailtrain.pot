@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-19 12:36+0000\n"
+"POT-Creation-Date: 2017-03-21 12:17+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
@@ -86,7 +86,7 @@ msgstr ""
 #: views/campaigns/unsubscribed.hbs:2
 #: views/campaigns/upload-attachment.hbs:2
 #: views/campaigns/view.hbs:2
-#: lib/tools.js:122
+#: lib/tools.js:125
 #: routes/campaigns.js:35
 msgid "Campaigns"
 msgstr ""
@@ -114,10 +114,10 @@ msgid "Subscribers who bounced and were unsubscribed:"
 msgstr ""
 
 #: views/campaigns/bounced.hbs:7
-#: views/campaigns/clicked.hbs:13
+#: views/campaigns/clicked.hbs:15
 #: views/campaigns/complained.hbs:7
 #: views/campaigns/delivered.hbs:7
-#: views/campaigns/opened.hbs:7
+#: views/campaigns/opened.hbs:9
 #: views/campaigns/unsubscribed.hbs:7
 #: views/lists/subscription/import-failed.hbs:8
 #: views/lists/view.hbs:19
@@ -126,10 +126,10 @@ msgid "Address"
 msgstr ""
 
 #: views/campaigns/bounced.hbs:8
-#: views/campaigns/clicked.hbs:14
+#: views/campaigns/clicked.hbs:16
 #: views/campaigns/complained.hbs:8
 #: views/campaigns/delivered.hbs:8
-#: views/campaigns/opened.hbs:8
+#: views/campaigns/opened.hbs:10
 #: views/campaigns/unsubscribed.hbs:8
 #: views/lists/subscription/add.hbs:6
 #: views/lists/subscription/edit.hbs:7
@@ -141,10 +141,10 @@ msgid "First Name"
 msgstr ""
 
 #: views/campaigns/bounced.hbs:9
-#: views/campaigns/clicked.hbs:15
+#: views/campaigns/clicked.hbs:17
 #: views/campaigns/complained.hbs:9
 #: views/campaigns/delivered.hbs:9
-#: views/campaigns/opened.hbs:9
+#: views/campaigns/opened.hbs:11
 #: views/campaigns/unsubscribed.hbs:9
 #: views/lists/subscription/add.hbs:7
 #: views/lists/subscription/edit.hbs:8
@@ -282,11 +282,21 @@ msgstr ""
 msgid "Subscribers who clicked on this link:"
 msgstr ""
 
-#: views/campaigns/clicked.hbs:16
+#: views/campaigns/clicked.hbs:13
+#: views/campaigns/opened.hbs:7
+msgid "Stats by country"
+msgstr ""
+
+#: views/campaigns/clicked.hbs:14
+#: views/campaigns/opened.hbs:8
+msgid "Stats by device type"
+msgstr ""
+
+#: views/campaigns/clicked.hbs:18
 msgid "First click time"
 msgstr ""
 
-#: views/campaigns/clicked.hbs:17
+#: views/campaigns/clicked.hbs:19
 msgid "Click count"
 msgstr ""
 
@@ -573,7 +583,7 @@ msgstr ""
 #: views/campaigns/edit.hbs:35
 #: views/lists/edit.hbs:16
 #: views/lists/fields/edit.hbs:39
-#: views/lists/forms/edit.hbs:31
+#: views/lists/forms/edit.hbs:29
 #: views/lists/forms/forms.hbs:12
 #: views/lists/segments/edit.hbs:14
 #: views/lists/segments/rule-edit.hbs:38
@@ -592,6 +602,7 @@ msgstr ""
 
 #: views/campaigns/edit-triggered.hbs:6
 #: views/campaigns/edit.hbs:6
+#: routes/forms.js:143
 msgid "General"
 msgstr ""
 
@@ -648,11 +659,11 @@ msgstr ""
 msgid "Subscribers who opened this message:"
 msgstr ""
 
-#: views/campaigns/opened.hbs:10
+#: views/campaigns/opened.hbs:12
 msgid "First open"
 msgstr ""
 
-#: views/campaigns/opened.hbs:11
+#: views/campaigns/opened.hbs:13
 msgid "Opened count"
 msgstr ""
 
@@ -929,6 +940,7 @@ msgstr ""
 #: views/subscription/web-manage.mjml.hbs:3
 #: views/subscription/web-unsubscribe.mjml.hbs:1
 #: views/subscription/web-unsubscribe.mjml.hbs:3
+#: routes/forms.js:213
 #: routes/lists.js:269
 msgid "Unsubscribe"
 msgstr ""
@@ -962,14 +974,14 @@ msgid ""
 msgstr ""
 
 #: views/index.hbs:3
-#: views/index.hbs:6
-#: views/index.hbs:9
-#: views/index.hbs:12
-#: views/index.hbs:15
-#: views/index.hbs:18
-#: views/index.hbs:21
-#: views/index.hbs:24
-#: views/index.hbs:27
+#: views/index.hbs:7
+#: views/index.hbs:10
+#: views/index.hbs:13
+#: views/index.hbs:16
+#: views/index.hbs:19
+#: views/index.hbs:22
+#: views/index.hbs:25
+#: views/index.hbs:28
 msgid "Show more"
 msgstr ""
 
@@ -989,63 +1001,67 @@ msgid ""
 "merge tags."
 msgstr ""
 
-#: views/index.hbs:7
-msgid "List Segmentation"
+#: views/index.hbs:6
+msgid "Mailtrain also supports custom forms."
 msgstr ""
 
 #: views/index.hbs:8
+msgid "List Segmentation"
+msgstr ""
+
+#: views/index.hbs:9
 msgid ""
 "Send messages only to list subscribers that match predefined segmentation "
 "rules. No need to create separate lists with small differences."
 msgstr ""
 
-#: views/index.hbs:10
+#: views/index.hbs:11
 msgid "RSS Campaigns"
 msgstr ""
 
-#: views/index.hbs:11
+#: views/index.hbs:12
 msgid ""
 "Setup Mailtrain to track RSS feeds and if a new entry is detected in a feed "
 "then Mailtrain auto-generates a new campaign using entry data as message "
 "contents and sends it to selected subscribers."
 msgstr ""
 
-#: views/index.hbs:13
+#: views/index.hbs:14
 msgid "GPG Encryption"
 msgstr ""
 
-#: views/index.hbs:14
+#: views/index.hbs:15
 msgid ""
 "If a list has a custom field for a GPG Public Key set then subscribers can "
 "upload their GPG public key to receive encrypted messages from the list."
 msgstr ""
 
-#: views/index.hbs:16
+#: views/index.hbs:17
 msgid "Click Stats"
 msgstr ""
 
-#: views/index.hbs:17
+#: views/index.hbs:18
 msgid ""
 "After a campaign is sent, check individual click statistics for every link "
 "included in the message."
 msgstr ""
 
-#: views/index.hbs:19
+#: views/index.hbs:20
 msgid "Template Editors"
 msgstr ""
 
-#: views/index.hbs:20
+#: views/index.hbs:21
 msgid ""
 "Mailtrain ships with GrapeJS and Mosaico built in, two advanced template "
 "editors. Mailtrain also offers a code editor if you prefer to handcraft the "
 "HTML yourself."
 msgstr ""
 
-#: views/index.hbs:22
+#: views/index.hbs:23
 msgid "Send via Any Provider"
 msgstr ""
 
-#: views/index.hbs:23
+#: views/index.hbs:24
 msgid ""
 "Mailtrain recommends <a "
 "href=\"https://sendpulse.com/?utm_source=mailtrain&utm_medium=providerlist\""
@@ -1055,26 +1071,26 @@ msgid ""
 "Postfix and ZoneMTA."
 msgstr ""
 
-#: views/index.hbs:25
-#: lib/tools.js:126
+#: views/index.hbs:26
+#: lib/tools.js:129
 msgid "Automation"
 msgstr ""
 
-#: views/index.hbs:26
+#: views/index.hbs:27
 msgid ""
 "Define automation triggers to send specific messages when a user activates "
 "the trigger."
 msgstr ""
 
-#: views/index.hbs:28
+#: views/index.hbs:29
 msgid "Donate to Author"
 msgstr ""
 
-#: views/index.hbs:29
+#: views/index.hbs:30
 msgid "Mailtrain is available under GPLv3 license and completely open source."
 msgstr ""
 
-#: views/index.hbs:30
+#: views/index.hbs:31
 msgid ""
 "If you really like Mailtrain or your business benefits from it financially "
 "then I would really appreciate a small donation to keep the Mailtrain "
@@ -1082,19 +1098,19 @@ msgid ""
 "donations. My Bitcoin wallet is"
 msgstr ""
 
-#: views/index.hbs:31
+#: views/index.hbs:32
 msgid "Or Donate Using Paypal"
 msgstr ""
 
-#: views/index.hbs:32
+#: views/index.hbs:33
 msgid "Official Mailtrain Partners"
 msgstr ""
 
-#: views/index.hbs:33
+#: views/index.hbs:34
 msgid "A reliable SMTP server, easy integration, and 12,000 messages a month free"
 msgstr ""
 
-#: views/index.hbs:34
+#: views/index.hbs:35
 msgid "Free, open source mail server solution"
 msgstr ""
 
@@ -1177,7 +1193,7 @@ msgstr ""
 #: views/lists/subscription/import-preview.hbs:2
 #: views/lists/subscription/import.hbs:2
 #: views/lists/view.hbs:2
-#: lib/tools.js:114
+#: lib/tools.js:117
 msgid "Lists"
 msgstr ""
 
@@ -1424,7 +1440,7 @@ msgstr ""
 
 #: views/lists/fields/fields.hbs:10
 #: views/lists/fields/fields.hbs:11
-#: views/lists/forms/edit.hbs:23
+#: views/lists/forms/edit.hbs:22
 #: views/lists/forms/forms.hbs:8
 #: views/lists/lists.hbs:9
 #: views/lists/segments/segments.hbs:8
@@ -1433,7 +1449,7 @@ msgstr ""
 #: views/triggers/triggers.hbs:14
 #: routes/campaigns.js:287
 #: routes/campaigns.js:576
-#: routes/campaigns.js:626
+#: routes/campaigns.js:665
 #: routes/lists.js:238
 #: routes/triggers.js:297
 msgid "Edit"
@@ -1497,7 +1513,7 @@ msgstr ""
 #: views/lists/subscription/add.hbs:16
 #: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:4
 #: views/subscription/mail-unsubscribe-confirmed-text.hbs:4
-#: routes/forms.js:150
+#: routes/forms.js:157
 #: routes/lists.js:269
 msgid "Subscribe"
 msgstr ""
@@ -1515,6 +1531,7 @@ msgid "Unsubscribed Notice"
 msgstr ""
 
 #: views/lists/forms/edit.hbs:17
+#: routes/forms.js:195
 msgid "Manage"
 msgstr ""
 
@@ -1531,7 +1548,7 @@ msgstr ""
 #: views/templates/edit.hbs:2
 #: views/templates/templates.hbs:2
 #: views/templates/templates.hbs:4
-#: lib/tools.js:118
+#: lib/tools.js:121
 msgid "Templates"
 msgstr ""
 
@@ -1539,38 +1556,27 @@ msgstr ""
 msgid "Fields"
 msgstr ""
 
-#: views/lists/forms/edit.hbs:22
-msgid "Help"
-msgstr ""
-
-#: views/lists/forms/edit.hbs:24
+#: views/lists/forms/edit.hbs:23
 msgid "Form Fields"
 msgstr ""
 
-#: views/lists/forms/edit.hbs:25
+#: views/lists/forms/edit.hbs:24
 msgid "Fields hidden on subscription page:"
 msgstr ""
 
-#: views/lists/forms/edit.hbs:26
+#: views/lists/forms/edit.hbs:25
 msgid "Fields shown on subscription page:"
 msgstr ""
 
-#: views/lists/forms/edit.hbs:27
+#: views/lists/forms/edit.hbs:26
 msgid "Fields hidden on preferences page:"
 msgstr ""
 
-#: views/lists/forms/edit.hbs:28
+#: views/lists/forms/edit.hbs:27
 msgid "Fields shown on preferences page:"
 msgstr ""
 
-#: views/lists/forms/edit.hbs:29
-msgid ""
-"The MJML Documentation can be found <a "
-"href=\"https://mjml.io/documentation/\" rel=\"noreferrer\" "
-"target=\"_blank\">here</a>."
-msgstr ""
-
-#: views/lists/forms/edit.hbs:30
+#: views/lists/forms/edit.hbs:28
 msgid "Delete Form"
 msgstr ""
 
@@ -1860,7 +1866,7 @@ msgstr ""
 #: views/lists/subscription/edit.hbs:6
 #: views/lists/subscription/import-preview.hbs:6
 #: views/subscription/partials/subscription-unsubscribe-form.hbs:1
-#: lib/helpers.js:38
+#: lib/helpers.js:40
 #: lib/models/segments.js:11
 msgid "Email address"
 msgstr ""
@@ -3143,16 +3149,16 @@ msgid "Could not find template with specified ID"
 msgstr ""
 
 #: lib/editor-helpers.js:32
-#: routes/archive.js:142
+#: routes/archive.js:145
 #: routes/campaigns.js:131
 #: routes/campaigns.js:295
 #: routes/campaigns.js:390
 #: routes/campaigns.js:435
 #: routes/campaigns.js:475
-#: routes/campaigns.js:739
-#: routes/campaigns.js:762
-#: routes/campaigns.js:781
-#: routes/campaigns.js:803
+#: routes/campaigns.js:778
+#: routes/campaigns.js:801
+#: routes/campaigns.js:820
+#: routes/campaigns.js:842
 #: routes/triggers.js:146
 msgid "Could not find campaign with specified ID"
 msgstr ""
@@ -3166,41 +3172,41 @@ msgstr ""
 msgid "Bad status code %s"
 msgstr ""
 
-#: lib/helpers.js:29
+#: lib/helpers.js:31
 msgid "URL that points to the unsubscribe page"
 msgstr ""
 
-#: lib/helpers.js:32
+#: lib/helpers.js:34
 msgid "URL that points to the preferences page of the subscriber"
 msgstr ""
 
-#: lib/helpers.js:35
+#: lib/helpers.js:37
 msgid "URL to preview the message in a browser"
 msgstr ""
 
-#: lib/helpers.js:41
+#: lib/helpers.js:43
 #: lib/models/segments.js:31
 msgid "First name"
 msgstr ""
 
-#: lib/helpers.js:44
+#: lib/helpers.js:46
 #: lib/models/segments.js:35
 msgid "Last name"
 msgstr ""
 
-#: lib/helpers.js:47
+#: lib/helpers.js:49
 msgid "Full name (first and last name combined)"
 msgstr ""
 
-#: lib/helpers.js:50
+#: lib/helpers.js:52
 msgid "Unique ID that identifies the recipient"
 msgstr ""
 
-#: lib/helpers.js:53
+#: lib/helpers.js:55
 msgid "Unique ID that identifies the list used for this campaign"
 msgstr ""
 
-#: lib/helpers.js:56
+#: lib/helpers.js:58
 msgid "Unique ID that identifies current campaign"
 msgstr ""
 
@@ -3208,33 +3214,33 @@ msgstr ""
 msgid "Invalid mail transport"
 msgstr ""
 
-#: lib/models/campaigns.js:271
-#: lib/models/campaigns.js:298
-#: lib/models/campaigns.js:371
-#: lib/models/campaigns.js:494
-#: lib/models/campaigns.js:752
-#: lib/models/campaigns.js:881
+#: lib/models/campaigns.js:308
+#: lib/models/campaigns.js:335
+#: lib/models/campaigns.js:408
+#: lib/models/campaigns.js:531
+#: lib/models/campaigns.js:792
+#: lib/models/campaigns.js:924
 msgid "Missing Campaign ID"
 msgstr ""
 
-#: lib/models/campaigns.js:407
+#: lib/models/campaigns.js:444
 msgid "Emtpy or too large attahcment"
 msgstr ""
 
-#: lib/models/campaigns.js:573
-#: lib/models/campaigns.js:761
+#: lib/models/campaigns.js:610
+#: lib/models/campaigns.js:801
 msgid "Campaign Name must be set"
 msgstr ""
 
-#: lib/models/campaigns.js:577
+#: lib/models/campaigns.js:614
 msgid "RSS URL must be set and needs to be a valid URL"
 msgstr ""
 
-#: lib/models/campaigns.js:730
+#: lib/models/campaigns.js:770
 msgid "Selected template not found"
 msgstr ""
 
-#: lib/models/campaigns.js:1082
+#: lib/models/campaigns.js:1125
 msgid "Invalid or missing message ID"
 msgstr ""
 
@@ -3259,8 +3265,8 @@ msgstr ""
 #: lib/models/fields.js:123
 #: lib/models/forms.js:37
 #: lib/models/lists.js:81
-#: lib/models/lists.js:175
-#: lib/models/lists.js:212
+#: lib/models/lists.js:178
+#: lib/models/lists.js:218
 #: lib/models/segments.js:43
 #: lib/models/segments.js:176
 #: lib/models/subscriptions.js:89
@@ -3309,45 +3315,46 @@ msgstr ""
 msgid "Provided List ID not found"
 msgstr ""
 
-#: lib/models/forms.js:62
-#: lib/models/forms.js:88
-#: lib/models/forms.js:136
-#: lib/models/forms.js:183
+#: lib/models/forms.js:61
+#: lib/models/forms.js:104
+#: lib/models/forms.js:192
+#: lib/models/forms.js:282
 msgid "Missing Form ID"
 msgstr ""
 
-#: lib/models/forms.js:96
-#: lib/models/forms.js:140
+#: lib/models/forms.js:112
+#: lib/models/forms.js:196
 msgid "Form Name must be set"
 msgstr ""
 
-#: lib/models/forms.js:200
+#: lib/models/forms.js:298
 msgid "Custom form not found"
 msgstr ""
 
-#: lib/models/links.js:328
+#: lib/models/links.js:329
 #: routes/campaigns.js:541
-#: routes/campaigns.js:590
+#: routes/campaigns.js:589
+#: routes/campaigns.js:629
 #: services/sender.js:304
 msgid "Campaign not found"
 msgstr ""
 
-#: lib/models/links.js:336
+#: lib/models/links.js:337
 #: routes/lists.js:162
 #: services/sender.js:311
 msgid "List not found"
 msgstr ""
 
-#: lib/models/links.js:344
+#: lib/models/links.js:345
 msgid "Subscription not found"
 msgstr ""
 
 #: lib/models/lists.js:117
-#: lib/models/lists.js:179
+#: lib/models/lists.js:182
 msgid "List Name must be set"
 msgstr ""
 
-#: lib/models/lists.js:241
+#: lib/models/lists.js:247
 msgid "Missing List CID"
 msgstr ""
 
@@ -3488,13 +3495,13 @@ msgid "This address is already registered by someone else"
 msgstr ""
 
 #: lib/models/templates.js:51
-#: lib/models/templates.js:122
-#: lib/models/templates.js:163
+#: lib/models/templates.js:125
+#: lib/models/templates.js:169
 msgid "Missing Template ID"
 msgstr ""
 
 #: lib/models/templates.js:80
-#: lib/models/templates.js:126
+#: lib/models/templates.js:129
 msgid "Template Name must be set"
 msgstr ""
 
@@ -3609,39 +3616,39 @@ msgstr ""
 msgid "Invalid new password"
 msgstr ""
 
-#: lib/passport.js:38
+#: lib/passport.js:40
 msgid "%s  logged out"
 msgstr ""
 
-#: lib/passport.js:51
+#: lib/passport.js:53
 msgid "Failed to authenticate user"
 msgstr ""
 
-#: lib/passport.js:67
+#: lib/passport.js:69
 msgid "Logged in as %s"
 msgstr ""
 
-#: lib/passport.js:125
+#: lib/passport.js:128
 msgid "Incorrect username or password"
 msgstr ""
 
-#: lib/tools.js:136
+#: lib/tools.js:139
 msgid "Blocked email address \"%s\""
 msgstr ""
 
-#: lib/tools.js:145
+#: lib/tools.js:148
 msgid "Invalid email address \"%s\"."
 msgstr ""
 
-#: lib/tools.js:148
+#: lib/tools.js:151
 msgid "MX record not found for domain"
 msgstr ""
 
-#: lib/tools.js:151
+#: lib/tools.js:154
 msgid "Address domain not found"
 msgstr ""
 
-#: lib/tools.js:154
+#: lib/tools.js:157
 msgid "Address domain name is required"
 msgstr ""
 
@@ -3652,13 +3659,13 @@ msgstr ""
 msgid "Not Found"
 msgstr ""
 
-#: routes/archive.js:118
-#: services/sender.js:451
+#: routes/archive.js:121
+#: services/sender.js:447
 msgid "Received status code %s from %s"
 msgstr ""
 
-#: routes/archive.js:150
-#: routes/campaigns.js:789
+#: routes/archive.js:153
+#: routes/campaigns.js:828
 msgid "Attachment not found"
 msgstr ""
 
@@ -3699,12 +3706,12 @@ msgid "Campaign settings not updated"
 msgstr ""
 
 #: routes/campaigns.js:238
-#: routes/campaigns.js:639
+#: routes/campaigns.js:678
 msgid "Campaign deleted"
 msgstr ""
 
 #: routes/campaigns.js:240
-#: routes/campaigns.js:641
+#: routes/campaigns.js:680
 msgid "Could not delete specified campaign"
 msgstr ""
 
@@ -3736,61 +3743,61 @@ msgstr ""
 msgid "Unknown status selector"
 msgstr ""
 
-#: routes/campaigns.js:657
+#: routes/campaigns.js:696
 msgid "Scheduled sending"
 msgstr ""
 
-#: routes/campaigns.js:659
+#: routes/campaigns.js:698
 msgid "Could not schedule sending"
 msgstr ""
 
-#: routes/campaigns.js:671
+#: routes/campaigns.js:710
 msgid "Sending resumed"
 msgstr ""
 
-#: routes/campaigns.js:673
+#: routes/campaigns.js:712
 msgid "Could not resume sending"
 msgstr ""
 
-#: routes/campaigns.js:685
+#: routes/campaigns.js:724
 msgid "Sending reset"
 msgstr ""
 
-#: routes/campaigns.js:687
+#: routes/campaigns.js:726
 msgid "Could not reset sending"
 msgstr ""
 
-#: routes/campaigns.js:699
-#: routes/campaigns.js:727
+#: routes/campaigns.js:738
+#: routes/campaigns.js:766
 msgid "Sending paused"
 msgstr ""
 
-#: routes/campaigns.js:701
-#: routes/campaigns.js:729
+#: routes/campaigns.js:740
+#: routes/campaigns.js:768
 msgid "Could not pause sending"
 msgstr ""
 
-#: routes/campaigns.js:713
+#: routes/campaigns.js:752
 msgid "Sending activated"
 msgstr ""
 
-#: routes/campaigns.js:715
+#: routes/campaigns.js:754
 msgid "Could not activate sending"
 msgstr ""
 
-#: routes/campaigns.js:750
+#: routes/campaigns.js:789
 msgid "Attachment uploaded"
 msgstr ""
 
-#: routes/campaigns.js:752
+#: routes/campaigns.js:791
 msgid "Could not store attachment"
 msgstr ""
 
-#: routes/campaigns.js:769
+#: routes/campaigns.js:808
 msgid "Attachment deleted"
 msgstr ""
 
-#: routes/campaigns.js:771
+#: routes/campaigns.js:810
 msgid "Could not delete attachment"
 msgstr ""
 
@@ -3857,83 +3864,99 @@ msgstr ""
 msgid "Selected form not found"
 msgstr ""
 
-#: routes/forms.js:141
-msgid "Layout"
+#: routes/forms.js:136
+msgid "The plaintext version for this email"
+msgstr ""
+
+#: routes/forms.js:137
+msgid "Custom forms use MJML for formatting"
+msgstr ""
+
+#: routes/forms.js:138
+msgid "See the MJML documentation <a class=\"mjml-documentation\">here</a>"
 msgstr ""
 
 #: routes/forms.js:146
+msgid "Layout"
+msgstr ""
+
+#: routes/forms.js:152
 msgid "Form Input Style"
 msgstr ""
 
-#: routes/forms.js:153
+#: routes/forms.js:154
+msgid "This CSS stylesheet defines the appearance of form input elements and alerts"
+msgstr ""
+
+#: routes/forms.js:160
 msgid "Web - Subscribe"
 msgstr ""
 
-#: routes/forms.js:157
+#: routes/forms.js:165
 msgid "Web - Confirm Notice"
 msgstr ""
 
-#: routes/forms.js:161
+#: routes/forms.js:170
 msgid "Mail - Confirm Subscription (MJML)"
 msgstr ""
 
-#: routes/forms.js:165
+#: routes/forms.js:175
 msgid "Mail - Confirm Subscription (Text)"
 msgstr ""
 
-#: routes/forms.js:169
+#: routes/forms.js:180
 msgid "Web - Subscribed Notice"
 msgstr ""
 
-#: routes/forms.js:173
+#: routes/forms.js:185
 msgid "Mail - Subscription Confirmed (MJML)"
 msgstr ""
 
-#: routes/forms.js:177
+#: routes/forms.js:190
 msgid "Mail - Subscription Confirmed (Text)"
 msgstr ""
 
-#: routes/forms.js:184
+#: routes/forms.js:198
 msgid "Web - Manage Preferences"
 msgstr ""
 
-#: routes/forms.js:188
+#: routes/forms.js:203
 msgid "Web - Manage Address"
 msgstr ""
 
-#: routes/forms.js:192
+#: routes/forms.js:208
 msgid "Web - Updated Notice"
 msgstr ""
 
-#: routes/forms.js:199
+#: routes/forms.js:216
 msgid "Web - Unsubscribe"
 msgstr ""
 
-#: routes/forms.js:203
+#: routes/forms.js:221
 msgid "Web - Unsubscribe Notice"
 msgstr ""
 
-#: routes/forms.js:207
+#: routes/forms.js:226
 msgid "Mail - Unsubscribe Confirmed (MJML)"
 msgstr ""
 
-#: routes/forms.js:211
+#: routes/forms.js:231
 msgid "Mail - Unsubscribe Confirmed (Text)"
 msgstr ""
 
-#: routes/forms.js:248
+#: routes/forms.js:269
 msgid "Form settings updated"
 msgstr ""
 
-#: routes/forms.js:250
+#: routes/forms.js:271
 msgid "Form settings not updated"
 msgstr ""
 
-#: routes/forms.js:266
+#: routes/forms.js:287
 msgid "Custom form deleted"
 msgstr ""
 
-#: routes/forms.js:268
+#: routes/forms.js:289
 msgid "Could not delete specified form"
 msgstr ""
 
@@ -3941,7 +3964,7 @@ msgstr ""
 msgid "Self Hosted Newsletter App"
 msgstr ""
 
-#: routes/links.js:40
+#: routes/links.js:39
 msgid "Oops, we couldn't find a link for the URL you clicked"
 msgstr ""
 
