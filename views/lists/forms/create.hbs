@@ -1,0 +1,27 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li><a href="/forms/{{list.id}}">{{#translate}}Custom Forms{{/translate}}</a></li>
+    <li class="active">{{#translate}}Create Form{{/translate}}</li>
+</ol>
+
+<h2>{{list.name}} <small>{{#translate}}Create Custom Form{{/translate}}</small></h2>
+
+<hr>
+
+<form class="form-horizontal" method="post" action="/forms/{{list.id}}/create">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">{{#translate}}Form Name{{/translate}}</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control input-lg" name="name" id="name" value="{{name}}" placeholder="{{#translate}}Form Name{{/translate}}" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Add Form{{/translate}}</button>
+        </div>
+    </div>
+</form>

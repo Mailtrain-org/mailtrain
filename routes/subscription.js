@@ -3,6 +3,7 @@
 let log = require('npmlog');
 
 let tools = require('../lib/tools');
+let helpers = require('../lib/helpers');
 let mailer = require('../lib/mailer');
 let passport = require('../lib/passport');
 let express = require('express');
@@ -10,11 +11,13 @@ let urllib = require('url');
 let router = new express.Router();
 let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
+let forms = require('../lib/models/forms');
 let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
 let openpgp = require('openpgp');
 let _ = require('../lib/translate')._;
 let util = require('util');
+let hbs = require('hbs');
 
 router.get('/subscribe/:cid', (req, res, next) => {
     subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
@@ -37,17 +40,44 @@ router.get('/subscribe/:cid', (req, res, next) => {
                 return next(err);
             }
 
-            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultFrom', 'disableConfirmations'], (err, configItems) => {
+            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultPostaddress', 'defaultFrom', 'disableConfirmations'], (err, configItems) => {
                 if (err) {
                     return next(err);
                 }
 
-                res.render('subscription/subscribed', {
+                let data = {
                     title: list.name,
-                    layout: 'subscription/layout',
                     homepage: configItems.defaultHomepage || configItems.serviceUrl,
                     preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid,
-                    hasPubkey: !!configItems.pgpPrivateKey
+                    hasPubkey: !!configItems.pgpPrivateKey,
+                    defaultAddress: configItems.defaultAddress,
+                    defaultPostaddress: configItems.defaultPostaddress,
+                    template: {
+                        template: 'subscription/web-subscribed.mjml.hbs',
+                        layout: 'subscription/layout.mjml.hbs'
+                    }
+                };
+
+                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribed', data, (err, data) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        helpers.captureFlashMessages(req, res, (err, flash) => {
+                            if (err) {
+                                return next(err);
+                            }
+
+                            data.isWeb = true;
+                            data.flashMessages = flash;
+                            res.send(htmlRenderer(data));
+                        });
+                    });
                 });
 
                 if (configItems.disableConfirmations) {
@@ -66,30 +96,52 @@ router.get('/subscribe/:cid', (req, res, next) => {
                         }
                     });
 
-                    mailer.sendMail({
-                        from: {
-                            name: configItems.defaultFrom,
-                            address: configItems.defaultAddress
-                        },
-                        to: {
-                            name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
-                            address: subscription.email
-                        },
-                        subject: util.format(_('%s: Subscription Confirmed'), list.name),
-                        encryptionKeys
-                    }, {
-                        html: 'emails/subscription-confirmed-html.hbs',
-                        text: 'emails/subscription-confirmed-text.hbs',
-                        data: {
-                            title: list.name,
-                            contactAddress: configItems.defaultAddress,
-                            preferencesUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/manage/' + subscription.cid),
-                            unsubscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid)
-                        }
-                    }, err => {
+                    let sendMail = (html, text) => {
+                        mailer.sendMail({
+                            from: {
+                                name: configItems.defaultFrom,
+                                address: configItems.defaultAddress
+                            },
+                            to: {
+                                name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
+                                address: subscription.email
+                            },
+                            subject: util.format(_('%s: Subscription Confirmed'), list.name),
+                            encryptionKeys
+                        }, {
+                            html,
+                            text,
+                            data: {
+                                title: list.name,
+                                homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                                contactAddress: configItems.defaultAddress,
+                                defaultPostaddress: configItems.defaultPostaddress,
+                                preferencesUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/manage/' + subscription.cid),
+                                unsubscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid),
+                            }
+                        }, err => {
+                            if (err) {
+                                log.error('Subscription', err.stack);
+                            }
+                        });
+                    };
+
+                    let text = {
+                        template: 'subscription/mail-subscription-confirmed-text.hbs'
+                    };
+
+                    let html = {
+                        template: 'subscription/mail-subscription-confirmed-html.mjml.hbs',
+                        layout: 'subscription/layout.mjml.hbs',
+                        type: 'mjml'
+                    };
+
+                    helpers.injectCustomFormTemplates(req.query.fid || list.defaultForm, { text, html }, (err, tmpl) => {
                         if (err) {
-                            log.error('Subscription', err.stack);
+                            return sendMail(html, text);
                         }
+
+                        sendMail(tmpl.html, tmpl.text);
                     });
                 });
             });
@@ -124,12 +176,41 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
             data.customFields = fields.getRow(fieldList, data);
             data.useEditor = true;
 
-            settings.list(['pgpPrivateKey'], (err, configItems) => {
+            settings.list(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
                 if (err) {
                     return next(err);
                 }
                 data.hasPubkey = !!configItems.pgpPrivateKey;
-                res.render('subscription/subscribe', data);
+                data.defaultAddress = configItems.defaultAddress;
+                data.defaultPostaddress = configItems.defaultPostaddress;
+
+                data.template = {
+                    template: 'subscription/web-subscribe.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                };
+
+                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data, (err, data) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        helpers.captureFlashMessages(req, res, (err, flash) => {
+                            if (err) {
+                                return next(err);
+                            }
+
+                            data.isWeb = true;
+                            data.needsJsWarning = true;
+                            data.flashMessages = flash;
+                            res.send(htmlRenderer(data));
+                        });
+                    });
+                });
             });
         });
     });
@@ -146,15 +227,43 @@ router.get('/:cid/confirm-notice', (req, res, next) => {
             return next(err);
         }
 
-        settings.list(['defaultHomepage', 'serviceUrl'], (err, configItems) => {
+        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
             if (err) {
                 return next(err);
             }
 
-            res.render('subscription/confirm-notice', {
+            let data = {
                 title: list.name,
-                layout: 'subscription/layout',
-                homepage: configItems.defaultHomepage || configItems.serviceUrl
+                homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                defaultAddress: configItems.defaultAddress,
+                defaultPostaddress: configItems.defaultPostaddress,
+                template: {
+                    template: 'subscription/web-confirm-notice.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                }
+            };
+
+            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-confirm-notice', data, (err, data) => {
+                if (err) {
+                    return next(err);
+                }
+
+                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.captureFlashMessages(req, res, (err, flash) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        data.isWeb = true;
+                        data.isConfirmNotice = true;
+                        data.flashMessages = flash;
+                        res.send(htmlRenderer(data));
+                    });
+                });
             });
         });
     });
@@ -171,15 +280,42 @@ router.get('/:cid/updated-notice', (req, res, next) => {
             return next(err);
         }
 
-        settings.list(['defaultHomepage', 'serviceUrl'], (err, configItems) => {
+        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
             if (err) {
                 return next(err);
             }
 
-            res.render('subscription/updated-notice', {
+            let data = {
                 title: list.name,
-                layout: 'subscription/layout',
-                homepage: configItems.defaultHomepage || configItems.serviceUrl
+                homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                defaultAddress: configItems.defaultAddress,
+                defaultPostaddress: configItems.defaultPostaddress,
+                template: {
+                    template: 'subscription/web-updated-notice.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                }
+            };
+
+            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-updated-notice', data, (err, data) => {
+                if (err) {
+                    return next(err);
+                }
+
+                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.captureFlashMessages(req, res, (err, flash) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        data.isWeb = true;
+                        data.flashMessages = flash;
+                        res.send(htmlRenderer(data));
+                    });
+                });
             });
         });
     });
@@ -196,15 +332,43 @@ router.get('/:cid/unsubscribe-notice', (req, res, next) => {
             return next(err);
         }
 
-        settings.list(['defaultHomepage', 'serviceUrl'], (err, configItems) => {
+        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
             if (err) {
                 return next(err);
             }
 
-            res.render('subscription/unsubscribe-notice', {
+            let data = {
                 title: list.name,
                 layout: 'subscription/layout',
-                homepage: configItems.defaultHomepage || configItems.serviceUrl
+                homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                defaultAddress: configItems.defaultAddress,
+                defaultPostaddress: configItems.defaultPostaddress,
+                template: {
+                    template: 'subscription/web-unsubscribe-notice.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                }
+            };
+
+            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-unsubscribe-notice', data, (err, data) => {
+                if (err) {
+                    return next(err);
+                }
+
+                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.captureFlashMessages(req, res, (err, flash) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        data.isWeb = true;
+                        data.flashMessages = flash;
+                        res.send(htmlRenderer(data));
+                    });
+                });
             });
         });
     });
@@ -298,13 +462,42 @@ router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
 
                 subscription.useEditor = true;
 
-                settings.list(['pgpPrivateKey'], (err, configItems) => {
+                settings.list(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
                     if (err) {
                         return next(err);
                     }
                     subscription.hasPubkey = !!configItems.pgpPrivateKey;
+                    subscription.defaultAddress = configItems.defaultAddress;
+                    subscription.defaultPostaddress = configItems.defaultPostaddress;
 
-                    res.render('subscription/manage', subscription);
+                    subscription.template = {
+                        template: 'subscription/web-manage.mjml.hbs',
+                        layout: 'subscription/layout.mjml.hbs'
+                    };
+
+                    helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-manage', subscription, (err, data) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                            if (err) {
+                                return next(err);
+                            }
+
+                            helpers.captureFlashMessages(req, res, (err, flash) => {
+                                if (err) {
+                                    return next(err);
+                                }
+
+                                data.isWeb = true;
+                                data.needsJsWarning = true;
+                                data.isManagePreferences = true;
+                                data.flashMessages = flash;
+                                res.send(htmlRenderer(data));
+                            });
+                        });
+                    });
                 });
             });
         });
@@ -344,23 +537,54 @@ router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, ne
             return next(err);
         }
 
-        subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-            if (!err && !subscription) {
-                err = new Error(_('Subscription not found from this list'));
-                err.status = 404;
+        settings.list(['defaultAddress', 'defaultPostaddress'], (err, configItems) => {
+            if (err) {
+                return next(err);
             }
 
-            subscription.lcid = req.params.lcid;
-            subscription.title = list.name;
-            subscription.csrfToken = req.csrfToken();
-            subscription.layout = 'subscription/layout';
-            subscription.useEditor = true;
+            subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
+                if (!err && !subscription) {
+                    err = new Error(_('Subscription not found from this list'));
+                    err.status = 404;
+                }
 
-            res.render('subscription/manage-address', subscription);
+                subscription.lcid = req.params.lcid;
+                subscription.title = list.name;
+                subscription.csrfToken = req.csrfToken();
+                subscription.defaultAddress = configItems.defaultAddress;
+                subscription.defaultPostaddress = configItems.defaultPostaddress;
+
+                subscription.template = {
+                    template: 'subscription/web-manage-address.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                };
+
+                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-manage-address', subscription, (err, data) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        helpers.captureFlashMessages(req, res, (err, flash) => {
+                            if (err) {
+                                return next(err);
+                            }
+
+                            data.isWeb = true;
+                            data.needsJsWarning = true;
+                            data.flashMessages = flash;
+                            res.send(htmlRenderer(data));
+                        });
+                    });
+                });
+            });
         });
     });
 });
-
 
 router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.lcid, (err, list) => {
@@ -397,23 +621,56 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
             return next(err);
         }
 
-        subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-            if (!err && !subscription) {
-                err = new Error(_('Subscription not found from this list'));
-                err.status = 404;
-            }
-
+        settings.list(['defaultAddress', 'defaultPostaddress'], (err, configItems) => {
             if (err) {
                 return next(err);
             }
 
-            subscription.lcid = req.params.lcid;
-            subscription.title = list.name;
-            subscription.csrfToken = req.csrfToken();
-            subscription.layout = 'subscription/layout';
-            subscription.autosubmit = !!req.query.auto;
-            subscription.campaign = req.query.c;
-            res.render('subscription/unsubscribe', subscription);
+            subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
+                if (!err && !subscription) {
+                    err = new Error(_('Subscription not found from this list'));
+                    err.status = 404;
+                }
+
+                if (err) {
+                    return next(err);
+                }
+
+                subscription.lcid = req.params.lcid;
+                subscription.title = list.name;
+                subscription.csrfToken = req.csrfToken();
+                subscription.autosubmit = !!req.query.auto;
+                subscription.campaign = req.query.c;
+                subscription.defaultAddress = configItems.defaultAddress;
+                subscription.defaultPostaddress = configItems.defaultPostaddress;
+
+                subscription.template = {
+                    template: 'subscription/web-unsubscribe.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                };
+
+                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-unsubscribe', subscription, (err, data) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        helpers.captureFlashMessages(req, res, (err, flash) => {
+                            if (err) {
+                                return next(err);
+                            }
+
+                            data.isWeb = true;
+                            data.flashMessages = flash;
+                            res.send(htmlRenderer(data));
+                        });
+                    });
+                });
+            });
         });
     });
 });
@@ -451,7 +708,7 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                     }
                 });
 
-                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'serviceUrl', 'disableConfirmations'], (err, configItems) => {
+                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'defaultPostaddress', 'serviceUrl', 'disableConfirmations'], (err, configItems) => {
                     if (err) {
                         return log.error('Settings', err);
                     }
@@ -460,29 +717,50 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                         return;
                     }
 
-                    mailer.sendMail({
-                        from: {
-                            name: configItems.defaultFrom,
-                            address: configItems.defaultAddress
-                        },
-                        to: {
-                            name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
-                            address: subscription.email
-                        },
-                        subject: util.format(_('%s: Subscription Confirmed'), list.name),
-                        encryptionKeys
-                    }, {
-                        html: 'emails/unsubscribe-confirmed-html.hbs',
-                        text: 'emails/unsubscribe-confirmed-text.hbs',
-                        data: {
-                            title: list.name,
-                            contactAddress: configItems.defaultAddress,
-                            subscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '?cid=' + subscription.cid)
-                        }
-                    }, err => {
+                    let sendMail = (html, text) => {
+                        mailer.sendMail({
+                            from: {
+                                name: configItems.defaultFrom,
+                                address: configItems.defaultAddress
+                            },
+                            to: {
+                                name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
+                                address: subscription.email
+                            },
+                            subject: util.format(_('%s: Unsubscribe Confirmed'), list.name),
+                            encryptionKeys
+                        }, {
+                            html,
+                            text,
+                            data: {
+                                title: list.name,
+                                contactAddress: configItems.defaultAddress,
+                                defaultPostaddress: configItems.defaultPostaddress,
+                                subscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '?cid=' + subscription.cid),
+                            }
+                        }, err => {
+                            if (err) {
+                                log.error('Subscription', err.stack);
+                            }
+                        });
+                    };
+
+                    let text = {
+                        template: 'subscription/mail-unsubscribe-confirmed-text.hbs'
+                    };
+
+                    let html = {
+                        template: 'subscription/mail-unsubscribe-confirmed-html.mjml.hbs',
+                        layout: 'subscription/layout.mjml.hbs',
+                        type: 'mjml'
+                    };
+
+                    helpers.injectCustomFormTemplates(req.query.fid || list.defaultForm, { text, html }, (err, tmpl) => {
                         if (err) {
-                            log.error('Subscription', err.stack);
+                            return sendMail(html, text);
                         }
+
+                        sendMail(tmpl.html, tmpl.text);
                     });
                 });
             });

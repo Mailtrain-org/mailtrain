@@ -1,0 +1,283 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/lists/">{{#translate}}Lists{{/translate}}</a></li>
+    <li><a href="/lists/view/{{list.id}}">{{list.name}}</a></li>
+    <li><a href="/forms/{{list.id}}">{{#translate}}Custom Forms{{/translate}}</a></li>
+    <li class="active">{{#translate}}Edit Form{{/translate}}</li>
+</ol>
+
+<h2>{{list.name}} <small>{{#translate}}Edit Custom Form{{/translate}}</small> <a class="btn btn-default btn-xs" href="/forms/{{list.id}}" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}Back to forms{{/translate}}</a></h2>
+
+<hr>
+
+<form method="post" class="delete-form" id="forms-delete" action="/forms/{{list.id}}/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{form.id}}">
+</form>
+
+<form class="form-horizontal" method="post" id="forms-update" action="/forms/{{list.id}}/edit">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{form.id}}">
+    <input type="hidden" name="fields_shown_on_subscribe" value="{{form.fieldsShownOnSubscribe}}">
+    <input type="hidden" name="fields_shown_on_manage" value="{{form.fieldsShownOnManage}}">
+
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">{{#translate}}Form Name{{/translate}}</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control input-lg" name="name" id="name" value="{{form.name}}" placeholder="{{#translate}}Form Name{{/translate}}" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="form-description" class="col-sm-2 control-label">{{#translate}}Description{{/translate}}</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" id="form-description" name="description" rows="3" placeholder="{{#translate}}Optional comments about this form{{/translate}}">{{form.description}}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="previewLinks" class="col-sm-2 control-label">{{#translate}}Form Preview{{/translate}}</label>
+        <div class="col-sm-10" id="previewLinks">
+            <div class="help-block">
+                <small>
+                    {{#translate}}Note: These links are solely for a quick preview. If you submit a preview form you'll get redirected to the list's default form.{{/translate}}
+                </small>
+            </div>
+            <p>
+                <a href="/subscription/{{list.cid}}?fid={{form.id}}" target="_blank">{{#translate}}Subscribe{{/translate}}</a>
+                |
+                <a href="/subscription/{{list.cid}}/confirm-notice?fid={{form.id}}" target="_blank">{{#translate}}Confirm Notice{{/translate}}</a>
+                |
+                <a href="/subscription/{{list.cid}}/updated-notice?fid={{form.id}}" target="_blank">{{#translate}}Updated Notice{{/translate}}</a>
+                |
+                <a href="/subscription/{{list.cid}}/unsubscribe-notice?fid={{form.id}}" target="_blank">{{#translate}}Unsubscribed Notice{{/translate}}</a>
+                {{#if testUsers}}
+                    |
+                    <a href="/subscription/{{list.cid}}/manage/{{testUsers.0.cid}}?fid={{form.id}}" target="_blank">{{#translate}}Manage{{/translate}}</a>
+                    |
+                    <a href="/subscription/{{list.cid}}/manage-address/{{testUsers.0.cid}}?fid={{form.id}}" target="_blank">{{#translate}}Manage Address{{/translate}}</a>
+                {{else}}
+                    |
+                    <small class="text-muted">{{#translate}}Create a test user for additional options{{/translate}}</small>
+                {{/if}}
+            </p>
+        </div>
+    </div>
+
+
+    <p><br></p>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab">{{#translate}}Templates{{/translate}}</a></li>
+                <li role="presentation"><a href="#fields" aria-controls="fields" role="tab" data-toggle="tab">{{#translate}}Fields{{/translate}}</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="tab-content">
+
+        <div role="tabpanel" class="tab-pane active" id="templates">
+
+            <div class="form-group">
+                <label for="form-header" class="col-sm-2 control-label">{{#translate}}Edit{{/translate}}</label>
+                <div class="col-sm-10">
+                    <select class="form-control" id="templateSelect">
+                        {{#each templateOptgroups}}
+                            <optgroup label="{{label}}">
+                                {{#each opts}}
+                                    <option value="{{name}}">{{label}}</option>
+                                {{/each}}
+                            </optgroup>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var forceAceRender = function(name) {
+                        var div = $('.form-group.template.' + name).find('.ace_editor')[0];
+                        div.env && div.env.editor && div.env.editor.resize(true);
+                    };
+                    $('#templateSelect').on('change', function() {
+                        $('.form-group.template').hide();
+                        var name = $(this).val();
+                        $('.form-group.template.' + name).show();
+                        forceAceRender(name);
+                    });
+                    $('ul.nav-tabs > li > a').on('shown.bs.tab', function(e) {
+                        var id = $(e.target).attr('href').substr(1);
+                        id === 'templates' && forceAceRender($('#templateSelect').val());
+                    });
+                });
+            </script>
+
+            {{#each templateOptgroups}}
+                {{#each opts}}
+                    <div class="form-group template {{name}}" {{#unless isLayout}}style="display: none;"{{/unless}}>
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="help-block" style="margin-top: -8px;">
+                                <small>{{#if help}}{{{help}}}{{else}}&nbsp;{{/if}}</small>
+                            </div>
+                            <div class="code-editor-{{type}}" style="height: 700px; border: 1px solid #ccc;"></div>
+                            <input type="hidden" name="{{name}}" value="{{value}}">
+                        </div>
+                    </div>
+                {{/each}}
+            {{/each}}
+
+        </div>
+
+
+        <!-- Fields -->
+
+        <style>
+            ul.fields {
+                min-height: 54px;
+                border: 1px dashed #ccc;
+                margin: 0;
+                padding: 11px 10px 10px;
+                background: #efefef;
+            }
+            ul.fields li {
+                list-style: none;
+                margin: -1px 0 0;
+                padding: 0 10px;
+                background: #fff;
+                border: 1px solid #ccc;
+                line-height: 30px;
+                white-space: nowrap;
+                overflow: hidden;
+                cursor: move;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                jQuery.get('/javascript/jquery-ui-1.12.1.min.js', undefined, function() {
+
+                    $('.fieldsHiddenOnSubscribe, .fieldsShownOnSubscribe').sortable({
+                        connectWith: '.connectedSortableSubscribe'
+                    }).disableSelection();
+
+                    $('.fieldsHiddenOnManage, .fieldsShownOnManage').sortable({
+                        connectWith: '.connectedSortableManage'
+                    }).disableSelection();
+
+                    $('#forms-update').on('submit', function(e) {
+                        var s = [];
+                        var m = [];
+                        $('.fieldsShownOnSubscribe > li').each(function() {
+                            s.push($(this).data('field-id'));
+                        });
+                        $('.fieldsShownOnManage > li').each(function() {
+                            m.push($(this).data('field-id'));
+                        });
+                        $('input[name=fields_shown_on_subscribe]').val(s.join(','));
+                        $('input[name=fields_shown_on_manage]').val(m.join(','));
+                    });
+
+                }, 'script');
+            });
+        </script>
+
+        <div role="tabpanel" class="tab-pane" id="fields">
+            <div class="form-group">
+                <label for="form-fields" class="col-sm-2 control-label">{{#translate}}Form Fields{{/translate}}</label>
+                <div class="col-sm-10">
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <h6>{{#translate}}Fields hidden on subscription page:{{/translate}}</h6>
+                            <ul class="fields fieldsHiddenOnSubscribe connectedSortableSubscribe">
+                                {{#each fieldsHiddenOnSubscribe}}
+                                    <li class="ui-state-default" data-field-id="{{id}}">
+                                        {{name}}
+                                        <span style="font-size: 10px; color: #aaa; float: right;">{{type}}</span>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                            <h6>{{#translate}}Fields shown on subscription page:{{/translate}}</h6>
+                            <ul class="fields fieldsShownOnSubscribe connectedSortableSubscribe">
+                                {{#each fieldsShownOnSubscribe}}
+                                    <li class="ui-state-default" data-field-id="{{id}}">
+                                        {{name}}
+                                        <span style="font-size: 10px; color: #aaa; float: right;">{{type}}</span>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                            <br>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <h6>{{#translate}}Fields hidden on preferences page:{{/translate}}</h6>
+                            <ul class="fields fieldsHiddenOnManage connectedSortableManage">
+                                {{#each fieldsHiddenOnManage}}
+                                    <li class="ui-state-default" data-field-id="{{id}}">
+                                        {{name}}
+                                        <span style="font-size: 10px; color: #aaa; float: right;">{{type}}</span>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                            <h6>{{#translate}}Fields shown on preferences page:{{/translate}}</h6>
+                            <ul class="fields fieldsShownOnManage connectedSortableManage">
+                                {{#each fieldsShownOnManage}}
+                                    <li class="ui-state-default" data-field-id="{{id}}">
+                                        {{name}}
+                                        <span style="font-size: 10px; color: #aaa; float: right;">{{type}}</span>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                            <br>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end .tab-content -->
+
+    <hr>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="pull-right">
+                <button type="submit" form="forms-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> {{#translate}}Delete Form{{/translate}}</button>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update{{/translate}}</button>
+        </div>
+    </div>
+</form>
+
+
+<script src="/javascript/cookie.2.1.3.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Remember Tab
+        var tab = Cookies.get('tab');
+        tab && $('ul.nav-tabs > li > a[href="#' + tab + '"]').click();
+        $('ul.nav-tabs > li > a').on('shown.bs.tab', function(e) {
+            var id = $(e.target).attr('href').substr(1);
+            Cookies.set('tab', id, { expires: 7, path: '' });
+        });
+
+        // Remember Template
+        var tmpl = Cookies.get('tmpl');
+        tmpl && $('#templateSelect').val(tmpl).trigger('change');
+        $('#templateSelect').on('change', function() {
+            Cookies.set('tmpl', $(this).val(), { expires: 7, path: '' });
+        });
+
+        $('a.mjml-documentation')
+            .attr('href', 'https://mjml.io/documentation/')
+            .attr('target', '_blank')
+            .attr('rel', 'noreferrer')
+
+    });
+</script>

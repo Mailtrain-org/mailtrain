@@ -1,0 +1,20 @@
+<form method="post" id="main-form" action="/subscription/{{lcid}}/unsubscribe">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="campaign" value="{{campaign}}">
+    <input type="hidden" name="cid" value="{{cid}}">
+
+    <div class="form-group">
+        <label for="email">{{#translate}}Email address{{/translate}}</label>
+        <input type="email" name="email" id="email" placeholder="" value="{{email}}" autofocus required>
+    </div>
+
+    <button type="submit" style="position: absolute; top: -9999px; left: -9999px;">{{#translate}}Unsubscribe{{/translate}}</button>
+</form>
+
+{{#if email}}
+    {{#if autosubmit}}
+        <script>
+            document.getElementById('main-form').submit();
+        </script>
+    {{/if}}
+{{/if}}

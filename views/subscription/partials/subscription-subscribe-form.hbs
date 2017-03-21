@@ -1,0 +1,24 @@
+{{#if hasPubkey}}
+    <form method="post" id="download-pubkey" action="/subscription/publickey" style="display: none;">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="cid" value="{{cid}}">
+    </form>
+{{/if}}
+
+<form id="main-form" method="post" action="/subscription/{{cid}}/subscribe">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
+    <input type="hidden" name="address" value="">
+    <input type="hidden" name="sub" id="sub" value="">
+
+{{> subscription_custom_fields}}
+
+    <button type="submit" style="position: absolute; top: -9999px; left: -9999px;">{{#translate}}Subscribe to list{{/translate}}</button>
+</form>
+
+<script>
+    document.getElementById('sub').value = new Date().getTime();
+</script>
+
+<script src="/moment/moment.min.js"></script>
+<script src="/moment/moment-timezone-with-data.min.js"></script>

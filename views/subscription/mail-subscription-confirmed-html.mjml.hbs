@@ -1,0 +1,18 @@
+<mj-section>
+    <mj-column>
+        <mj-text mj-class="h3">
+            {{#translate}}Subscription Confirmed{{/translate}}
+        </mj-text>
+        <mj-text mj-class="p">
+            {{#translate}}Your subscription to our list has been confirmed{{/translate}}. {{#translate}}If you want to modify your subscription then you can {{/translate}}
+            <a href="{{preferencesUrl}}">{{#translate}}manage your preferences{{/translate}}</a> {{#translate}}or{{/translate}} <a href="{{unsubscribeUrl}}">{{#translate}}unsubscribe here{{/translate}}</a>.
+        </mj-text>
+        <mj-button mj-class="button" href="{{homepage}}">
+            {{#translate}}Return to our website{{/translate}}
+        </mj-button>
+        <mj-text mj-class="p">
+            {{#translate}}For questions about this list, please contact:{{/translate}}
+            <br/><a href="mailto:{{contactAddress}}">{{contactAddress}}</a>
+        </mj-text>
+    </mj-column>
+</mj-section>
