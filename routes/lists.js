@@ -8,6 +8,7 @@ let router = new express.Router();
 let lists = require('../lib/models/lists');
 let subscriptions = require('../lib/models/subscriptions');
 let fields = require('../lib/models/fields');
+let forms = require('../lib/models/forms');
 let tools = require('../lib/tools');
 let striptags = require('striptags');
 let htmlescape = require('escape-html');
@@ -101,8 +102,21 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
             req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
             return res.redirect('/lists');
         }
-        list.csrfToken = req.csrfToken();
-        res.render('lists/edit', list);
+
+        forms.list(list.id, (err, customForms) => {
+            if (err) {
+                req.flash('danger', err.message || err);
+                return res.redirect('/lists');
+            }
+
+            list.customForms = customForms.map(row => {
+                row.selected = list.defaultForm === row.id;
+                return row;
+            });
+
+            list.csrfToken = req.csrfToken();
+            res.render('lists/edit', list);
+        });
     });
 });
 
@@ -117,7 +131,9 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
             req.flash('info', _('List settings not updated'));
         }
 
-        if (req.body.id) {
+        if (req.query.next) {
+            return res.redirect(req.query.next);
+        } else if (req.body.id) {
             return res.redirect('/lists/edit/' + encodeURIComponent(req.body.id));
         } else {
             return res.redirect('/lists');
@@ -219,7 +235,7 @@ router.post('/ajax/:id', (req, res) => {
                         } else {
                             return htmlescape(cRow.value || '');
                         }
-                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>'))
+                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>'))
                 });
             });
         });

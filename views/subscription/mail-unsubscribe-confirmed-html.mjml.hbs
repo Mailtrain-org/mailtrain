@@ -1,0 +1,17 @@
+<mj-section>
+    <mj-column>
+        <mj-text mj-class="h3">
+            {{#translate}}You Are Now Unsubscribed{{/translate}}
+        </mj-text>
+        <mj-text mj-class="p">
+            {{#translate}}We have removed your email address from our list{{/translate}}. {{#translate}}If you unsubscribed by mistake, you can re-subscribe at:{{/translate}}
+        </mj-text>
+        <mj-button mj-class="button" href="{{subscribeUrl}}">
+            {{#translate}}Subscribe{{/translate}}
+        </mj-button>
+        <mj-text mj-class="p">
+            {{#translate}}For questions about this list, please contact:{{/translate}}
+            <br/><a href="mailto:{{contactAddress}}">{{contactAddress}}</a>
+        </mj-text>
+    </mj-column>
+</mj-section>

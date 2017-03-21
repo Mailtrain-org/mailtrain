@@ -29,6 +29,7 @@ let templates = require('./routes/templates');
 let campaigns = require('./routes/campaigns');
 let links = require('./routes/links');
 let fields = require('./routes/fields');
+let forms = require('./routes/forms');
 let segments = require('./routes/segments');
 let triggers = require('./routes/triggers');
 let webhooks = require('./routes/webhooks');
@@ -54,6 +55,7 @@ if (config.www.proxy) {
 app.disable('x-powered-by');
 
 hbs.registerPartials(__dirname + '/views/partials');
+hbs.registerPartials(__dirname + '/views/subscription/partials/');
 
 /**
  * We need this helper to make sure that we consume flash messages only
@@ -80,7 +82,9 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
         let rows = [];
 
         messages[key].forEach(message => {
-            rows.push(hbs.handlebars.escapeExpression(message));
+            message = hbs.handlebars.escapeExpression(message);
+            message = message.replace(/(\r\n|\n|\r)/gm, '<br>');
+            rows.push(message);
         });
 
         if (rows.length > 1) {
@@ -205,6 +209,7 @@ app.use('/campaigns', campaigns);
 app.use('/settings', settings);
 app.use('/links', links);
 app.use('/fields', fields);
+app.use('/forms', forms);
 app.use('/segments', segments);
 app.use('/triggers', triggers);
 app.use('/webhooks', webhooks);

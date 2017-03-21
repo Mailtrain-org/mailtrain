@@ -8,11 +8,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-03-12 00:22+0000\n"
+"POT-Creation-Date: 2017-03-19 12:36+0000\n"
 
 #: views/archive/layout.hbs:1
 #: views/layout.hbs:1
-#: views/subscription/layout.hbs:1
 msgid "Self hosted email newsletter app"
 msgstr ""
 
@@ -36,6 +35,9 @@ msgstr ""
 #: views/lists/fields/create.hbs:1
 #: views/lists/fields/edit.hbs:1
 #: views/lists/fields/fields.hbs:1
+#: views/lists/forms/create.hbs:1
+#: views/lists/forms/edit.hbs:1
+#: views/lists/forms/forms.hbs:1
 #: views/lists/lists.hbs:1
 #: views/lists/segments/create.hbs:1
 #: views/lists/segments/edit.hbs:1
@@ -64,7 +66,7 @@ msgstr ""
 #: views/users/forgot.hbs:1
 #: views/users/login.hbs:1
 #: views/users/reset.hbs:1
-#: app.js:172
+#: app.js:176
 msgid "Home"
 msgstr ""
 
@@ -84,7 +86,7 @@ msgstr ""
 #: views/campaigns/unsubscribed.hbs:2
 #: views/campaigns/upload-attachment.hbs:2
 #: views/campaigns/view.hbs:2
-#: lib/tools.js:119
+#: lib/tools.js:122
 #: routes/campaigns.js:35
 msgid "Campaigns"
 msgstr ""
@@ -118,7 +120,7 @@ msgstr ""
 #: views/campaigns/opened.hbs:7
 #: views/campaigns/unsubscribed.hbs:7
 #: views/lists/subscription/import-failed.hbs:8
-#: views/lists/view.hbs:18
+#: views/lists/view.hbs:19
 #: views/triggers/triggered.hbs:6
 msgid "Address"
 msgstr ""
@@ -132,9 +134,8 @@ msgstr ""
 #: views/lists/subscription/add.hbs:6
 #: views/lists/subscription/edit.hbs:7
 #: views/lists/subscription/import-preview.hbs:7
-#: views/lists/view.hbs:19
-#: views/subscription/manage.hbs:4
-#: views/subscription/subscribe.hbs:4
+#: views/lists/view.hbs:20
+#: views/subscription/partials/subscription-custom-fields.hbs:3
 #: views/triggers/triggered.hbs:7
 msgid "First Name"
 msgstr ""
@@ -148,9 +149,8 @@ msgstr ""
 #: views/lists/subscription/add.hbs:7
 #: views/lists/subscription/edit.hbs:8
 #: views/lists/subscription/import-preview.hbs:8
-#: views/lists/view.hbs:20
-#: views/subscription/manage.hbs:5
-#: views/subscription/subscribe.hbs:5
+#: views/lists/view.hbs:21
+#: views/subscription/partials/subscription-custom-fields.hbs:4
 #: views/triggers/triggered.hbs:8
 msgid "Last Name"
 msgstr ""
@@ -197,6 +197,7 @@ msgstr ""
 #: views/lists/create.hbs:5
 #: views/lists/edit.hbs:6
 #: views/lists/fields/fields.hbs:6
+#: views/lists/forms/forms.hbs:6
 #: views/lists/lists.hbs:5
 #: views/lists/segments/segments.hbs:6
 #: views/templates/templates.hbs:5
@@ -214,6 +215,8 @@ msgstr ""
 #: views/campaigns/view.hbs:72
 #: views/lists/create.hbs:7
 #: views/lists/edit.hbs:10
+#: views/lists/forms/edit.hbs:9
+#: views/lists/forms/forms.hbs:7
 #: views/lists/lists.hbs:8
 #: views/mosaico/editor.hbs:3
 #: views/partials/merge-tag-reference.hbs:4
@@ -228,16 +231,16 @@ msgstr ""
 
 #: views/campaigns/campaigns.hbs:10
 #: views/campaigns/view.hbs:73
-#: views/lists/view.hbs:21
-#: views/lists/view.hbs:29
+#: views/lists/view.hbs:22
+#: views/lists/view.hbs:30
 #: views/triggers/triggers.hbs:6
 msgid "Status"
 msgstr ""
 
 #: views/campaigns/campaigns.hbs:11
 #: views/campaigns/view.hbs:74
-#: views/lists/view.hbs:22
 #: views/lists/view.hbs:23
+#: views/lists/view.hbs:24
 msgid "Created"
 msgstr ""
 
@@ -369,8 +372,7 @@ msgstr ""
 #: views/lists/subscription/add.hbs:12
 #: views/lists/subscription/edit.hbs:11
 #: views/lists/subscription/import-preview.hbs:5
-#: views/subscription/manage.hbs:10
-#: views/subscription/subscribe.hbs:10
+#: views/subscription/partials/subscription-custom-fields.hbs:9
 #: views/templates/create.hbs:8
 #: views/triggers/create-select.hbs:7
 #: views/triggers/create.hbs:17
@@ -569,8 +571,10 @@ msgstr ""
 #: views/campaigns/edit-rss.hbs:24
 #: views/campaigns/edit-triggered.hbs:27
 #: views/campaigns/edit.hbs:35
-#: views/lists/edit.hbs:13
+#: views/lists/edit.hbs:16
 #: views/lists/fields/edit.hbs:39
+#: views/lists/forms/edit.hbs:31
+#: views/lists/forms/forms.hbs:12
 #: views/lists/segments/edit.hbs:14
 #: views/lists/segments/rule-edit.hbs:38
 #: views/lists/subscription/edit.hbs:17
@@ -625,7 +629,8 @@ msgstr ""
 #: views/campaigns/edit.hbs:32
 #: views/campaigns/view.hbs:66
 #: views/lists/fields/fields.hbs:12
-#: views/lists/view.hbs:32
+#: views/lists/forms/forms.hbs:9
+#: views/lists/view.hbs:33
 msgid "No data available in table"
 msgstr ""
 
@@ -663,7 +668,7 @@ msgstr ""
 #: views/campaigns/unsubscribed.hbs:11
 #: views/campaigns/view.hbs:26
 #: views/lists/subscription/import.hbs:10
-#: routes/lists.js:171
+#: routes/lists.js:187
 msgid "Unsubscribed"
 msgstr ""
 
@@ -725,7 +730,7 @@ msgid "List subscribers who received this message"
 msgstr ""
 
 #: views/campaigns/view.hbs:22
-#: routes/lists.js:171
+#: routes/lists.js:187
 msgid "Bounced"
 msgstr ""
 
@@ -888,55 +893,22 @@ msgid ""
 "that entry and it will be listed here"
 msgstr ""
 
-#: views/emails/confirm-html.hbs:1
-#: views/emails/confirm-html.hbs:2
-#: views/emails/confirm-text.hbs:1
-msgid "Please Confirm Subscription"
-msgstr ""
-
-#: views/emails/confirm-html.hbs:3
-#: views/emails/confirm-text.hbs:2
-msgid "Yes, subscribe me to this list"
-msgstr ""
-
-#: views/emails/confirm-html.hbs:4
-msgid ""
-"If you received this email by mistake, simply delete it. You won't be "
-"subscribed if you don't click the confirmation link above."
-msgstr ""
-
-#: views/emails/confirm-html.hbs:5
-#: views/emails/confirm-text.hbs:4
-#: views/emails/subscription-confirmed-html.hbs:7
-#: views/emails/subscription-confirmed-text.hbs:7
-#: views/emails/unsubscribe-confirmed-html.hbs:5
-#: views/emails/unsubscribe-confirmed-text.hbs:5
-msgid "For questions about this list, please contact:"
-msgstr ""
-
-#: views/emails/confirm-text.hbs:3
-msgid ""
-"If you received this email by mistake, simply delete it. You won't be "
-"subscribed unless you click the confirmation link above."
-msgstr ""
-
 #: views/emails/password-reset-html.hbs:1
-#: views/emails/password-reset-html.hbs:2
 #: views/emails/password-reset-text.hbs:1
 msgid "Change your password"
 msgstr ""
 
-#: views/emails/password-reset-html.hbs:3
+#: views/emails/password-reset-html.hbs:2
 #: views/emails/password-reset-text.hbs:2
 msgid "We have received a password change request for your Mailtrain account:"
 msgstr ""
 
-#: views/emails/password-reset-html.hbs:4
+#: views/emails/password-reset-html.hbs:3
 #: views/emails/password-reset-text.hbs:3
 msgid "Reset password"
 msgstr ""
 
-#: views/emails/password-reset-html.hbs:5
+#: views/emails/password-reset-html.hbs:4
 #: views/emails/password-reset-text.hbs:4
 msgid ""
 "If you did not ask to change your password, then you can ignore this email "
@@ -953,10 +925,11 @@ msgstr ""
 #: views/emails/stationery-html.hbs:4
 #: views/emails/stationery-text.hbs:4
 #: views/lists/subscription/edit.hbs:15
-#: views/subscription/manage.hbs:12
-#: views/subscription/unsubscribe.hbs:1
-#: views/subscription/unsubscribe.hbs:4
-#: routes/lists.js:253
+#: views/subscription/partials/subscription-unsubscribe-form.hbs:2
+#: views/subscription/web-manage.mjml.hbs:3
+#: views/subscription/web-unsubscribe.mjml.hbs:1
+#: views/subscription/web-unsubscribe.mjml.hbs:3
+#: routes/lists.js:269
 msgid "Unsubscribe"
 msgstr ""
 
@@ -974,63 +947,6 @@ msgstr ""
 #: views/emails/stationery-html.hbs:2
 #: views/emails/stationery-text.hbs:2
 msgid "Cheers,"
-msgstr ""
-
-#: views/emails/subscription-confirmed-html.hbs:1
-#: views/emails/subscription-confirmed-text.hbs:1
-#: views/subscription/subscribed.hbs:1
-msgid "Subscription Confirmed"
-msgstr ""
-
-#: views/emails/subscription-confirmed-html.hbs:2
-#: views/emails/subscription-confirmed-text.hbs:2
-#: views/subscription/subscribed.hbs:2
-msgid "Your subscription to our list has been confirmed."
-msgstr ""
-
-#: views/emails/subscription-confirmed-html.hbs:3
-#: views/emails/subscription-confirmed-text.hbs:3
-msgid "If you want to modify your subscription then you can:"
-msgstr ""
-
-#: views/emails/subscription-confirmed-html.hbs:4
-#: views/emails/subscription-confirmed-text.hbs:4
-#: views/subscription/subscribed.hbs:6
-msgid "manage your preferences"
-msgstr ""
-
-#: views/emails/subscription-confirmed-html.hbs:5
-#: views/emails/subscription-confirmed-text.hbs:5
-#: views/subscription/subscribed.hbs:5
-#: views/users/login.hbs:10
-msgid "or"
-msgstr ""
-
-#: views/emails/subscription-confirmed-html.hbs:6
-#: views/emails/subscription-confirmed-text.hbs:6
-msgid "unsubscribe here"
-msgstr ""
-
-#: views/emails/unsubscribe-confirmed-html.hbs:1
-#: views/emails/unsubscribe-confirmed-text.hbs:1
-msgid "You are now unsubscribed"
-msgstr ""
-
-#: views/emails/unsubscribe-confirmed-html.hbs:2
-#: views/emails/unsubscribe-confirmed-text.hbs:2
-msgid "We have removed your email address from our list."
-msgstr ""
-
-#: views/emails/unsubscribe-confirmed-html.hbs:3
-#: views/emails/unsubscribe-confirmed-text.hbs:3
-msgid "If you unsubscribed by mistake, you can re-subscribe at:"
-msgstr ""
-
-#: views/emails/unsubscribe-confirmed-html.hbs:4
-#: views/emails/unsubscribe-confirmed-text.hbs:4
-#: views/lists/subscription/add.hbs:16
-#: routes/lists.js:253
-msgid "Subscribe"
 msgstr ""
 
 #: views/index.hbs:1
@@ -1062,7 +978,7 @@ msgstr ""
 #: views/lists/fields/edit.hbs:3
 #: views/lists/fields/fields.hbs:3
 #: views/lists/fields/fields.hbs:5
-#: views/lists/view.hbs:5
+#: views/lists/view.hbs:6
 msgid "Custom Fields"
 msgstr ""
 
@@ -1140,7 +1056,7 @@ msgid ""
 msgstr ""
 
 #: views/index.hbs:25
-#: lib/tools.js:123
+#: lib/tools.js:126
 msgid "Automation"
 msgstr ""
 
@@ -1243,6 +1159,9 @@ msgstr ""
 #: views/lists/fields/create.hbs:2
 #: views/lists/fields/edit.hbs:2
 #: views/lists/fields/fields.hbs:2
+#: views/lists/forms/create.hbs:2
+#: views/lists/forms/edit.hbs:2
+#: views/lists/forms/forms.hbs:2
 #: views/lists/lists.hbs:2
 #: views/lists/lists.hbs:4
 #: views/lists/segments/create.hbs:2
@@ -1258,7 +1177,7 @@ msgstr ""
 #: views/lists/subscription/import-preview.hbs:2
 #: views/lists/subscription/import.hbs:2
 #: views/lists/view.hbs:2
-#: lib/tools.js:111
+#: lib/tools.js:114
 msgid "Lists"
 msgstr ""
 
@@ -1276,7 +1195,7 @@ msgstr ""
 
 #: views/lists/edit.hbs:3
 #: views/lists/edit.hbs:4
-#: views/lists/view.hbs:7
+#: views/lists/view.hbs:8
 msgid "Edit List"
 msgstr ""
 
@@ -1293,6 +1212,21 @@ msgid "This is the list ID displayed to the subscribers"
 msgstr ""
 
 #: views/lists/edit.hbs:12
+msgid "Custom Form"
+msgstr ""
+
+#: views/lists/edit.hbs:13
+#: views/lists/forms/forms.hbs:11
+msgid "Default Mailtrain Form"
+msgstr ""
+
+#: views/lists/edit.hbs:14
+msgid ""
+"The custom form used for this list. You can create a form <a "
+"href=\"/forms/{{id}}/create\">here</a>."
+msgstr ""
+
+#: views/lists/edit.hbs:15
 msgid "Delete List"
 msgstr ""
 
@@ -1484,12 +1418,14 @@ msgid "Delete Field"
 msgstr ""
 
 #: views/lists/fields/fields.hbs:7
-#: views/lists/view.hbs:25
+#: views/lists/view.hbs:26
 msgid "Type"
 msgstr ""
 
 #: views/lists/fields/fields.hbs:10
 #: views/lists/fields/fields.hbs:11
+#: views/lists/forms/edit.hbs:23
+#: views/lists/forms/forms.hbs:8
 #: views/lists/lists.hbs:9
 #: views/lists/segments/segments.hbs:8
 #: views/lists/segments/view.hbs:12
@@ -1498,9 +1434,148 @@ msgstr ""
 #: routes/campaigns.js:287
 #: routes/campaigns.js:576
 #: routes/campaigns.js:626
-#: routes/lists.js:222
+#: routes/lists.js:238
 #: routes/triggers.js:297
 msgid "Edit"
+msgstr ""
+
+#: views/lists/forms/create.hbs:3
+#: views/lists/forms/edit.hbs:3
+#: views/lists/forms/forms.hbs:3
+#: views/lists/forms/forms.hbs:5
+#: views/lists/view.hbs:5
+msgid "Custom Forms"
+msgstr ""
+
+#: views/lists/forms/create.hbs:4
+msgid "Create Form"
+msgstr ""
+
+#: views/lists/forms/create.hbs:5
+#: views/lists/forms/forms.hbs:4
+msgid "Create Custom Form"
+msgstr ""
+
+#: views/lists/forms/create.hbs:6
+#: views/lists/forms/create.hbs:7
+#: views/lists/forms/edit.hbs:7
+#: views/lists/forms/edit.hbs:8
+msgid "Form Name"
+msgstr ""
+
+#: views/lists/forms/create.hbs:8
+msgid "Add Form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:4
+msgid "Edit Form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:5
+msgid "Edit Custom Form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:6
+msgid "Back to forms"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:10
+msgid "Optional comments about this form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:11
+msgid "Form Preview"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:12
+msgid ""
+"Note: These links are solely for a quick preview. If you submit a preview "
+"form you'll get redirected to the list's default form."
+msgstr ""
+
+#: views/lists/forms/edit.hbs:13
+#: views/lists/subscription/add.hbs:16
+#: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:4
+#: views/subscription/mail-unsubscribe-confirmed-text.hbs:4
+#: routes/forms.js:150
+#: routes/lists.js:269
+msgid "Subscribe"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:14
+msgid "Confirm Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:15
+msgid "Updated Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:16
+msgid "Unsubscribed Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:17
+msgid "Manage"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:18
+msgid "Manage Address"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:19
+msgid "Create a test user for additional options"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:20
+#: views/templates/create.hbs:2
+#: views/templates/edit.hbs:2
+#: views/templates/templates.hbs:2
+#: views/templates/templates.hbs:4
+#: lib/tools.js:118
+msgid "Templates"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:21
+msgid "Fields"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:22
+msgid "Help"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:24
+msgid "Form Fields"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:25
+msgid "Fields hidden on subscription page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:26
+msgid "Fields shown on subscription page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:27
+msgid "Fields hidden on preferences page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:28
+msgid "Fields shown on preferences page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:29
+msgid ""
+"The MJML Documentation can be found <a "
+"href=\"https://mjml.io/documentation/\" rel=\"noreferrer\" "
+"target=\"_blank\">here</a>."
+msgstr ""
+
+#: views/lists/forms/edit.hbs:30
+msgid "Delete Form"
+msgstr ""
+
+#: views/lists/forms/forms.hbs:10
+msgid "The default form for this list is:"
 msgstr ""
 
 #: views/lists/lists.hbs:6
@@ -1519,8 +1594,8 @@ msgstr ""
 #: views/lists/segments/segments.hbs:3
 #: views/lists/segments/segments.hbs:5
 #: views/lists/segments/view.hbs:3
-#: views/lists/view.hbs:6
-#: views/lists/view.hbs:13
+#: views/lists/view.hbs:7
+#: views/lists/view.hbs:14
 msgid "Segments"
 msgstr ""
 
@@ -1562,7 +1637,7 @@ msgstr ""
 #: views/lists/segments/edit.hbs:4
 #: views/lists/segments/edit.hbs:5
 #: views/lists/segments/view.hbs:6
-#: views/lists/view.hbs:11
+#: views/lists/view.hbs:12
 msgid "Edit Segment"
 msgstr ""
 
@@ -1706,7 +1781,7 @@ msgid "Match"
 msgstr ""
 
 #: views/lists/segments/view.hbs:5
-#: views/lists/view.hbs:12
+#: views/lists/view.hbs:13
 msgid "Segment"
 msgstr ""
 
@@ -1728,8 +1803,7 @@ msgid "Add subscriber"
 msgstr ""
 
 #: views/lists/subscription/add.hbs:5
-#: views/subscription/manage.hbs:2
-#: views/subscription/subscribe.hbs:3
+#: views/subscription/partials/subscription-custom-fields.hbs:1
 #: views/users/account.hbs:7
 msgid "Email Address"
 msgstr ""
@@ -1738,8 +1812,7 @@ msgstr ""
 #: views/lists/subscription/edit.hbs:9
 #: views/settings.hbs:82
 #: views/settings.hbs:97
-#: views/subscription/manage.hbs:7
-#: views/subscription/subscribe.hbs:7
+#: views/subscription/partials/subscription-custom-fields.hbs:6
 msgid "Begins with"
 msgstr ""
 
@@ -1786,8 +1859,8 @@ msgstr ""
 
 #: views/lists/subscription/edit.hbs:6
 #: views/lists/subscription/import-preview.hbs:6
-#: views/subscription/unsubscribe.hbs:3
-#: lib/helpers.js:25
+#: views/subscription/partials/subscription-unsubscribe-form.hbs:1
+#: lib/helpers.js:38
 #: lib/models/segments.js:11
 msgid "Email address"
 msgstr ""
@@ -1851,7 +1924,7 @@ msgid "Categorize the imported subscribers as"
 msgstr ""
 
 #: views/lists/subscription/import.hbs:8
-#: routes/lists.js:171
+#: routes/lists.js:187
 msgid "Subscribed"
 msgstr ""
 
@@ -1871,7 +1944,7 @@ msgstr ""
 msgid "List Actions"
 msgstr ""
 
-#: views/lists/view.hbs:8
+#: views/lists/view.hbs:9
 #: views/triggers/create-select.hbs:3
 #: views/triggers/create-select.hbs:4
 #: views/triggers/create.hbs:3
@@ -1881,53 +1954,53 @@ msgstr ""
 msgid "Create Trigger"
 msgstr ""
 
-#: views/lists/view.hbs:9
+#: views/lists/view.hbs:10
 msgid "Add Subscriber"
 msgstr ""
 
-#: views/lists/view.hbs:10
+#: views/lists/view.hbs:11
 msgid "Import Subscribers"
 msgstr ""
 
-#: views/lists/view.hbs:14
+#: views/lists/view.hbs:15
 msgid "Create New Segment"
 msgstr ""
 
-#: views/lists/view.hbs:15
+#: views/lists/view.hbs:16
 msgid "Filter"
 msgstr ""
 
-#: views/lists/view.hbs:16
+#: views/lists/view.hbs:17
 msgid "Subscriptions"
 msgstr ""
 
-#: views/lists/view.hbs:17
+#: views/lists/view.hbs:18
 msgid "Imports"
 msgstr ""
 
-#: views/lists/view.hbs:24
+#: views/lists/view.hbs:25
 #: routes/campaigns.js:266
-#: routes/lists.js:265
+#: routes/lists.js:281
 msgid "Finished"
 msgstr ""
 
-#: views/lists/view.hbs:26
+#: views/lists/view.hbs:27
 msgid "Added"
 msgstr ""
 
-#: views/lists/view.hbs:27
+#: views/lists/view.hbs:28
 msgid "Updated"
 msgstr ""
 
-#: views/lists/view.hbs:28
+#: views/lists/view.hbs:29
 msgid "Failed"
 msgstr ""
 
-#: views/lists/view.hbs:30
+#: views/lists/view.hbs:31
 msgid "Are you sure? This action should only be called to resolve stalled imports"
 msgstr ""
 
-#: views/lists/view.hbs:31
+#: views/lists/view.hbs:32
 msgid "Restart"
 msgstr ""
 
@@ -2423,126 +2496,208 @@ msgid ""
 "are not signed."
 msgstr ""
 
-#: views/subscription/confirm-notice.hbs:1
-#: views/subscription/subscribe.hbs:1
+#: views/subscription/mail-confirm-html.mjml.hbs:1
+#: views/subscription/mail-confirm-text.hbs:1
+msgid "Please Confirm Subscription"
+msgstr ""
+
+#: views/subscription/mail-confirm-html.mjml.hbs:2
+#: views/subscription/mail-confirm-text.hbs:2
+msgid "Yes, subscribe me to this list"
+msgstr ""
+
+#: views/subscription/mail-confirm-html.mjml.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"subscribed if you don't click the confirmation link above."
+msgstr ""
+
+#: views/subscription/mail-confirm-html.mjml.hbs:4
+#: views/subscription/mail-confirm-text.hbs:4
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:8
+#: views/subscription/mail-subscription-confirmed-text.hbs:7
+#: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:5
+#: views/subscription/mail-unsubscribe-confirmed-text.hbs:5
+msgid "For questions about this list, please contact:"
+msgstr ""
+
+#: views/subscription/mail-confirm-text.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"subscribed unless you click the confirmation link above."
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:1
+#: views/subscription/mail-subscription-confirmed-text.hbs:1
+#: views/subscription/web-subscribed.mjml.hbs:1
+msgid "Subscription Confirmed"
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:2
+msgid "Your subscription to our list has been confirmed"
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:3
+msgid "If you want to modify your subscription then you can "
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:4
+#: views/subscription/mail-subscription-confirmed-text.hbs:4
+msgid "manage your preferences"
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:5
+#: views/subscription/mail-subscription-confirmed-text.hbs:5
+#: views/users/login.hbs:10
+msgid "or"
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:6
+#: views/subscription/mail-subscription-confirmed-text.hbs:6
+msgid "unsubscribe here"
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:7
+#: views/subscription/web-confirm-notice.mjml.hbs:3
+#: views/subscription/web-subscribed.mjml.hbs:4
+#: views/subscription/web-unsubscribe-notice.mjml.hbs:3
+#: views/subscription/web-updated-notice.mjml.hbs:3
+msgid "Return to our website"
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-text.hbs:2
+#: views/subscription/web-subscribed.mjml.hbs:2
+msgid "Your subscription to our list has been confirmed."
+msgstr ""
+
+#: views/subscription/mail-subscription-confirmed-text.hbs:3
+msgid "If you want to modify your subscription then you can:"
+msgstr ""
+
+#: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:1
+#: views/subscription/mail-unsubscribe-confirmed-text.hbs:1
+msgid "You Are Now Unsubscribed"
+msgstr ""
+
+#: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:2
+msgid "We have removed your email address from our list"
+msgstr ""
+
+#: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:3
+#: views/subscription/mail-unsubscribe-confirmed-text.hbs:3
+msgid "If you unsubscribed by mistake, you can re-subscribe at:"
+msgstr ""
+
+#: views/subscription/mail-unsubscribe-confirmed-text.hbs:2
+msgid "We have removed your email address from our list."
+msgstr ""
+
+#: views/subscription/partials/subscription-custom-fields.hbs:2
+msgid "want to change it?"
+msgstr ""
+
+#: views/subscription/partials/subscription-custom-fields.hbs:5
+msgid "Download signature verification key"
+msgstr ""
+
+#: views/subscription/partials/subscription-custom-fields.hbs:7
+msgid "Insert your GPG public key here to encrypt messages sent to your address"
+msgstr ""
+
+#: views/subscription/partials/subscription-custom-fields.hbs:8
+msgid "optional"
+msgstr ""
+
+#: views/subscription/partials/subscription-flash-messages.hbs:1
+#: views/subscription/partials/subscription-flash-messages.hbs:3
 msgid "Warning!"
 msgstr ""
 
-#: views/subscription/confirm-notice.hbs:2
+#: views/subscription/partials/subscription-flash-messages.hbs:2
 msgid "If JavaScript was not enabled then no confirmation message was sent"
 msgstr ""
 
-#: views/subscription/confirm-notice.hbs:3
-msgid "Almost finished."
+#: views/subscription/partials/subscription-flash-messages.hbs:4
+msgid "JavaScript must be enabled in order for this form to work"
 msgstr ""
 
-#: views/subscription/confirm-notice.hbs:4
-msgid ""
-"We need to confirm your email address. To complete the subscription "
-"process, please click the link in the email we just sent you."
-msgstr ""
-
-#: views/subscription/confirm-notice.hbs:5
-#: views/subscription/unsubscribe-notice.hbs:3
-#: views/subscription/updated-notice.hbs:3
-msgid "return to our website"
-msgstr ""
-
-#: views/subscription/manage-address.hbs:1
-msgid "Update your Email Address"
-msgstr ""
-
-#: views/subscription/manage-address.hbs:2
+#: views/subscription/partials/subscription-manage-address-form.hbs:1
 msgid "Existing Email Address"
 msgstr ""
 
-#: views/subscription/manage-address.hbs:3
+#: views/subscription/partials/subscription-manage-address-form.hbs:2
 msgid "New Email Address"
 msgstr ""
 
-#: views/subscription/manage-address.hbs:4
+#: views/subscription/partials/subscription-manage-address-form.hbs:3
 msgid "Your new email address"
 msgstr ""
 
-#: views/subscription/manage-address.hbs:5
+#: views/subscription/partials/subscription-manage-address-form.hbs:4
 msgid ""
 "You will receive a confirmation request to your new email address that you "
 "need to accept before your email is actually changed"
 msgstr ""
 
-#: views/subscription/manage-address.hbs:6
+#: views/subscription/partials/subscription-manage-address-form.hbs:5
+#: views/subscription/web-manage-address.mjml.hbs:2
 msgid "Update Email Address"
 msgstr ""
 
-#: views/subscription/manage.hbs:1
-msgid "Update your preferences"
-msgstr ""
-
-#: views/subscription/manage.hbs:3
-msgid "want to change it?"
-msgstr ""
-
-#: views/subscription/manage.hbs:6
-#: views/subscription/subscribe.hbs:6
-msgid "Download signature verification key"
-msgstr ""
-
-#: views/subscription/manage.hbs:8
-#: views/subscription/subscribe.hbs:8
-msgid "Insert your GPG public key here to encrypt messages sent to your address"
-msgstr ""
-
-#: views/subscription/manage.hbs:9
-#: views/subscription/subscribe.hbs:9
-msgid "optional"
-msgstr ""
-
-#: views/subscription/manage.hbs:11
+#: views/subscription/partials/subscription-manage-form.hbs:1
+#: views/subscription/web-manage.mjml.hbs:2
 msgid "Update Profile"
 msgstr ""
 
-#: views/subscription/subscribe.hbs:2
-msgid "JavaScript must be enabled in order for the subscription form to work"
-msgstr ""
-
-#: views/subscription/subscribe.hbs:11
+#: views/subscription/partials/subscription-subscribe-form.hbs:1
+#: views/subscription/web-subscribe.mjml.hbs:2
 msgid "Subscribe to list"
 msgstr ""
 
-#: views/subscription/subscribed.hbs:3
+#: views/subscription/web-confirm-notice.mjml.hbs:1
+msgid "Almost Finished"
+msgstr ""
+
+#: views/subscription/web-confirm-notice.mjml.hbs:2
+msgid ""
+"We need to confirm your email address. To complete the subscription "
+"process, please click the link in the email we just sent you."
+msgstr ""
+
+#: views/subscription/web-manage-address.mjml.hbs:1
+msgid "Update Your Email Address"
+msgstr ""
+
+#: views/subscription/web-manage.mjml.hbs:1
+msgid "Update Your Preferences"
+msgstr ""
+
+#: views/subscription/web-subscribe.mjml.hbs:1
+msgid "Subscribe to List"
+msgstr ""
+
+#: views/subscription/web-subscribed.mjml.hbs:3
 msgid "Thank you for subscribing!"
 msgstr ""
 
-#: views/subscription/subscribed.hbs:4
-msgid "continue to our website"
-msgstr ""
-
-#: views/subscription/unsubscribe-notice.hbs:1
+#: views/subscription/web-unsubscribe-notice.mjml.hbs:1
 msgid "Unsubscribe Successful"
 msgstr ""
 
-#: views/subscription/unsubscribe-notice.hbs:2
+#: views/subscription/web-unsubscribe-notice.mjml.hbs:2
 msgid "You have been removed from:"
 msgstr ""
 
-#: views/subscription/unsubscribe.hbs:2
+#: views/subscription/web-unsubscribe.mjml.hbs:2
 msgid "Enter your email address to unsubscribe from:"
 msgstr ""
 
-#: views/subscription/updated-notice.hbs:1
+#: views/subscription/web-updated-notice.mjml.hbs:1
 msgid "Profile Updated"
 msgstr ""
 
-#: views/subscription/updated-notice.hbs:2
+#: views/subscription/web-updated-notice.mjml.hbs:2
 msgid "Your profile information has been updated."
-msgstr ""
-
-#: views/templates/create.hbs:2
-#: views/templates/edit.hbs:2
-#: views/templates/templates.hbs:2
-#: views/templates/templates.hbs:4
-#: lib/tools.js:115
-msgid "Templates"
 msgstr ""
 
 #: views/templates/create.hbs:3
@@ -3011,45 +3166,45 @@ msgstr ""
 msgid "Bad status code %s"
 msgstr ""
 
-#: lib/helpers.js:16
+#: lib/helpers.js:29
 msgid "URL that points to the unsubscribe page"
 msgstr ""
 
-#: lib/helpers.js:19
+#: lib/helpers.js:32
 msgid "URL that points to the preferences page of the subscriber"
 msgstr ""
 
-#: lib/helpers.js:22
+#: lib/helpers.js:35
 msgid "URL to preview the message in a browser"
 msgstr ""
 
-#: lib/helpers.js:28
+#: lib/helpers.js:41
 #: lib/models/segments.js:31
 msgid "First name"
 msgstr ""
 
-#: lib/helpers.js:31
+#: lib/helpers.js:44
 #: lib/models/segments.js:35
 msgid "Last name"
 msgstr ""
 
-#: lib/helpers.js:34
+#: lib/helpers.js:47
 msgid "Full name (first and last name combined)"
 msgstr ""
 
-#: lib/helpers.js:37
+#: lib/helpers.js:50
 msgid "Unique ID that identifies the recipient"
 msgstr ""
 
-#: lib/helpers.js:40
+#: lib/helpers.js:53
 msgid "Unique ID that identifies the list used for this campaign"
 msgstr ""
 
-#: lib/helpers.js:43
+#: lib/helpers.js:56
 msgid "Unique ID that identifies current campaign"
 msgstr ""
 
-#: lib/mailer.js:215
+#: lib/mailer.js:245
 msgid "Invalid mail transport"
 msgstr ""
 
@@ -3102,19 +3257,20 @@ msgstr ""
 #: lib/models/fields.js:53
 #: lib/models/fields.js:98
 #: lib/models/fields.js:123
+#: lib/models/forms.js:37
 #: lib/models/lists.js:81
 #: lib/models/lists.js:175
 #: lib/models/lists.js:212
 #: lib/models/segments.js:43
 #: lib/models/segments.js:176
-#: lib/models/subscriptions.js:88
-#: lib/models/subscriptions.js:640
-#: lib/models/subscriptions.js:703
-#: lib/models/subscriptions.js:889
-#: lib/models/subscriptions.js:992
-#: lib/models/subscriptions.js:1046
-#: lib/models/subscriptions.js:1109
-#: lib/models/subscriptions.js:1152
+#: lib/models/subscriptions.js:89
+#: lib/models/subscriptions.js:661
+#: lib/models/subscriptions.js:724
+#: lib/models/subscriptions.js:910
+#: lib/models/subscriptions.js:1013
+#: lib/models/subscriptions.js:1067
+#: lib/models/subscriptions.js:1130
+#: lib/models/subscriptions.js:1173
 msgid "Missing List ID"
 msgstr ""
 
@@ -3153,6 +3309,22 @@ msgstr ""
 msgid "Provided List ID not found"
 msgstr ""
 
+#: lib/models/forms.js:62
+#: lib/models/forms.js:88
+#: lib/models/forms.js:136
+#: lib/models/forms.js:183
+msgid "Missing Form ID"
+msgstr ""
+
+#: lib/models/forms.js:96
+#: lib/models/forms.js:140
+msgid "Form Name must be set"
+msgstr ""
+
+#: lib/models/forms.js:200
+msgid "Custom form not found"
+msgstr ""
+
 #: lib/models/links.js:328
 #: routes/campaigns.js:541
 #: routes/campaigns.js:590
@@ -3161,7 +3333,7 @@ msgid "Campaign not found"
 msgstr ""
 
 #: lib/models/links.js:336
-#: routes/lists.js:146
+#: routes/lists.js:162
 #: services/sender.js:311
 msgid "List not found"
 msgstr ""
@@ -3270,48 +3442,48 @@ msgstr ""
 msgid "Selected rule not found"
 msgstr ""
 
-#: lib/models/subscriptions.js:233
+#: lib/models/subscriptions.js:235
 msgid "%s: Please Confirm Subscription"
 msgstr ""
 
-#: lib/models/subscriptions.js:324
+#: lib/models/subscriptions.js:345
 msgid "Could not save subscription"
 msgstr ""
 
-#: lib/models/subscriptions.js:507
-#: lib/models/subscriptions.js:537
+#: lib/models/subscriptions.js:528
+#: lib/models/subscriptions.js:558
 msgid "Missing Subbscription ID"
 msgstr ""
 
-#: lib/models/subscriptions.js:565
+#: lib/models/subscriptions.js:586
 msgid "Missing Subbscription email address"
 msgstr ""
 
-#: lib/models/subscriptions.js:644
-#: lib/models/subscriptions.js:893
-#: lib/models/subscriptions.js:1156
+#: lib/models/subscriptions.js:665
+#: lib/models/subscriptions.js:914
+#: lib/models/subscriptions.js:1177
 msgid "Missing subscription ID"
 msgstr ""
 
-#: lib/models/subscriptions.js:707
+#: lib/models/subscriptions.js:728
 msgid "Missing email address"
 msgstr ""
 
-#: lib/models/subscriptions.js:996
-#: lib/models/subscriptions.js:1050
-#: lib/models/subscriptions.js:1086
+#: lib/models/subscriptions.js:1017
+#: lib/models/subscriptions.js:1071
+#: lib/models/subscriptions.js:1107
 msgid "Missing Import ID"
 msgstr ""
 
-#: lib/models/subscriptions.js:1178
+#: lib/models/subscriptions.js:1199
 msgid "Unknown subscription ID"
 msgstr ""
 
-#: lib/models/subscriptions.js:1183
+#: lib/models/subscriptions.js:1204
 msgid "Nothing seems to be changed"
 msgstr ""
 
-#: lib/models/subscriptions.js:1197
+#: lib/models/subscriptions.js:1218
 msgid "This address is already registered by someone else"
 msgstr ""
 
@@ -3453,30 +3625,30 @@ msgstr ""
 msgid "Incorrect username or password"
 msgstr ""
 
-#: lib/tools.js:133
+#: lib/tools.js:136
 msgid "Blocked email address \"%s\""
 msgstr ""
 
-#: lib/tools.js:142
+#: lib/tools.js:145
 msgid "Invalid email address \"%s\"."
 msgstr ""
 
-#: lib/tools.js:145
+#: lib/tools.js:148
 msgid "MX record not found for domain"
 msgstr ""
 
-#: lib/tools.js:148
+#: lib/tools.js:151
 msgid "Address domain not found"
 msgstr ""
 
-#: lib/tools.js:151
+#: lib/tools.js:154
 msgid "Address domain name is required"
 msgstr ""
 
 #: routes/archive.js:31
 #: routes/archive.js:43
 #: routes/archive.js:55
-#: app.js:220
+#: app.js:225
 msgid "Not Found"
 msgstr ""
 
@@ -3493,8 +3665,9 @@ msgstr ""
 #: routes/campaigns.js:26
 #: routes/editorapi.js:35
 #: routes/fields.js:13
+#: routes/forms.js:16
 #: routes/grapejs.js:13
-#: routes/lists.js:49
+#: routes/lists.js:50
 #: routes/mosaico.js:14
 #: routes/segments.js:13
 #: routes/settings.js:23
@@ -3637,6 +3810,9 @@ msgstr ""
 #: routes/fields.js:28
 #: routes/fields.js:64
 #: routes/fields.js:118
+#: routes/forms.js:31
+#: routes/forms.js:63
+#: routes/forms.js:94
 #: routes/segments.js:28
 #: routes/segments.js:59
 #: routes/segments.js:102
@@ -3673,6 +3849,94 @@ msgstr ""
 msgid "Could not delete specified field"
 msgstr ""
 
+#: routes/forms.js:78
+msgid "Could not create custom form"
+msgstr ""
+
+#: routes/forms.js:105
+msgid "Selected form not found"
+msgstr ""
+
+#: routes/forms.js:141
+msgid "Layout"
+msgstr ""
+
+#: routes/forms.js:146
+msgid "Form Input Style"
+msgstr ""
+
+#: routes/forms.js:153
+msgid "Web - Subscribe"
+msgstr ""
+
+#: routes/forms.js:157
+msgid "Web - Confirm Notice"
+msgstr ""
+
+#: routes/forms.js:161
+msgid "Mail - Confirm Subscription (MJML)"
+msgstr ""
+
+#: routes/forms.js:165
+msgid "Mail - Confirm Subscription (Text)"
+msgstr ""
+
+#: routes/forms.js:169
+msgid "Web - Subscribed Notice"
+msgstr ""
+
+#: routes/forms.js:173
+msgid "Mail - Subscription Confirmed (MJML)"
+msgstr ""
+
+#: routes/forms.js:177
+msgid "Mail - Subscription Confirmed (Text)"
+msgstr ""
+
+#: routes/forms.js:184
+msgid "Web - Manage Preferences"
+msgstr ""
+
+#: routes/forms.js:188
+msgid "Web - Manage Address"
+msgstr ""
+
+#: routes/forms.js:192
+msgid "Web - Updated Notice"
+msgstr ""
+
+#: routes/forms.js:199
+msgid "Web - Unsubscribe"
+msgstr ""
+
+#: routes/forms.js:203
+msgid "Web - Unsubscribe Notice"
+msgstr ""
+
+#: routes/forms.js:207
+msgid "Mail - Unsubscribe Confirmed (MJML)"
+msgstr ""
+
+#: routes/forms.js:211
+msgid "Mail - Unsubscribe Confirmed (Text)"
+msgstr ""
+
+#: routes/forms.js:248
+msgid "Form settings updated"
+msgstr ""
+
+#: routes/forms.js:250
+msgid "Form settings not updated"
+msgstr ""
+
+#: routes/forms.js:266
+msgid "Custom form deleted"
+msgstr ""
+
+#: routes/forms.js:268
+msgid "Could not delete specified form"
+msgstr ""
+
 #: routes/index.js:11
 msgid "Self Hosted Newsletter App"
 msgstr ""
@@ -3681,148 +3945,148 @@ msgstr ""
 msgid "Oops, we couldn't find a link for the URL you clicked"
 msgstr ""
 
-#: routes/lists.js:90
+#: routes/lists.js:91
 msgid "Could not create list"
 msgstr ""
 
-#: routes/lists.js:93
+#: routes/lists.js:94
 msgid "List created"
 msgstr ""
 
-#: routes/lists.js:101
-#: routes/lists.js:236
-#: routes/lists.js:301
-#: routes/lists.js:340
-#: routes/lists.js:409
-#: routes/lists.js:434
-#: routes/lists.js:479
-#: routes/lists.js:501
-#: routes/lists.js:530
-#: routes/lists.js:609
-#: routes/lists.js:666
-#: routes/lists.js:693
+#: routes/lists.js:102
+#: routes/lists.js:252
+#: routes/lists.js:317
+#: routes/lists.js:356
+#: routes/lists.js:425
+#: routes/lists.js:450
+#: routes/lists.js:495
+#: routes/lists.js:517
+#: routes/lists.js:546
+#: routes/lists.js:625
+#: routes/lists.js:682
+#: routes/lists.js:709
 msgid "Could not find list with specified ID"
 msgstr ""
 
-#: routes/lists.js:115
+#: routes/lists.js:129
 msgid "List settings updated"
 msgstr ""
 
-#: routes/lists.js:117
+#: routes/lists.js:131
 msgid "List settings not updated"
 msgstr ""
 
-#: routes/lists.js:133
+#: routes/lists.js:149
 msgid "List deleted"
 msgstr ""
 
-#: routes/lists.js:135
+#: routes/lists.js:151
 msgid "Could not delete specified list"
 msgstr ""
 
-#: routes/lists.js:171
+#: routes/lists.js:187
 msgid "Unknown"
 msgstr ""
 
-#: routes/lists.js:171
+#: routes/lists.js:187
 msgid "Complained"
 msgstr ""
 
-#: routes/lists.js:202
+#: routes/lists.js:218
 msgid "Invalid key"
 msgstr ""
 
-#: routes/lists.js:204
+#: routes/lists.js:220
 msgid "Expired key"
 msgstr ""
 
-#: routes/lists.js:206
+#: routes/lists.js:222
 msgid "Revoked key"
 msgstr ""
 
-#: routes/lists.js:256
+#: routes/lists.js:272
 msgid "Initializing"
 msgstr ""
 
-#: routes/lists.js:259
+#: routes/lists.js:275
 msgid "Initialized"
 msgstr ""
 
-#: routes/lists.js:262
+#: routes/lists.js:278
 msgid "Importing"
 msgstr ""
 
-#: routes/lists.js:268
+#: routes/lists.js:284
 msgid "Errored"
 msgstr ""
 
-#: routes/lists.js:346
-#: routes/lists.js:415
-#: routes/lists.js:440
+#: routes/lists.js:362
+#: routes/lists.js:431
+#: routes/lists.js:456
 msgid "Could not find subscriber with specified ID"
 msgstr ""
 
-#: routes/lists.js:392
+#: routes/lists.js:408
 msgid "Could not add subscription"
 msgstr ""
 
-#: routes/lists.js:397
+#: routes/lists.js:413
 msgid "%s was successfully added to your list"
 msgstr ""
 
-#: routes/lists.js:399
+#: routes/lists.js:415
 msgid "%s was not added to your list"
 msgstr ""
 
-#: routes/lists.js:421
+#: routes/lists.js:437
 msgid "Could not unsubscribe user"
 msgstr ""
 
-#: routes/lists.js:424
+#: routes/lists.js:440
 msgid "%s was successfully unsubscribed from your list"
 msgstr ""
 
-#: routes/lists.js:444
+#: routes/lists.js:460
 msgid "%s was successfully removed from your list"
 msgstr ""
 
-#: routes/lists.js:456
+#: routes/lists.js:472
 msgid "Another subscriber with email address %s already exists"
 msgstr ""
 
-#: routes/lists.js:463
+#: routes/lists.js:479
 msgid "Subscription settings updated"
 msgstr ""
 
-#: routes/lists.js:465
+#: routes/lists.js:481
 msgid "Subscription settings not updated"
 msgstr ""
 
-#: routes/lists.js:507
-#: routes/lists.js:615
-#: routes/lists.js:651
-#: routes/lists.js:679
-#: routes/lists.js:699
+#: routes/lists.js:523
+#: routes/lists.js:631
+#: routes/lists.js:667
+#: routes/lists.js:695
+#: routes/lists.js:715
 msgid "Could not find import data with specified ID"
 msgstr ""
 
-#: routes/lists.js:538
+#: routes/lists.js:554
 msgid "Could not process CSV"
 msgstr ""
 
-#: routes/lists.js:547
+#: routes/lists.js:563
 msgid "Could not create importer"
 msgstr ""
 
-#: routes/lists.js:598
+#: routes/lists.js:614
 msgid "Empty file"
 msgstr ""
 
-#: routes/lists.js:655
+#: routes/lists.js:671
 msgid "Import started"
 msgstr ""
 
-#: routes/lists.js:683
+#: routes/lists.js:699
 msgid "Import restarted"
 msgstr ""
 
@@ -3954,50 +4218,53 @@ msgstr ""
 msgid "Mailer settings verified, ready to send some mail!"
 msgstr ""
 
-#: routes/subscription.js:22
+#: routes/subscription.js:25
 msgid "Selected subscription not found"
 msgstr ""
 
-#: routes/subscription.js:32
-#: routes/subscription.js:103
-#: routes/subscription.js:141
-#: routes/subscription.js:166
-#: routes/subscription.js:191
-#: routes/subscription.js:232
-#: routes/subscription.js:270
-#: routes/subscription.js:317
-#: routes/subscription.js:339
-#: routes/subscription.js:368
-#: routes/subscription.js:392
-#: routes/subscription.js:424
+#: routes/subscription.js:35
+#: routes/subscription.js:155
+#: routes/subscription.js:222
+#: routes/subscription.js:275
+#: routes/subscription.js:327
+#: routes/subscription.js:396
+#: routes/subscription.js:434
+#: routes/subscription.js:510
+#: routes/subscription.js:532
+#: routes/subscription.js:592
+#: routes/subscription.js:616
+#: routes/subscription.js:681
 msgid "Selected list not found"
 msgstr ""
 
-#: routes/subscription.js:78
-#: routes/subscription.js:472
+#: routes/subscription.js:109
 msgid "%s: Subscription Confirmed"
 msgstr ""
 
-#: routes/subscription.js:217
+#: routes/subscription.js:381
 msgid "Email address not set"
 msgstr ""
 
-#: routes/subscription.js:255
+#: routes/subscription.js:419
 msgid "Could not store confirmation data"
 msgstr ""
 
-#: routes/subscription.js:284
-#: routes/subscription.js:349
-#: routes/subscription.js:402
+#: routes/subscription.js:448
+#: routes/subscription.js:547
+#: routes/subscription.js:631
 msgid "Subscription not found from this list"
 msgstr ""
 
-#: routes/subscription.js:383
+#: routes/subscription.js:607
 msgid "Email address updated, check your mailbox for verification instructions"
 msgstr ""
 
-#: routes/subscription.js:499
-#: routes/subscription.js:515
+#: routes/subscription.js:730
+msgid "%s: Unsubscribe Confirmed"
+msgstr ""
+
+#: routes/subscription.js:777
+#: routes/subscription.js:793
 msgid "Public key is not set"
 msgstr ""
 

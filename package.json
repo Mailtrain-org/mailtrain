@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "1.22.0",
+  "version": "1.23.0",
   "description": "Self hosted email newsletter app",
   "main": "index.js",
   "scripts": {
@@ -47,6 +47,7 @@
     "csurf": "^1.9.0",
     "csv-generate": "^1.0.0",
     "csv-parse": "^1.2.0",
+    "dompurify": "^0.8.5",
     "escape-html": "^1.0.3",
     "express": "^4.15.2",
     "express-session": "^1.15.1",
@@ -69,6 +70,7 @@
     "libmime": "^3.1.0",
     "marked": "^0.3.6",
     "memory-cache": "^0.1.6",
+    "mjml": "^3.3.0",
     "mkdirp": "^0.5.1",
     "moment-timezone": "^0.5.11",
     "morgan": "^1.8.1",
@@ -80,6 +82,7 @@
     "nodemailer": "^3.1.8",
     "nodemailer-openpgp": "^1.0.2",
     "npmlog": "^4.0.2",
+    "object-hash": "^1.1.7",
     "openpgp": "^2.5.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
