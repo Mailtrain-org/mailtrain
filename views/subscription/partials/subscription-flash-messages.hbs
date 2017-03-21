@@ -1,0 +1,20 @@
+{{{flashMessages}}}
+
+{{#if isConfirmNotice}}
+    <div class="alert alert-warning js-warning" role="alert">
+        <strong>{{#translate}}Warning!{{/translate}}</strong> {{#translate}}If JavaScript was not enabled then no confirmation message was sent{{/translate}}
+    </div>
+{{/if}}
+
+{{#if needsJsWarning}}
+    <div class="alert alert-danger js-warning" role="alert">
+        <strong>{{#translate}}Warning!{{/translate}}</strong>
+        {{#translate}}JavaScript must be enabled in order for this form to work{{/translate}}
+    </div>
+{{/if}}
+
+<script>
+    document.querySelectorAll('.js-warning').forEach(function(el) {
+        el.style.display = 'none';
+    });
+</script>

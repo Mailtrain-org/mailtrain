@@ -1,0 +1,19 @@
+{{#if hasPubkey}}
+    <form method="post" id="download-pubkey" action="/subscription/publickey" style="display: none;">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="cid" value="{{cid}}">
+    </form>
+{{/if}}
+
+<form id="main-form" method="post" action="/subscription/{{lcid}}/manage">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="cid" value="{{cid}}">
+    <input type="hidden" class="tz-detect" name="tz" id="tz" value="{{tz}}">
+
+{{> subscription_custom_fields}}
+
+    <button type="submit" style="position: absolute; top: -9999px; left: -9999px;">{{#translate}}Update Profile{{/translate}}</button>
+</form>
+
+<script src="/moment/moment.min.js"></script>
+<script src="/moment/moment-timezone-with-data.min.js"></script>

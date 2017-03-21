@@ -1,0 +1,22 @@
+<form id="main-form" method="post" action="/subscription/{{lcid}}/manage-address">
+
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="cid" value="{{cid}}">
+
+    <div class="form-group">
+        <label for="email">{{#translate}}Existing Email Address{{/translate}}</label>
+        <input type="email" name="email" id="email" placeholder="" value="{{email}}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="email-new">{{#translate}}New Email Address{{/translate}}</label>
+        <input type="email" name="email-new" id="email-new" placeholder="{{#translate}}Your new email address{{/translate}}" value="{{email}}">
+    </div>
+
+    <p>
+        {{#translate}}You will receive a confirmation request to your new email address that you need to accept before your email is actually changed{{/translate}}
+    </p>
+
+    <button type="submit" style="position: absolute; top: -9999px; left: -9999px;">{{#translate}}Update Email Address{{/translate}}</button>
+
+</form>
