@@ -13,7 +13,7 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 
 curl -sL https://deb.nodesource.com/setup_6.x | bash -
-apt-get -q -y install mariadb-server pwgen nodejs git ufw build-essential dnsutils python software-properties-common
+apt-get -q -y install mariadb-server pwgen nodejs imagemagick git ufw build-essential dnsutils python software-properties-common
 
 apt-add-repository -y ppa:chris-lea/redis-server
 apt-get -q -y install redis-server
