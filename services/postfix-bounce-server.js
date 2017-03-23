@@ -43,7 +43,7 @@ let server = net.createServer(socket => {
                     }
                     campaigns.updateMessage(message, 'bounced', true, (err, updated) => {
                         if (err) {
-                            log.error('POSTFIXBOUNCE', 'Failed updating message: %s', err.stack);
+                            log.error('POSTFIXBOUNCE', 'Failed updating message: %s', err && err.stack);
                         } else if (updated) {
                             log.verbose('POSTFIXBOUNCE', 'Marked message %s as bounced', queueId);
                         }
@@ -71,7 +71,7 @@ let server = net.createServer(socket => {
 });
 
 server.on('error', err => {
-    log.error('POSTFIXBOUNCE', err.stack);
+    log.error('POSTFIXBOUNCE', err && err.stack);
 });
 
 module.exports = callback => {
