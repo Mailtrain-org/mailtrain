@@ -120,7 +120,7 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
 ##### Requirements:
     * Docker
     * docker-compose
-  
+
   1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `sudo docker build -t mailtrain-node:latest .`
   3. Copy default.toml to production.toml. Run `sudo mkdir -p /etc/mailtrain && sudo cp config/default.toml /etc/mailtrain/production.toml`
@@ -310,7 +310,7 @@ Enclose translatable strings to `{{#translate}}` tags
 
 * Translations are loaded from Gettext MO files. In order to generate such files you need a Gettext translations editor. [POEdit](https://poedit.net/) is a great choice.
 
-* To update the translation catalog ([mailtrain.pot](./languages/mailtrain.pot)) run `grunt` from command line. This fetches all translatable strings from JavaScript and Handlebars files and merges these into the translation catalog
+* To create the translation catalog run `grunt` from command line. This fetches all translatable strings from JavaScript and Handlebars files and merges these into the translation catalog located at */languages/mailtrain.pot*
 
 * To add a new language use this catalog file as source. Once you want to update your translation file from the updated catalog, then select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This would merge all new translations from the POT file to your PO file.
  *If you have saved the PO file in [./languages](./languages) then POEdit should auto generate required MO file whenever you hit save for the PO file.
