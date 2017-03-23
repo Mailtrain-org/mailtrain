@@ -40,7 +40,7 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 ## Cons
 
   * Beta-grade software. Might or might not work as expected. There are several users with list sizes between 100k and 1M and Mailtrain seems to work for them but YMMV
-  * Almost no documentation (there are some guides in the [Wiki](https://github.com/andris9/mailtrain/wiki))
+  * Almost no documentation (there are some guides in the [Wiki](https://github.com/Mailtrain-org/mailtrain/wiki))
 
 ## Requirements
 
@@ -58,7 +58,7 @@ Mailtrain and all required dependencies (including MySQL). The installation scri
 If you like living on the edge and feel adventurous you can run the installation script directly from your command line as root:
 
 ```
-curl https://raw.githubusercontent.com/andris9/mailtrain/master/setup/install.sh | sudo bash
+curl https://raw.githubusercontent.com/Mailtrain-org/mailtrain/master/setup/install.sh | sudo bash
 ```
 
 Install script installs and sets up the following:
@@ -121,7 +121,7 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
     * Docker
     * docker-compose
 
-  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  1. Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `sudo docker build -t mailtrain-node:latest .`
   3. Copy default.toml to production.toml. Run `sudo mkdir -p /etc/mailtrain && sudo cp config/default.toml /etc/mailtrain/production.toml`
   4. Create `/etc/docker-compose.yml`. Example (dont forget change MYSQL_ROOT_PASS and MYSQL_USER_PASSWORD to your passwords):
@@ -192,7 +192,7 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
 
 ### Manual Install (any OS that supports Node.js)
 
-  1. Download Mailtrain files using git: `git clone git://github.com/andris9/mailtrain.git` (or download [zipped repo](https://github.com/andris9/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  1. Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `npm install --production` in the Mailtrain folder to install required dependencies
   3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL and any other settings in it
   4. Run the server `NODE_ENV=production npm start`
@@ -203,7 +203,7 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
 
 ## Upgrade
 
-  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/andris9/mailtrain/archive/master.zip) and replace old ones with these
+  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these
   * Run `npm install --production` in the Mailtrain folder
 
 ## Using Environment Variables
@@ -246,9 +246,9 @@ The source code for the Cloudron app is [here](https://git.cloudron.io/cloudron/
 Mailtrain uses webhooks integration to detect bounces and spam complaints. Currently supported webhooks are:
 
   * **AWS SES** – create a SNS topic for complaints and bounces and use `http://domain/webhooks/aws` as the subscriber URL for these topics
-  * **SparkPost** – use `http://domain/webhooks/sparkpost` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-SparkPost))
-  * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-SendGrid))
-  * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints ([instructions](https://github.com/andris9/mailtrain/wiki/Setting-up-Webhooks-for-Mailgun))
+  * **SparkPost** – use `http://domain/webhooks/sparkpost` as the webhook URL for bounces and complaints ([instructions](https://github.com/Mailtrain-org/mailtrain/wiki/Setting-up-Webhooks-for-SparkPost))
+  * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints ([instructions](https://github.com/Mailtrain-org/mailtrain/wiki/Setting-up-Webhooks-for-SendGrid))
+  * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints ([instructions](https://github.com/Mailtrain-org/mailtrain/wiki/Setting-up-Webhooks-for-Mailgun))
   * **ZoneMTA** – use `http://domain/webhooks/zone-mta` as the webhook URL for bounces. If you install Mailtrain with the included installation script then this route gets set up automatically during the installation process
   * **Postfix** – This is not a webhook but a TCP server on port 5699 to listen for piped Postfix logs. Enable it with the `[postfixbounce]` config option. To use it, pipe the log to that port using *tail*: `tail -F /var/log/mail.log | nc localhost 5699 -` (if Mailtrain restarts then you need to re-establish the *tail* pipe), alternatively you could send the log with a cron job periodically `tail -n 100 | nc localhost 5699 -`.
 
@@ -315,7 +315,7 @@ Enclose translatable strings to `{{#translate}}` tags
 * To add a new language use this catalog file as source. Once you want to update your translation file from the updated catalog, then select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This would merge all new translations from the POT file to your PO file.
  *If you have saved the PO file in [./languages](./languages) then POEdit should auto generate required MO file whenever you hit save for the PO file.
 
-* Once you have a correct MO file in the languages folder, then edit Mailtrain config and set ["language" option](https://github.com/andris9/mailtrain/blob/ba8bd1212335cb9bd7ba094beb7b5400f35cae6c/config/default.toml#L30-L31) to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
+* Once you have a correct MO file in the languages folder, then edit Mailtrain config and set ["language" option](https://github.com/Mailtrain-org/mailtrain/blob/ba8bd1212335cb9bd7ba094beb7b5400f35cae6c/config/default.toml#L30-L31) to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
 
 > **NB!** For now translation settings are global, so if you have set a translation in config then this applies to all users. An user can't select another translation than the default even if there is a translation file. This is because current Mailtrain code does not provide request context to functions and the functions generating strings do not know which language to use.
 

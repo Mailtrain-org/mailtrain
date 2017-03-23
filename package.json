@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/andris9/mailtrain.git"
+    "url": "git://github.com/Mailtrain-org/mailtrain.git"
   },
   "author": "Andris Reinman",
   "license": "GPL-3.0",

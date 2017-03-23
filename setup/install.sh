@@ -46,7 +46,7 @@ ufw --force enable
 # Fetch Mailtrain files
 mkdir -p /opt/mailtrain
 cd /opt/mailtrain
-git clone git://github.com/andris9/mailtrain.git .
+git clone git://github.com/Mailtrain-org/mailtrain.git .
 
 # Normally we would let Mailtrain itself to import the initial SQL data but in this case
 # we need to modify it, before we start Mailtrain
