@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "async": "^2.1.5",
-    "aws-sdk": "^2.29.0",
+    "aws-sdk": "^2.31.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.1",
     "bounce-handler": "^7.3.2-fork.2",

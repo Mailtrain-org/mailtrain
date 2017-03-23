@@ -5,6 +5,9 @@ config/development.*
 config/production.*
 dump.rdb
 
+# generate POT file every time you want to update your PO file
+languages/mailtrain.pot
+
 public/mosaico/uploads/*
 !public/mosaico/uploads/README.md
 public/mosaico/custom/*
