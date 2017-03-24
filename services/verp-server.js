@@ -88,7 +88,7 @@ let server = new SMTPServer({
             } else {
                 campaigns.updateMessage(session.message, 'bounced', bounceResult.action === 'failed', (err, updated) => {
                     if (err) {
-                        log.error('VERP', 'Failed updating message: %s', err.stack);
+                        log.error('VERP', 'Failed updating message: %s', err);
                     } else if (updated) {
                         log.verbose('VERP', 'Marked message %s as unsubscribed', session.campaignId);
                     }
@@ -100,7 +100,7 @@ let server = new SMTPServer({
 });
 
 server.on('error', err => {
-    log.error('VERP', err.stack);
+    log.error('VERP', err);
     server.close();
 });
 

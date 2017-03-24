@@ -20,7 +20,7 @@ router.get('/:campaign/:list/:subscription', (req, res) => {
     });
     links.countOpen(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, (err, opened) => {
         if (err) {
-            log.error('Redirect', err.stack || err);
+            log.error('Redirect', err);
         }
         if (opened) {
             log.verbose('Redirect', 'First open for %s:%s:%s', req.params.campaign, req.params.list, req.params.subscription);
@@ -54,7 +54,7 @@ router.get('/:campaign/:list/:subscription/:link', (req, res) => {
         }
         links.countClick(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, linkId, (err, status) => {
             if (err) {
-                log.error('Redirect', err.stack || err);
+                log.error('Redirect', err);
             }
             if (status) {
                 log.verbose('Redirect', 'First click for %s:%s:%s (%s)', req.params.campaign, req.params.list, req.params.subscription, url);

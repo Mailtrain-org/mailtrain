@@ -50,7 +50,7 @@ router.post('/aws', (req, res, next) => {
                             case 'Bounce':
                                 campaigns.updateMessage(message, 'bounced', req.body.Message.bounce.bounceType === 'Permanent', (err, updated) => {
                                     if (err) {
-                                        log.error('AWS', 'Failed updating message: %s', err.stack);
+                                        log.error('AWS', 'Failed updating message: %s', err);
                                     } else if (updated) {
                                         log.verbose('AWS', 'Marked message %s as bounced', req.body.Message.mail.messageId);
                                     }
@@ -60,7 +60,7 @@ router.post('/aws', (req, res, next) => {
                                 if (req.body.Message.complaint) {
                                     campaigns.updateMessage(message, 'complained', true, (err, updated) => {
                                         if (err) {
-                                            log.error('AWS', 'Failed updating message: %s', err.stack);
+                                            log.error('AWS', 'Failed updating message: %s', err);
                                         } else if (updated) {
                                             log.verbose('AWS', 'Marked message %s as complaint', req.body.Message.mail.messageId);
                                         }
@@ -118,7 +118,7 @@ router.post('/sparkpost', (req, res, next) => {
                     // https://support.sparkpost.com/customer/portal/articles/1929896
                     return campaigns.updateMessage(message, 'bounced', [1, 10, 25, 30, 50].indexOf(Number(evt.bounce_class)) >= 0, (err, updated) => {
                         if (err) {
-                            log.error('Sparkpost', 'Failed updating message: %s', err.stack);
+                            log.error('Sparkpost', 'Failed updating message: %s', err);
                         } else if (updated) {
                             log.verbose('Sparkpost', 'Marked message %s as bounced', evt.campaign_id);
                         }
@@ -127,7 +127,7 @@ router.post('/sparkpost', (req, res, next) => {
                 case 'spam_complaint':
                     return campaigns.updateMessage(message, 'complained', true, (err, updated) => {
                         if (err) {
-                            log.error('Sparkpost', 'Failed updating message: %s', err.stack);
+                            log.error('Sparkpost', 'Failed updating message: %s', err);
                         } else if (updated) {
                             log.verbose('Sparkpost', 'Marked message %s as complaint', evt.campaign_id);
                         }
@@ -136,7 +136,7 @@ router.post('/sparkpost', (req, res, next) => {
                 case 'link_unsubscribe':
                     return campaigns.updateMessage(message, 'unsubscribed', true, (err, updated) => {
                         if (err) {
-                            log.error('Sparkpost', 'Failed updating message: %s', err.stack);
+                            log.error('Sparkpost', 'Failed updating message: %s', err);
                         } else if (updated) {
                             log.verbose('Sparkpost', 'Marked message %s as unsubscribed', evt.campaign_id);
                         }
@@ -182,7 +182,7 @@ router.post('/sendgrid', (req, res, next) => {
                     // https://support.sparkpost.com/customer/portal/articles/1929896
                     return campaigns.updateMessage(message, 'bounced', true, (err, updated) => {
                         if (err) {
-                            log.error('Sendgrid', 'Failed updating message: %s', err.stack);
+                            log.error('Sendgrid', 'Failed updating message: %s', err);
                         } else if (updated) {
                             log.verbose('Sendgrid', 'Marked message %s as bounced', evt.campaign_id);
                         }
@@ -191,7 +191,7 @@ router.post('/sendgrid', (req, res, next) => {
                 case 'spamreport':
                     return campaigns.updateMessage(message, 'complained', true, (err, updated) => {
                         if (err) {
-                            log.error('Sendgrid', 'Failed updating message: %s', err.stack);
+                            log.error('Sendgrid', 'Failed updating message: %s', err);
                         } else if (updated) {
                             log.verbose('Sendgrid', 'Marked message %s as complaint', evt.campaign_id);
                         }
@@ -201,7 +201,7 @@ router.post('/sendgrid', (req, res, next) => {
                 case 'unsubscribe':
                     return campaigns.updateMessage(message, 'unsubscribed', true, (err, updated) => {
                         if (err) {
-                            log.error('Sendgrid', 'Failed updating message: %s', err.stack);
+                            log.error('Sendgrid', 'Failed updating message: %s', err);
                         } else if (updated) {
                             log.verbose('Sendgrid', 'Marked message %s as unsubscribed', evt.campaign_id);
                         }
@@ -228,7 +228,7 @@ router.post('/mailgun', uploads.any(), (req, res) => {
             case 'bounced':
                 return campaigns.updateMessage(message, 'bounced', true, (err, updated) => {
                     if (err) {
-                        log.error('Mailgun', 'Failed updating message: %s', err.stack);
+                        log.error('Mailgun', 'Failed updating message: %s', err);
                     } else if (updated) {
                         log.verbose('Mailgun', 'Marked message %s as bounced', evt.campaign_id);
                     }
@@ -236,7 +236,7 @@ router.post('/mailgun', uploads.any(), (req, res) => {
             case 'complained':
                 return campaigns.updateMessage(message, 'complained', true, (err, updated) => {
                     if (err) {
-                        log.error('Mailgun', 'Failed updating message: %s', err.stack);
+                        log.error('Mailgun', 'Failed updating message: %s', err);
                     } else if (updated) {
                         log.verbose('Mailgun', 'Marked message %s as complaint', evt.campaign_id);
                     }
@@ -244,7 +244,7 @@ router.post('/mailgun', uploads.any(), (req, res) => {
             case 'unsubscribed':
                 return campaigns.updateMessage(message, 'unsubscribed', true, (err, updated) => {
                     if (err) {
-                        log.error('Mailgun', 'Failed updating message: %s', err.stack);
+                        log.error('Mailgun', 'Failed updating message: %s', err);
                     } else if (updated) {
                         log.verbose('Mailgun', 'Marked message %s as unsubscribed', evt.campaign_id);
                     }
@@ -274,7 +274,7 @@ router.post('/zone-mta', (req, res, next) => {
             }
             campaigns.updateMessage(message, 'bounced', true, (err, updated) => {
                 if (err) {
-                    log.error('ZoneMTA', 'Failed updating message: %s', err.stack);
+                    log.error('ZoneMTA', 'Failed updating message: %s', err);
                 } else if (updated) {
                     log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
                 }

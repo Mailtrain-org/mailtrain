@@ -11,13 +11,11 @@ let urllib = require('url');
 let router = new express.Router();
 let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
-let forms = require('../lib/models/forms');
 let subscriptions = require('../lib/models/subscriptions');
 let settings = require('../lib/models/settings');
 let openpgp = require('openpgp');
 let _ = require('../lib/translate')._;
 let util = require('util');
-let hbs = require('hbs');
 
 router.get('/subscribe/:cid', (req, res, next) => {
     subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
@@ -117,11 +115,11 @@ router.get('/subscribe/:cid', (req, res, next) => {
                                 contactAddress: configItems.defaultAddress,
                                 defaultPostaddress: configItems.defaultPostaddress,
                                 preferencesUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/manage/' + subscription.cid),
-                                unsubscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid),
+                                unsubscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid)
                             }
                         }, err => {
                             if (err) {
-                                log.error('Subscription', err.stack);
+                                log.error('Subscription', err);
                             }
                         });
                     };
@@ -736,11 +734,11 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                                 title: list.name,
                                 contactAddress: configItems.defaultAddress,
                                 defaultPostaddress: configItems.defaultPostaddress,
-                                subscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '?cid=' + subscription.cid),
+                                subscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '?cid=' + subscription.cid)
                             }
                         }, err => {
                             if (err) {
-                                log.error('Subscription', err.stack);
+                                log.error('Subscription', err);
                             }
                         });
                     };
