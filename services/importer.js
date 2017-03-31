@@ -140,6 +140,43 @@ function processImport(data, callback) {
                 return setImmediate(processRows);
             }
 
+            function insertToSubscription() {
+              subscriptions.insert(listId, {
+                  imported: data.id,
+                  status: data.type,
+                  partial: true
+              }, entry, (err, response) => {
+                  if (err) {
+                      // ignore
+                      log.error('Import', err.stack);
+                  } else if (response.entryId) {
+                      //log.verbose('Import', 'Inserted %s as %s', entry.email, entryId);
+                  }
+
+                  db.getConnection((err, connection) => {
+                      if (err) {
+                          log.error('Import', err.stack);
+                          return setImmediate(processRows);
+                      }
+
+                      let query;
+                      if (response.inserted) {
+                          // this record did not exist before, count as new
+                          query = 'UPDATE importer SET `processed`=`processed`+1, `new`=`new`+1 WHERE `id`=? LIMIT 1';
+                      } else {
+                          // it's an existing record
+                          query = 'UPDATE importer SET `processed`=`processed`+1 WHERE `id`=? LIMIT 1';
+                      }
+
+                      connection.query(query, [data.id], () => {
+                          connection.release();
+                          return setImmediate(processRows);
+                      });
+                  });
+              });
+            }
+
+            if (data.emailcheck === 1) {
             tools.validateEmail(entry.email, true, err => {
                 if (err) {
                     let reason = (err.message || '').toString().trim().replace(/^[a-z]Error:\s*/i, '');
@@ -165,42 +202,11 @@ function processImport(data, callback) {
                     });
                     return;
                 }
-
-                subscriptions.insert(listId, {
-                    imported: data.id,
-                    status: data.type,
-                    partial: true
-                }, entry, (err, response) => {
-                    if (err) {
-                        // ignore
-                        log.error('Import', err.stack);
-                    } else if (response.entryId) {
-                        //log.verbose('Import', 'Inserted %s as %s', entry.email, entryId);
-                    }
-
-                    db.getConnection((err, connection) => {
-                        if (err) {
-                            log.error('Import', err.stack);
-                            return setImmediate(processRows);
-                        }
-
-                        let query;
-                        if (response.inserted) {
-                            // this record did not exist before, count as new
-                            query = 'UPDATE importer SET `processed`=`processed`+1, `new`=`new`+1 WHERE `id`=? LIMIT 1';
-                        } else {
-                            // it's an existing record
-                            query = 'UPDATE importer SET `processed`=`processed`+1 WHERE `id`=? LIMIT 1';
-                        }
-
-                        connection.query(query, [data.id], () => {
-                            connection.release();
-                            return setImmediate(processRows);
-                        });
-                    });
-                });
-
+                insertToSubscription();
             });
+          } else {
+            insertToSubscription();
+          }
         };
 
         parser.on('readable', () => {
