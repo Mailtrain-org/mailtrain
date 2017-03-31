@@ -555,7 +555,7 @@ router.post('/subscription/import', uploads.single('listimport'), passport.parse
                 return res.redirect('/lists');
             } else {
 
-                subscriptions.createImport(list.id, req.body.type === 'subscribed' ? 1 : 2, req.file.path, req.file.size, delimiter, {
+                subscriptions.createImport(list.id, req.body.type === 'subscribed' ? 1 : 2, req.file.path, req.file.size, delimiter, req.body.emailcheck === 'enabled' ? 1 : 0, {
                     columns: rows[0],
                     example: rows[1] || []
                 }, (err, importId) => {
