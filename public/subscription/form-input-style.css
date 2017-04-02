@@ -143,11 +143,12 @@ textarea {
 /* --- Alerts ------------- */
 
 .alert {
-    margin: 1.25em auto 0;
-    padding: 1em;
+    margin: 22px auto 0;
+    padding: 15px;
     border-radius: 4px;
     font-family: inherit;
-    font-size: 1em;
+    font-size: 15px;
+    line-height: 21px;
     box-sizing: border-box;
 }
 
