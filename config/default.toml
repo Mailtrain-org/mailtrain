@@ -137,6 +137,10 @@ host="127.0.0.1"
 # You can use more than 1 process only if you have Redis enabled
 processes=1
 
+[cors]
+# Allow subscription widgets to be embedded
+# origins=['https://www.example.com']
+
 [mosaico]
 # Installed templates
 templates=[["versafix-1", "Versafix One"]]

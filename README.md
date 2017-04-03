@@ -19,6 +19,7 @@ Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv
 * [Installation](#installation)
 * [Upgrade](#upgrade)
 * [Using Environment Variables](#using-environment-variables)
+* [Subscription Widget](#subscription-widget)
 * [Cloudron](#cloudron)
 * [Bounce Handling](#bounce-handling)
 * [Testing](#testing)
@@ -232,6 +233,27 @@ Edit [mailtrain.nginx](setup/mailtrain-nginx.conf) (update `server_name` directi
 ### Running as an Upstart Service in Ubuntu 14.04
 
 Edit [mailtrain.conf](setup/mailtrain.conf) (update application folder) and copy it to `/etc/init`
+
+## Subscription Widget
+
+The (experimental) Mailtrain Subscription Widget allows you to embed your sign-up forms on your website. To embed a Widget, you need to:
+
+Enable cross-origin resource sharing in your `config` file and whitelist your site:
+
+```
+[cors]
+# Allow subscription widgets to be embedded
+origins=['https://www.example.com']
+```
+
+Embed the widget code on your website:
+
+```
+<div data-mailtrain-subscription-widget data-url="http://domain/subscription/Byf44R-og/widget">
+    <a href="http://domain/subscription/Byf44R-og">Subscribe to our list</a>
+</div>
+<script src="http://domain/subscription/widget.js"></script>
+```
 
 ## Cloudron
 

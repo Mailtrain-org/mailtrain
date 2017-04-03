@@ -1,7 +1,7 @@
 'use strict';
 
 let log = require('npmlog');
-
+let config = require('config');
 let tools = require('../lib/tools');
 let helpers = require('../lib/helpers');
 let mailer = require('../lib/mailer');
@@ -16,6 +16,33 @@ let settings = require('../lib/models/settings');
 let openpgp = require('openpgp');
 let _ = require('../lib/translate')._;
 let util = require('util');
+let cors = require('cors');
+let cache = require('memory-cache');
+
+let originWhitelist = config.cors && config.cors.origins || [];
+
+let corsOptions = {
+    allowedHeaders: ['Content-Type', 'Origin', 'Accept', 'X-Requested-With'],
+    methods: ['GET', 'POST'],
+    optionsSuccessStatus: 200, // IE11 chokes on 204
+    origin: (origin, callback) => {
+        if (originWhitelist.includes(origin)) {
+            callback(null, true);
+        } else {
+            let err = new Error(_('Not allowed by CORS'));
+            err.status = 403;
+            callback(err);
+        }
+    }
+};
+
+let corsOrCsrfProtection = (req, res, next) => {
+    if (req.get('X-Requested-With') === 'XMLHttpRequest') {
+        cors(corsOptions)(req, res, next);
+    } else {
+        passport.csrfProtection(req, res, next);
+    }
+};
 
 router.get('/subscribe/:cid', (req, res, next) => {
     subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
@@ -214,6 +241,77 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
     });
 });
 
+router.options('/:cid/widget', cors(corsOptions));
+
+router.get('/:cid/widget', cors(corsOptions), (req, res, next) => {
+    let cached = cache.get(req.path);
+    if (cached) {
+        return res.status(200).json(cached);
+    }
+
+    let sendError = err => {
+        res.status(err.status || 500);
+        res.json({
+            error: err.message || err
+        });
+    };
+
+    lists.getByCid(req.params.cid, (err, list) => {
+        if (!err && !list) {
+            err = new Error(_('Selected list not found'));
+            err.status = 404;
+        }
+
+        if (err) {
+            return sendError(err);
+        }
+
+        fields.list(list.id, (err, fieldList) => {
+            if (err && !fieldList) {
+                fieldList = [];
+            }
+
+            settings.list(['serviceUrl', 'pgpPrivateKey'], (err, configItems) => {
+                if (err) {
+                    return sendError(err);
+                }
+
+                let data = {
+                    title: list.name,
+                    cid: list.cid,
+                    serviceUrl: configItems.serviceUrl,
+                    hasPubkey: !!configItems.pgpPrivateKey,
+                    customFields: fields.getRow(fieldList),
+                    layout: null,
+                };
+
+                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data, (err, data) => {
+                    if (err) {
+                        return sendError(err);
+                    }
+
+                    res.render('subscription/widget-subscribe', data, (err, html) => {
+                        if (err) {
+                            return sendError(err);
+                        }
+
+                        let response = {
+                            data: {
+                                title: data.title,
+                                cid: data.cid,
+                                html
+                            }
+                        };
+
+                        cache.put(req.path, response, 30000); // ms
+                        res.status(200).json(response);
+                    });
+                });
+            });
+        });
+    });
+});
+
 router.get('/:cid/confirm-notice', (req, res, next) => {
     lists.getByCid(req.params.cid, (err, list) => {
         if (!err && !list) {
@@ -372,10 +470,22 @@ router.get('/:cid/unsubscribe-notice', (req, res, next) => {
     });
 });
 
-router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req, res, next) => {
+router.options('/:cid/subscribe', cors(corsOptions));
+
+router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, res, next) => {
+    let sendJsonError = (err, status) => {
+        res.status(status || err.status || 500);
+        res.json({
+            error: err.message || err
+        });
+    };
+
     let email = (req.body.email || '').toString().trim();
 
     if (!email) {
+        if (req.xhr) {
+            return sendJsonError(_('Email address not set'), 400);
+        }
         req.flash('danger', _('Email address not set'));
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
@@ -396,7 +506,7 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
         }
 
         if (err) {
-            return next(err);
+            return req.xhr ? sendJsonError(err) : next(err);
         }
 
         let data = {};
@@ -416,11 +526,20 @@ router.post('/:cid/subscribe', passport.parseForm, passport.csrfProtection, (req
             if (!err && !confirmCid) {
                 err = new Error(_('Could not store confirmation data'));
             }
+
             if (err) {
+                if (req.xhr) {
+                    return sendJsonError(err);
+                }
                 req.flash('danger', err.message || err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
             }
 
+            if (req.xhr) {
+                return res.status(200).json({
+                    msg: _('Please Confirm Subscription')
+                });
+            }
             res.redirect('/subscription/' + req.params.cid + '/confirm-notice');
         });
     });
@@ -766,7 +885,7 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
     });
 });
 
-router.post('/publickey', passport.parseForm, passport.csrfProtection, (req, res, next) => {
+router.post('/publickey', passport.parseForm, (req, res, next) => {
     settings.list(['pgpPassphrase', 'pgpPrivateKey'], (err, configItems) => {
         if (err) {
             return next(err);

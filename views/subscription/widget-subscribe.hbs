@@ -1,0 +1,35 @@
+<div id="mailtrain-subscription-widget-{{cid}}" class="mailtrain-subscription-widget">
+    {{#if hasPubkey}}
+        <form method="post" id="download-pubkey" action="{{serviceUrl}}subscription/publickey" style="display: none;">
+            <input type="hidden" name="cid" value="{{cid}}">
+        </form>
+    {{/if}}
+
+    <h3>{{title}}</h3>
+
+    <form class="form" method="post" action="{{serviceUrl}}subscription/{{cid}}/subscribe">
+        <input type="hidden" class="tz-detect" name="tz" value="">
+        <input type="hidden" name="address" value="">
+        <input type="hidden" class="sub-time" name="sub" value="">
+        {{> subscription_custom_fields}}
+        <button type="submit">{{#translate}}Subscribe to list{{/translate}}</button>
+    </form>
+
+    <div class="status"></div>
+
+    <div style="display: none;">
+        <div class="spinner" data-status-template="spinner">
+            <p>{{#translate}}Sending ...{{/translate}}</p>
+        </div>
+        <div class="info" data-status-template="already-subscribed">
+            <p>{{#translate}}It looks like you are already subscribed to this list.{{/translate}}</p>
+        </div>
+        <div class="success" data-status-template="confirm-notice">
+            <h4>{{#translate}}Almost Finished{{/translate}}</h4>
+            <p>{{#translate}}We need to confirm your email address. To complete the subscription process, please click the link in the email we just sent you.{{/translate}}</p>
+        </div>
+        <div class="error" data-status-template="error">
+            <p>{message}</p>
+        </div>
+    </div>
+</div>

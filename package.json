@@ -44,6 +44,7 @@
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.2.0",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.3",
     "csurf": "^1.9.0",
     "csv-generate": "^1.0.0",
     "csv-parse": "^1.2.0",
