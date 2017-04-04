@@ -154,6 +154,7 @@ CREATE TABLE `importer` (
   `path` varchar(255) NOT NULL DEFAULT '',
   `size` int(11) unsigned NOT NULL DEFAULT '0',
   `delimiter` varchar(1) CHARACTER SET ascii NOT NULL DEFAULT ',',
+  `emailcheck` tinyint(4) unsigned NOT NULL DEFAULT '1',
   `status` tinyint(4) unsigned NOT NULL DEFAULT '0',
   `error` varchar(255) DEFAULT NULL,
   `processed` int(11) unsigned NOT NULL DEFAULT '0',
@@ -237,7 +238,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','smtp-pulse.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','465');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','TLS');
@@ -254,7 +255,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','http://localhost:3000/');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','23');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','24');
 CREATE TABLE `subscription` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
