@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.23.2 2017-04-04
+
+  * Allow skipping DNS check for imports
+  * Added option to use subscription widgets
+
 ## 1.23.0 2017-03-19
 
   * Fixed security issue where description tags were able to include script tags. Reported by Andreas Lindh. Fixed with [ae6affda](https://github.com/Mailtrain-org/mailtrain/commit/ae6affda8193f034e06f7e095ee23821a83d5190)
