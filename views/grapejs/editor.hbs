@@ -49,6 +49,9 @@
 
     /* Hide the fullscreen button - doesn't work from within our iFrame */
     #gjs-pn-options .gjs-pn-btn.fa.fa-arrows-alt { display: none !important; }
+
+    /* Hide pencil icon on image toolbar, issue #195 */
+    .gjs-toolbar > div > div.fa-pencil { display: none; }
 </style>
 
 
@@ -256,12 +259,6 @@
                 toastr.error(res.errors);
             }
         });
-
-    cmdm.add('tlb-edit', {
-        run: function(ed) {
-            alert('No image editor installed');
-        },
-    });
 
     // Add Merge Tag Reference command
     var mergeTagReferenceContainer = document.getElementById('merge-tag-reference-container');
