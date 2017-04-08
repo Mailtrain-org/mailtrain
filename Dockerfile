@@ -1,7 +1,7 @@
 FROM centos
 RUN curl --silent --location https://rpm.nodesource.com/setup_7.x | bash -
 RUN yum install -y git make gcc nodejs ImageMagick && yum clean all
-RUN git clone git://github.com/Mailtrain-org/mailtrain.git /app
+ADD app /app
 WORKDIR /app/
 ENV NODE_ENV production
 RUN npm install --no-progress --production && npm install --no-progress passport-ldapjs
