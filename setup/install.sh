@@ -83,8 +83,6 @@ secret="`pwgen -1`"
 password="$MYSQL_PASSWORD"
 [redis]
 enabled=true
-[verp]
-enabled=true
 [queue]
 processes=5
 EOT
