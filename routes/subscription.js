@@ -282,6 +282,7 @@ router.get('/:cid/widget', cors(corsOptions), (req, res, next) => {
                     serviceUrl: configItems.serviceUrl,
                     hasPubkey: !!configItems.pgpPrivateKey,
                     customFields: fields.getRow(fieldList),
+                    template: {},
                     layout: null,
                 };
 
