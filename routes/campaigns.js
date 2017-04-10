@@ -425,6 +425,9 @@ router.get('/status/:id/:status', passport.csrfProtection, (req, res) => {
         case 'complained':
             status = 4;
             break;
+        case 'blacklisted':
+            status = 5;
+            break;
         default:
             req.flash('danger', _('Unknown status selector'));
             return res.redirect('/campaigns');
