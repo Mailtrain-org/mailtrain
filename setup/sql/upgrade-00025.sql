@@ -4,7 +4,7 @@ SET @schema_version = '25';
 
 # Create table to store global blacklist
 CREATE TABLE `blacklist` (
-  `email` varchar(255) NOT NULL,
+  `email` varchar(191) NOT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
