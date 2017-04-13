@@ -17,6 +17,12 @@
     <input type="hidden" name="cid" value="{{cid}}">
 </form>
 
+<form method="post" id="subscriber-blacklist" action="/blacklist/ajax/add">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="email" value="{{email}}">
+    <input type="hidden" name="next" value="/lists/view/{{list.id}}">
+</form>
+
 <form method="post" class="delete-form" id="subscriber-delete" action="/lists/subscription/delete">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" name="list" value="{{list.id}}">
@@ -166,6 +172,7 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <div class="pull-right">
+                <button type="submit" form="subscriber-blacklist" class="btn btn-danger"><span class="glyphicon glyphicon-ban-circle"></span>{{#translate}}Blacklist{{/translate}}</button>
                 {{#if isSubscribed}}
                     <button type="submit" form="subscriber-unsubscribe" class="btn btn-default"><i class="glyphicon glyphicon-ban-circle"></i> {{#translate}}Unsubscribe{{/translate}}</button>
                 {{/if}}

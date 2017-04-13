@@ -3,6 +3,7 @@
 let users = require('../lib/models/users');
 let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
+let blacklist = require('../lib/models/blacklist');
 let subscriptions = require('../lib/models/subscriptions');
 let tools = require('../lib/tools');
 let express = require('express');
@@ -323,6 +324,85 @@ router.post('/field/:listId', (req, res) => {
                 }
             });
         });
+    });
+});
+
+router.post('/blacklist/add', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    if (!(input.EMAIL) || (input.EMAIL === ''))  {
+      res.status(500);
+      return res.json({
+          error: 'EMAIL argument are required',
+          data: []
+      });
+    }
+    blacklist.add(input.EMAIL, (err) =>{
+      if (err) {
+          res.status(500);
+          return res.json({
+              error: err.message || err,
+              data: []
+          });
+      }
+      res.status(200);
+      res.json({
+          data: []
+      });
+    });
+});
+
+router.post('/blacklist/delete', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    if (!(input.EMAIL) || (input.EMAIL === ''))  {
+      res.status(500);
+      return res.json({
+          error: 'EMAIL argument are required',
+          data: []
+      });
+    }
+    blacklist.delete(input.EMAIL, (err) =>{
+      if (err) {
+          res.status(500);
+          return res.json({
+              error: err.message || err,
+              data: []
+          });
+      }
+      res.status(200);
+      res.json({
+          data: []
+      });
+    });
+});
+
+router.get('/blacklist/get', (req, res) => {
+    let start = parseInt(req.query.start || 0, 10);
+    let limit = parseInt(req.query.limit || 10000, 10);
+    let search = req.query.search || '';
+
+    blacklist.get(start, limit, search, (err, data, total) => {
+      if (err) {
+          res.status(500);
+          return res.json({
+              error: err.message || err,
+              data: []
+          });
+      }
+      res.status(200);
+      res.json({
+          data: {
+            total: total,
+            start: start,
+            limit: limit,
+            emails: data
+          }
+      });
     });
 });
 

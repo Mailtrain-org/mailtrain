@@ -1,0 +1,54 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/campaigns">{{#translate}}Campaigns{{/translate}}</a></li>
+    {{#if parent}}
+        <li><a href="/campaigns/view/{{parent.id}}">{{parent.name}}</a></li>
+    {{/if}}
+    <li><a href="/campaigns/view/{{id}}">{{name}}</a></li>
+    <li class="active">{{#translate}}Blacklisted info{{/translate}}</li>
+</ol>
+
+<h2><span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> {{name}} <small>{{#translate}}Blacklisted info{{/translate}}</small> <a class="btn btn-default btn-xs" href="/campaigns/view/{{id}}?tab=overview" role="button"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{#translate}}View campaign{{/translate}}</a></h2>
+
+<hr>
+
+{{#if description}}
+    <div class="well well-sm">{{{description}}}</div>
+{{/if}}
+
+<div class="table-responsive">
+
+    <div class="panel panel-info">
+        <!-- Default panel contents -->
+        <div class="panel-heading">{{#translate}}Subscribers who blacklisted by global blacklist:{{/translate}}</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table data-topic-url="/campaigns/status" data-topic-id="{{id}}/5" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,0,1,0">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">
+                                #
+                            </th>
+                            <th>
+                                {{#translate}}Address{{/translate}}
+                            </th>
+                            <th>
+                                {{#translate}}First Name{{/translate}}
+                            </th>
+                            <th>
+                                {{#translate}}Last Name{{/translate}}
+                            </th>
+                            <th>
+                                {{#translate}}Reason{{/translate}}
+                            </th>
+                            <th>
+                                {{#translate}}Time{{/translate}}
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

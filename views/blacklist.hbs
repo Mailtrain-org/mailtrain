@@ -1,0 +1,38 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li class="active">{{#translate}}Blacklist{{/translate}}</li>
+</ol>
+
+<h2>{{#translate}}Blacklist{{/translate}}</h2>
+
+<form class="form-horizontal" method="post" action="/blacklist/ajax/add">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="next" value="/blacklist">
+    <div class="col-sm-4">
+        <input type="text" class="form-control input-md" name="email" id="add-email-input" value="" placeholder="{{#translate}}Add email to blacklist{{/translate}}">
+    </div>
+    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>{{#translate}}Add{{/translate}}</button>
+</form>
+
+<form class="form-horizontal" id="delete-email-form" method="post" action="/blacklist/ajax/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="next" value="/blacklist">
+    <input type="hidden" name="email" id="delete-email-input" value="">
+</form>
+
+<hr>
+<div class="table-responsive">
+    <table data-topic-url="/blacklist" data-sort-column="1" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,0">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                {{#translate}}Email{{/translate}}
+            </th>
+            <th class="col-md-1">
+                &nbsp;
+            </th>
+        </thead>
+    </table>
+</div>
