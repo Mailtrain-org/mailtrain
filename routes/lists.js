@@ -82,6 +82,10 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 
     data.csrfToken = req.csrfToken();
 
+    if (!('publicSubscribe' in data)) {
+        data.publicSubscribe = true;
+    }
+
     res.render('lists/create', data);
 });
 
