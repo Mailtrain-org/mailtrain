@@ -545,7 +545,6 @@ let sendLoop = () => {
                             });
                         };
                         setImmediate(trySend);
-                        setImmediate(() => mailer.transport.checkThrottling(getNext));
                       } else {
                           db.getConnection((err, connection) => {
                               if (err) {
@@ -571,6 +570,7 @@ let sendLoop = () => {
                               });
                           });
                       }
+                      setImmediate(() => mailer.transport.checkThrottling(getNext));
                     });
                 });
             });
