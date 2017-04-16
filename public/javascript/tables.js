@@ -31,7 +31,7 @@
             });
         }
 
-        return {
+        var opts = {
             scrollX: true,
             order: [
                 [sortColumn, sortOrder]
@@ -41,6 +41,55 @@
             info: paging, /* This controls the "Showing 1 to 16 of 16 entries" */
             pageLength: 50
         };
+
+        if ($(elem).hasClass('data-table-selectable') || $(elem).hasClass('data-table-multiselectable')) {
+            var isMulti = $(elem).hasClass('data-table-multiselectable');
+
+            var dataElem = $(elem).siblings("input").first();
+
+            opts.rowCallback = function( row, data ) {
+                var selected = dataElem.val() == '' ? [] : dataElem.val().split(',').map(function(item) { return Number(item); });
+
+                if (!isMulti && selected.length > 0) {
+                    selected = [selected[0]];
+                }
+
+                if ($.inArray(data.DT_RowId, selected) !== -1) {
+                    $(row).addClass('selected');
+                }
+            }
+
+            $(elem).on('click', 'tbody tr', function () {
+                var id = this.id;
+                var selected = dataElem.val() == '' ? [] : dataElem.val().split(',');
+
+                var index = $.inArray(id, selected);
+
+                if (isMulti) {
+                    if ( index === -1 ) {
+                        selected.push(id);
+                    } else {
+                        selected.splice(index, 1);
+                    }
+
+                    $(this).toggleClass('selected');
+                } else {
+                    for (var selIdx=0; selIdx < selected.length; selIdx++) {
+                        if (selected[selIdx] != id) {
+                            $('#' + selected[selIdx], elem).removeClass('selected');
+                        }
+                    }
+
+                    $('#' + id, elem).addClass('selected');
+
+                    selected = [id];
+                }
+
+                dataElem.val(selected.join(','));
+            } );
+        }
+
+        return opts;
     }
 
     $('.data-table').each(function () {
@@ -69,6 +118,7 @@
             });
         });
     });
+
 })();
 
 $('.data-stats-pie-chart').each(function () {

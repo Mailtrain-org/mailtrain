@@ -722,8 +722,8 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
     });
 });
 
-router.post('/selection/ajax', (req, res) => {
-    campaigns.filter(req.body, Number(req.query.parent) || false, (err, data, total, filteredTotal) => {
+router.post('/quicklist/ajax', (req, res) => {
+    campaigns.filterQuicklist(req.body, (err, data, total, filteredTotal) => {
         if (err) {
             return res.json({
                 error: err.message || err,
@@ -735,13 +735,13 @@ router.post('/selection/ajax', (req, res) => {
             draw: req.body.draw,
             recordsTotal: total,
             recordsFiltered: filteredTotal,
-            data: data.map((row, i) => [
-                '',
-                (Number(req.body.start) || 0) + 1 + i,
-                '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> <a href="/campaigns/view/' + row.id + '">' + htmlescape(row.name || '') + '</a>',
-                htmlescape(striptags(row.description) || ''),
-                '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>']
-            )
+            data: data.map((row, i) => ({
+                "0": (Number(req.body.start) || 0) + 1 + i,
+                "1": '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> <a href="/campaigns/view/' + row.id + '">' + htmlescape(row.name || '') + '</a>',
+                "2": htmlescape(striptags(row.description) || ''),
+                "3": '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
+                "DT_RowId": row.id
+            }))
         });
     });
 });

@@ -40,6 +40,8 @@ let blacklist = require('./routes/blacklist');
 let editorapi = require('./routes/editorapi');
 let grapejs = require('./routes/grapejs');
 let mosaico = require('./routes/mosaico');
+let reports = require('./routes/reports');
+let reportsTemplates = require('./routes/report-templates');
 
 let app = express();
 
@@ -57,6 +59,8 @@ app.disable('x-powered-by');
 
 hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerPartials(__dirname + '/views/subscription/partials/');
+hbs.registerPartials(__dirname + '/views/report-templates/partials/');
+hbs.registerPartials(__dirname + '/views/reports/partials/');
 
 /**
  * We need this helper to make sure that we consume flash messages only
@@ -117,6 +121,29 @@ hbs.registerHelper('translate', function (context, options) { // eslint-disable-
         result = util.format(result, ...context);
     }
     return new hbs.handlebars.SafeString(result);
+});
+
+/* Credits to http://chrismontrois.net/2016/01/30/handlebars-switch/
+
+ {{#switch letter}}
+ {{#case "a"}}
+ A is for alpaca
+ {{/case}}
+ {{#case "b"}}
+ B is for bluebird
+ {{/case}}
+ {{/switch}}
+ */
+hbs.registerHelper("switch", function(value, options) {
+    this._switch_value_ = value;
+    var html = options.fn(this); // Process the body of the switch block
+    delete this._switch_value_;
+    return html;
+});
+hbs.registerHelper("case", function(value, options) {
+    if (value == this._switch_value_) {
+        return options.fn(this);
+    }
 });
 
 app.use(compression());
@@ -221,6 +248,8 @@ app.use('/api', api);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
+app.use('/reports', reports);
+app.use('/report-templates', reportsTemplates);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

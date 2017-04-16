@@ -1,0 +1,11 @@
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">{{#translate}}Report Template{{/translate}}</label>
+        <div class="col-sm-10">
+            <select class="form-control" id="reportTemplate" name="reportTemplate" required {{options}}>
+                <option value=""> –– {{#translate}}Select{{/translate}} –– </option>
+                {{#each reportTemplates}}
+                    <option value="{{id}}" {{#if selected}} selected {{/if}}>{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>

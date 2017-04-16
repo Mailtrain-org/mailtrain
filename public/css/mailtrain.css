@@ -31,3 +31,11 @@ h2 .glyphicon {
 h3 .glyphicon {
     font-size: .8em;
 }
+
+tbody>tr.selected {
+    background-color: rgb(218, 231, 255);
+}
+
+.table-hover>tbody>tr.selected:hover {
+    background-color: rgb(205, 212, 226);
+}
