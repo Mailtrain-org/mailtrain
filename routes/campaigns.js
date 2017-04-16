@@ -673,6 +673,80 @@ router.post('/status/ajax/:id/:status', (req, res) => {
     });
 });
 
+router.post('/clicked/ajax/:id/:linkId', (req, res) => {
+    let linkId = Number(req.params.linkId) || 0;
+
+    campaigns.get(req.params.id, true, (err, campaign) => {
+        if (err || !campaign) {
+            return res.json({
+                error: err && err.message || err || _('Campaign not found'),
+                data: []
+            });
+        }
+        lists.get(campaign.list, (err, list) => {
+            if (err) {
+                return res.json({
+                    error: err && err.message || err,
+                    data: []
+                });
+            }
+
+            let campaignCid = campaign.cid;
+            let listCid = list.cid;
+
+            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '`.`created', 'count'];
+            campaigns.filterClickedSubscribers(campaign, linkId, req.body, columns, (err, data, total, filteredTotal) => {
+                if (err) {
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
+                }
+
+                res.json({
+                    draw: req.body.draw,
+                    recordsTotal: total,
+                    recordsFiltered: filteredTotal,
+                    data: data.map((row, i) => [
+                        '<a href="/archive/' + encodeURIComponent(campaignCid) + '/' + encodeURIComponent(listCid) + '/' + encodeURIComponent(row.cid) + '?track=no">' + ((Number(req.body.start) || 0) + 1 + i) + '</a>',
+                        htmlescape(row.email || ''),
+                        htmlescape(row.firstName || ''),
+                        htmlescape(row.lastName || ''),
+                        row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A',
+                        row.count,
+                        '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/subscription/' + campaign.list + '/edit/' + row.cid + '">' + _('Edit') + '</a>'
+                    ])
+                });
+            });
+        });
+    });
+});
+
+router.post('/selection/ajax', (req, res) => {
+    campaigns.filter(req.body, Number(req.query.parent) || false, (err, data, total, filteredTotal) => {
+        if (err) {
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+
+        res.json({
+            draw: req.body.draw,
+            recordsTotal: total,
+            recordsFiltered: filteredTotal,
+            data: data.map((row, i) => [
+                '',
+                (Number(req.body.start) || 0) + 1 + i,
+                '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> <a href="/campaigns/view/' + row.id + '">' + htmlescape(row.name || '') + '</a>',
+                htmlescape(striptags(row.description) || ''),
+                '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>']
+            )
+        });
+    });
+});
+
+
 router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) => {
     campaigns.delete(req.body.id, (err, deleted) => {
         if (err) {

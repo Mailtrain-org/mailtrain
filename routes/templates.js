@@ -8,6 +8,7 @@ let settings = require('../lib/models/settings');
 let tools = require('../lib/tools');
 let helpers = require('../lib/helpers');
 let striptags = require('striptags');
+let htmlescape = require('escape-html');
 let passport = require('../lib/passport');
 let mailer = require('../lib/mailer');
 let _ = require('../lib/translate')._;
@@ -22,23 +23,8 @@ router.all('/*', (req, res, next) => {
 });
 
 router.get('/', (req, res) => {
-    let limit = 999999999;
-    let start = 0;
-
-    templates.list(start, limit, (err, rows, total) => {
-        if (err) {
-            req.flash('danger', err.message || err);
-            return res.redirect('/');
-        }
-
-        res.render('templates/templates', {
-            rows: rows.map((row, i) => {
-                row.index = start + i + 1;
-                row.description = striptags(row.description);
-                return row;
-            }),
-            total
-        });
+    res.render('templates/templates', {
+        title: _('Templates')
     });
 });
 
@@ -161,6 +147,29 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         }
 
         return res.redirect('/templates');
+    });
+});
+
+router.post('/ajax', (req, res) => {
+    templates.filter(req.body, Number(req.query.parent) || false, (err, data, total, filteredTotal) => {
+        if (err) {
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+
+        res.json({
+            draw: req.body.draw,
+            recordsTotal: total,
+            recordsFiltered: filteredTotal,
+            data: data.map((row, i) => [
+                (Number(req.body.start) || 0) + 1 + i,
+                '<span class="glyphicon glyphicon-file" aria-hidden="true"></span> ' + htmlescape(row.name || ''),
+                htmlescape(striptags(row.description) || ''),
+                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/templates/edit/' + row.id + '">' + _('Edit') + '</a>' ]
+            )
+        });
     });
 });
 

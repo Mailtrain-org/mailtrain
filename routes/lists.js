@@ -55,23 +55,8 @@ router.all('/*', (req, res, next) => {
 });
 
 router.get('/', (req, res) => {
-    let limit = 999999999;
-    let start = 0;
-
-    lists.list(start, limit, (err, rows, total) => {
-        if (err) {
-            req.flash('danger', err.message || err);
-            return res.redirect('/');
-        }
-
-        res.render('lists/lists', {
-            rows: rows.map((row, i) => {
-                row.index = start + i + 1;
-                row.description = striptags(row.description);
-                return row;
-            }),
-            total
-        });
+    res.render('lists/lists', {
+        title: _('Lists')
     });
 });
 
@@ -158,6 +143,32 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         return res.redirect('/lists');
     });
 });
+
+router.post('/ajax', (req, res) => {
+    lists.filter(req.body, Number(req.query.parent) || false, (err, data, total, filteredTotal) => {
+        if (err) {
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+
+        res.json({
+            draw: req.body.draw,
+            recordsTotal: total,
+            recordsFiltered: filteredTotal,
+            data: data.map((row, i) => [
+                (Number(req.body.start) || 0) + 1 + i,
+                '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <a href="/lists/view/' + row.id + '">' + htmlescape(row.name || '') + '</a>',
+                '<code>' + row.cid + '</code>',
+                row.subscribers,
+                htmlescape(striptags(row.description) || ''),
+                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/edit/' + row.id + '">' + _('Edit') + '</a>' ]
+            )
+        });
+    });
+});
+
 
 router.post('/ajax/:id', (req, res) => {
     lists.get(req.params.id, (err, list) => {

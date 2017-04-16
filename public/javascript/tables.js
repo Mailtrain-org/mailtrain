@@ -4,73 +4,72 @@
 
 'use strict';
 
-$('.data-table').each(function () {
-    var rowSort = $(this).data('rowSort') || false;
-    var columns = false;
+(function(){
+    function getDataTableOptions(elem) {
+        var rowSort = $(elem).data('rowSort') || false;
 
-    if (rowSort) {
-        columns = rowSort.split(',').map(function (sort) {
-            return {
-                orderable: sort === '1'
-            };
-        });
+        var columns = false;
+
+        var sortColumn = $(elem).data('sortColumn') === undefined ? 1 : Number($(elem).data('sortColumn'));
+        var sortOrder = ($(elem).data('sortOrder') || 'asc').toString().trim().toLowerCase();
+
+        var paging = $(elem).data('paging') === false ? false : true;
+
+        // allow only asc and desc
+        if (sortOrder !== 'desc') {
+            sortOrder = 'asc';
+        }
+
+        var columnsCount = 0;
+        var columnsSort = []
+
+        if (rowSort) {
+            columns = rowSort.split(',').map(function (sort) {
+                return {
+                    orderable: sort === '1'
+                };
+            });
+        }
+
+        return {
+            scrollX: true,
+            order: [
+                [sortColumn, sortOrder]
+            ],
+            columns: columns,
+            paging: paging,
+            info: paging, /* This controls the "Showing 1 to 16 of 16 entries" */
+            pageLength: 50
+        };
     }
 
-    $(this).DataTable({
-        scrollX: true,
-        order: [
-            [1, 'asc']
-        ],
-        columns: columns,
-        pageLength: 50
+    $('.data-table').each(function () {
+        var opts = getDataTableOptions(this);
+        $(this).DataTable(opts);
     });
-});
 
-$('.data-table-ajax').each(function () {
-    var rowSort = $(this).data('rowSort') || false;
-    var columns = false;
+    $('.data-table-ajax').each(function () {
+        var topicUrl = $(this).data('topicUrl') || '/lists';
+        var topicArgs = $(this).data('topicArgs') || false;
+        var topicId = $(this).data('topicId') || '';
 
-    var topicUrl = $(this).data('topicUrl') || '/lists';
-    var topicArgs = $(this).data('topicArgs') || false;
-    var topicId = $(this).data('topicId') || '';
+        var ajaxUrl = topicUrl + '/ajax/' + topicId + (topicArgs ? '?' + topicArgs : '');
 
-    var sortColumn = Number($(this).data('sortColumn')) || 1;
-    var sortOrder = ($(this).data('sortOrder') || 'asc').toString().trim().toLowerCase();
-
-    // allow only asc and desc
-    if (sortOrder !== 'desc') {
-        sortOrder = 'asc';
-    }
-
-    var ajaxUrl = topicUrl + '/ajax/' + topicId + (topicArgs ? '?' + topicArgs : '');
-
-    if (rowSort) {
-        columns = rowSort.split(',').map(function (sort) {
-            return {
-                orderable: sort === '1'
-            };
-        });
-    }
-
-    $(this).DataTable({
-        scrollX: true,
-        serverSide: true,
-        ajax: {
+        var opts = getDataTableOptions(this);
+        opts.ajax = {
             url: ajaxUrl,
             type: 'POST'
-        },
-        order: [
-            [sortColumn, sortOrder]
-        ],
-        columns: columns,
-        pageLength: 50,
-        processing: true
-    }).on('draw', function () {
-        $('.datestring').each(function () {
-            $(this).html(moment($(this).data('date')).fromNow());
+        };
+        opts.serverSide = true;
+        opts.processing = true;
+
+        $(this).DataTable(opts).on('draw', function () {
+            $('.datestring').each(function () {
+                $(this).html(moment($(this).data('date')).fromNow());
+            });
         });
     });
-});
+})();
 
 $('.data-stats-pie-chart').each(function () {
     var column = $(this).data('column') || 'country';
