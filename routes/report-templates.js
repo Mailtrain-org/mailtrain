@@ -55,10 +55,7 @@ router.post('/ajax', (req, res) => {
 });
 
 router.get('/create', passport.csrfProtection, (req, res) => {
-    const data = tools.convertKeys(req.query, {
-        skip: ['layout']
-    });
-
+    const data = req.query;
     const wizard = req.query['type'] || '';
 
     if (wizard == 'subscribers-all') {
@@ -86,7 +83,6 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '    }\n' +
             '\n' +
             '    const data = {\n' +
-            '        title: "Sample Report on " + inputs.campaign.name,\n' +
             '        results: results\n' +
             '    };\n' +
             '\n' +
@@ -152,7 +148,6 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '    }\n' +
             '\n' +
             '    let data = {\n' +
-            '        title: "Sample Report on " + inputs.campaign.name,\n' +
             '        results: results\n' +
             '    };\n' +
             '\n' +
@@ -226,7 +221,6 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '    }\n' +
             '\n' +
             '    let data = {\n' +
-            '        title: "Sample Export of " + inputs.list.name,\n' +
             '        results: results\n' +
             '    };\n' +
             '\n' +

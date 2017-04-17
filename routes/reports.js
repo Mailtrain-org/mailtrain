@@ -12,8 +12,8 @@ const tools = require('../lib/tools');
 const util = require('util');
 const htmlescape = require('escape-html');
 const striptags = require('striptags');
-const hbs = require('hbs');
-const vm = require('vm');
+const fs = require('fs');
+const fsTools = require('../lib/fs-tools');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -31,10 +31,23 @@ router.get('/', (req, res) => {
 });
 
 router.post('/ajax', (req, res) => {
-    function getViewIcon(mimeType) {
-        let icon = 'search';
-        if (mimeType == 'text/csv') icon = 'download-alt';
-        return icon;
+    function getViewLink(row) {
+        if (row.state == 0) {
+            // TODO: Render waiting
+            // TODO: Add error output
+            return '<span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> ';
+        } else if (row.state == 1) {
+            let icon = 'eye-open';
+            if (row.mimeType == 'text/csv') icon = 'download-alt';
+
+            // TODO: Add error output
+            return '<a href="/reports/view/' + row.id + '"><span class="glyphicon glyphicon-' + icon + '" aria-hidden="true"></span></a> ';
+        } else if (row.state == 2) {
+            // TODO: Add error output
+            return '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> ';
+        }
+
+        return '';
     }
 
     reports.filter(req.body, (err, data, total, filteredTotal) => {
@@ -55,7 +68,7 @@ router.post('/ajax', (req, res) => {
                 htmlescape(row.reportTemplateName || ''),
                 htmlescape(striptags(row.description) || ''),
                 '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
-                '<a href="/reports/view/' + row.id + '"><span class="glyphicon glyphicon-' + getViewIcon(row.mimeType) + '" aria-hidden="true"></span></a> ' +
+                getViewLink(row) +
                 '<a href="/reports/edit/' + row.id + '"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>']
             )
         });
@@ -63,10 +76,7 @@ router.post('/ajax', (req, res) => {
 });
 
 router.get('/create', passport.csrfProtection, (req, res) => {
-    const reqData = tools.convertKeys(req.query, {
-        skip: ['layout']
-    });
-
+    const reqData = req.query;
     reqData.csrfToken = req.csrfToken();
     reqData.title = _('Create Report');
     reqData.useEditor = true;
@@ -106,6 +116,8 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     const reqData = req.body;
+    delete reqData.filename; // This is to make sure no one inserts a fake filename when editing the report.
+
     const reportTemplateId = Number(reqData.reportTemplate);
 
     addParamsObject(reportTemplateId, reqData, (err, data) => {
@@ -126,10 +138,7 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
 });
 
 router.get('/edit/:id', passport.csrfProtection, (req, res) => {
-    const reqData = tools.convertKeys(req.query, {
-        skip: ['layout']
-    });
-
+    const reqData = req.query;
     reports.get(req.params.id, (err, report) => {
         if (err || !report) {
             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
@@ -170,6 +179,8 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
 
 router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => {
     const reqData = req.body;
+    delete reqData.filename; // This is to make sure no one inserts a fake filename when editing the report.
+
     const reportTemplateId = Number(reqData.reportTemplate);
 
     addParamsObject(reportTemplateId, reqData, (err, data) => {
@@ -216,119 +227,48 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
         reportTemplates.get(report.reportTemplate, (err, reportTemplate) => {
             if (err) {
-                return callback(err);
+                req.flash('danger', err && err.message || err || _('Could not find report template'));
+                return res.redirect('/reports');
             }
 
-            resolveUserFields(reportTemplate.userFieldsObject, report.paramsObject, (err, inputs) => {
-                if (err) {
-                    req.flash('danger', err.message || err);
-                    return res.redirect('/reports');
+            if (report.state == 1) {
+                if (reportTemplate.mimeType == 'text/html') {
+
+                    fs.readFile(path.join(__dirname, '../protected/reports', report.filename + '.report'), (err, reportContent) => {
+                        if (err) {
+                            req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
+                            return res.redirect('/reports');
+                        }
+
+                        const data = {
+                            csrfToken: req.csrfToken(),
+                            report: new hbs.handlebars.SafeString(reportContent),
+                            title: report.name
+                        };
+
+                        res.render('reports/view', data);
+                    });
+
+                } else if (reportTemplate.mimeType == 'text/csv') {
+                    const headers = {
+                        'Content-Disposition': 'attachment;filename=' + fsTools.nameToFileName(report.name) + '.csv',
+                        'Content-Type': 'text/csv'
+                    };
+
+                    res.sendFile(path.join(__dirname, '../protected/reports', report.filename + '.report'), {headers: headers});
+
+                } else {
+                    req.flash('danger', _('Unknown type of template'));
+                    res.redirect('/reports');
                 }
 
-                const sandbox = {
-                    require: require,
-                    inputs: inputs,
-                    callback: (err, outputs) => {
-                        if (err) {
-                            req.flash('danger', err.message || err);
-                            return res.redirect('/reports');
-                        }
-
-                        const hbsTmpl = hbs.handlebars.compile(reportTemplate.hbs);
-                        const reportText = hbsTmpl(outputs);
-
-                        if (reportTemplate.mimeType == 'text/html') {
-                            const data = {
-                                csrfToken: req.csrfToken(),
-                                report: new hbs.handlebars.SafeString(reportText),
-                                title: outputs.title
-                            };
-
-                            res.render('reports/view', data);
-
-                        } else if (reportTemplate.mimeType == 'text/csv') {
-                            res.set('Content-Disposition', 'attachment;filename=' + toFileName(report.name) + '.csv');
-                            res.set('Content-Type', 'text/csv');
-                            res.send(new Buffer(reportText));
-
-                        } else {
-                            req.flash('danger', _('Unknown type of template'));
-                            return res.redirect('/reports');
-                        }
-                    }
-                };
-
-                const script = new vm.Script(reportTemplate.js);
-                script.runInNewContext(sandbox, { displayErrors: true, timeout: 10000 });
-            });
+            } else {
+                req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
+                return res.redirect('/reports');
+            }
         });
     });
 });
-
-function toFileName(name) {
-    return name.
-        trim().
-        toLowerCase().
-        replace(/[ .+/]/g, '-').
-        replace(/[^a-z0-9\-_]/gi, '');
-}
-
-function resolveEntities(getter, ids, callback) {
-    const idsRemaining = ids.slice();
-    const resolved = [];
-
-    function doWork() {
-        if (idsRemaining.length == 0) {
-            return callback(null, resolved);
-        }
-
-        getter(idsRemaining.shift(), (err, entity) => {
-            if (err) {
-                return callback(err);
-            }
-
-            resolved.push(entity);
-            return doWork();
-        });
-    }
-
-    setImmediate(doWork);
-}
-
-const userFieldTypeToGetter = {
-    'campaign': (id, callback) => campaigns.get(id, false, callback),
-    'list': lists.get
-};
-
-function resolveUserFields(userFields, params, callback) {
-    const userFieldsRemaining = userFields.slice();
-    const resolved = {};
-
-    function doWork() {
-        if (userFieldsRemaining.length == 0) {
-            return callback(null, resolved);
-        }
-
-        const spec = userFieldsRemaining.shift();
-        const getter = userFieldTypeToGetter[spec.type];
-
-        if (getter) {
-            return resolveEntities(getter, params[spec.id], (err, entities) => {
-                if (spec.minOccurences == 1 && spec.maxOccurences == 1) {
-                    resolved[spec.id] = entities[0];
-                } else {
-                    resolved[spec.id] = entities;
-                }
-
-                doWork();
-            });
-        } else {
-            return callback(new Error(_('Unknown user field type "' + spec.type + '".')));
-        }
-    }
-
-    setImmediate(doWork);
-}
 
 function addUserFields(reportTemplateId, reqData, report, callback) {
     reportTemplates.get(reportTemplateId, (err, reportTemplate) => {
