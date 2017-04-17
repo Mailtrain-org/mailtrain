@@ -62,7 +62,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
     const wizard = req.query['type'] || '';
 
     if (wizard == 'subscribers-all') {
-        if (!('description' in data)) data.description = 'This sample shows how to generate a report listing all subscribers along with their statistics.';
+        if (!('description' in data)) data.description = 'Generates a campaign report listing all subscribers along with their statistics.';
 
         if (!('mimeType' in data)) data.mimeType = 'text/html';
 
@@ -124,7 +124,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '</div>';
 
     } else if (wizard == 'subscribers-grouped') {
-        if (!('description' in data)) data.description = 'This sample shows how to generate a report where results are aggregated by some (typically custom) field. The sample assumes that the list associated with the campaign contains a custom field "Country" (which would be filled in via the subscription form).';
+        if (!('description' in data)) data.description = 'Generates a campaign report with results are aggregated by some "Country" custom field.';
 
         if (!('mimeType' in data)) data.mimeType = 'text/html';
 
@@ -142,13 +142,13 @@ router.get('/create', passport.csrfProtection, (req, res) => {
         if (!('js' in data)) data.js =
             'const reports = require("../lib/models/reports");\n' +
             '\n' +
-            'reports.getCampaignResults(inputs.campaign, ["custom_country", "count(*) AS countAll", "SUM(IF(tracker.count IS NULL, 0, 1)) AS countOpened"], "GROUP BY custom_country", (err, results) => {\n' +
+            'reports.getCampaignResults(inputs.campaign, ["custom_country", "count(*) AS count_all", "SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"], "GROUP BY custom_country", (err, results) => {\n' +
             '    if (err) {\n' +
             '        return callback(err);\n' +
             '    }\n' +
             '\n' +
             '    for (let row of results) {\n' +
-            '        row["percentage"] = Math.round((row.countOpened / row.countAll) * 100);\n' +
+            '        row["percentage"] = Math.round((row.count_opened / row.count_all) * 100);\n' +
             '    }\n' +
             '\n' +
             '    let data = {\n' +
@@ -186,10 +186,10 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '                        {{custom_zone}}\n' +
             '                    </th>\n' +
             '                    <td style="width: 20%;">\n' +
-            '                        {{countOpened}}\n' +
+            '                        {{count_opened}}\n' +
             '                    </td>\n' +
             '                    <td style="width: 20%;">\n' +
-            '                        {{countAll}}\n' +
+            '                        {{count_all}}\n' +
             '                    </td>\n' +
             '                    <td style="width: 20%;">\n' +
             '                        {{percentage}}%\n' +
@@ -200,6 +200,43 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '        {{/if}}\n' +
             '    </table>\n' +
             '</div>';
+
+    } else if (wizard == 'export-list-csv') {
+        if (!('description' in data)) data.description = 'Exports a list as a CSV file.';
+
+        if (!('mimeType' in data)) data.mimeType = 'text/csv';
+
+        if (!('userFields' in data)) data.userFields =
+            '[\n' +
+            '    {\n' +
+            '        "id": "list",\n' +
+            '        "name": "List",\n' +
+            '        "type": "list",\n' +
+            '        "minOccurences": 1,\n' +
+            '        "maxOccurences": 1\n' +
+            '    }\n' +
+            ']';
+
+        if (!('js' in data)) data.js =
+            'const subscriptions = require("../lib/models/subscriptions");\n' +
+            '\n' +
+            'subscriptions.list(inputs.list.id,0,0, (err, results) => {\n' +
+            '    if (err) {\n' +
+            '        return callback(err);\n' +
+            '    }\n' +
+            '\n' +
+            '    let data = {\n' +
+            '        title: "Sample Export of " + inputs.list.name,\n' +
+            '        results: results\n' +
+            '    };\n' +
+            '\n' +
+            '    return callback(null, data);\n' +
+            '});';
+
+        if (!('hbs' in data)) data.hbs =
+            '{{#each results}}\n' +
+            '{{firstName}},{{lastName}},{{email}}\n' +
+            '{{/each}}';
     }
 
     data.csrfToken = req.csrfToken();

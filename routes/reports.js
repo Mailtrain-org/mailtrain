@@ -7,6 +7,7 @@ const _ = require('../lib/translate')._;
 const reportTemplates = require('../lib/models/report-templates');
 const reports = require('../lib/models/reports');
 const campaigns = require('../lib/models/campaigns');
+const lists = require('../lib/models/lists');
 const tools = require('../lib/tools');
 const util = require('util');
 const htmlescape = require('escape-html');
@@ -30,6 +31,12 @@ router.get('/', (req, res) => {
 });
 
 router.post('/ajax', (req, res) => {
+    function getViewIcon(mimeType) {
+        let icon = 'search';
+        if (mimeType == 'text/csv') icon = 'download-alt';
+        return icon;
+    }
+
     reports.filter(req.body, (err, data, total, filteredTotal) => {
         if (err) {
             return res.json({
@@ -48,7 +55,7 @@ router.post('/ajax', (req, res) => {
                 htmlescape(row.reportTemplateName || ''),
                 htmlescape(striptags(row.description) || ''),
                 '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
-                '<a href="/reports/view/' + row.id + '"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a> ' +
+                '<a href="/reports/view/' + row.id + '"><span class="glyphicon glyphicon-' + getViewIcon(row.mimeType) + '" aria-hidden="true"></span></a> ' +
                 '<a href="/reports/edit/' + row.id + '"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>']
             )
         });
@@ -123,15 +130,15 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
         skip: ['layout']
     });
 
-    reports.get(req.params.id, (err, template) => {
-        if (err || !template) {
+    reports.get(req.params.id, (err, report) => {
+        if (err || !report) {
             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
             return res.redirect('/reports');
         }
 
-        template.csrfToken = req.csrfToken();
-        template.title = _('Edit Report');
-        template.useEditor = true;
+        report.csrfToken = req.csrfToken();
+        report.title = _('Edit Report');
+        report.useEditor = true;
 
         reportTemplates.quicklist((err, items) => {
             if (err) {
@@ -139,7 +146,7 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
                 return res.redirect('/');
             }
 
-            const reportTemplateId = template.reportTemplate;
+            const reportTemplateId = report.reportTemplate;
 
             items.forEach(item => {
                 if (item.id === reportTemplateId) {
@@ -147,9 +154,9 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
                 }
             });
 
-            template.reportTemplates = items;
+            report.reportTemplates = items;
 
-            addUserFields(reportTemplateId, reqData, template, (err, data) => {
+            addUserFields(reportTemplateId, reqData, report, (err, data) => {
                 if (err) {
                     req.flash('danger', err.message || err);
                     return res.redirect('/reports');
@@ -201,18 +208,18 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
 });
 
 router.get('/view/:id', passport.csrfProtection, (req, res) => {
-    reports.get(req.params.id, (err, template) => {
-        if (err || !template) {
+    reports.get(req.params.id, (err, report) => {
+        if (err || !report) {
             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
             return res.redirect('/reports');
         }
 
-        reportTemplates.get(template.reportTemplate, (err, reportTemplate) => {
+        reportTemplates.get(report.reportTemplate, (err, reportTemplate) => {
             if (err) {
                 return callback(err);
             }
 
-            resolveUserFields(reportTemplate.userFieldsObject, template.paramsObject, (err, inputs) => {
+            resolveUserFields(reportTemplate.userFieldsObject, report.paramsObject, (err, inputs) => {
                 if (err) {
                     req.flash('danger', err.message || err);
                     return res.redirect('/reports');
@@ -228,31 +235,45 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                         }
 
                         const hbsTmpl = hbs.handlebars.compile(reportTemplate.hbs);
-                        const report = hbsTmpl(outputs);
+                        const reportText = hbsTmpl(outputs);
 
-                        const data = {
-                            csrfToken: req.csrfToken(),
-                            report: new hbs.handlebars.SafeString(report),
-                            title: outputs.title
-                        };
+                        if (reportTemplate.mimeType == 'text/html') {
+                            const data = {
+                                csrfToken: req.csrfToken(),
+                                report: new hbs.handlebars.SafeString(reportText),
+                                title: outputs.title
+                            };
 
-                        res.render('reports/view', data);
+                            res.render('reports/view', data);
+
+                        } else if (reportTemplate.mimeType == 'text/csv') {
+                            res.set('Content-Disposition', 'attachment;filename=' + toFileName(report.name) + '.csv');
+                            res.set('Content-Type', 'text/csv');
+                            res.send(new Buffer(reportText));
+
+                        } else {
+                            req.flash('danger', _('Unknown type of template'));
+                            return res.redirect('/reports');
+                        }
                     }
                 };
 
-                try {
-                    const script = new vm.Script(reportTemplate.js);
-                    script.runInNewContext(sandbox, { displayErrors: true, timeout: 10000 });
-                } catch (err) {
-                    req.flash('danger', 'Error in the report template script ... ' + err.stack.replace(/at ContextifyScript.Script.runInContext[\s\S]*/,''));
-                    return res.redirect('/reports');
-                }
+                const script = new vm.Script(reportTemplate.js);
+                script.runInNewContext(sandbox, { displayErrors: true, timeout: 10000 });
             });
         });
     });
 });
 
-function resolveCampaigns(ids, callback) {
+function toFileName(name) {
+    return name.
+        trim().
+        toLowerCase().
+        replace(/[ .+/]/g, '-').
+        replace(/[^a-z0-9\-_]/gi, '');
+}
+
+function resolveEntities(getter, ids, callback) {
     const idsRemaining = ids.slice();
     const resolved = [];
 
@@ -261,18 +282,23 @@ function resolveCampaigns(ids, callback) {
             return callback(null, resolved);
         }
 
-        campaigns.get(idsRemaining.shift(), false, (err, campaign) => {
+        getter(idsRemaining.shift(), (err, entity) => {
             if (err) {
                 return callback(err);
             }
 
-            resolved.push(campaign);
+            resolved.push(entity);
             return doWork();
         });
     }
 
     setImmediate(doWork);
 }
+
+const userFieldTypeToGetter = {
+    'campaign': (id, callback) => campaigns.get(id, false, callback),
+    'list': lists.get
+};
 
 function resolveUserFields(userFields, params, callback) {
     const userFieldsRemaining = userFields.slice();
@@ -284,25 +310,27 @@ function resolveUserFields(userFields, params, callback) {
         }
 
         const spec = userFieldsRemaining.shift();
-        if (spec.type == 'campaign') {
-            return resolveCampaigns(params[spec.id], (err, campaigns) => {
+        const getter = userFieldTypeToGetter[spec.type];
+
+        if (getter) {
+            return resolveEntities(getter, params[spec.id], (err, entities) => {
                 if (spec.minOccurences == 1 && spec.maxOccurences == 1) {
-                    resolved[spec.id] = campaigns[0];
+                    resolved[spec.id] = entities[0];
                 } else {
-                    resolved[spec.id] = campaigns;
+                    resolved[spec.id] = entities;
                 }
 
                 doWork();
             });
+        } else {
+            return callback(new Error(_('Unknown user field type "' + spec.type + '".')));
         }
-
-        return callback(new Error(_('Unknown user field type "' + spec.type + '".')));
     }
 
     setImmediate(doWork);
 }
 
-function addUserFields(reportTemplateId, reqData, template, callback) {
+function addUserFields(reportTemplateId, reqData, report, callback) {
     reportTemplates.get(reportTemplateId, (err, reportTemplate) => {
         if (err) {
             return callback(err);
@@ -314,8 +342,8 @@ function addUserFields(reportTemplateId, reqData, template, callback) {
             let value = '';
             if ((spec.id + 'Selection') in reqData) {
                 value = reqData[spec.id + 'Selection'];
-            } else if (template && template.paramsObject && spec.id in template.paramsObject) {
-                value = template.paramsObject[spec.id].join(',');
+            } else if (report && report.paramsObject && spec.id in report.paramsObject) {
+                value = report.paramsObject[spec.id].join(',');
             }
 
             userFields.push({
@@ -327,7 +355,7 @@ function addUserFields(reportTemplateId, reqData, template, callback) {
             });
         }
 
-        const data = template ? template : reqData;
+        const data = report ? report : reqData;
         data.userFields = userFields;
 
         callback(null, data);

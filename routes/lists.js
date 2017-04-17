@@ -748,4 +748,27 @@ router.get('/subscription/:id/import/:importId/failed', (req, res) => {
     });
 });
 
+router.post('/quicklist/ajax', (req, res) => {
+    lists.filterQuicklist(req.body, (err, data, total, filteredTotal) => {
+        if (err) {
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+
+        res.json({
+            draw: req.body.draw,
+            recordsTotal: total,
+            recordsFiltered: filteredTotal,
+            data: data.map((row, i) => ({
+                "0": (Number(req.body.start) || 0) + 1 + i,
+                "1": '<span class="glyphicon glyphicon-inbox" aria-hidden="true"></span> <a href="/lists/view/' + row.id + '">' + htmlescape(row.name || '') + '</a>',
+                "2": row.subscribers,
+                "DT_RowId": row.id
+            }))
+        });
+    });
+});
+
 module.exports = router;
