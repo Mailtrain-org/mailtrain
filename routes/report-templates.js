@@ -93,7 +93,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '<h2>{{title}}</h2>\n' +
             '\n' +
             '<div class="table-responsive">\n' +
-            '    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="1,1,1" data-paging="false">\n' +
+            '    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="1,1" data-paging="false">\n' +
             '        <thead>\n' +
             '        <th>\n' +
             '            {{#translate}}Email{{/translate}}\n' +

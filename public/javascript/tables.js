@@ -4,7 +4,62 @@
 
 'use strict';
 
-(function(){
+(function() {
+    function refreshTargets(data) {
+        for (var target in data) {
+            var newContent = $(data[target]);
+
+            $(target).replaceWith(newContent);
+            installHandlers(newContent.parent());
+        }
+    }
+
+    function getAjaxUrl(self) {
+        var topicId = self.data('topicId');
+        var topicUrl = self.data('topicUrl');
+
+        return topicUrl + '/ajax/' + topicId;
+    }
+
+    function setupAjaxRefresh() {
+        var self = $(this);
+        var ajaxUrl = getAjaxUrl(self);
+
+        var interval = Number(self.data('interval')) || 60;
+
+        setTimeout(function () {
+            $.get(ajaxUrl, function(data) {
+                refreshTargets(data);
+            });
+
+        }, interval * 1000);
+    }
+
+    function setupAjaxAction() {
+        var self = $(this);
+        var ajaxUrl = getAjaxUrl(self);
+
+        var processing = false;
+
+        self.click(function () {
+            if (!processing) {
+                $.get(ajaxUrl, function (data) {
+                    refreshTargets(data);
+                });
+
+                processing = true;
+            }
+
+            return false;
+        });
+    }
+
+    function setupDatestring() {
+        var self = $(this);
+        self.html(moment(self.data('date')).fromNow());
+    }
+
+
     function getDataTableOptions(elem) {
         var rowSort = $(elem).data('rowSort') || false;
 
@@ -92,6 +147,15 @@
         return opts;
     }
 
+
+    function installHandlers(elem) {
+        $('.ajax-refresh', elem).each(setupAjaxRefresh);
+        $('.ajax-action', elem).each(setupAjaxAction);
+        $('.datestring', elem).each(setupDatestring);
+    }
+
+    installHandlers($(document));
+
     $('.data-table').each(function () {
         var opts = getDataTableOptions(this);
         $(this).DataTable(opts);
@@ -112,131 +176,135 @@
         opts.serverSide = true;
         opts.processing = true;
 
+        opts.createdRow = function( row, data, dataIndex ) {
+            installHandlers($(row));
+        }
+
         $(this).DataTable(opts).on('draw', function () {
-            $('.datestring').each(function () {
-                $(this).html(moment($(this).data('date')).fromNow());
-            });
+            $('.datestring').each(setupDatestring);
         });
     });
+
+    $('.data-stats-pie-chart').each(function () {
+        var column = $(this).data('column') || 'country';
+        var limit = $(this).data('limit') || 20;
+        var topicId = $(this).data('topicId');
+        var topicUrl = $(this).data('topicUrl') || '/campaigns/clicked';
+        var ajaxUrl = topicUrl + '/ajax/' + topicId + '/stats';
+        var self = $(this);
+
+        $.post(ajaxUrl, {column: column, limit: limit}, function(data) {
+          google.charts.load('current', {'packages':['corechart']});
+          google.charts.setOnLoadCallback(drawChart);
+
+          function drawChart() {
+            var gTable = new google.visualization.DataTable();
+            gTable.addColumn('string', 'Column');
+            gTable.addColumn('number', 'Value');
+            gTable.addRows(data.data);
+
+            var options = {'width':500, 'height':400};
+            var chart = new google.visualization.PieChart(self[0]);
+            chart.draw(gTable, options);
+          }
+        });
+    });
+
+    $('.datestring').each(function () {
+        $(this).html(moment($(this).data('date')).fromNow());
+    });
+
+    $('.delete-form,.confirm-submit').on('submit', function (e) {
+        if (!confirm($(this).data('confirmMessage') || 'Are you sure? This action can not be undone')) {
+            e.preventDefault();
+        }
+    });
+
+    $('.fm-date-us.date').datepicker({
+        format: 'mm/dd/yyyy',
+        weekStart: 0,
+        autoclose: true
+    });
+
+    $('.fm-date-eur.date').datepicker({
+        format: 'dd/mm/yyyy',
+        weekStart: 1,
+        autoclose: true
+    });
+
+    $('.fm-date-generic.date').datepicker({
+        format: 'yyyy-mm-dd',
+        weekStart: 1,
+        autoclose: true
+    });
+
+    $('.fm-birthday-us.date').datepicker({
+        format: 'mm/dd',
+        weekStart: 0,
+        autoclose: true
+    });
+
+    $('.fm-birthday-eur.date').datepicker({
+        format: 'dd/mm',
+        weekStart: 1,
+        autoclose: true
+    });
+
+    $('.fm-birthday-generic.date').datepicker({
+        format: 'mm-dd',
+        weekStart: 1,
+        autoclose: true
+    });
+
+    $('.page-refresh').each(function () {
+        var interval = Number($(this).data('interval')) || 60;
+        setTimeout(function () {
+            window.location.reload();
+        }, interval * 1000);
+    });
+
+
+    $('.click-select').on('click', function () {
+        $(this).select();
+    });
+
+    if (typeof moment.tz !== 'undefined') {
+        (function () {
+            var tz = moment.tz.guess();
+            if (tz) {
+                $('.tz-detect').val(tz);
+            }
+        })();
+    }
+
+    // setup SMTP check
+    var smtpForm = document.querySelector('form#smtp-verify');
+    if (smtpForm) {
+        smtpForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var form = document.getElementById('settings-form');
+            var formData = new FormData(form);
+            var result = fetch('/settings/smtp-verify', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+
+            var $btn = $('#verify-button').button('loading');
+
+            result.then(function (res) {
+                return res.json();
+            }).then(function (data) {
+                alert(data.error ? 'Invalid Mailer settings\n' + data.error : data.message);
+                $btn.button('reset');
+            }).catch(function (err) {
+                alert(err.message);
+                $btn.button('reset');
+            });
+
+        });
+    }
 
 })();
 
-$('.data-stats-pie-chart').each(function () {
-    var column = $(this).data('column') || 'country';
-    var limit = $(this).data('limit') || 20;
-    var topicId = $(this).data('topicId');
-    var topicUrl = $(this).data('topicUrl') || '/campaigns/clicked';
-    var ajaxUrl = topicUrl + '/ajax/' + topicId + '/stats';
-    var self = $(this);
-
-    $.post(ajaxUrl, {column: column, limit: limit}, function(data) {
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-
-      function drawChart() {
-        var gTable = new google.visualization.DataTable();
-        gTable.addColumn('string', 'Column');
-        gTable.addColumn('number', 'Value');
-        gTable.addRows(data.data);
-
-        var options = {'width':500, 'height':400};
-        var chart = new google.visualization.PieChart(self[0]);
-        chart.draw(gTable, options);
-      }
-    });
-});
-
-$('.datestring').each(function () {
-    $(this).html(moment($(this).data('date')).fromNow());
-});
-
-$('.delete-form,.confirm-submit').on('submit', function (e) {
-    if (!confirm($(this).data('confirmMessage') || 'Are you sure? This action can not be undone')) {
-        e.preventDefault();
-    }
-});
-
-$('.fm-date-us.date').datepicker({
-    format: 'mm/dd/yyyy',
-    weekStart: 0,
-    autoclose: true
-});
-
-$('.fm-date-eur.date').datepicker({
-    format: 'dd/mm/yyyy',
-    weekStart: 1,
-    autoclose: true
-});
-
-$('.fm-date-generic.date').datepicker({
-    format: 'yyyy-mm-dd',
-    weekStart: 1,
-    autoclose: true
-});
-
-$('.fm-birthday-us.date').datepicker({
-    format: 'mm/dd',
-    weekStart: 0,
-    autoclose: true
-});
-
-$('.fm-birthday-eur.date').datepicker({
-    format: 'dd/mm',
-    weekStart: 1,
-    autoclose: true
-});
-
-$('.fm-birthday-generic.date').datepicker({
-    format: 'mm-dd',
-    weekStart: 1,
-    autoclose: true
-});
-
-$('.page-refresh').each(function () {
-    var interval = Number($(this).data('interval')) || 60;
-    setTimeout(function () {
-        window.location.reload();
-    }, interval * 1000);
-});
-
-$('.click-select').on('click', function () {
-    $(this).select();
-});
-
-if (typeof moment.tz !== 'undefined') {
-    (function () {
-        var tz = moment.tz.guess();
-        if (tz) {
-            $('.tz-detect').val(tz);
-        }
-    })();
-}
-
-// setup SMTP check
-var smtpForm = document.querySelector('form#smtp-verify');
-if (smtpForm) {
-    smtpForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        var form = document.getElementById('settings-form');
-        var formData = new FormData(form);
-        var result = fetch('/settings/smtp-verify', {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin'
-        });
-
-        var $btn = $('#verify-button').button('loading');
-
-        result.then(function (res) {
-            return res.json();
-        }).then(function (data) {
-            alert(data.error ? 'Invalid Mailer settings\n' + data.error : data.message);
-            $btn.button('reset');
-        }).catch(function (err) {
-            alert(err.message);
-            $btn.button('reset');
-        });
-
-    });
-}

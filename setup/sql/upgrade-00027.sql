@@ -22,7 +22,6 @@ CREATE TABLE `reports` (
   `description` text,
   `report_template` int(11) unsigned NOT NULL,
   `params` longtext,
-  `filename`  varchar(255) DEFAULT NULL,
   `state`  int(11) unsigned NOT NULL DEFAULT 0,
   `last_run` DATETIME DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

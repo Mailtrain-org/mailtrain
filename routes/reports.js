@@ -6,6 +6,7 @@ const router = new express.Router();
 const _ = require('../lib/translate')._;
 const reportTemplates = require('../lib/models/report-templates');
 const reports = require('../lib/models/reports');
+const reportProcessor = require('../services/report-processor');
 const campaigns = require('../lib/models/campaigns');
 const lists = require('../lib/models/lists');
 const tools = require('../lib/tools');
@@ -13,7 +14,7 @@ const util = require('util');
 const htmlescape = require('escape-html');
 const striptags = require('striptags');
 const fs = require('fs');
-const fsTools = require('../lib/fs-tools');
+const hbs = require('hbs');
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -30,26 +31,9 @@ router.get('/', (req, res) => {
     });
 });
 
+
+
 router.post('/ajax', (req, res) => {
-    function getViewLink(row) {
-        if (row.state == 0) {
-            // TODO: Render waiting
-            // TODO: Add error output
-            return '<span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> ';
-        } else if (row.state == 1) {
-            let icon = 'eye-open';
-            if (row.mimeType == 'text/csv') icon = 'download-alt';
-
-            // TODO: Add error output
-            return '<a href="/reports/view/' + row.id + '"><span class="glyphicon glyphicon-' + icon + '" aria-hidden="true"></span></a> ';
-        } else if (row.state == 2) {
-            // TODO: Add error output
-            return '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> ';
-        }
-
-        return '';
-    }
-
     reports.filter(req.body, (err, data, total, filteredTotal) => {
         if (err) {
             return res.json({
@@ -67,11 +51,26 @@ router.post('/ajax', (req, res) => {
                 htmlescape(row.name || ''),
                 htmlescape(row.reportTemplateName || ''),
                 htmlescape(striptags(row.description) || ''),
-                '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>',
-                getViewLink(row) +
-                '<a href="/reports/edit/' + row.id + '"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>']
-            )
+                getRowLastRun(row),
+                getRowActions(row)
+            ])
         });
+    });
+});
+
+router.get('/row/ajax/:id', (req, res) => {
+    respondRowActions(req.params.id, res);
+});
+
+router.get('/start/ajax/:id', (req, res) => {
+    reportProcessor.start(req.params.id, () => {
+        respondRowActions(req.params.id, res);
+    });
+});
+
+router.get('/stop/ajax/:id', (req, res) => {
+    reportProcessor.stop(req.params.id, () => {
+        respondRowActions(req.params.id, res);
     });
 });
 
@@ -116,7 +115,6 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     const reqData = req.body;
-    delete reqData.filename; // This is to make sure no one inserts a fake filename when editing the report.
 
     const reportTemplateId = Number(reqData.reportTemplate);
 
@@ -131,6 +129,9 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
                 req.flash('danger', err && err.message || err || _('Could not create report'));
                 return res.redirect('/reports/create?' + tools.queryParams(data));
             }
+
+            reportProcessor.start(id);
+
             req.flash('success', util.format(_('Report “%s” created'), data.name));
             res.redirect('/reports');
         });
@@ -179,8 +180,6 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
 
 router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => {
     const reqData = req.body;
-    delete reqData.filename; // This is to make sure no one inserts a fake filename when editing the report.
-
     const reportTemplateId = Number(reqData.reportTemplate);
 
     addParamsObject(reportTemplateId, reqData, (err, data) => {
@@ -231,10 +230,10 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                 return res.redirect('/reports');
             }
 
-            if (report.state == 1) {
+            if (report.state == reports.ReportState.FINISHED) {
                 if (reportTemplate.mimeType == 'text/html') {
 
-                    fs.readFile(path.join(__dirname, '../protected/reports', report.filename + '.report'), (err, reportContent) => {
+                    fs.readFile(reportProcessor.getFileName(report, 'report'), (err, reportContent) => {
                         if (err) {
                             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
                             return res.redirect('/reports');
@@ -251,11 +250,11 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
                 } else if (reportTemplate.mimeType == 'text/csv') {
                     const headers = {
-                        'Content-Disposition': 'attachment;filename=' + fsTools.nameToFileName(report.name) + '.csv',
+                        'Content-Disposition': 'attachment;filename=' + tools.nameToFileName(report.name) + '.csv',
                         'Content-Type': 'text/csv'
                     };
 
-                    res.sendFile(path.join(__dirname, '../protected/reports', report.filename + '.report'), {headers: headers});
+                    res.sendFile(reportProcessor.getFileName(report, 'report'), {headers: headers});
 
                 } else {
                     req.flash('danger', _('Unknown type of template'));
@@ -269,6 +268,83 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
         });
     });
 });
+
+router.get('/output/:id', passport.csrfProtection, (req, res) => {
+    reports.get(req.params.id, (err, report) => {
+        if (err || !report) {
+            req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
+            return res.redirect('/reports');
+        }
+
+        fs.readFile(reportProcessor.getFileName(report, 'output'), (err, output) => {
+            let data = {
+                csrfToken: req.csrfToken(),
+                title: 'Output for report ' + report.name
+            };
+
+            if (err) {
+                data.error = 'No output.';
+            } else {
+                data.output = output;
+            }
+
+            res.render('reports/output', data);
+        });
+    });
+});
+
+function getRowLastRun(row) {
+    return '<span id="row-last-run-' + row.id + '">' + (row.lastRun ? '<span class="datestring" data-date="' + row.lastRun.toISOString() + '" title="' + row.lastRun.toISOString() + '">' + row.lastRun.toISOString() + '</span>' : '') + '</span>';
+}
+
+function getRowActions(row) {
+    let requestRefresh = false;
+    let view, startStop;
+    let topic = 'data-topic-id="' + row.id + '"';
+
+    if (row.state == reports.ReportState.PROCESSING || row.state == reports.ReportState.SCHEDULED) {
+        view = '<span class="row-action glyphicon glyphicon-hourglass" aria-hidden="true" title="Processing"></span>';
+        startStop = '<a class="row-action ajax-action" href="" data-topic-url="/reports/stop" ' + topic + ' title="Stop"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></a>';
+        requestRefresh = true;
+
+    } else if (row.state == reports.ReportState.FINISHED) {
+        let icon = 'eye-open';
+        if (row.mimeType == 'text/csv') icon = 'download-alt';
+
+        view = '<a class="row-action" href="/reports/view/' + row.id + '" title="View report"><span class="glyphicon glyphicon-' + icon + '" aria-hidden="true"></span></a>';
+        startStop = '<a class="row-action ajax-action" href="" data-topic-url="/reports/start" ' + topic + ' title="Refresh report"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></a>';
+
+    } else if (row.state == reports.ReportState.FAILED) {
+        view = '<span class="row-action glyphicon glyphicon-thumbs-down" aria-hidden="true" title="Report generation failed"></span>';
+        startStop = '<a class="row-action ajax-action" href="" data-topic-url="/reports/start" ' + topic + ' title="Refresh report"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></a>';
+    }
+
+    let actions = view;
+    actions += '<a class="row-action" href="/reports/output/' + row.id + '" title="View console output"><span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span></a>';
+    actions += startStop;
+    actions += '<a class="row-action" href="/reports/edit/' + row.id + '"><span class="glyphicon glyphicon-wrench" aria-hidden="true" title="Edit"></span></a>';
+
+    return '<span id="row-actions-' + row.id + '"' + (requestRefresh ? ' class="row-actions ajax-refresh" data-interval="5" data-topic-url="/reports/row" ' + topic : ' class="row-actions"') + '>' +
+        actions +
+        '</span>';
+}
+
+function respondRowActions(id, res) {
+    reports.get(id, (err, report) => {
+        if (err) {
+            return res.json({
+                error: err,
+            });
+        }
+
+        const data = {};
+        data['#row-last-run-' + id] = getRowLastRun(report);
+        data['#row-actions-' + id] = getRowActions(report);
+
+        res.json(data);
+    });
+}
+
 
 function addUserFields(reportTemplateId, reqData, report, callback) {
     reportTemplates.get(reportTemplateId, (err, reportTemplate) => {

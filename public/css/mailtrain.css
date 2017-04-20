@@ -39,3 +39,11 @@ tbody>tr.selected {
 .table-hover>tbody>tr.selected:hover {
     background-color: rgb(205, 212, 226);
 }
+
+.row-actions .row-action {
+    padding-right: 15px;
+}
+
+.row-actions .row-action:last-child {
+    padding-right: 0px;
+}

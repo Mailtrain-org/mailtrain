@@ -11,8 +11,7 @@ const hbs = require('hbs');
 const vm = require('vm');
 const log = require('npmlog');
 const fs = require('fs');
-const path = require('path');
-const fsTools = require('../lib/fs-tools');
+const reportProcessor = require('./report-processor');
 
 handlebarsHelpers.registerHelpers(handlebars);
 
@@ -74,64 +73,52 @@ function resolveUserFields(userFields, params, callback) {
 }
 
 function doneSuccess(id) {
-    // TODO: Mark in the DB as completed + update the date/time
-    // TODO update the report filename in the DB
-
     process.exit(0);
 }
 
 function doneFail(id) {
-    // TODO: Mark in the DB as failed
     process.exit(1);
 }
-
-function start(id) {
-    // TODO: Mark in the DB as running
-}
-
-// TODO: Retrieve report task from the DB and run it
 
 function processReport(reportId) {
     reports.get(reportId, (err, report) => {
         if (err || !report) {
             log.error('reports', err && err.message || err || _('Could not find report with specified ID'));
-            doneFail(reportId);
+            doneFail();
         }
 
         reportTemplates.get(report.reportTemplate, (err, reportTemplate) => {
             if (err) {
                 log.error('reports', err && err.message || err || _('Could not find report template'));
-                doneFail(reportId);
+                doneFail();
             }
 
             resolveUserFields(reportTemplate.userFieldsObject, report.paramsObject, (err, inputs) => {
                 if (err) {
                     log.error('reports', err.message || err);
-                    doneFail(reportId);
+                    doneFail();
                 }
-
-                const filename = fsTools.nameToFileName(report.name);
 
                 const sandbox = {
                     require: require,
                     inputs: inputs,
+                    console: console,
                     callback: (err, outputs) => {
                         if (err) {
                             log.error('reports', err.message || err);
-                            doneFail(reportId);
+                            doneFail();
                         }
 
                         const hbsTmpl = handlebars.compile(reportTemplate.hbs);
                         const reportText = hbsTmpl(outputs);
 
-                        fs.writeFile(path.join(__dirname, '../protected/reports', filename + '.report'), reportText, (err, reportContent) => {
+                        fs.writeFile(reportProcessor.getFileName(report, 'report'), reportText, (err, reportContent) => {
                             if (err) {
                                 log.error('reports', err && err.message || err || _('Could not find report with specified ID'));
-                                doneFail(reportId);
+                                doneFail();
                             }
 
-                            doneSuccess(reportId, filename);
-                            process
+                            doneSuccess();
                         });
                     }
                 };
@@ -143,4 +130,4 @@ function processReport(reportId) {
     });
 }
 
-processReport(1);
+processReport(Number(process.argv[2]));

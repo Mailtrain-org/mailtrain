@@ -18,6 +18,7 @@ let tzupdate = require('./services/tzupdate');
 let feedcheck = require('./services/feedcheck');
 let dbcheck = require('./lib/dbcheck');
 let tools = require('./lib/tools');
+let reportProcessor = require('./services/report-processor');
 
 let port = config.www.port;
 let host = config.www.host;
@@ -120,23 +121,25 @@ server.on('listening', () => {
                         spawnSenders(() => {
                             feedcheck(() => {
                                 postfixBounceServer(() => {
-                                    log.info('Service', 'All services started');
-                                    if (config.group) {
-                                        try {
-                                            process.setgid(config.group);
-                                            log.info('Service', 'Changed group to "%s" (%s)', config.group, process.getgid());
-                                        } catch (E) {
-                                            log.info('Service', 'Failed to change group to "%s" (%s)', config.group, E.message);
+                                    reportProcessor.init(() => {
+                                        log.info('Service', 'All services started');
+                                        if (config.group) {
+                                            try {
+                                                process.setgid(config.group);
+                                                log.info('Service', 'Changed group to "%s" (%s)', config.group, process.getgid());
+                                            } catch (E) {
+                                                log.info('Service', 'Failed to change group to "%s" (%s)', config.group, E.message);
+                                            }
                                         }
-                                    }
-                                    if (config.user) {
-                                        try {
-                                            process.setuid(config.user);
-                                            log.info('Service', 'Changed user to "%s" (%s)', config.user, process.getuid());
-                                        } catch (E) {
-                                            log.info('Service', 'Failed to change user to "%s" (%s)', config.user, E.message);
+                                        if (config.user) {
+                                            try {
+                                                process.setuid(config.user);
+                                                log.info('Service', 'Changed user to "%s" (%s)', config.user, process.getuid());
+                                            } catch (E) {
+                                                log.info('Service', 'Failed to change user to "%s" (%s)', config.user, E.message);
+                                            }
                                         }
-                                    }
+                                    });
                                 });
                             });
                         });
