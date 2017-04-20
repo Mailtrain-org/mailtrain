@@ -130,10 +130,10 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
                 return res.redirect('/reports/create?' + tools.queryParams(data));
             }
 
-            reportProcessor.start(id);
-
-            req.flash('success', util.format(_('Report “%s” created'), data.name));
-            res.redirect('/reports');
+            reportProcessor.start(id, () => {
+                req.flash('success', util.format(_('Report “%s” created'), data.name));
+                res.redirect('/reports');
+            });
         });
     });
 });
