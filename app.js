@@ -4,7 +4,6 @@ const config = require('config');
 const log = require('npmlog');
 
 const _ = require('./lib/translate')._;
-const util = require('util');
 
 const express = require('express');
 const bodyParser = require('body-parser');

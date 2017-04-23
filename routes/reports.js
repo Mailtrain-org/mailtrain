@@ -217,7 +217,7 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
     });
 });
 
-router.get('/view/:id', passport.csrfProtection, (req, res) => {
+router.get('/view/:id', (req, res) => {
     reports.get(req.params.id, (err, report) => {
         if (err || !report) {
             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
@@ -269,7 +269,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
     });
 });
 
-router.get('/output/:id', passport.csrfProtection, (req, res) => {
+router.get('/output/:id', (req, res) => {
     reports.get(req.params.id, (err, report) => {
         if (err || !report) {
             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
