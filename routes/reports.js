@@ -6,10 +6,11 @@ const router = new express.Router();
 const _ = require('../lib/translate')._;
 const reportTemplates = require('../lib/models/report-templates');
 const reports = require('../lib/models/reports');
-const reportProcessor = require('../services/report-processor');
+const reportProcessor = require('../lib/report-processor');
 const campaigns = require('../lib/models/campaigns');
 const lists = require('../lib/models/lists');
 const tools = require('../lib/tools');
+const fileHelpers = require('../lib/file-helpers');
 const util = require('util');
 const htmlescape = require('escape-html');
 const striptags = require('striptags');
@@ -233,14 +234,13 @@ router.get('/view/:id', (req, res) => {
             if (report.state == reports.ReportState.FINISHED) {
                 if (reportTemplate.mimeType == 'text/html') {
 
-                    fs.readFile(reportProcessor.getFileName(report, 'report'), (err, reportContent) => {
+                    fs.readFile(fileHelpers.getReportContentFile(report), (err, reportContent) => {
                         if (err) {
                             req.flash('danger', err && err.message || err || _('Could not find report with specified ID'));
                             return res.redirect('/reports');
                         }
 
                         const data = {
-                            csrfToken: req.csrfToken(),
                             report: new hbs.handlebars.SafeString(reportContent),
                             title: report.name
                         };
@@ -250,11 +250,11 @@ router.get('/view/:id', (req, res) => {
 
                 } else if (reportTemplate.mimeType == 'text/csv') {
                     const headers = {
-                        'Content-Disposition': 'attachment;filename=' + tools.nameToFileName(report.name) + '.csv',
+                        'Content-Disposition': 'attachment;filename=' + fileHelpers.nameToFileName(report.name) + '.csv',
                         'Content-Type': 'text/csv'
                     };
 
-                    res.sendFile(reportProcessor.getFileName(report, 'report'), {headers: headers});
+                    res.sendFile(fileHelpers.getReportContentFile(report), {headers: headers});
 
                 } else {
                     req.flash('danger', _('Unknown type of template'));
@@ -276,9 +276,8 @@ router.get('/output/:id', (req, res) => {
             return res.redirect('/reports');
         }
 
-        fs.readFile(reportProcessor.getFileName(report, 'output'), (err, output) => {
+        fs.readFile(fileHelpers.getReportOutputFile(report), (err, output) => {
             let data = {
-                csrfToken: req.csrfToken(),
                 title: 'Output for report ' + report.name
             };
 
@@ -298,6 +297,8 @@ function getRowLastRun(row) {
 }
 
 function getRowActions(row) {
+    /* FIXME: add csrf protection to stop and refresh actions */
+
     let requestRefresh = false;
     let view, startStop;
     let topic = 'data-topic-id="' + row.id + '"';

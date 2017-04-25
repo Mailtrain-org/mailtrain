@@ -33,10 +33,14 @@
     "grunt-eslint": "^19.0.0",
     "jsxgettext-andris": "^0.9.0-patch.1"
   },
+  "optionalDependencies": {
+    "posix": "^4.1.1"
+  },
   "dependencies": {
     "async": "^2.3.0",
     "aws-sdk": "^2.37.0",
     "bcrypt-nodejs": "0.0.3",
+    "bluebird": "^3.5.0",
     "body-parser": "^1.17.1",
     "bounce-handler": "^7.3.2-fork.2",
     "compression": "^1.6.2",
@@ -56,6 +60,7 @@
     "faker": "^4.1.0",
     "feedparser": "^2.1.0",
     "file-type": "^4.1.0",
+    "fs-extra": "^2.1.2",
     "geoip-ultralight": "^0.1.5",
     "gettext-parser": "^1.2.2",
     "gm": "^1.23.0",
@@ -97,6 +102,8 @@
     "slugify": "^1.1.0",
     "smtp-server": "^2.0.3",
     "striptags": "^3.0.1",
-    "toml": "^2.3.2"
+    "toml": "^2.3.2",
+    "try-require": "^1.2.1",
+    "walk": "^2.3.9"
   }
 }

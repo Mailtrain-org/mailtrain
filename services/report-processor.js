@@ -1,154 +1,191 @@
 'use strict';
 
-const log = require('npmlog');
-const db = require('../lib/db');
 const reports = require('../lib/models/reports');
+const reportTemplates = require('../lib/models/report-templates');
+const lists = require('../lib/models/lists');
+const subscriptions = require('../lib/models/subscriptions');
+const campaigns = require('../lib/models/campaigns');
+const handlebars = require('handlebars');
+const handlebarsHelpers = require('../lib/handlebars-helpers');
 const _ = require('../lib/translate')._;
-const path = require('path');
-const tools = require('../lib/tools');
+const hbs = require('hbs');
+const vm = require('vm');
+const log = require('npmlog');
 const fs = require('fs');
-const fork = require('child_process').fork;
+const fileHelpers = require('../lib/file-helpers');
+const path = require('path');
+const privilegeHelpers = require('../lib/privilege-helpers');
 
-let runningWorkersCount = 0;
-let maxWorkersCount = 1;
+handlebarsHelpers.registerHelpers(handlebars);
 
-let workers = {};
+let reportId = Number(process.argv[2]);
+let reportDir;
 
-function getFileName(report, suffix) {
-    return path.join(__dirname, '..', 'protected', 'reports', report.id + '-' + tools.nameToFileName(report.name) + '.' + suffix);
-}
+function resolveEntities(getter, ids, callback) {
+    const idsRemaining = ids.slice();
+    const resolved = [];
 
-module.exports.getFileName = getFileName;
-
-function spawnWorker(report) {
-
-    fs.open(getFileName(report, 'output'), 'w', (err, outFd) => {
-        if (err) {
-            log.error('ReportProcessor', err);
-            return;
+    function doWork() {
+        if (idsRemaining.length == 0) {
+            return callback(null, resolved);
         }
 
-        runningWorkersCount++;
-
-        const options = {
-            stdio: ['ignore', outFd, outFd, 'ipc'],
-            cwd: path.join(__dirname, '..')
-        };
-
-        let child = fork(path.join(__dirname, 'report-processor-worker.js'), [report.id], options);
-        let pid = child.pid;
-        workers[report.id] = child;
-
-        log.info('ReportProcessor', 'Worker process for "%s" started with pid %s. Current worker count is %s.', report.name, pid, runningWorkersCount);
-
-        child.on('close', (code, signal) => {
-            runningWorkersCount--;
-
-            delete workers[report.id];
-            log.info('ReportProcessor', 'Worker process for "%s" (pid %s) exited with code %s signal %s. Current worker count is %s.', report.name, pid, code, signal, runningWorkersCount);
-
-            fs.close(outFd, (err) => {
-                if (err) {
-                    log.error('ReportProcessor', err);
-                }
-
-                const fields = {};
-                if (code ===0 ) {
-                    fields.state = reports.ReportState.FINISHED;
-                    fields.lastRun = new Date();
-                } else {
-                    fields.state = reports.ReportState.FAILED;
-                }
-
-                reports.updateFields(report.id, fields, (err) => {
-                    if (err) {
-                        log.error('ReportProcessor', err);
-                    }
-
-                    setImmediate(worker);
-                });
-            });
-        });
-    });
-};
-
-function worker() {
-    reports.listWithState(reports.ReportState.SCHEDULED, 0, maxWorkersCount - runningWorkersCount, (err, reportList) => {
-        if (err) {
-            log.error('ReportProcessor', err);
-            return;
-        }
-
-        for (let report of reportList) {
-            reports.updateFields(report.id, { state: reports.ReportState.PROCESSING }, (err) => {
-                if (err) {
-                    log.error('ReportProcessor', err);
-                    return;
-                }
-
-                spawnWorker(report);
-            });
-        }
-    });
-}
-
-module.exports.start = (reportId, callback) => {
-    if (!workers[reportId]) {
-        log.info('ReportProcessor', 'Scheduling report id: %s', reportId);
-        reports.updateFields(reportId, { state: reports.ReportState.SCHEDULED, lastRun: null}, (err) => {
+        getter(idsRemaining.shift(), (err, entity) => {
             if (err) {
                 return callback(err);
             }
 
-            if (runningWorkersCount < maxWorkersCount) {
-                log.info('ReportProcessor', 'Starting worker because runningWorkersCount=%s maxWorkersCount=%s', runningWorkersCount, maxWorkersCount);
-
-                worker();
-            } else {
-                log.info('ReportProcessor', 'Not starting worker because runningWorkersCount=%s maxWorkersCount=%s', runningWorkersCount, maxWorkersCount);
-            }
-
-            callback(null);
+            resolved.push(entity);
+            return doWork();
         });
-    } else {
-        log.info('ReportProcessor', 'Worker for report id: %s is already running.', reportId);
     }
+
+    setImmediate(doWork);
+}
+
+const userFieldTypeToGetter = {
+    'campaign': (id, callback) => campaigns.get(id, false, callback),
+    'list': lists.get
 };
 
-module.exports.stop = (reportId, callback) => {
-    const child = workers[reportId];
-    if (child) {
-        log.info('ReportProcessor', 'Killing worker for report id: %s', reportId);
-        child.kill();
-        reports.updateFields(reportId, { state: reports.ReportState.FAILED}, callback);
-    } else {
-        log.info('ReportProcessor', 'No running worker found for report id: %s', reportId);
-    }
-};
+function resolveUserFields(userFields, params, callback) {
+    const userFieldsRemaining = userFields.slice();
+    const resolved = {};
 
-module.exports.init = (callback) => {
-    reports.listWithState(reports.ReportState.PROCESSING, 0, 0, (err, reportList) => {
-        if (err) {
-            log.error('ReportProcessor', err);
+    function doWork() {
+        if (userFieldsRemaining.length == 0) {
+            return callback(null, resolved);
         }
 
-        function scheduleReport() {
-            if (reportList.length > 0) {
-                const report = reportList.shift();
+        const spec = userFieldsRemaining.shift();
+        const getter = userFieldTypeToGetter[spec.type];
 
-                reports.updateFields(report.id, { state: reports.ReportState.SCHEDULED}, (err) => {
+        if (getter) {
+            return resolveEntities(getter, params[spec.id], (err, entities) => {
+                if (spec.minOccurences == 1 && spec.maxOccurences == 1) {
+                    resolved[spec.id] = entities[0];
+                } else {
+                    resolved[spec.id] = entities;
+                }
+
+                doWork();
+            });
+        } else {
+            return callback(new Error(_('Unknown user field type "' + spec.type + '".')));
+        }
+    }
+
+    setImmediate(doWork);
+}
+
+function tearDownChrootDir(callback) {
+    if (reportDir) {
+        privilegeHelpers.tearDownChrootDir(reportDir, callback);
+    } else {
+        callback();
+    }
+}
+
+function doneSuccess() {
+    tearDownChrootDir((err) => {
+        if (err)
+            process.exit(1)
+        else
+            process.exit(0);
+    });
+}
+
+function doneFail() {
+    tearDownChrootDir((err) => {
+        process.exit(1)
+    });
+}
+
+
+
+reports.get(reportId, (err, report) => {
+    if (err || !report) {
+        log.error('reports', err && err.message || err || _('Could not find report with specified ID'));
+        doneFail();
+        return;
+    }
+
+    reportTemplates.get(report.reportTemplate, (err, reportTemplate) => {
+        if (err) {
+            log.error('reports', err && err.message || err || _('Could not find report template'));
+            doneFail();
+            return;
+        }
+
+        resolveUserFields(reportTemplate.userFieldsObject, report.paramsObject, (err, inputs) => {
+            if (err) {
+                log.error('reports', err.message || err);
+                doneFail();
+                return;
+            }
+
+            const campaignsProxy = {
+                results: reports.getCampaignResults,
+                list: campaigns.list,
+                get: campaigns.get
+            };
+
+            const subscriptionsProxy = {
+                list: subscriptions.list
+            };
+
+            const reportFile = fileHelpers.getReportContentFile(report);
+
+            const sandbox = {
+                console,
+                campaigns: campaignsProxy,
+                subscriptions: subscriptionsProxy,
+                inputs,
+
+                callback: (err, outputs) => {
                     if (err) {
-                        log.error('ReportProcessor', err);
+                        log.error('reports', err.message || err);
+                        doneFail();
+                        return;
                     }
 
-                    scheduleReport();
-                });
-            }
+                    const hbsTmpl = handlebars.compile(reportTemplate.hbs);
+                    const reportText = hbsTmpl(outputs);
 
-            worker();
-            callback();
-        }
+                    fs.writeFile(path.basename(reportFile), reportText, (err, reportContent) => {
+                        if (err) {
+                            log.error('reports', err && err.message || err || _('Could not find report with specified ID'));
+                            doneFail();
+                            return;
+                        }
 
-        scheduleReport();
+                        doneSuccess();
+                        return;
+                    });
+                }
+            };
+
+            const script = new vm.Script(reportTemplate.js);
+
+            reportDir = fileHelpers.getReportDir(report);
+            privilegeHelpers.setupChrootDir(reportDir, (err) => {
+                if (err) {
+                    doneFail();
+                    return;
+                }
+
+                privilegeHelpers.chrootAndDropRootPrivileges(reportDir);
+
+                try {
+                    script.runInNewContext(sandbox, {displayErrors: true, timeout: 120000});
+                } catch (err) {
+                    console.log(err);
+
+                    doneFail();
+                    return;
+                }
+            });
+        });
     });
-};
+});
+

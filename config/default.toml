@@ -74,6 +74,11 @@ postsize="2MB"
 host="localhost"
 user="mailtrain"
 password="mailtrain"
+# If more security is desired when running reports (which use user-defined JS scripts located in DB),
+# one can specify a DB user with read-only permissions. If these are not specified, Mailtrain uses the
+# regular DB user (which has also write permissions).
+# userRO="mailtrain-ro"
+# passwordRO="mailtrain-ro"
 database="mailtrain"
 # Some installations, eg. MAMP can use a different port (8889)
 # MAMP users should also turn on "Allow network access to MySQL" otherwise MySQL might not be accessible
@@ -150,3 +155,18 @@ templates=[["versafix-1", "Versafix One"]]
 [grapejs]
 # Installed templates
 templates=[["demo", "Demo Template"]]
+
+[reports]
+# The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be
+# properly protected.
+# Reports rely on custom user defined Javascript snippets defined in the report template. The snippets are run on the
+# server when generating a report. As these snippets are stored in the DB, they pose a security risk because they can
+# help gaining access to the server if the DB cannot
+# be properly protected (e.g. if it is shared with another application with security weaknesses).
+# Mailtrain mitigates this problem by running the custom Javascript snippets in a chrooted environment and under a
+# DB user that cannot modify the database (see userRO in [mysql] above). However the chrooted environment is available
+# only if Mailtrain is started as root. The chrooted environment still does not prevent the custom JS script in
+# performing network operations and in generating XSS attacks as part of the report.
+# The bottom line is that if people who are creating report templates or have write access to the DB cannot be trusted,
+# then it's safer to switch off the reporting functionality below.
+enabled=false

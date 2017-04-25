@@ -75,9 +75,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             ']';
 
         if (!('js' in data)) data.js =
-            'const reports = require("../lib/models/reports");\n' +
-            '\n' +
-            'reports.getCampaignResults(inputs.campaign, ["*"], "", (err, results) => {\n' +
+            'campaigns.results(inputs.campaign, ["*"], "", (err, results) => {\n' +
             '    if (err) {\n' +
             '        return callback(err);\n' +
             '    }\n' +
@@ -136,9 +134,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             ']';
 
         if (!('js' in data)) data.js =
-            'const reports = require("../lib/models/reports");\n' +
-            '\n' +
-            'reports.getCampaignResults(inputs.campaign, ["custom_country", "count(*) AS count_all", "SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"], "GROUP BY custom_country", (err, results) => {\n' +
+            'campaigns.results(inputs.campaign, ["custom_country", "count(*) AS count_all", "SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"], "GROUP BY custom_country", (err, results) => {\n' +
             '    if (err) {\n' +
             '        return callback(err);\n' +
             '    }\n' +
@@ -213,8 +209,6 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             ']';
 
         if (!('js' in data)) data.js =
-            'const subscriptions = require("../lib/models/subscriptions");\n' +
-            '\n' +
             'subscriptions.list(inputs.list.id,0,0, (err, results) => {\n' +
             '    if (err) {\n' +
             '        return callback(err);\n' +

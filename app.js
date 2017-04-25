@@ -213,8 +213,11 @@ app.use('/api', api);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
-app.use('/reports', reports);
-app.use('/report-templates', reportsTemplates);
+
+if (config.reports && config.reports.enabled === true) {
+    app.use('/reports', reports);
+    app.use('/report-templates', reportsTemplates);
+}
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
