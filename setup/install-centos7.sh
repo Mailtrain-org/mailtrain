@@ -13,7 +13,7 @@ set -e
 yum -y install epel-release
 
 curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
-yum -y install mariadb-server nodejs ImageMagick git python redis pwgen bind-utils
+yum -y install mariadb-server nodejs ImageMagick git python redis pwgen bind-utils gcc-c++ make
 
 systemctl start mariadb
 systemctl enable mariadb
@@ -45,7 +45,8 @@ firewall-cmd --reload
 # Fetch Mailtrain files
 mkdir -p /opt/mailtrain
 cd /opt/mailtrain
-git clone git://github.com/Mailtrain-org/mailtrain.git .
+#git clone git://github.com/Mailtrain-org/mailtrain.git .
+git clone git://github.com/bures/mailtrain.git .
 
 # Normally we would let Mailtrain itself to import the initial SQL data but in this case
 # we need to modify it, before we start Mailtrain
@@ -84,6 +85,8 @@ password="$MYSQL_PASSWORD"
 enabled=true
 [queue]
 processes=5
+[reports]
+enabled=true
 EOT
 
 # Install required node packages
@@ -105,7 +108,7 @@ cat <<EOM > /etc/logrotate.d/mailtrain
 EOM
 
 # Set up systemd service script
-cp setup/mailtrain.service /etc/systemd/system/
+cp setup/mailtrain-centos7.service /etc/systemd/system/mailtrain.service
 systemctl enable mailtrain.service
 
 # Fetch ZoneMTA files
@@ -204,7 +207,9 @@ systemctl enable zone-mta.service
 
 # Start the service
 systemctl daemon-reload
+
 systemctl start zone-mta.service
 systemctl start mailtrain.service
 
 echo "Success! Open http://$HOSTNAME/ and log in as admin:test";
+
