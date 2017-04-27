@@ -48,8 +48,7 @@ firewall-cmd --reload
 # Fetch Mailtrain files
 mkdir -p /opt/mailtrain
 cd /opt/mailtrain
-#git clone git://github.com/Mailtrain-org/mailtrain.git .
-git clone git://github.com/bures/mailtrain.git .
+git clone git://github.com/Mailtrain-org/mailtrain.git .
 
 # Normally we would let Mailtrain itself to import the initial SQL data but in this case
 # we need to modify it, before we start Mailtrain
@@ -77,6 +76,8 @@ useradd zone-mta || true
 cat >> config/production.toml <<EOT
 user="mailtrain"
 group="mailtrain"
+rouser="nobody"
+rogroup="nobody"
 [log]
 level="error"
 [www]
@@ -103,6 +104,7 @@ EOT
 # Install required node packages
 npm install --no-progress --production
 chown -R mailtrain:mailtrain .
+chmod o-rwx config
 
 # Setup log rotation to not spend up entire storage on logs
 cat <<EOM > /etc/logrotate.d/mailtrain

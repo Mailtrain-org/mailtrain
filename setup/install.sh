@@ -101,6 +101,7 @@ EOT
 # Install required node packages
 npm install --no-progress --production
 chown -R mailtrain:mailtrain .
+chmod o-rwx config
 
 # Setup log rotation to not spend up entire storage on logs
 cat <<EOM > /etc/logrotate.d/mailtrain
