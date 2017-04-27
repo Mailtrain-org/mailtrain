@@ -15,26 +15,36 @@ let processes = {};
 
 function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
 
+    function reportFail(msg) {
+        process.send({
+            type: 'process-failed',
+            msg,
+            tid
+        });
+    }
+
     fs.open(outFile, 'w', (err, outFd) => {
         if (err) {
             log.error('Executor', err);
+            reportFail('Cannot create standard output file.');
             return;
         }
 
         fs.open(errFile, 'w', (err, errFd) => {
             if (err) {
                 log.error('Executor', err);
+                reportFail('Cannot create standard error file.');
                 return;
             }
 
             privilegeHelpers.ensureMailtrainOwner(outFile, (err) => {
                 if (err) {
-                    log.info('Executor', 'Cannot change owner of output file of process tid:%s.', tid)
+                    log.warn('Executor', 'Cannot change owner of output file of process tid:%s.', tid)
                 }
 
                 privilegeHelpers.ensureMailtrainOwner(errFile, (err) => {
                     if (err) {
-                        log.info('Executor', 'Cannot change owner of error output file of process tid:%s.', tid)
+                        log.warn('Executor', 'Cannot change owner of error output file of process tid:%s.', tid)
                     }
 
                     const options = {
@@ -45,7 +55,16 @@ function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
                         gid
                     };
 
-                    const child = fork(executable, args, options);
+                    let child;
+
+                    try {
+                        child = fork(executable, args, options);
+                    } catch (err) {
+                        log.error('Executor', 'Cannot start process with tid:%s.', tid);
+                        reportFail('Cannot start process.');
+                        return;
+                    }
+
                     const pid = child.pid;
                     processes[tid] = child;
 
