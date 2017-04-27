@@ -28,12 +28,15 @@ fi
 HOSTNAME="${HOSTNAME:-`hostname`}"
 
 MYSQL_PASSWORD=`pwgen 12 -1`
+MYSQL_RO_PASSWORD=`pwgen 12 -1`
 DKIM_API_KEY=`pwgen 12 -1`
 SMTP_PASS=`pwgen 12 -1`
 
 # Setup MySQL user for Mailtrain
 mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
 mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';"
+mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$MYSQL_RO_PASSWORD';"
+mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';"
 mysql -u mailtrain --password="$MYSQL_PASSWORD" -e "CREATE database mailtrain;"
 
 # Enable firewall, allow connections to SSH, HTTP, HTTPS and SMTP
@@ -85,6 +88,14 @@ password="$MYSQL_PASSWORD"
 enabled=true
 [queue]
 processes=5
+EOT
+
+cat >> workers/reports/config/production.toml <<EOT
+[log]
+level="error"
+[mysql]
+user="mailtrain_ro"
+password="$MYSQL_RO_PASSWORD"
 EOT
 
 # Install required node packages
