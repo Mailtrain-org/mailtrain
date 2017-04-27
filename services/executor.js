@@ -13,50 +13,71 @@ const privilegeHelpers = require('../lib/privilege-helpers');
 
 let processes = {};
 
-function spawnProcess(tid, executable, args, outputFile, cwd) {
+function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
 
-    fs.open(outputFile, 'w', (err, outFd) => {
+    fs.open(outFile, 'w', (err, outFd) => {
         if (err) {
             log.error('Executor', err);
             return;
         }
 
-        privilegeHelpers.ensureMailtrainOwner(outputFile, (err) => {
+        fs.open(errFile, 'w', (err, errFd) => {
             if (err) {
-                log.info('Executor', 'Cannot change owner of output file of process tid:%s.', tid)
+                log.error('Executor', err);
+                return;
             }
 
-            const options = {
-                stdio: ['ignore', outFd, outFd, 'ipc'],
-                cwd: cwd,
-                env: {NODE_ENV: process.env.NODE_ENV}
-            };
+            privilegeHelpers.ensureMailtrainOwner(outFile, (err) => {
+                if (err) {
+                    log.info('Executor', 'Cannot change owner of output file of process tid:%s.', tid)
+                }
 
-            const child = fork(executable, args, options);
-            const pid = child.pid;
-            processes[tid] = child;
-
-            log.info('Executor', 'Process started with tid:%s pid:%s.', tid, pid);
-            process.send({
-                type: 'process-started',
-                tid
-            });
-
-            child.on('close', (code, signal) => {
-
-                delete processes[tid];
-                log.info('Executor', 'Process tid:%s pid:%s exited with code %s signal %s.', tid, pid, code, signal);
-
-                fs.close(outFd, (err) => {
+                privilegeHelpers.ensureMailtrainOwner(errFile, (err) => {
                     if (err) {
-                        log.error('Executor', err);
+                        log.info('Executor', 'Cannot change owner of error output file of process tid:%s.', tid)
                     }
 
+                    const options = {
+                        stdio: ['ignore', outFd, errFd, 'ipc'],
+                        cwd,
+                        env: {NODE_ENV: process.env.NODE_ENV},
+                        uid,
+                        gid
+                    };
+
+                    const child = fork(executable, args, options);
+                    const pid = child.pid;
+                    processes[tid] = child;
+
+                    log.info('Executor', 'Process started with tid:%s pid:%s.', tid, pid);
                     process.send({
-                        type: 'process-finished',
-                        tid,
-                        code,
-                        signal
+                        type: 'process-started',
+                        tid
+                    });
+
+                    child.on('close', (code, signal) => {
+
+                        delete processes[tid];
+                        log.info('Executor', 'Process tid:%s pid:%s exited with code %s signal %s.', tid, pid, code, signal);
+
+                        fs.close(outFd, (err) => {
+                            if (err) {
+                                log.error('Executor', err);
+                            }
+
+                            fs.close(errFd, (err) => {
+                                if (err) {
+                                    log.error('Executor', err);
+                                }
+
+                                process.send({
+                                    type: 'process-finished',
+                                    tid,
+                                    code,
+                                    signal
+                                });
+                            });
+                        });
                     });
                 });
             });
@@ -69,7 +90,9 @@ process.on('message', msg => {
         const type = msg.type;
 
         if (type === 'start-report-processor-worker') {
-            spawnProcess(msg.tid, path.join(__dirname, 'report-processor.js'), [msg.data.id], fileHelpers.getReportOutputFile(msg.data), path.join(__dirname, '..'));
+
+            const ids = privilegeHelpers.getConfigROUidGid();
+            spawnProcess(msg.tid, path.join(__dirname, '..', 'workers', 'reports', 'report-processor.js'), [msg.data.id], fileHelpers.getReportContentFile(msg.data), fileHelpers.getReportOutputFile(msg.data), path.join(__dirname, '..', 'workers', 'reports'), ids.uid, ids.gid);
 
         } else if (type === 'stop-process') {
             const child = processes[msg.tid];

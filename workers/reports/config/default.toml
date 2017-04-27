@@ -1,0 +1,18 @@
+# Process title visible in monitoring logs and process listing
+title="mailtrain"
+
+# Default language to use
+language="en"
+
+[log]
+# silly|verbose|info|http|warn|error|silent
+level="verbose"
+
+[mysql]
+host="localhost"
+user="mailtrain"
+password="mailtrain"
+database="mailtrain"
+port=3306
+charset="utf8mb4"
+timezone="local"

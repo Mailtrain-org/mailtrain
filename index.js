@@ -141,7 +141,7 @@ server.on('listening', () => {
     }
 
     if (config.reports && config.reports.enabled === true) {
-        executor.spawn(() => startNextServices);
+        executor.spawn(startNextServices);
     } else {
         startNextServices();
     }

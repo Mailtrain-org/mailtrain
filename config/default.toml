@@ -43,8 +43,14 @@ language="en"
 
 # If you start out as a root user (eg. if you want to use ports lower than 1000)
 # then you can downgrade the user once all services are up and running
-#user="nobody"
-#group="nogroup"
+#user="mailtrain"
+#group="mailtrain"
+
+# If Mailtrain is started as root, "Reports" feature drops the privileges of script generating the report to disallow
+# any modifications of Mailtrain code and even prohibits reading the production configuration (which contains the MySQL
+# password for read/write operations). The rouser/rogroup determines the user to be used
+#rouser="nobody"
+#rogroup="nogroup"
 
 [log]
 # silly|verbose|info|http|warn|error|silent
@@ -74,11 +80,6 @@ postsize="2MB"
 host="localhost"
 user="mailtrain"
 password="mailtrain"
-# If more security is desired when running reports (which use user-defined JS scripts located in DB),
-# one can specify a DB user with read-only permissions. If these are not specified, Mailtrain uses the
-# regular DB user (which has also write permissions).
-# userRO="mailtrain-ro"
-# passwordRO="mailtrain-ro"
 database="mailtrain"
 # Some installations, eg. MAMP can use a different port (8889)
 # MAMP users should also turn on "Allow network access to MySQL" otherwise MySQL might not be accessible

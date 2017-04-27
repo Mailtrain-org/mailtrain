@@ -174,7 +174,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
             '            {{#each results}}\n' +
             '                <tr>\n' +
             '                    <th scope="row">\n' +
-            '                        {{custom_zone}}\n' +
+            '                        {{custom_country}}\n' +
             '                    </th>\n' +
             '                    <td style="width: 20%;">\n' +
             '                        {{count_opened}}\n' +
