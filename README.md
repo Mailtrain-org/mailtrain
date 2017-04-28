@@ -204,8 +204,15 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
 
 ## Upgrade
 
-  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these
-  * Run `npm install --production` in the Mailtrain folder
+Run the following commands:
+
+    cd /opt/mailtrain
+    git pull
+    npm install --production
+    service mailtrain restart
+    /etc/init.d/mysql restart
+
+Instead of updating old files with git, you can [manually download the new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these.
 
 ## Using Environment Variables
 
