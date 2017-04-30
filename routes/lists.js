@@ -71,6 +71,8 @@ router.get('/create', passport.csrfProtection, (req, res) => {
         data.publicSubscribe = true;
     }
 
+    data.unsubscriptionModeOptions = getUnsubscriptionModeOptions(data.unsubscriptionMode || lists.UnsubscriptionMode.ONE_STEP);
+
     res.render('lists/create', data);
 });
 
@@ -102,6 +104,8 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
                 row.selected = list.defaultForm === row.id;
                 return row;
             });
+
+            list.unsubscriptionModeOptions = getUnsubscriptionModeOptions(list.unsubscriptionMode);
 
             list.csrfToken = req.csrfToken();
             res.render('lists/edit', list);
@@ -770,5 +774,29 @@ router.post('/quicklist/ajax', (req, res) => {
         });
     });
 });
+
+function getUnsubscriptionModeOptions(unsubscriptionMode) {
+    const options = [];
+
+    options[lists.UnsubscriptionMode.ONE_STEP] = {
+        value: lists.UnsubscriptionMode.ONE_STEP,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP,
+        label: _('One-step (i.e. no email with confirmation link)')
+    };
+
+    options[lists.UnsubscriptionMode.TWO_STEP] = {
+        value: lists.UnsubscriptionMode.TWO_STEP,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP,
+        label: _('Two-step (i.e. an email with confirmation link will be sent)')
+    };
+
+    options[lists.UnsubscriptionMode.MANUAL] = {
+        value: lists.UnsubscriptionMode.MANUAL,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.MANUAL,
+        label: _('Manual (i.e. unsubscription has to be performed by the list administrator)')
+    };
+
+    return options;
+}
 
 module.exports = router;

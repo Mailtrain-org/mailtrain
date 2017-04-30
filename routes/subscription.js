@@ -44,8 +44,8 @@ let corsOrCsrfProtection = (req, res, next) => {
     }
 };
 
-router.get('/subscribe/:cid', (req, res, next) => {
-    subscriptions.subscribe(req.params.cid, req.ip, (err, subscription) => {
+router.get('/confirm/:cid', (req, res, next) => {
+    subscriptions.processConfirmation(req.params.cid, req.ip, (err, subscription, action) => {
         if (!err && !subscription) {
             err = new Error(_('Selected subscription not found'));
             err.status = 404;
@@ -70,40 +70,9 @@ router.get('/subscribe/:cid', (req, res, next) => {
                     return next(err);
                 }
 
-                let data = {
-                    title: list.name,
-                    homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                    preferences: '/subscription/' + list.cid + '/manage/' + subscription.cid,
-                    hasPubkey: !!configItems.pgpPrivateKey,
-                    defaultAddress: configItems.defaultAddress,
-                    defaultPostaddress: configItems.defaultPostaddress,
-                    template: {
-                        template: 'subscription/web-subscribed.mjml.hbs',
-                        layout: 'subscription/layout.mjml.hbs'
-                    }
-                };
+                // FIXME - split decision based on action
 
-                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribed', data, (err, data) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        helpers.captureFlashMessages(req, res, (err, flash) => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            data.isWeb = true;
-                            data.flashMessages = flash;
-                            res.send(htmlRenderer(data));
-                        });
-                    });
-                });
+                res.redirect('/subscription/' + list.cid + '/subscribed-notice');
 
                 if (configItems.disableConfirmations) {
                     return;
@@ -318,164 +287,6 @@ router.get('/:cid/widget', cors(corsOptions), (req, res, next) => {
     });
 });
 
-router.get('/:cid/confirm-notice', (req, res, next) => {
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
-
-        if (err) {
-            return next(err);
-        }
-
-        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-            if (err) {
-                return next(err);
-            }
-
-            let data = {
-                title: list.name,
-                homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                defaultAddress: configItems.defaultAddress,
-                defaultPostaddress: configItems.defaultPostaddress,
-                template: {
-                    template: 'subscription/web-confirm-notice.mjml.hbs',
-                    layout: 'subscription/layout.mjml.hbs'
-                }
-            };
-
-            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-confirm-notice', data, (err, data) => {
-                if (err) {
-                    return next(err);
-                }
-
-                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    helpers.captureFlashMessages(req, res, (err, flash) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        data.isWeb = true;
-                        data.isConfirmNotice = true;
-                        data.flashMessages = flash;
-                        res.send(htmlRenderer(data));
-                    });
-                });
-            });
-        });
-    });
-});
-
-router.get('/:cid/updated-notice', (req, res, next) => {
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
-
-        if (err) {
-            return next(err);
-        }
-
-        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-            if (err) {
-                return next(err);
-            }
-
-            let data = {
-                title: list.name,
-                homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                defaultAddress: configItems.defaultAddress,
-                defaultPostaddress: configItems.defaultPostaddress,
-                template: {
-                    template: 'subscription/web-updated-notice.mjml.hbs',
-                    layout: 'subscription/layout.mjml.hbs'
-                }
-            };
-
-            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-updated-notice', data, (err, data) => {
-                if (err) {
-                    return next(err);
-                }
-
-                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    helpers.captureFlashMessages(req, res, (err, flash) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        data.isWeb = true;
-                        data.flashMessages = flash;
-                        res.send(htmlRenderer(data));
-                    });
-                });
-            });
-        });
-    });
-});
-
-router.get('/:cid/unsubscribe-notice', (req, res, next) => {
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
-
-        if (err) {
-            return next(err);
-        }
-
-        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-            if (err) {
-                return next(err);
-            }
-
-            let data = {
-                title: list.name,
-                layout: 'subscription/layout',
-                homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                defaultAddress: configItems.defaultAddress,
-                defaultPostaddress: configItems.defaultPostaddress,
-                template: {
-                    template: 'subscription/web-unsubscribe-notice.mjml.hbs',
-                    layout: 'subscription/layout.mjml.hbs'
-                }
-            };
-
-            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-unsubscribe-notice', data, (err, data) => {
-                if (err) {
-                    return next(err);
-                }
-
-                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    helpers.captureFlashMessages(req, res, (err, flash) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        data.isWeb = true;
-                        data.flashMessages = flash;
-                        res.send(htmlRenderer(data));
-                    });
-                });
-            });
-        });
-    });
-});
-
 router.options('/:cid/subscribe', cors(corsOptions));
 
 router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, res, next) => {
@@ -496,62 +307,73 @@ router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, r
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
 
-    // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
-    // the subsciber has JavaScript turned on and thats it. If Mailtrain gets more targeted then this
-    // simple check should be replaced with an actual captcha
-    let subTime = Number(req.body.sub) || 0;
-    // allow clock skew 24h in the past and 24h to the future
-    let subTimeTest = !!(subTime > Date.now() - 24 * 3600 * 1000 && subTime < Date.now() + 24 * 3600 * 1000);
-    let addressTest = !req.body.address;
-    let testsPass = subTimeTest && addressTest;
-
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err) {
-            if (!list) {
-                err = new Error(_('Selected list not found'));
-                err.status = 404;
-            } else if (!list.publicSubscribe) {
-                err = new Error(_('The list does not allow public subscriptions.'));
-                err.status = 403;
-            }
-        }
-
+    tools.validateEmail(email, false, err => {
         if (err) {
-            return req.xhr ? sendJsonError(err) : next(err);
+            if (req.xhr) {
+                return sendJsonError(err.message, 400);
+            }
+            req.flash('danger', err.message);
+            return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
         }
 
-        let data = {};
-        Object.keys(req.body).forEach(key => {
-            if (key !== 'email' && key.charAt(0) !== '_') {
-                data[key] = (req.body[key] || '').toString().trim();
-            }
-        });
+        // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
+        // the subsciber has JavaScript turned on and thats it. If Mailtrain gets more targeted then this
+        // simple check should be replaced with an actual captcha
+        let subTime = Number(req.body.sub) || 0;
+        // allow clock skew 24h in the past and 24h to the future
+        let subTimeTest = !!(subTime > Date.now() - 24 * 3600 * 1000 && subTime < Date.now() + 24 * 3600 * 1000);
+        let addressTest = !req.body.address;
+        let testsPass = subTimeTest && addressTest;
 
-        data = tools.convertKeys(data);
-
-        data._address = req.body.address;
-        data._sub = req.body.sub;
-        data._skip = !testsPass;
-
-        subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
-            if (!err && !confirmCid) {
-                err = new Error(_('Could not store confirmation data'));
+        lists.getByCid(req.params.cid, (err, list) => {
+            if (!err) {
+                if (!list) {
+                    err = new Error(_('Selected list not found'));
+                    err.status = 404;
+                } else if (!list.publicSubscribe) {
+                    err = new Error(_('The list does not allow public subscriptions.'));
+                    err.status = 403;
+                }
             }
 
             if (err) {
-                if (req.xhr) {
-                    return sendJsonError(err);
-                }
-                req.flash('danger', err.message || err);
-                return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+                return req.xhr ? sendJsonError(err) : next(err);
             }
 
-            if (req.xhr) {
-                return res.status(200).json({
-                    msg: _('Please Confirm Subscription')
-                });
-            }
-            res.redirect('/subscription/' + req.params.cid + '/confirm-notice');
+            let data = {};
+            Object.keys(req.body).forEach(key => {
+                if (key !== 'email' && key.charAt(0) !== '_') {
+                    data[key] = (req.body[key] || '').toString().trim();
+                }
+            });
+
+            data = tools.convertKeys(data);
+
+            data._address = req.body.address;
+            data._sub = req.body.sub;
+            data._skip = !testsPass;
+            data._action = 'subscribe';
+
+            subscriptions.addConfirmation(list, email, req.ip, data, (err, confirmCid) => {
+                if (!err && !confirmCid) {
+                    err = new Error(_('Could not store confirmation data'));
+                }
+
+                if (err) {
+                    if (req.xhr) {
+                        return sendJsonError(err);
+                    }
+                    req.flash('danger', err.message || err);
+                    return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+                }
+
+                if (req.xhr) {
+                    return res.status(200).json({
+                        msg: _('Please Confirm Subscription')
+                    });
+                }
+                res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
+            });
         });
     });
 });
@@ -732,7 +554,7 @@ router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage-address/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
 
-            req.flash('info', _('Email address updated, check your mailbox for verification instructions'));
+            req.flash('info', _('An email with further instructions has been sent to the provided address'));
             res.redirect('/subscription/' + req.params.lcid + '/manage/' + req.body.cid);
         });
     });
@@ -822,7 +644,7 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                 log.error('Subscription', err);
                 return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
             }
-            res.redirect('/subscription/' + req.params.lcid + '/unsubscribe-notice');
+            res.redirect('/subscription/' + req.params.lcid + '/unsubscribed-notice');
 
             fields.list(list.id, (err, fieldList) => {
                 if (err) {
@@ -874,11 +696,11 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                     };
 
                     let text = {
-                        template: 'subscription/mail-unsubscribe-confirmed-text.hbs'
+                        template: 'subscription/mail-unsubscription-confirmed-text.hbs'
                     };
 
                     let html = {
-                        template: 'subscription/mail-unsubscribe-confirmed-html.mjml.hbs',
+                        template: 'subscription/mail-unsubscription-confirmed-html.mjml.hbs',
                         layout: 'subscription/layout.mjml.hbs',
                         type: 'mjml'
                     };
@@ -894,6 +716,26 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
             });
         });
     });
+});
+
+router.get('/:cid/confirm-subscription-notice', (req, res, next) => {
+    notice('confirm-subscription', req, res, next);
+});
+
+router.get('/:cid/confirm-unsubscription-notice', (req, res, next) => {
+    notice('confirm-unsubscription', req, res, next);
+});
+
+router.get('/:cid/subscribed-notice', (req, res, next) => {
+    notice('subscribed', req, res, next);
+});
+
+router.get('/:cid/updated-notice', (req, res, next) => {
+    notice('updated', req, res, next);
+});
+
+router.get('/:cid/unsubscribed-notice', (req, res, next) => {
+    notice('unsubscribed', req, res, next);
 });
 
 router.post('/publickey', passport.parseForm, (req, res, next) => {
@@ -933,5 +775,60 @@ router.post('/publickey', passport.parseForm, (req, res, next) => {
         res.end(pubkey);
     });
 });
+
+
+function notice(type, req, res, next) {
+    lists.getByCid(req.params.cid, (err, list) => {
+        if (!err && !list) {
+            err = new Error(_('Selected list not found'));
+            err.status = 404;
+        }
+
+        if (err) {
+            return next(err);
+        }
+
+        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
+            if (err) {
+                return next(err);
+            }
+
+            let data = {
+                title: list.name,
+                homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                defaultAddress: configItems.defaultAddress,
+                defaultPostaddress: configItems.defaultPostaddress,
+                template: {
+                    template: 'subscription/web-' + type + '-notice.mjml.hbs',
+                    layout: 'subscription/layout.mjml.hbs'
+                }
+            };
+
+            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-' + type + '-notice', data, (err, data) => {
+                if (err) {
+                    return next(err);
+                }
+
+                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    helpers.captureFlashMessages(req, res, (err, flash) => {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        data.isWeb = true;
+                        data.isConfirmNotice = true;
+                        data.flashMessages = flash;
+                        res.send(htmlRenderer(data));
+                    });
+                });
+            });
+        });
+    });
+}
+
 
 module.exports = router;

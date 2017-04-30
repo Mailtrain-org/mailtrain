@@ -93,6 +93,8 @@ router.post('/subscribe/:listId', (req, res) => {
                 subscription.tz = (input.TIMEZONE || '').toString().trim();
             }
 
+            subscription._action = 'subscribe';
+
             fields.list(list.id, (err, fieldList) => {
                 if (err && !fieldList) {
                     fieldList = [];

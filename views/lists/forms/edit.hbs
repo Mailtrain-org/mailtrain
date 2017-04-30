@@ -46,11 +46,15 @@
             <p>
                 <a href="/subscription/{{list.cid}}?fid={{form.id}}" target="_blank">{{#translate}}Subscribe{{/translate}}</a>
                 |
-                <a href="/subscription/{{list.cid}}/confirm-notice?fid={{form.id}}" target="_blank">{{#translate}}Confirm Notice{{/translate}}</a>
+                <a href="/subscription/{{list.cid}}/confirm-subscription-notice?fid={{form.id}}" target="_blank">{{#translate}}Confirm Subscription Notice{{/translate}}</a>
+                |
+                <a href="/subscription/{{list.cid}}/confirm-unsubscription-notice?fid={{form.id}}" target="_blank">{{#translate}}Confirm Unsubscription Notice{{/translate}}</a>
+                |
+                <a href="/subscription/{{list.cid}}/subscribed-notice?fid={{form.id}}" target="_blank">{{#translate}}Subscribed Notice{{/translate}}</a>
                 |
                 <a href="/subscription/{{list.cid}}/updated-notice?fid={{form.id}}" target="_blank">{{#translate}}Updated Notice{{/translate}}</a>
                 |
-                <a href="/subscription/{{list.cid}}/unsubscribe-notice?fid={{form.id}}" target="_blank">{{#translate}}Unsubscribed Notice{{/translate}}</a>
+                <a href="/subscription/{{list.cid}}/unsubscribed-notice?fid={{form.id}}" target="_blank">{{#translate}}Unsubscribed Notice{{/translate}}</a>
                 {{#if testUsers}}
                     |
                     <a href="/subscription/{{list.cid}}/manage/{{testUsers.0.cid}}?fid={{form.id}}" target="_blank">{{#translate}}Manage{{/translate}}</a>
