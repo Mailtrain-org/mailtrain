@@ -65,80 +65,23 @@ router.get('/confirm/:cid', (req, res, next) => {
                 return next(err);
             }
 
-            settings.list(['defaultHomepage', 'serviceUrl', 'pgpPrivateKey', 'defaultAddress', 'defaultPostaddress', 'defaultFrom', 'disableConfirmations'], (err, configItems) => {
-                if (err) {
-                    return next(err);
-                }
+            // FIXME - differentiate email based on action
 
-                // FIXME - split decision based on action
+            const relativeUrls = {
+                preferencesUrl: '/subscription/' + list.cid + '/manage/' + subscription.cid,
+                unsubscribeUrl: '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid
+            };
+
+            subscriptions.sendMail(list, subscription.email, 'subscription-confirmed', _('%s: Subscription Confirmed'), relativeUrls, {}, subscription, (err) => {
+                if (err) {
+                    req.flash('danger', err.message || err);
+                    log.error('Subscription', err);
+                    return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
+                }
 
                 res.redirect('/subscription/' + list.cid + '/subscribed-notice');
-
-                if (configItems.disableConfirmations) {
-                    return;
-                }
-
-                fields.list(list.id, (err, fieldList) => {
-                    if (err) {
-                        return log.error('Fields', err);
-                    }
-
-                    let encryptionKeys = [];
-                    fields.getRow(fieldList, subscription).forEach(field => {
-                        if (field.type === 'gpg' && field.value) {
-                            encryptionKeys.push(field.value.trim());
-                        }
-                    });
-
-                    let sendMail = (html, text) => {
-                        mailer.sendMail({
-                            from: {
-                                name: configItems.defaultFrom,
-                                address: configItems.defaultAddress
-                            },
-                            to: {
-                                name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
-                                address: subscription.email
-                            },
-                            subject: util.format(_('%s: Subscription Confirmed'), list.name),
-                            encryptionKeys
-                        }, {
-                            html,
-                            text,
-                            data: {
-                                title: list.name,
-                                homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                                contactAddress: configItems.defaultAddress,
-                                defaultPostaddress: configItems.defaultPostaddress,
-                                preferencesUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/manage/' + subscription.cid),
-                                unsubscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid)
-                            }
-                        }, err => {
-                            if (err) {
-                                log.error('Subscription', err);
-                            }
-                        });
-                    };
-
-                    let text = {
-                        template: 'subscription/mail-subscription-confirmed-text.hbs'
-                    };
-
-                    let html = {
-                        template: 'subscription/mail-subscription-confirmed-html.mjml.hbs',
-                        layout: 'subscription/layout.mjml.hbs',
-                        type: 'mjml'
-                    };
-
-                    helpers.injectCustomFormTemplates(req.query.fid || list.defaultForm, { text, html }, (err, tmpl) => {
-                        if (err) {
-                            return sendMail(html, text);
-                        }
-
-                        sendMail(tmpl.html, tmpl.text);
-                    });
-                });
             });
+
         });
     });
 });
@@ -158,6 +101,8 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
         if (err) {
             return next(err);
         }
+
+        // FIXME: process subscriber cid param for resubscription requests
 
         let data = tools.convertKeys(req.query, {
             skip: ['layout']
@@ -561,6 +506,8 @@ router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection
 });
 
 router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next) => {
+    // FIXME: handle different subscription options. The one below is currently "One-step with unsubscribe form"
+
     lists.getByCid(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
@@ -587,9 +534,9 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
                 }
 
                 subscription.lcid = req.params.lcid;
+                subscription.ucid = req.params.ucid;
                 subscription.title = list.name;
                 subscription.csrfToken = req.csrfToken();
-                subscription.autosubmit = !!req.query.auto;
                 subscription.campaign = req.query.c;
                 subscription.defaultAddress = configItems.defaultAddress;
                 subscription.defaultPostaddress = configItems.defaultPostaddress;
@@ -636,83 +583,24 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
             return next(err);
         }
 
-        let email = req.body.email;
-
-        subscriptions.unsubscribe(list.id, email, req.body.campaign, (err, subscription) => {
+        subscriptions.unsubscribe(list.id, req.body.ucid, req.body.campaign, (err, subscription) => {
             if (err) {
                 req.flash('danger', err.message || err);
                 log.error('Subscription', err);
-                return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.cid) + '?' + tools.queryParams(req.body));
+                return res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/unsubscribe/' + encodeURIComponent(req.body.ucid) + '?' + tools.queryParams(req.body));
             }
-            res.redirect('/subscription/' + req.params.lcid + '/unsubscribed-notice');
 
-            fields.list(list.id, (err, fieldList) => {
+            const relativeUrls = {
+                subscribeUrl: '/subscription/' + list.cid + '?cid=' + subscription.cid
+            };
+            subscriptions.sendMail(list, subscription.email, 'unsubscription-confirmed', _('%s: Unsubscribe Confirmed'), relativeUrls, {}, subscription, (err) => {
                 if (err) {
-                    return log.error('Fields', err);
+                    req.flash('danger', err.message || err);
+                    log.error('Subscription', err);
+                    return res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribe/' + encodeURIComponent(subscription.cid) + '?' + tools.queryParams(req.body));
                 }
 
-                let encryptionKeys = [];
-                fields.getRow(fieldList, subscription).forEach(field => {
-                    if (field.type === 'gpg' && field.value) {
-                        encryptionKeys.push(field.value.trim());
-                    }
-                });
-
-                settings.list(['defaultHomepage', 'defaultFrom', 'defaultAddress', 'defaultPostaddress', 'serviceUrl', 'disableConfirmations'], (err, configItems) => {
-                    if (err) {
-                        return log.error('Settings', err);
-                    }
-
-                    if (configItems.disableConfirmations) {
-                        return;
-                    }
-
-                    let sendMail = (html, text) => {
-                        mailer.sendMail({
-                            from: {
-                                name: configItems.defaultFrom,
-                                address: configItems.defaultAddress
-                            },
-                            to: {
-                                name: [].concat(subscription.firstName || []).concat(subscription.lastName || []).join(' '),
-                                address: subscription.email
-                            },
-                            subject: util.format(_('%s: Unsubscribe Confirmed'), list.name),
-                            encryptionKeys
-                        }, {
-                            html,
-                            text,
-                            data: {
-                                title: list.name,
-                                contactAddress: configItems.defaultAddress,
-                                defaultPostaddress: configItems.defaultPostaddress,
-                                subscribeUrl: urllib.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '?cid=' + subscription.cid)
-                            }
-                        }, err => {
-                            if (err) {
-                                log.error('Subscription', err);
-                            }
-                        });
-                    };
-
-                    let text = {
-                        template: 'subscription/mail-unsubscription-confirmed-text.hbs'
-                    };
-
-                    let html = {
-                        template: 'subscription/mail-unsubscription-confirmed-html.mjml.hbs',
-                        layout: 'subscription/layout.mjml.hbs',
-                        type: 'mjml'
-                    };
-
-                    helpers.injectCustomFormTemplates(req.query.fid || list.defaultForm, { text, html }, (err, tmpl) => {
-                        if (err) {
-                            return sendMail(html, text);
-                        }
-
-                        sendMail(tmpl.html, tmpl.text);
-                    });
-                });
+                res.redirect('/subscription/' + req.params.lcid + '/unsubscribed-notice');
             });
         });
     });

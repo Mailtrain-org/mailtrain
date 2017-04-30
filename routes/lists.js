@@ -784,10 +784,22 @@ function getUnsubscriptionModeOptions(unsubscriptionMode) {
         label: _('One-step (i.e. no email with confirmation link)')
     };
 
+    options[lists.UnsubscriptionMode.ONE_STEP_WITH_FORM] = {
+        value: lists.UnsubscriptionMode.ONE_STEP_WITH_FORM,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM,
+        label: _('One-step with unsubscription form (i.e. no email with confirmation link)')
+    };
+
     options[lists.UnsubscriptionMode.TWO_STEP] = {
         value: lists.UnsubscriptionMode.TWO_STEP,
         selected: unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP,
         label: _('Two-step (i.e. an email with confirmation link will be sent)')
+    };
+
+    options[lists.UnsubscriptionMode.TWO_STEP_WITH_FORM] = {
+        value: lists.UnsubscriptionMode.TWO_STEP_WITH_FORM,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM,
+        label: _('Two-step with unsubscription form (i.e. an email with confirmation link will be sent)')
     };
 
     options[lists.UnsubscriptionMode.MANUAL] = {
