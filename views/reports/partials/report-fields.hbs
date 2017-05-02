@@ -1,0 +1,73 @@
+    {{> report_select_template options="readonly" }}
+
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">{{#translate}}Name{{/translate}}</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control input-lg" name="name" id="name" value="{{name}}" placeholder="{{#translate}}Report Name{{/translate}}" autofocus required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="description" class="col-sm-2 control-label">{{#translate}}Description{{/translate}}</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" rows="3" name="description" id="description">{{description}}</textarea>
+            <span class="help-block">{{#translate}}HTML is allowed{{/translate}}</span>
+        </div>
+    </div>
+
+    {{#each userFields}}
+        {{#switch type}}
+            {{#case "campaign"}}
+                <div class="form-group">
+                    <label for="description" class="col-sm-2 control-label">{{name}}</label>
+                    <div class="col-sm-10">
+                        <div class="table-responsive">
+                            <table data-topic-url="/campaigns/quicklist" data-sort-column="2" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax data-table-{{#if isMulti}}multi{{/if}}selectable display nowrap" width="100%" data-row-sort="0,1,0,1">
+                                <thead>
+                                <th class="col-md-1">
+                                    #
+                                </th>
+                                <th>
+                                    {{#translate}}Name{{/translate}}
+                                </th>
+                                <th>
+                                    {{#translate}}Description{{/translate}}
+                                </th>
+                                <th>
+                                    {{#translate}}Created{{/translate}}
+                                </th>
+                                </thead>
+                            </table>
+                            <input type="hidden" name="{{id}}Selection" value="{{value}}" />
+                        </div>
+                        <span class="help-block">{{#translate}}Select a campaign in the table above by clicking on the respective row number.{{/translate}}</span>
+                    </div>
+                </div>
+            {{/case}}
+            {{#case "list"}}
+                <div class="form-group">
+                    <label for="description" class="col-sm-2 control-label">{{name}}</label>
+                    <div class="col-sm-10">
+                        <div class="table-responsive">
+                            <table data-topic-url="/lists/quicklist" data-sort-column="2" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax data-table-{{#if isMulti}}multi{{/if}}selectable display nowrap" width="100%" data-row-sort="0,1,1">
+                                <thead>
+                                <th class="col-md-1">
+                                    #
+                                </th>
+                                <th>
+                                    {{#translate}}Name{{/translate}}
+                                </th>
+                                <th>
+                                    {{#translate}}Subscribers{{/translate}}
+                                </th>
+                                </thead>
+                            </table>
+                            <input type="hidden" name="{{id}}Selection" value="{{value}}" />
+                        </div>
+                        <span class="help-block">{{#translate}}Select a campaign in the table above by clicking on the respective row number.{{/translate}}</span>
+                    </div>
+                </div>
+            {{/case}}
+        {{/switch}}
+    {{/each}}
+

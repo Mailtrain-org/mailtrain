@@ -1,47 +1,49 @@
 'use strict';
 
-let config = require('config');
-let log = require('npmlog');
+const config = require('config');
+const log = require('npmlog');
 
-let _ = require('./lib/translate')._;
-let util = require('util');
+const _ = require('./lib/translate')._;
 
-let express = require('express');
-let bodyParser = require('body-parser');
-let path = require('path');
-let favicon = require('serve-favicon');
-let logger = require('morgan');
-let cookieParser = require('cookie-parser');
-let session = require('express-session');
-let RedisStore = require('connect-redis')(session);
-let flash = require('connect-flash');
-let hbs = require('hbs');
-let compression = require('compression');
-let passport = require('./lib/passport');
-let tools = require('./lib/tools');
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const flash = require('connect-flash');
+const hbs = require('hbs');
+const handlebarsHelpers = require('./lib/handlebars-helpers');
+const compression = require('compression');
+const passport = require('./lib/passport');
+const tools = require('./lib/tools');
 
-let routes = require('./routes/index');
-let users = require('./routes/users');
-let lists = require('./routes/lists');
-let settings = require('./routes/settings');
-let settingsModel = require('./lib/models/settings');
-let templates = require('./routes/templates');
-let campaigns = require('./routes/campaigns');
-let links = require('./routes/links');
-let fields = require('./routes/fields');
-let forms = require('./routes/forms');
-let segments = require('./routes/segments');
-let triggers = require('./routes/triggers');
-let webhooks = require('./routes/webhooks');
-let subscription = require('./routes/subscription');
-let archive = require('./routes/archive');
-let api = require('./routes/api');
-let blacklist = require('./routes/blacklist');
-let editorapi = require('./routes/editorapi');
-let grapejs = require('./routes/grapejs');
-let mosaico = require('./routes/mosaico');
+const routes = require('./routes/index');
+const users = require('./routes/users');
+const lists = require('./routes/lists');
+const settings = require('./routes/settings');
+const settingsModel = require('./lib/models/settings');
+const templates = require('./routes/templates');
+const campaigns = require('./routes/campaigns');
+const links = require('./routes/links');
+const fields = require('./routes/fields');
+const forms = require('./routes/forms');
+const segments = require('./routes/segments');
+const triggers = require('./routes/triggers');
+const webhooks = require('./routes/webhooks');
+const subscription = require('./routes/subscription');
+const archive = require('./routes/archive');
+const api = require('./routes/api');
+const blacklist = require('./routes/blacklist');
+const editorapi = require('./routes/editorapi');
+const grapejs = require('./routes/grapejs');
+const mosaico = require('./routes/mosaico');
+const reports = require('./routes/reports');
+const reportsTemplates = require('./routes/report-templates');
 
-let app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,6 +59,8 @@ app.disable('x-powered-by');
 
 hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerPartials(__dirname + '/views/subscription/partials/');
+hbs.registerPartials(__dirname + '/views/report-templates/partials/');
+hbs.registerPartials(__dirname + '/views/reports/partials/');
 
 /**
  * We need this helper to make sure that we consume flash messages only
@@ -104,20 +108,8 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
     );
 });
 
-// {{#translate}}abc{{/translate}}
-hbs.registerHelper('translate', function (context, options) { // eslint-disable-line prefer-arrow-callback
-    if (typeof options === 'undefined' && context) {
-        options = context;
-        context = false;
-    }
+handlebarsHelpers.registerHelpers(hbs.handlebars);
 
-    let result = _(options.fn(this)); // eslint-disable-line no-invalid-this
-
-    if (Array.isArray(context)) {
-        result = util.format(result, ...context);
-    }
-    return new hbs.handlebars.SafeString(result);
-});
 
 app.use(compression());
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -221,6 +213,11 @@ app.use('/api', api);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
+
+if (config.reports && config.reports.enabled === true) {
+    app.use('/reports', reports);
+    app.use('/report-templates', reportsTemplates);
+}
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

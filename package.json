@@ -33,6 +33,9 @@
     "grunt-eslint": "^19.0.0",
     "jsxgettext-andris": "^0.9.0-patch.1"
   },
+  "optionalDependencies": {
+    "posix": "^4.1.1"
+  },
   "dependencies": {
     "async": "^2.3.0",
     "aws-sdk": "^2.37.0",
@@ -97,6 +100,7 @@
     "slugify": "^1.1.0",
     "smtp-server": "^2.0.3",
     "striptags": "^3.0.1",
-    "toml": "^2.3.2"
+    "toml": "^2.3.2",
+    "try-require": "^1.2.1"
   }
 }

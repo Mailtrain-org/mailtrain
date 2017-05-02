@@ -176,9 +176,14 @@ router.get('/subscribe/:cid', (req, res, next) => {
 
 router.get('/:cid', passport.csrfProtection, (req, res, next) => {
     lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
+        if (!err) {
+            if (!list) {
+                err = new Error(_('Selected list not found'));
+                err.status = 404;
+            } else if (!list.publicSubscribe) {
+                err = new Error(_('The list does not allow public subscriptions.'));
+                err.status = 403;
+            }
         }
 
         if (err) {
@@ -501,9 +506,14 @@ router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, r
     let testsPass = subTimeTest && addressTest;
 
     lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
+        if (!err) {
+            if (!list) {
+                err = new Error(_('Selected list not found'));
+                err.status = 404;
+            } else if (!list.publicSubscribe) {
+                err = new Error(_('The list does not allow public subscriptions.'));
+                err.status = 403;
+            }
         }
 
         if (err) {

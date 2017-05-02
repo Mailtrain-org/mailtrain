@@ -1,0 +1,16 @@
+[Unit]
+Description=Mailtrain server
+Requires=mariadb.service
+After=syslog.target network.target
+
+[Service]
+Environment="NODE_ENV=production"
+WorkingDirectory=/opt/mailtrain
+ExecStart=/usr/bin/node index.js
+Type=simple
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+# Alias=mailtrain.service

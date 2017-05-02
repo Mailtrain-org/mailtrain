@@ -3,6 +3,8 @@ npm-debug.log
 .DS_Store
 config/development.*
 config/production.*
+workers/reports/config/development.*
+workers/reports/config/production.*
 dump.rdb
 
 # generate POT file every time you want to update your PO file

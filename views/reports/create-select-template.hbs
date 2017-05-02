@@ -1,0 +1,22 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/reports">{{#translate}}Reports{{/translate}}</a></li>
+    <li class="active">{{#translate}}Create Report{{/translate}}</li>
+</ol>
+
+<h2>{{#translate}}Create Report{{/translate}}</h2>
+
+<hr>
+
+<form class="form-horizontal" method="get" action="/reports/create">
+
+{{> report_select_template }}
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-chevron-right"></i> {{#translate}}Next{{/translate}}</button>
+        </div>
+    </div>
+</form>

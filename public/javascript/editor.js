@@ -39,6 +39,12 @@ $('div[class*="code-editor-"]').each(function () {
         editor.getSession().setUseWorker(false);
     } else if ($(this).hasClass('code-editor-css')) {
         mode = 'css';
+    } else if ($(this).hasClass('code-editor-javascript')) {
+        mode = 'javascript';
+    } else if ($(this).hasClass('code-editor-json')) {
+        mode = 'json';
+    } else if ($(this).hasClass('code-editor-handlebars')) {
+        mode = 'handlebars';
     }
 
     editor.setTheme('ace/theme/chrome');
