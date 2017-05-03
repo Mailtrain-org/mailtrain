@@ -2,21 +2,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-21 13:18+0100\n"
-"PO-Revision-Date: 2017-03-21 14:21+0100\n"
+"POT-Creation-Date: 2017-05-04 00:45+0200\n"
+"PO-Revision-Date: 2017-05-04 00:46+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.12\n"
+"X-Generator: Poedit 2.0.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: views/archive/layout.hbs:1 views/layout.hbs:1
 msgid "Self hosted email newsletter app"
 msgstr "Selbst gehostete Newsletter-App"
 
+#: views/blacklist.hbs:1 views/campaigns/blacklisted.hbs:1
 #: views/campaigns/bounced.hbs:1 views/campaigns/campaigns.hbs:1
 #: views/campaigns/clicked.hbs:1 views/campaigns/complained.hbs:1
 #: views/campaigns/create-rss.hbs:1 views/campaigns/create-triggered.hbs:1
@@ -36,70 +37,112 @@ msgstr "Selbst gehostete Newsletter-App"
 #: views/lists/subscription/import-failed.hbs:1
 #: views/lists/subscription/import-preview.hbs:1
 #: views/lists/subscription/import.hbs:1 views/lists/view.hbs:1
-#: views/settings.hbs:1 views/templates/create.hbs:1 views/templates/edit.hbs:1
+#: views/report-templates/create.hbs:1 views/report-templates/edit.hbs:1
+#: views/report-templates/report-templates.hbs:1
+#: views/reports/create-select-template.hbs:1 views/reports/create.hbs:1
+#: views/reports/edit.hbs:1 views/reports/output.hbs:1
+#: views/reports/reports.hbs:1 views/reports/view.hbs:1 views/settings.hbs:1
+#: views/templates/create.hbs:1 views/templates/edit.hbs:1
 #: views/templates/templates.hbs:1 views/triggers/create-select.hbs:1
 #: views/triggers/create.hbs:1 views/triggers/edit.hbs:1
 #: views/triggers/triggered.hbs:1 views/triggers/triggers.hbs:1
 #: views/users/account.hbs:1 views/users/api.hbs:1 views/users/forgot.hbs:1
-#: views/users/login.hbs:1 views/users/reset.hbs:1 app.js:176
+#: views/users/login.hbs:1 views/users/reset.hbs:1 app.js:169
 msgid "Home"
 msgstr "Home"
 
-#: views/campaigns/bounced.hbs:2 views/campaigns/campaigns.hbs:2
-#: views/campaigns/campaigns.hbs:7 views/campaigns/clicked.hbs:2
-#: views/campaigns/complained.hbs:2 views/campaigns/create-rss.hbs:2
-#: views/campaigns/create-triggered.hbs:2 views/campaigns/create.hbs:2
-#: views/campaigns/delivered.hbs:2 views/campaigns/edit-rss.hbs:2
-#: views/campaigns/edit-triggered.hbs:2 views/campaigns/edit.hbs:2
-#: views/campaigns/opened.hbs:2 views/campaigns/unsubscribed.hbs:2
-#: views/campaigns/upload-attachment.hbs:2 views/campaigns/view.hbs:2
-#: lib/tools.js:125 routes/campaigns.js:35
+#: views/blacklist.hbs:2 views/blacklist.hbs:3 views/layout.hbs:7
+#: views/lists/subscription/edit.hbs:15
+msgid "Blacklist"
+msgstr "Blacklist"
+
+#: views/blacklist.hbs:4 views/users/api.hbs:55
+msgid "Add email to blacklist"
+msgstr "E-Mail zur Blacklist hinzufügen"
+
+#: views/blacklist.hbs:5
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: views/blacklist.hbs:6
+msgid "Email"
+msgstr "E-Mail"
+
+#: views/campaigns/blacklisted.hbs:2 views/campaigns/bounced.hbs:2
+#: views/campaigns/campaigns.hbs:2 views/campaigns/campaigns.hbs:7
+#: views/campaigns/clicked.hbs:2 views/campaigns/complained.hbs:2
+#: views/campaigns/create-rss.hbs:2 views/campaigns/create-triggered.hbs:2
+#: views/campaigns/create.hbs:2 views/campaigns/delivered.hbs:2
+#: views/campaigns/edit-rss.hbs:2 views/campaigns/edit-triggered.hbs:2
+#: views/campaigns/edit.hbs:2 views/campaigns/opened.hbs:2
+#: views/campaigns/unsubscribed.hbs:2 views/campaigns/upload-attachment.hbs:2
+#: views/campaigns/view.hbs:2 lib/tools.js:126 routes/campaigns.js:35
 msgid "Campaigns"
 msgstr "Kampagnen"
 
-#: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
-msgid "Bounced info"
-msgstr "Bounced Info"
+#: views/campaigns/blacklisted.hbs:3 views/campaigns/blacklisted.hbs:4
+msgid "Blacklisted info"
+msgstr "Blacklisted info"
 
-#: views/campaigns/bounced.hbs:5 views/campaigns/clicked.hbs:5
-#: views/campaigns/complained.hbs:5 views/campaigns/delivered.hbs:5
-#: views/campaigns/edit-rss.hbs:5 views/campaigns/edit-triggered.hbs:5
-#: views/campaigns/edit.hbs:5 views/campaigns/opened.hbs:5
-#: views/campaigns/unsubscribed.hbs:5 views/campaigns/upload-attachment.hbs:6
+#: views/campaigns/blacklisted.hbs:5 views/campaigns/bounced.hbs:5
+#: views/campaigns/clicked.hbs:5 views/campaigns/complained.hbs:5
+#: views/campaigns/delivered.hbs:5 views/campaigns/edit-rss.hbs:5
+#: views/campaigns/edit-triggered.hbs:5 views/campaigns/edit.hbs:5
+#: views/campaigns/opened.hbs:5 views/campaigns/unsubscribed.hbs:5
+#: views/campaigns/upload-attachment.hbs:6
 msgid "View campaign"
 msgstr "Kampagne ansehen"
 
-#: views/campaigns/bounced.hbs:6
-msgid "Subscribers who bounced and were unsubscribed:"
-msgstr "Abonnenten, die bounced und abgemeldet wurden:"
+#: views/campaigns/blacklisted.hbs:6
+msgid "Subscribers who blacklisted by global blacklist:"
+msgstr "Abonnenten, die von der globalen Blacklist aufgelistet wurden:"
 
-#: views/campaigns/bounced.hbs:7 views/campaigns/clicked.hbs:15
-#: views/campaigns/complained.hbs:7 views/campaigns/delivered.hbs:7
-#: views/campaigns/opened.hbs:9 views/campaigns/unsubscribed.hbs:7
+#: views/campaigns/blacklisted.hbs:7 views/campaigns/bounced.hbs:7
+#: views/campaigns/clicked.hbs:15 views/campaigns/complained.hbs:7
+#: views/campaigns/delivered.hbs:7 views/campaigns/opened.hbs:9
+#: views/campaigns/unsubscribed.hbs:7
 #: views/lists/subscription/import-failed.hbs:8 views/lists/view.hbs:19
 #: views/triggers/triggered.hbs:6
 msgid "Address"
 msgstr "Adresse"
 
-#: views/campaigns/bounced.hbs:8 views/campaigns/clicked.hbs:16
-#: views/campaigns/complained.hbs:8 views/campaigns/delivered.hbs:8
-#: views/campaigns/opened.hbs:10 views/campaigns/unsubscribed.hbs:8
-#: views/lists/subscription/add.hbs:6 views/lists/subscription/edit.hbs:7
+#: views/campaigns/blacklisted.hbs:8 views/campaigns/bounced.hbs:8
+#: views/campaigns/clicked.hbs:16 views/campaigns/complained.hbs:8
+#: views/campaigns/delivered.hbs:8 views/campaigns/opened.hbs:10
+#: views/campaigns/unsubscribed.hbs:8 views/lists/subscription/add.hbs:6
+#: views/lists/subscription/edit.hbs:7
 #: views/lists/subscription/import-preview.hbs:7 views/lists/view.hbs:20
 #: views/subscription/partials/subscription-custom-fields.hbs:3
 #: views/triggers/triggered.hbs:7
 msgid "First Name"
 msgstr "Vorname"
 
-#: views/campaigns/bounced.hbs:9 views/campaigns/clicked.hbs:17
-#: views/campaigns/complained.hbs:9 views/campaigns/delivered.hbs:9
-#: views/campaigns/opened.hbs:11 views/campaigns/unsubscribed.hbs:9
-#: views/lists/subscription/add.hbs:7 views/lists/subscription/edit.hbs:8
+#: views/campaigns/blacklisted.hbs:9 views/campaigns/bounced.hbs:9
+#: views/campaigns/clicked.hbs:17 views/campaigns/complained.hbs:9
+#: views/campaigns/delivered.hbs:9 views/campaigns/opened.hbs:11
+#: views/campaigns/unsubscribed.hbs:9 views/lists/subscription/add.hbs:7
+#: views/lists/subscription/edit.hbs:8
 #: views/lists/subscription/import-preview.hbs:8 views/lists/view.hbs:21
 #: views/subscription/partials/subscription-custom-fields.hbs:4
 #: views/triggers/triggered.hbs:8
 msgid "Last Name"
 msgstr "Nachname"
+
+#: views/campaigns/blacklisted.hbs:10
+msgid "Reason"
+msgstr "Grund"
+
+#: views/campaigns/blacklisted.hbs:11
+msgid "Time"
+msgstr "Zeit"
+
+#: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
+msgid "Bounced info"
+msgstr "Bounced Info"
+
+#: views/campaigns/bounced.hbs:6
+msgid "Subscribers who bounced and were unsubscribed:"
+msgstr "Abonnenten, die bounced und abgemeldet wurden:"
 
 #: views/campaigns/bounced.hbs:10 views/campaigns/complained.hbs:10
 #: views/campaigns/delivered.hbs:10 views/campaigns/unsubscribed.hbs:10
@@ -131,10 +174,15 @@ msgstr "Trigger-Kampagne"
 #: views/campaigns/campaigns.hbs:8 views/campaigns/create-rss.hbs:6
 #: views/campaigns/create-triggered.hbs:5 views/campaigns/create.hbs:5
 #: views/campaigns/edit-rss.hbs:8 views/campaigns/edit-triggered.hbs:9
-#: views/campaigns/edit.hbs:10 views/campaigns/view.hbs:71
+#: views/campaigns/edit.hbs:10 views/campaigns/view.hbs:73
 #: views/lists/create.hbs:5 views/lists/edit.hbs:6
 #: views/lists/fields/fields.hbs:6 views/lists/forms/forms.hbs:6
 #: views/lists/lists.hbs:5 views/lists/segments/segments.hbs:6
+#: views/report-templates/partials/report-template-fields.hbs:1
+#: views/report-templates/report-templates.hbs:10
+#: views/reports/partials/report-fields.hbs:1
+#: views/reports/partials/report-fields.hbs:5
+#: views/reports/partials/report-fields.hbs:9 views/reports/reports.hbs:6
 #: views/templates/templates.hbs:5 views/triggers/triggers.hbs:5
 msgid "Name"
 msgstr "Name"
@@ -142,25 +190,31 @@ msgstr "Name"
 #: views/campaigns/campaigns.hbs:9 views/campaigns/create-rss.hbs:8
 #: views/campaigns/create-triggered.hbs:7 views/campaigns/create.hbs:7
 #: views/campaigns/edit-rss.hbs:10 views/campaigns/edit-triggered.hbs:11
-#: views/campaigns/edit.hbs:12 views/campaigns/view.hbs:72
+#: views/campaigns/edit.hbs:12 views/campaigns/view.hbs:74
 #: views/lists/create.hbs:7 views/lists/edit.hbs:10
 #: views/lists/forms/edit.hbs:9 views/lists/forms/forms.hbs:7
 #: views/lists/lists.hbs:8 views/mosaico/editor.hbs:3
-#: views/partials/merge-tag-reference.hbs:4 views/templates/create.hbs:9
-#: views/templates/edit.hbs:8 views/templates/templates.hbs:6
-#: views/triggers/create.hbs:7 views/triggers/edit.hbs:8
-#: views/triggers/triggers.hbs:7
+#: views/partials/merge-tag-reference.hbs:4
+#: views/report-templates/partials/report-template-fields.hbs:3
+#: views/report-templates/report-templates.hbs:11
+#: views/reports/partials/report-fields.hbs:3
+#: views/reports/partials/report-fields.hbs:6 views/reports/reports.hbs:8
+#: views/templates/create.hbs:9 views/templates/edit.hbs:8
+#: views/templates/templates.hbs:6 views/triggers/create.hbs:7
+#: views/triggers/edit.hbs:8 views/triggers/triggers.hbs:7
 msgid "Description"
 msgstr "Beschreibung"
 
-#: views/campaigns/campaigns.hbs:10 views/campaigns/view.hbs:73
+#: views/campaigns/campaigns.hbs:10 views/campaigns/view.hbs:75
 #: views/lists/view.hbs:22 views/lists/view.hbs:30
 #: views/triggers/triggers.hbs:6
 msgid "Status"
 msgstr "Status"
 
-#: views/campaigns/campaigns.hbs:11 views/campaigns/view.hbs:74
+#: views/campaigns/campaigns.hbs:11 views/campaigns/view.hbs:76
 #: views/lists/view.hbs:23 views/lists/view.hbs:24
+#: views/report-templates/report-templates.hbs:12
+#: views/reports/partials/report-fields.hbs:7 views/reports/reports.hbs:9
 msgid "Created"
 msgstr "Erstellt"
 
@@ -168,23 +222,23 @@ msgstr "Erstellt"
 msgid "Link info"
 msgstr "Link Info"
 
-#: views/campaigns/clicked.hbs:6 views/campaigns/view.hbs:61
+#: views/campaigns/clicked.hbs:6 views/campaigns/view.hbs:63
 msgid "URL"
 msgstr "URL"
 
-#: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:62
+#: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:64
 msgid "Clicks"
 msgstr "Klicks"
 
-#: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:63
+#: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:65
 msgid "% of clicks"
 msgstr "% der Klicks"
 
-#: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:64
+#: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:66
 msgid "% of messages"
 msgstr "% der Nachrichten"
 
-#: views/campaigns/clicked.hbs:10 views/campaigns/view.hbs:67
+#: views/campaigns/clicked.hbs:10 views/campaigns/view.hbs:69
 msgid "Aggregated clicks"
 msgstr "Aggregierte Klicks"
 
@@ -249,8 +303,10 @@ msgstr "Kampagnen Name"
 #: views/campaigns/create.hbs:8 views/campaigns/edit-rss.hbs:11
 #: views/campaigns/edit-triggered.hbs:12 views/campaigns/edit.hbs:13
 #: views/lists/create.hbs:8 views/lists/edit.hbs:11
-#: views/templates/create.hbs:11 views/templates/edit.hbs:10
-#: views/triggers/create.hbs:9 views/triggers/edit.hbs:10
+#: views/report-templates/partials/report-template-fields.hbs:4
+#: views/reports/partials/report-fields.hbs:4 views/templates/create.hbs:11
+#: views/templates/edit.hbs:10 views/triggers/create.hbs:9
+#: views/triggers/edit.hbs:10
 msgid "HTML is allowed"
 msgstr "HTML ist erlaubt"
 
@@ -272,6 +328,7 @@ msgstr "Liste"
 #: views/lists/segments/rule-create.hbs:7 views/lists/subscription/add.hbs:10
 #: views/lists/subscription/add.hbs:12 views/lists/subscription/edit.hbs:11
 #: views/lists/subscription/import-preview.hbs:5
+#: views/reports/partials/report-select-template.hbs:2
 #: views/subscription/partials/subscription-custom-fields.hbs:9
 #: views/templates/create.hbs:8 views/triggers/create-select.hbs:7
 #: views/triggers/create.hbs:17 views/triggers/create.hbs:20
@@ -342,7 +399,7 @@ msgstr "Trigger-Kampagne erstellen"
 #: views/campaigns/create-triggered.hbs:12 views/campaigns/create.hbs:12
 #: views/campaigns/edit-triggered.hbs:7 views/campaigns/edit.hbs:7
 #: views/lists/fields/create.hbs:31 views/lists/fields/edit.hbs:33
-#: views/templates/create.hbs:13
+#: views/reports/reports.hbs:7 views/templates/create.hbs:13
 msgid "Template"
 msgstr "Vorlage"
 
@@ -439,12 +496,12 @@ msgid "Delete Campaign"
 msgstr "Kampagne löschen"
 
 #: views/campaigns/edit-rss.hbs:24 views/campaigns/edit-triggered.hbs:27
-#: views/campaigns/edit.hbs:35 views/lists/edit.hbs:16
+#: views/campaigns/edit.hbs:35 views/lists/edit.hbs:17
 #: views/lists/fields/edit.hbs:39 views/lists/forms/edit.hbs:29
 #: views/lists/forms/forms.hbs:12 views/lists/segments/edit.hbs:14
-#: views/lists/segments/rule-edit.hbs:38 views/lists/subscription/edit.hbs:17
-#: views/settings.hbs:99 views/templates/edit.hbs:12 views/triggers/edit.hbs:30
-#: views/users/account.hbs:18
+#: views/lists/segments/rule-edit.hbs:38 views/lists/subscription/edit.hbs:18
+#: views/reports/edit.hbs:6 views/settings.hbs:99 views/templates/edit.hbs:12
+#: views/triggers/edit.hbs:30 views/users/account.hbs:18
 msgid "Update"
 msgstr "Aktualisieren"
 
@@ -483,7 +540,7 @@ msgstr "Datei"
 msgid "Size"
 msgstr "Grösse"
 
-#: views/campaigns/edit.hbs:32 views/campaigns/view.hbs:66
+#: views/campaigns/edit.hbs:32 views/campaigns/view.hbs:68
 #: views/lists/fields/fields.hbs:12 views/lists/forms/forms.hbs:9
 #: views/lists/view.hbs:33
 msgid "No data available in table"
@@ -517,8 +574,8 @@ msgstr "Abmeldungs-Info"
 msgid "Subscribers who unsubscribed:"
 msgstr "Abonnenten welche deabonnierten:"
 
-#: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:26
-#: views/lists/subscription/import.hbs:10 routes/lists.js:187
+#: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:28
+#: views/lists/subscription/import.hbs:10 routes/lists.js:202
 msgid "Unsubscribed"
 msgstr "Abbestellt"
 
@@ -572,7 +629,7 @@ msgstr "Noch keine Testbenutzer vorhanden, erstellen Sie einen hier"
 msgid "Go"
 msgstr "Los"
 
-#: views/campaigns/view.hbs:20 lib/models/triggers.js:25
+#: views/campaigns/view.hbs:20 lib/models/triggers.js:26
 msgid "Delivered"
 msgstr "Zugestellt"
 
@@ -580,111 +637,119 @@ msgstr "Zugestellt"
 msgid "List subscribers who received this message"
 msgstr "Abonnenten dieser Liste, die diese Nachricht erhalten haben"
 
-#: views/campaigns/view.hbs:22 routes/lists.js:187
+#: views/campaigns/view.hbs:22
+msgid "Blacklisted"
+msgstr "Blacklisted"
+
+#: views/campaigns/view.hbs:23
+msgid "List subscribers who blacklisted by global blacklist"
+msgstr ""
+
+#: views/campaigns/view.hbs:24 routes/lists.js:202
 msgid "Bounced"
 msgstr "Bounced"
 
-#: views/campaigns/view.hbs:23
+#: views/campaigns/view.hbs:25
 msgid "List subscribers who bounced"
 msgstr "Bounced Listen Abonnenten"
 
-#: views/campaigns/view.hbs:24
+#: views/campaigns/view.hbs:26
 msgid "Complaints"
 msgstr "Beschwerden"
 
-#: views/campaigns/view.hbs:25
+#: views/campaigns/view.hbs:27
 msgid "List subscribers who complained for this message"
 msgstr "Abonnenten, die sich über diese Nachricht beschwert haben"
 
-#: views/campaigns/view.hbs:27
+#: views/campaigns/view.hbs:29
 msgid "List subscribers who unsubscribed after this message"
 msgstr "Abonnenten, die sich nach dieser Nachricht abgemeldet haben"
 
-#: views/campaigns/view.hbs:28
+#: views/campaigns/view.hbs:30
 msgid "Opened"
 msgstr "Geöffnet"
 
-#: views/campaigns/view.hbs:29
+#: views/campaigns/view.hbs:31
 msgid "List subscribers who opened this message"
 msgstr "Abonnenten, die diese Nachricht geöffnet haben"
 
-#: views/campaigns/view.hbs:30
+#: views/campaigns/view.hbs:32
 msgid "Clicked"
 msgstr "Geklickt"
 
-#: views/campaigns/view.hbs:31 views/campaigns/view.hbs:68
+#: views/campaigns/view.hbs:33 views/campaigns/view.hbs:70
 msgid "List subscribers who clicked on a link"
 msgstr "Abonnenten, die auf einen Link geklickt haben"
 
-#: views/campaigns/view.hbs:32
+#: views/campaigns/view.hbs:34
 msgid ""
 "Are you sure? This action would start sending messages to the selected list"
 msgstr ""
 "Sind Sie sicher? Diese Aktion würde mit dem Senden von Nachrichten an die "
 "ausgewählte Liste beginnen"
 
-#: views/campaigns/view.hbs:33
+#: views/campaigns/view.hbs:35
 msgid "Delay sending"
 msgstr "Senden verzögern"
 
-#: views/campaigns/view.hbs:34
+#: views/campaigns/view.hbs:36
 msgid "hours"
 msgstr "Stunden"
 
-#: views/campaigns/view.hbs:35
+#: views/campaigns/view.hbs:37
 msgid "minutes"
 msgstr "Minuten"
 
-#: views/campaigns/view.hbs:36
+#: views/campaigns/view.hbs:38
 msgid "Send to subscribers:"
 msgstr "An Abonnenten senden:"
 
-#: views/campaigns/view.hbs:37
+#: views/campaigns/view.hbs:39
 msgid "Are you sure? This action would reset scheduling"
 msgstr "Sind Sie sicher? Diese Aktion würde die Terminierung zurücksetzen"
 
-#: views/campaigns/view.hbs:38
+#: views/campaigns/view.hbs:40
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: views/campaigns/view.hbs:39
+#: views/campaigns/view.hbs:41
 msgid "Sending scheduled"
 msgstr "Senden geplant"
 
-#: views/campaigns/view.hbs:40 views/campaigns/view.hbs:52
+#: views/campaigns/view.hbs:42 views/campaigns/view.hbs:54
 msgid "Pause"
 msgstr "Pause"
 
-#: views/campaigns/view.hbs:41 routes/campaigns.js:264
+#: views/campaigns/view.hbs:43 routes/campaigns.js:253
 msgid "Sending"
 msgstr "Am senden"
 
-#: views/campaigns/view.hbs:42 views/campaigns/view.hbs:46
+#: views/campaigns/view.hbs:44 views/campaigns/view.hbs:48
 msgid ""
 "Are you sure? This action would resume sending messages to the selected list"
 msgstr ""
 "Sind Sie sicher? Diese Aktion würde das Senden von E-Mails an die "
 "ausgewählte Liste fortsetzen"
 
-#: views/campaigns/view.hbs:43 views/campaigns/view.hbs:47
+#: views/campaigns/view.hbs:45 views/campaigns/view.hbs:49
 msgid "Are you sure? This action would reset all stats about current progress"
 msgstr ""
 "Sind Sie sicher? Diese Aktion würde alle Statistiken über den aktuellen "
 "Fortschritt zurücksetzen"
 
-#: views/campaigns/view.hbs:44
+#: views/campaigns/view.hbs:46
 msgid "Resume"
 msgstr "Fortsetzen"
 
-#: views/campaigns/view.hbs:45 views/campaigns/view.hbs:49
+#: views/campaigns/view.hbs:47 views/campaigns/view.hbs:51
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: views/campaigns/view.hbs:48
+#: views/campaigns/view.hbs:50
 msgid "Continue"
 msgstr "Weiter"
 
-#: views/campaigns/view.hbs:50
+#: views/campaigns/view.hbs:52
 msgid ""
 "All messages sent! Hit \"Continue\" if you you want to send this campaign to "
 "new subscribers"
@@ -692,7 +757,7 @@ msgstr ""
 "Alle E-Mails gesendet! Klicken Sie auf \"Weiter\", wenn Sie diese Kampagne "
 "an neue Abonnenten senden möchten"
 
-#: views/campaigns/view.hbs:51
+#: views/campaigns/view.hbs:53
 msgid ""
 "Are you sure? This action would pause sending new entries in RSS feed as "
 "email messages to the selected list"
@@ -700,15 +765,15 @@ msgstr ""
 "Sind Sie sicher? Diese Aktion würde das Senden neuer Einträge des RSS-Feed "
 "als E-Mail-Nachrichten an die ausgewählte Liste pausieren"
 
-#: views/campaigns/view.hbs:53 views/campaigns/view.hbs:57
+#: views/campaigns/view.hbs:55 views/campaigns/view.hbs:59
 msgid "Campaign status:"
 msgstr "Kampagnen Status:"
 
-#: views/campaigns/view.hbs:54
+#: views/campaigns/view.hbs:56
 msgid "ACTIVE"
 msgstr "AKTIV"
 
-#: views/campaigns/view.hbs:55
+#: views/campaigns/view.hbs:57
 msgid ""
 "Are you sure? This action would start sending new entries in RSS feed as "
 "email messages to the selected list"
@@ -716,15 +781,15 @@ msgstr ""
 "Sind Sie sicher? Diese Aktion würde neue RSS Feed Einträge als E-Mail-"
 "Nachrichten der ausgewählten Liste zustellen"
 
-#: views/campaigns/view.hbs:56
+#: views/campaigns/view.hbs:58
 msgid "Activate"
 msgstr "Aktivieren"
 
-#: views/campaigns/view.hbs:58
+#: views/campaigns/view.hbs:60
 msgid "INACTIVE"
 msgstr "INAKTIV"
 
-#: views/campaigns/view.hbs:59
+#: views/campaigns/view.hbs:61
 msgid ""
 "This is a triggered campaign. Messages are only sent to subscribers that hit "
 "some trigger that invokes this campaign"
@@ -732,15 +797,15 @@ msgstr ""
 "Dies ist eine Trigger-Kampagne. Nachrichten werden nur an Abonnenten "
 "gesendet, die einen Trigger auslösen, der diese Kampagne aufruft"
 
-#: views/campaigns/view.hbs:60
+#: views/campaigns/view.hbs:62
 msgid "see more"
 msgstr "mehr anzeigen"
 
-#: views/campaigns/view.hbs:65
+#: views/campaigns/view.hbs:67
 msgid "List subscribers who clicked this link"
 msgstr "Abonnenten dieser Liste, die diesen Link geklickt haben"
 
-#: views/campaigns/view.hbs:69
+#: views/campaigns/view.hbs:71
 msgid ""
 "Clicks are counted as unique subscribers that clicked on a specific link or "
 "on any link (in aggregated view)"
@@ -748,7 +813,7 @@ msgstr ""
 "Klicks werden als eindeutige Abonnenten gezählt, die auf einen bestimmten "
 "Link oder auf irgendeinen Link geklickt haben (in der aggregierter Ansicht)"
 
-#: views/campaigns/view.hbs:70
+#: views/campaigns/view.hbs:72
 msgid ""
 "If a new entry is found from campaign feed a new subcampaign is created of "
 "that entry and it will be listed here"
@@ -787,12 +852,12 @@ msgid "Preferences"
 msgstr "Persönliche Einstellungen"
 
 #: views/emails/rss-html.hbs:2 views/emails/stationery-html.hbs:4
-#: views/emails/stationery-text.hbs:4 views/lists/subscription/edit.hbs:15
+#: views/emails/stationery-text.hbs:4 views/lists/subscription/edit.hbs:16
 #: views/subscription/partials/subscription-unsubscribe-form.hbs:2
 #: views/subscription/web-manage.mjml.hbs:3
 #: views/subscription/web-unsubscribe.mjml.hbs:1
 #: views/subscription/web-unsubscribe.mjml.hbs:3 routes/forms.js:213
-#: routes/lists.js:269
+#: routes/lists.js:284
 msgid "Unsubscribe"
 msgstr "Newsletter abbestellen"
 
@@ -936,7 +1001,7 @@ msgstr ""
 "Webhooks für SES, SparkPost, SendGrid und Mailgun unterstützt, auch für "
 "Postfix und ZoneMTA."
 
-#: views/index.hbs:26 lib/tools.js:129
+#: views/index.hbs:26 lib/tools.js:130
 msgid "Automation"
 msgstr "Automatisierung"
 
@@ -1007,28 +1072,28 @@ msgstr "Account"
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: views/layout.hbs:7 views/users/api.hbs:2 views/users/api.hbs:3
+#: views/layout.hbs:8 views/users/api.hbs:2 views/users/api.hbs:3
 msgid "API"
 msgstr "API"
 
-#: views/layout.hbs:8
+#: views/layout.hbs:9
 msgid "Log out"
 msgstr "Abmelden"
 
-#: views/layout.hbs:9 views/users/forgot.hbs:2 views/users/login.hbs:2
+#: views/layout.hbs:10 views/users/forgot.hbs:2 views/users/login.hbs:2
 #: views/users/login.hbs:3 views/users/login.hbs:9 views/users/reset.hbs:2
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: views/layout.hbs:10
+#: views/layout.hbs:11
 msgid "Self Hosted Newsletter App Built on Top of Nodemailer"
 msgstr "Selbst gehostete Newsletter-App basierend auf Nodemailer"
 
-#: views/layout.hbs:11 views/layout.hbs:13
+#: views/layout.hbs:12 views/layout.hbs:14
 msgid "Source on GitHub"
 msgstr "Quellcode auf Github"
 
-#: views/layout.hbs:12
+#: views/layout.hbs:13
 msgid "Subscribe to Our Newsletter"
 msgstr "Abonnieren Sie unseren Newsletter"
 
@@ -1045,11 +1110,11 @@ msgstr "Abonnieren Sie unseren Newsletter"
 #: views/lists/subscription/import-failed.hbs:2
 #: views/lists/subscription/import-preview.hbs:2
 #: views/lists/subscription/import.hbs:2 views/lists/view.hbs:2
-#: lib/tools.js:117
+#: lib/tools.js:118 routes/lists.js:59
 msgid "Lists"
 msgstr "Listen"
 
-#: views/lists/create.hbs:3 views/lists/create.hbs:4 views/lists/create.hbs:9
+#: views/lists/create.hbs:3 views/lists/create.hbs:4 views/lists/create.hbs:10
 #: views/lists/lists.hbs:3
 msgid "Create List"
 msgstr "Liste erstellen"
@@ -1057,6 +1122,10 @@ msgstr "Liste erstellen"
 #: views/lists/create.hbs:6 views/lists/edit.hbs:7
 msgid "List Name"
 msgstr "Linstennamen"
+
+#: views/lists/create.hbs:9 views/lists/edit.hbs:15
+msgid "Allow public users to subscribe themselves"
+msgstr "Allen erlauben, diese Liste selbst zu abonnieren"
 
 #: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:8
 msgid "Edit List"
@@ -1090,7 +1159,7 @@ msgstr ""
 "Das Standard-Formular dieser Liste. Wenn Sie ein Formular erstellt möchten, "
 "klicken Sie <a href=\"/forms/{{id}}/create\">hier</a>."
 
-#: views/lists/edit.hbs:15
+#: views/lists/edit.hbs:16
 msgid "Delete List"
 msgstr "Liste löschen"
 
@@ -1260,16 +1329,17 @@ msgid "Delete Field"
 msgstr "Feld löschen"
 
 #: views/lists/fields/fields.hbs:7 views/lists/view.hbs:26
+#: views/report-templates/partials/report-template-fields.hbs:5
 msgid "Type"
 msgstr "Typ"
 
 #: views/lists/fields/fields.hbs:10 views/lists/fields/fields.hbs:11
 #: views/lists/forms/edit.hbs:22 views/lists/forms/forms.hbs:8
-#: views/lists/lists.hbs:9 views/lists/segments/segments.hbs:8
-#: views/lists/segments/view.hbs:12 views/templates/templates.hbs:7
-#: views/triggers/triggers.hbs:14 routes/campaigns.js:287
-#: routes/campaigns.js:576 routes/campaigns.js:665 routes/lists.js:238
-#: routes/triggers.js:297
+#: views/lists/segments/segments.hbs:8 views/lists/segments/view.hbs:12
+#: views/triggers/triggers.hbs:14 routes/campaigns.js:276
+#: routes/campaigns.js:568 routes/campaigns.js:657 routes/campaigns.js:706
+#: routes/lists.js:166 routes/lists.js:253 routes/report-templates.js:51
+#: routes/templates.js:170 routes/triggers.js:297
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -1328,7 +1398,7 @@ msgstr ""
 #: views/lists/forms/edit.hbs:13 views/lists/subscription/add.hbs:16
 #: views/subscription/mail-unsubscribe-confirmed-html.mjml.hbs:4
 #: views/subscription/mail-unsubscribe-confirmed-text.hbs:4 routes/forms.js:157
-#: routes/lists.js:269
+#: routes/lists.js:284
 msgid "Subscribe"
 msgstr "Abonnieren"
 
@@ -1356,9 +1426,11 @@ msgstr "Adresse Verwalten"
 msgid "Create a test user for additional options"
 msgstr "Erstellen Sie einen Testbenutzer für zusätzliche Optionen"
 
-#: views/lists/forms/edit.hbs:20 views/templates/create.hbs:2
+#: views/lists/forms/edit.hbs:20 views/report-templates/create.hbs:3
+#: views/report-templates/edit.hbs:3
+#: views/report-templates/report-templates.hbs:3 views/templates/create.hbs:2
 #: views/templates/edit.hbs:2 views/templates/templates.hbs:2
-#: views/templates/templates.hbs:4 lib/tools.js:121
+#: views/templates/templates.hbs:4 lib/tools.js:122 routes/templates.js:27
 msgid "Templates"
 msgstr "Vorlagen"
 
@@ -1398,7 +1470,7 @@ msgstr "Das Standard-Formular für diese Liste ist:"
 msgid "ID"
 msgstr "ID"
 
-#: views/lists/lists.hbs:7
+#: views/lists/lists.hbs:7 views/reports/partials/report-fields.hbs:10
 msgid "Subscribers"
 msgstr "Abonnenten "
 
@@ -1556,7 +1628,9 @@ msgid "Add Rule"
 msgstr "Regel hinzufügen"
 
 #: views/lists/segments/rule-create.hbs:8
-#: views/lists/subscription/import.hbs:12 views/triggers/create-select.hbs:9
+#: views/lists/subscription/import.hbs:15
+#: views/reports/create-select-template.hbs:5
+#: views/triggers/create-select.hbs:9
 msgid "Next"
 msgstr "Weiter"
 
@@ -1645,11 +1719,11 @@ msgstr "Zurück zur Liste"
 #: views/lists/subscription/edit.hbs:6
 #: views/lists/subscription/import-preview.hbs:6
 #: views/subscription/partials/subscription-unsubscribe-form.hbs:1
-#: lib/helpers.js:40 lib/models/segments.js:11
+#: lib/helpers.js:41 lib/models/segments.js:11
 msgid "Email address"
 msgstr "E-Mail-Adresse"
 
-#: views/lists/subscription/edit.hbs:16
+#: views/lists/subscription/edit.hbs:17
 msgid "Delete Subscription"
 msgstr "Abonnement löschen"
 
@@ -1686,7 +1760,8 @@ msgid "Import subscribers"
 msgstr "Abonnenten importieren"
 
 #: views/lists/subscription/import-preview.hbs:10 views/users/api.hbs:27
-#: views/users/api.hbs:35 views/users/api.hbs:43 views/users/api.hbs:55
+#: views/users/api.hbs:35 views/users/api.hbs:43 views/users/api.hbs:54
+#: views/users/api.hbs:62 views/users/api.hbs:70
 msgid "Example"
 msgstr "Beispiel"
 
@@ -1706,7 +1781,7 @@ msgstr "CSV-Trennzeichen"
 msgid "Categorize the imported subscribers as"
 msgstr "Kategorisiere die importierten Abonnenten als"
 
-#: views/lists/subscription/import.hbs:8 routes/lists.js:187
+#: views/lists/subscription/import.hbs:8 routes/lists.js:202
 msgid "Subscribed"
 msgstr "Abonniert"
 
@@ -1717,6 +1792,18 @@ msgstr "Normale Abonnenten-Adressen"
 #: views/lists/subscription/import.hbs:11
 msgid "Suppressed emails that will be unsubscribed from your list"
 msgstr "Unterdrückte E-Mail-Adressen, die von Ihrer Liste abgemeldet werden"
+
+#: views/lists/subscription/import.hbs:12
+msgid "Check imported emails"
+msgstr "Überprüfe die importierten E-Mail-Adressen"
+
+#: views/lists/subscription/import.hbs:13 views/triggers/triggers.hbs:12
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#: views/lists/subscription/import.hbs:14 views/triggers/triggers.hbs:13
+msgid "Disabled"
+msgstr "Deaktiviert"
 
 #: views/lists/view.hbs:3
 msgid "Subscription Form"
@@ -1757,7 +1844,7 @@ msgstr "Abonnemente"
 msgid "Imports"
 msgstr "Importe"
 
-#: views/lists/view.hbs:25 routes/campaigns.js:266 routes/lists.js:281
+#: views/lists/view.hbs:25 routes/campaigns.js:255 routes/lists.js:296
 msgid "Finished"
 msgstr "Fertig"
 
@@ -1880,6 +1967,116 @@ msgstr "Mosaico öffnen"
 #: views/partials/plaintext.hbs:1
 msgid "Template content (plaintext)"
 msgstr "Vorlagen-Inhalt (Klartext) "
+
+#: views/report-templates/create.hbs:2 views/report-templates/edit.hbs:2
+#: views/report-templates/report-templates.hbs:2
+#: views/reports/create-select-template.hbs:2 views/reports/create.hbs:2
+#: views/reports/edit.hbs:2 views/reports/output.hbs:2
+#: views/reports/reports.hbs:2 views/reports/reports.hbs:5
+#: views/reports/view.hbs:2 lib/tools.js:137 routes/reports.js:31
+msgid "Reports"
+msgstr "Reporte"
+
+#: views/report-templates/create.hbs:4 views/report-templates/create.hbs:6
+#: views/report-templates/report-templates.hbs:4 views/templates/create.hbs:3
+#: views/templates/create.hbs:4 views/templates/create.hbs:12
+#: views/templates/templates.hbs:3
+msgid "Create Template"
+msgstr "Vorlage erstellen"
+
+#: views/report-templates/create.hbs:5 routes/report-templates.js:231
+msgid "Create Report Template"
+msgstr "Report-Vorlage erstellen"
+
+#: views/report-templates/edit.hbs:4 views/templates/edit.hbs:3
+#: views/templates/edit.hbs:4
+msgid "Edit Template"
+msgstr "Vorlage bearbeiten"
+
+#: views/report-templates/edit.hbs:5 routes/report-templates.js:262
+msgid "Edit Report Template"
+msgstr "Report-Vorlage bearbeiten"
+
+#: views/report-templates/edit.hbs:6 views/templates/edit.hbs:11
+msgid "Delete Template"
+msgstr "Vorlage löschen"
+
+#: views/report-templates/edit.hbs:7
+msgid "Update and Stay"
+msgstr "Aktualisieren und bleiben"
+
+#: views/report-templates/edit.hbs:8
+msgid "Update and Leave"
+msgstr "Aktualisieren und verlassen"
+
+#: views/report-templates/partials/report-template-fields.hbs:2
+msgid "Template Name"
+msgstr "Vorlagen-Name"
+
+#: views/report-templates/partials/report-template-fields.hbs:6
+msgid "User selectable fields"
+msgstr "Vom Benutzer wählbare Felder"
+
+#: views/report-templates/partials/report-template-fields.hbs:7
+msgid "Data processing code"
+msgstr "Datenverarbeitungs-Code"
+
+#: views/report-templates/partials/report-template-fields.hbs:8
+msgid "Rendering template"
+msgstr "Render-Vorlage"
+
+#: views/report-templates/report-templates.hbs:5
+msgid "Blank"
+msgstr "Leer"
+
+#: views/report-templates/report-templates.hbs:6
+msgid "All Subscribers"
+msgstr "Alle Abonnenten"
+
+#: views/report-templates/report-templates.hbs:7
+msgid "Grouped Subscribers"
+msgstr "Gruppierte Abonnenten"
+
+#: views/report-templates/report-templates.hbs:8
+msgid "Export List as CSV"
+msgstr "Liste als CSV exportieren"
+
+#: views/report-templates/report-templates.hbs:9 views/reports/reports.hbs:4
+#: routes/report-templates.js:29
+msgid "Report Templates"
+msgstr "Report-Vorlagen"
+
+#: views/reports/create-select-template.hbs:3
+#: views/reports/create-select-template.hbs:4 views/reports/create.hbs:3
+#: views/reports/create.hbs:4 views/reports/create.hbs:5
+#: views/reports/reports.hbs:3 routes/reports.js:81
+msgid "Create Report"
+msgstr "Report erstellen"
+
+#: views/reports/edit.hbs:3 views/reports/edit.hbs:4 routes/reports.js:151
+msgid "Edit Report"
+msgstr "Report bearbeiten"
+
+#: views/reports/edit.hbs:5
+msgid "Delete Report"
+msgstr "Report löschen"
+
+#: views/reports/partials/report-fields.hbs:2
+msgid "Report Name"
+msgstr "Report-Name"
+
+#: views/reports/partials/report-fields.hbs:8
+#: views/reports/partials/report-fields.hbs:11
+msgid ""
+"Select a campaign in the table above by clicking on the respective row "
+"number."
+msgstr ""
+"Wählen Sie eine Kampagne in der obigen Tabelle aus, indem Sie auf die "
+"jeweilige Zeilennummer klicken."
+
+#: views/reports/partials/report-select-template.hbs:1
+msgid "Report Template"
+msgstr "Report-Vorlage"
 
 #: views/settings.hbs:5
 msgid "Service Address (URL)"
@@ -2337,7 +2534,7 @@ msgstr ""
 "werden Nachrichten nicht signiert."
 
 #: views/subscription/mail-confirm-html.mjml.hbs:1
-#: views/subscription/mail-confirm-text.hbs:1
+#: views/subscription/mail-confirm-text.hbs:1 routes/subscription.js:551
 msgid "Please Confirm Subscription"
 msgstr "Bitte bestätigen Sie ihr Abonnement"
 
@@ -2505,14 +2702,17 @@ msgstr "Einstellungen aktualisieren"
 
 #: views/subscription/partials/subscription-subscribe-form.hbs:1
 #: views/subscription/web-subscribe.mjml.hbs:2
+#: views/subscription/widget-subscribe.hbs:1
 msgid "Subscribe to list"
 msgstr "Newsletter abonnieren"
 
 #: views/subscription/web-confirm-notice.mjml.hbs:1
+#: views/subscription/widget-subscribe.hbs:4
 msgid "Almost Finished"
 msgstr "Fast Fertig"
 
 #: views/subscription/web-confirm-notice.mjml.hbs:2
+#: views/subscription/widget-subscribe.hbs:5
 msgid ""
 "We need to confirm your email address. To complete the subscription process, "
 "please click the link in the email we just sent you."
@@ -2557,10 +2757,13 @@ msgstr "Einstellungen aktualisiert"
 msgid "Your profile information has been updated."
 msgstr "Ihre Profilinformationen wurden aktualisiert."
 
-#: views/templates/create.hbs:3 views/templates/create.hbs:4
-#: views/templates/create.hbs:12 views/templates/templates.hbs:3
-msgid "Create Template"
-msgstr "Vorlage erstellen"
+#: views/subscription/widget-subscribe.hbs:2
+msgid "Sending ..."
+msgstr "Am senden …"
+
+#: views/subscription/widget-subscribe.hbs:3
+msgid "It looks like you are already subscribed to this list."
+msgstr "Es sieht so aus, als hätten Sie diese Liste bereits abonniert."
 
 #: views/templates/create.hbs:5 views/templates/edit.hbs:6
 msgid "Template name"
@@ -2578,17 +2781,9 @@ msgstr "HTML Editor"
 msgid "Optional comments about this template"
 msgstr "Optionale Kommentare zu dieser Vorlage"
 
-#: views/templates/edit.hbs:3 views/templates/edit.hbs:4
-msgid "Edit Template"
-msgstr "Vorlage bearbeiten"
-
 #: views/templates/edit.hbs:5
 msgid "Back to templates"
 msgstr "Zurück zu Vorlagen"
-
-#: views/templates/edit.hbs:11
-msgid "Delete Template"
-msgstr "Vorlage löschen"
 
 #: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2
 #: views/triggers/edit.hbs:2 views/triggers/triggered.hbs:2
@@ -2690,14 +2885,6 @@ msgstr "Ziel-Kampagne"
 #: views/triggers/triggers.hbs:11
 msgid "Triggered count"
 msgstr "Anzahl Auslösungen"
-
-#: views/triggers/triggers.hbs:12
-msgid "Enabled"
-msgstr "Aktiviert"
-
-#: views/triggers/triggers.hbs:13
-msgid "Disabled"
-msgstr "Deaktiviert"
 
 #: views/users/account.hbs:4
 msgid "This account is managed through LDAP."
@@ -2817,12 +3004,13 @@ msgstr ""
 
 #: views/users/api.hbs:15 views/users/api.hbs:17 views/users/api.hbs:30
 #: views/users/api.hbs:32 views/users/api.hbs:38 views/users/api.hbs:40
-#: views/users/api.hbs:46 views/users/api.hbs:48
+#: views/users/api.hbs:46 views/users/api.hbs:57 views/users/api.hbs:59
+#: views/users/api.hbs:65 views/users/api.hbs:67
 msgid "arguments"
 msgstr "Argumente"
 
 #: views/users/api.hbs:16 views/users/api.hbs:31 views/users/api.hbs:39
-#: views/users/api.hbs:47
+#: views/users/api.hbs:47 views/users/api.hbs:58 views/users/api.hbs:66
 msgid "your personal access token"
 msgstr "Ihr persönlicher Access Token"
 
@@ -2831,7 +3019,7 @@ msgid "subscriber's email address"
 msgstr "E-Mail-Adresse des Abonnenten"
 
 #: views/users/api.hbs:19 views/users/api.hbs:34 views/users/api.hbs:42
-#: views/users/api.hbs:50
+#: views/users/api.hbs:61 views/users/api.hbs:69
 msgid "required"
 msgstr "erforderlich"
 
@@ -2899,44 +3087,52 @@ msgid "This API call deletes a subscription"
 msgstr "Dieser API-Aufruf löscht ein Abonnement"
 
 #: views/users/api.hbs:44
-msgid "Add new custom field"
-msgstr "Neues benutzerdefiniertes Feld hinzufügen"
+msgid "Get list of blacklisted emails"
+msgstr ""
 
 #: views/users/api.hbs:45
-msgid "This API call creates a new custom field for a list."
+msgid "This API call get list of blacklisted emails."
 msgstr ""
-"Dieser API-Aufruf erstellt ein neues benutzerdefiniertes Feld für eine Liste."
+
+#: views/users/api.hbs:48
+msgid "Start position"
+msgstr "Startposition"
 
 #: views/users/api.hbs:49
-msgid "field name"
-msgstr "Feldname"
+msgid "optional, default 0"
+msgstr "optional, standard 0"
+
+#: views/users/api.hbs:50
+msgid "limit emails count in response"
+msgstr ""
 
 #: views/users/api.hbs:51
-msgid "one of the following types:"
-msgstr "Einer der folgenden Typen:"
+msgid "optional, default 10000"
+msgstr "optional, standard 10000"
 
 #: views/users/api.hbs:52
-msgid ""
-"If the type is 'option' then you also need to specify the parent element ID"
+msgid "filter by part of email"
 msgstr ""
-"Wenn der Typ 'Option' ist, dann müssen Sie auch die übergeordnete Element-ID "
-"angeben"
 
 #: views/users/api.hbs:53
-msgid ""
-"Template for the group element. If not set, then values of the elements are "
-"joined with commas"
-msgstr ""
-"Vorlage für das Gruppenelement. Wenn nicht gesetzt, dann werden die Werte "
-"der Elemente mit Kommas verbunden"
+msgid "optional, default ''"
+msgstr "optional, standard ''"
 
-#: views/users/api.hbs:54
-msgid ""
-"if not visible then the subscriber can not view or modify this value at the "
-"profile page"
+#: views/users/api.hbs:56
+msgid "This API call either add emails to blacklist"
 msgstr ""
-"Wenn nicht sichtbar, kann der Abonnent diesen Wert auf der Profilseite weder "
-"sehen noch bearbeiten"
+
+#: views/users/api.hbs:60 views/users/api.hbs:68
+msgid "email address"
+msgstr "E-Mail-Adresse"
+
+#: views/users/api.hbs:63
+msgid "Delete email from blacklist"
+msgstr "E-Mail aus der Blacklist löschen"
+
+#: views/users/api.hbs:64
+msgid "This API call either delete emails from blacklist"
+msgstr ""
 
 #: views/users/forgot.hbs:3 views/users/reset.hbs:3
 msgid "Password Reset"
@@ -2991,18 +3187,18 @@ msgstr "Wähle Sie Ihr neues Passwort"
 msgid "Please enter a new password."
 msgstr "Bitte geben Sie ein neues Passwort ein"
 
-#: lib/editor-helpers.js:16 routes/templates.js:109
+#: lib/editor-helpers.js:17 routes/templates.js:95
 msgid "Could not find template with specified ID"
 msgstr "Konnte keine Vorlage mit angegebener ID finden"
 
-#: lib/editor-helpers.js:32 routes/archive.js:145 routes/campaigns.js:131
-#: routes/campaigns.js:295 routes/campaigns.js:390 routes/campaigns.js:435
-#: routes/campaigns.js:475 routes/campaigns.js:778 routes/campaigns.js:801
-#: routes/campaigns.js:820 routes/campaigns.js:842 routes/triggers.js:146
+#: lib/editor-helpers.js:33 routes/archive.js:145 routes/campaigns.js:131
+#: routes/campaigns.js:284 routes/campaigns.js:379 routes/campaigns.js:427
+#: routes/campaigns.js:467 routes/campaigns.js:844 routes/campaigns.js:867
+#: routes/campaigns.js:886 routes/campaigns.js:908 routes/triggers.js:146
 msgid "Could not find campaign with specified ID"
 msgstr "Konnte keine Kampagne mit dieser ID finden"
 
-#: lib/editor-helpers.js:46 routes/editorapi.js:308
+#: lib/editor-helpers.js:47 routes/editorapi.js:308
 msgid "Invalid resource type"
 msgstr "Ungültiger Ressourcentyp"
 
@@ -3010,71 +3206,95 @@ msgstr "Ungültiger Ressourcentyp"
 msgid "Bad status code %s"
 msgstr "Bad Statuscode %s"
 
-#: lib/helpers.js:31
+#: lib/helpers.js:32
 msgid "URL that points to the unsubscribe page"
 msgstr "URL, die auf die Abmeldungsseite verweist"
 
-#: lib/helpers.js:34
+#: lib/helpers.js:35
 msgid "URL that points to the preferences page of the subscriber"
 msgstr ""
 "URL, die auf die Persönliche-Einstellungs-Seite des Teilnehmers verweist"
 
-#: lib/helpers.js:37
+#: lib/helpers.js:38
 msgid "URL to preview the message in a browser"
 msgstr "URL zur Vorschau der E-Mail im Browser"
 
-#: lib/helpers.js:43 lib/models/segments.js:31
+#: lib/helpers.js:44 lib/models/segments.js:31
 msgid "First name"
 msgstr "Vorname"
 
-#: lib/helpers.js:46 lib/models/segments.js:35
+#: lib/helpers.js:47 lib/models/segments.js:35
 msgid "Last name"
 msgstr "Nachname"
 
-#: lib/helpers.js:49
+#: lib/helpers.js:50
 msgid "Full name (first and last name combined)"
 msgstr "Vollständiger Name (Vor- und Nachname kombiniert)"
 
-#: lib/helpers.js:52
+#: lib/helpers.js:53
 msgid "Unique ID that identifies the recipient"
 msgstr "Eindeutige ID, die den Empfänger identifiziert"
 
-#: lib/helpers.js:55
+#: lib/helpers.js:56
 msgid "Unique ID that identifies the list used for this campaign"
 msgstr ""
 "Eindeutige ID, welche die für diese Kampagne verwendete Liste identifiziert"
 
-#: lib/helpers.js:58
+#: lib/helpers.js:59
 msgid "Unique ID that identifies current campaign"
 msgstr "Eindeutige ID, welche die aktuelle Kampagne identifiziert"
+
+#: lib/helpers.js:67 lib/helpers.js:79
+msgid "content from an RSS entry"
+msgstr "Inhalt aus einem RSS-Eintrag"
+
+#: lib/helpers.js:70
+msgid "RSS entry title"
+msgstr ""
+
+#: lib/helpers.js:73
+msgid "RSS entry date"
+msgstr ""
+
+#: lib/helpers.js:76
+msgid "RSS entry link"
+msgstr ""
+
+#: lib/helpers.js:82
+msgid "RSS entry summary"
+msgstr ""
+
+#: lib/helpers.js:85
+msgid "RSS entry image URL"
+msgstr ""
 
 #: lib/mailer.js:245
 msgid "Invalid mail transport"
 msgstr "Ungültiger Mail-Transport"
 
-#: lib/models/campaigns.js:308 lib/models/campaigns.js:335
-#: lib/models/campaigns.js:408 lib/models/campaigns.js:531
-#: lib/models/campaigns.js:792 lib/models/campaigns.js:924
+#: lib/models/campaigns.js:105 lib/models/campaigns.js:132
+#: lib/models/campaigns.js:205 lib/models/campaigns.js:328
+#: lib/models/campaigns.js:589 lib/models/campaigns.js:721
 msgid "Missing Campaign ID"
 msgstr "Kampagnen-ID fehlt"
 
-#: lib/models/campaigns.js:444
+#: lib/models/campaigns.js:241
 msgid "Emtpy or too large attahcment"
 msgstr "Leere oder zu große Anhangsdatei"
 
-#: lib/models/campaigns.js:610 lib/models/campaigns.js:801
+#: lib/models/campaigns.js:407 lib/models/campaigns.js:598
 msgid "Campaign Name must be set"
 msgstr "Kampagnenname ist erforderlich"
 
-#: lib/models/campaigns.js:614
+#: lib/models/campaigns.js:411
 msgid "RSS URL must be set and needs to be a valid URL"
 msgstr "RSS URL ist erforderlich und muss eine gültige URL sein"
 
-#: lib/models/campaigns.js:770
+#: lib/models/campaigns.js:567
 msgid "Selected template not found"
 msgstr "Ausgewählte Vorlage nicht gefunden"
 
-#: lib/models/campaigns.js:1125
+#: lib/models/campaigns.js:922
 msgid "Invalid or missing message ID"
 msgstr "Ungültige oder fehlende Nachrichten-ID"
 
@@ -3095,12 +3315,12 @@ msgid "Option"
 msgstr "Option"
 
 #: lib/models/fields.js:53 lib/models/fields.js:98 lib/models/fields.js:123
-#: lib/models/forms.js:37 lib/models/lists.js:81 lib/models/lists.js:178
-#: lib/models/lists.js:218 lib/models/segments.js:43 lib/models/segments.js:176
-#: lib/models/subscriptions.js:89 lib/models/subscriptions.js:661
-#: lib/models/subscriptions.js:724 lib/models/subscriptions.js:910
-#: lib/models/subscriptions.js:1013 lib/models/subscriptions.js:1067
-#: lib/models/subscriptions.js:1130 lib/models/subscriptions.js:1173
+#: lib/models/forms.js:37 lib/models/lists.js:72 lib/models/lists.js:172
+#: lib/models/lists.js:212 lib/models/segments.js:43 lib/models/segments.js:176
+#: lib/models/subscriptions.js:74 lib/models/subscriptions.js:574
+#: lib/models/subscriptions.js:637 lib/models/subscriptions.js:823
+#: lib/models/subscriptions.js:926 lib/models/subscriptions.js:980
+#: lib/models/subscriptions.js:1043 lib/models/subscriptions.js:1086
 msgid "Missing List ID"
 msgstr "Listen-ID fehlt"
 
@@ -3150,12 +3370,12 @@ msgstr "Formular-Name ist erforderlich"
 msgid "Custom form not found"
 msgstr "Formular nicht gefunden"
 
-#: lib/models/links.js:329 routes/campaigns.js:541 routes/campaigns.js:589
-#: routes/campaigns.js:629 services/sender.js:304
+#: lib/models/links.js:329 routes/campaigns.js:533 routes/campaigns.js:581
+#: routes/campaigns.js:621 routes/campaigns.js:671 services/sender.js:305
 msgid "Campaign not found"
 msgstr "Kampagne nicht gefunden"
 
-#: lib/models/links.js:337 routes/lists.js:162 services/sender.js:311
+#: lib/models/links.js:337 routes/lists.js:177 services/sender.js:312
 msgid "List not found"
 msgstr "Liste nicht gefunden"
 
@@ -3163,27 +3383,44 @@ msgstr "Liste nicht gefunden"
 msgid "Subscription not found"
 msgstr "Abonnement nicht gefunden"
 
-#: lib/models/lists.js:117 lib/models/lists.js:182
+#: lib/models/lists.js:110 lib/models/lists.js:176
 msgid "List Name must be set"
 msgstr "Listennamen ist erforderlich"
 
-#: lib/models/lists.js:247
+#: lib/models/lists.js:241
 msgid "Missing List CID"
 msgstr "Listen CID fehlt"
+
+#: lib/models/report-templates.js:26 lib/models/report-templates.js:70
+#: lib/models/report-templates.js:142
+msgid "Missing report template ID"
+msgstr "Report-Vorlagen-ID fehlt"
+
+#: lib/models/report-templates.js:77
+msgid "Report template name must be set"
+msgstr "Report-Vorlagen-Name ist erforderlich"
+
+#: lib/models/reports.js:39 lib/models/reports.js:109 lib/models/reports.js:187
+msgid "Missing report ID"
+msgstr "Report-ID fehlt"
+
+#: lib/models/reports.js:115
+msgid "Report name must be set"
+msgstr "Report-Name ist erforderlich"
 
 #: lib/models/segments.js:15
 msgid "Signup country"
 msgstr "Anmeldungs-Land"
 
-#: lib/models/segments.js:19 lib/models/triggers.js:11
+#: lib/models/segments.js:19 lib/models/triggers.js:12
 msgid "Sign up date"
 msgstr "Anmeldungs-Datum"
 
-#: lib/models/segments.js:23 lib/models/triggers.js:15
+#: lib/models/segments.js:23 lib/models/triggers.js:16
 msgid "Latest open"
 msgstr "Letzte Öffnung"
 
-#: lib/models/segments.js:27 lib/models/triggers.js:19
+#: lib/models/segments.js:27 lib/models/triggers.js:20
 msgid "Latest click"
 msgstr "Letzter Klick"
 
@@ -3242,107 +3479,107 @@ msgstr "Das Segment wurde nicht gefunden"
 msgid "Selected rule not found"
 msgstr "Ausgewählte Regel nicht gefunden"
 
-#: lib/models/subscriptions.js:235
+#: lib/models/subscriptions.js:148
 msgid "%s: Please Confirm Subscription"
 msgstr "%s: Bitte bestätigen Sie Ihr Abonnement"
 
-#: lib/models/subscriptions.js:345
+#: lib/models/subscriptions.js:258
 msgid "Could not save subscription"
 msgstr "Abonnement konnte nicht gespeichert werden"
 
-#: lib/models/subscriptions.js:528 lib/models/subscriptions.js:558
+#: lib/models/subscriptions.js:441 lib/models/subscriptions.js:471
 msgid "Missing Subbscription ID"
 msgstr "Abonnement-ID fehlt"
 
-#: lib/models/subscriptions.js:586
+#: lib/models/subscriptions.js:499
 msgid "Missing Subbscription email address"
 msgstr "Abonnement-E-Mail-Adresse fehlt"
 
-#: lib/models/subscriptions.js:665 lib/models/subscriptions.js:914
-#: lib/models/subscriptions.js:1177
+#: lib/models/subscriptions.js:578 lib/models/subscriptions.js:827
+#: lib/models/subscriptions.js:1090
 msgid "Missing subscription ID"
 msgstr "Abonnement-ID fehlt"
 
-#: lib/models/subscriptions.js:728
+#: lib/models/subscriptions.js:641
 msgid "Missing email address"
 msgstr "E-Mail-Adresse fehlt"
 
-#: lib/models/subscriptions.js:1017 lib/models/subscriptions.js:1071
-#: lib/models/subscriptions.js:1107
+#: lib/models/subscriptions.js:930 lib/models/subscriptions.js:984
+#: lib/models/subscriptions.js:1020
 msgid "Missing Import ID"
 msgstr "Import-ID fehlt"
 
-#: lib/models/subscriptions.js:1199
+#: lib/models/subscriptions.js:1112
 msgid "Unknown subscription ID"
 msgstr "Unbekannte Abonnement-ID"
 
-#: lib/models/subscriptions.js:1204
+#: lib/models/subscriptions.js:1117
 msgid "Nothing seems to be changed"
 msgstr "Nichts scheint sich geändert zu haben"
 
-#: lib/models/subscriptions.js:1218
+#: lib/models/subscriptions.js:1131
 msgid "This address is already registered by someone else"
 msgstr "Diese Adresse ist bereits von jemand anderem registriert"
 
-#: lib/models/templates.js:51 lib/models/templates.js:125
-#: lib/models/templates.js:169
+#: lib/models/templates.js:26 lib/models/templates.js:100
+#: lib/models/templates.js:144
 msgid "Missing Template ID"
 msgstr "Vorlagen ID fehlt"
 
-#: lib/models/templates.js:80 lib/models/templates.js:129
+#: lib/models/templates.js:55 lib/models/templates.js:104
 msgid "Template Name must be set"
 msgstr "Vorlagen-Name ist erforderlich"
 
-#: lib/models/triggers.js:28
+#: lib/models/triggers.js:29
 msgid "Has Opened"
 msgstr "Hat geöffnet"
 
-#: lib/models/triggers.js:31
+#: lib/models/triggers.js:32
 msgid "Has Clicked"
 msgstr "Hat geklickt"
 
-#: lib/models/triggers.js:34
+#: lib/models/triggers.js:35
 msgid "Not Opened"
 msgstr "Nicht geöffnet"
 
-#: lib/models/triggers.js:37
+#: lib/models/triggers.js:38
 msgid "Not Clicked"
 msgstr "Nicht geklickt"
 
-#: lib/models/triggers.js:174 lib/models/triggers.js:211
+#: lib/models/triggers.js:175 lib/models/triggers.js:212
 msgid "Missing or invalid list ID"
 msgstr "Fehlende oder ungültige Listen ID"
 
-#: lib/models/triggers.js:178 lib/models/triggers.js:263
+#: lib/models/triggers.js:179 lib/models/triggers.js:264
 msgid "Days in the past are not allowed"
 msgstr "Tage in der Vergangenheit sind nicht erlaubt"
 
-#: lib/models/triggers.js:182 lib/models/triggers.js:203
-#: lib/models/triggers.js:267 lib/models/triggers.js:288
+#: lib/models/triggers.js:183 lib/models/triggers.js:204
+#: lib/models/triggers.js:268 lib/models/triggers.js:289
 msgid "Missing or invalid trigger rule"
 msgstr "Fehlende oder ungültige Trigger-Regel"
 
-#: lib/models/triggers.js:189 lib/models/triggers.js:274
+#: lib/models/triggers.js:190 lib/models/triggers.js:275
 msgid "Invalid subscription configuration"
 msgstr "Ungültige Abonnement-Konfiguration"
 
-#: lib/models/triggers.js:196 lib/models/triggers.js:281
+#: lib/models/triggers.js:197 lib/models/triggers.js:282
 msgid "Invalid campaign configuration"
 msgstr "Kampagnen Konfiguration ungültig"
 
-#: lib/models/triggers.js:199 lib/models/triggers.js:284
+#: lib/models/triggers.js:200 lib/models/triggers.js:285
 msgid "A campaing can not be a target for itself"
 msgstr "Eine Kampagne kann kein Ziel für sich selbst sein"
 
-#: lib/models/triggers.js:232
+#: lib/models/triggers.js:233
 msgid "Could not store trigger row"
 msgstr "Trigger-Zeile konnte nicht gespeichert werden"
 
-#: lib/models/triggers.js:249
+#: lib/models/triggers.js:250
 msgid "Missing or invalid Trigger ID"
 msgstr "Trigger-ID fehlt oder ist ungültig"
 
-#: lib/models/triggers.js:316
+#: lib/models/triggers.js:317
 msgid "Missing Trigger ID"
 msgstr "Trigger-ID fehlt"
 
@@ -3413,42 +3650,43 @@ msgstr "Eingeloggt als %s"
 msgid "Incorrect username or password"
 msgstr "Falscher Benutzername oder Passwort"
 
-#: lib/tools.js:139
+#: lib/tools.js:148
 msgid "Blocked email address \"%s\""
 msgstr "Gesperrte E-Mail-Adresse \"%s\""
 
-#: lib/tools.js:148
+#: lib/tools.js:157
 msgid "Invalid email address \"%s\"."
 msgstr "Ungültige E-Mail-Adresse \"%s\"."
 
-#: lib/tools.js:151
+#: lib/tools.js:160
 msgid "MX record not found for domain"
 msgstr "MX-Record für die Domäne nicht gefunden"
 
-#: lib/tools.js:154
+#: lib/tools.js:163
 msgid "Address domain not found"
 msgstr "Address-Domain nicht gefunden"
 
-#: lib/tools.js:157
+#: lib/tools.js:166
 msgid "Address domain name is required"
 msgstr "Address-Domain-Name ist erforderlich"
 
-#: routes/archive.js:31 routes/archive.js:43 routes/archive.js:55 app.js:225
+#: routes/archive.js:31 routes/archive.js:43 routes/archive.js:55 app.js:224
 msgid "Not Found"
 msgstr "Nicht gefunden"
 
-#: routes/archive.js:121 services/sender.js:447
+#: routes/archive.js:121 services/sender.js:449
 msgid "Received status code %s from %s"
 msgstr "Empfangener Statuscode %s von %s"
 
-#: routes/archive.js:153 routes/campaigns.js:828
+#: routes/archive.js:153 routes/campaigns.js:894
 msgid "Attachment not found"
 msgstr "Anhangs-Datei nicht gefunden"
 
-#: routes/campaigns.js:26 routes/editorapi.js:35 routes/fields.js:13
-#: routes/forms.js:16 routes/grapejs.js:13 routes/lists.js:50
-#: routes/mosaico.js:14 routes/segments.js:13 routes/settings.js:23
-#: routes/templates.js:17 routes/triggers.js:18 routes/users.js:75
+#: routes/blacklist.js:13 routes/campaigns.js:26 routes/editorapi.js:35
+#: routes/fields.js:13 routes/forms.js:16 routes/grapejs.js:13
+#: routes/lists.js:50 routes/mosaico.js:14 routes/report-templates.js:20
+#: routes/reports.js:22 routes/segments.js:13 routes/settings.js:23
+#: routes/templates.js:18 routes/triggers.js:18 routes/users.js:75
 #: routes/users.js:120
 msgid "Need to be logged in to access restricted content"
 msgstr "Sie müssen angemeldet sein, um auf geschützte Inhalte zuzugreifen."
@@ -3461,107 +3699,103 @@ msgstr "Kampagne konnte nicht erstellt werden"
 msgid "Campaign “%s” created"
 msgstr "Die Kampagne “%s” wurde erstellt"
 
-#: routes/campaigns.js:204
-msgid "content from an RSS entry"
-msgstr "Inhalt aus einem RSS-Eintrag"
-
-#: routes/campaigns.js:220
+#: routes/campaigns.js:209
 msgid "Campaign settings updated"
 msgstr "Kampagnen-Einstellungen aktualisiert"
 
-#: routes/campaigns.js:222
+#: routes/campaigns.js:211
 msgid "Campaign settings not updated"
 msgstr "Kampagnen-Einstellungen nicht aktualisiert"
 
-#: routes/campaigns.js:238 routes/campaigns.js:678
+#: routes/campaigns.js:227 routes/campaigns.js:744
 msgid "Campaign deleted"
 msgstr "Kampagne gelöscht"
 
-#: routes/campaigns.js:240 routes/campaigns.js:680
+#: routes/campaigns.js:229 routes/campaigns.js:746
 msgid "Could not delete specified campaign"
 msgstr "Die Kampagne konnte nicht gelöscht werden"
 
-#: routes/campaigns.js:259
+#: routes/campaigns.js:248
 msgid "Idling"
 msgstr "Ruhend"
 
-#: routes/campaigns.js:262
+#: routes/campaigns.js:251
 msgid "Scheduled"
 msgstr "Geplant"
 
-#: routes/campaigns.js:268
+#: routes/campaigns.js:257
 msgid "Paused"
 msgstr "Pausiert"
 
-#: routes/campaigns.js:270
+#: routes/campaigns.js:259
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: routes/campaigns.js:272
+#: routes/campaigns.js:261
 msgid "Active"
 msgstr "Aktiv"
 
-#: routes/campaigns.js:274
+#: routes/campaigns.js:263
 msgid "Other"
 msgstr "Andere"
 
-#: routes/campaigns.js:429
+#: routes/campaigns.js:421
 msgid "Unknown status selector"
 msgstr "Unbekannter Status-Selektor"
 
-#: routes/campaigns.js:696
+#: routes/campaigns.js:762
 msgid "Scheduled sending"
 msgstr "Senden geplant"
 
-#: routes/campaigns.js:698
+#: routes/campaigns.js:764
 msgid "Could not schedule sending"
 msgstr "Versand konnte nicht geplant werden"
 
-#: routes/campaigns.js:710
+#: routes/campaigns.js:776
 msgid "Sending resumed"
 msgstr "Versand wieder aufgenommen"
 
-#: routes/campaigns.js:712
+#: routes/campaigns.js:778
 msgid "Could not resume sending"
 msgstr "Versand konnte nicht fortgesetzt werden"
 
-#: routes/campaigns.js:724
+#: routes/campaigns.js:790
 msgid "Sending reset"
 msgstr "Versand zurückgesetzt"
 
-#: routes/campaigns.js:726
+#: routes/campaigns.js:792
 msgid "Could not reset sending"
 msgstr "Versand konnte nicht zurückgesetzt werden"
 
-#: routes/campaigns.js:738 routes/campaigns.js:766
+#: routes/campaigns.js:804 routes/campaigns.js:832
 msgid "Sending paused"
 msgstr "Versand pausiert"
 
-#: routes/campaigns.js:740 routes/campaigns.js:768
+#: routes/campaigns.js:806 routes/campaigns.js:834
 msgid "Could not pause sending"
 msgstr "Versand konnte nicht pausiert werden"
 
-#: routes/campaigns.js:752
+#: routes/campaigns.js:818
 msgid "Sending activated"
 msgstr "Versand aktiviert"
 
-#: routes/campaigns.js:754
+#: routes/campaigns.js:820
 msgid "Could not activate sending"
 msgstr "Versand konnte nicht aktiviert werden"
 
-#: routes/campaigns.js:789
+#: routes/campaigns.js:855
 msgid "Attachment uploaded"
 msgstr "Anhang hochgeladen"
 
-#: routes/campaigns.js:791
+#: routes/campaigns.js:857
 msgid "Could not store attachment"
 msgstr "Anhang konnte nicht gespeichert werden"
 
-#: routes/campaigns.js:808
+#: routes/campaigns.js:874
 msgid "Attachment deleted"
 msgstr "Anhang gelöscht"
 
-#: routes/campaigns.js:810
+#: routes/campaigns.js:876
 msgid "Could not delete attachment"
 msgstr "Anhang konnte nicht gelöscht werden"
 
@@ -3726,137 +3960,206 @@ msgid "Oops, we couldn't find a link for the URL you clicked"
 msgstr ""
 "Ups, wir konnten keinen Link für die URL finden, die Sie geklickt haben"
 
-#: routes/lists.js:91
+#: routes/lists.js:80
 msgid "Could not create list"
 msgstr "Die Liste konnte nicht erstellt werden"
 
-#: routes/lists.js:94
+#: routes/lists.js:83
 msgid "List created"
 msgstr "Liste erstellt"
 
-#: routes/lists.js:102 routes/lists.js:252 routes/lists.js:317
-#: routes/lists.js:356 routes/lists.js:425 routes/lists.js:450
-#: routes/lists.js:495 routes/lists.js:517 routes/lists.js:546
-#: routes/lists.js:625 routes/lists.js:682 routes/lists.js:709
+#: routes/lists.js:91 routes/lists.js:267 routes/lists.js:332
+#: routes/lists.js:371 routes/lists.js:440 routes/lists.js:465
+#: routes/lists.js:510 routes/lists.js:532 routes/lists.js:561
+#: routes/lists.js:640 routes/lists.js:697 routes/lists.js:724
 msgid "Could not find list with specified ID"
 msgstr "Die Liste mit angegebener ID konnte nicht gefunden werden"
 
-#: routes/lists.js:129
+#: routes/lists.js:118
 msgid "List settings updated"
 msgstr "Listeneinstellungen aktualisiert"
 
-#: routes/lists.js:131
+#: routes/lists.js:120
 msgid "List settings not updated"
 msgstr "Listeneinstellungen nicht aktualisiert"
 
-#: routes/lists.js:149
+#: routes/lists.js:138
 msgid "List deleted"
 msgstr "Liste gelöscht"
 
-#: routes/lists.js:151
+#: routes/lists.js:140
 msgid "Could not delete specified list"
 msgstr "Die Liste konnte nicht gelöscht werden"
 
-#: routes/lists.js:187
+#: routes/lists.js:202
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: routes/lists.js:187
+#: routes/lists.js:202
 msgid "Complained"
 msgstr "Beschwert"
 
-#: routes/lists.js:218
+#: routes/lists.js:233
 msgid "Invalid key"
 msgstr "Ungültiger Key"
 
-#: routes/lists.js:220
+#: routes/lists.js:235
 msgid "Expired key"
 msgstr "Abgelaufener Key"
 
-#: routes/lists.js:222
+#: routes/lists.js:237
 msgid "Revoked key"
 msgstr "Widerrufener Key"
 
-#: routes/lists.js:272
+#: routes/lists.js:287
 msgid "Initializing"
 msgstr "Initialisierung"
 
-#: routes/lists.js:275
+#: routes/lists.js:290
 msgid "Initialized"
 msgstr "Initialisiert"
 
-#: routes/lists.js:278
+#: routes/lists.js:293
 msgid "Importing"
 msgstr "Importieren"
 
-#: routes/lists.js:284
+#: routes/lists.js:299
 msgid "Errored"
 msgstr "Fehlerhaft"
 
-#: routes/lists.js:362 routes/lists.js:431 routes/lists.js:456
+#: routes/lists.js:377 routes/lists.js:446 routes/lists.js:471
 msgid "Could not find subscriber with specified ID"
 msgstr "Der Abonnent mit angegebenen ID konnte nicht gefunden werden"
 
-#: routes/lists.js:408
+#: routes/lists.js:423
 msgid "Could not add subscription"
 msgstr "Das Abonnement konnte nicht hinzugefügt werden"
 
-#: routes/lists.js:413
+#: routes/lists.js:428
 msgid "%s was successfully added to your list"
 msgstr "%s wurde Ihrer Liste erfolgreich hinzugefügt"
 
-#: routes/lists.js:415
+#: routes/lists.js:430
 msgid "%s was not added to your list"
 msgstr "%s wurde nicht zu Ihrer Liste hinzugefügt"
 
-#: routes/lists.js:437
+#: routes/lists.js:452
 msgid "Could not unsubscribe user"
 msgstr "Der Benutzer konnte nicht deabonniert werden"
 
-#: routes/lists.js:440
+#: routes/lists.js:455
 msgid "%s was successfully unsubscribed from your list"
 msgstr "%s wurde erfolgreich von Ihrer Liste entfernt"
 
-#: routes/lists.js:460
+#: routes/lists.js:475
 msgid "%s was successfully removed from your list"
 msgstr "%s wurde erfolgreich aus Ihrer Liste entfernt"
 
-#: routes/lists.js:472
+#: routes/lists.js:487
 msgid "Another subscriber with email address %s already exists"
 msgstr "Ein anderer Abonnent mit der E-Mail-Adresse %s existiert bereits"
 
-#: routes/lists.js:479
+#: routes/lists.js:494
 msgid "Subscription settings updated"
 msgstr "Abonnementeinstellungen aktualisiert"
 
-#: routes/lists.js:481
+#: routes/lists.js:496
 msgid "Subscription settings not updated"
 msgstr "Abonnementeinstellungen nicht aktualisiert"
 
-#: routes/lists.js:523 routes/lists.js:631 routes/lists.js:667
-#: routes/lists.js:695 routes/lists.js:715
+#: routes/lists.js:538 routes/lists.js:646 routes/lists.js:682
+#: routes/lists.js:710 routes/lists.js:730
 msgid "Could not find import data with specified ID"
 msgstr "Keine Importdaten für diese ID gefunden"
 
-#: routes/lists.js:554
+#: routes/lists.js:569
 msgid "Could not process CSV"
 msgstr "CSV-Datei konnte nicht verarbeitet werden"
 
-#: routes/lists.js:563
+#: routes/lists.js:578
 msgid "Could not create importer"
 msgstr "Importer konnte nicht erstellt werden"
 
-#: routes/lists.js:614
+#: routes/lists.js:629
 msgid "Empty file"
 msgstr "Leere Datei"
 
-#: routes/lists.js:671
+#: routes/lists.js:686
 msgid "Import started"
 msgstr "Import gestartet"
 
-#: routes/lists.js:699
+#: routes/lists.js:714
 msgid "Import restarted"
 msgstr "Import neu gestartet"
+
+#: routes/report-templates.js:246
+msgid "Could not create report template"
+msgstr "Report-Vorlage konnte nicht erstellt werden"
+
+#: routes/report-templates.js:249
+msgid "Report template “%s” created"
+msgstr "Die Report-Vorlage “%s” wurde erstellt"
+
+#: routes/report-templates.js:257
+msgid "Could not find report template with specified ID"
+msgstr "Report-Vorlage mit angegebener ID konnte nicht gefunden werden"
+
+#: routes/report-templates.js:280
+msgid "Report template updated"
+msgstr "Report-Vorlage aktualisiert"
+
+#: routes/report-templates.js:282
+msgid "Report template not updated"
+msgstr "Report-Vorlage wurde nicht aktualisiert"
+
+#: routes/report-templates.js:298
+msgid "Report template deleted"
+msgstr "Report-Vorlage gelöscht"
+
+#: routes/report-templates.js:300
+msgid "Could not delete specified report template"
+msgstr "Die Report-Vorlage konnte nicht gelöscht werden"
+
+#: routes/reports.js:124 routes/reports.js:130
+msgid "Could not create report"
+msgstr "Der Report konnte nicht erstellt werden"
+
+#: routes/reports.js:135
+msgid "Report “%s” created"
+msgstr "Report “%s” erstellt"
+
+#: routes/reports.js:146 routes/reports.js:224 routes/reports.js:239
+#: routes/reports.js:265 routes/reports.js:275
+msgid "Could not find report with specified ID"
+msgstr "Der Report mit dieser ID konnte nicht gefunden werden"
+
+#: routes/reports.js:188 routes/reports.js:194
+msgid "Could not update report"
+msgstr "Der Report konnte nicht aktualisiert werden"
+
+#: routes/reports.js:197
+msgid "Report updated"
+msgstr "Report aktualisiert"
+
+#: routes/reports.js:199
+msgid "Report not updated"
+msgstr "Report nicht aktualisiert"
+
+#: routes/reports.js:212
+msgid "Report deleted"
+msgstr "Report gelöscht"
+
+#: routes/reports.js:214
+msgid "Could not delete specified report"
+msgstr "Der Report konnte nicht gelöscht werden"
+
+#: routes/reports.js:230
+msgid "Could not find report template"
+msgstr "Report-Vorlage konnte nicht gefunden werden"
+
+#: routes/reports.js:260
+msgid "Unknown type of template"
+msgstr "Unbekannter Mime-Type des Template"
 
 #: routes/segments.js:86
 msgid "Could not create segment"
@@ -3993,71 +4296,80 @@ msgstr "Server antwortete mit: \"%s\""
 msgid "Mailer settings verified, ready to send some mail!"
 msgstr "Mailer-Einstellungen überprüft, bereit zum Senden!"
 
-#: routes/subscription.js:25
+#: routes/subscription.js:32
+msgid "Not allowed by CORS"
+msgstr "Nicht erlaubt von CORS"
+
+#: routes/subscription.js:50
 msgid "Selected subscription not found"
 msgstr "Ausgewähltes Abonnement nicht gefunden"
 
-#: routes/subscription.js:35 routes/subscription.js:155
-#: routes/subscription.js:222 routes/subscription.js:275
-#: routes/subscription.js:327 routes/subscription.js:396
-#: routes/subscription.js:434 routes/subscription.js:510
-#: routes/subscription.js:532 routes/subscription.js:592
-#: routes/subscription.js:616 routes/subscription.js:681
+#: routes/subscription.js:60 routes/subscription.js:181
+#: routes/subscription.js:266 routes/subscription.js:324
+#: routes/subscription.js:377 routes/subscription.js:429
+#: routes/subscription.js:511 routes/subscription.js:562
+#: routes/subscription.js:638 routes/subscription.js:660
+#: routes/subscription.js:720 routes/subscription.js:744
+#: routes/subscription.js:809
 msgid "Selected list not found"
 msgstr "Ausgewählte Liste nicht gefunden"
 
-#: routes/subscription.js:109
+#: routes/subscription.js:134
 msgid "%s: Subscription Confirmed"
 msgstr "%s: Abonnement bestätigt"
 
-#: routes/subscription.js:381
+#: routes/subscription.js:184 routes/subscription.js:514
+msgid "The list does not allow public subscriptions."
+msgstr "Die Liste erlaubt keine öffentlichen Abonnements."
+
+#: routes/subscription.js:493 routes/subscription.js:495
 msgid "Email address not set"
 msgstr "E-Mail-Adresse nicht gesetzt"
 
-#: routes/subscription.js:419
+#: routes/subscription.js:538
 msgid "Could not store confirmation data"
 msgstr "Die Bestätigungsdaten konnten nicht gespeichert werden"
 
-#: routes/subscription.js:448 routes/subscription.js:547
-#: routes/subscription.js:631
+#: routes/subscription.js:576 routes/subscription.js:675
+#: routes/subscription.js:759
 msgid "Subscription not found from this list"
 msgstr "Abonnement konnte in dieser Liste nicht gefunden werden"
 
-#: routes/subscription.js:607
+#: routes/subscription.js:735
 msgid "Email address updated, check your mailbox for verification instructions"
 msgstr ""
 "Die E-Mail-Adresse wurde aktualisiert. Bitte überprüfen Sie Ihre Mailbox zur "
 "Bestätigung"
 
-#: routes/subscription.js:730
+#: routes/subscription.js:858
 msgid "%s: Unsubscribe Confirmed"
 msgstr "%s: Abmeldungen Bestätigt"
 
-#: routes/subscription.js:777 routes/subscription.js:793
+#: routes/subscription.js:905 routes/subscription.js:921
 msgid "Public key is not set"
 msgstr "Public-Key ist nicht gesetzt"
 
-#: routes/templates.js:98
+#: routes/templates.js:84
 msgid "Could not create template"
 msgstr "Vorlage konnte nicht erstellt werden"
 
-#: routes/templates.js:101
+#: routes/templates.js:87
 msgid "Template created"
 msgstr "Vorlage erstellt"
 
-#: routes/templates.js:140
+#: routes/templates.js:126
 msgid "Template settings updated"
 msgstr "Vorlageneinstellungen aktualisiert"
 
-#: routes/templates.js:142
+#: routes/templates.js:128
 msgid "Template settings not updated"
 msgstr "Template Einstellungen wurden nicht aktualisiert"
 
-#: routes/templates.js:158
+#: routes/templates.js:144
 msgid "Template deleted"
 msgstr "Vorlage gelöscht"
 
-#: routes/templates.js:160
+#: routes/templates.js:146
 msgid "Could not delete specified template"
 msgstr "Die Vorlage konnte nicht gelöscht werden"
 
@@ -4145,17 +4457,47 @@ msgstr "Fand %s neue Kampagnen-Nachrichten im Feed"
 msgid "Found nothing new from the feed"
 msgstr "Im Feed wurde nichts neues gefunden"
 
-#: services/feedcheck.js:143
+#: services/feedcheck.js:146
 msgid "RSS entry %s"
 msgstr "RSS Eintrag %s"
 
-#: services/importer.js:243
+#: services/importer.js:249
 msgid "Could not access import file"
 msgstr "Auf die Importdatei konnte nicht zugegriffen werden"
 
 #: services/triggers.js:51
 msgid "Unknown trigger type %s"
 msgstr "Unbekannter Trigger-Typ %s"
+
+#~ msgid "Add new custom field"
+#~ msgstr "Neues benutzerdefiniertes Feld hinzufügen"
+
+#~ msgid "field name"
+#~ msgstr "Feldname"
+
+#~ msgid "one of the following types:"
+#~ msgstr "Einer der folgenden Typen:"
+
+#~ msgid ""
+#~ "If the type is 'option' then you also need to specify the parent element "
+#~ "ID"
+#~ msgstr ""
+#~ "Wenn der Typ 'Option' ist, dann müssen Sie auch die übergeordnete Element-"
+#~ "ID angeben"
+
+#~ msgid ""
+#~ "Template for the group element. If not set, then values of the elements "
+#~ "are joined with commas"
+#~ msgstr ""
+#~ "Vorlage für das Gruppenelement. Wenn nicht gesetzt, dann werden die Werte "
+#~ "der Elemente mit Kommas verbunden"
+
+#~ msgid ""
+#~ "if not visible then the subscriber can not view or modify this value at "
+#~ "the profile page"
+#~ msgstr ""
+#~ "Wenn nicht sichtbar, kann der Abonnent diesen Wert auf der Profilseite "
+#~ "weder sehen noch bearbeiten"
 
 #~ msgid "You are now unsubscribed"
 #~ msgstr "Sie sind jetzt aus dieser Liste ausgetragen"
