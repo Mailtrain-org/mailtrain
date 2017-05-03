@@ -266,6 +266,11 @@ router.get('/:list/edit/:form', passport.csrfProtection, (req, res) => {
                             label: _('Mail - Unsubscription Confirmed (Text)'),
                             type: 'text',
                             help: helpEmailText
+                        }, {
+                            name: 'web_manual_unsubscribe_notice',
+                            label: _('Web - Manual Unsubscribe Notice'),
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }]
                     }
                 ];
