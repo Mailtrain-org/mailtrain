@@ -318,6 +318,7 @@ function formatMessage(message, callback) {
                 }
 
                 let useVerp = config.verp.enabled && configItems.verpUse && configItems.verpHostname;
+                let useVerpSenderHeader = useVerp && config.verp.disablesenderheader !== true;
                 fields.list(list.id, (err, fieldList) => {
                     if (err) {
                         return callback(err);
@@ -389,7 +390,7 @@ function formatMessage(message, callback) {
                                         name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
                                         address: message.subscription.email
                                     },
-                                    sender: useVerp ? campaignAddress + '@' + configItems.verpHostname : false,
+                                    sender: useVerpSenderHeader ? campaignAddress + '@' + configItems.verpHostname : false,
 
                                     envelope: useVerp ? {
                                         from: campaignAddress + '@' + configItems.verpHostname,

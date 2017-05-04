@@ -132,8 +132,11 @@ function checkEntries(parent, entries, callback) {
                 let entryId = result.insertId;
                 let html = (parent.html || '').toString().trim();
 
-                if (/\[RSS_ENTRY\]/i.test(html)) {
-                    html = html.replace(/\[RSS_ENTRY\]/, entry.content);
+                if (/\[RSS_ENTRY[\w]*\]/i.test(html)) {
+                    html = html.replace(/\[RSS_ENTRY\]/, entry.content); //for backward compatibility
+                    Object.keys(entry).forEach(key => {
+                        html = html.replace('\[RSS_ENTRY_'+key.toUpperCase()+'\]', entry[key])
+                    });
                 } else {
                     html = entry.content + html;
                 }
