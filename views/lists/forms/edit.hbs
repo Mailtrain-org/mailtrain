@@ -55,7 +55,11 @@
                 <a href="/subscription/{{list.cid}}/updated-notice?fid={{form.id}}" target="_blank">{{#translate}}Updated Notice{{/translate}}</a>
                 |
                 <a href="/subscription/{{list.cid}}/unsubscribed-notice?fid={{form.id}}" target="_blank">{{#translate}}Unsubscribed Notice{{/translate}}</a>
+                |
+                <a href="/subscription/{{list.cid}}/manual-unsubscribe-notice?fid={{form.id}}" target="_blank">{{#translate}}Manual Unsubscribe Notice{{/translate}}</a>
                 {{#if testUsers}}
+                    |
+                    <a href="/subscription/{{list.cid}}/unsubscribe/{{testUsers.0.cid}}?fid={{form.id}}&formTest=1" target="_blank">{{#translate}}Unsubscribe{{/translate}}</a>
                     |
                     <a href="/subscription/{{list.cid}}/manage/{{testUsers.0.cid}}?fid={{form.id}}" target="_blank">{{#translate}}Manage{{/translate}}</a>
                     |

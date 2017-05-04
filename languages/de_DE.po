@@ -4030,7 +4030,7 @@ msgstr ""
 "Bestätigung"
 
 #: routes/subscription.js:730
-msgid "%s: Unsubscribe Confirmed"
+msgid "%s: Unsubscription Confirmed"
 msgstr "%s: Abmeldungen Bestätigt"
 
 #: routes/subscription.js:777 routes/subscription.js:793
