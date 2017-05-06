@@ -45,18 +45,16 @@ let corsOrCsrfProtection = (req, res, next) => {
     }
 };
 
-router.get('/confirm/:cid', (req, res, next) => {
+function checkAndExecuteConfirmation(req, action, errorMsg, next, exec) {
     confirmations.takeConfirmation(req.params.cid, (err, confirmation) => {
-        if (!err && !confirmation) {
-            err = new Error(_('Selected subscription not found'));
+        if (!err && (!confirmation || confirmation.action !== action)) {
+            err = new Error(_(errorMsg));
             err.status = 404;
         }
 
         if (err) {
             return next(err);
         }
-
-        const data = confirmation.data;
 
         lists.get(confirmation.listId, (err, list) => {
             if (!err && !list) {
@@ -68,90 +66,104 @@ router.get('/confirm/:cid', (req, res, next) => {
                 return next(err);
             }
 
+            exec(confirmation, list);
+        });
+    });
+}
 
-            if (confirmation.action === 'change-address') {
-                if (!data.subscriptionId) { // Something went terribly wrong and we don't have data that we have originally provided
-                    return next(new Error(_('Subscriber info corrupted or missing')));
+router.get('/confirm/subscribe/:cid', (req, res, next) => {
+    checkAndExecuteConfirmation(req, 'subscribe', 'Request invalid or already completed. If your subscription request is still pending, please subscribe again.', next, (confirmation, list) => {
+        const data = confirmation.data;
+        let optInCountry = geoip.lookupCountry(confirmation.ip) || null;
+
+        const meta = {
+            email: data.email,
+            optInIp: confirmation.ip,
+            optInCountry,
+            status: subscriptions.Status.SUBSCRIBED
+        };
+
+        subscriptions.insert(list.id, meta, data.subscriptionData, (err, result) => {
+            if (err) {
+                return next(err);
+            }
+
+            if (!result.entryId) {
+                return next(new Error(_('Could not save subscription')));
+            }
+
+            subscriptions.getById(list.id, result.entryId, (err, subscription) => {
+                if (err) {
+                    return next(err);
                 }
 
-                subscriptions.updateAddress(list.id, data.subscriptionId, data.emailNew, err => {
+                mailHelpers.sendSubscriptionConfirmed(list, data.email, subscription, err => {
                     if (err) {
                         return next(err);
                     }
 
-                    subscriptions.getById(list.id, data.subscriptionId, (err, subscription) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        mailHelpers.sendSubscriptionConfirmed(list, data.emailNew, subscription, err => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            req.flash('info', _('Email address changed'));
-                            res.redirect('/subscription/' + list.cid + '/manage/' + subscription.cid);
-                        });
-                    });
+                    res.redirect('/subscription/' + list.cid + '/subscribed-notice');
                 });
+            });
+        });
+    });
+});
 
-            } else if (confirmation.action === 'subscribe') {
-                let optInCountry = geoip.lookupCountry(confirmation.ip) || null;
+router.get('/confirm/change-address/:cid', (req, res, next) => {
+    checkAndExecuteConfirmation(req, 'change-address', 'Request invalid or already completed. If your address change request is still pending, please change the address again.', next, (confirmation, list) => {
+        const data = confirmation.data;
 
-                const meta = {
-                    email: data.email,
-                    optInIp: confirmation.ip,
-                    optInCountry,
-                    status: subscriptions.Status.SUBSCRIBED
-                };
+        if (!data.subscriptionId) { // Something went terribly wrong and we don't have data that we have originally provided
+            return next(new Error(_('Subscriber info corrupted or missing')));
+        }
 
-                subscriptions.insert(list.id, meta, data.subscriptionData, (err, result) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    if (!result.entryId) {
-                        return next(new Error(_('Could not save subscription')));
-                    }
-
-                    subscriptions.getById(list.id, result.entryId, (err, subscription) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        mailHelpers.sendSubscriptionConfirmed(list, data.email, subscription, err => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            res.redirect('/subscription/' + list.cid + '/subscribed-notice');
-                        });
-                    });
-                });
-
-            } else if (confirmation.action === 'unsubscribe') {
-                subscriptions.changeStatus(list.id, confirmation.data.subscriptionId, confirmation.data.campaignId, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    // TODO: Shall we do anything with "found"?
-
-                    subscriptions.getById(list.id, confirmation.data.subscriptionId, (err, subscription) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
-                        });
-                    });
-                });
+        subscriptions.updateAddress(list.id, data.subscriptionId, data.emailNew, err => {
+            if (err) {
+                return next(err);
             }
+
+            subscriptions.getById(list.id, data.subscriptionId, (err, subscription) => {
+                if (err) {
+                    return next(err);
+                }
+
+                mailHelpers.sendSubscriptionConfirmed(list, data.emailNew, subscription, err => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    req.flash('info', _('Email address changed'));
+                    res.redirect('/subscription/' + list.cid + '/manage/' + subscription.cid);
+                });
+            });
+        });
+    });
+});
+
+router.get('/confirm/unsubscribe/:cid', (req, res, next) => {
+    checkAndExecuteConfirmation(req, 'unsubscribe', 'Request invalid or already completed. If your unsubscription request is still pending, please unsubscribe again.', next, (confirmation, list) => {
+        const data = confirmation.data;
+
+        subscriptions.changeStatus(list.id, confirmation.data.subscriptionId, confirmation.data.campaignId, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
+            if (err) {
+                return next(err);
+            }
+
+            // TODO: Shall we do anything with "found"?
+
+            subscriptions.getById(list.id, confirmation.data.subscriptionId, (err, subscription) => {
+                if (err) {
+                    return next(err);
+                }
+
+                mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
+                });
+            });
         });
     });
 });

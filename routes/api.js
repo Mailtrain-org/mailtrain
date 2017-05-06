@@ -5,10 +5,12 @@ let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
 let blacklist = require('../lib/models/blacklist');
 let subscriptions = require('../lib/models/subscriptions');
+let confirmations = require('../lib/models/confirmations');
 let tools = require('../lib/tools');
 let express = require('express');
 let log = require('npmlog');
 let router = new express.Router();
+let mailHelpers = require('../lib/subscription-mail-helpers');
 
 router.all('/*', (req, res, next) => {
     if (!req.query.access_token) {
@@ -93,8 +95,6 @@ router.post('/subscribe/:listId', (req, res) => {
                 subscription.tz = (input.TIMEZONE || '').toString().trim();
             }
 
-            subscription._action = 'subscribe';
-
             fields.list(list.id, (err, fieldList) => {
                 if (err && !fieldList) {
                     fieldList = [];
@@ -125,7 +125,7 @@ router.post('/subscribe/:listId', (req, res) => {
                 }
 
                 if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
-                    subscriptions.addConfirmation(list, input.EMAIL, req.ip, subscription, (err, cid) => {
+                    confirmations.addConfirmation(list.id, 'subscribe', req.ip, subscription, (err, confirmCid) => {
                         if (err) {
                             log.error('API', err);
                             res.status(500);
@@ -134,11 +134,23 @@ router.post('/subscribe/:listId', (req, res) => {
                                 data: []
                             });
                         }
-                        res.status(200);
-                        res.json({
-                            data: {
-                                id: cid
+
+                        mailHelpers.sendConfirmSubscription(list, input.EMAIL, confirmCid, subscription, (err) => {
+                            if (err) {
+                                log.error('API', err);
+                                res.status(500);
+                                return res.json({
+                                    error: err.message || err,
+                                    data: []
+                                });
                             }
+
+                            res.status(200);
+                            res.json({
+                                data: {
+                                    id: confirmCid
+                                }
+                            });
                         });
                     });
                 } else {
@@ -191,7 +203,8 @@ router.post('/unsubscribe/:listId', (req, res) => {
                 data: []
             });
         }
-        subscriptions.unsubscribe(list.id, input.EMAIL, false, (err, subscription) => {
+
+        subscriptions.getByEmail(list.id, input.EMAIL, (err, subscription) => {
             if (err) {
                 res.status(500);
                 return res.json({
@@ -199,12 +212,30 @@ router.post('/unsubscribe/:listId', (req, res) => {
                     data: []
                 });
             }
-            res.status(200);
-            res.json({
-                data: {
-                    id: subscription.id,
-                    unsubscribed: true
+
+            if (!subscription) {
+                res.status(404);
+                return res.json({
+                    error: 'Subscription with given email not found',
+                    data: []
+                });
+            }
+
+            subscriptions.changeStatus(list.id, subscription.id, false, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
+                if (err) {
+                    res.status(500);
+                    return res.json({
+                        error: err.message || err,
+                        data: []
+                    });
                 }
+                res.status(200);
+                res.json({
+                    data: {
+                        id: subscription.id,
+                        unsubscribed: true
+                    }
+                });
             });
         });
     });
