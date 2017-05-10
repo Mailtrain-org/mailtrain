@@ -18,17 +18,26 @@ class Mail extends Page {
     }
 }
 
+class WebSubscribe extends Web {
+    constructor(driver, list) {
+        super(driver, {
+            url: `/subscription/${list.cid}`,
+            elementToWaitFor: 'form',
+            elements: {
+                form: `form[action="/subscription/${list.cid}/subscribe"]`,
+                emailInput: '#main-form input[name="email"]',
+                submitButton: 'a[href="#submit"]'
+            }
+        });
+    }
+    foo() {
+        // ...
+    }
+}
+
 module.exports = (driver, list) => ({
 
-    webSubscribe: new Web(driver, {
-        url: `/subscription/${list.cid}`,
-        elementToWaitFor: 'form',
-        elements: {
-            form: `form[action="/subscription/${list.cid}/subscribe"]`,
-            emailInput: '#main-form input[name="email"]',
-            submitButton: 'a[href="#submit"]'
-        }
-    }),
+    webSubscribe: new WebSubscribe(driver, list),
 
     webConfirmSubscriptionNotice: new Web(driver, {
         url: `/subscription/${list.cid}/confirm-notice`,

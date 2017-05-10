@@ -1,7 +1,6 @@
 'use strict';
 
 const Page = require('./page');
-let flash;
 
 class Flash extends Page {
     getText() {
@@ -17,7 +16,7 @@ class Flash extends Page {
     }
 }
 
-module.exports = driver => flash || new Flash(driver, {
+module.exports = driver => new Flash(driver, {
     elementToWaitFor: 'alert',
     elements: {
         alert: 'div.alert:not(.js-warning)'

@@ -1,9 +1,8 @@
 'use strict';
 
 const Page = require('./page');
-let home;
 
-module.exports = driver => home || new Page(driver, {
+module.exports = driver => new Page(driver, {
     url: '/',
     elementToWaitFor: 'body',
     elements: {
