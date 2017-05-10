@@ -1,8 +1,8 @@
 'use strict';
 
-const Page = require('./page');
+const page = require('./page');
 
-module.exports = driver => new Page(driver, {
+module.exports = driver => Object.assign(page(driver), {
     url: '/',
     elementToWaitFor: 'body',
     elements: {

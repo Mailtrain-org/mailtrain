@@ -1,45 +1,36 @@
 'use strict';
 
 const config = require('../helpers/config');
-const Page = require('./page');
+const page = require('./page');
 
-class Web extends Page {
+const web = {
     enterEmail(value) {
         this.element('emailInput').clear();
         return this.element('emailInput').sendKeys(value);
     }
-}
+};
 
-class Mail extends Page {
+const mail = {
     navigate(address) {
         this.driver.sleep(100);
         this.driver.navigate().to(`http://localhost:${config.app.testserver.mailboxserverport}/${address}`);
         return this.waitUntilVisible();
     }
-}
-
-class WebSubscribe extends Web {
-    constructor(driver, list) {
-        super(driver, {
-            url: `/subscription/${list.cid}`,
-            elementToWaitFor: 'form',
-            elements: {
-                form: `form[action="/subscription/${list.cid}/subscribe"]`,
-                emailInput: '#main-form input[name="email"]',
-                submitButton: 'a[href="#submit"]'
-            }
-        });
-    }
-    foo() {
-        // ...
-    }
-}
+};
 
 module.exports = (driver, list) => ({
 
-    webSubscribe: new WebSubscribe(driver, list),
+    webSubscribe: Object.assign(page(driver), web, {
+        url: `/subscription/${list.cid}`,
+        elementToWaitFor: 'form',
+        elements: {
+            form: `form[action="/subscription/${list.cid}/subscribe"]`,
+            emailInput: '#main-form input[name="email"]',
+            submitButton: 'a[href="#submit"]'
+        }
+    }),
 
-    webConfirmSubscriptionNotice: new Web(driver, {
+    webConfirmSubscriptionNotice: Object.assign(page(driver), web, {
         url: `/subscription/${list.cid}/confirm-notice`,
         elementToWaitFor: 'homepageButton',
         elements: {
@@ -47,21 +38,21 @@ module.exports = (driver, list) => ({
         }
     }),
 
-    mailConfirmSubscription: new Mail(driver, {
+    mailConfirmSubscription: Object.assign(page(driver), mail, {
         elementToWaitFor: 'confirmLink',
         elements: {
             confirmLink: `a[href^="${config.settings['service-url']}subscription/subscribe/"]`
         }
     }),
 
-    webSubscribedNotice: new Web(driver, {
+    webSubscribedNotice: Object.assign(page(driver), web, {
         elementToWaitFor: 'homepageButton',
         elements: {
             homepageButton: 'a[href^="https://mailtrain.org"]'
         }
     }),
 
-    mailSubscriptionConfirmed: new Mail(driver, {
+    mailSubscriptionConfirmed: Object.assign(page(driver), mail, {
         elementToWaitFor: 'unsubscribeLink',
         elements: {
             unsubscribeLink: 'a[href*="/unsubscribe/"]',
@@ -69,21 +60,21 @@ module.exports = (driver, list) => ({
         }
     }),
 
-    webUnsubscribe: new Web(driver, {
+    webUnsubscribe: Object.assign(page(driver), web, {
         elementToWaitFor: 'submitButton',
         elements: {
             submitButton: 'a[href="#submit"]'
         }
     }),
 
-    webUnsubscribedNotice: new Web(driver, {
+    webUnsubscribedNotice: Object.assign(page(driver), web, {
         elementToWaitFor: 'homepageButton',
         elements: {
             homepageButton: 'a[href^="https://mailtrain.org"]'
         }
     }),
 
-    mailUnsubscriptionConfirmed: new Mail(driver, {
+    mailUnsubscriptionConfirmed: Object.assign(page(driver), mail, {
         elementToWaitFor: 'resubscribeLink',
         elements: {
             resubscribeLink: `a[href^="${config.settings['service-url']}subscription/${list.cid}"]`

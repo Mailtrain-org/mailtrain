@@ -4,10 +4,10 @@ const config = require('../helpers/config');
 const shortid = require('shortid');
 const expect = require('chai').expect;
 const driver = require('../helpers/driver');
-const Page = require('../page-objects/page');
 
-const page = new Page(driver);
+const page = require('../page-objects/page')(driver);
 const flash = require('../page-objects/flash')(driver);
+
 const {
     webSubscribe,
     webConfirmSubscriptionNotice,

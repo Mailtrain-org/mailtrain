@@ -1,11 +1,15 @@
 'use strict';
 
-const Page = require('./page');
+const page = require('./page');
 
-class Flash extends Page {
+module.exports = driver => Object.assign(page(driver), {
+    elementToWaitFor: 'alert',
+    elements: {
+        alert: 'div.alert:not(.js-warning)'
+    },
     getText() {
         return this.element('alert').getText();
-    }
+    },
     clear() {
         return this.driver.executeScript(`
             var elements = document.getElementsByClassName('alert');
@@ -13,12 +17,5 @@ class Flash extends Page {
                 elements[0].parentNode.removeChild(elements[0]);
             }
         `);
-    }
-}
-
-module.exports = driver => new Flash(driver, {
-    elementToWaitFor: 'alert',
-    elements: {
-        alert: 'div.alert:not(.js-warning)'
     }
 });
