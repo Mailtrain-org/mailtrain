@@ -42,6 +42,7 @@ const grapejs = require('./routes/grapejs');
 const mosaico = require('./routes/mosaico');
 const reports = require('./routes/reports');
 const reportsTemplates = require('./routes/report-templates');
+const namespaces = require('./routes/namespaces');
 
 const app = express();
 
@@ -213,6 +214,7 @@ app.use('/api', api);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
+app.use('/namespaces', namespaces);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/reports', reports);

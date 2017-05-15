@@ -25,6 +25,10 @@
         <link rel="stylesheet" href="/summernote/summernote.css">
     {{/if}}
 
+    {{#if useFancyTree}}
+        <link rel="stylesheet" href="/fancytree/skin-bootstrap/ui.fancytree.min.css" >
+    {{/if}}
+
     {{#each customStyles}}
         <link rel="stylesheet" href="{{this}}">
     {{/each}}
@@ -33,6 +37,20 @@
         <script src="{{this}}"></script>
     {{/each}}
 
+    <style type="text/css">
+        #tree .fancytree-container {
+            height: 100px;
+            overflow: auto;
+            position: relative;
+        }
+        #tree .fancytree-active {
+            background-color: #5094ce;
+        }
+        #tree .fancytree-title {
+            background-color: transparent;
+            border-color: transparent;
+        }
+    </style>
 </head>
 
 <body class="{{#if user}}logged-in user-{{user.username}}{{/if}}">
@@ -165,6 +183,12 @@
         <script src="/summernote/summernote.min.js"></script>
         <script src="/javascript/editor.js"></script>
     {{/if}}
+
+    {{#if useFancyTree}}
+        <script src="/javascript/jquery-ui-1.12.1.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/fancytree/jquery.fancytree-all.min.js"></script>
+    {{/if}}
+
 
     {{> tracking_scripts}}
 

@@ -177,3 +177,18 @@ templates=[["demo", "Demo Template"]]
 # The bottom line is that if people who are creating report templates or have write access to the DB cannot be trusted,
 # then it's safer to switch off the reporting functionality below.
 enabled=false
+
+
+[shares.list.master]
+name="Master"
+description="All permissions"
+permissions=["view"]
+
+
+[shares.namespace.master]
+name="Master"
+description="All permissions"
+
+[shares.namespace.master.permissions]
+list=["view"]
+namespace=["view", "edit", "create", "delete", "create list"]

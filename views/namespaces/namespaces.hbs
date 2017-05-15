@@ -1,0 +1,111 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li class="active">{{#translate}}Namespaces{{/translate}}</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/reports/create" role="button"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Namespace{{/translate}}</a>
+</div>
+
+<h2>{{#translate}}Namespaces{{/translate}}</h2>
+
+<hr>
+
+<div id="tree">
+</div>
+
+<div id="treetable-container" style="height: 100px; overflow: auto;">
+    <table id="treetable" class="table table-hover table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>B</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        glyph_opts = {
+            map: {
+                expanderClosed: 'glyphicon glyphicon-menu-right',
+                expanderLazy: 'glyphicon glyphicon-menu-right',  // glyphicon-plus-sign
+                expanderOpen: 'glyphicon glyphicon-menu-down',  // glyphicon-collapse-down
+            }
+        };
+
+
+        $('#tree').fancytree({
+            extensions: ['glyph'],
+            glyph: glyph_opts,
+            selectMode: 1,
+            icon: false,
+            autoScroll: true,
+            source: [
+                {title: 'A', key: '1', expanded: true},
+                {title: 'B', key: '2', expanded: true, folder: true, children: [
+                    {title: 'BA', key: '3', expanded: true, folder: true, children: [
+                        {title: 'BAA', key: '4', expanded: true},
+                        {title: 'BAB', key: '5', expanded: true}
+                    ]},
+                    {title: 'BB', key: '6', expanded: true, folder: true, children: [
+                        {title: 'BBA', key: '7', expanded: true},
+                        {title: 'BBB', key: '8', expanded: true}
+                    ]}
+                ]}
+            ]
+        });
+
+/*
+        $('#treetable').fancytree({
+            extensions: ['glyph', 'table'],
+            glyph: glyph_opts,
+            selectMode: 1,
+            icon: false,
+            autoScroll: true,
+            scrollParent: $("#treetable-container"),
+            source: [
+                {title: 'A', key: '1', expanded: true},
+                {title: 'B', key: '2', expanded: true, folder: true, children: [
+                    {title: 'BA', key: '3', expanded: true, folder: true, children: [
+                        {title: 'BAA', key: '4', expanded: true},
+                        {title: 'BAB', key: '5', expanded: true}
+                    ]},
+                    {title: 'BB', key: '6', expanded: true, folder: true, children: [
+                        {title: 'BBA', key: '7', expanded: true},
+                        {title: 'BBB', key: '8', expanded: true}
+                    ]}
+                ]}
+            ],
+            table: {
+                nodeColumnIdx: 0
+            }
+        });
+*/
+
+        $('#treetable').fancytree({
+            extensions: ['glyph', 'table'],
+            glyph: glyph_opts,
+            selectMode: 1,
+            icon: false,
+            autoScroll: true,
+            scrollParent: $("#treetable-container"),
+            source: {
+                url: "/namespaces/list/ajax",
+                cache: true
+            },
+            table: {
+                nodeColumnIdx: 0
+            }
+        });
+
+    });
+</script>
