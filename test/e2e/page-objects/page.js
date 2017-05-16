@@ -7,15 +7,14 @@ const until = webdriver.until;
 
 module.exports = driver => ({
     driver,
-    url: '/',
     elements: {},
 
     element(key) {
         return this.driver.findElement(By.css(this.elements[key] || key));
     },
 
-    navigate() {
-        this.driver.navigate().to(config.baseUrl + this.url);
+    navigate(path) {
+        this.driver.navigate().to(config.baseUrl + (path || this.url));
         return this.waitUntilVisible();
     },
 

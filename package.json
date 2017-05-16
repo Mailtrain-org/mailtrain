@@ -17,7 +17,7 @@
     "sqldumptest": "NODE_ENV=test DUMP_NAME_SUFFIX=-test npm run sqldump",
     "sqlresettest": "NODE_ENV=test npm run sqldrop && NODE_ENV=test npm run sqlinit",
     "starttest": "NODE_ENV=test node index.js",
-    "_e2e": "PATH=$PATH:./node_modules/phantomjs/lib/phantom/bin:./test/e2e/bin NODE_ENV=test ./node_modules/.bin/mocha test/e2e/index.js",
+    "_e2e": "NODE_ENV=test mocha test/e2e/index.js",
     "e2e": "npm run sqlresettest && npm run _e2e"
   },
   "repository": {
