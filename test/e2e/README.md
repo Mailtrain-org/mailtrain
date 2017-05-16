@@ -12,7 +12,7 @@ Both can be created by running `sudo sh test/e2e/install.sh` from within your ma
 
 For tests to succeed Mailtrian must be started in `test` mode on port 3000 (as http://localhost:3000/ is the predefined service url). The tests itself have to be started in a second Terminal window.
 
-1. Start Mailtrain with `npm run startest`
+1. Start Mailtrain with `npm run starttest`
 2. Start e2e tests with `npm run e2e`
 
 ## Using Different Browsers
