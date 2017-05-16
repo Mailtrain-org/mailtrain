@@ -4,6 +4,8 @@
 
 ![](http://mailtrain.org/mailtrain.png)
 
+> Mailtrain requires at least **Node.js v7**. If you want to use an older version of Node.js then you should use version v1.24 of Mailtrain. You can either download it [here](https://github.com/Mailtrain-org/mailtrain/archive/v1.24.0.zip) or if using git then run `git checkout v1.24.0` before starting it
+
 ## Features
 
 Mailtrain supports subscriber list management, list segmentation, custom fields, email templates, large CSV list import files, etc.
