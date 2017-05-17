@@ -110,16 +110,6 @@ host="0.0.0.0"
 # VERP hostname is in the same domain as the From address.
 # disablesenderheader=true
 
-[testserver]
-# Starts a vanity server that redirects all mail to /dev/null
-# Mostly needed for local development
-enabled=false
-port=5587
-host="0.0.0.0"
-username="testuser"
-password="testpass"
-logger=false
-
 [ldap]
 # enable to use ldap user backend
 enabled=false
@@ -177,3 +167,17 @@ templates=[["demo", "Demo Template"]]
 # The bottom line is that if people who are creating report templates or have write access to the DB cannot be trusted,
 # then it's safer to switch off the reporting functionality below.
 enabled=false
+
+[testserver]
+# Starts a vanity server that redirects all mail to /dev/null
+# Mostly needed for local development
+enabled=false
+port=5587
+mailboxserverport=3001
+host="0.0.0.0"
+username="testuser"
+password="testpass"
+logger=false
+
+[seleniumwebdriver]
+browser="phantomjs"

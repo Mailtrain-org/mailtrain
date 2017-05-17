@@ -4,11 +4,36 @@ let log = require('npmlog');
 let config = require('config');
 let crypto = require('crypto');
 let humanize = require('humanize');
+let http = require('http');
 
 let SMTPServer = require('smtp-server').SMTPServer;
+let simpleParser = require('mailparser').simpleParser;
 
 let totalMessages = 0;
 let received = 0;
+
+let mailstore = {
+    accounts: {},
+    saveMessage(address, message) {
+        if (!this.accounts[address]) {
+            this.accounts[address] = [];
+        }
+        this.accounts[address].push(message);
+    },
+    getMail(address, callback) {
+        if (!this.accounts[address] || this.accounts[address].length === 0) {
+            let err = new Error('No mail for ' + address);
+            err.status = 404;
+            return callback(err);
+        }
+        simpleParser(this.accounts[address].shift(), (err, mail) => {
+            if (err) {
+                return callback(err.message || err);
+            }
+            callback(null, mail);
+        });
+    }
+};
 
 // Setup server
 let server = new SMTPServer({
@@ -74,8 +99,12 @@ let server = new SMTPServer({
     // Handle message stream
     onData: (stream, session, callback) => {
         let hash = crypto.createHash('md5');
+        let message = '';
         stream.on('data', chunk => {
             hash.update(chunk);
+            if (/^keep/i.test(session.envelope.rcptTo[0].address)) {
+                message += chunk;
+            }
         });
         stream.on('end', () => {
             let err;
@@ -84,6 +113,12 @@ let server = new SMTPServer({
                 err.responseCode = 552;
                 return callback(err);
             }
+
+            // Store message for e2e tests
+            if (/^keep/i.test(session.envelope.rcptTo[0].address)) {
+                mailstore.saveMessage(session.envelope.rcptTo[0].address, message);
+            }
+
             received++;
             callback(null, 'Message queued as ' + hash.digest('hex')); // accept the message once the stream is ended
         });
@@ -92,6 +127,41 @@ let server = new SMTPServer({
 
 server.on('error', err => {
     log.error('Test SMTP', err.stack);
+});
+
+let mailBoxServer = http.createServer((req, res) => {
+    let renderer = data => (
+        '<!doctype html><html><head><title>' + data.title + '</title></head><body>' + data.body + '</body></html>'
+    );
+
+    let address = req.url.substring(1);
+    mailstore.getMail(address, (err, mail) => {
+        if (err) {
+            let html = renderer({
+                title: 'error',
+                body: err.message || err
+            });
+            res.writeHead(err.status || 500, { 'Content-Type': 'text/html' });
+            return res.end(html);
+        }
+
+        let html = mail.html || renderer({
+            title: 'error',
+            body: 'This mail has no HTML part'
+        });
+
+        // https://nodemailer.com/extras/mailparser/#mail-object
+        delete mail.html;
+        delete mail.textAsHtml;
+        delete mail.attachments;
+
+        let script = '<script> var mailObject = ' + JSON.stringify(mail) + '; console.log(mailObject); </script>';
+        html = html.replace(/<\/body\b/i, match => script + match);
+        html = html.replace(/target="_blank"/g, 'target="_self"');
+
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(html);
+    });
 });
 
 module.exports = callback => {
@@ -112,7 +182,10 @@ module.exports = callback => {
                 }
             }, 60 * 1000);
 
-            setImmediate(callback);
+            mailBoxServer.listen(config.testserver.mailboxserverport, config.testserver.host, () => {
+                log.info('Test SMTP', 'Mail Box Server listening on port %s', config.testserver.mailboxserverport);
+                setImmediate(callback);
+            });
         });
     } else {
         setImmediate(callback);
