@@ -9,7 +9,7 @@ module.exports = function (grunt) {
         },
 
         nodeunit: {
-            all: ['test/**/*-test.js']
+            all: ['test/nodeunit/**/*-test.js']
         },
 
         jsxgettext: {
