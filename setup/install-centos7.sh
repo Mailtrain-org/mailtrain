@@ -12,7 +12,7 @@ set -e
 
 yum -y install epel-release
 
-curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
+curl --silent --location https://rpm.nodesource.com/setup_7.x | bash -
 yum -y install mariadb-server nodejs ImageMagick git python redis pwgen bind-utils gcc-c++ make
 
 systemctl start mariadb
@@ -225,4 +225,3 @@ systemctl start zone-mta.service
 systemctl start mailtrain.service
 
 echo "Success! Open http://$HOSTNAME/ and log in as admin:test";
-
