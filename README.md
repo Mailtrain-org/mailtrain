@@ -1,6 +1,6 @@
 # Mailtrain
 
-[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v5+) and MySQL (v5.5+ or MariaDB).
+[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v7+) and MySQL (v5.5+ or MariaDB).
 
 ![](http://mailtrain.org/mailtrain.png)
 
@@ -47,7 +47,7 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 
 ## Requirements
 
-  * Nodejs v6+
+  * Nodejs v7+
   * MySQL v5.5 or MariaDB
   * Redis. Optional, disabled by default. Used for session storage and for caching state between multiple processes. If you do not have Redis enabled then you can only use a single sender process
 
