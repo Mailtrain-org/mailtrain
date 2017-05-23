@@ -1,6 +1,6 @@
 'use strict';
 
-const page = require('./page');
+const page = require('./web');
 
 module.exports = driver => Object.assign(page(driver), {
     url: '/',

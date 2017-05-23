@@ -5,7 +5,7 @@ const shortid = require('shortid');
 const expect = require('chai').expect;
 const driver = require('../helpers/driver');
 
-const page = require('../page-objects/page')(driver);
+const page = require('../page-objects/web')(driver);
 const flash = require('../page-objects/flash')(driver);
 
 const {

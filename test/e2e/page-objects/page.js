@@ -4,52 +4,78 @@ const config = require('../helpers/config');
 const webdriver = require('selenium-webdriver');
 const By = webdriver.By;
 const until = webdriver.until;
+const fs = require('fs-extra');
 
-module.exports = driver => ({
+module.exports = (driver, ...extras) => Object.assign({
     driver,
+
     elements: {},
 
-    element(key) {
-        return this.driver.findElement(By.css(this.elements[key] || key));
+    async element(key) {
+        return await this.driver.findElement(By.css(this.elements[key] || key));
     },
 
-    navigate(path) {
-        this.driver.navigate().to(config.baseUrl + (path || this.url));
-        return this.waitUntilVisible();
-    },
+    async waitUntilVisible(selector) {
+        // This is left here to ease debugging
+        // await this.sleep(2000);
+        // await this.takeScreenshot('image.png');
+        // console.log(await this.source());
 
-    waitUntilVisible() {
-        let selector = this.elements[this.elementToWaitFor];
-        if (!selector && this.url) {
-            selector = 'body.page--' + (this.url.substring(1).replace(/\//g, '--') || 'home');
+        const sel = selector || this.elements[this.elementToWaitFor] || 'body';
+        await this.driver.wait(until.elementLocated(By.css(sel)), 10000);
+
+        if (this.url) {
+            await this.ensureUrl();
         }
-        return selector ? this.driver.wait(until.elementLocated(By.css(selector))) : this.driver.sleep(1000);
     },
 
-    submit() {
-        return this.element('submitButton').click();
+    async link(key) {
+        const elem = await this.element(key);
+        return await elem.getAttribute('href');
     },
 
-    click(key) {
-        return this.element(key).click();
+    async submit() {
+        const submitButton = await this.element('submitButton');
+        await submitButton.click();
     },
 
-    getText(key) {
-        return this.element(key).getText();
+    async click(key) {
+        const elem = await this.element(key);
+        await elem.click();
     },
 
-    getValue(key) {
-        return this.element(key).getAttribute('value');
+    async getText(key) {
+        const elem = await this.element(key);
+        return await elem.getText();
     },
 
-    setValue(key, value) {
-        return this.element(key).sendKeys(value);
+    async getValue(key) {
+        const elem = await this.element(key);
+        return await elem.getAttribute('value');
     },
 
-    containsText(str) {
-        // let text = await driver.findElement({ css: 'body' }).getText();
-        return this.driver.executeScript(`
+    async setValue(key, value) {
+        const elem = await this.element(key);
+        await elem.sendKeys(value);
+    },
+
+    async containsText(str) {
+        return await this.driver.executeScript(`
             return (document.documentElement.textContent || document.documentElement.innerText).indexOf('${str}') > -1;
         `);
+    },
+
+    async source() {
+        return await this.driver.getPageSource();
+    },
+
+    async takeScreenshot(destPath) {
+        const pngData = await this.driver.takeScreenshot();
+        const buf = new Buffer(pngData, 'base64');
+        await fs.writeFile(destPath, buf);
+    },
+
+    async sleep(ms) {
+        await this.driver.sleep(ms);
     }
-});
+}, ...extras);

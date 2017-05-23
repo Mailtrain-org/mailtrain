@@ -11,8 +11,6 @@ const {
 } = require('../page-objects/users')(driver);
 
 describe('login', function() {
-    this.timeout(10000);
-
     before(() => driver.manage().deleteAllCookies());
 
     it('can access home page', async () => {
