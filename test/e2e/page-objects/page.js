@@ -5,77 +5,84 @@ const webdriver = require('selenium-webdriver');
 const By = webdriver.By;
 const until = webdriver.until;
 const fs = require('fs-extra');
+const driver = require('../helpers/mocha-e2e').driver;
+const url = require('url');
+const UrlPattern = require('url-pattern');
 
-module.exports = (driver, ...extras) => Object.assign({
-    driver,
-
+module.exports = (...extras) => Object.assign({
     elements: {},
 
-    async element(key) {
-        return await this.driver.findElement(By.css(this.elements[key] || key));
+    async getElement(key) {
+        return await driver.findElement(By.css(this.elements[key]));
+    },
+
+    async getLinkParams(key) {
+        const elem = await driver.findElement(By.css(this.elements[key]));
+
+        const linkUrl = await elem.getAttribute('href');
+        const linkPath = url.parse(linkUrl).path;
+
+        const urlPattern = new UrlPattern(this.links[key]);
+
+        const params = urlPattern.match(linkPath);
+        if (!params) {
+            throw new Error(`Cannot match URL pattern ${this.links[key]}`);
+        }
+        return params;
     },
 
     async waitUntilVisible(selector) {
-        // This is left here to ease debugging
-        // await this.sleep(2000);
-        // await this.takeScreenshot('image.png');
-        // console.log(await this.source());
-
         const sel = selector || this.elements[this.elementToWaitFor] || 'body';
-        await this.driver.wait(until.elementLocated(By.css(sel)), 10000);
+
+        await driver.wait(until.elementLocated(By.css(sel)), 10000);
 
         if (this.url) {
             await this.ensureUrl();
         }
     },
 
-    async link(key) {
-        const elem = await this.element(key);
-        return await elem.getAttribute('href');
-    },
-
-    async submit() {
-        const submitButton = await this.element('submitButton');
-        await submitButton.click();
-    },
-
     async click(key) {
-        const elem = await this.element(key);
+        const elem = await this.getElement(key);
         await elem.click();
     },
 
+    async getHref(key) {
+        const elem = await this.getElement(key);
+        return await elem.getAttribute('href');
+    },
+
     async getText(key) {
-        const elem = await this.element(key);
+        const elem = await this.getElement(key);
         return await elem.getText();
     },
 
     async getValue(key) {
-        const elem = await this.element(key);
+        const elem = await this.getElement(key);
         return await elem.getAttribute('value');
     },
 
-    async setValue(key, value) {
-        const elem = await this.element(key);
-        await elem.sendKeys(value);
-    },
-
     async containsText(str) {
-        return await this.driver.executeScript(`
+        return await driver.executeScript(`
             return (document.documentElement.textContent || document.documentElement.innerText).indexOf('${str}') > -1;
         `);
     },
 
-    async source() {
-        return await this.driver.getPageSource();
+    async getSource() {
+        return await driver.getPageSource();
+    },
+
+    async saveSource(destPath) {
+        const src = await this.getSource();
+        await fs.writeFile(destPath, src);
     },
 
     async takeScreenshot(destPath) {
-        const pngData = await this.driver.takeScreenshot();
+        const pngData = await driver.takeScreenshot();
         const buf = new Buffer(pngData, 'base64');
         await fs.writeFile(destPath, buf);
     },
 
     async sleep(ms) {
-        await this.driver.sleep(ms);
+        await driver.sleep(ms);
     }
 }, ...extras);

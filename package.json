@@ -42,7 +42,8 @@
     "mailparser": "^2.0.5",
     "mocha": "^3.3.0",
     "phantomjs": "^2.1.7",
-    "selenium-webdriver": "^3.4.0"
+    "selenium-webdriver": "^3.4.0",
+    "url-pattern": "^1.0.3"
   },
   "optionalDependencies": {
     "posix": "^4.1.1"

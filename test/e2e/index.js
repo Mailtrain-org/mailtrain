@@ -1,12 +1,10 @@
 'use strict';
 
 require('./helpers/exit-unless-test');
-const mocha = require('./helpers/mocha-e2e').mocha;
+const { mocha, driver } = require('./helpers/mocha-e2e');
 const path = require('path');
 
 global.USE_SHARED_DRIVER = true;
-
-const driver = require('./helpers/driver');
 
 const only = 'only';
 const skip = 'skip';
@@ -29,6 +27,5 @@ for (const testSpec of tests) {
 }
 
 mocha.run(failures => {
-    driver.originalQuit();
     process.exit(failures);  // exit with non-zero status if there were failures
 });

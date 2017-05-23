@@ -4,17 +4,10 @@ const config = require('../helpers/config');
 const webBase = require('./web');
 const mailBase = require('./mail');
 
-module.exports = (driver, list) => {
+module.exports = list => {
 
-    const web = params => webBase(driver, {
-        async enterEmail(value) {
-            const emailInput = await this.element('emailInput');
-            await emailInput.clear();
-            await emailInput.sendKeys(value);
-        },
-    }, params);
-
-    const mail = params => mailBase(driver, params);
+    const web = params => webBase(params);
+    const mail = params => mailBase(params);
 
     return {
         webSubscribe: web({
@@ -23,6 +16,8 @@ module.exports = (driver, list) => {
             elements: {
                 form: `form[action="/subscription/${list.cid}/subscribe"]`,
                 emailInput: '#main-form input[name="email"]',
+                firstNameInput: '#main-form input[name="first-name"]',
+                lastNameInput: '#main-form input[name="last-name"]',
                 submitButton: 'a[href="#submit"]'
             }
         }),
@@ -55,17 +50,40 @@ module.exports = (driver, list) => {
             elements: {
                 unsubscribeLink: `a[href^="${config.settings['service-url']}subscription/${list.cid}/unsubscribe/"]`,
                 manageLink: `a[href^="${config.settings['service-url']}subscription/${list.cid}/manage/"]`
+            },
+            links: {
+                unsubscribeLink: `/subscription/${list.cid}/unsubscribe/:ucid`,
+                manageLink: `/subscription/${list.cid}/manage/:ucid`
             }
         }),
 
-/*
+        webManage: web({
+            url: `/subscription/${list.cid}/manage/:ucid`,
+            elementToWaitFor: 'form',
+            elements: {
+                form: `form[action="/subscription/${list.cid}/manage"]`,
+                emailInput: '#main-form input[name="email"]',
+                firstNameInput: '#main-form input[name="first-name"]',
+                lastNameInput: '#main-form input[name="last-name"]',
+                submitButton: 'a[href="#submit"]'
+            }
+        }),
+
+        webUpdatedNotice: web({
+            url: `/subscription/${list.cid}/updated-notice`,
+            elementToWaitFor: 'homepageButton',
+            elements: {
+                homepageButton: `a[href="${config.settings['default-homepage']}"]`
+            }
+        }),
+
+        /*
         webUnsubscribe: web({ // FIXME
             elementToWaitFor: 'submitButton',
             elements: {
                 submitButton: 'a[href="#submit"]'
             }
         }),
-*/
 
         webUnsubscribedNotice: web({
             url: `/subscription/${list.cid}/unsubscribed-notice`,
@@ -81,14 +99,8 @@ module.exports = (driver, list) => {
                 resubscribeLink: `a[href^="${config.settings['service-url']}subscription/${list.cid}"]`
             }
         }),
-/* TODO
-        webManage: web({
-            url: `/subscription/${list.cid}/manage`,
-            elementToWaitFor: 'homepageButton',
-            elements: {
-                homepageButton: `a[href="${config.settings['default-homepage']}"]`
-            }
-        }),
-*/
+ */
+
+
     };
 };

@@ -1,14 +1,14 @@
 'use strict';
 
 const config = require('../helpers/config');
-
+const driver = require('../helpers/mocha-e2e').driver;
 const page = require('./page');
 
-module.exports = (driver, ...extras) => page(driver, {
+module.exports = (...extras) => page({
 
     async fetchMail(address) {
-        await this.driver.sleep(1000);
-        await this.driver.navigate().to(`${config.mailUrl}/${address}`);
+        await driver.sleep(1000);
+        await driver.navigate().to(`${config.mailUrl}/${address}`);
         await this.waitUntilVisible();
     },
 

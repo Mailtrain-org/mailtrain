@@ -1,4 +1,6 @@
-.idea
+/.idea
+/last-failed-e2e-test.*
+
 node_modules
 npm-debug.log
 .DS_Store

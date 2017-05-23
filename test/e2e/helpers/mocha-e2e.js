@@ -2,6 +2,18 @@
 
 const Mocha = require('mocha');
 const color = Mocha.reporters.Base.color;
+const Semaphore = require('./semaphore');
+const fs = require('fs-extra');
+const config = require('./config');
+const webdriver = require('selenium-webdriver');
+
+const driver = new webdriver.Builder()
+    .forBrowser(config.app.seleniumwebdriver.browser || 'phantomjs')
+    .build();
+
+
+const failHandlerRunning = new Semaphore();
+
 
 function UseCaseReporter(runner) {
     Mocha.reporters.Base.call(this, runner);
@@ -37,9 +49,6 @@ function UseCaseReporter(runner) {
 
     runner.on('use-case end', () => {
         --indents;
-        if (indents === 1) {
-            console.log();
-        }
     });
 
     runner.on('step pass', step => {
@@ -71,8 +80,22 @@ function UseCaseReporter(runner) {
         }
     });
 
-    runner.on('fail', test => {
+    runner.on('fail', (test, err) => {
+        failHandlerRunning.enter();
+        (async () => {
+            const currentUrl = await driver.getCurrentUrl();
+            const info = `URL: ${currentUrl}`;
+            await fs.writeFile('last-failed-e2e-test.info', info);
+            await fs.writeFile('last-failed-e2e-test.html', await driver.getPageSource());
+            await fs.writeFile('last-failed-e2e-test.png', new Buffer(await driver.takeScreenshot(), 'base64'));
+            failHandlerRunning.exit();
+        })();
+
         console.log(indent() + color('fail', '  %s'), test.title);
+        console.log();
+        console.log(err);
+        console.log();
+        console.log(`Snaphot of and info about the current page are in last-failed-e2e-test.*`);
     });
 
     runner.on('end', () => {
@@ -101,31 +124,54 @@ function UseCaseReporter(runner) {
     });
 }
 
+
 const mocha = new Mocha()
     .timeout(120000)
-    .reporter(UseCaseReporter);
+    .reporter(UseCaseReporter)
+    .ui('tdd');
 
 mocha._originalRun = mocha.run;
 
+
 let runner;
 mocha.run = fn => {
-    runner = mocha._originalRun(fn);
-}
+    runner = mocha._originalRun(async () => {
+        await failHandlerRunning.waitForEmpty();
+        await driver.quit();
 
-async function useCase(name, asyncFn) {
-    it('Use case: ' + name, async () => {
-        runner.emit('use-case', {title: name});
-
-        try {
-            await asyncFn();
-            runner.emit('use-case end');
-        } catch (err) {
-            runner.emit('use-case end');
-            console.err(err);
-            throw err;
-        }
+        fn();
     });
+};
+
+
+async function useCaseExec(name, asyncFn) {
+    runner.emit('use-case', {title: name});
+
+    try {
+        await asyncFn();
+        runner.emit('use-case end');
+    } catch (err) {
+        runner.emit('use-case end');
+        throw err;
+    }
 }
+
+function useCase(name, asyncFn) {
+    if (asyncFn) {
+        return test('Use case: ' + name, () => useCaseExec(name, asyncFn));
+    } else {
+        // Pending test
+        return test('Use case: ' + name);
+    }
+}
+
+useCase.only = (name, asyncFn) => {
+    return test.only('Use case: ' + name, () => useCaseExec(name, asyncFn));
+};
+
+useCase.skip = (name, asyncFn) => {
+    return test.skip('Use case: ' + name, () => useCaseExec(name, asyncFn));
+};
 
 async function step(name, asyncFn) {
     try {
@@ -133,7 +179,6 @@ async function step(name, asyncFn) {
         runner.emit('step pass', {title: name});
     } catch (err) {
         runner.emit('step fail', {title: name});
-        console.err(err);
         throw err;
     }
 }
@@ -141,5 +186,6 @@ async function step(name, asyncFn) {
 module.exports = {
     mocha,
     useCase,
-    step
+    step,
+    driver
 };
