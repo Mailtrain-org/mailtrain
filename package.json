@@ -39,7 +39,6 @@
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-eslint": "^19.0.0",
     "jsxgettext-andris": "^0.9.0-patch.1",
-    "mailparser": "^2.0.5",
     "mocha": "^3.3.0",
     "phantomjs": "^2.1.7",
     "selenium-webdriver": "^3.4.0"
@@ -84,6 +83,7 @@
     "jsdom": "^9.12.0",
     "juice": "^4.0.2",
     "libmime": "^3.1.0",
+    "mailparser": "^2.0.5",
     "marked": "^0.3.6",
     "memory-cache": "^0.1.6",
     "mjml": "3.3.0",
