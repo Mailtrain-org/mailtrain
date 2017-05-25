@@ -1,11 +1,7 @@
 'use strict';
 
-const page = require('./web');
+const web = require('../lib/web');
 
-module.exports = driver => Object.assign(page(driver), {
-    url: '/',
-    elementToWaitFor: 'body',
-    elements: {
-        body: 'body.page--home'
-    }
+module.exports = web({
+    url: '/'
 });

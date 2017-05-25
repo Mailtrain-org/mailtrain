@@ -1,7 +1,7 @@
 'use strict';
 
-require('./helpers/exit-unless-test');
-const { mocha, driver } = require('./helpers/mocha-e2e');
+require('./lib/exit-unless-test');
+const { mocha, driver } = require('./lib/mocha-e2e');
 const path = require('path');
 
 global.USE_SHARED_DRIVER = true;
@@ -11,8 +11,7 @@ const skip = 'skip';
 
 let tests = [
     'login',
-    'subscription',
-    ['subscription-uc', only]
+    'subscription'
 ];
 
 tests = tests.map(testSpec => (testSpec.constructor === Array ? testSpec : [testSpec]));

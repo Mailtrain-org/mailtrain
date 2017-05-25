@@ -1,10 +1,10 @@
 'use strict';
 
-const config = require('../helpers/config');
+const config = require('./config');
 const By = require('selenium-webdriver').By;
 const url = require('url');
 const UrlPattern = require('url-pattern');
-const driver = require('../helpers/mocha-e2e').driver;
+const driver = require('./mocha-e2e').driver;
 const page = require('./page');
 
 module.exports = (...extras) => page({
@@ -14,7 +14,7 @@ module.exports = (...extras) => page({
         if (typeof pathOrParams === 'string') {
             path = pathOrParams;
         } else {
-            const urlPattern = new UrlPattern(this.url);
+            const urlPattern = new UrlPattern(this.requestUrl || this.url);
             path = urlPattern.stringify(pathOrParams)
         }
 
@@ -54,7 +54,7 @@ module.exports = (...extras) => page({
         await this.waitUntilVisible('div.alert:not(.js-warning)');
     },
 
-    async flash() {
+    async getFlash() {
         const elem = await driver.findElement(By.css('div.alert:not(.js-warning)'));
         return await elem.getText();
     },

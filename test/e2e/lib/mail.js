@@ -1,7 +1,7 @@
 'use strict';
 
-const config = require('../helpers/config');
-const driver = require('../helpers/mocha-e2e').driver;
+const config = require('./config');
+const driver = require('./mocha-e2e').driver;
 const page = require('./page');
 
 module.exports = (...extras) => page({

@@ -1,13 +1,15 @@
 'use strict';
 
-const config = require('../helpers/config');
+const config = require('./config');
 const webdriver = require('selenium-webdriver');
 const By = webdriver.By;
 const until = webdriver.until;
 const fs = require('fs-extra');
-const driver = require('../helpers/mocha-e2e').driver;
+const driver = require('./mocha-e2e').driver;
 const url = require('url');
 const UrlPattern = require('url-pattern');
+
+const waitTimeout = 10000;
 
 module.exports = (...extras) => Object.assign({
     elements: {},
@@ -32,13 +34,36 @@ module.exports = (...extras) => Object.assign({
     },
 
     async waitUntilVisible(selector) {
-        const sel = selector || this.elements[this.elementToWaitFor] || 'body';
+        await driver.wait(until.elementLocated(By.css('body')), waitTimeout);
 
-        await driver.wait(until.elementLocated(By.css(sel)), 10000);
+        for (const elem of (this.elementsToWaitFor || [])) {
+            const sel = this.elements[elem];
+            if (!sel) {
+                throw new Error(`Element "${elem}" not found.`);
+            }
+            await driver.wait(until.elementLocated(By.css(sel)), waitTimeout);
+        }
+
+        for (const text of (this.textsToWaitFor || [])) {
+            await driver.wait(new webdriver.Condition(`for text "${text}"`, async (driver) => {
+                return await this.containsText(text);
+            }), waitTimeout);
+        }
 
         if (this.url) {
             await this.ensureUrl();
         }
+
+        await driver.executeScript('document.mailTrainRefreshAcknowledged = true;');
+    },
+
+    async waitUntilVisibleAfterRefresh(selector) {
+        await driver.wait(new webdriver.Condition('for refresh', async (driver) => {
+            const val = await driver.executeScript('return document.mailTrainRefreshAcknowledged;');
+            return !val;
+        }), waitTimeout);
+
+        await this.waitUntilVisible(selector);
     },
 
     async click(key) {
@@ -63,7 +88,7 @@ module.exports = (...extras) => Object.assign({
 
     async containsText(str) {
         return await driver.executeScript(`
-            return (document.documentElement.textContent || document.documentElement.innerText).indexOf('${str}') > -1;
+            return (document.documentElement.innerText || document.documentElement.textContent).indexOf('${str}') > -1;
         `);
     },
 
@@ -76,10 +101,19 @@ module.exports = (...extras) => Object.assign({
         await fs.writeFile(destPath, src);
     },
 
-    async takeScreenshot(destPath) {
+    async saveScreenshot(destPath) {
         const pngData = await driver.takeScreenshot();
         const buf = new Buffer(pngData, 'base64');
         await fs.writeFile(destPath, buf);
+    },
+
+    async saveSnapshot(destPathBase) {
+        destPathBase = destPathBase || 'last-failed-e2e-test';
+        const currentUrl = await driver.getCurrentUrl();
+        const info = `URL: ${currentUrl}`;
+        await fs.writeFile(destPathBase + '.info', info);
+        await this.saveSource(destPathBase + '.html');
+        await this.saveScreenshot(destPathBase + '.png');
     },
 
     async sleep(ms) {
