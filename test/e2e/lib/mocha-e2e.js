@@ -51,6 +51,15 @@ function UseCaseReporter(runner) {
         --indents;
     });
 
+    runner.on('steps', useCase => {
+        ++indents;
+        console.log(color('pass', '%s%s'), indent(), useCase.title);
+    });
+
+    runner.on('steps end', () => {
+        --indents;
+    });
+
     runner.on('step pass', step => {
         console.log(indent() + color('checkmark', '  ' + Mocha.reporters.Base.symbols.ok) + color('pass', ' %s'), step.title);
     });
@@ -183,9 +192,26 @@ async function step(name, asyncFn) {
     }
 }
 
+async function steps(name, asyncFn) {
+    try {
+        runner.emit('steps', {title: name});
+        await asyncFn();
+        runner.emit('steps end');
+    } catch (err) {
+        runner.emit('step end');
+        throw err;
+    }
+}
+
+async function precondition(preConditionName, useCaseName, asyncFn) {
+    await steps(`Including use case "${useCaseName}" to satisfy precondition "${preConditionName}"`, asyncFn);
+}
+
 module.exports = {
     mocha,
     useCase,
     step,
+    steps,
+    precondition,
     driver
 };

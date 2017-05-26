@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../lib/config');
-const { useCase, step, driver } = require('../lib/mocha-e2e');
+const { useCase, step, precondition, driver } = require('../lib/mocha-e2e');
 const shortid = require('shortid');
 const expect = require('chai').expect;
 
@@ -60,6 +60,13 @@ async function subscribe(subscription) {
     return subscription;
 }
 
+async function subscriptionExistsPrecondition(subscription) {
+    await precondition('Subscription exists', 'Subscription to a public list (main scenario)', async () => {
+        await subscribe(subscription);
+    });
+    return subscription;
+}
+
 suite('Subscription use-cases', function() {
     before(() => driver.manage().deleteAllCookies());
 
@@ -86,7 +93,7 @@ suite('Subscription use-cases', function() {
     });
 
     useCase('Subscription to a public list (email already registered)', async () => {
-        const subscription = await subscribe({
+        const subscription = await subscriptionExistsPrecondition({
             email: generateEmail()
         });
 
@@ -112,7 +119,7 @@ suite('Subscription use-cases', function() {
     useCase('Subscription to a non-public list');
 
     useCase('Change profile info', async () => {
-        const subscription = await subscribe({
+        const subscription = await subscriptionExistsPrecondition({
             email: generateEmail(),
             firstName: 'John',
             lastName: 'Doe'
@@ -154,7 +161,7 @@ suite('Subscription use-cases', function() {
     });
 
     useCase('Change email', async () => {
-        const subscription = await subscribe({
+        const subscription = await subscriptionExistsPrecondition({
             email: generateEmail(),
             firstName: 'John',
             lastName: 'Doe'
@@ -212,7 +219,7 @@ suite('Subscription use-cases', function() {
     });
 
     useCase('Unsubscription from list #1 (one-step, no form).', async () => {
-        const subscription = await subscribe({
+        const subscription = await subscriptionExistsPrecondition({
             email: generateEmail()
         });
 
@@ -236,4 +243,6 @@ suite('Subscription use-cases', function() {
     useCase('Unsubscription from list #4 (two-step, with form).');
 
     useCase('Unsubscription from list #5 (manual unsubscribe).');
+
+    useCase('Resubscription.'); // This one is supposed to check that values pre-filled in resubscription (i.e. the re-subscribe link in unsubscription confirmation) are the same as the ones used before.
 });
