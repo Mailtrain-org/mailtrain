@@ -1,12 +1,13 @@
 'use strict';
 
-let config = require('config');
-let express = require('express');
-let router = new express.Router();
-let passport = require('../lib/passport');
-let fs = require('fs');
-let path = require('path');
-let editorHelpers = require('../lib/editor-helpers.js')
+const config = require('config');
+const express = require('express');
+const router = new express.Router();
+const passport = require('../lib/passport');
+const _ = require('../lib/translate')._;
+const fs = require('fs');
+const path = require('path');
+const editorHelpers = require('../lib/editor-helpers')
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -23,28 +24,38 @@ router.get('/editor', passport.csrfProtection, (req, res) => {
             return res.redirect('/');
         }
 
-        resource.editorName = resource.editorName ||  'grapejs';
-        resource.editorData = !resource.editorData ?
-            {
+        try {
+            resource.editorData = JSON.parse(resource.editorData);
+        } catch (err) {
+            resource.editorData = {
                 template: req.query.template || 'demo'
-            } :
-            JSON.parse(resource.editorData);
+            }
+        }
 
-        if (!resource.html && !resource.editorData.html) {
+        if (!resource.html && !resource.editorData.html && !resource.editorData.mjml) {
+            const base = path.join(__dirname, '..', 'public', 'grapejs', 'templates', resource.editorData.template);
             try {
-                let file = path.join(__dirname, '..', 'public', 'grapejs', 'templates', resource.editorData.template, 'index.html');
-                resource.html = fs.readFileSync(file, 'utf8');
+                resource.editorData.mjml = fs.readFileSync(path.join(base, 'index.mjml'), 'utf8');
             } catch (err) {
-                resource.html = err.message || err;
+                try {
+                    resource.html = fs.readFileSync(path.join(base, 'index.html'), 'utf8');
+                } catch (err) {
+                    resource.html = err.message || err;
+                }
             }
         }
 
         res.render('grapejs/editor', {
             layout: 'grapejs/layout-editor',
             type: req.query.type,
+            stringifiedResource: JSON.stringify(resource),
             resource,
-            editorConfig: config.grapejs,
-            csrfToken: req.csrfToken(),
+            editor: {
+                name: resource.editorName || 'grapejs',
+                mode: resource.editorData.mjml ? 'mjml' : 'html',
+                config: config.grapejs
+            },
+            csrfToken: req.csrfToken()
         });
     });
 });
