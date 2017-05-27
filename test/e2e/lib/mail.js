@@ -12,7 +12,7 @@ module.exports = (...extras) => page({
         await this.waitUntilVisible();
     },
 
-    async ensureUrl(path) {
+    async ensureUrl(path) { // eslint-disable-line no-unused-vars
         throw new Error('Unsupported method.');
     },
 

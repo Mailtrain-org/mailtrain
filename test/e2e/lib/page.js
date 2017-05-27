@@ -1,6 +1,5 @@
 'use strict';
 
-const config = require('./config');
 const webdriver = require('selenium-webdriver');
 const By = webdriver.By;
 const until = webdriver.until;
@@ -45,7 +44,7 @@ module.exports = (...extras) => Object.assign({
         }
 
         for (const text of (this.textsToWaitFor || [])) {
-            await driver.wait(new webdriver.Condition(`for text "${text}"`, async (driver) => {
+            await driver.wait(new webdriver.Condition(`for text "${text}"`, async () => {
                 return await this.containsText(text);
             }), waitTimeout);
         }
@@ -58,7 +57,7 @@ module.exports = (...extras) => Object.assign({
     },
 
     async waitUntilVisibleAfterRefresh(selector) {
-        await driver.wait(new webdriver.Condition('for refresh', async (driver) => {
+        await driver.wait(new webdriver.Condition('for refresh', async () => {
             const val = await driver.executeScript('return document.mailTrainRefreshAcknowledged;');
             return !val;
         }), waitTimeout);

@@ -25,7 +25,7 @@ function UseCaseReporter(runner) {
         return Array(indents).join('  ');
     }
 
-    runner.on('start', function () {
+    runner.on('start', () => {
         console.log();
     });
 
@@ -104,7 +104,7 @@ function UseCaseReporter(runner) {
         console.log();
         console.log(err);
         console.log();
-        console.log(`Snaphot of and info about the current page are in last-failed-e2e-test.*`);
+        console.log('Snaphot of and info about the current page are in last-failed-e2e-test.*');
     });
 
     runner.on('end', () => {

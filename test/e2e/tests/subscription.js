@@ -67,7 +67,7 @@ async function subscriptionExistsPrecondition(subscription) {
     return subscription;
 }
 
-suite('Subscription use-cases', function() {
+suite('Subscription use-cases', () => {
     before(() => driver.manage().deleteAllCookies());
 
     useCase('Subscription to a public list (main scenario)', async () => {

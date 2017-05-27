@@ -15,7 +15,7 @@ module.exports = (...extras) => page({
             path = pathOrParams;
         } else {
             const urlPattern = new UrlPattern(this.requestUrl || this.url);
-            path = urlPattern.stringify(pathOrParams)
+            path = urlPattern.stringify(pathOrParams);
         }
 
         const parsedUrl = url.parse(path);

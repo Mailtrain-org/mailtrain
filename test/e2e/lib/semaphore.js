@@ -19,7 +19,7 @@ class Semaphore {
         const self = this;
 
         function wait(resolve) {
-            if (self.counter == 0) {
+            if (self.counter === 0) {
                 resolve();
             } else {
                 setTimeout(wait, 500, resolve);
@@ -28,7 +28,7 @@ class Semaphore {
 
         return new Promise(resolve => {
             setTimeout(wait, 500, resolve);
-        })
+        });
     }
 }
 
