@@ -1,0 +1,36 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/reports">{{#translate}}Reports{{/translate}}</a></li>
+    <li><a href="/report-templates">{{#translate}}Templates{{/translate}}</a></li>
+    <li class="active">{{#translate}}Edit Template{{/translate}}</li>
+</ol>
+
+<h2>{{#translate}}Edit Report Template{{/translate}}</h2>
+
+<hr>
+
+<form method="post" class="delete-form" id="report-templates-delete" action="/report-templates/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{id}}" />
+</form>
+
+
+<form class="form-horizontal" method="post" action="/report-templates/edit">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{id}}" />
+
+{{> report_template_fields }}
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="pull-right">
+                <button type="submit" form="report-templates-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> {{#translate}}Delete Template{{/translate}}</button>
+            </div>
+            <button type="submit" name="submit" value="update-and-stay"  class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update and Stay{{/translate}}</button>
+            <button type="submit" name="submit" value="update-and-leave" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update and Leave{{/translate}}</button>
+        </div>
+    </div>
+
+</form>

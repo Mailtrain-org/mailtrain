@@ -1,0 +1,40 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li class="active">{{#translate}}Reports{{/translate}}</li>
+</ol>
+
+<div class="pull-right">
+    <a class="btn btn-primary" href="/reports/create" role="button"><i class="glyphicon glyphicon-plus"></i> {{#translate}}Create Report{{/translate}}</a>
+
+    <a class="btn btn-primary" href="/report-templates" role="button">{{#translate}}Report Templates{{/translate}}</a>
+</div>
+
+<h2>{{#translate}}Reports{{/translate}}</h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table data-topic-url="/reports" data-sort-column="2" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,0,1,0">
+        <thead>
+        <th style="width: 1%">
+            #
+        </th>
+        <th>
+            {{#translate}}Name{{/translate}}
+        </th>
+        <th>
+            {{#translate}}Template{{/translate}}
+        </th>
+        <th>
+            {{#translate}}Description{{/translate}}
+        </th>
+        <th>
+            {{#translate}}Created{{/translate}}
+        </th>
+        <th style="width: 1%">
+            &nbsp;
+        </th>
+        </thead>
+    </table>
+</div>
+

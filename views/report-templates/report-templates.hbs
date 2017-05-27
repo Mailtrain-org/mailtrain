@@ -1,0 +1,45 @@
+<ol class="breadcrumb">
+    <li><a href="/">{{#translate}}Home{{/translate}}</a></li>
+    <li><a href="/reports">{{#translate}}Reports{{/translate}}</a></li>
+    <li class="active">{{#translate}}Templates{{/translate}}</li>
+</ol>
+
+<div class="pull-right">
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{#translate}}Create Template{{/translate}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="/report-templates/create">{{#translate}}Blank{{/translate}}</a></li>
+            <li><a href="/report-templates/create?type=subscribers-all">{{#translate}}All Subscribers{{/translate}}</a></li>
+            <li><a href="/report-templates/create?type=subscribers-grouped">{{#translate}}Grouped Subscribers{{/translate}}</a></li>
+            <li><a href="/report-templates/create?type=export-list-csv">{{#translate}}Export List as CSV{{/translate}}</a></li>
+        </ul>
+    </div>
+</div>
+
+<h2>{{#translate}}Report Templates{{/translate}}</h2>
+
+<hr>
+
+<div class="table-responsive">
+    <table data-topic-url="/report-templates" data-sort-column="2" data-sort-order="desc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,0,1,0">
+        <thead>
+            <th class="col-md-1">
+                #
+            </th>
+            <th>
+                {{#translate}}Name{{/translate}}
+            </th>
+            <th>
+                {{#translate}}Description{{/translate}}
+            </th>
+            <th>
+                {{#translate}}Created{{/translate}}
+            </th>
+            <th class="col-md-1">
+                &nbsp;
+            </th>
+        </thead>
+    </table>
+</div>

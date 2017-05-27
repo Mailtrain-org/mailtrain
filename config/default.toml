@@ -43,8 +43,14 @@ language="en"
 
 # If you start out as a root user (eg. if you want to use ports lower than 1000)
 # then you can downgrade the user once all services are up and running
-#user="nobody"
-#group="nogroup"
+#user="mailtrain"
+#group="mailtrain"
+
+# If Mailtrain is started as root, "Reports" feature drops the privileges of script generating the report to disallow
+# any modifications of Mailtrain code and even prohibits reading the production configuration (which contains the MySQL
+# password for read/write operations). The rouser/rogroup determines the user to be used
+#rouser="nobody"
+#rogroup="nogroup"
 
 [log]
 # silly|verbose|info|http|warn|error|silent
@@ -97,16 +103,12 @@ db=5
 enabled=false
 port=2525
 host="0.0.0.0"
-
-[testserver]
-# Starts a vanity server that redirects all mail to /dev/null
-# Mostly needed for local development
-enabled=false
-port=5587
-host="0.0.0.0"
-username="testuser"
-password="testpass"
-logger=false
+# With DMARC, the Return-Path and From address must match the same domain.
+# By default we get around this by using the VERP address in the Sender header,
+# with the side effect that some email clients diplay an ugly "on behalf of" message.
+# You can safely disable this Sender header if you're not using DMARC or your
+# VERP hostname is in the same domain as the From address.
+# disablesenderheader=true
 
 [ldap]
 # enable to use ldap user backend
@@ -150,3 +152,32 @@ templates=[["versafix-1", "Versafix One"]]
 [grapejs]
 # Installed templates
 templates=[["demo", "Demo Template"]]
+
+[reports]
+# The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be
+# properly protected.
+# Reports rely on custom user defined Javascript snippets defined in the report template. The snippets are run on the
+# server when generating a report. As these snippets are stored in the DB, they pose a security risk because they can
+# help gaining access to the server if the DB cannot
+# be properly protected (e.g. if it is shared with another application with security weaknesses).
+# Mailtrain mitigates this problem by running the custom Javascript snippets in a chrooted environment and under a
+# DB user that cannot modify the database (see userRO in [mysql] above). However the chrooted environment is available
+# only if Mailtrain is started as root. The chrooted environment still does not prevent the custom JS script in
+# performing network operations and in generating XSS attacks as part of the report.
+# The bottom line is that if people who are creating report templates or have write access to the DB cannot be trusted,
+# then it's safer to switch off the reporting functionality below.
+enabled=false
+
+[testserver]
+# Starts a vanity server that redirects all mail to /dev/null
+# Mostly needed for local development
+enabled=false
+port=5587
+mailboxserverport=3001
+host="0.0.0.0"
+username="testuser"
+password="testpass"
+logger=false
+
+[seleniumwebdriver]
+browser="phantomjs"

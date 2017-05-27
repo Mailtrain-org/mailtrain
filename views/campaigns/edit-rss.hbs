@@ -71,8 +71,6 @@
             </div>
         </div>
 
-        {{> merge_tag_reference}}
-
         <div class="form-group">
             <label for="template" class="col-sm-2 control-label">{{#translate}}RSS Feed Url{{/translate}}</label>
             <div class="col-sm-10">
@@ -80,6 +78,8 @@
                 <span class="help-block">{{#translate}}New entries from this RSS URL are sent out to list subscribers as email messages{{/translate}}</span>
             </div>
         </div>
+
+        {{> merge_tag_reference}}
 
         {{#if disableWysiwyg}}
 {{> codeeditor}}

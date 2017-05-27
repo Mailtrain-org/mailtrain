@@ -12,57 +12,26 @@
 <hr>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="0,1,1,1,0,0">
+    <table data-topic-url="/lists" data-sort-column="1" data-sort-order="asc" class="table table-bordered table-hover data-table-ajax display nowrap" width="100%" data-row-sort="0,1,1,1,0,0">
         <thead>
-            <th>
-                #
-            </th>
-            <th>
-                {{#translate}}Name{{/translate}}
-            </th>
-            <th>
-                {{#translate}}ID{{/translate}}
-            </th>
-            <th>
-                {{#translate}}Subscribers{{/translate}}
-            </th>
-            <th>
-                {{#translate}}Description{{/translate}}
-            </th>
-            <th>
-                &nbsp;
-            </th>
+        <th style="width: 1%">
+            #
+        </th>
+        <th>
+            {{#translate}}Name{{/translate}}
+        </th>
+        <th>
+            {{#translate}}ID{{/translate}}
+        </th>
+        <th>
+            {{#translate}}Subscribers{{/translate}}
+        </th>
+        <th>
+            {{#translate}}Description{{/translate}}
+        </th>
+        <th style="width: 1%">
+            &nbsp;
+        </th>
         </thead>
-        {{#if rows}}
-            <tbody>
-                {{#each rows}}
-                    <tr>
-                        <th scope="row">
-                            {{index}}
-                        </th>
-                        <td style="width: 30%;">
-                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-                            <a href="/lists/view/{{id}}">
-                            {{name}}
-                        </a>
-                        </td>
-                        <td>
-                            <code>{{cid}}</code>
-                        </td>
-                        <td class="text-center">
-                            {{subscribers}}
-                        </td>
-                        <td class="text-muted" style="width: 70%;">
-                            {{description}}
-                        </td>
-                        <td>
-                            <a href="/lists/edit/{{id}}">
-                            {{#translate}}Edit{{/translate}}
-                        </a>
-                        </td>
-                    </tr>
-                {{/each}}
-            </tbody>
-        {{/if}}
     </table>
 </div>

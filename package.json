@@ -8,12 +8,17 @@
     "test": "grunt",
     "start": "node index.js",
     "sqlinit": "node setup/sql/init.js",
-    "sqldump": "node setup/sql/dump.js | sed -e '/^\\/\\*.*\\*\\/;$/d' -e 's/.[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]./NOW()/g' > setup/sql/mailtrain.sql",
+    "sqldump": "node setup/sql/dump.js | sed -e '/^\\/\\*.*\\*\\/;$/d' -e 's/.[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]./NOW()/g' > setup/sql/mailtrain${DUMP_NAME_SUFFIX}.sql",
     "sqldrop": "node setup/sql/drop.js",
     "sqlgen": "npm run sqldrop && DB_FROM_START=Y npm run sqlinit && npm run sqldump",
     "langs:hbs": "jsxgettext -L handlebars -k translate -o langs/hbs.pot views/layout.hbs views/index.hbs",
     "langs:js": "jsxgettext -o languages/js.pot routes/index.js",
-    "langs": "npm run langs:hbs && npm run langs:js"
+    "langs": "npm run langs:hbs && npm run langs:js",
+    "sqldumptest": "NODE_ENV=test DUMP_NAME_SUFFIX=-test npm run sqldump",
+    "sqlresettest": "NODE_ENV=test npm run sqldrop && NODE_ENV=test npm run sqlinit",
+    "starttest": "NODE_ENV=test node index.js",
+    "_e2e": "NODE_ENV=test mocha test/e2e/index.js",
+    "e2e": "npm run sqlresettest && npm run _e2e"
   },
   "repository": {
     "type": "git",
@@ -26,12 +31,20 @@
     "node": ">=5.0.0"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "chai": "^3.5.0",
     "eslint-config-nodemailer": "^1.0.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-eslint": "^19.0.0",
-    "jsxgettext-andris": "^0.9.0-patch.1"
+    "jsxgettext-andris": "^0.9.0-patch.1",
+    "mocha": "^3.3.0",
+    "phantomjs": "^2.1.7",
+    "selenium-webdriver": "^3.4.0"
+  },
+  "optionalDependencies": {
+    "posix": "^4.1.1"
   },
   "dependencies": {
     "async": "^2.3.0",
@@ -70,6 +83,7 @@
     "jsdom": "^9.12.0",
     "juice": "^4.0.2",
     "libmime": "^3.1.0",
+    "mailparser": "^2.0.5",
     "marked": "^0.3.6",
     "memory-cache": "^0.1.6",
     "mjml": "3.3.0",
@@ -97,6 +111,7 @@
     "slugify": "^1.1.0",
     "smtp-server": "^2.0.3",
     "striptags": "^3.0.1",
-    "toml": "^2.3.2"
+    "toml": "^2.3.2",
+    "try-require": "^1.2.1"
   }
 }

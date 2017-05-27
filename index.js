@@ -4,20 +4,23 @@
  * Module dependencies.
  */
 
-let config = require('config');
-let log = require('npmlog');
-let app = require('./app');
-let http = require('http');
-let fork = require('child_process').fork;
-let triggers = require('./services/triggers');
-let importer = require('./services/importer');
-let verpServer = require('./services/verp-server');
-let testServer = require('./services/test-server');
-let postfixBounceServer = require('./services/postfix-bounce-server');
-let tzupdate = require('./services/tzupdate');
-let feedcheck = require('./services/feedcheck');
-let dbcheck = require('./lib/dbcheck');
-let tools = require('./lib/tools');
+const config = require('config');
+const log = require('npmlog');
+const app = require('./app');
+const http = require('http');
+const fork = require('child_process').fork;
+const triggers = require('./services/triggers');
+const importer = require('./services/importer');
+const verpServer = require('./services/verp-server');
+const testServer = require('./services/test-server');
+const postfixBounceServer = require('./services/postfix-bounce-server');
+const tzupdate = require('./services/tzupdate');
+const feedcheck = require('./services/feedcheck');
+const dbcheck = require('./lib/dbcheck');
+const tools = require('./lib/tools');
+const reportProcessor = require('./lib/report-processor');
+const executor = require('./lib/executor');
+const privilegeHelpers = require('./lib/privilege-helpers');
 
 let port = config.www.port;
 let host = config.www.host;
@@ -112,31 +115,22 @@ server.on('listening', () => {
     log.info('Express', 'WWW server listening on %s', bind);
 
     // start additional services
-    testServer(() => {
-        verpServer(() => {
-            tzupdate(() => {
-                importer(() => {
-                    triggers(() => {
-                        spawnSenders(() => {
-                            feedcheck(() => {
-                                postfixBounceServer(() => {
-                                    log.info('Service', 'All services started');
-                                    if (config.group) {
-                                        try {
-                                            process.setgid(config.group);
-                                            log.info('Service', 'Changed group to "%s" (%s)', config.group, process.getgid());
-                                        } catch (E) {
-                                            log.info('Service', 'Failed to change group to "%s" (%s)', config.group, E.message);
-                                        }
-                                    }
-                                    if (config.user) {
-                                        try {
-                                            process.setuid(config.user);
-                                            log.info('Service', 'Changed user to "%s" (%s)', config.user, process.getuid());
-                                        } catch (E) {
-                                            log.info('Service', 'Failed to change user to "%s" (%s)', config.user, E.message);
-                                        }
-                                    }
+    function startNextServices() {
+        testServer(() => {
+            verpServer(() => {
+
+                privilegeHelpers.dropRootPrivileges();
+
+                tzupdate(() => {
+                    importer(() => {
+                        triggers(() => {
+                            spawnSenders(() => {
+                                feedcheck(() => {
+                                    postfixBounceServer(() => {
+                                        reportProcessor.init(() => {
+                                            log.info('Service', 'All services started');
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -144,5 +138,11 @@ server.on('listening', () => {
                 });
             });
         });
-    });
+    }
+
+    if (config.reports && config.reports.enabled === true) {
+        executor.spawn(startNextServices);
+    } else {
+        startNextServices();
+    }
 });
