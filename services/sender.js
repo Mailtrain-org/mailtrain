@@ -419,7 +419,7 @@ function formatMessage(message, callback) {
                                         }
                                     },
                                     list: {
-                                        unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid + '?auto=yes')
+                                        unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid)
                                     },
                                     subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
                                     html: renderedHtml,

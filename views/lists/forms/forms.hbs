@@ -68,7 +68,7 @@
 <form class="form-inline" method="post" action="/lists/edit?next=%2Fforms%2F{{list.id}}">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" name="id" value="{{list.id}}" />
-    <input type="hidden" name="name" value="{{list.name}}" />
+    <input type="hidden" name="customFormChangeOnly" value="1" />
 
     <div class="form-group">
         <label for="default_form" class="control-label" style="color: #666; font-weight: normal;">{{#translate}}The default form for this list is:{{/translate}}</label>

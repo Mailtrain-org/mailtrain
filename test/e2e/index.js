@@ -1,36 +1,30 @@
 'use strict';
 
-require('./helpers/exit-unless-test');
+require('./lib/exit-unless-test');
+const { mocha, driver } = require('./lib/mocha-e2e');
+const path = require('path');
 
 global.USE_SHARED_DRIVER = true;
 
-const driver = require('./helpers/driver');
 const only = 'only';
 const skip = 'skip';
 
-
-
 let tests = [
-    ['tests/login'],
-    ['tests/subscription']
+    'login',
+    'subscription'
 ];
 
-
-
-tests = tests.filter(t => t[1] !== skip);
-
-if (tests.some(t => t[1] === only)) {
-    tests = tests.filter(t => t[1] === only);
+tests = tests.map(testSpec => (testSpec.constructor === Array ? testSpec : [testSpec]));
+tests = tests.filter(testSpec => testSpec[1] !== skip);
+if (tests.some(testSpec => testSpec[1] === only)) {
+    tests = tests.filter(testSpec => testSpec[1] === only);
 }
 
-describe('e2e', function() {
-    this.timeout(10000);
+for (const testSpec of tests) {
+    const testPath = path.join(__dirname, 'tests', testSpec[0] + '.js');
+    mocha.addFile(testPath);
+}
 
-    tests.forEach(t => {
-        describe(t[0], () => {
-            require('./' + t[0]); // eslint-disable-line global-require
-        });
-    });
-
-    after(() => driver.originalQuit());
+mocha.run(failures => {
+    process.exit(failures);  // exit with non-zero status if there were failures
 });

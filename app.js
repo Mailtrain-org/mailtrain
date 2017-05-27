@@ -184,8 +184,9 @@ app.use((req, res, next) => {
     res.locals.customScripts = config.customscripts || [];
 
     let bodyClasses = [];
-    app.get('env') === 'test' && bodyClasses.push('page--' + (req.path.substring(1).replace(/\//g, '--') || 'home'));
-    req.user && bodyClasses.push('logged-in user-' + req.user.username);
+    if (req.user) {
+        bodyClasses.push('logged-in user-' + req.user.username);
+    }
     res.locals.bodyClass = bodyClasses.join(' ');
 
     settingsModel.list(['ua_code', 'shoutout'], (err, configItems) => {
