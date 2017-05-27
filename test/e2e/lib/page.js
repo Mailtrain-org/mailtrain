@@ -35,6 +35,10 @@ module.exports = (...extras) => Object.assign({
     async waitUntilVisible(selector) {
         await driver.wait(until.elementLocated(By.css('body')), waitTimeout);
 
+        if (selector) {
+            await driver.wait(until.elementLocated(By.css(selector)), waitTimeout);
+        }
+        
         for (const elem of (this.elementsToWaitFor || [])) {
             const sel = this.elements[elem];
             if (!sel) {
