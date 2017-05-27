@@ -5,6 +5,7 @@ const config = require('config');
 module.exports = {
     app: config,
     baseUrl: 'http://localhost:' + config.www.port,
+    mailUrl: 'http://localhost:' + config.testserver.mailboxserverport,
     users: {
         admin: {
             username: 'admin',

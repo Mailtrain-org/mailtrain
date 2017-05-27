@@ -71,6 +71,8 @@ router.get('/create', passport.csrfProtection, (req, res) => {
         data.publicSubscribe = true;
     }
 
+    data.unsubscriptionModeOptions = getUnsubscriptionModeOptions(data.unsubscriptionMode || lists.UnsubscriptionMode.ONE_STEP);
+
     res.render('lists/create', data);
 });
 
@@ -102,6 +104,8 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
                 row.selected = list.defaultForm === row.id;
                 return row;
             });
+
+            list.unsubscriptionModeOptions = getUnsubscriptionModeOptions(list.unsubscriptionMode);
 
             list.csrfToken = req.csrfToken();
             res.render('lists/edit', list);
@@ -447,7 +451,7 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
                 return res.redirect('/lists/view/' + list.id);
             }
 
-            subscriptions.unsubscribe(list.id, subscription.email, false, err => {
+            subscriptions.changeStatus(list.id, subscription.id, false, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
                 if (err) {
                     req.flash('danger', err && err.message || err || _('Could not unsubscribe user'));
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
@@ -770,5 +774,41 @@ router.post('/quicklist/ajax', (req, res) => {
         });
     });
 });
+
+function getUnsubscriptionModeOptions(unsubscriptionMode) {
+    const options = [];
+
+    options[lists.UnsubscriptionMode.ONE_STEP] = {
+        value: lists.UnsubscriptionMode.ONE_STEP,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP,
+        label: _('One-step (i.e. no email with confirmation link)')
+    };
+
+    options[lists.UnsubscriptionMode.ONE_STEP_WITH_FORM] = {
+        value: lists.UnsubscriptionMode.ONE_STEP_WITH_FORM,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM,
+        label: _('One-step with unsubscription form (i.e. no email with confirmation link)')
+    };
+
+    options[lists.UnsubscriptionMode.TWO_STEP] = {
+        value: lists.UnsubscriptionMode.TWO_STEP,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP,
+        label: _('Two-step (i.e. an email with confirmation link will be sent)')
+    };
+
+    options[lists.UnsubscriptionMode.TWO_STEP_WITH_FORM] = {
+        value: lists.UnsubscriptionMode.TWO_STEP_WITH_FORM,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM,
+        label: _('Two-step with unsubscription form (i.e. an email with confirmation link will be sent)')
+    };
+
+    options[lists.UnsubscriptionMode.MANUAL] = {
+        value: lists.UnsubscriptionMode.MANUAL,
+        selected: unsubscriptionMode === lists.UnsubscriptionMode.MANUAL,
+        label: _('Manual (i.e. unsubscription has to be performed by the list administrator)')
+    };
+
+    return options;
+}
 
 module.exports = router;

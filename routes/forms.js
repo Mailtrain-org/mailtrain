@@ -161,22 +161,32 @@ router.get('/:list/edit/:form', passport.csrfProtection, (req, res) => {
                             type: 'mjml',
                             help: helpMjmlGeneral
                         }, {
-                            name: 'web_confirm_notice',
-                            label: _('Web - Confirm Notice'),
+                            name: 'web_confirm_subscription_notice',
+                            label: _('Web - Confirm Subscription Notice'),
                             type: 'mjml',
                             help: helpMjmlGeneral
                         }, {
-                            name: 'mail_confirm_html',
+                            name: 'mail_confirm_subscription_html',
                             label: _('Mail - Confirm Subscription (MJML)'),
                             type: 'mjml',
                             help: helpMjmlGeneral
                         }, {
-                            name: 'mail_confirm_text',
+                            name: 'mail_confirm_subscription_text',
                             label: _('Mail - Confirm Subscription (Text)'),
                             type: 'text',
                             help: helpEmailText
                         }, {
-                            name: 'web_subscribed',
+                            name: 'mail_already_subscribed_html',
+                            label: _('Mail - Already Subscribed (MJML)'),
+                            type: 'mjml',
+                            help: helpMjmlGeneral
+                        }, {
+                            name: 'mail_already_subscribed_text',
+                            label: _('Mail - Already Subscribed (Text)'),
+                            type: 'text',
+                            help: helpEmailText
+                        }, {
+                            name: 'web_subscribed_notice',
                             label: _('Web - Subscribed Notice'),
                             type: 'mjml',
                             help: helpMjmlGeneral
@@ -217,20 +227,50 @@ router.get('/:list/edit/:form', passport.csrfProtection, (req, res) => {
                             type: 'mjml',
                             help: helpMjmlGeneral
                         }, {
-                            name: 'web_unsubscribe_notice',
-                            label: _('Web - Unsubscribe Notice'),
+                            name: 'web_confirm_unsubscription_notice',
+                            label: _('Web - Confirm Unsubscription Notice'),
                             type: 'mjml',
                             help: helpMjmlGeneral
                         }, {
-                            name: 'mail_unsubscribe_confirmed_html',
-                            label: _('Mail - Unsubscribe Confirmed (MJML)'),
+                            name: 'mail_confirm_unsubscription_html',
+                            label: _('Mail - Confirm Unsubscription (MJML)'),
                             type: 'mjml',
                             help: helpMjmlGeneral
                         }, {
-                            name: 'mail_unsubscribe_confirmed_text',
-                            label: _('Mail - Unsubscribe Confirmed (Text)'),
+                            name: 'mail_confirm_unsubscription_text',
+                            label: _('Mail - Confirm Unsubscription (Text)'),
                             type: 'text',
                             help: helpEmailText
+                        }, {
+                            name: 'mail_confirm_address_change_html',
+                            label: _('Mail - Confirm Address Change (MJML)'),
+                            type: 'mjml',
+                            help: helpMjmlGeneral
+                        }, {
+                            name: 'mail_confirm_address_change_text',
+                            label: _('Mail - Confirm Address Change (Text)'),
+                            type: 'text',
+                            help: helpEmailText
+                        }, {
+                            name: 'web_unsubscribed_notice',
+                            label: _('Web - Unsubscribed Notice'),
+                            type: 'mjml',
+                            help: helpMjmlGeneral
+                        }, {
+                            name: 'mail_unsubscription_confirmed_html',
+                            label: _('Mail - Unsubscription Confirmed (MJML)'),
+                            type: 'mjml',
+                            help: helpMjmlGeneral
+                        }, {
+                            name: 'mail_unsubscription_confirmed_text',
+                            label: _('Mail - Unsubscription Confirmed (Text)'),
+                            type: 'text',
+                            help: helpEmailText
+                        }, {
+                            name: 'web_manual_unsubscribe_notice',
+                            label: _('Web - Manual Unsubscribe Notice'),
+                            type: 'mjml',
+                            help: helpMjmlGeneral
                         }]
                     }
                 ];

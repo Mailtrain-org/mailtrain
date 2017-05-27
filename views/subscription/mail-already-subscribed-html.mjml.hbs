@@ -1,0 +1,24 @@
+<mj-section>
+    <mj-column>
+        <mj-text mj-class="h3">
+            {{#translate}}Email address already registered{{/translate}}
+        </mj-text>
+        <mj-text mj-class="p">
+            {{#translate}}We have received a subscription request. Your email address is however already registered.{{/translate}}.
+        </mj-text>
+        <mj-text mj-class="p">
+            {{#translate}}If you received this email by mistake, simply delete it. Your existing subscription won't be affected.{{/translate}}
+        </mj-text>
+        <mj-text mj-class="p">
+            {{#translate}}If you want to modify your subscription then you can {{/translate}}
+            <a href="{{preferencesUrl}}">{{#translate}}manage your preferences{{/translate}}</a> {{#translate}}or{{/translate}} <a href="{{unsubscribeUrl}}">{{#translate}}unsubscribe here{{/translate}}</a>.
+        </mj-text>
+        <mj-button mj-class="button" href="{{homepage}}">
+            {{#translate}}Return to our website{{/translate}}
+        </mj-button>
+        <mj-text mj-class="p">
+            {{#translate}}For questions about this list, please contact:{{/translate}}
+            <br/><a href="mailto:{{contactAddress}}">{{contactAddress}}</a>
+        </mj-text>
+    </mj-column>
+</mj-section>

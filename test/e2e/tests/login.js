@@ -1,57 +1,68 @@
 'use strict';
 
-const config = require('../helpers/config');
+const config = require('../lib/config');
+const { useCase, step, driver } = require('../lib/mocha-e2e');
 const expect = require('chai').expect;
-const driver = require('../helpers/driver');
-const home = require('../page-objects/home')(driver);
-const flash = require('../page-objects/flash')(driver);
-const {
-    login,
-    account
-} = require('../page-objects/users')(driver);
 
-describe('login', function() {
-    this.timeout(10000);
+const page = require('../page-objects/user');
+const home = require('../page-objects/home');
 
+suite('Login use-cases', function() {
     before(() => driver.manage().deleteAllCookies());
 
-    it('can access home page', async () => {
+    test('User can access home page', async () => {
         await home.navigate();
     });
 
-    it('can not access restricted content', async () => {
-        driver.navigate().to(config.baseUrl + '/settings');
-        flash.waitUntilVisible();
-        expect(await flash.getText()).to.contain('Need to be logged in to access restricted content');
-        await flash.clear();
+    test('Anonymous user cannot access restricted content', async () => {
+        await driver.navigate().to(config.baseUrl + '/settings');
+        await page.login.waitUntilVisible();
+        await page.login.waitForFlash();
+        expect(await page.login.getFlash()).to.contain('Need to be logged in to access restricted content');
     });
 
-    it('can not login with false credentials', async () => {
-        login.enterUsername(config.users.admin.username);
-        login.enterPassword('invalid');
-        login.submit();
-        flash.waitUntilVisible();
-        expect(await flash.getText()).to.contain('Incorrect username or password');
-        await flash.clear();
+    useCase('Login (invalid credential)', async () => {
+        await step('User navigates to the login page.', async () => {
+            await page.login.navigate();
+        });
+
+        await step('User fills in the user name and incorrect password.', async () => {
+            await page.login.setValue('usernameInput', config.users.admin.username);
+            await page.login.setValue('passwordInput', 'invalid');
+            await page.login.submit();
+        });
+
+        await step('System shows a flash notice that credentials are invalid.', async () => {
+            await page.login.waitForFlash();
+            expect(await page.login.getFlash()).to.contain('Incorrect username or password');
+        });
     });
 
-    it('can login as admin', async () => {
-        login.enterUsername(config.users.admin.username);
-        login.enterPassword(config.users.admin.password);
-        login.submit();
-        flash.waitUntilVisible();
-        expect(await flash.getText()).to.contain('Logged in as admin');
-    });
+    useCase('Login and logout', async () => {
+        await step('User navigates to the login page.', async () => {
+            await page.login.navigate();
+        });
 
-    it('can access account page as admin', async () => {
-        await account.navigate();
-    });
+        await step('User fills in the user name and password.', async () => {
+            await page.login.setValue('usernameInput', config.users.admin.username);
+            await page.login.setValue('passwordInput', config.users.admin.password);
+            await page.login.submit();
+        });
 
-    it('can logout', async () => {
-        driver.navigate().to(config.baseUrl + '/users/logout');
-        flash.waitUntilVisible();
-        expect(await flash.getText()).to.contain('logged out');
-    });
+        await step('System shows the home page and a flash notice that user has been logged in.', async () => {
+            await home.waitUntilVisibleAfterRefresh();
+            await home.waitForFlash();
+            expect(await home.getFlash()).to.contain('Logged in as admin');
+        });
 
-    after(() => driver.quit());
+        await step('User navigates to its account.', async () => {
+            await page.account.navigate();
+        });
+
+        await step('User logs out.', async () => {
+            await page.logout.navigate();
+            await home.waitForFlash();
+            expect(await home.getFlash()).to.contain('logged out');
+        });
+    });
 });
