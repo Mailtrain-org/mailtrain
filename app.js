@@ -184,6 +184,12 @@ app.use((req, res, next) => {
     res.locals.customStyles = config.customstyles || [];
     res.locals.customScripts = config.customscripts || [];
 
+    let bodyClasses = [];
+    if (req.user) {
+        bodyClasses.push('logged-in user-' + req.user.username);
+    }
+    res.locals.bodyClass = bodyClasses.join(' ');
+
     settingsModel.list(['ua_code', 'shoutout'], (err, configItems) => {
         if (err) {
             return next(err);

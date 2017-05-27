@@ -1,10 +1,15 @@
+/.idea
+/last-failed-e2e-test.*
+
 node_modules
 npm-debug.log
 .DS_Store
 config/development.*
 config/production.*
+config/test.*
 workers/reports/config/development.*
 workers/reports/config/production.*
+workers/reports/config/test.*
 dump.rdb
 
 # generate POT file every time you want to update your PO file
