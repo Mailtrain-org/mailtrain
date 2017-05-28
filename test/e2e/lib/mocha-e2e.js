@@ -13,9 +13,7 @@ const driver = new webdriver.Builder()
     .forBrowser(config.app.seleniumwebdriver.browser || 'phantomjs')
     .build();
 
-
 const failHandlerRunning = new WorkerCounter();
-
 
 function UseCaseReporter(runner) {
     Mocha.reporters.Base.call(this, runner);

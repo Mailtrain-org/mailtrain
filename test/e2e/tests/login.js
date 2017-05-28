@@ -9,7 +9,7 @@ const expect = require('chai').expect;
 const page = require('../page-objects/user');
 const home = require('../page-objects/home');
 
-suite('Login use-cases', function() {
+suite('Login use-cases', () => {
     before(() => driver.manage().deleteAllCookies());
 
     test('User can access home page', async () => {

@@ -1,10 +1,8 @@
 'use strict';
 
 require('./lib/exit-unless-test');
-const { mocha } = require('./lib/mocha-e2e');
+const mocha = require('./lib/mocha-e2e').mocha;
 const path = require('path');
-
-global.USE_SHARED_DRIVER = true;
 
 const only = 'only';
 const skip = 'skip';

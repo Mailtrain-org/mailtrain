@@ -19,6 +19,11 @@ module.exports = list => ({
         }
     }),
 
+    webSubscribeNonPublic: web({
+        url: `/subscription/${list.cid}`,
+        textsToWaitFor: ['The list does not allow public subscriptions'],
+    }),
+
     webConfirmSubscriptionNotice: web({
         url: `/subscription/${list.cid}/confirm-subscription-notice`,
         textsToWaitFor: ['We need to confirm your email address']
@@ -116,6 +121,36 @@ module.exports = list => ({
         elements: {
             resubscribeLink: `a[href^="${config.settings['service-url']}subscription/${list.cid}"]`
         }
-    })
-});
+    }),
 
+    webUnsubscribe: web({
+        elementsToWaitFor: ['submitButton'],
+        textsToWaitFor: ['Unsubscribe'],
+        elements: {
+            submitButton: 'a[href="#submit"]'
+        }
+    }),
+
+    webConfirmUnsubscriptionNotice: web({
+        url: `/subscription/${list.cid}/confirm-unsubscription-notice`,
+        textsToWaitFor: ['We need to confirm your email address']
+    }),
+
+    mailConfirmUnsubscription: mail({
+        elementsToWaitFor: ['confirmLink'],
+        textsToWaitFor: ['Please Confirm Unsubscription'],
+        elements: {
+            confirmLink: `a[href^="${config.settings['service-url']}subscription/confirm/unsubscribe/"]`
+        }
+    }),
+
+    webManualUnsubscribeNotice: web({
+        url: `/subscription/${list.cid}/manual-unsubscribe-notice`,
+        elementsToWaitFor: ['contactLink'],
+        textsToWaitFor: ['Online Unsubscription Is Not Possible', config.settings['admin-email']],
+        elements: {
+            contactLink: `a[href^="mailto:${config.settings['admin-email']}"]`
+        }
+    }),
+
+});

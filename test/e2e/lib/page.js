@@ -32,9 +32,13 @@ module.exports = (...extras) => Object.assign({
         return params;
     },
 
-    async waitUntilVisible() {
+    async waitUntilVisible(selector) {
         await driver.wait(until.elementLocated(By.css('body')), waitTimeout);
 
+        if (selector) {
+            await driver.wait(until.elementLocated(By.css(selector)), waitTimeout);
+        }
+        
         for (const elem of (this.elementsToWaitFor || [])) {
             const sel = this.elements[elem];
             if (!sel) {
@@ -54,13 +58,13 @@ module.exports = (...extras) => Object.assign({
         await driver.executeScript('document.mailTrainRefreshAcknowledged = true;');
     },
 
-    async waitUntilVisibleAfterRefresh() {
+    async waitUntilVisibleAfterRefresh(selector) {
         await driver.wait(new webdriver.Condition('for refresh', async driver => {
             const val = await driver.executeScript('return document.mailTrainRefreshAcknowledged;');
             return !val;
         }), waitTimeout);
 
-        await this.waitUntilVisible();
+        await this.waitUntilVisible(selector);
     },
 
     async click(key) {
