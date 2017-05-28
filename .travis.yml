@@ -1,0 +1,18 @@
+dist: trusty
+sudo: required
+language: node_js
+node_js:
+  - 7
+services:
+  - mysql
+before_install:
+  - sudo apt-get -q -y install pwgen imagemagick
+install:
+  - sudo bash test/e2e/install.sh
+  - npm install
+before_script:
+  - npm run starttest > /dev/null 2>&1 &
+  - sleep 10
+script:
+  - grunt
+  - npm run _e2e
