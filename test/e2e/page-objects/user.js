@@ -22,8 +22,8 @@ module.exports = {
         url: '/users/account',
         elementsToWaitFor: ['form'],
         elements: {
-            form: `form[action="/users/account"]`,
+            form: 'form[action="/users/account"]',
             emailInput: 'form[action="/users/account"] input[name="email"]'
         }
-    }),
+    })
 };

@@ -38,7 +38,7 @@ exports.up = function(knex, Promise) {
     // For now, we just check whether our DB is up-to-date based on the existing SQL migration infrastructure in Mailtrain.
     return knex('settings').where({key: 'db_schema_version'}).first('value')
         .then(row => {
-            if (!row || Number(row.value) !== 28) {
+            if (!row || Number(row.value) !== 29) {
                 throw new Error('Unsupported DB schema version: ' + row.value);
             }
         })

@@ -1,6 +1,5 @@
 'use strict';
 
-const config = require('./config');
 const webdriver = require('selenium-webdriver');
 const By = webdriver.By;
 const until = webdriver.until;
@@ -36,6 +35,10 @@ module.exports = (...extras) => Object.assign({
     async waitUntilVisible(selector) {
         await driver.wait(until.elementLocated(By.css('body')), waitTimeout);
 
+        if (selector) {
+            await driver.wait(until.elementLocated(By.css(selector)), waitTimeout);
+        }
+        
         for (const elem of (this.elementsToWaitFor || [])) {
             const sel = this.elements[elem];
             if (!sel) {
@@ -45,9 +48,7 @@ module.exports = (...extras) => Object.assign({
         }
 
         for (const text of (this.textsToWaitFor || [])) {
-            await driver.wait(new webdriver.Condition(`for text "${text}"`, async (driver) => {
-                return await this.containsText(text);
-            }), waitTimeout);
+            await driver.wait(new webdriver.Condition(`for text "${text}"`, async () => await this.containsText(text)), waitTimeout);
         }
 
         if (this.url) {
@@ -58,7 +59,7 @@ module.exports = (...extras) => Object.assign({
     },
 
     async waitUntilVisibleAfterRefresh(selector) {
-        await driver.wait(new webdriver.Condition('for refresh', async (driver) => {
+        await driver.wait(new webdriver.Condition('for refresh', async driver => {
             const val = await driver.executeScript('return document.mailTrainRefreshAcknowledged;');
             return !val;
         }), waitTimeout);

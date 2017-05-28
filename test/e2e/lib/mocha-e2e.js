@@ -1,8 +1,10 @@
 'use strict';
 
+/* eslint-disable no-console */
+
 const Mocha = require('mocha');
 const color = Mocha.reporters.Base.color;
-const Semaphore = require('./semaphore');
+const WorkerCounter = require('./worker-counter');
 const fs = require('fs-extra');
 const config = require('./config');
 const webdriver = require('selenium-webdriver');
@@ -11,9 +13,7 @@ const driver = new webdriver.Builder()
     .forBrowser(config.app.seleniumwebdriver.browser || 'phantomjs')
     .build();
 
-
-const failHandlerRunning = new Semaphore();
-
+const failHandlerRunning = new WorkerCounter();
 
 function UseCaseReporter(runner) {
     Mocha.reporters.Base.call(this, runner);
@@ -25,7 +25,7 @@ function UseCaseReporter(runner) {
         return Array(indents).join('  ');
     }
 
-    runner.on('start', function () {
+    runner.on('start', () => {
         console.log();
     });
 
@@ -104,7 +104,7 @@ function UseCaseReporter(runner) {
         console.log();
         console.log(err);
         console.log();
-        console.log(`Snaphot of and info about the current page are in last-failed-e2e-test.*`);
+        console.log('Snaphot of and info about the current page are in last-failed-e2e-test.*');
     });
 
     runner.on('end', () => {
@@ -174,13 +174,9 @@ function useCase(name, asyncFn) {
     }
 }
 
-useCase.only = (name, asyncFn) => {
-    return test.only('Use case: ' + name, () => useCaseExec(name, asyncFn));
-};
+useCase.only = (name, asyncFn) => test.only('Use case: ' + name, () => useCaseExec(name, asyncFn));
 
-useCase.skip = (name, asyncFn) => {
-    return test.skip('Use case: ' + name, () => useCaseExec(name, asyncFn));
-};
+useCase.skip = (name, asyncFn) => test.skip('Use case: ' + name, () => useCaseExec(name, asyncFn));
 
 async function step(name, asyncFn) {
     try {

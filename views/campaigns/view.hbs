@@ -164,7 +164,7 @@
                     </div>
                 </dd>
 
-                {{#unless trackingDisabled}}
+                {{#unless openTrackingDisabled}}
 
                     <dt>{{#translate}}Opened{{/translate}} <a href="/campaigns/opened/{{id}}" title="{{#translate}}List subscribers who opened this message{{/translate}}"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                     <dd>
@@ -174,7 +174,8 @@
                             </div>
                         </div>
                     </dd>
-
+                {{/unless}}
+                {{#unless clickTrackingDisabled}}
                     <dt>{{#translate}}Clicked{{/translate}} <a href="/campaigns/clicked/{{id}}/all" title="{{#translate}}List subscribers who clicked on a link{{/translate}}"> <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a></dt>
                     <dd>
                         <div class="progress">

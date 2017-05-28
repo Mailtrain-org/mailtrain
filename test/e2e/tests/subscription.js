@@ -1,17 +1,24 @@
 'use strict';
 
+/* eslint-disable prefer-arrow-callback */
+
 const config = require('../lib/config');
 const { useCase, step, precondition, driver } = require('../lib/mocha-e2e');
 const shortid = require('shortid');
 const expect = require('chai').expect;
+const createPage = require('../page-objects/subscription');
 
-const page = require('../page-objects/subscription')(config.lists.one);
+function getPage(listConf) {
+    return createPage(listConf);
+}
 
 function generateEmail() {
     return 'keep.' + shortid.generate() + '@mailtrain.org';
 }
 
-async function subscribe(subscription) {
+async function subscribe(listConf, subscription) {
+    const page = getPage(listConf);
+
     await step('User navigates to list subscription page.', async () => {
         await page.webSubscribe.navigate();
     });
@@ -60,23 +67,25 @@ async function subscribe(subscription) {
     return subscription;
 }
 
-async function subscriptionExistsPrecondition(subscription) {
+async function subscriptionExistsPrecondition(listConf, subscription) {
     await precondition('Subscription exists', 'Subscription to a public list (main scenario)', async () => {
-        await subscribe(subscription);
+        await subscribe(listConf, subscription);
     });
     return subscription;
 }
 
-suite('Subscription use-cases', function() {
+suite('Subscription use-cases', () => {
     before(() => driver.manage().deleteAllCookies());
 
     useCase('Subscription to a public list (main scenario)', async () => {
-        await subscribe({
+        await subscribe(config.lists.l1, {
             email: generateEmail()
         });
     });
 
     useCase('Subscription to a public list (invalid email)', async () => {
+        const page = getPage(config.lists.l1);
+
         await step('User navigates to list subscribe page', async () => {
             await page.webSubscribe.navigate();
         });
@@ -93,7 +102,9 @@ suite('Subscription use-cases', function() {
     });
 
     useCase('Subscription to a public list (email already registered)', async () => {
-        const subscription = await subscriptionExistsPrecondition({
+        const page = getPage(config.lists.l1);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
             email: generateEmail()
         });
 
@@ -116,10 +127,18 @@ suite('Subscription use-cases', function() {
 
     });
 
-    useCase('Subscription to a non-public list');
+    useCase('Subscription to a non-public list', async () => {
+        const page = getPage(config.lists.l6);
+
+        await step('User navigates to list subscription page and sees message that this list does not allow public subscriptions.', async () => {
+            await page.webSubscribeNonPublic.navigate();
+        });
+    });
 
     useCase('Change profile info', async () => {
-        const subscription = await subscriptionExistsPrecondition({
+        const page = getPage(config.lists.l1);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
             email: generateEmail(),
             firstName: 'John',
             lastName: 'Doe'
@@ -161,7 +180,9 @@ suite('Subscription use-cases', function() {
     });
 
     useCase('Change email', async () => {
-        const subscription = await subscriptionExistsPrecondition({
+        const page = getPage(config.lists.l1);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
             email: generateEmail(),
             firstName: 'John',
             lastName: 'Doe'
@@ -219,7 +240,9 @@ suite('Subscription use-cases', function() {
     });
 
     useCase('Unsubscription from list #1 (one-step, no form).', async () => {
-        const subscription = await subscriptionExistsPrecondition({
+        const page = getPage(config.lists.l1);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
             email: generateEmail()
         });
 
@@ -236,13 +259,181 @@ suite('Subscription use-cases', function() {
         });
     });
 
-    useCase('Unsubscription from list #2 (one-step, with form).');
+    useCase('Unsubscription from list #2 (one-step, with form).', async () => {
+        const page = getPage(config.lists.l2);
 
-    useCase('Unsubscription from list #3 (two-step, no form).');
+        const subscription = await subscriptionExistsPrecondition(config.lists.l2, {
+            email: generateEmail()
+        });
 
-    useCase('Unsubscription from list #4 (two-step, with form).');
+        await step('User clicks the unsubscribe button.', async () => {
+            await page.mailSubscriptionConfirmed.click('unsubscribeLink');
+        });
 
-    useCase('Unsubscription from list #5 (manual unsubscribe).');
+        await step('Systems shows a form to unsubscribe.', async () => {
+            await page.webUnsubscribe.waitUntilVisibleAfterRefresh();
+        });
 
-    useCase('Resubscription.'); // This one is supposed to check that values pre-filled in resubscription (i.e. the re-subscribe link in unsubscription confirmation) are the same as the ones used before.
+        await step('User confirms unsubscribe and clicks the unsubscribe button.', async () => {
+            await page.webUnsubscribe.submit();
+        });
+
+        await step('System shows a notice that confirms unsubscription.', async () => {
+            await page.webUnsubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email that confirms unsubscription.', async () => {
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+        });
+    });
+
+    useCase('Unsubscription from list #3 (two-step, no form).', async () => {
+        const page = getPage(config.lists.l3);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l3, {
+            email: generateEmail()
+        });
+
+        await step('User clicks the unsubscribe button.', async () => {
+            await page.mailSubscriptionConfirmed.click('unsubscribeLink');
+        });
+
+        await step('System shows a notice that further instructions are in the email.', async () => {
+            await page.webConfirmUnsubscriptionNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email with a link to confirm unsubscription.', async () => {
+            await page.mailConfirmUnsubscription.fetchMail(subscription.email);
+        });
+
+        await step('User clicks the confirm unsubscribe button in the email.', async () => {
+            await page.mailConfirmUnsubscription.click('confirmLink');
+        });
+
+        await step('System shows a notice that confirms unsubscription.', async () => {
+            await page.webUnsubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email that confirms unsubscription.', async () => {
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+        });
+    });
+
+    useCase('Unsubscription from list #4 (two-step, with form).', async () => {
+        const page = getPage(config.lists.l4);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l4, {
+            email: generateEmail()
+        });
+
+        await step('User clicks the unsubscribe button.', async () => {
+            await page.mailSubscriptionConfirmed.click('unsubscribeLink');
+        });
+
+        await step('Systems shows a form to unsubscribe.', async () => {
+            await page.webUnsubscribe.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('User confirms unsubscribe and clicks the unsubscribe button.', async () => {
+            await page.webUnsubscribe.submit();
+        });
+
+        await step('System shows a notice that further instructions are in the email.', async () => {
+            await page.webConfirmUnsubscriptionNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email with a link to confirm unsubscription.', async () => {
+            await page.mailConfirmUnsubscription.fetchMail(subscription.email);
+        });
+
+        await step('User clicks the confirm unsubscribe button in the email.', async () => {
+            await page.mailConfirmUnsubscription.click('confirmLink');
+        });
+
+        await step('System shows a notice that confirms unsubscription.', async () => {
+            await page.webUnsubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email that confirms unsubscription.', async () => {
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+        });
+    });
+
+    useCase('Unsubscription from list #5 (manual unsubscribe).', async () => {
+        const page = getPage(config.lists.l5);
+
+        await subscriptionExistsPrecondition(config.lists.l5, {
+            email: generateEmail()
+        });
+
+        await step('User clicks the unsubscribe button.', async () => {
+            await page.mailSubscriptionConfirmed.click('unsubscribeLink');
+        });
+
+        await step('Systems shows a notice that online unsubscription is not possible.', async () => {
+            await page.webManualUnsubscribeNotice.waitUntilVisibleAfterRefresh();
+        });
+    });
+
+    useCase('Resubscription.', async () => {
+        const page = getPage(config.lists.l1);
+
+        const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
+            email: generateEmail(),
+            firstName: 'John',
+            lastName: 'Doe'
+        });
+
+        await step('User clicks the unsubscribe button.', async () => {
+            await page.mailSubscriptionConfirmed.click('unsubscribeLink');
+        });
+
+        await step('System shows a notice that confirms unsubscription.', async () => {
+            await page.webUnsubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email that confirms unsubscription.', async () => {
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+        });
+
+        await step('User clicks the resubscribe button.', async () => {
+            await page.mailUnsubscriptionConfirmed.click('resubscribeLink');
+        });
+
+        await step('Systems shows the subscription form. The form contains data entered during initial subscription.', async () => {
+            await page.webSubscribe.waitUntilVisibleAfterRefresh();
+            expect(await page.webSubscribe.getValue('emailInput')).to.equal(subscription.email);
+            expect(await page.webSubscribe.getValue('firstNameInput')).to.equal(subscription.firstName);
+            expect(await page.webSubscribe.getValue('lastNameInput')).to.equal(subscription.lastName);
+        });
+
+        await step('User submits the subscription form.', async () => {
+            await page.webSubscribe.submit();
+        });
+
+        await step('System shows a notice that further instructions are in the email.', async () => {
+            await page.webConfirmSubscriptionNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email with a link to confirm the subscription.', async () => {
+            await page.mailConfirmSubscription.fetchMail(subscription.email);
+        });
+
+        await step('User clicks confirm subscription in the email', async () => {
+            await page.mailConfirmSubscription.click('confirmLink');
+        });
+
+        await step('System shows a notice that subscription has been confirmed.', async () => {
+            await page.webSubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email with subscription confirmation. The manage and unsubscribe links are identical with the initial subscription.', async () => {
+            await page.mailSubscriptionConfirmed.fetchMail(subscription.email);
+            const unsubscribeLink = await page.mailSubscriptionConfirmed.getHref('unsubscribeLink');
+            const manageLink = await page.mailSubscriptionConfirmed.getHref('manageLink');
+            expect(subscription.unsubscribeLink).to.equal(unsubscribeLink);
+            expect(subscription.manageLink).to.equal(manageLink);
+        });
+    });
+
 });

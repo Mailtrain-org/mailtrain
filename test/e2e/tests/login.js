@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable prefer-arrow-callback */
+
 const config = require('../lib/config');
 const { useCase, step, driver } = require('../lib/mocha-e2e');
 const expect = require('chai').expect;
@@ -7,7 +9,7 @@ const expect = require('chai').expect;
 const page = require('../page-objects/user');
 const home = require('../page-objects/home');
 
-suite('Login use-cases', function() {
+suite('Login use-cases', () => {
     before(() => driver.manage().deleteAllCookies());
 
     test('User can access home page', async () => {
