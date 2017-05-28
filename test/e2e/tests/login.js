@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable prefer-arrow-callback */
+
 const config = require('../lib/config');
 const { useCase, step, driver } = require('../lib/mocha-e2e');
 const expect = require('chai').expect;

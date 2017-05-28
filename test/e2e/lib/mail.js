@@ -12,8 +12,8 @@ module.exports = (...extras) => page({
         await this.waitUntilVisible();
     },
 
-    async ensureUrl(path) {
+    async ensureUrl() {
         throw new Error('Unsupported method.');
-    },
+    }
 
 }, ...extras);

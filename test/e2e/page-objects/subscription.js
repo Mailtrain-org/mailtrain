@@ -88,7 +88,7 @@ module.exports = list => ({
             form: `form[action="/subscription/${list.cid}/manage-address"]`,
             emailInput: '#main-form input[name="email"]',
             emailNewInput: '#main-form input[name="email-new"]',
-            submitButton: 'a[href="#submit"]',
+            submitButton: 'a[href="#submit"]'
         }
     }),
 
@@ -102,12 +102,12 @@ module.exports = list => ({
 
     webUpdatedNotice: web({
         url: `/subscription/${list.cid}/updated-notice`,
-        textsToWaitFor: ['Profile Updated'],
+        textsToWaitFor: ['Profile Updated']
     }),
 
     webUnsubscribedNotice: web({
         url: `/subscription/${list.cid}/unsubscribed-notice`,
-        textsToWaitFor: ['Unsubscribe Successful'],
+        textsToWaitFor: ['Unsubscribe Successful']
     }),
 
     mailUnsubscriptionConfirmed: mail({
@@ -116,17 +116,6 @@ module.exports = list => ({
         elements: {
             resubscribeLink: `a[href^="${config.settings['service-url']}subscription/${list.cid}"]`
         }
-    }),
-
-    /*
-    webUnsubscribe: web({ // FIXME
-        elementsToWaitFor: ['submitButton'],
-        elements: {
-            submitButton: 'a[href="#submit"]'
-        }
-    }),
-
-*/
-
+    })
 });
 
