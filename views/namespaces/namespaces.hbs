@@ -11,9 +11,6 @@
 
 <hr>
 
-<div id="tree">
-</div>
-
 <div id="treetable-container" style="height: 100px; overflow: auto;">
     <table id="treetable" class="table table-hover table-striped table-condensed">
         <thead>
@@ -42,53 +39,32 @@
             }
         };
 
+        /*
 
-        $('#tree').fancytree({
-            extensions: ['glyph'],
-            glyph: glyph_opts,
-            selectMode: 1,
-            icon: false,
-            autoScroll: true,
-            source: [
-                {title: 'A', key: '1', expanded: true},
-                {title: 'B', key: '2', expanded: true, folder: true, children: [
-                    {title: 'BA', key: '3', expanded: true, folder: true, children: [
-                        {title: 'BAA', key: '4', expanded: true},
-                        {title: 'BAB', key: '5', expanded: true}
-                    ]},
-                    {title: 'BB', key: '6', expanded: true, folder: true, children: [
-                        {title: 'BBA', key: '7', expanded: true},
-                        {title: 'BBB', key: '8', expanded: true}
+            $('#treetable').fancytree({
+                extensions: ['glyph', 'table'],
+                glyph: glyph_opts,
+                selectMode: 1,
+                icon: false,
+                autoScroll: true,
+                scrollParent: $("#treetable-container"),
+                source: [
+                    {title: 'A', key: '1', expanded: true},
+                    {title: 'B', key: '2', expanded: true, folder: true, children: [
+                        {title: 'BA', key: '3', expanded: true, folder: true, children: [
+                            {title: 'BAA', key: '4', expanded: true},
+                            {title: 'BAB', key: '5', expanded: true}
+                        ]},
+                        {title: 'BB', key: '6', expanded: true, folder: true, children: [
+                            {title: 'BBA', key: '7', expanded: true},
+                            {title: 'BBB', key: '8', expanded: true}
+                        ]}
                     ]}
-                ]}
-            ]
-        });
-
-/*
-        $('#treetable').fancytree({
-            extensions: ['glyph', 'table'],
-            glyph: glyph_opts,
-            selectMode: 1,
-            icon: false,
-            autoScroll: true,
-            scrollParent: $("#treetable-container"),
-            source: [
-                {title: 'A', key: '1', expanded: true},
-                {title: 'B', key: '2', expanded: true, folder: true, children: [
-                    {title: 'BA', key: '3', expanded: true, folder: true, children: [
-                        {title: 'BAA', key: '4', expanded: true},
-                        {title: 'BAB', key: '5', expanded: true}
-                    ]},
-                    {title: 'BB', key: '6', expanded: true, folder: true, children: [
-                        {title: 'BBA', key: '7', expanded: true},
-                        {title: 'BBB', key: '8', expanded: true}
-                    ]}
-                ]}
-            ],
-            table: {
-                nodeColumnIdx: 0
-            }
-        });
+                ],
+                table: {
+                    nodeColumnIdx: 0
+                }
+            });
 */
 
         $('#treetable').fancytree({
@@ -106,6 +82,5 @@
                 nodeColumnIdx: 0
             }
         });
-
-    });
+});
 </script>

@@ -14,43 +14,34 @@
         {{#if title}} | {{title}}{{/if}}
     </title>
 
-    <link rel="stylesheet" href="/bootstrap/themes/united.min.css">
-    <link rel="stylesheet" href="/datatables/datatables.min.css">
+    {{#if reactEntryPoint}}
+        <link rel="stylesheet" href="/bootstrap/themes/united.min.css">
+        <link rel="stylesheet" href="/css/footer.css">
+        <link rel="stylesheet" href="/css/mailtrain.css">
+        <script src="/javascript/jquery-2.2.1.min.js"></script>
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/mailtrain/common.js"></script>
+        <script src="/mailtrain/{{reactEntryPoint}}.js"></script>
+    {{else}}
+        <link rel="stylesheet" href="/bootstrap/themes/united.min.css">
+        <link rel="stylesheet" href="/datatables/datatables.min.css">
 
-    <link rel="stylesheet" href="/datepicker/css/bootstrap-datepicker3.css">
-    <link rel="stylesheet" href="/css/footer.css">
-    <link rel="stylesheet" href="/css/mailtrain.css">
+        <link rel="stylesheet" href="/datepicker/css/bootstrap-datepicker3.css">
+        <link rel="stylesheet" href="/css/footer.css">
+        <link rel="stylesheet" href="/css/mailtrain.css">
 
-    {{#if useEditor}}
-        <link rel="stylesheet" href="/summernote/summernote.css">
+        {{#if useEditor}}
+            <link rel="stylesheet" href="/summernote/summernote.css">
+        {{/if}}
+
+        {{#each customStyles}}
+            <link rel="stylesheet" href="{{this}}">
+        {{/each}}
+
+        {{#each customScripts}}
+            <script src="{{this}}"></script>
+        {{/each}}
     {{/if}}
-
-    {{#if useFancyTree}}
-        <link rel="stylesheet" href="/fancytree/skin-bootstrap/ui.fancytree.min.css" >
-    {{/if}}
-
-    {{#each customStyles}}
-        <link rel="stylesheet" href="{{this}}">
-    {{/each}}
-
-    {{#each customScripts}}
-        <script src="{{this}}"></script>
-    {{/each}}
-
-    <style type="text/css">
-        #tree .fancytree-container {
-            height: 100px;
-            overflow: auto;
-            position: relative;
-        }
-        #tree .fancytree-active {
-            background-color: #5094ce;
-        }
-        #tree .fancytree-title {
-            background-color: transparent;
-            border-color: transparent;
-        }
-    </style>
 </head>
 
 <body class="{{bodyClass}}">
@@ -169,26 +160,22 @@
         </div>
     </footer>
 
-    <script src="/javascript/jquery-2.2.1.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    {{#unless reactEntryPoint}}
+        <script src="/javascript/jquery-2.2.1.min.js"></script>
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
 
-    <script src="/datepicker/js/bootstrap-datepicker.min.js"></script>
-    <script src="/datatables/datatables.min.js"></script>
-    <script src="/moment/moment.min.js"></script>
-    <script src="/javascript/tables.js"></script>
-    <script src="/javascript/fetch.js"></script>
+        <script src="/datepicker/js/bootstrap-datepicker.min.js"></script>
+        <script src="/datatables/datatables.min.js"></script>
+        <script src="/moment/moment.min.js"></script>
+        <script src="/javascript/tables.js"></script>
+        <script src="/javascript/fetch.js"></script>
 
-    {{#if useEditor}}
-        <script src="/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="/summernote/summernote.min.js"></script>
-        <script src="/javascript/editor.js"></script>
-    {{/if}}
-
-    {{#if useFancyTree}}
-        <script src="/javascript/jquery-ui-1.12.1.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="/fancytree/jquery.fancytree-all.min.js"></script>
-    {{/if}}
-
+        {{#if useEditor}}
+            <script src="/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+            <script src="/summernote/summernote.min.js"></script>
+            <script src="/javascript/editor.js"></script>
+        {{/if}}
+    {{/unless}}
 
     {{> tracking_scripts}}
 

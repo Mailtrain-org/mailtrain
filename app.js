@@ -128,6 +128,8 @@ app.use(logger(config.www.log, {
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
+app.use('/locales', express.static(path.join(__dirname, 'client', 'locales')));
 
 app.use(session({
     store: config.redis.enabled ? new RedisStore(config.redis) : false,
