@@ -111,7 +111,15 @@
         <div class="col-sm-offset-2">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="tracking-disabled" value="1" {{#if trackingDisabled}} checked {{/if}}> {{#translate}}Disable clicked/opened tracking{{/translate}}
+                    <input type="checkbox" name="open-tracking-disabled" value="1" {{#if openTrackingDisabled}} checked {{/if}}> {{#translate}}Disable opened tracking{{/translate}}
+                </label>
+            </div>
+        </div>
+        
+        <div class="col-sm-offset-2">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="click-tracking-disabled" value="1" {{#if clickTrackingDisabled}} checked {{/if}}> {{#translate}}Disable clicked tracking{{/translate}}
                 </label>
             </div>
         </div>

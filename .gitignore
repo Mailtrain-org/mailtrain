@@ -1,3 +1,6 @@
+/.idea
+/last-failed-e2e-test.*
+
 node_modules
 npm-debug.log
 .DS_Store
@@ -23,3 +26,4 @@ public/grapejs/uploads/*
 !public/grapejs/uploads/README.md
 public/grapejs/templates/*
 !public/grapejs/templates/demo
+!public/grapejs/templates/aves

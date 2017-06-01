@@ -702,7 +702,12 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
                 }
 
 
-                if (req.query.formTest ||
+                const autoUnsubscribe = req.query.auto === 'yes';
+
+                if (autoUnsubscribe) {
+                    handleUnsubscribe(list, subscription, autoUnsubscribe, req.query.c, req.ip, res, next);
+
+                } else if (req.query.formTest ||
                     list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM ||
                     list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
 
@@ -741,7 +746,7 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
                         });
                     });
                 } else { // UnsubscriptionMode.ONE_STEP || UnsubscriptionMode.TWO_STEP || UnsubscriptionMode.MANUAL
-                    handleUnsubscribe(list, subscription, req.query.c, req.ip, res, next);
+                    handleUnsubscribe(list, subscription, autoUnsubscribe, req.query.c, req.ip, res, next);
                 }
             });
         });
@@ -771,14 +776,32 @@ router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (
                 return next(err);
             }
 
-            handleUnsubscribe(list, subscription, campaignId, req.ip, res, next);
+            handleUnsubscribe(list, subscription, false, campaignId, req.ip, res, next);
         });
     });
 });
 
-function handleUnsubscribe(list, subscription, campaignId, ip, res, next) {
-    if (list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP ||
-        list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
+function handleUnsubscribe(list, subscription, autoUnsubscribe, campaignId, ip, res, next) {
+    if ((list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM) ||
+        (autoUnsubscribe && (list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM)) ) {
+
+        subscriptions.changeStatus(list.id, subscription.id, campaignId, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
+            if (err) {
+                return next(err);
+            }
+    
+            // TODO: Shall we do anything with "found"?
+
+            mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {
+                if (err) {
+                    return next(err);
+                }
+
+                res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
+            });
+        });
+
+    } else if (list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
 
         const data = {
             subscriptionId: subscription.id,
@@ -799,24 +822,6 @@ function handleUnsubscribe(list, subscription, campaignId, ip, res, next) {
             });
         });
 
-    } else if (list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP ||
-        list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM) {
-
-        subscriptions.changeStatus(list.id, subscription.id, campaignId, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
-            if (err) {
-                return next(err);
-            }
-
-            // TODO: Shall we do anything with "found"?
-
-            mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {
-                if (err) {
-                    return next(err);
-                }
-
-                res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
-            });
-        });
     } else { // UnsubscriptionMode.MANUAL
         res.redirect('/subscription/' + list.cid + '/manual-unsubscribe-notice');
     }

@@ -2,8 +2,9 @@
   "parser": "babel-eslint",
   "rules": {
       "strict": 0,
-      "no-invalid-this": 0,
-      "no-unused-expressions": 0
+      "no-console": 0,
+      "comma-dangle": 0,
+      "arrow-body-style": 0
   },
   "env": {
       "mocha": true

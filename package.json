@@ -17,7 +17,7 @@
     "sqldumptest": "NODE_ENV=test DUMP_NAME_SUFFIX=-test npm run sqldump",
     "sqlresettest": "NODE_ENV=test npm run sqldrop && NODE_ENV=test npm run sqlinit",
     "starttest": "NODE_ENV=test node index.js",
-    "_e2e": "NODE_ENV=test mocha test/e2e/index.js",
+    "_e2e": "NODE_ENV=test node test/e2e/index.js",
     "e2e": "npm run sqlresettest && npm run _e2e"
   },
   "repository": {
@@ -39,10 +39,10 @@
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-eslint": "^19.0.0",
     "jsxgettext-andris": "^0.9.0-patch.1",
-    "mailparser": "^2.0.5",
     "mocha": "^3.3.0",
     "phantomjs": "^2.1.7",
-    "selenium-webdriver": "^3.4.0"
+    "selenium-webdriver": "^3.4.0",
+    "url-pattern": "^1.0.3"
   },
   "optionalDependencies": {
     "posix": "^4.1.1"
@@ -70,6 +70,7 @@
     "faker": "^4.1.0",
     "feedparser": "^2.1.0",
     "file-type": "^4.1.0",
+    "fs-extra": "^3.0.1",
     "geoip-ultralight": "^0.1.5",
     "gettext-parser": "^1.2.2",
     "gm": "^1.23.0",
@@ -84,6 +85,7 @@
     "jsdom": "^9.12.0",
     "juice": "^4.0.2",
     "libmime": "^3.1.0",
+    "mailparser": "^2.0.5",
     "marked": "^0.3.6",
     "memory-cache": "^0.1.6",
     "mjml": "3.3.0",

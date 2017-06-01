@@ -69,7 +69,6 @@ CREATE TABLE `campaigns` (
   `html_prepared` longtext,
   `text` longtext,
   `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
-  `tracking_disabled` tinyint(4) unsigned NOT NULL DEFAULT '0',
   `scheduled` timestamp NULL DEFAULT NULL,
   `status_change` timestamp NULL DEFAULT NULL,
   `delivered` int(11) unsigned NOT NULL DEFAULT '0',
@@ -80,6 +79,8 @@ CREATE TABLE `campaigns` (
   `bounced` int(1) unsigned NOT NULL DEFAULT '0',
   `complained` int(1) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `open_tracking_disabled` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `click_tracking_disabled` tinyint(4) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `cid` (`cid`),
   KEY `name` (`name`(191)),
@@ -93,8 +94,8 @@ CREATE TABLE `confirmations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
   `list` int(11) unsigned NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `opt_in_ip` varchar(100) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `ip` varchar(100) DEFAULT NULL,
   `data` text NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -193,11 +194,17 @@ CREATE TABLE `lists` (
   `subscribers` int(11) unsigned DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `public_subscribe` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `unsubscription_mode` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `cid` (`cid`),
   KEY `name` (`name`(191))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`) VALUES (1,'Hkj1vCoJb',NULL,'01 Testlist - Public Subscribe','',0,NOW(),1);
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`, `unsubscription_mode`) VALUES (1,'Hkj1vCoJb',0,'#1 (one-step, no form)','',0,NOW(),1,0);
+INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`, `unsubscription_mode`) VALUES (2,'SktV4HDZ-',NULL,'#2 (one-step, with form)','',0,NOW(),1,1);
+INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`, `unsubscription_mode`) VALUES (3,'BkdvNBw-W',NULL,'#3 (two-step, no form)','',0,NOW(),1,2);
+INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`, `unsubscription_mode`) VALUES (4,'rJMKVrDZ-',NULL,'#4 (two-step, with form)','',0,NOW(),1,3);
+INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`, `unsubscription_mode`) VALUES (5,'SJgoNSw-W',NULL,'#5 (manual unsubscribe)','',0,NOW(),1,4);
+INSERT INTO `lists` (`id`, `cid`, `default_form`, `name`, `description`, `subscribers`, `created`, `public_subscribe`, `unsubscription_mode`) VALUES (6,'HyveEPvWW',NULL,'#6 (non-public)','',0,NOW(),0,0);
 CREATE TABLE `queued` (
   `campaign` int(11) unsigned NOT NULL,
   `list` int(11) unsigned NOT NULL,
@@ -269,7 +276,7 @@ CREATE TABLE `settings` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8mb4;
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (1,'smtp_hostname','localhost');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (2,'smtp_port','5587');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (3,'smtp_encryption','NONE');
@@ -286,7 +293,7 @@ INSERT INTO `settings` (`id`, `key`, `value`) VALUES (13,'default_from','My Awes
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (14,'default_address','admin@example.com');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (15,'default_subject','Test message');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (16,'default_homepage','https://mailtrain.org');
-INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','27');
+INSERT INTO `settings` (`id`, `key`, `value`) VALUES (17,'db_schema_version','29');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (46,'ua_code','');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (47,'shoutout','');
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES (54,'mail_transport','smtp');
@@ -334,6 +341,146 @@ CREATE TABLE `subscription` (
   KEY `created` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `subscription__1` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cid` varchar(255) CHARACTER SET ascii NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `opt_in_ip` varchar(100) DEFAULT NULL,
+  `opt_in_country` varchar(2) DEFAULT NULL,
+  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,
+  `imported` int(11) unsigned DEFAULT NULL,
+  `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `is_test` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `status_change` timestamp NULL DEFAULT NULL,
+  `latest_open` timestamp NULL DEFAULT NULL,
+  `latest_click` timestamp NULL DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cid` (`cid`),
+  KEY `status` (`status`),
+  KEY `first_name` (`first_name`(191)),
+  KEY `last_name` (`last_name`(191)),
+  KEY `subscriber_tz` (`tz`),
+  KEY `is_test` (`is_test`),
+  KEY `latest_open` (`latest_open`),
+  KEY `latest_click` (`latest_click`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `subscription__2` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cid` varchar(255) CHARACTER SET ascii NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `opt_in_ip` varchar(100) DEFAULT NULL,
+  `opt_in_country` varchar(2) DEFAULT NULL,
+  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,
+  `imported` int(11) unsigned DEFAULT NULL,
+  `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `is_test` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `status_change` timestamp NULL DEFAULT NULL,
+  `latest_open` timestamp NULL DEFAULT NULL,
+  `latest_click` timestamp NULL DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cid` (`cid`),
+  KEY `status` (`status`),
+  KEY `first_name` (`first_name`(191)),
+  KEY `last_name` (`last_name`(191)),
+  KEY `subscriber_tz` (`tz`),
+  KEY `is_test` (`is_test`),
+  KEY `latest_open` (`latest_open`),
+  KEY `latest_click` (`latest_click`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `subscription__3` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cid` varchar(255) CHARACTER SET ascii NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `opt_in_ip` varchar(100) DEFAULT NULL,
+  `opt_in_country` varchar(2) DEFAULT NULL,
+  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,
+  `imported` int(11) unsigned DEFAULT NULL,
+  `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `is_test` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `status_change` timestamp NULL DEFAULT NULL,
+  `latest_open` timestamp NULL DEFAULT NULL,
+  `latest_click` timestamp NULL DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cid` (`cid`),
+  KEY `status` (`status`),
+  KEY `first_name` (`first_name`(191)),
+  KEY `last_name` (`last_name`(191)),
+  KEY `subscriber_tz` (`tz`),
+  KEY `is_test` (`is_test`),
+  KEY `latest_open` (`latest_open`),
+  KEY `latest_click` (`latest_click`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `subscription__4` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cid` varchar(255) CHARACTER SET ascii NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `opt_in_ip` varchar(100) DEFAULT NULL,
+  `opt_in_country` varchar(2) DEFAULT NULL,
+  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,
+  `imported` int(11) unsigned DEFAULT NULL,
+  `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `is_test` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `status_change` timestamp NULL DEFAULT NULL,
+  `latest_open` timestamp NULL DEFAULT NULL,
+  `latest_click` timestamp NULL DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cid` (`cid`),
+  KEY `status` (`status`),
+  KEY `first_name` (`first_name`(191)),
+  KEY `last_name` (`last_name`(191)),
+  KEY `subscriber_tz` (`tz`),
+  KEY `is_test` (`is_test`),
+  KEY `latest_open` (`latest_open`),
+  KEY `latest_click` (`latest_click`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `subscription__5` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cid` varchar(255) CHARACTER SET ascii NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `opt_in_ip` varchar(100) DEFAULT NULL,
+  `opt_in_country` varchar(2) DEFAULT NULL,
+  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,
+  `imported` int(11) unsigned DEFAULT NULL,
+  `status` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `is_test` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `status_change` timestamp NULL DEFAULT NULL,
+  `latest_open` timestamp NULL DEFAULT NULL,
+  `latest_click` timestamp NULL DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cid` (`cid`),
+  KEY `status` (`status`),
+  KEY `first_name` (`first_name`(191)),
+  KEY `last_name` (`last_name`(191)),
+  KEY `subscriber_tz` (`tz`),
+  KEY `is_test` (`is_test`),
+  KEY `latest_open` (`latest_open`),
+  KEY `latest_click` (`latest_click`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `subscription__6` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) CHARACTER SET ascii NOT NULL,
   `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
@@ -422,14 +569,14 @@ INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/blantyre',120);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/brazzaville',60);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/bujumbura',120);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/cairo',120);
-INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/casablanca',60);
+INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/casablanca',0);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/ceuta',120);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/conakry',0);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/dakar',0);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/dar_es_salaam',180);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/djibouti',180);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/douala',60);
-INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/el_aaiun',60);
+INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/el_aaiun',0);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/freetown',0);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/gaborone',120);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('africa/harare',120);
@@ -603,7 +750,7 @@ INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/rio_branco',-300);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/rosario',-180);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/santarem',-180);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/santa_isabel',-420);
-INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/santiago',-180);
+INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/santiago',-240);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/santo_domingo',-240);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/sao_paulo',-180);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('america/scoresbysund',0);
@@ -788,8 +935,8 @@ INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('canada/pacific',-420);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('canada/saskatchewan',-360);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('canada/yukon',-420);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('cet',120);
-INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('chile/continental',-180);
-INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('chile/easterisland',-300);
+INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('chile/continental',-240);
+INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('chile/easterisland',-360);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('cst6cdt',-300);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('cuba',-240);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('eet',180);
@@ -936,7 +1083,7 @@ INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/auckland',720);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/bougainville',660);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/chatham',765);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/chuuk',600);
-INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/easter',-300);
+INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/easter',-360);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/efate',660);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/enderbury',780);
 INSERT INTO `tzoffset` (`tz`, `offset`) VALUES ('pacific/fakaofo',780);
