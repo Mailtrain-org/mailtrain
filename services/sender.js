@@ -332,7 +332,7 @@ function formatMessage(message, callback) {
                     };
 
                     let encryptionKeys = [];
-                    fields.getRow(fieldList, message.subscription, true, true).forEach(field => {
+                    fields.getRow(fieldList, message.subscription, false, true).forEach(field => {
                         if (field.mergeTag) {
                             message.subscription.mergeTags[field.mergeTag] = field.mergeValue || '';
                         }
