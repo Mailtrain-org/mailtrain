@@ -257,7 +257,7 @@ router.post('/status/ajax/:id', (req, res) => {
             });
         }
 
-        let columns = ['#', 'email', 'first_name', 'last_name', 'trigger__' + trigger.id + '`.`created'];
+        let columns = ['#', 'email', 'first_name', 'last_name', 'trigger__' + trigger.id + '.created'];
         triggers.filterSubscribers(trigger, req.body, columns, (err, data, total, filteredTotal) => {
             if (err) {
                 return res.json({

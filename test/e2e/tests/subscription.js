@@ -436,4 +436,75 @@ suite('Subscription use-cases', () => {
         });
     });
 
+    useCase('A subscriber address can be changed to an address which has been previously unsubscribed. #222', async () => {
+        const page = getPage(config.lists.l1);
+
+        const oldSubscription = await subscriptionExistsPrecondition(config.lists.l1, {
+            email: generateEmail(),
+            firstName: 'old first name',
+            lastName: 'old last name'
+        });
+
+        await step('User clicks the unsubscribe button.', async () => {
+            await page.mailSubscriptionConfirmed.click('unsubscribeLink');
+        });
+
+        await step('System shows a notice that confirms unsubscription.', async () => {
+            await page.webUnsubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email that confirms unsubscription.', async () => {
+            await page.mailUnsubscriptionConfirmed.fetchMail(oldSubscription.email);
+        });
+
+        const newSubscription = await subscriptionExistsPrecondition(config.lists.l1, {
+            email: generateEmail(),
+            firstName: 'new first name'
+        });
+
+        await step('User clicks the manage subscription button.', async () => {
+            await page.mailSubscriptionConfirmed.click('manageLink');
+        });
+
+        await step('User clicks the change address button.', async () => {
+            await page.webManage.click('manageAddressLink');
+        });
+
+        await step('Systems shows a form to change email.', async () => {
+            await page.webManageAddress.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('User fills in the email address of the original subscription and submits the form.', async () => {
+            await page.webManageAddress.setValue('emailNewInput', oldSubscription.email);
+            await page.webManageAddress.submit();
+        });
+
+        await step('System goes back to the profile form and shows a flash notice that further instructions are in the email.', async () => {
+            await page.webManage.waitUntilVisibleAfterRefresh();
+            await page.webManage.waitForFlash();
+            expect(await page.webManage.getFlash()).to.contain('An email with further instructions has been sent to the provided address');
+        });
+
+        await step('System sends an email with a link to confirm the address change.', async () => {
+            await page.mailConfirmAddressChange.fetchMail(oldSubscription.email);
+        });
+
+        await step('User clicks confirm subscription in the email', async () => {
+            await page.mailConfirmAddressChange.click('confirmLink');
+        });
+
+        await step('System shows the profile form with a flash notice that address has been changed. The form does not contain data from the old subscription.', async () => {
+            await page.webManage.waitUntilVisibleAfterRefresh();
+            await page.webManage.waitForFlash();
+            expect(await page.webManage.getFlash()).to.contain('Email address changed');
+            expect(await page.webManage.getValue('emailInput')).to.equal(oldSubscription.email);
+            expect(await page.webManage.getValue('firstNameInput')).to.equal(newSubscription.firstName);
+            expect(await page.webManage.getValue('lastNameInput')).to.equal('');
+        });
+
+        await step('System sends an email with subscription confirmation.', async () => {
+            await page.mailSubscriptionConfirmed.fetchMail(oldSubscription.email);
+        });
+    });
+
 });

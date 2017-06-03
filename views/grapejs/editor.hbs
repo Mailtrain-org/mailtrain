@@ -59,14 +59,7 @@
 
 
 <div id="gjs-wrapper">
-    <div id="gjs" style="height:0px; overflow:hidden">
-        {{#if resource.editorData.html}}
-            <style>{{{resource.editorData.css}}}</style>
-            {{{resource.editorData.html}}}
-        {{else}}
-            {{{resource.html}}}
-        {{/if}}
-    </div>
+    <div id="gjs" style="height: 0px; overflow: hidden"></div>
 </div>
 
 
@@ -136,21 +129,69 @@
 <script>
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } });
 
-    var editor = grapesjs.init({
-        height: '100%',
-        storageManager: {
-            type: 'none'
-        },
-        assetManager: {
-            assets: [],
-            upload: '/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{resource.editorName}}',
-            uploadText: 'Drop images here or click to upload',
-        },
-        container : '#gjs',
-        fromElement: true,
-        plugins: ['gjs-preset-newsletter'],
-        pluginsOpts: {
-            'gjs-preset-newsletter': {
+    var resource = {{{stringifiedResource}}};
+
+    var config = (function(mode) {
+        var c = {
+            clearOnRender: true,
+            height: '100%',
+            storageManager: {
+                type: 'none'
+            },
+            assetManager: {
+                assets: [],
+                upload: '/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{editor.name}}',
+                uploadText: 'Drop images here or click to upload',
+            },
+            container : '#gjs',
+            fromElement: false,
+            plugins: [],
+            pluginsOpts: {},
+        };
+
+        if (mode === 'mjml') {
+            var serializer = new XMLSerializer();
+            var doc = new DOMParser().parseFromString(resource.editorData.mjml, 'text/xml');
+
+            // convert relative to absolute urls
+            ['mj-wrapper', 'mj-section', 'mj-navbar', 'mj-hero', 'mj-image'].forEach(function(tagName) {
+                var serviceUrl = window.location.protocol + '//' + window.location.host + '/';
+                var elements = doc.getElementsByTagName(tagName);
+
+                for (var i = 0; i < elements.length; i++) {
+                    var node = elements[i];
+                    var attrName = tagName === 'mj-image' ? 'src' : 'background-url';
+                    var url = node.getAttribute(attrName);
+
+                    if (url && url.substring(0, 2) === './') {
+                        var absoluteUrl = serviceUrl + 'grapejs/templates/' + resource.editorData.template + '/' + url.substring(2);
+                        node.setAttribute(attrName, absoluteUrl);
+                    }
+                }
+            });
+
+            var title = doc.getElementsByTagName('mj-title')[0];
+            if (title) {
+                title.textContent = resource.name;
+            }
+
+            var head = doc.getElementsByTagName('mj-head')[0];
+            var mjHead = head ? serializer.serializeToString(head) : '<mj-head></mj-head>';
+
+            var container = doc.getElementsByTagName('mj-container')[0];
+            var mjContainer = container ? serializer.serializeToString(container) : '<mj-container></mj-container>';
+
+            c.plugins.push('gjs-mjml', 'gjs-preset-mjml');
+            c.pluginsOpts['gjs-mjml'] = {
+                preMjml: '<mjml>' + mjHead + '<mj-body>',
+                postMjml: '</mj-body></mjml>',
+            };
+            c.components = mjContainer;
+        }
+
+        if (mode === 'html') {
+            c.plugins.push('gjs-preset-newsletter');
+            c.pluginsOpts['gjs-preset-newsletter'] = {
                 modalLabelImport: 'Paste all your code here below and click import',
                 modalLabelExport: 'Copy the code and use it wherever you want',
                 codeViewerTheme: 'material',
@@ -163,68 +204,161 @@
                     margin: 0,
                     padding: 0,
                 }
-            }
+            };
+            c.components = resource.editorData.html || resource.html || '';
+            c.style = resource.editorData.css || '';
         }
-    });
 
-    $.getJSON('/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{resource.editorName}}', function(data) {
+        return c;
+    })('{{editor.mode}}');
+
+    var editor = grapesjs.init(config);
+
+    $.getJSON('/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{editor.name}}', function(data) {
         editor.AssetManager.add(data.files);
     });
 
-    function getPreparedHtml() {
-        var imgs = [];
-        $('.gjs-pn-buttons > .gjs-pn-btn.fa.fa-desktop').click();
-        $('.gjs-editor > .gjs-cv-canvas > iframe.gjs-frame')
-            .contents()
-            .find('img')
-            .each(function() {
-                var src = $(this).attr('src');
-                var s = src.match(/\/editorapi\/img\?src=([^&]*)/);
-                var encodedSrc = (s && s[1]) || encodeURIComponent(src);
-                var dynamicSrc = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + $(this).width() + '%2C' + $(this).height();
-                imgs.push({
-                    cls: $(this).attr('class').split(' ')[0],
-                    dynamicSrc: dynamicSrc,
-                    src: src,
+    function getMjml() {
+        var c = config.pluginsOpts['gjs-mjml'];
+        return c.preMjml + editor.getHtml() + c.postMjml;
+    }
+
+    function getPreparedHtml(callback) {
+        var html;
+
+        switch ('{{editor.mode}}') {
+            case 'html':
+                html = editor.runCommand('gjs-get-inlined-html');
+                html = '<!doctype html><html><head><meta charset="utf-8"><title>{{resource.name}}</title></head><body>' + html + '</body></html>';
+                break;
+            case 'mjml':
+                var mjml = editor.runCommand('mjml-get-code');
+                mjml.errors.length && mjml.errors.forEach(function(err) {
+                    console.warn(err.formattedMessage);
+                });
+                html = mjml.html;
+                break;
+        }
+
+        var frame = document.createElement('iframe');
+        frame.width = 2048;
+        frame.height = 0;
+        document.body.appendChild(frame);
+        var frameDoc = frame.contentDocument || frame.contentWindow.document;
+
+        frame.onload = function() {
+            var imgs = frameDoc.querySelectorAll('img');
+
+            for (var i = 0; i < imgs.length; i++) {
+                var img = imgs[i];
+                var m = img.src.match(/\/editorapi\/img\?src=([^&]*)/);
+                var encodedSrc = m && m[1] || encodeURIComponent(img.src);
+                img.src = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + img.clientWidth + '%2C' + img.clientHeight;
+            }
+
+            html = '<!doctype html>' + frameDoc.documentElement.outerHTML;
+            document.body.removeChild(frame);
+            callback(html);
+        };
+
+        frameDoc.open();
+        frameDoc.write(html);
+        frameDoc.close();
+    }
+
+
+    // Save Button
+
+    window.bridge = window.bridge || {};
+
+    $('#mt-save').on('click', function() {
+
+        if ($(this).hasClass('busy')) {
+            return;
+        }
+
+        $(this).addClass('busy');
+
+        getPreparedHtml(function(html) {
+            var editorData = '{{editor.mode}}' === 'mjml' ? {
+                template: resource.editorData.template,
+                mjml: getMjml(),
+            } : {
+                template: resource.editorData.template,
+                css: editor.getCss(),
+                html: editor.getHtml(),
+                style: editor.getStyle(),
+                components: editor.getComponents(),
+            };
+
+            // TODO: Make templates and campaigns accept partial updates, i.e. don't require 'name' and 'list'
+            var update = {
+                id: resource.id,
+                name: resource.name,
+                {{#if resource.list}} list: resource.list, {{/if}}
+                editorData: JSON.stringify(editorData),
+                html: html,
+            };
+
+            $.post('/editorapi/update?type={{type}}&editor={{editor.name}}', update, null, 'html')
+                .success(function() {
+                    window.bridge.lastSavedHtml = html;
+                    toastr.success('Sucessfully saved');
+                })
+                .fail(function(data) {
+                    toastr.error(data.responseText || 'An error occured while saving the document');
+                })
+                .always(function() {
+                    setTimeout(function() {
+                        $('#mt-save').removeClass('busy');
+                    }, 200); // Don't save too fast
                 });
         });
-        var html = editor.runCommand('gjs-get-inlined-html');
-        imgs.forEach(function(img) {
-            html = html.replace(
-                '<img class="' + img.cls + '" src="' + img.src,
-                '<img class="' + img.cls + '" src="' + img.dynamicSrc
-            );
-        });
+    });
 
-        html = '<!doctype html><html><head><meta charset="utf-8"><title>{{resource.name}}</title></head><body>' + html + '</body></html>';
 
-        return html;
-    }
+    // Close Button
+
+    $('#mt-close').on('click', function() {
+        if (confirm('Unsaved changes will be lost. Close now?') === true) {
+            window.bridge.exit
+                ? window.bridge.exit()
+                : window.location.href = '/{{type}}s/edit/{{resource.id}}?tab=template';
+        }
+    });
+
+
+    // Commands
 
     var mdlClass = 'gjs-mdl-dialog-sm';
     var pnm = editor.Panels;
     var cmdm = editor.Commands;
-    var testContainer = document.getElementById("test-form");
-    var contentEl = testContainer.querySelector('input[name=html]');
     var md = editor.Modal;
+
+
+    // Test email command
+
+    var testContainer = document.getElementById('test-form');
+    var testContentEl = testContainer.querySelector('input[name=html]');
 
     cmdm.add('send-test', {
         run(editor, sender) {
-            sender.set('active', 0);
-            var modalContent = md.getContentEl();
-            var mdlDialog = document.querySelector('.gjs-mdl-dialog');
-            // var cmdGetCode = cmdm.get('gjs-get-inlined-html');
-            // contentEl.value = cmdGetCode && cmdGetCode.run(editor);
-            contentEl.value = getPreparedHtml();
-            mdlDialog.className += ' ' + mdlClass;
-            testContainer.style.display = 'block';
-            md.setTitle('Test your Newsletter');
-            md.setContent(testContainer);
-            md.open();
-            md.getModel().once('change:open', function() {
-                mdlDialog.className = mdlDialog.className.replace(mdlClass, '');
-                //clean status
-            })
+            // TODO: Show a spinner
+            getPreparedHtml(function(html) {
+                sender.set('active', 0);
+                var modalContent = md.getContentEl();
+                var mdlDialog = document.querySelector('.gjs-mdl-dialog');
+                testContentEl.value = html;
+                mdlDialog.className += ' ' + mdlClass;
+                testContainer.style.display = 'block';
+                md.setTitle('Test your Newsletter');
+                md.setContent(testContainer);
+                md.open();
+                md.getModel().once('change:open', function() {
+                    mdlDialog.className = mdlDialog.className.replace(mdlClass, '');
+                    //clean status
+                });
+            });
         }
     });
 
@@ -240,6 +374,7 @@
 
     var statusFormElC = document.querySelector('.form-status');
     var statusFormEl = document.querySelector('.form-status i');
+
     var ajaxTest = ajaxable(testContainer, { headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } })
         .onStart(function() {
             statusFormEl.className = 'fa fa-refresh anim-spin';
@@ -260,7 +395,24 @@
             }
         });
 
-    // Add Merge Tag Reference command
+    // Remember testemail address
+
+    var isValidEmail = function(email) {
+        return /\S+@\S+\.\S+/.test(email);
+    };
+
+    if (isValidEmail(localStorage.getItem('testemail'))) {
+        $('#test-form input[name=email]').val(localStorage.getItem('testemail'));
+    }
+
+    $('#test-form').on('submit', function() {
+        var email = $('#test-form input[name=email]').val();
+        isValidEmail(email) && localStorage.setItem('testemail', email);
+    });
+
+
+    // Merge Tag Reference command
+
     var mergeTagReferenceContainer = document.getElementById('merge-tag-reference-container');
     cmdm.add('open-merge-tag-reference', {
         run(editor, sender) {
@@ -287,7 +439,9 @@
         },
     });
 
+
     // Simple warn notifier
+
     var origWarn = console.warn;
     toastr.options = {
         closeButton: true,
@@ -300,8 +454,10 @@
         origWarn(msg);
     };
 
+
+    // Beautify tooltips
+
     $(document).ready(function() {
-        // Beautify tooltips
         $('*[title]').each(function() {
             var el = $(this);
             var title = el.attr('title').trim();
@@ -310,65 +466,6 @@
                 el.attr('title', '');
             }
         });
-
-        // Remember testmail address
-        var isValidEmail = function(email) {
-            return /\S+@\S+\.\S+/.test(email);
-        };
-        var email = localStorage.getItem('testemail');
-        isValidEmail(email) && $('#test-form input[name=email]').val(email);
-
-        $(document).on('submit', '#test-form', function() {
-            var email = $('#test-form input[name=email]').val();
-            isValidEmail(email) && localStorage.setItem('testemail', email);
-        });
-
-
-        // Save and Close Buttons
-
-        window.bridge = window.bridge || {};
-
-        $('#mt-close').on('click', function() {
-            if (confirm('Unsaved changes will be lost. Close now?') === true) {
-                window.bridge.exit
-                    ? window.bridge.exit()
-                    : window.location.href = '/{{type}}s/edit/{{resource.id}}?tab=template';
-            }
-        });
-
-        $('#mt-save').on('click', function() {
-            if ($(this).hasClass('busy')) {
-                return;
-            }
-            $(this).addClass('busy');
-
-            var html = getPreparedHtml();
-
-            $.post('/editorapi/update?type={{type}}&editor={{resource.editorName}}', {
-                id: {{resource.id}},
-                name: '{{resource.name}}',
-                {{#if resource.list}} list: {{resource.list}}, {{/if}}
-                html: html,
-                editorData: JSON.stringify({
-                    template: '{{resource.editorData.template}}',
-                    css: editor.getCss(),
-                    html: editor.getHtml(),
-                    style: editor.getStyle(),
-                    components: editor.getComponents(),
-                }),
-            }, null, 'html')
-                .success(function() {
-                    window.bridge.lastSavedHtml = html;
-                    toastr.success('Sucessfully saved');
-                })
-                .fail(function(data) {
-                    toastr.error(data.responseText || 'An error occured while saving the document');
-                })
-                .always(function() {
-                    setTimeout(function() {
-                        $(this).removeClass('busy');
-                    }.bind(this), 500); // Don't save too fast
-                }.bind(this));
-        });
     });
+
 </script>

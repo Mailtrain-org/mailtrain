@@ -545,7 +545,7 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
             let campaignCid = campaign.cid;
             let listCid = list.cid;
 
-            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '`.`created', 'count'];
+            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '.created', 'count'];
             campaigns.filterClickedSubscribers(campaign, linkId, req.body, columns, (err, data, total, filteredTotal) => {
                 if (err) {
                     return res.json({
@@ -634,7 +634,7 @@ router.post('/status/ajax/:id/:status', (req, res) => {
             let campaignCid = campaign.cid;
             let listCid = list.cid;
 
-            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign__' + campaign.id + '`.`updated'];
+            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign__' + campaign.id + '.updated'];
             campaigns.filterStatusSubscribers(campaign, status, req.body, columns, (err, data, total, filteredTotal) => {
                 if (err) {
                     return res.json({
@@ -683,7 +683,7 @@ router.post('/clicked/ajax/:id/:linkId', (req, res) => {
             let campaignCid = campaign.cid;
             let listCid = list.cid;
 
-            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '`.`created', 'count'];
+            let columns = ['#', 'email', 'first_name', 'last_name', 'campaign_tracker__' + campaign.id + '.created', 'count'];
             campaigns.filterClickedSubscribers(campaign, linkId, req.body, columns, (err, data, total, filteredTotal) => {
                 if (err) {
                     return res.json({

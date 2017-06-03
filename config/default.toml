@@ -151,7 +151,10 @@ templates=[["versafix-1", "Versafix One"]]
 
 [grapejs]
 # Installed templates
-templates=[["demo", "Demo Template"]]
+templates=[
+  ["demo", "HTML Template"],
+  ["aves", "MJML Template"]
+]
 
 [reports]
 # The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be

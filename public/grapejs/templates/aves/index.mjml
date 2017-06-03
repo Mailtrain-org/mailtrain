@@ -1,0 +1,86 @@
+<mjml>
+  <mj-head>
+    <mj-title>Hello World</mj-title>
+  </mj-head>
+  <mj-body>
+    <mj-container>
+
+      <!-- Company Header -->
+      <mj-section background-color="#f0f0f0">
+        <mj-column>
+          <mj-text font-style="italic" font-size="20" color="#626262">
+            My Company
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <!-- Image Header -->
+      <mj-section background-url="./images/clouds.jpg" background-size="cover" background-repeat="no-repeat">
+        <mj-column>
+          <mj-text align="center" color="#fff" font-size="40" font-family="Helvetica Neue" padding-top="30px" padding-bottom="30px">Slogan here</mj-text>
+          <mj-button background-color="#F63A4D" href="#">
+            Promotion
+          </mj-button>
+        </mj-column>
+      </mj-section>
+
+      <!-- Intro text -->
+      <mj-section background-color="#fafafa">
+        <mj-column width="400">
+          <mj-text font-style="italic" font-size="20" font-family="Helvetica Neue" color="#cc2d2d">Attention!</mj-text>
+          <mj-text color="#525252">
+            The MJML Mode is currently experimental and there're a few bugs you should avoid.
+            <ul>
+                <li>Don't toggle visibility in the layer manager.</li>
+                <li>Don't import the mj-head if you import a custom template.</li>
+                <li>Don't duplicate mj-image as the duplicate is missing the src attribute on export. This bug is probably not limited to mj-image.</li>
+                <li>Don't use % values.</li>
+            </ul>
+            It's generally working great and very promising. Thanks to @artf for making this all possible.
+          </mj-text>
+          <mj-button background-color="#F45E43" href="https://github.com/artf/grapesjs-mjml">Learn more about GrapesJS MJML</mj-button>
+        </mj-column>
+      </mj-section>
+
+      <!-- Side image -->
+      <mj-section background-color="white">
+        <mj-column>
+          <mj-image src="./images/bird-1.jpg" />
+        </mj-column>
+        <mj-column>
+          <mj-text font-style="italic" font-size="20" font-family="Helvetica Neue" color="#626262">
+            Amazing Birds
+          </mj-text>
+          <mj-text color="#525252">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus.</mj-text>
+        </mj-column>
+      </mj-section>
+
+      <!-- Icons -->
+      <mj-section background-color="#fbfbfb">
+        <mj-column>
+          <mj-image width="200" src="./images/bird-2.jpg" />
+        </mj-column>
+        <mj-column>
+          <mj-image width="200" src="./images/bird-3.jpg" />
+        </mj-column>
+        <mj-column>
+          <mj-image width="200" src="./images/bird-4.jpg" />
+        </mj-column>
+      </mj-section>
+
+      <!-- Footer -->
+      <mj-section background-color="#e7e7e7">
+        <mj-column>
+          <mj-text color="#525252">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget
+            nulla elit. Nulla aliquet mollis faucibus.
+          </mj-text>
+          <mj-button href="#">Hello There!</mj-button>
+          <mj-social display="facebook twitter" />
+        </mj-column>
+      </mj-section>
+
+    </mj-container>
+  </mj-body>
+</mjml>
