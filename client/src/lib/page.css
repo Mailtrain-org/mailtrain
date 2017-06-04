@@ -1,0 +1,7 @@
+.mt-button-row > button{
+    margin-right: 15px;
+}
+
+.mt-button-row > button:last-child {
+    margin-right: 0px;
+}

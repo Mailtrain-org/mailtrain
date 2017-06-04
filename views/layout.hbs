@@ -21,6 +21,11 @@
         <script src="/javascript/jquery-2.2.1.min.js"></script>
         <script src="/bootstrap/js/bootstrap.min.js"></script>
         <script src="/mailtrain/common.js"></script>
+
+        <script>
+            window.csfrToken = '{{reactCsrfToken}}';
+        </script>
+
         <script src="/mailtrain/{{reactEntryPoint}}.js"></script>
     {{else}}
         <link rel="stylesheet" href="/bootstrap/themes/united.min.css">

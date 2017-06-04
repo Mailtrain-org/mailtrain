@@ -14,15 +14,50 @@ router.all('/*', (req, res, next) => {
     next();
 });
 
-router.getAsync('/', async (req, res) => {
-    res.render('react-root', {
-        title: _('Namespaces'),
-        reactEntryPoint: 'namespaces'
-    });
+router.getAsyncJSON('/rest/namespaces/:nsId', async (req, res) => {
+   const ns = await namespaces.getById(req.params.nsId);
+   return res.json(ns);
 });
 
-router.getAsync('/list/ajax', async (req, res) => {
+router.postAsyncJSON('/rest/namespaces', passport.csrfProtection, async (req, res) => {
+   console.log(req.body);
+    // await namespaces.create(req.body);
+    return res.json();
+});
+
+router.putAsyncJSON('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
+    console.log(req.body);
+    ns = req.body;
+    ns.id = req.params.nsId;
+
+    // await namespaces.updateWithConsistencyCheck(ns);
+    return res.json();
+});
+
+router.deleteAsyncJSON('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
+    console.log(req.body);
+    // await namespaces.remove(req.params.nsId);
+    return res.json();
+});
+
+router.getAsyncJSON('/rest/namespacesTree', async (req, res) => {
     const entries = {};
+
+    /* Example of roots:
+    [
+        {title: 'A', key: '1', expanded: true},
+        {title: 'B', key: '2', expanded: true, folder: true, children: [
+            {title: 'BA', key: '3', expanded: true, folder: true, children: [
+                {title: 'BAA', key: '4', expanded: true},
+                {title: 'BAB', key: '5', expanded: true}
+            ]},
+            {title: 'BB', key: '6', expanded: true, folder: true, children: [
+                {title: 'BBA', key: '7', expanded: true},
+                {title: 'BBB', key: '8', expanded: true}
+            ]}
+        ]}
+    ]
+    */
     const roots = [];
 
     const rows = await namespaces.list();
@@ -58,6 +93,12 @@ router.getAsync('/list/ajax', async (req, res) => {
     return res.json(roots);
 });
 
-router.getAsync('')
+router.getAsync('/*', passport.csrfProtection, async (req, res) => {
+    res.render('react-root', {
+        title: _('Namespaces'),
+        reactEntryPoint: 'namespaces',
+        reactCsrfToken: req.csrfToken()
+    });
+});
 
 module.exports = router;

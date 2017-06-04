@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        namespaces: './src/namespaces.js'
+        namespaces: './src/namespaces/root.js'
     },
     output: {
         library: 'MailtrainReactBody',
@@ -18,7 +18,8 @@ module.exports = {
         ]
     },
     externals: {
-        jquery: 'jQuery'
+        jquery: 'jQuery',
+        csfrToken: 'csfrToken'
     },
     plugins: [
 //        new webpack.optimize.UglifyJsPlugin(),

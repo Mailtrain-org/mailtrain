@@ -1,3 +1,4 @@
 {
-  "plugins": ["transform-react-jsx", "transform-decorators-legacy"]
+  "presets": ["stage-1"],
+  "plugins": ["transform-react-jsx", "transform-decorators-legacy", "transform-function-bind"]
 }
