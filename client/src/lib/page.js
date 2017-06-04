@@ -5,7 +5,6 @@ import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
-
 import './page.css';
 
 
@@ -138,41 +137,6 @@ class Toolbar extends Component {
     }
 }
 
-class Button extends Component {
-    static propTypes = {
-        onClick: PropTypes.func,
-        label: PropTypes.string,
-        icon: PropTypes.string,
-        className: PropTypes.string,
-        type: PropTypes.string
-    }
-
-    render() {
-        const props = this.props;
-
-        let className = 'btn';
-        if (props.className) {
-            className = className + ' ' + props.className;
-        }
-
-        let type = props.type || 'button';
-
-        let icon;
-        if (props.icon) {
-            icon = <span className={'glyphicon glyphicon-' + props.icon}></span>
-        }
-
-        let iconSpacer;
-        if (props.icon && props.label) {
-            iconSpacer = ' ';
-        }
-
-        return (
-            <button type={type} className={className} onClick={props.onClick}>{icon}{iconSpacer}{props.label}</button>
-        );
-    }
-}
-
 class NavButton extends Component {
     static propTypes = {
         label: PropTypes.string,
@@ -186,6 +150,46 @@ class NavButton extends Component {
 
         return (
             <Link to={props.linkTo}><Button label={props.label} icon={props.icon} className={props.className}/></Link>
+        );
+    }
+}
+
+class Button extends Component {
+    static propTypes = {
+        onClick: PropTypes.func,
+        label: PropTypes.string,
+        icon: PropTypes.string,
+        className: PropTypes.string
+    }
+
+    async onClick(evt) {
+        evt.preventDefault();
+
+        if (this.props.onClick) {
+            onClick(evt);
+        }
+    }
+
+    render() {
+        const props = this.props;
+
+        let className = 'btn';
+        if (props.className) {
+            className = className + ' ' + props.className;
+        }
+
+        let icon;
+        if (props.icon) {
+            icon = <span className={'glyphicon glyphicon-' + props.icon}></span>
+        }
+
+        let iconSpacer;
+        if (props.icon && props.label) {
+            iconSpacer = ' ';
+        }
+
+        return (
+            <button type="button" className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
         );
     }
 }

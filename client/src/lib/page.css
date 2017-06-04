@@ -5,3 +5,8 @@
 .mt-button-row > button:last-child {
     margin-right: 0px;
 }
+
+.mt-form-status {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

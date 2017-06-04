@@ -3,8 +3,9 @@
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import csfrToken from 'csfrToken';
-import { withForm, Form, InputField, TextArea, ButtonRow, Button } from '../lib/form';
+import { withForm, Form, InputField, TextArea, ButtonRow, Button} from '../lib/form';
 import { Title } from "../lib/page";
+import axios from 'axios';
 
 @translate()
 @withForm
@@ -15,11 +16,11 @@ export default class Edit extends Component {
         this.nsId = parseInt(this.props.match.params.nsId);
 
         this.initFormState();
-        this.populateFormStateFromURL(`/namespaces/rest/namespaces/${this.nsId}`);
+        this.populateFormValuesFromURL(`/namespaces/rest/namespaces/${this.nsId}`);
     }
 
 
-    validateFormState(state) {
+    validateFormValues(state) {
         const t = this.props.t;
 
         if (!state.getIn(['name','value']).trim()) {
@@ -29,13 +30,22 @@ export default class Edit extends Component {
         }
     }
 
-    submitHandler(evt) {
-        evt.preventDefault();
-        this.showFormValidation();
+    async submitHandler() {
+        if (this.isFormWithoutErrors()) {
+            const data = this.getFormValues();
+            console.log(data);
+
+            const response = await axios.put(`/namespaces/rest/namespaces/${this.nsId}`);
+            console.log(response);
+
+        } else {
+            this.showFormValidation();
+        }
     }
 
-    deleteHandler() {
-        this.hideFormValidation();
+    async deleteHandler() {
+        this.setFormStatusMessage('Deleting namespace')
+        this.setFormStatusMessage()
     }
 
     render() {
@@ -45,13 +55,13 @@ export default class Edit extends Component {
             <div>
                 <Title>{t('Edit Namespace')}</Title>
 
-                <Form stateOwner={this} onSubmit={::this.submitHandler}>
+                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')} description={t('Namespace Name')}/>
                     <TextArea id="description" label={t('Description')} description={t('Description')}/>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Update')}/>
-                        <Button className="btn-danger" icon="remove" label={t('Delete Namespace')} onClick={::this.deleteHandler}/>
+                        <Button className="btn-danger" icon="remove" label={t('Delete Namespace')} onClickAsync={::this.deleteHandler}/>
                     </ButtonRow>
                 </Form>
             </div>

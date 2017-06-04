@@ -5,7 +5,6 @@ import axios from 'axios';
 import Immutable from 'immutable';
 import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
-import { Button } from './page.js';
 
 const FormState = {
     Loading: 0,
@@ -13,12 +12,11 @@ const FormState = {
     Ready: 2
 };
 
-
 @translate()
 class Form extends Component {
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
-        onSubmit: PropTypes.func
+        onSubmitAsync: PropTypes.func
     }
 
     static childContextTypes = {
@@ -31,10 +29,27 @@ class Form extends Component {
         };
     }
 
+    async onSubmit(evt) {
+        evt.preventDefault();
+
+        const t = this.props.t;
+
+        if (this.props.onSubmitAsync) {
+            this.props.stateOwner.disableForm();
+            this.props.stateOwner.setFormStatusMessage(t('Submitting...'));
+
+            await this.props.onSubmitAsync(evt);
+
+            this.props.stateOwner.setFormStatusMessage();
+            this.props.stateOwner.enableForm();
+        }
+    }
+
     render() {
         const t = this.props.t;
         const owner = this.props.stateOwner;
         const props = this.props;
+        const statusMessage = owner.getFormStatusMessage();
 
         if (!owner.isFormReady()) {
             if (owner.isFormWithLoadingNotice()) {
@@ -44,8 +59,11 @@ class Form extends Component {
             }
         } else {
             return (
-                <form className="form-horizontal" onSubmit={props.onSubmit}>
-                    {props.children}
+                <form className="form-horizontal" onSubmit={::this.onSubmit}>
+                    <fieldset disabled={owner.isFormDisabled()}>
+                        {props.children}
+                    </fieldset>
+                    {statusMessage && <p className="col-sm-10 col-sm-offset-2 alert alert-info mt-form-status" role="alert">{owner.getFormStatusMessage()}</p>}
                 </form>
             );
         }
@@ -84,7 +102,7 @@ class InputField extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label,
-            <input type="text" value={owner.getFormState(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindToFormState(id)}/>
+            <input type="text" value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindToFormValue(id)}/>
         );
     }
 }
@@ -107,7 +125,7 @@ class TextArea extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label,
-            <textarea id={htmlId} value={owner.getFormState(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindToFormState(id)}></textarea>
+            <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindToFormValue(id)}></textarea>
         );
     }
 }
@@ -124,8 +142,60 @@ class ButtonRow extends Component {
     }
 }
 
+class Button extends Component {
+    static propTypes = {
+        onClickAsync: PropTypes.func,
+        onClick: PropTypes.func,
+        label: PropTypes.string,
+        icon: PropTypes.string,
+        className: PropTypes.string,
+        type: PropTypes.string
+    }
 
+    static contextTypes = {
+        stateOwner: PropTypes.object.isRequired
+    }
 
+    async onClick(evt) {
+        if (this.props.onClick) {
+            evt.preventDefault();
+
+            onClick(evt);
+
+        } else if (this.props.onClickAsync) {
+            evt.preventDefault();
+
+            this.context.stateOwner.disableForm();
+            await this.props.onClickAsync(evt);
+            this.context.stateOwner.enableForm();
+        }
+    }
+
+    render() {
+        const props = this.props;
+
+        let className = 'btn';
+        if (props.className) {
+            className = className + ' ' + props.className;
+        }
+
+        let type = props.type || 'button';
+
+        let icon;
+        if (props.icon) {
+            icon = <span className={'glyphicon glyphicon-' + props.icon}></span>
+        }
+
+        let iconSpacer;
+        if (props.icon && props.label) {
+            iconSpacer = ' ';
+        }
+
+        return (
+            <button type={type} className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
+        );
+    }
+}
 
 function withForm(target) {
     const inst = target.prototype;
@@ -134,76 +204,89 @@ function withForm(target) {
         const state = this.state || {};
 
         state.formState = Immutable.Map({
-            _state: FormState.Loading,
-            _isValidationShown: false
+            state: FormState.Loading,
+            isValidationShown: false,
+            isDisabled: false,
+            statusMessage: '',
+            data: Immutable.Map()
         });
 
         this.state = state;
     };
 
-    inst.populateFormStateFromURL = function(url) {
+    inst.populateFormValuesFromURL = function(url) {
         setTimeout(() => {
             this.setState(previousState => {
-                if (previousState.formState.get('_state') === FormState.Loading) {
+                if (previousState.formState.get('state') === FormState.Loading) {
                     return {
-                        formState: previousState.formState.set('_state', FormState.LoadingWithNotice)
+                        formState: previousState.formState.set('state', FormState.LoadingWithNotice)
                     };
                 }
             });
         }, 500);
 
         axios.get(url).then(response => {
-            this.populateFormState(response.data);
+            this.populateFormValues(response.data);
         });
     };
 
-    inst.populateFormState = function(data) {
+    inst.populateFormValues = function(data) {
         this.setState(previousState => ({
             formState: previousState.formState.withMutations(state => {
-                state.set('_state', FormState.Ready);
+                state.set('state', FormState.Ready);
 
-                for (const key in data) {
-                    state.set(key, Immutable.Map({
-                        value: data[key]
-                    }));
-                }
+                state.update('data', stateData => stateData.withMutations(mutableStateData => {
+                    for (const key in data) {
+                        mutableStateData.set(key, Immutable.Map({
+                            value: data[key]
+                        }));
+                    }
 
-                this.validateFormState(state);
+                    this.validateFormValues(mutableStateData);
+                }));
             })
         }));
     };
 
-    inst.updateFormState = function(key, value) {
+    inst.updateFormValue = function(key, value) {
         this.setState(previousState => ({
-            formState: previousState.formState.withMutations(state => {
-                state.setIn([key, 'value'], value);
-                this.validateFormState(state);
-            })
+            formState: previousState.formState.update('data', stateData => stateData.withMutations(mutableStateData => {
+                mutableStateData.setIn([key, 'value'], value);
+                this.validateFormValues(mutableStateData);
+            }))
         }));
     };
 
-    inst.bindToFormState = function(name) {
-        return evt => this.updateFormState(name, evt.target.value);
+    inst.bindToFormValue = function(name) {
+        return evt => this.updateFormValue(name, evt.target.value);
     };
 
-    inst.getFormState = function(name) {
-        return this.state.formState.getIn([name, 'value']);
+    inst.getFormValue = function(name) {
+        return this.state.formState.getIn(['data', name, 'value']);
+    };
+
+    inst.getFormValues = function(name) {
+        return this.state.formState.get('data').map(attr => attr.get('value')).toJS();
     };
 
     inst.getFormError = function(name) {
-        return this.state.formState.getIn([name, 'error']);
+        return this.state.formState.getIn(['data', name, 'error']);
     };
 
     inst.isFormWithLoadingNotice = function() {
-        return this.state.formState.get('_state') === FormState.LoadingWithNotice;
+        return this.state.formState.get('state') === FormState.LoadingWithNotice;
+    };
+
+    inst.isFormLoading = function() {
+        return this.state.formState.get('state') === FormState.Loading || this.state.formState.get('state') === FormState.LoadingWithNotice;
     };
 
     inst.isFormReady = function() {
-        return this.state.formState.get('_state') === FormState.Ready;
+        return this.state.formState.get('state') === FormState.Ready;
     };
 
     inst.isFormValidationShown = function() {
-        return this.state.formState.get('_isValidationShown');
+        return this.state.formState.get('isValidationShown');
     };
 
     inst.addFormValidationClass = function(className, name) {
@@ -228,12 +311,37 @@ function withForm(target) {
     };
 
     inst.showFormValidation = function() {
-        this.setState(previousState => ({formState: previousState.formState.set('_isValidationShown', true)}));
+        this.setState(previousState => ({formState: previousState.formState.set('isValidationShown', true)}));
     };
 
     inst.hideFormValidation = function() {
-        this.setState(previousState => ({formState: previousState.formState.set('_isValidationShown', false)}));
+        this.setState(previousState => ({formState: previousState.formState.set('isValidationShown', false)}));
     };
+
+    inst.isFormWithoutErrors = function() {
+        return !this.state.formState.get('data').find(attr => attr.get('error'));
+    };
+
+    inst.getFormStatusMessage = function() {
+        return this.state.formState.get('statusMessage');
+    };
+
+    inst.setFormStatusMessage = function(message) {
+        this.setState(previousState => ({formState: previousState.formState.set('statusMessage', message)}));
+    };
+
+    inst.enableForm = function() {
+        this.setState(previousState => ({formState: previousState.formState.set('isDisabled', false)}));
+    };
+
+    inst.disableForm = function() {
+        this.setState(previousState => ({formState: previousState.formState.set('isDisabled', true)}));
+    };
+
+    inst.isFormDisabled = function() {
+        return this.state.formState.get('isDisabled');
+    };
+
 }
 
 

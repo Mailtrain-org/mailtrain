@@ -44,6 +44,8 @@ const reports = require('./routes/reports');
 const reportsTemplates = require('./routes/report-templates');
 const namespaces = require('./routes/namespaces');
 
+const interoperableErrors = require('./lib/interoperable-errors');
+
 const app = express();
 
 // view engine setup
@@ -245,11 +247,27 @@ if (app.get('env') === 'development') {
         if (!err) {
             return next();
         }
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+
+        if (req.needsJSONResponse) {
+            const resp = {
+                message: err.message,
+                error: err
+            };
+
+            if (err instanceof InteroperableError) {
+                resp.type = err.type;
+                resp.data = err.data;
+            }
+
+            res.status(err.status || 500).json(resp);
+        } else {
+            res.status(err.status || 500);
+            res.render('error', {
+                message: err.message,
+                error: err
+            });
+        }
+
     });
 }
 
@@ -259,11 +277,26 @@ app.use((err, req, res, next) => {
     if (!err) {
         return next();
     }
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+
+    if (req.needsJSONResponse) {
+        const resp = {
+            message: err.message,
+            error: {}
+        };
+
+        if (err instanceof interoperableErrors.InteroperableError) {
+            resp.type = err.type;
+            resp.data = err.data;
+        }
+
+        res.status(err.status || 500).json(resp);
+    } else {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: {}
+        });
+    }
 });
 
 module.exports = app;

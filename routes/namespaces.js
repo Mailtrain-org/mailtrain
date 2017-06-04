@@ -4,28 +4,31 @@ const passport = require('../lib/passport');
 const router = require('../lib/router-async').create();
 const _ = require('../lib/translate')._;
 const namespaces = require('../lib/models/namespaces');
+const interoperableErrors = require('../lib/interoperable-errors');
 
-router.all('/*', (req, res, next) => {
+router.all('/rest/*', (req, res, next) => {
+    req.needsJSONResponse = true;
+
     if (!req.user) {
-        req.flash('danger', _('Need to be logged in to access restricted content'));
-        return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
+        throw new interoperableErrors.NotLoggedInError();
     }
-//    res.setSelectedMenu('namespaces');
+
     next();
 });
 
-router.getAsyncJSON('/rest/namespaces/:nsId', async (req, res) => {
+
+router.getAsync('/rest/namespaces/:nsId', async (req, res) => {
    const ns = await namespaces.getById(req.params.nsId);
    return res.json(ns);
 });
 
-router.postAsyncJSON('/rest/namespaces', passport.csrfProtection, async (req, res) => {
+router.postAsync('/rest/namespaces', passport.csrfProtection, async (req, res) => {
    console.log(req.body);
     // await namespaces.create(req.body);
     return res.json();
 });
 
-router.putAsyncJSON('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
+router.putAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
     console.log(req.body);
     ns = req.body;
     ns.id = req.params.nsId;
@@ -34,13 +37,13 @@ router.putAsyncJSON('/rest/namespaces/:nsId', passport.csrfProtection, async (re
     return res.json();
 });
 
-router.deleteAsyncJSON('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
+router.deleteAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
     console.log(req.body);
     // await namespaces.remove(req.params.nsId);
     return res.json();
 });
 
-router.getAsyncJSON('/rest/namespacesTree', async (req, res) => {
+router.getAsync('/rest/namespacesTree', async (req, res) => {
     const entries = {};
 
     /* Example of roots:
@@ -91,6 +94,15 @@ router.getAsyncJSON('/rest/namespacesTree', async (req, res) => {
     }
 
     return res.json(roots);
+});
+
+router.all('/*', (req, res, next) => {
+    if (!req.user) {
+        req.flash('danger', _('Need to be logged in to access restricted content'));
+        return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
+    }
+//    res.setSelectedMenu('namespaces');
+    next();
 });
 
 router.getAsync('/*', passport.csrfProtection, async (req, res) => {
