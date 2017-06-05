@@ -4,7 +4,7 @@ const passport = require('../lib/passport');
 const router = require('../lib/router-async').create();
 const _ = require('../lib/translate')._;
 const namespaces = require('../lib/models/namespaces');
-const interoperableErrors = require('../lib/interoperable-errors');
+const interoperableErrors = require('../shared/interoperable-errors');
 
 router.all('/rest/*', (req, res, next) => {
     req.needsJSONResponse = true;
@@ -15,7 +15,6 @@ router.all('/rest/*', (req, res, next) => {
 
     next();
 });
-
 
 router.getAsync('/rest/namespaces/:nsId', async (req, res) => {
    const ns = await namespaces.getById(req.params.nsId);
@@ -29,11 +28,10 @@ router.postAsync('/rest/namespaces', passport.csrfProtection, async (req, res) =
 });
 
 router.putAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
-    console.log(req.body);
-    ns = req.body;
-    ns.id = req.params.nsId;
+    const ns = req.body;
+    ns.id = parseInt(req.params.nsId);
 
-    // await namespaces.updateWithConsistencyCheck(ns);
+    await namespaces.updateWithConsistencyCheck(ns);
     return res.json();
 });
 
@@ -45,24 +43,7 @@ router.deleteAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req
 
 router.getAsync('/rest/namespacesTree', async (req, res) => {
     const entries = {};
-
-    /* Example of roots:
-    [
-        {title: 'A', key: '1', expanded: true},
-        {title: 'B', key: '2', expanded: true, folder: true, children: [
-            {title: 'BA', key: '3', expanded: true, folder: true, children: [
-                {title: 'BAA', key: '4', expanded: true},
-                {title: 'BAB', key: '5', expanded: true}
-            ]},
-            {title: 'BB', key: '6', expanded: true, folder: true, children: [
-                {title: 'BBA', key: '7', expanded: true},
-                {title: 'BBB', key: '8', expanded: true}
-            ]}
-        ]}
-    ]
-    */
-    const roots = [];
-
+    let root; // Only the Root namespace is without a parent
     const rows = await namespaces.list();
 
     for (let row of rows) {
@@ -86,14 +67,14 @@ router.getAsync('/rest/namespacesTree', async (req, res) => {
             entries[row.parent].children.push(entry);
 
         } else {
-            roots.push(entry);
+            root = entry;
         }
 
         entry.title = row.name;
         entry.key = row.id;
     }
 
-    return res.json(roots);
+    return res.json(root);
 });
 
 router.all('/*', (req, res, next) => {
@@ -101,7 +82,7 @@ router.all('/*', (req, res, next) => {
         req.flash('danger', _('Need to be logged in to access restricted content'));
         return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
     }
-//    res.setSelectedMenu('namespaces');
+//    res.setSelectedMenu('namespaces');  FIXME
     next();
 });
 

@@ -6,9 +6,14 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
 import './page.css';
+import { withErrorHandling } from './error-handling';
 
 
 class PageContent extends Component {
+    static propTypes = {
+        structure: PropTypes.object.isRequired
+    }
+
     getRoutes(urlPrefix, children) {
         let routes = [];
         for (let routeKey in children) {
@@ -49,6 +54,10 @@ class PageContent extends Component {
 
 @withRouter
 class Breadcrumb extends Component {
+    static propTypes = {
+        structure: PropTypes.object.isRequired
+    }
+
     renderElement(breadcrumbElem) {
         if (breadcrumbElem.isActive) {
             return <li key={breadcrumbElem.idx} className="active">{breadcrumbElem.title}</li>;
@@ -92,6 +101,113 @@ class Breadcrumb extends Component {
 }
 
 @translate()
+class DismissibleAlert extends Component {
+    static propTypes = {
+        severity: PropTypes.string.isRequired,
+        onClose: PropTypes.func
+    }
+
+    close() {
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
+    }
+
+    render() {
+        const t = this.props.t;
+
+        return (
+            <div className={`alert alert-${this.props.severity} alert-dismissible`} role="alert">
+                <button type="button" className="close" aria-label={t('Close')} onClick={::this.close}><span aria-hidden="true">&times;</span></button>
+                {this.props.children}
+            </div>
+        )
+    }
+}
+
+
+
+@withRouter
+@withErrorHandling
+class SectionContent extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            flashMessageText: ''
+        }
+
+        this.historyUnlisten = props.history.listen((location, action) => {
+            this.closeFlashMessage();
+        })
+    }
+
+    static propTypes = {
+        structure: PropTypes.object.isRequired,
+        root: PropTypes.string.isRequired
+    }
+
+    static childContextTypes = {
+        sectionContent: PropTypes.object
+    }
+
+    getChildContext() {
+        return {
+            sectionContent: this
+        };
+    }
+
+    getFlashMessageText() {
+        return this.state.flashMessageText;
+    }
+
+    getFlashMessageSeverity() {
+        return this.state.flashMessageSeverity;
+    }
+
+    setFlashMessage(severity, text) {
+        this.setState({
+            flashMessageText: text,
+            flashMessageSeverity: severity
+        });
+    }
+
+    navigateTo(path) {
+        this.props.history.push(path);
+    }
+
+    navigateToWithFlashMessage(path, severity, text) {
+        this.props.history.push(path);
+        this.setFlashMessage(severity, text);
+    }
+
+    errorHandler(error) {
+        if (error.response && error.response.data && error.response.data.message) {
+            this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);
+        } else {
+            this.navigateToWithFlashMessage(this.props.root, 'danger', error.message);
+        }
+        return true;
+    }
+
+    closeFlashMessage() {
+        this.setState({
+            flashMessageText: ''
+        })
+    }
+
+    render() {
+        return (
+            <div>
+                <Breadcrumb structure={this.props.structure} />
+                {(this.state.flashMessageText && <DismissibleAlert severity={this.state.flashMessageSeverity} onClose={::this.closeFlashMessage}>{this.state.flashMessageText}</DismissibleAlert>)}
+                <PageContent structure={this.props.structure}/>
+            </div>
+        );
+    }
+}
+
+@translate()
 class Section extends Component {
     constructor(props) {
         super(props);
@@ -104,17 +220,20 @@ class Section extends Component {
         this.structure = structure;
     }
 
+    static propTypes = {
+        structure: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
+        root: PropTypes.string.isRequired
+    }
+
     render() {
         return (
             <Router>
-                <div>
-                    <Breadcrumb structure={this.structure} />
-                    <PageContent structure={this.structure}/>
-                </div>
+                <SectionContent root={this.props.root} structure={this.structure} />
             </Router>
         );
     }
 }
+
 
 class Title extends Component {
     render() {
@@ -194,11 +313,43 @@ class Button extends Component {
     }
 }
 
+function withSectionHelpers(target) {
+    const inst = target.prototype;
+
+    const contextTypes = target.contextTypes || {};
+
+    contextTypes.sectionContent = PropTypes.object.isRequired;
+
+    target.contextTypes = contextTypes;
+
+    inst.getFlashMessageText = function() {
+        return this.context.sectionContent.getFlashMessageText();
+    };
+
+    inst.getFlashMessageSeverity = function() {
+        return this.context.sectionContent.getFlashMessageSeverity();
+    };
+
+    inst.setFlashMessage = function(severity, text) {
+        return this.context.sectionContent.setFlashMessage(severity, text);
+    };
+
+    inst.navigateTo = function(path) {
+        return this.context.sectionContent.navigateTo(path);
+    }
+
+    inst.navigateToWithFlashMessage = function(path, severity, text) {
+        return this.context.sectionContent.navigateToWithFlashMessage(path, severity, text);
+    }
+
+    return target;
+}
 
 export {
     Section,
     Title,
     Toolbar,
     Button,
-    NavButton
+    NavButton,
+    withSectionHelpers
 };

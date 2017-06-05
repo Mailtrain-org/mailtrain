@@ -44,7 +44,7 @@ const reports = require('./routes/reports');
 const reportsTemplates = require('./routes/report-templates');
 const namespaces = require('./routes/namespaces');
 
-const interoperableErrors = require('./lib/interoperable-errors');
+const interoperableErrors = require('./shared/interoperable-errors');
 
 const app = express();
 

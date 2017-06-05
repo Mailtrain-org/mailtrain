@@ -2,13 +2,20 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import NamespacesTreeTable from './NamespacesTreeTable';
-import { Title, Toolbar, NavButton } from "../lib/page";
+import { Title, Toolbar, NavButton } from '../lib/page';
+import { TreeTable } from '../lib/tree';
 
 @translate()
 export default class List extends Component {
     render() {
         const t = this.props.t;
+
+        const actionLinks = [
+            {
+                label: 'Edit',
+                link: key => '/namespaces/edit/' + key
+            }
+        ];
 
         return (
             <div>
@@ -18,7 +25,7 @@ export default class List extends Component {
 
                 <Title>{t('Namespaces')}</Title>
 
-                <NamespacesTreeTable />
+                <TreeTable withHeader dataUrl="/namespaces/rest/namespacesTree" actionLinks={actionLinks} />
             </div>
         );
     }

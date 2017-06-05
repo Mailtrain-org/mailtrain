@@ -1,0 +1,16 @@
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td,
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active:hover>td {
+    background-color: transparent;
+}
+
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-title {
+    color: #333333;
+}
+
+.mt-treetable-container {
+    padding-top: 9px;
+}
+
+.mt-treetable-container.mt-treetable-noheader>.table>tbody>tr>td {
+    border-top: 0px none;
+}

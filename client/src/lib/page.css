@@ -1,4 +1,4 @@
-.mt-button-row > button{
+.mt-button-row > button {
     margin-right: 15px;
 }
 
@@ -9,4 +9,12 @@
 .mt-form-status {
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+.mt-action-links > a {
+    margin-right: 8px;
+}
+
+.mt-action-links > a:last-child {
+    margin-right: 0px;
 }

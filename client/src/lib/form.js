@@ -1,10 +1,14 @@
 'use strict';
 
 import React, { Component } from 'react';
-import axios from 'axios';
+import axios from './axios';
 import Immutable from 'immutable';
 import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
+import interoperableErrors from '../../../shared/interoperable-errors';
+import { withSectionHelpers } from './page'
+import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
+import { TreeTable } from './tree';
 
 const FormState = {
     Loading: 0,
@@ -12,7 +16,10 @@ const FormState = {
     Ready: 2
 };
 
+
 @translate()
+@withSectionHelpers
+@withErrorHandling
 class Form extends Component {
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
@@ -20,28 +27,44 @@ class Form extends Component {
     }
 
     static childContextTypes = {
-        stateOwner: PropTypes.object
+        formStateOwner: PropTypes.object
     }
 
     getChildContext() {
         return {
-            stateOwner: this.props.stateOwner
+            formStateOwner: this.props.stateOwner
         };
     }
 
+    @withAsyncErrorHandler
     async onSubmit(evt) {
-        evt.preventDefault();
-
         const t = this.props.t;
 
-        if (this.props.onSubmitAsync) {
-            this.props.stateOwner.disableForm();
-            this.props.stateOwner.setFormStatusMessage(t('Submitting...'));
+        try {
+            evt.preventDefault();
 
-            await this.props.onSubmitAsync(evt);
+            if (this.props.onSubmitAsync) {
+                this.props.stateOwner.disableForm();
+                this.props.stateOwner.setFormStatusMessage('info', t('Submitting...'));
 
-            this.props.stateOwner.setFormStatusMessage();
-            this.props.stateOwner.enableForm();
+                await this.props.onSubmitAsync(evt);
+
+                this.props.stateOwner.setFormStatusMessage();
+                this.props.stateOwner.enableForm();
+            }
+        } catch (error) {
+            if (error instanceof interoperableErrors.ChangedError) {
+                this.props.stateOwner.disableForm();
+                this.props.stateOwner.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                    </span>
+                );
+                return;
+            }
+
+            throw error;
         }
     }
 
@@ -49,11 +72,12 @@ class Form extends Component {
         const t = this.props.t;
         const owner = this.props.stateOwner;
         const props = this.props;
-        const statusMessage = owner.getFormStatusMessage();
+        const statusMessageText = owner.getFormStatusMessageText();
+        const statusMessageSeverity = owner.getFormStatusMessageSeverity();
 
         if (!owner.isFormReady()) {
             if (owner.isFormWithLoadingNotice()) {
-                return <div>{t('Loading ...')}</div>
+                return <p className={`alert alert-info mt-form-status`} role="alert">{t('Loading ...')}</p>
             } else {
                 return <div></div>;
             }
@@ -63,7 +87,7 @@ class Form extends Component {
                     <fieldset disabled={owner.isFormDisabled()}>
                         {props.children}
                     </fieldset>
-                    {statusMessage && <p className="col-sm-10 col-sm-offset-2 alert alert-info mt-form-status" role="alert">{owner.getFormStatusMessage()}</p>}
+                    {statusMessageText && <p className={`col-sm-10 col-sm-offset-2 alert alert-${statusMessageSeverity} mt-form-status`} role="alert">{statusMessageText}</p>}
                 </form>
             );
         }
@@ -92,17 +116,17 @@ class InputField extends Component {
     }
 
     static contextTypes = {
-        stateOwner: PropTypes.object.isRequired
+        formStateOwner: PropTypes.object.isRequired
     }
 
     render() {
         const props = this.props;
-        const owner = this.context.stateOwner;
+        const owner = this.context.formStateOwner;
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label,
-            <input type="text" value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindToFormValue(id)}/>
+            <input type="text" value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindChangeEventToFormValue(id)}/>
         );
     }
 }
@@ -115,17 +139,17 @@ class TextArea extends Component {
     }
 
     static contextTypes = {
-        stateOwner: PropTypes.object.isRequired
+        formStateOwner: PropTypes.object.isRequired
     }
 
     render() {
         const props = this.props;
-        const owner = this.context.stateOwner;
+        const owner = this.context.formStateOwner;
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label,
-            <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindToFormValue(id)}></textarea>
+            <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindChangeEventToFormValue(id)}></textarea>
         );
     }
 }
@@ -142,6 +166,7 @@ class ButtonRow extends Component {
     }
 }
 
+@withErrorHandling
 class Button extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
@@ -153,9 +178,10 @@ class Button extends Component {
     }
 
     static contextTypes = {
-        stateOwner: PropTypes.object.isRequired
+        formStateOwner: PropTypes.object.isRequired
     }
 
+    @withAsyncErrorHandler
     async onClick(evt) {
         if (this.props.onClick) {
             evt.preventDefault();
@@ -165,9 +191,9 @@ class Button extends Component {
         } else if (this.props.onClickAsync) {
             evt.preventDefault();
 
-            this.context.stateOwner.disableForm();
+            this.context.formStateOwner.disableForm();
             await this.props.onClickAsync(evt);
-            this.context.stateOwner.enableForm();
+            this.context.formStateOwner.enableForm();
         }
     }
 
@@ -197,21 +223,63 @@ class Button extends Component {
     }
 }
 
+class TreeTableSelect extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        dataUrl: PropTypes.string.isRequired
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    async onSelectionChangedAsync(sel) {
+        const owner = this.context.formStateOwner;
+        owner.updateFormValue(this.props.id, sel);
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        return (
+            <div className={owner.addFormValidationClass('form-group', id)} >
+                <div className="col-sm-2">
+                    <label htmlFor={htmlId} className="control-label">{props.label}</label>
+                </div>
+                <div className="col-sm-10">
+                    <TreeTable dataUrl={this.props.dataUrl} selectMode={TreeTable.SelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                </div>
+                <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{owner.getFormValidationMessage(id)}</div>
+            </div>
+        );
+    }
+}
+
 function withForm(target) {
     const inst = target.prototype;
 
+    const cleanFormState = Immutable.Map({
+        state: FormState.Loading,
+        isValidationShown: false,
+        isDisabled: false,
+        statusMessageText: '',
+        data: Immutable.Map()
+    });
+
     inst.initFormState = function() {
         const state = this.state || {};
-
-        state.formState = Immutable.Map({
-            state: FormState.Loading,
-            isValidationShown: false,
-            isDisabled: false,
-            statusMessage: '',
-            data: Immutable.Map()
-        });
-
+        state.formState = cleanFormState;
         this.state = state;
+    };
+
+    inst.resetFormState = function() {
+        this.setState({
+            formState: cleanFormState
+        });
     };
 
     inst.populateFormValuesFromURL = function(url) {
@@ -226,7 +294,12 @@ function withForm(target) {
         }, 500);
 
         axios.get(url).then(response => {
-            this.populateFormValues(response.data);
+            const data = response.data;
+
+            data.originalHash = data.hash;
+            delete data.hash;
+
+            this.populateFormValues(data);
         });
     };
 
@@ -257,7 +330,7 @@ function withForm(target) {
         }));
     };
 
-    inst.bindToFormValue = function(name) {
+    inst.bindChangeEventToFormValue = function(name) {
         return evt => this.updateFormValue(name, evt.target.value);
     };
 
@@ -322,12 +395,21 @@ function withForm(target) {
         return !this.state.formState.get('data').find(attr => attr.get('error'));
     };
 
-    inst.getFormStatusMessage = function() {
-        return this.state.formState.get('statusMessage');
+    inst.getFormStatusMessageText = function() {
+        return this.state.formState.get('statusMessageText');
     };
 
-    inst.setFormStatusMessage = function(message) {
-        this.setState(previousState => ({formState: previousState.formState.set('statusMessage', message)}));
+    inst.getFormStatusMessageSeverity = function() {
+        return this.state.formState.get('statusMessageSeverity');
+    };
+
+    inst.setFormStatusMessage = function(severity, text) {
+        this.setState(previousState => ({
+            formState: previousState.formState.withMutations(map => {
+                map.set('statusMessageText', text);
+                map.set('statusMessageSeverity', severity);
+            })
+        }));
     };
 
     inst.enableForm = function() {
@@ -342,6 +424,7 @@ function withForm(target) {
         return this.state.formState.get('isDisabled');
     };
 
+    return target;
 }
 
 
@@ -351,5 +434,6 @@ export {
     InputField,
     TextArea,
     ButtonRow,
-    Button
+    Button,
+    TreeTableSelect
 }

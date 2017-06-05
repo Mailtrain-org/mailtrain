@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        namespaces: './src/namespaces/root.js'
+        namespaces: ['babel-polyfill', './src/namespaces/root.js']
     },
     output: {
         library: 'MailtrainReactBody',
