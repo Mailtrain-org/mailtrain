@@ -18,7 +18,9 @@ export default class Edit extends Component {
 
         console.log('Constructing Edit');
         this.initFormState();
-        this.populateFormValuesFromURL(`/namespaces/rest/namespaces/${this.nsId}`);
+        this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.nsId}`, data => {
+            if (data.parent) data.parent = data.parent.toString();
+        });
     }
 
     validateFormValues(state) {
@@ -32,14 +34,15 @@ export default class Edit extends Component {
     }
 
     async submitHandler() {
-        if (this.isFormWithoutErrors()) {
-            const data = this.getFormValues();
-            console.log(data);
+        const t = this.props.t;
 
-            await axios.put(`/namespaces/rest/namespaces/${this.nsId}`, data);
-        } else {
-            this.showFormValidation();
-        }
+        await this.validateAndPutFormValuesToURL(`/namespaces/rest/namespaces/${this.nsId}`, data => {
+            if (data.parent) data.parent = parseInt(data.parent);
+        });
+
+        this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace saved'));
+
+        // FIXME - the enable form in form.js gets called. This causes a warning. Check there whether the component is still mounted.
     }
 
     async deleteHandler() {

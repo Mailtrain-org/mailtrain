@@ -282,7 +282,7 @@ function withForm(target) {
         });
     };
 
-    inst.populateFormValuesFromURL = function(url) {
+    inst.getFormValuesFromURL = async function(url, mutator) {
         setTimeout(() => {
             this.setState(previousState => {
                 if (previousState.formState.get('state') === FormState.Loading) {
@@ -293,15 +293,34 @@ function withForm(target) {
             });
         }, 500);
 
-        axios.get(url).then(response => {
-            const data = response.data;
+        const response = await axios.get(url)
 
-            data.originalHash = data.hash;
-            delete data.hash;
+        const data = response.data;
 
-            this.populateFormValues(data);
-        });
+        data.originalHash = data.hash;
+        delete data.hash;
+
+        if (mutator) {
+            mutator(data);
+        }
+
+        this.populateFormValues(data);
     };
+
+    inst.validateAndPutFormValuesToURL = async function(url, mutator) {
+        if (this.isFormWithoutErrors()) {
+            const data = this.getFormValues();
+
+            if (mutator) {
+                mutator(data);
+            }
+
+            await axios.put(`/namespaces/rest/namespaces/${this.nsId}`, data);
+        } else {
+            this.showFormValidation();
+        }
+    };
+
 
     inst.populateFormValues = function(data) {
         this.setState(previousState => ({
