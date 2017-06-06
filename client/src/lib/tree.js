@@ -10,11 +10,16 @@ import '../../public/jquery/jquery-ui-1.12.1.min.js';
 import '../../public/fancytree/jquery.fancytree-all.js';
 import '../../public/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.css';
-import axios from 'axios';
+import axios from './axios';
 
 import { withSectionHelpers } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 
+const TreeSelectMode = {
+    NONE: 0,
+    SINGLE: 1,
+    MULTI: 2
+};
 
 @translate()
 @withSectionHelpers
@@ -23,24 +28,25 @@ class TreeTable extends Component {
     constructor(props) {
         super(props);
 
-        this.selectMode = this.props.selectMode || TreeTable.SelectMode.NONE;
-
-        let selection = props.selection;
-        if (this.selectMode == TreeTable.SelectMode.MULTI) {
-            selection = selection.slice().sort();
-        }
-
         this.state = {
-            treeData: [],
-            selection: selection
+            treeData: []
         };
 
-        this.loadData();
+        if (props.data) {
+            this.state.treeData = props.data;
+        }
+
+        // Select Mode simply cannot be changed later. This is just to make sure we avoid inconsistencies if someone changes it anyway.
+        this.selectMode = this.props.selectMode;
+    }
+
+    static defaultProps = {
+        selectMode: TreeSelectMode.NONE 
     }
 
     @withAsyncErrorHandler
-    async loadData() {
-        axios.get(this.props.dataUrl)
+    async loadData(dataUrl) {
+        axios.get(dataUrl)
             .then(response => {
                 this.setState({
                     treeData: [ response.data ]
@@ -49,7 +55,8 @@ class TreeTable extends Component {
     }
 
     static propTypes = {
-        dataUrl: PropTypes.string.isRequired,
+        dataUrl: PropTypes.string,
+        data: PropTypes.array,
         selectMode: PropTypes.number,
         selection: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
         onSelectionChangedAsync: PropTypes.func,
@@ -57,13 +64,25 @@ class TreeTable extends Component {
         withHeader: PropTypes.bool
     }
 
-    static SelectMode = {
-        NONE: 0,
-        SINGLE: 1,
-        MULTI: 2
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.data) {
+            this.setState({
+                treeData: nextProps.data
+            });
+        } else if (nextProps.dataUrl && this.props.dataUrl !== nextProps.dataUrl) {
+            this.loadData(next.props.dataUrl);
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.props.selection !== nextProps.selection || this.state.treeData != nextState.treeData;
     }
 
     componentDidMount() {
+        if (!this.props.data && this.props.dataUrl) {
+            this.loadData(this.props.dataUrl);
+        }
+
         const glyphOpts = {
             map: {
                 expanderClosed: 'glyphicon glyphicon-menu-right',
@@ -100,7 +119,7 @@ class TreeTable extends Component {
         this.tree = jQuery(this.domTable).fancytree({
             extensions: ['glyph', 'table'],
             glyph: glyphOpts,
-            selectMode: (this.selectMode == TreeTable.SelectMode.MULTI ? 2 : 1),
+            selectMode: (this.selectMode === TreeSelectMode.MULTI ? 2 : 1),
             icon: false,
             autoScroll: true,
             scrollParent: jQuery(this.domTableContainer),
@@ -109,9 +128,9 @@ class TreeTable extends Component {
                 nodeColumnIdx: 0
             },
             createNode: createNodeFn,
-            checkbox: this.selectMode == TreeTable.SelectMode.MULTI,
-            activate: (this.selectMode == TreeTable.SelectMode.SINGLE ? ::this.onActivate : null),
-            select: (this.selectMode == TreeTable.SelectMode.MULTI ? ::this.onSelect : null)
+            checkbox: this.selectMode === TreeSelectMode.MULTI,
+            activate: (this.selectMode === TreeSelectMode.SINGLE ? ::this.onActivate : null),
+            select: (this.selectMode === TreeSelectMode.MULTI ? ::this.onSelect : null)
         }).fancytree("getTree");
 
         this.updateSelection();
@@ -124,15 +143,15 @@ class TreeTable extends Component {
 
     updateSelection() {
         const tree = this.tree;
-        if (this.selectMode == TreeTable.SelectMode.MULTI) {
-            const selectSet = new Set(this.state.selection);
+        if (this.selectMode === TreeSelectMode.MULTI) {
+            const selectSet = new Set(this.props.selection);
 
             tree.enableUpdate(false);
             tree.visit(node => node.setSelected(selectSet.has(node.key)));
             tree.enableUpdate(true);
 
-        } else if (this.selectMode == TreeTable.SelectMode.SINGLE) {
-            this.tree.activateKey(this.state.selection);
+        } else if (this.selectMode === TreeSelectMode.SINGLE) {
+            this.tree.activateKey(this.props.selection);
         }
     }
 
@@ -146,11 +165,7 @@ class TreeTable extends Component {
     // Single-select
     onActivate(event, data) {
         const selection = this.tree.getActiveNode().key;
-        if (selection !== this.state.selection) {
-            this.setState({
-                selection
-            });
-
+        if (selection !== this.props.selection) {
             this.onSelectionChanged(selection);
         }
     }
@@ -158,10 +173,10 @@ class TreeTable extends Component {
     // Multi-select
     onSelect(event, data) {
         const newSel = this.tree.getSelectedNodes().map(node => node.key).sort();
-        const oldSel = this.state.selection;
+        const oldSel = this.props.selection;
 
         let updated = false;
-        const length = oldSel.length
+        const length = oldSel.length;
         if (length === newSel.length) {
             for (let i = 0; i < length; i++) {
                 if (oldSel[i] !== newSel[i]) {
@@ -174,10 +189,6 @@ class TreeTable extends Component {
         }
 
         if (updated) {
-            this.setState({
-                selection: newSel
-            });
-
             this.onSelectionChanged(selection);
         }
     }
@@ -189,7 +200,7 @@ class TreeTable extends Component {
         const withHeader = props.withHeader;
 
         let containerClass = 'mt-treetable-container';
-        if (this.selectMode == TreeTable.SelectMode.NONE) {
+        if (this.selectMode === TreeSelectMode.NONE) {
             containerClass += ' mt-treetable-inactivable';
         }
 
@@ -197,8 +208,10 @@ class TreeTable extends Component {
             containerClass += ' mt-treetable-noheader';
         }
 
+        // FIXME: style={{ height: '100px', overflow: 'auto'}}
+
         const container =
-            <div className={containerClass} ref={(domElem) => { this.domTableContainer = domElem; }} style={{ height: '100px', overflow: 'auto'}}>
+            <div className={containerClass} ref={(domElem) => { this.domTableContainer = domElem; }} >
                 <table ref={(domElem) => { this.domTable = domElem; }} className="table table-hover table-striped table-condensed">
                     {props.withHeader &&
                         <thead>
@@ -224,5 +237,6 @@ class TreeTable extends Component {
 }
 
 export {
-    TreeTable
+    TreeTable,
+    TreeSelectMode
 }

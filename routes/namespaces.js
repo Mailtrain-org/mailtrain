@@ -17,13 +17,12 @@ router.all('/rest/*', (req, res, next) => {
 });
 
 router.getAsync('/rest/namespaces/:nsId', async (req, res) => {
-   const ns = await namespaces.getById(req.params.nsId);
-   return res.json(ns);
+    const ns = await namespaces.getById(req.params.nsId);
+    return res.json(ns);
 });
 
 router.postAsync('/rest/namespaces', passport.csrfProtection, async (req, res) => {
-   console.log(req.body);
-    // await namespaces.create(req.body);
+    await namespaces.create(req.body);
     return res.json();
 });
 
@@ -36,8 +35,7 @@ router.putAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req, r
 });
 
 router.deleteAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req, res) => {
-    console.log(req.body);
-    // await namespaces.remove(req.params.nsId);
+    await namespaces.remove(req.params.nsId);
     return res.json();
 });
 
@@ -58,7 +56,7 @@ router.getAsync('/rest/namespacesTree', async (req, res) => {
         }
 
         if (row.parent) {
-            if (entries[row.parent]) {
+            if (!entries[row.parent]) {
                 entries[row.parent] = {
                     children: []
                 };

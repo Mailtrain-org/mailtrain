@@ -7,6 +7,7 @@ import { withRouter } from 'react-router';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
 import './page.css';
 import { withErrorHandling } from './error-handling';
+import interoperableErrors from '../../../shared/interoperable-errors';
 
 
 class PageContent extends Component {
@@ -25,9 +26,10 @@ class PageContent extends Component {
                 path = path + '/' + structure.params.join('/');
             }
 
-            if (structure.component) {
+            if (structure.component || structure.render) {
                 const route = {
                     component: structure.component,
+                    render: structure.render,
                     path: (path === '' ? '/' : path)
                 };
 
@@ -43,7 +45,11 @@ class PageContent extends Component {
     }
 
     renderRoute(route) {
-        return <Route key={route.path} exact path={route.path} component={route.component} />;
+        if (route.component) {
+            return <Route key={route.path} exact path={route.path} component={route.component} />;
+        } else if (route.render) {
+            return <Route key={route.path} exact path={route.path} render={route.render} />;
+        }
     }
 
     render() {
@@ -182,7 +188,9 @@ class SectionContent extends Component {
     }
 
     errorHandler(error) {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error instanceof interoperableErrors.NotLoggedInError) {
+            this.navigateTo('/users/login?next=' + encodeURIComponent(this.props.root));
+        } else if (error.response && error.response.data && error.response.data.message) {
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);
         } else {
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.message);
@@ -282,9 +290,8 @@ class Button extends Component {
     }
 
     async onClick(evt) {
-        evt.preventDefault();
-
         if (this.props.onClick) {
+            evt.preventDefault();
             onClick(evt);
         }
     }

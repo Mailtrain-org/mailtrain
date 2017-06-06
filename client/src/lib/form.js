@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import { withSectionHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
-import { TreeTable } from './tree';
+import { TreeTable, TreeSelectMode } from './tree';
 
 const FormState = {
     Loading: 0,
@@ -16,6 +16,10 @@ const FormState = {
     Ready: 2
 };
 
+const FormSendMethod = {
+    PUT: 0,
+    POST: 1
+};
 
 @translate()
 @withSectionHelpers
@@ -40,26 +44,22 @@ class Form extends Component {
     async onSubmit(evt) {
         const t = this.props.t;
 
+        const owner = this.props.stateOwner;
+        
         try {
             evt.preventDefault();
 
             if (this.props.onSubmitAsync) {
-                this.props.stateOwner.disableForm();
-                this.props.stateOwner.setFormStatusMessage('info', t('Submitting...'));
-
                 await this.props.onSubmitAsync(evt);
-
-                this.props.stateOwner.setFormStatusMessage();
-                this.props.stateOwner.enableForm();
             }
         } catch (error) {
             if (error instanceof interoperableErrors.ChangedError) {
-                this.props.stateOwner.disableForm();
-                this.props.stateOwner.setFormStatusMessage('danger',
+                owner.disableForm();
+                owner.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                    <strong>{t('Your updates cannot be saved.')}</strong>{' '}
                         {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
-                    </span>
+                </span>
                 );
                 return;
             }
@@ -126,7 +126,7 @@ class InputField extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label,
-            <input type="text" value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindChangeEventToFormValue(id)}/>
+            <input type="text" value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );
     }
 }
@@ -149,7 +149,7 @@ class TextArea extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label,
-            <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={owner.bindChangeEventToFormValue(id)}></textarea>
+            <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
 }
@@ -227,7 +227,8 @@ class TreeTableSelect extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        dataUrl: PropTypes.string.isRequired
+        dataUrl: PropTypes.string,
+        data: PropTypes.array
     }
 
     static contextTypes = {
@@ -251,7 +252,7 @@ class TreeTableSelect extends Component {
                     <label htmlFor={htmlId} className="control-label">{props.label}</label>
                 </div>
                 <div className="col-sm-10">
-                    <TreeTable dataUrl={this.props.dataUrl} selectMode={TreeTable.SelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                    <TreeTable data={this.props.data} dataUrl={this.props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                 </div>
                 <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{owner.getFormValidationMessage(id)}</div>
             </div>
@@ -307,7 +308,7 @@ function withForm(target) {
         this.populateFormValues(data);
     };
 
-    inst.validateAndPutFormValuesToURL = async function(url, mutator) {
+    inst.validateAndSendFormValuesToURL = async function(method, url, mutator) {
         if (this.isFormWithoutErrors()) {
             const data = this.getFormValues();
 
@@ -315,9 +316,15 @@ function withForm(target) {
                 mutator(data);
             }
 
-            await axios.put(`/namespaces/rest/namespaces/${this.nsId}`, data);
+            if (method === FormSendMethod.PUT) {
+                await axios.put(url, data);
+            } else if (method === FormSendMethod.POST) {
+                await axios.post(url, data);
+            }
+            return true;
         } else {
             this.showFormValidation();
+            return false;
         }
     };
 
@@ -347,10 +354,6 @@ function withForm(target) {
                 this.validateFormValues(mutableStateData);
             }))
         }));
-    };
-
-    inst.bindChangeEventToFormValue = function(name) {
-        return evt => this.updateFormValue(name, evt.target.value);
     };
 
     inst.getFormValue = function(name) {
@@ -454,5 +457,6 @@ export {
     TextArea,
     ButtonRow,
     Button,
-    TreeTableSelect
+    TreeTableSelect,
+    FormSendMethod
 }

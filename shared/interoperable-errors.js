@@ -10,7 +10,7 @@ class InteroperableError extends Error {
 
 class NotLoggedInError extends InteroperableError {
     constructor(msg, data) {
-        super('NotLoggedIn', msg, data);
+        super('NotLoggedInError', msg, data);
     }
 }
 
@@ -26,16 +26,29 @@ class NotFoundError extends InteroperableError {
     }
 }
 
+class LoopDetectedError extends InteroperableError {
+    constructor(msg, data) {
+        super('LoopDetectedError', msg, data);
+    }
+}
+
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
     ChangedError,
-    NotFoundError
+    NotFoundError,
+    LoopDetectedError
 };
 
 function deserialize(errorObj) {
     if (errorObj.type) {
-        return new errorTypes[errorObj.type](errorObj.message, errorObj.data)
+
+        const ctor = errorTypes[errorObj.type];
+        if (ctor) {
+            return new ctor(errorObj.message, errorObj.data);
+        } else {
+            console.log('Warning unknown type of interoperable error: ' + errorObj.type);
+        }
     }
 }
 
