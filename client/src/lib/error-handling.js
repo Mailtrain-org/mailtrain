@@ -2,8 +2,29 @@
 
 import PropTypes from 'prop-types';
 
+
+function handleError(that, error) {
+    let errorHandled;
+    if (that.errorHandler) {
+        errorHandled = that.errorHandler(error);
+    }
+
+    if (!errorHandled && that.context.parentErrorHandler) {
+        errorHandled = handleError(that.context.parentErrorHandler, error);
+    }
+
+    if (!errorHandled) {
+        throw error;
+    }
+
+    return errorHandled;
+}
+
 function withErrorHandling(target) {
     const inst = target.prototype;
+
+    if (inst._withErrorHandlingApplied) return;
+    inst._withErrorHandlingApplied = true;
 
     const contextTypes = target.contextTypes || {};
     contextTypes.parentErrorHandler = PropTypes.object;
@@ -28,22 +49,21 @@ function withErrorHandling(target) {
         }
     }
 
+    /* Example of use:
+       this.getFormValuesFromURL(....).catch(error => this.handleError(error));
+
+       It's equivalent to:
+
+       @withAsyncErrorHandler
+       async loadFormValues() {
+         await this.getFormValuesFromURL(...);
+       }
+    */
+    inst.handleError = function(error) {
+        handleError(this, error);
+    };
+
     return target;
-}
-
-function handleError(that, error) {
-    let errorHandled;
-    if (that.errorHandler) {
-        errorHandled = that.errorHandler(error);
-    }
-
-    if (!errorHandled && that.context.parentErrorHandler) {
-        errorHandled = handleError(that.context.parentErrorHandler, error);
-    }
-
-    if (!errorHandled) {
-        throw error;
-    }
 }
 
 function withAsyncErrorHandler(target, name, descriptor) {

@@ -12,7 +12,7 @@ import '../../public/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.css';
 import axios from './axios';
 
-import { withSectionHelpers } from '../lib/page'
+import { withPageHelpers } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 
 const TreeSelectMode = {
@@ -22,7 +22,7 @@ const TreeSelectMode = {
 };
 
 @translate()
-@withSectionHelpers
+@withPageHelpers
 @withErrorHandling
 class TreeTable extends Component {
     constructor(props) {
@@ -46,12 +46,17 @@ class TreeTable extends Component {
 
     @withAsyncErrorHandler
     async loadData(dataUrl) {
-        axios.get(dataUrl)
-            .then(response => {
-                this.setState({
-                    treeData: [ response.data ]
-                });
-            });
+        const response = await axios.get(dataUrl);
+        const treeData = response.data;
+
+        treeData.expanded = true;
+        for (const child of treeData.children) {
+            child.expanded = true;
+        }
+
+        this.setState({
+            treeData: [ response.data ]
+        });
     }
 
     static propTypes = {

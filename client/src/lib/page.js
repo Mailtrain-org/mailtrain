@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
 import './page.css';
 import { withErrorHandling } from './error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
+import { DismissibleAlert, Button } from './bootstrap-components';
 
 
 class PageContent extends Component {
@@ -106,31 +107,6 @@ class Breadcrumb extends Component {
     }
 }
 
-@translate()
-class DismissibleAlert extends Component {
-    static propTypes = {
-        severity: PropTypes.string.isRequired,
-        onClose: PropTypes.func
-    }
-
-    close() {
-        if (this.props.onClose) {
-            this.props.onClose();
-        }
-    }
-
-    render() {
-        const t = this.props.t;
-
-        return (
-            <div className={`alert alert-${this.props.severity} alert-dismissible`} role="alert">
-                <button type="button" className="close" aria-label={t('Close')} onClick={::this.close}><span aria-hidden="true">&times;</span></button>
-                {this.props.children}
-            </div>
-        )
-    }
-}
-
 
 
 @withRouter
@@ -146,6 +122,30 @@ class SectionContent extends Component {
         this.historyUnlisten = props.history.listen((location, action) => {
             this.closeFlashMessage();
         })
+
+
+        // -------------------------------------------------------------------------------------------------------
+        /* FIXME - remove this once we migrate fully to React
+           This part transforms the flash notice rendered by the server to flash notice managed by React client.
+           It is used primarily for the login info, but there may be some other cases.
+         */
+        const alrt = jQuery('.container>.alert');
+        alrt.find('button').remove();
+
+        const alrtText = alrt.text();
+        if (alrtText) {
+            this.state.flashMessageText = alrtText;
+
+            const severityRegex = /alert-([^ ]*)/;
+            const match = alrt.attr('class').match(severityRegex);
+
+            if (match) {
+                this.state.flashMessageSeverity = match[1];
+            }
+        }
+
+        alrt.remove();
+        // -------------------------------------------------------------------------------------------------------
     }
 
     static propTypes = {
@@ -189,7 +189,7 @@ class SectionContent extends Component {
 
     errorHandler(error) {
         if (error instanceof interoperableErrors.NotLoggedInError) {
-            this.navigateTo('/users/login?next=' + encodeURIComponent(this.props.root));
+            window.location = '/users/login?next=' + encodeURIComponent(this.props.root);
         } else if (error.response && error.response.data && error.response.data.message) {
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);
         } else {
@@ -198,7 +198,7 @@ class SectionContent extends Component {
         return true;
     }
 
-    closeFlashMessage() {
+    async closeFlashMessage() {
         this.setState({
             flashMessageText: ''
         })
@@ -208,7 +208,7 @@ class SectionContent extends Component {
         return (
             <div>
                 <Breadcrumb structure={this.props.structure} />
-                {(this.state.flashMessageText && <DismissibleAlert severity={this.state.flashMessageSeverity} onClose={::this.closeFlashMessage}>{this.state.flashMessageText}</DismissibleAlert>)}
+                {(this.state.flashMessageText && <DismissibleAlert severity={this.state.flashMessageSeverity} onCloseAsync={::this.closeFlashMessage}>{this.state.flashMessageText}</DismissibleAlert>)}
                 <PageContent structure={this.props.structure}/>
             </div>
         );
@@ -281,46 +281,10 @@ class NavButton extends Component {
     }
 }
 
-class Button extends Component {
-    static propTypes = {
-        onClick: PropTypes.func,
-        label: PropTypes.string,
-        icon: PropTypes.string,
-        className: PropTypes.string
-    }
 
-    async onClick(evt) {
-        if (this.props.onClick) {
-            evt.preventDefault();
-            onClick(evt);
-        }
-    }
+function withPageHelpers(target) {
+    withErrorHandling(target);
 
-    render() {
-        const props = this.props;
-
-        let className = 'btn';
-        if (props.className) {
-            className = className + ' ' + props.className;
-        }
-
-        let icon;
-        if (props.icon) {
-            icon = <span className={'glyphicon glyphicon-' + props.icon}></span>
-        }
-
-        let iconSpacer;
-        if (props.icon && props.label) {
-            iconSpacer = ' ';
-        }
-
-        return (
-            <button type="button" className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
-        );
-    }
-}
-
-function withSectionHelpers(target) {
     const inst = target.prototype;
 
     const contextTypes = target.contextTypes || {};
@@ -349,6 +313,8 @@ function withSectionHelpers(target) {
         return this.context.sectionContent.navigateToWithFlashMessage(path, severity, text);
     }
 
+    inst.axios
+
     return target;
 }
 
@@ -356,7 +322,6 @@ export {
     Section,
     Title,
     Toolbar,
-    Button,
     NavButton,
-    withSectionHelpers
+    withPageHelpers
 };

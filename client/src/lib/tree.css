@@ -7,6 +7,10 @@
     color: #333333;
 }
 
+.mt-treetable-container span.fancytree-node span.fancytree-expander:hover {
+    color: inherit;
+}
+
 .mt-treetable-container {
     padding-top: 9px;
     padding-bottom: 9px;

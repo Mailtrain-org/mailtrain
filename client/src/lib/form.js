@@ -6,7 +6,7 @@ import Immutable from 'immutable';
 import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 import interoperableErrors from '../../../shared/interoperable-errors';
-import { withSectionHelpers } from './page'
+import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import { TreeTable, TreeSelectMode } from './tree';
 
@@ -22,7 +22,7 @@ const FormSendMethod = {
 };
 
 @translate()
-@withSectionHelpers
+@withPageHelpers
 @withErrorHandling
 class Form extends Component {
     static propTypes = {
@@ -57,9 +57,9 @@ class Form extends Component {
                 owner.disableForm();
                 owner.setFormStatusMessage('danger',
                     <span>
-                    <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
                         {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
-                </span>
+                    </span>
                 );
                 return;
             }

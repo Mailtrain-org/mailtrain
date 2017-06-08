@@ -2,21 +2,23 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { withSectionHelpers, Title } from '../lib/page'
+import { withPageHelpers, Title } from '../lib/page'
 import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button, TreeTableSelect } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
+import { ModalDialog } from "../lib/bootstrap-components";
 
 @translate()
 @withForm
-@withSectionHelpers
+@withPageHelpers
 @withErrorHandling
-export default class CreateOrEdit extends Component {
+export default class CUD extends Component {
     constructor(props) {
         super(props);
 
         this.initFormState();
+        this.hasChildren = false;
     }
 
     isEditGlobal() {
@@ -28,6 +30,10 @@ export default class CreateOrEdit extends Component {
             const entry = data[idx];
 
             if (entry.key === this.nsId) {
+                if (entry.children.length > 0) {
+                    this.hasChildren = true;
+                }
+
                 data.splice(idx, 1);
                 return true;
             }
@@ -43,6 +49,7 @@ export default class CreateOrEdit extends Component {
         axios.get("/namespaces/rest/namespacesTree")
             .then(response => {
 
+                response.data.expanded = true;
                 const data = [response.data];
 
                 if (this.props.edit && !this.isEditGlobal()) {
@@ -55,14 +62,19 @@ export default class CreateOrEdit extends Component {
             });
     }
 
+    @withAsyncErrorHandler
+    async loadFormValues() {
+        await this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.nsId}`, data => {
+            if (data.parent) data.parent = data.parent.toString();
+        });
+    }
+
     componentDidMount() {
         const edit = this.props.edit;
 
         if (edit) {
             this.nsId = parseInt(this.props.match.params.nsId);
-            this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.nsId}`, data => {
-                if (data.parent) data.parent = data.parent.toString();
-            });
+            this.loadFormValues();
         } else {
             this.populateFormValues({
                 name: '',
@@ -138,17 +150,63 @@ export default class CreateOrEdit extends Component {
         }
     }
 
-    async deleteHandler() {
-        this.setFormStatusMessage('Deleting namespace');
-        this.setFormStatusMessage();
+    async showDeleteModal() {
+        this.setState({
+            deleteConfirmationShown: true
+        });
+    }
+
+    async hideDeleteModal() {
+        this.setState({
+            deleteConfirmationShown: false
+        });
+    }
+
+    async performDelete() {
+        await this.hideDeleteModal();
+
+        const t = this.props.t;
+
+        try {
+            this.disableForm();
+            this.setFormStatusMessage('info', t('Deleting namespace...'));
+
+            await axios.delete(`/namespaces/rest/namespaces/${this.nsId}`);
+
+            this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace deleted'));
+
+        } catch (error) {
+            if (error instanceof interoperableErrors.ChildDetectedError) {
+                this.disableForm();
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('The namespace cannot be deleted.')}</strong>{' '}
+                        {t('There has been a child namespace found. This is most likely because someone else has changed the parent of some namespace in the meantime. Refresh your page to start anew with fresh data.')}
+                    </span>
+                );
+                return;
+            }
+
+            throw error;
+        }
     }
 
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
+        const deleteConfirmationShown = this.state.deleteConfirmationShown;
 
         return (
             <div>
+                {!this.isEditGlobal() && deleteConfirmationShown &&
+                    <ModalDialog title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
+                        { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
+                        { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
+                    ]}>
+                        {t('Are you sure you want to delete namespace "{{namespace}}"?', {namespace: this.getFormValue('name')})}
+                    </ModalDialog>
+                }
+
                 <Title>{edit ? t('Edit Namespace') : t('Create Namespace')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
@@ -160,8 +218,8 @@ export default class CreateOrEdit extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <Button className="btn-danger" icon="remove" label={t('Delete Namespace')}
-                                         onClickAsync={::this.deleteHandler}/>}
+                        {!this.isEditGlobal() && !this.hasChildren && edit && <Button className="btn-danger" icon="remove" label={t('Delete Namespace')}
+                                         onClickAsync={::this.showDeleteModal}/>}
                     </ButtonRow>
                 </Form>
             </div>

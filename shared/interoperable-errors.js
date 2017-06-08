@@ -32,12 +32,20 @@ class LoopDetectedError extends InteroperableError {
     }
 }
 
+class ChildDetectedError extends InteroperableError {
+    constructor(msg, data) {
+        super('ChildDetectedError', msg, data);
+    }
+}
+
+
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
     ChangedError,
     NotFoundError,
-    LoopDetectedError
+    LoopDetectedError,
+    ChildDetectedError
 };
 
 function deserialize(errorObj) {

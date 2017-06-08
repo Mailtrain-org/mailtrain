@@ -6,7 +6,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../lib/i18n';
 
 import { Section } from '../lib/page'
-import CreateOrEdit from './CreateOrEdit'
+import CUD from './CUD'
 import List from './List'
 
 const getStructure = t => ({
@@ -22,12 +22,12 @@ const getStructure = t => ({
                     'edit' : {
                         title: t('Edit Namespace'),
                         params: [':nsId'],
-                        render: props => (<CreateOrEdit edit {...props} />)
+                        render: props => (<CUD edit {...props} />)
                     },
                     'create' : {
                         title: t('Create Namespace'),
                         link: '/namespaces/create',
-                        render: props => (<CreateOrEdit {...props} />)
+                        render: props => (<CUD {...props} />)
                     }
                 }
             }

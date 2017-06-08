@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "watch": "webpack --watch --watch-poll",
     "locales": "for moFile in ../languages/*.mo; do lng=`basename $moFile .mo`; i18next-conv -s $moFile -t locales/$lng/common.json -l $lng; done"
   },
   "repository": {
