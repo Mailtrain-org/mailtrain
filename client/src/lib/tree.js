@@ -109,9 +109,9 @@ class TreeTable extends Component {
 
                 const linksContainer = jQuery('<span class="mt-action-links"/>');
                 const links = actionLinks.map(({label, link}) => {
-                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href="#">{label}</a>);
+                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href="">{label}</a>);
                     const lnk = jQuery(lnkHtml);
-                    lnk.click(() => this.navigateTo(link(node.key)));
+                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(link(node.key)) });
                     linksContainer.append(lnk);
                 });
 

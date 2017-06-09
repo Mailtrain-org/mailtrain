@@ -21,12 +21,11 @@ const getStructure = t => ({
                 children: {
                     'edit' : {
                         title: t('Edit Namespace'),
-                        params: [':nsId'],
+                        params: [':nsId', ':action?'],
                         render: props => (<CUD edit {...props} />)
                     },
                     'create' : {
                         title: t('Create Namespace'),
-                        link: '/namespaces/create',
                         render: props => (<CUD {...props} />)
                     }
                 }

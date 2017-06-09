@@ -68,10 +68,19 @@ class Breadcrumb extends Component {
     renderElement(breadcrumbElem) {
         if (breadcrumbElem.isActive) {
             return <li key={breadcrumbElem.idx} className="active">{breadcrumbElem.title}</li>;
+
         } else if (breadcrumbElem.externalLink) {
             return <li key={breadcrumbElem.idx}><a href={breadcrumbElem.externalLink}>{breadcrumbElem.title}</a></li>;
+
         } else if (breadcrumbElem.link) {
-            return <li key={breadcrumbElem.idx}><Link to={breadcrumbElem.link}>{breadcrumbElem.title}</Link></li>;
+            let link;
+            if (typeof breadcrumbElem.link === 'function') {
+                link = breadcrumbElem.link(this.props.match);
+            } else {
+                link = breadcrumbElem.link;
+            }
+            return <li key={breadcrumbElem.idx}><Link to={link}>{breadcrumbElem.title}</Link></li>;
+
         } else {
             return <li key={breadcrumbElem.idx}>{breadcrumbElem.title}</li>;
         }
@@ -180,6 +189,10 @@ class SectionContent extends Component {
 
     navigateTo(path) {
         this.props.history.push(path);
+    }
+
+    navigateBack() {
+        this.props.history.goBack();
     }
 
     navigateToWithFlashMessage(path, severity, text) {
@@ -307,6 +320,10 @@ function withPageHelpers(target) {
 
     inst.navigateTo = function(path) {
         return this.context.sectionContent.navigateTo(path);
+    }
+
+    inst.navigateBack = function() {
+        return this.context.sectionContent.navigateBack();
     }
 
     inst.navigateToWithFlashMessage = function(path, severity, text) {

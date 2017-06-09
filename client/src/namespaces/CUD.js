@@ -17,19 +17,30 @@ export default class CUD extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {};
+
+        if (props.edit) {
+            this.state.nsId = parseInt(props.match.params.nsId);
+        }
+
         this.initFormState();
         this.hasChildren = false;
+
     }
 
     isEditGlobal() {
-        return this.nsId === 1;
+        return this.state.nsId === 1;
+    }
+
+    isDelete() {
+        return this.props.match.params.action === 'delete';
     }
 
     removeNsIdSubtree(data) {
         for (let idx = 0; idx < data.length; idx++) {
             const entry = data[idx];
 
-            if (entry.key === this.nsId) {
+            if (entry.key === this.state.nsId) {
                 if (entry.children.length > 0) {
                     this.hasChildren = true;
                 }
@@ -64,16 +75,13 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.nsId}`, data => {
+        await this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.state.nsId}`, data => {
             if (data.parent) data.parent = data.parent.toString();
         });
     }
 
     componentDidMount() {
-        const edit = this.props.edit;
-
-        if (edit) {
-            this.nsId = parseInt(this.props.match.params.nsId);
+        if (this.props.edit) {
             this.loadFormValues();
         } else {
             this.populateFormValues({
@@ -113,7 +121,7 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (edit) {
             sendMethod = FormSendMethod.PUT;
-            url = `/namespaces/rest/namespaces/${this.nsId}`
+            url = `/namespaces/rest/namespaces/${this.state.nsId}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/namespaces/rest/namespaces'
@@ -151,15 +159,11 @@ export default class CUD extends Component {
     }
 
     async showDeleteModal() {
-        this.setState({
-            deleteConfirmationShown: true
-        });
+        this.navigateTo(`/namespaces/edit/${this.state.nsId}/delete`);
     }
 
     async hideDeleteModal() {
-        this.setState({
-            deleteConfirmationShown: false
-        });
+        this.navigateTo(`/namespaces/edit/${this.state.nsId}`);
     }
 
     async performDelete() {
@@ -171,7 +175,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Deleting namespace...'));
 
-            await axios.delete(`/namespaces/rest/namespaces/${this.nsId}`);
+            await axios.delete(`/namespaces/rest/namespaces/${this.state.nsId}`);
 
             this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace deleted'));
 
@@ -194,12 +198,11 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
-        const deleteConfirmationShown = this.state.deleteConfirmationShown;
 
         return (
             <div>
                 {!this.isEditGlobal() && !this.hasChildren && edit &&
-                    <ModalDialog hidden={!deleteConfirmationShown} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
+                    <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
                         { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
                         { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
                     ]}>
