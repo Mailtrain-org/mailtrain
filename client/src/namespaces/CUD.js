@@ -163,9 +163,9 @@ export default class CUD extends Component {
     }
 
     async performDelete() {
-        await this.hideDeleteModal();
-
         const t = this.props.t;
+
+        await this.hideDeleteModal();
 
         try {
             this.disableForm();
@@ -198,8 +198,8 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {!this.isEditGlobal() && deleteConfirmationShown &&
-                    <ModalDialog title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
+                {!this.isEditGlobal() && !this.hasChildren && edit &&
+                    <ModalDialog hidden={!deleteConfirmationShown} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
                         { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
                         { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
                     ]}>

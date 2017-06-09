@@ -85,53 +85,69 @@ class ModalDialog extends Component {
         this.state = {
             buttons: this.props.buttons || [ { label: t('Close'), className: 'btn-default', onClickAsync: null } ]
         };
-
-        this.buttonClicked = null;
     }
 
     static propTypes = {
         title: PropTypes.string,
         onCloseAsync: PropTypes.func,
         onButtonClickAsync: PropTypes.func,
-        buttons: PropTypes.array
+        buttons: PropTypes.array,
+        hidden: PropTypes.bool
     }
+
+    /*
+      this.props.hidden - this is the desired state of the modal
+      this.hidden - this is the actual state of the modal - this is because there is no public API on Bootstrap modal to know whether the modal is shown or not
+     */
 
     componentDidMount() {
         const jqModal = jQuery(this.domModal);
 
         jqModal.on('shown.bs.modal', () => jqModal.focus());
-        jqModal.on('hidden.bs.modal', () => this.onHide());
-        jqModal.modal();
+        jqModal.on('hide.bs.modal', ::this.onHide);
 
+        this.hidden = this.props.hidden;
+        jqModal.modal({
+            show: !this.props.hidden
+        });
     }
 
-    close() {
-        const jqModal = jQuery(this.domModal);
-        jqModal.modal('hide');
+    componentDidUpdate() {
+        if (this.props.hidden != this.hidden) {
+            const jqModal = jQuery(this.domModal);
+            this.hidden = this.props.hidden;
+            jqModal.modal(this.props.hidden ? 'hide' : 'show');
+        }
+    }
+
+    componentWillUnmount() {
+        // We discard the modal in a hard way (without hiding it). Thus we have to take care of the backgrop too.
+        jQuery('.modal-backdrop').remove();
+    }
+
+    onHide(evt) {
+        // Hide event is emited is both when hidden through user action or through API. We have to let the API
+        // calls through, otherwise the modal would never hide. The user actions, which change the desired state,
+        // are capture, converted to onClose callback and prevented. It's up to the parent to decide whether to
+        // hide the modal or not.
+        if (!this.props.hidden) {
+            this.onClose();
+            evt.preventDefault();
+        }
     }
 
     @withAsyncErrorHandler
-    async onHide() {
-        if (this.buttonClicked === null) {
-            if (this.props.onCloseAsync) {
-                await this.props.onCloseAsync();
-            }
-        } else {
-            const idx = this.buttonClicked;
-            this.buttonClicked = null;
-
-            const buttonSpec = this.state.buttons[idx];
-            if (buttonSpec.onClickAsync) {
-                await buttonSpec.onClickAsync(idx);
-            }
-
+    async onClose() {
+        if (this.props.onCloseAsync) {
+            await this.props.onCloseAsync();
         }
     }
 
     async onButtonClick(idx) {
-        this.buttonClicked = idx;
-        const jqModal = jQuery(this.domModal);
-        jqModal.modal('hide');
+        const buttonSpec = this.state.buttons[idx];
+        if (buttonSpec.onClickAsync) {
+            await buttonSpec.onClickAsync(idx);
+        }
     }
 
     render() {
@@ -150,7 +166,7 @@ class ModalDialog extends Component {
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" className="close" aria-label={t('Close')} onClick={::this.close}><span aria-hidden="true">&times;</span></button>
+                            <button type="button" className="close" aria-label={t('Close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
                             <h4 className="modal-title">{this.props.title}</h4>
                         </div>
                         <div className="modal-body">{this.props.children}</div>
