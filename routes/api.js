@@ -125,7 +125,12 @@ router.post('/subscribe/:listId', (req, res) => {
                 }
 
                 if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
-                    confirmations.addConfirmation(list.id, 'subscribe', req.ip, subscription, (err, confirmCid) => {
+                    const data = {
+                        email: subscription.email,
+                        subscriptionData: subscription
+                    };
+
+                    confirmations.addConfirmation(list.id, 'subscribe', req.ip, data, (err, confirmCid) => {
                         if (err) {
                             log.error('API', err);
                             res.status(500);
