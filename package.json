@@ -109,6 +109,7 @@
     "redfour": "^1.0.0",
     "redis": "^2.7.1",
     "request": "^2.81.0",
+    "request-promise": "^4.2.1",
     "serve-favicon": "^2.4.2",
     "shortid": "^2.2.8",
     "slugify": "^1.1.0",
