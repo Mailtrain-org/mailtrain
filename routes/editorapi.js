@@ -1,5 +1,6 @@
 'use strict';
 
+let log = require('npmlog');
 let config = require('config');
 let express = require('express');
 let router = new express.Router();
@@ -70,19 +71,15 @@ let listImages = (dir, dirURL, callback) => {
     });
 };
 
-let getStaticImageUrl = ({
-    dynamicUrl,
-    staticDir,
-    staticDirUrl
-}, callback) => {
+const getStaticImageUrl = (dynamicUrl, staticDir, staticDirUrl, callback) => {
     mkdirp(staticDir, err => {
         if (err) {
-            return callback(dynamicUrl);
+            return callback(err);
         }
 
         fs.readdir(staticDir, (err, files) => {
             if (err) {
-                return callback(dynamicUrl);
+                return callback(err);
             }
 
             let hash = crypto.createHash('md5').update(dynamicUrl).digest('hex');
@@ -90,7 +87,7 @@ let getStaticImageUrl = ({
             let headers = {};
 
             if (match) {
-                return callback(staticDirUrl + '/' + match);
+                return callback(null, staticDirUrl + '/' + match);
             }
 
             if (dynamicUrl.includes('/editorapi/img?')) {
@@ -103,24 +100,27 @@ let getStaticImageUrl = ({
                     headers
                 })
                 .then(res => {
+                    if (res.status < 200 || res.status >= 300) {
+                        throw new Error(`Received HTTP status code ${res.status} while fetching image ${dynamicUrl}`);
+                    }
                     return res.buffer();
                 })
                 .then(buffer => {
                     let ft = fileType(buffer);
-                    if (!ft) {
-                        return callback(dynamicUrl);
-                    }
-                    if (['image/jpeg', 'image/png', 'image/gif'].includes(ft.mime)) {
+                    if (ft && ['image/jpeg', 'image/png', 'image/gif'].includes(ft.mime)) {
                         fs.writeFile(path.join(staticDir, hash + '.' + ft.ext), buffer, err => {
                             if (err) {
-                                return callback(dynamicUrl);
+                                throw err;
                             }
                             let staticUrl = staticDirUrl + '/' + hash + '.' + ft.ext;
-                            callback(staticUrl);
+                            callback(null, staticUrl);
                         });
                     } else {
-                        callback(dynamicUrl);
+                        throw new Error(`Unsupported image MIME type for ${dynamicUrl}`);
                     }
+                })
+                .catch(err => {
+                    callback(err);
                 });
         });
     });
@@ -139,6 +139,7 @@ let prepareHtml = ({
         let srcs = {};
         let re = /<img[^>]+src="([^"]+)"/g;
         let result;
+
         while ((result = re.exec(html)) !== null) {
             srcs[result[1]] = result[1];
         }
@@ -153,15 +154,26 @@ let prepareHtml = ({
             }
         };
 
+        const staticDir = path.join(__dirname, '..', 'public', editorName, 'uploads', 'static');
+        const staticDirUrl = url.resolve(serviceUrl, editorName + '/uploads/static');
+
         Object.keys(srcs).forEach(src => {
             jobs++;
             let dynamicUrl = src.replace(/&amp;/g, '&');
             dynamicUrl = /^https?:\/\/|^\/\//i.test(dynamicUrl) ? dynamicUrl : url.resolve(serviceUrl, dynamicUrl);
-            getStaticImageUrl({
-                dynamicUrl,
-                staticDir: path.join(__dirname, '..', 'public', editorName, 'uploads', 'static'),
-                staticDirUrl: url.resolve(serviceUrl, editorName + '/uploads/static'),
-            }, staticUrl => {
+
+            getStaticImageUrl(dynamicUrl, staticDir, staticDirUrl, (err, staticUrl) => {
+                if (err) {
+                    // TODO: Send a warning back to the editor. For now we just skip image resizing.
+                    log.error('editorapi', err.message || err);
+
+                    if (dynamicUrl.includes('/editorapi/img?')) {
+                        staticUrl = url.parse(dynamicUrl, true).query.src || dynamicUrl;
+                    } else {
+                        staticUrl = dynamicUrl;
+                    }
+                }
+
                 srcs[src] = staticUrl;
                 jobs--;
                 done();
@@ -329,10 +341,12 @@ router.get('/upload', passport.csrfProtection, (req, res) => {
 
             if (req.query.type === 'campaign' && Number(req.query.id) > 0) {
                 listImages(path.join(baseDir, req.query.id), baseDirUrl + '/' + req.query.id, (err, campaignImages) => {
-                    err ? res.status(500).send(err.message || err) :
-                        res.json({
-                            files: sharedImages.concat(campaignImages)
-                        });
+                    if (err) {
+                        return res.status(500).send(err.message || err);
+                    }
+                    res.json({
+                        files: sharedImages.concat(campaignImages)
+                    });
                 });
             } else {
                 res.json({
