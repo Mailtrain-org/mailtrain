@@ -121,76 +121,18 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
 
 ### Simple Install (Docker)
 ##### Requirements:
-    * Docker
-    * docker-compose
+    * [Docker](https://www.docker.com/)
+    * [Docker Compose](https://docs.docker.com/compose/)
 
-  1. Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
-  2. Run `sudo docker build -t mailtrain-node:latest .`
-  3. Copy default.toml to production.toml. Run `sudo mkdir -p /etc/mailtrain && sudo cp config/default.toml /etc/mailtrain/production.toml`
-  4. Create `/etc/docker-compose.yml`. Example (dont forget change MYSQL_ROOT_PASS and MYSQL_USER_PASSWORD to your passwords):
-  ```
-  version: '2'
-  services:
-    mailtrain-mysql:
-        image: mysql:latest
-        ports:
-          - "3306:3306"
-        container_name: "mailtrain-mysql"
-        restart: always
-        environment:
-           MYSQL_ROOT_PASSWORD: "MYSQL_ROOT_PASS"
-           MYSQL_DATABASE: "mailtrain"
-           MYSQL_USER: "mailtrain"
-           MYSQL_PASSWORD: "MYSQL_USER_PASSWORD"
-        volumes:
-           - mailtrain-mysq-data:/var/lib/mysql
-
-    mailtrain-redis:
-        image: redis:3.0
-        container_name: "mailtrain-redis"
-        volumes:
-           - mailtrain-redis-data:/data
-
-    mailtrain-node:
-      image: mailtrain-node:latest
-      container_name: "mailtrain-node"
-      links:
-        - "mailtrain-mysql:mailtrain-mysql"
-        - "mailtrain-redis:mailtrain-redis"
-      ports:
-        - "3000:3000"
-      volumes:
-        - "/etc/mailtrain/production.toml:/app/config/production.toml"
-        - "mailtrain-node-data:/app/public/grapejs/uploads"
-        - "mailtrain-node-data:/app/public/mosaico/uploads"
-  volumes:
-    mailtrain-mysq-data: {}
-    mailtrain-redis-data: {}
-    mailtrain-node-data: {}
-
-  ```
-  5. Update MySQL and Redis credintial in `/etc/mailtrain/production.toml` like this:
-  ```
-  [mysql]
-  host="mailtrain-mysql"
-  user="mailtrain"
-  password="MYSQL_USER_PASSWORD"
-  database="mailtrain"
-  port=3306
-  charset="utf8mb4"
-  timezone="UTC"
-
-  [redis]
-  enabled=true
-  host="mailtrain-redis"
-  port=6379
-  db=5
-  ```
-  6. Run docker container with command `sudo docker-compose -f /etc/docker-compose.yml up -d`
-  7. Open [http://localhost:3000/](http://localhost:3000/)
-  8. Authenticate as `admin`:`test`
-  9. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration
-  10. Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password
+  * Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
+  * **Note**: depending on how you have configured your system and Docker you may need to prepend the commands below with `sudo`.
+  * Bring up the stack with: `docker-compose up -d`, by default it will use the included `docker-compose.yml` file and override some configurations taken from the `docker-compose.override.yml` file.
+  * You might want to modify the `docker-compose.yml` or `docker-compose.override.yml` file, modify port mappings, change volume paths, etc.
+  * If you want to use only / copy the `docker-compose.yml` file (for example, if you were deploying with Rancher), you may need to first run `docker-compose build` to make sure your system has a Docker image `mailtrain:latest`.
+  * Open [http://localhost:3000/](http://localhost:3000/) (change the host name `localhost` to the name of the host where you are deploying the system).
+  * Authenticate as `admin`:`test`
+  * Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration.
+  * Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password.
 
 
 ### Manual Install (any OS that supports Node.js)
