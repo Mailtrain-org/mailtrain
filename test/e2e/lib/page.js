@@ -14,7 +14,7 @@ module.exports = (...extras) => Object.assign({
     elements: {},
 
     async getElement(key) {
-        return await driver.findElement(By.css(this.elements[key]));
+        return await driver.findElement(By.css(this.elements[key] || key));
     },
 
     async getLinkParams(key) {
@@ -38,7 +38,7 @@ module.exports = (...extras) => Object.assign({
         if (selector) {
             await driver.wait(until.elementLocated(By.css(selector)), waitTimeout);
         }
-        
+
         for (const elem of (this.elementsToWaitFor || [])) {
             const sel = this.elements[elem];
             if (!sel) {

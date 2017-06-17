@@ -3,6 +3,49 @@
 const config = require('../lib/config');
 const web = require('../lib/web');
 const mail = require('../lib/mail');
+const expect = require('chai').expect;
+
+const fieldHelpers = list => ({
+    async fillFields(subscription) {
+        if (subscription.EMAIL && this.url === `/subscription/${list.cid}`) {
+            await this.setValue('emailInput', subscription.EMAIL);
+        }
+
+        if (subscription.FIRST_NAME) {
+            await this.setValue('firstNameInput', subscription.FIRST_NAME);
+        }
+
+        if (subscription.LAST_NAME) {
+            await this.setValue('lastNameInput', subscription.LAST_NAME);
+        }
+
+        for (const field of list.customFields) {
+            if (field.key in subscription) {
+                await this.setValue(`[name="${field.column}"]`, subscription[field.key]);
+            }
+        }
+    },
+
+    async assertFields(subscription) {
+        if (subscription.EMAIL) {
+            expect(await this.getValue('emailInput')).to.equal(subscription.EMAIL);
+        }
+
+        if (subscription.FIRST_NAME) {
+            expect(await this.getValue('firstNameInput')).to.equal(subscription.FIRST_NAME);
+        }
+
+        if (subscription.LAST_NAME) {
+            expect(await this.getValue('lastNameInput')).to.equal(subscription.LAST_NAME);
+        }
+
+        for (const field of list.customFields) {
+            if (field.key in subscription) {
+                expect(await this.getValue(`[name="${field.column}"]`)).to.equal(subscription[field.key]);
+            }
+        }
+    }
+});
 
 module.exports = list => ({
 
@@ -17,7 +60,7 @@ module.exports = list => ({
             lastNameInput: '#main-form input[name="last-name"]',
             submitButton: 'a[href="#submit"]'
         }
-    }),
+    }, fieldHelpers(list)),
 
     webSubscribeNonPublic: web({
         url: `/subscription/${list.cid}`,
@@ -83,7 +126,7 @@ module.exports = list => ({
         links: {
             manageAddressLink: `/subscription/${list.cid}/manage-address/:ucid`
         }
-    }),
+    }, fieldHelpers(list)),
 
     webManageAddress: web({
         url: `/subscription/${list.cid}/manage-address/:ucid`,

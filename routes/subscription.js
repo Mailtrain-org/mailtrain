@@ -77,6 +77,7 @@ router.get('/confirm/subscribe/:cid', (req, res, next) => {
         let optInCountry = geoip.lookupCountry(confirmation.ip) || null;
 
         const meta = {
+            cid: req.params.cid,
             email: data.email,
             optInIp: confirmation.ip,
             optInCountry,
@@ -438,7 +439,7 @@ router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, r
                             log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
                             sendWebResponse();
                         } else {
-                            mailHelpers.sendConfirmSubscription(list, email, confirmCid, data, (err) => {
+                            mailHelpers.sendConfirmSubscription(list, email, confirmCid, subscriptionData, (err) => {
                                 if (err) {
                                     return req.xhr ? sendJsonError(err) : sendWebResponse(err);
                                 }
@@ -789,7 +790,7 @@ function handleUnsubscribe(list, subscription, autoUnsubscribe, campaignId, ip, 
             if (err) {
                 return next(err);
             }
-    
+
             // TODO: Shall we do anything with "found"?
 
             mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {

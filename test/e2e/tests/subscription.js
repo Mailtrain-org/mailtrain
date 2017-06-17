@@ -7,6 +7,8 @@ const { useCase, step, precondition, driver } = require('../lib/mocha-e2e');
 const shortid = require('shortid');
 const expect = require('chai').expect;
 const createPage = require('../page-objects/subscription');
+const faker = require('faker');
+const request = require('request-promise');
 
 function getPage(listConf) {
     return createPage(listConf);
@@ -14,6 +16,59 @@ function getPage(listConf) {
 
 function generateEmail() {
     return 'keep.' + shortid.generate() + '@mailtrain.org';
+}
+
+function generateCustomFieldValue(field) {
+    // https://github.com/marak/Faker.js/#api-methods
+    switch (field.type) {
+        case 'text':
+            return faker.lorem.words();
+        case 'website':
+            return faker.internet.url();
+        case 'gpg':
+            return '';
+        case 'longtext':
+            return faker.lorem.lines();
+        case 'json':
+            return `{"say":"${faker.lorem.word()}"}`;
+        case 'number':
+            return faker.random.number().toString();
+        case 'option':
+            return Math.round(Math.random());
+        case 'date-us':
+            return '10/20/2017';
+        case 'date-eur':
+            return '20/10/2017';
+        case 'birthday-us':
+            return '10/20';
+        case 'birthday-eur':
+            return '20/10';
+        default:
+            return '';
+    }
+}
+
+function generateSubscriptionData(listConf) {
+    const data = {
+        EMAIL: generateEmail(),
+        FIRST_NAME: faker.name.firstName(),
+        LAST_NAME: faker.name.lastName(),
+        TIMEZONE: 'Europe/Tallinn',
+    };
+
+    listConf.customFields.forEach(field => {
+        data[field.key] = generateCustomFieldValue(field);
+    });
+
+    return data;
+}
+
+function changeSubscriptionData(listConf, subscription) {
+    const data = generateSubscriptionData(listConf);
+    delete data.EMAIL;
+    const changedSubscription = Object.assign({}, subscription, data);
+    // TODO: Make sure values have actually changed.
+    return changedSubscription;
 }
 
 async function subscribe(listConf, subscription) {
@@ -24,16 +79,7 @@ async function subscribe(listConf, subscription) {
     });
 
     await step('User submits a valid email and other subscription info.', async () => {
-        await page.webSubscribe.setValue('emailInput', subscription.email);
-
-        if (subscription.firstName) {
-            await page.webSubscribe.setValue('firstNameInput', subscription.firstName);
-        }
-
-        if (subscription.lastName) {
-            await page.webSubscribe.setValue('lastNameInput', subscription.lastName);
-        }
-
+        await page.webSubscribe.fillFields(subscription);
         await page.webSubscribe.submit();
     });
 
@@ -42,7 +88,7 @@ async function subscribe(listConf, subscription) {
     });
 
     await step('System sends an email with a link to confirm the subscription.', async () => {
-        await page.mailConfirmSubscription.fetchMail(subscription.email);
+        await page.mailConfirmSubscription.fetchMail(subscription.EMAIL);
     });
 
     await step('User clicks confirm subscription in the email', async () => {
@@ -54,7 +100,7 @@ async function subscribe(listConf, subscription) {
     });
 
     await step('System sends an email with subscription confirmation.', async () => {
-        await page.mailSubscriptionConfirmed.fetchMail(subscription.email);
+        await page.mailSubscriptionConfirmed.fetchMail(subscription.EMAIL);
         subscription.unsubscribeLink = await page.mailSubscriptionConfirmed.getHref('unsubscribeLink');
         subscription.manageLink = await page.mailSubscriptionConfirmed.getHref('manageLink');
 
@@ -79,7 +125,7 @@ suite('Subscription use-cases', () => {
 
     useCase('Subscription to a public list (main scenario)', async () => {
         await subscribe(config.lists.l1, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
     });
 
@@ -105,7 +151,7 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l1);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
 
         await step('User navigates to list subscribe page', async () => {
@@ -113,7 +159,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('User submits the email which has been already registered.', async () => {
-            await page.webSubscribe.setValue('emailInput', subscription.email);
+            await page.webSubscribe.setValue('emailInput', subscription.EMAIL);
             await page.webSubscribe.submit();
         });
 
@@ -122,7 +168,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email informing that the address has been already registered.', async () => {
-            await page.mailAlreadySubscribed.fetchMail(subscription.email);
+            await page.mailAlreadySubscribed.fetchMail(subscription.EMAIL);
         });
 
     });
@@ -138,11 +184,7 @@ suite('Subscription use-cases', () => {
     useCase('Change profile info', async () => {
         const page = getPage(config.lists.l1);
 
-        const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail(),
-            firstName: 'John',
-            lastName: 'Doe'
-        });
+        let subscription = await subscriptionExistsPrecondition(config.lists.l1, generateSubscriptionData(config.lists.l1));
 
         await step('User clicks the manage subscription button.', async () => {
             await page.mailSubscriptionConfirmed.click('manageLink');
@@ -150,16 +192,12 @@ suite('Subscription use-cases', () => {
 
         await step('Systems shows a form to change subscription details. The form contains data entered during subscription.', async () => {
             await page.webManage.waitUntilVisibleAfterRefresh();
-            expect(await page.webManage.getValue('emailInput')).to.equal(subscription.email);
-            expect(await page.webManage.getValue('firstNameInput')).to.equal(subscription.firstName);
-            expect(await page.webManage.getValue('lastNameInput')).to.equal(subscription.lastName);
+            await page.webManage.assertFields(subscription);
         });
 
-        await step('User enters another name and submits the form.', async () => {
-            subscription.firstName = 'Adam';
-            subscription.lastName = 'B';
-            await page.webManage.setValue('firstNameInput', subscription.firstName);
-            await page.webManage.setValue('lastNameInput', subscription.lastName);
+        await step('User enters other values and submits the form.', async () => {
+            subscription = changeSubscriptionData(config.lists.l1, subscription);
+            await page.webManage.fillFields(subscription);
             await page.webManage.submit();
         });
 
@@ -168,14 +206,11 @@ suite('Subscription use-cases', () => {
         });
 
         await step('User navigates to manage subscription again.', async () => {
-            // await page.webManage.navigate(subscription.manageLink);
             await page.webManage.navigate({ ucid: subscription.ucid });
         });
 
         await step('Systems shows a form with the changes made previously.', async () => {
-            expect(await page.webManage.getValue('emailInput')).to.equal(subscription.email);
-            expect(await page.webManage.getValue('firstNameInput')).to.equal(subscription.firstName);
-            expect(await page.webManage.getValue('lastNameInput')).to.equal(subscription.lastName);
+            await page.webManage.assertFields(subscription);
         });
     });
 
@@ -183,9 +218,9 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l1);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail(),
-            firstName: 'John',
-            lastName: 'Doe'
+            EMAIL: generateEmail(),
+            FIRST_NAME: 'John',
+            LAST_NAME: 'Doe'
         });
 
         await step('User clicks the manage subscription button.', async () => {
@@ -194,9 +229,7 @@ suite('Subscription use-cases', () => {
 
         await step('Systems shows a form to change subscription details. The form contains data entered during subscription.', async () => {
             await page.webManage.waitUntilVisibleAfterRefresh();
-            expect(await page.webManage.getValue('emailInput')).to.equal(subscription.email);
-            expect(await page.webManage.getValue('firstNameInput')).to.equal(subscription.firstName);
-            expect(await page.webManage.getValue('lastNameInput')).to.equal(subscription.lastName);
+            await page.webManage.fillFields(subscription);
         });
 
         await step('User clicks the change address button.', async () => {
@@ -208,8 +241,8 @@ suite('Subscription use-cases', () => {
         });
 
         await step('User fills in a new email address and submits the form.', async () => {
-            subscription.email = generateEmail();
-            await page.webManageAddress.setValue('emailNewInput', subscription.email);
+            subscription.EMAIL = generateEmail();
+            await page.webManageAddress.setValue('emailNewInput', subscription.EMAIL);
             await page.webManageAddress.submit();
         });
 
@@ -220,7 +253,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email with a link to confirm the address change.', async () => {
-            await page.mailConfirmAddressChange.fetchMail(subscription.email);
+            await page.mailConfirmAddressChange.fetchMail(subscription.EMAIL);
         });
 
         await step('User clicks confirm subscription in the email', async () => {
@@ -231,11 +264,11 @@ suite('Subscription use-cases', () => {
             await page.webManage.waitUntilVisibleAfterRefresh();
             await page.webManage.waitForFlash();
             expect(await page.webManage.getFlash()).to.contain('Email address changed');
-            expect(await page.webManage.getValue('emailInput')).to.equal(subscription.email);
+            expect(await page.webManage.getValue('emailInput')).to.equal(subscription.EMAIL);
         });
 
         await step('System sends an email with subscription confirmation.', async () => {
-            await page.mailSubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailSubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
     });
 
@@ -243,7 +276,7 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l1);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -255,7 +288,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email that confirms unsubscription.', async () => {
-            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
     });
 
@@ -263,7 +296,7 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l2);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l2, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -283,7 +316,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email that confirms unsubscription.', async () => {
-            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
     });
 
@@ -291,7 +324,7 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l3);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l3, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -303,7 +336,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email with a link to confirm unsubscription.', async () => {
-            await page.mailConfirmUnsubscription.fetchMail(subscription.email);
+            await page.mailConfirmUnsubscription.fetchMail(subscription.EMAIL);
         });
 
         await step('User clicks the confirm unsubscribe button in the email.', async () => {
@@ -315,7 +348,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email that confirms unsubscription.', async () => {
-            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
     });
 
@@ -323,7 +356,7 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l4);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l4, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -343,7 +376,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email with a link to confirm unsubscription.', async () => {
-            await page.mailConfirmUnsubscription.fetchMail(subscription.email);
+            await page.mailConfirmUnsubscription.fetchMail(subscription.EMAIL);
         });
 
         await step('User clicks the confirm unsubscribe button in the email.', async () => {
@@ -355,7 +388,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email that confirms unsubscription.', async () => {
-            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
     });
 
@@ -363,7 +396,7 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l5);
 
         await subscriptionExistsPrecondition(config.lists.l5, {
-            email: generateEmail()
+            EMAIL: generateEmail()
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -379,9 +412,9 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l1);
 
         const subscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail(),
-            firstName: 'John',
-            lastName: 'Doe'
+            EMAIL: generateEmail(),
+            FIRST_NAME: 'John',
+            LAST_NAME: 'Doe'
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -393,7 +426,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email that confirms unsubscription.', async () => {
-            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailUnsubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
 
         await step('User clicks the resubscribe button.', async () => {
@@ -402,9 +435,9 @@ suite('Subscription use-cases', () => {
 
         await step('Systems shows the subscription form. The form contains data entered during initial subscription.', async () => {
             await page.webSubscribe.waitUntilVisibleAfterRefresh();
-            expect(await page.webSubscribe.getValue('emailInput')).to.equal(subscription.email);
-            expect(await page.webSubscribe.getValue('firstNameInput')).to.equal(subscription.firstName);
-            expect(await page.webSubscribe.getValue('lastNameInput')).to.equal(subscription.lastName);
+            expect(await page.webSubscribe.getValue('emailInput')).to.equal(subscription.EMAIL);
+            expect(await page.webSubscribe.getValue('firstNameInput')).to.equal(subscription.FIRST_NAME);
+            expect(await page.webSubscribe.getValue('lastNameInput')).to.equal(subscription.LAST_NAME);
         });
 
         await step('User submits the subscription form.', async () => {
@@ -416,7 +449,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email with a link to confirm the subscription.', async () => {
-            await page.mailConfirmSubscription.fetchMail(subscription.email);
+            await page.mailConfirmSubscription.fetchMail(subscription.EMAIL);
         });
 
         await step('User clicks confirm subscription in the email', async () => {
@@ -428,7 +461,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email with subscription confirmation. The manage and unsubscribe links are identical with the initial subscription.', async () => {
-            await page.mailSubscriptionConfirmed.fetchMail(subscription.email);
+            await page.mailSubscriptionConfirmed.fetchMail(subscription.EMAIL);
             const unsubscribeLink = await page.mailSubscriptionConfirmed.getHref('unsubscribeLink');
             const manageLink = await page.mailSubscriptionConfirmed.getHref('manageLink');
             expect(subscription.unsubscribeLink).to.equal(unsubscribeLink);
@@ -440,9 +473,9 @@ suite('Subscription use-cases', () => {
         const page = getPage(config.lists.l1);
 
         const oldSubscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail(),
-            firstName: 'old first name',
-            lastName: 'old last name'
+            EMAIL: generateEmail(),
+            FIRST_NAME: 'old first name',
+            LAST_NAME: 'old last name'
         });
 
         await step('User clicks the unsubscribe button.', async () => {
@@ -454,12 +487,12 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email that confirms unsubscription.', async () => {
-            await page.mailUnsubscriptionConfirmed.fetchMail(oldSubscription.email);
+            await page.mailUnsubscriptionConfirmed.fetchMail(oldSubscription.EMAIL);
         });
 
         const newSubscription = await subscriptionExistsPrecondition(config.lists.l1, {
-            email: generateEmail(),
-            firstName: 'new first name'
+            EMAIL: generateEmail(),
+            FIRST_NAME: 'new first name'
         });
 
         await step('User clicks the manage subscription button.', async () => {
@@ -467,6 +500,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('User clicks the change address button.', async () => {
+            await page.webManage.waitUntilVisibleAfterRefresh();
             await page.webManage.click('manageAddressLink');
         });
 
@@ -475,7 +509,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('User fills in the email address of the original subscription and submits the form.', async () => {
-            await page.webManageAddress.setValue('emailNewInput', oldSubscription.email);
+            await page.webManageAddress.setValue('emailNewInput', oldSubscription.EMAIL);
             await page.webManageAddress.submit();
         });
 
@@ -486,7 +520,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System sends an email with a link to confirm the address change.', async () => {
-            await page.mailConfirmAddressChange.fetchMail(oldSubscription.email);
+            await page.mailConfirmAddressChange.fetchMail(oldSubscription.EMAIL);
         });
 
         await step('User clicks confirm subscription in the email', async () => {
@@ -497,13 +531,117 @@ suite('Subscription use-cases', () => {
             await page.webManage.waitUntilVisibleAfterRefresh();
             await page.webManage.waitForFlash();
             expect(await page.webManage.getFlash()).to.contain('Email address changed');
-            expect(await page.webManage.getValue('emailInput')).to.equal(oldSubscription.email);
-            expect(await page.webManage.getValue('firstNameInput')).to.equal(newSubscription.firstName);
+            expect(await page.webManage.getValue('emailInput')).to.equal(oldSubscription.EMAIL);
+            expect(await page.webManage.getValue('firstNameInput')).to.equal(newSubscription.FIRST_NAME);
             expect(await page.webManage.getValue('lastNameInput')).to.equal('');
         });
 
         await step('System sends an email with subscription confirmation.', async () => {
-            await page.mailSubscriptionConfirmed.fetchMail(oldSubscription.email);
+            await page.mailSubscriptionConfirmed.fetchMail(oldSubscription.EMAIL);
+        });
+    });
+
+});
+
+
+async function apiSubscribe(listConf, subscription) {
+    await step('Add subscription via API call.', async () => {
+        const response = await request({
+            uri: `${config.baseUrl}/api/subscribe/${listConf.cid}?access_token=${config.users.admin.accessToken}`,
+            method: 'POST',
+            json: subscription
+        });
+        expect(response.error).to.be.a('undefined');
+        expect(response.data.id).to.be.a('string');
+        subscription.ucid = response.data.id;
+    });
+    return subscription;
+}
+
+suite('API Subscription use-cases', () => {
+
+    useCase('Subscription to list #1, without confirmation.', async () => {
+        const page = getPage(config.lists.l1);
+        const subscription = await apiSubscribe(config.lists.l1, generateSubscriptionData(config.lists.l1));
+
+        await step('User navigates to manage subscription.', async () => {
+            await page.webManage.navigate({ ucid: subscription.ucid });
+        });
+
+        await step('Systems shows a form containing the data submitted with the API call.', async () => {
+            await page.webManage.assertFields(subscription);
+        });
+    });
+
+    useCase('Subscription to list #1, with confirmation.', async () => {
+        const page = getPage(config.lists.l1);
+
+        const subscription = await apiSubscribe(config.lists.l1, Object.assign(generateSubscriptionData(config.lists.l1), {
+            REQUIRE_CONFIRMATION: 'yes'
+        }));
+
+        await step('System sends an email with a link to confirm the subscription.', async () => {
+            await page.mailConfirmSubscription.fetchMail(subscription.EMAIL);
+        });
+
+        await step('User clicks confirm subscription in the email', async () => {
+            await page.mailConfirmSubscription.click('confirmLink');
+        });
+
+        await step('System shows a notice that subscription has been confirmed.', async () => {
+            await page.webSubscribedNotice.waitUntilVisibleAfterRefresh();
+        });
+
+        await step('System sends an email with subscription confirmation.', async () => {
+            await page.mailSubscriptionConfirmed.fetchMail(subscription.EMAIL);
+        });
+
+        await step('User navigates to manage subscription.', async () => {
+            await page.webManage.navigate({ ucid: subscription.ucid });
+        });
+
+        await step('Systems shows a form containing the data submitted with the API call.', async () => {
+            await page.webManage.assertFields(subscription);
+        });
+    });
+
+    useCase('Change profile info', async () => {
+        const page = getPage(config.lists.l1);
+
+        const initialSubscription = await apiSubscribe(config.lists.l1, generateSubscriptionData(config.lists.l1));
+
+        const update = changeSubscriptionData(config.lists.l1, initialSubscription);
+        delete update.FIRST_NAME;
+
+        const changedSubscription = await apiSubscribe(config.lists.l1, update);
+        changedSubscription.FIRST_NAME = initialSubscription.FIRST_NAME;
+
+        expect(changedSubscription.ucid).to.equal(initialSubscription.ucid);
+
+        await step('User navigates to manage subscription.', async () => {
+            await page.webManage.navigate({ ucid: changedSubscription.ucid });
+        });
+
+        await step('Systems shows a form containing the updated subscription data.', async () => {
+            await page.webManage.assertFields(changedSubscription);
+        });
+    });
+
+    useCase('Unsubscribe', async () => {
+        const subscription = await apiSubscribe(config.lists.l1, generateSubscriptionData(config.lists.l1));
+
+        await step('Unsubsribe via API call.', async () => {
+            const response = await request({
+                uri: `${config.baseUrl}/api/unsubscribe/${config.lists.l1.cid}?access_token=${config.users.admin.accessToken}`,
+                method: 'POST',
+                json: {
+                    EMAIL: subscription.EMAIL
+                }
+            });
+
+            expect(response.error).to.be.a('undefined');
+            expect(response.data.id).to.be.a('number'); // FIXME Shouldn't data.id be the cid instead of the DB id?
+            expect(response.data.unsubscribed).to.equal(true);
         });
     });
 
