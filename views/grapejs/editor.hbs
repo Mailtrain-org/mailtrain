@@ -129,6 +129,7 @@
 <script>
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } });
 
+    var serviceUrl = '{{{serviceUrl}}}';
     var resource = {{{stringifiedResource}}};
 
     var config = (function(mode) {
@@ -155,7 +156,6 @@
 
             // convert relative to absolute urls
             ['mj-wrapper', 'mj-section', 'mj-navbar', 'mj-hero', 'mj-image'].forEach(function(tagName) {
-                var serviceUrl = window.location.protocol + '//' + window.location.host + '/';
                 var elements = doc.getElementsByTagName(tagName);
 
                 for (var i = 0; i < elements.length; i++) {
@@ -246,6 +246,14 @@
         document.body.appendChild(frame);
         var frameDoc = frame.contentDocument || frame.contentWindow.document;
 
+        var isLocalImage = function(src) {
+            var a1 = document.createElement('a');
+            var a2 = document.createElement('a');
+            a1.href = serviceUrl;
+            a2.href = src;
+            return a1.host === a2.host;
+        };
+
         frame.onload = function() {
             var imgs = frameDoc.querySelectorAll('img');
 
@@ -253,7 +261,9 @@
                 var img = imgs[i];
                 var m = img.src.match(/\/editorapi\/img\?src=([^&]*)/);
                 var encodedSrc = m && m[1] || encodeURIComponent(img.src);
-                img.src = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + img.clientWidth + '%2C' + img.clientHeight;
+                if (isLocalImage(decodeURIComponent(encodedSrc))) {
+                    img.src = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + img.clientWidth + '%2C' + img.clientHeight;
+                }
             }
 
             html = '<!doctype html>' + frameDoc.documentElement.outerHTML;

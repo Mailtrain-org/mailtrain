@@ -69,7 +69,6 @@
     "express-session": "^1.15.2",
     "faker": "^4.1.0",
     "feedparser": "^2.1.0",
-    "file-type": "^5.2.0",
     "fs-extra": "^3.0.1",
     "geoip-ultralight": "^0.1.5",
     "gettext-parser": "^1.2.2",

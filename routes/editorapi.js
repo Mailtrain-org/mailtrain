@@ -1,38 +1,34 @@
 'use strict';
 
-let log = require('npmlog');
-let config = require('config');
-let express = require('express');
-let router = new express.Router();
-let passport = require('../lib/passport');
-let os = require('os');
-let fs = require('fs');
-let path = require('path');
-let mkdirp = require('mkdirp');
-let cache = require('memory-cache');
-let crypto = require('crypto');
-let fetch = require('node-fetch');
-let events = require('events');
-let httpMocks = require('node-mocks-http');
-let multiparty = require('multiparty');
-let fileType = require('file-type');
-let escapeStringRegexp = require('escape-string-regexp');
-let jqueryFileUpload = require('jquery-file-upload-middleware');
-let gm = require('gm').subClass({
+const log = require('npmlog');
+const config = require('config');
+const express = require('express');
+const router = new express.Router();
+const passport = require('../lib/passport');
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+const crypto = require('crypto');
+const events = require('events');
+const httpMocks = require('node-mocks-http');
+const multiparty = require('multiparty');
+const escapeStringRegexp = require('escape-string-regexp');
+const jqueryFileUpload = require('jquery-file-upload-middleware');
+const gm = require('gm').subClass({
     imageMagick: true
 });
-let url = require('url');
-let htmlToText = require('html-to-text');
-let premailerApi = require('premailer-api');
-let editorHelpers = require('../lib/editor-helpers');
-let _ = require('../lib/translate')._;
-let mailer = require('../lib/mailer');
-let settings = require('../lib/models/settings');
-let templates = require('../lib/models/templates');
-let campaigns = require('../lib/models/campaigns');
+const url = require('url');
+const htmlToText = require('html-to-text');
+const premailerApi = require('premailer-api');
+const _ = require('../lib/translate')._;
+const mailer = require('../lib/mailer');
+const settings = require('../lib/models/settings');
+const templates = require('../lib/models/templates');
+const campaigns = require('../lib/models/campaigns');
 
 router.all('/*', (req, res, next) => {
-    if (!req.user && !cache.get(req.get('If-Match'))) {
+    if (!req.user) {
         return res.status(403).send(_('Need to be logged in to access restricted content'));
     }
     if (req.originalUrl.startsWith('/editorapi/img?')) {
@@ -48,30 +44,150 @@ jqueryFileUpload.on('begin', fileInfo => {
     fileInfo.name = fileInfo.name
         .toLowerCase()
         .replace(/ /g, '-')
-        .replace(/[^a-z0-9+-\.]+/g, '');
+        .replace(/[^a-z0-9+-.]+/g, '');
 });
 
-let listImages = (dir, dirURL, callback) => {
+const listImages = (dir, dirURL, callback) => {
     fs.readdir(dir, (err, files = []) => {
         if (err && err.code !== 'ENOENT') {
             return callback(err.message || err);
         }
         files = files.filter(name => /\.(jpe?g|png|gif)$/i.test(name));
-        files = files.map(name => {
-            return {
-                // mosaico
-                name,
-                url: dirURL + '/' + name,
-                thumbnailUrl: dirURL + '/thumbnail/' + name,
-                // grapejs
-                src: dirURL + '/' + name,
-            };
-        });
+        files = files.map(name => ({
+            // mosaico
+            name,
+            url: dirURL + '/' + name,
+            thumbnailUrl: dirURL + '/thumbnail/' + name,
+            // grapejs
+            src: dirURL + '/' + name
+        }));
         callback(null, files);
     });
 };
 
+const placeholderImage = (width, height, callback) => {
+    const magick = gm(width, height, '#707070');
+    const size = 40;
+    let x = 0;
+    let y = 0;
+
+    // stripes
+    while (y < height) {
+        magick
+            .fill('#808080')
+            .drawPolygon([x, y], [x + size, y], [x + size * 2, y + size], [x + size * 2, y + size * 2])
+            .drawPolygon([x, y + size], [x + size, y + size * 2], [x, y + size * 2]);
+        x = x + size * 2;
+        if (x > width) {
+            x = 0;
+            y = y + size * 2;
+        }
+    }
+
+    // text
+    magick
+        .fill('#B0B0B0')
+        .fontSize(20)
+        .drawText(0, 0, width + ' x ' + height, 'center');
+
+    magick.stream('png', (err, stream) => {
+        if (err) {
+            return callback(err);
+        }
+
+        const image = {
+            format: 'PNG',
+            stream
+        };
+
+        callback(null, image);
+    });
+};
+
+const resizedImage = (src, method, width, height, callback) => {
+    const pathname = path.join('/', url.parse(src).pathname);
+    const filePath = path.join(__dirname, '..', 'public', pathname);
+    const magick = gm(filePath);
+
+    magick.format((err, format) => {
+        if (err) {
+            return callback(err);
+        }
+
+        const streamHandler = (err, stream) => {
+            if (err) {
+                return callback(err);
+            }
+
+            const image = {
+                format,
+                stream
+            };
+
+            callback(null, image);
+        };
+
+        switch (method) {
+            case 'resize':
+                return magick
+                    .autoOrient()
+                    .resize(width, height)
+                    .stream(streamHandler);
+
+            case 'cover':
+                return magick
+                    .autoOrient()
+                    .resize(width, height + '^')
+                    .gravity('Center')
+                    .extent(width, height + '>')
+                    .stream(streamHandler);
+
+            default:
+                return callback(new Error(_('Method not supported')));
+        }
+    });
+};
+
+const getProcessedImage = (dynamicUrl, callback) => {
+    if (!dynamicUrl.includes('/editorapi/img?')) {
+        return callback(new Error('Invalid dynamicUrl'));
+    }
+
+    const {
+        src,
+        method,
+        params = '600,null'
+    } = url.parse(dynamicUrl, true).query;
+
+    let width = params.split(',')[0];
+    let height = params.split(',')[1];
+
+    const sanitizeSize = (val, min, max, defaultVal, allowNull) => {
+        if (val === 'null' && allowNull) {
+            return null;
+        }
+        val = Number(val) || defaultVal;
+        val = Math.max(min, val);
+        val = Math.min(max, val);
+        return val;
+    };
+
+    if (method === 'placeholder') {
+        width = sanitizeSize(width, 1, 2048, 600, false);
+        height = sanitizeSize(height, 1, 2048, 300, false);
+        placeholderImage(width, height, callback);
+    } else {
+        width = sanitizeSize(width, 1, 2048, 600, false);
+        height = sanitizeSize(height, 1, 2048, 300, true);
+        resizedImage(src, method, width, height, callback);
+    }
+};
+
 const getStaticImageUrl = (dynamicUrl, staticDir, staticDirUrl, callback) => {
+    if (!dynamicUrl.includes('/editorapi/img?')) {
+        return callback(null, dynamicUrl);
+    }
+
     mkdirp(staticDir, err => {
         if (err) {
             return callback(err);
@@ -82,242 +198,126 @@ const getStaticImageUrl = (dynamicUrl, staticDir, staticDirUrl, callback) => {
                 return callback(err);
             }
 
-            let hash = crypto.createHash('md5').update(dynamicUrl).digest('hex');
-            let match = files.find(el => el.startsWith(hash));
-            let headers = {};
+            const hash = crypto.createHash('md5').update(dynamicUrl).digest('hex');
+            const match = files.find(el => el.startsWith(hash));
 
             if (match) {
                 return callback(null, staticDirUrl + '/' + match);
             }
 
-            if (dynamicUrl.includes('/editorapi/img?')) {
-                let token = crypto.randomBytes(16).toString('hex');
-                cache.put(token, true, 1000);
-                headers['If-Match'] = token;
-            }
+            getProcessedImage(dynamicUrl, (err, image) => {
+                if (err) {
+                    return callback(err);
+                }
 
-            fetch(dynamicUrl, {
-                    headers
-                })
-                .then(res => {
-                    if (res.status < 200 || res.status >= 300) {
-                        throw new Error(`Received HTTP status code ${res.status} while fetching image ${dynamicUrl}`);
-                    }
-                    return res.buffer();
-                })
-                .then(buffer => {
-                    let ft = fileType(buffer);
-                    if (ft && ['image/jpeg', 'image/png', 'image/gif'].includes(ft.mime)) {
-                        fs.writeFile(path.join(staticDir, hash + '.' + ft.ext), buffer, err => {
-                            if (err) {
-                                throw err;
-                            }
-                            let staticUrl = staticDirUrl + '/' + hash + '.' + ft.ext;
-                            callback(null, staticUrl);
-                        });
-                    } else {
-                        throw new Error(`Unsupported image MIME type for ${dynamicUrl}`);
-                    }
-                })
-                .catch(err => {
-                    callback(err);
-                });
+                const fileName = hash + '.' + image.format.toLowerCase();
+                const filePath = path.join(staticDir, fileName);
+                const fileUrl = staticDirUrl + '/' + fileName;
+
+                const writeStream = fs.createWriteStream(filePath);
+                writeStream.on('error', err => callback(err));
+                writeStream.on('finish', () => callback(null, fileUrl));
+                image.stream.pipe(writeStream);
+            });
         });
     });
 };
 
-let prepareHtml = ({
-    editorName,
-    html
-}, callback) => {
+const prepareHtml = (html, editorName, callback) => {
     settings.get('serviceUrl', (err, serviceUrl) => {
         if (err) {
             return callback(err.message || err);
         }
 
+        const srcs = new Map();
+        const re = /<img[^>]+src="([^"]*\/editorapi\/img\?[^"]+)"/ig;
         let jobs = 0;
-        let srcs = {};
-        let re = /<img[^>]+src="([^"]+)"/g;
         let result;
 
         while ((result = re.exec(html)) !== null) {
-            srcs[result[1]] = result[1];
+            srcs.set(result[1], result[1]);
         }
 
-        let done = () => {
+        const done = () => {
             if (jobs === 0) {
-                Object.keys(srcs).forEach(src => {
-                    // console.log(`replace dynamic - ${src} - with static - ${srcs[src]}`);
-                    html = html.replace(new RegExp(escapeStringRegexp(src), 'g'), srcs[src]);
-                });
-                callback(null, html);
+                for (const [key, value] of srcs) {
+                    // console.log(`replace dynamicUrl: ${key} - with staticUrl: ${value}`);
+                    html = html.replace(new RegExp(escapeStringRegexp(key), 'g'), value);
+                }
+                return callback(null, html);
             }
         };
 
         const staticDir = path.join(__dirname, '..', 'public', editorName, 'uploads', 'static');
         const staticDirUrl = url.resolve(serviceUrl, editorName + '/uploads/static');
 
-        Object.keys(srcs).forEach(src => {
+        for (const key of srcs.keys()) {
             jobs++;
-            let dynamicUrl = src.replace(/&amp;/g, '&');
-            dynamicUrl = /^https?:\/\/|^\/\//i.test(dynamicUrl) ? dynamicUrl : url.resolve(serviceUrl, dynamicUrl);
+            const dynamicUrl = key.replace(/&amp;/g, '&');
 
             getStaticImageUrl(dynamicUrl, staticDir, staticDirUrl, (err, staticUrl) => {
                 if (err) {
                     // TODO: Send a warning back to the editor. For now we just skip image resizing.
-                    log.error('editorapi', err.message || err);
+                    log.error('editorapi', err);
 
                     if (dynamicUrl.includes('/editorapi/img?')) {
-                        staticUrl = url.parse(dynamicUrl, true).query.src || dynamicUrl;
+                        staticUrl = url.parse(dynamicUrl, true).query.src || dynamicUrl;
                     } else {
                         staticUrl = dynamicUrl;
                     }
+
+                    if (!/^https?:\/\/|^\/\//i.test(staticUrl)) {
+                        staticUrl = url.resolve(serviceUrl, staticUrl);
+                    }
                 }
 
-                srcs[src] = staticUrl;
+                srcs.set(key, staticUrl);
                 jobs--;
                 done();
             });
-        });
+        }
 
         done();
     });
 };
 
-let placeholderImage = (req, res, {
-    width,
-    height
-}) => {
-    let magick = gm(width, height, '#707070');
-    let x = 0;
-    let y = 0;
-    let size = 40;
-    // stripes
-    while (y < height) {
-        magick = magick
-            .fill('#808080')
-            .drawPolygon([x, y], [x + size, y], [x + size * 2, y + size], [x + size * 2, y + size * 2])
-            .drawPolygon([x, y + size], [x + size, y + size * 2], [x, y + size * 2]);
-        x = x + size * 2;
-        if (x > width) {
-            x = 0;
-            y = y + size * 2;
-        }
-    }
-    // text
-    magick = magick
-        .fill('#B0B0B0')
-        .fontSize(20)
-        .drawText(0, 0, width + ' x ' + height, 'center');
-
-    res.set('Content-Type', 'image/png');
-    magick.stream('png').pipe(res);
-};
-
-let resizedImage = (req, res, {
-    src,
-    method,
-    width,
-    height
-}) => {
-    let magick = gm(src);
-    magick.format((err, format) => {
-        if (err) {
-            return res.status(500).send(err.message || err);
-        }
-
-        switch (method) {
-            case 'resize':
-                res.set('Content-Type', 'image/' + format.toLowerCase());
-                magick.autoOrient()
-                    .resize(width, height)
-                    .stream()
-                    .pipe(res);
-                return;
-
-            case 'cover':
-                res.set('Content-Type', 'image/' + format.toLowerCase());
-                magick.autoOrient()
-                    .resize(width, height + '^')
-                    .gravity('Center')
-                    .extent(width, height + '>')
-                    .stream()
-                    .pipe(res);
-                return;
-
-            default:
-                res.status(501).send(_('Method not supported'));
-        }
-    });
-};
-
+// URL structure defined by Mosaico
 // /editorapi/img?src=" + encodeURIComponent(src) + "&method=" + encodeURIComponent(method) + "&params=" + encodeURIComponent(width + "," + height);
-router.get('/img', passport.csrfProtection, (req, res) => {
-    settings.get('serviceUrl', (err, serviceUrl) => {
+router.get('/img', (req, res) => {
+    getProcessedImage(req.originalUrl, (err, image) => {
         if (err) {
-            return res.status(500).send(err.message || err);
+            res.status(err.status || 500);
+            res.send(err.message || err);
+            return;
         }
 
-        let {
-            src,
-            method,
-            params = '600,null'
-        } = req.query;
-        let width = params.split(',')[0];
-        let height = params.split(',')[1];
-        width = (width === 'null') ? null : Number(width);
-        height = (height === 'null') ? null : Number(height);
-
-        switch (method) {
-            case 'placeholder':
-                return placeholderImage(req, res, {
-                    width,
-                    height
-                });
-            case 'resize':
-            case 'cover':
-                src = /^https?:\/\/|^\/\//i.test(src) ? src : url.resolve(serviceUrl, src);
-                return resizedImage(req, res, {
-                    src,
-                    method,
-                    width,
-                    height
-                });
-            default:
-                return res.status(501).send(_('Method not supported'));
-        }
+        res.set('Content-Type', 'image/' + image.format.toLowerCase());
+        image.stream.pipe(res);
     });
 });
 
 router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) => {
-    prepareHtml({
-        editorName: req.query.editor,
-        html: req.body.html
-    }, (err, html) => {
+    const sendResponse = err => {
         if (err) {
             return res.status(500).send(err.message || err);
+        }
+        res.send('ok');
+    };
+
+    prepareHtml(req.body.html, req.query.editor, (err, html) => {
+        if (err) {
+            return sendResponse(err);
         }
 
         req.body.html = html;
 
-        if (req.query.type === 'template') {
-            templates.update(req.body.id, req.body, (err, updated) => {
-                if (err) {
-                    return res.status(500).send(err.message || err);
-                }
-                res.send('ok');
-            });
-
-        } else if (req.query.type === 'campaign') {
-            campaigns.update(req.body.id, req.body, (err, updated) => {
-                if (err) {
-                    return res.status(500).send(err.message || err);
-                }
-                res.send('ok');
-            });
-
-        } else {
-            res.status(500).send(_('Invalid resource type'));
+        switch (req.query.type) {
+            case 'template':
+                return templates.update(req.body.id, req.body, sendResponse);
+            case 'campaign':
+                return campaigns.update(req.body.id, req.body, sendResponse);
+            default:
+                return sendResponse(new Error(_('Invalid resource type')));
         }
     });
 });
@@ -331,8 +331,8 @@ router.get('/upload', passport.csrfProtection, (req, res) => {
             return res.status(500).send(err.message || err);
         }
 
-        let baseDir = path.join(__dirname, '..', 'public', req.query.editor, 'uploads');
-        let baseDirUrl = serviceUrl + req.query.editor + '/uploads';
+        const baseDir = path.join(__dirname, '..', 'public', req.query.editor, 'uploads');
+        const baseDirUrl = serviceUrl + req.query.editor + '/uploads';
 
         listImages(path.join(baseDir, '0'), baseDirUrl + '/0', (err, sharedImages) => {
             if (err) {
@@ -358,55 +358,78 @@ router.get('/upload', passport.csrfProtection, (req, res) => {
 });
 
 router.post('/upload', passport.csrfProtection, (req, res) => {
-    let dirName = req.query.type === 'template' ? '0' :
-        req.query.type === 'campaign' && Number(req.query.id) > 0 ? req.query.id :
-        null;
-
-    if (dirName === null) {
-        return res.status(500).send(_('Invalid resource type or ID'));
-    }
-
-    let opts = {
-        tmpDir: config.www.tmpdir || os.tmpdir(),
-        imageVersions: req.query.editor === 'mosaico' ? {
-            thumbnail: {
-                width: 90,
-                height: 90
-            }
-        } : {},
-        uploadDir: path.join(__dirname, '..', 'public', req.query.editor, 'uploads', dirName),
-        uploadUrl: '/' + req.query.editor + '/uploads/' + dirName, // must be root relative
-        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-    };
-
-    let mockres = httpMocks.createResponse({
-        eventEmitter: events.EventEmitter
-    });
-
-    mockres.on('end', () => {
-        if (req.query.editor === 'grapejs') {
-            let data = [];
-            JSON.parse(mockres._getData()).files.forEach(file => {
-                data.push({
-                    src: file.url
-                });
-            });
-            res.json({
-                data
-            });
-        } else {
-            res.send(mockres._getData());
+    settings.get('serviceUrl', (err, serviceUrl) => {
+        if (err) {
+            return res.status(500).send(err.message || err);
         }
-    });
 
-    jqueryFileUpload.fileHandler(opts)(req, mockres);
+        const getDirName = () => {
+            switch (req.query.type) {
+                case 'template':
+                    return '0';
+                case 'campaign':
+                    return Number(req.query.id) > 0 ? req.query.id : false;
+                default:
+                    return false;
+            }
+        };
+
+        const dirName = getDirName();
+
+        if (dirName === false) {
+            return res.status(500).send(_('Invalid resource type or ID'));
+        }
+
+        const opts = {
+            tmpDir: config.www.tmpdir || os.tmpdir(),
+            imageVersions: req.query.editor === 'mosaico' ? {
+                thumbnail: {
+                    width: 90,
+                    height: 90
+                }
+            } : {},
+            uploadDir: path.join(__dirname, '..', 'public', req.query.editor, 'uploads', dirName),
+            uploadUrl: '/' + req.query.editor + '/uploads/' + dirName, // must be root relative
+            acceptFileTypes: /\.(gif|jpe?g|png)$/i,
+            hostname: url.parse(serviceUrl).host // include port
+        };
+
+        const mockres = httpMocks.createResponse({
+            eventEmitter: events.EventEmitter
+        });
+
+        mockres.on('error', err => {
+            res.status(500).json({
+                error: err.message || err,
+                data: []
+            });
+        });
+
+        mockres.on('end', () => {
+            const data = [];
+            try {
+                JSON.parse(mockres._getData()).files.forEach(file => {
+                    data.push({
+                        src: file.url
+                    });
+                });
+                res.json({
+                    data
+                });
+            } catch(err) {
+                res.status(500).json({
+                    error: err.message || err,
+                    data
+                });
+            }
+        });
+
+        jqueryFileUpload.fileHandler(opts)(req, req.query.editor === 'grapejs' ? mockres : res);
+    });
 });
 
 router.post('/download', passport.csrfProtection, (req, res) => {
-    prepareHtml({
-        editorName: req.query.editor,
-        html: req.body.html
-    }, (err, html) => {
+    prepareHtml(req.body.html, req.query.editor, (err, html) => {
         if (err) {
             return res.status(500).send(err.message || err);
         }
@@ -416,9 +439,12 @@ router.post('/download', passport.csrfProtection, (req, res) => {
     });
 });
 
-let parseGrapejsMultipartTestForm = (req, res, next) => {
+const parseGrapejsMultipartTestForm = (req, res, next) => {
     if (req.query.editor === 'grapejs') {
-        new multiparty.Form().parse(req, (err, fields, files) => {
+        new multiparty.Form().parse(req, (err, fields) => {
+            if (err) {
+                return next(err);
+            }
             req.body.email = fields.email[0];
             req.body.subject = fields.subject[0];
             req.body.html = fields.html[0];
@@ -431,7 +457,7 @@ let parseGrapejsMultipartTestForm = (req, res, next) => {
 };
 
 router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (req, res) => {
-    let sendError = err => {
+    const sendError = err => {
         if (req.query.editor === 'grapejs') {
             res.status(500).json({
                 errors: err.message || err
@@ -441,10 +467,7 @@ router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (re
         }
     };
 
-    prepareHtml({
-        editorName: req.query.editor,
-        html: req.body.html
-    }, (err, html) => {
+    prepareHtml(req.body.html, req.query.editor, (err, html) => {
         if (err) {
             return sendError(err);
         }
@@ -459,29 +482,31 @@ router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (re
                     return sendError(err);
                 }
 
-                let opts = {
+                const opts = {
                     from: {
                         name: configItems.defaultFrom,
-                        address: configItems.defaultAddress,
+                        address: configItems.defaultAddress
                     },
                     to: req.body.email,
                     subject: req.body.subject,
                     text: htmlToText.fromString(html, {
                         wordwrap: 100
                     }),
-                    html,
+                    html
                 };
 
-                transport.sendMail(opts, (err, info) => {
+                transport.sendMail(opts, err => {
                     if (err) {
                         return sendError(err);
                     }
 
-                    req.query.editor === 'grapejs' ?
+                    if (req.query.editor === 'grapejs') {
                         res.json({
                             data: 'ok'
-                        }) :
+                        });
+                    } else {
                         res.send('ok');
+                    }
                 });
             });
         });
