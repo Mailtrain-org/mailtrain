@@ -3,7 +3,7 @@
 const passport = require('../lib/passport');
 const router = require('../lib/router-async').create();
 const _ = require('../lib/translate')._;
-const namespaces = require('../lib/models/namespaces');
+const namespaces = require('../models/namespaces');
 const interoperableErrors = require('../shared/interoperable-errors');
 
 router.all('/rest/*', (req, res, next) => {

@@ -268,12 +268,16 @@ function withForm(target) {
         isValidationShown: false,
         isDisabled: false,
         statusMessageText: '',
-        data: Immutable.Map()
+        data: Immutable.Map(),
+        isServerValidationRunning: false
     });
 
-    inst.initFormState = function() {
+    inst.initFormState = function(serverValidationUrl, serverValidationAttrs) {
         const state = this.state || {};
         state.formState = cleanFormState;
+        if (serverValidationUrl) {
+            state.formStateServerValidation = { url: serverValidationUrl, attrs: serverValidationAttrs };
+        }
         this.state = state;
     };
 
@@ -294,7 +298,7 @@ function withForm(target) {
             });
         }, 500);
 
-        const response = await axios.get(url)
+        const response = await axios.get(url);
 
         const data = response.data;
 
@@ -309,6 +313,8 @@ function withForm(target) {
     };
 
     inst.validateAndSendFormValuesToURL = async function(method, url, mutator) {
+        await this.waitForFormServerValidated();
+
         if (this.isFormWithoutErrors()) {
             const data = this.getFormValues();
 
@@ -331,28 +337,113 @@ function withForm(target) {
 
     inst.populateFormValues = function(data) {
         this.setState(previousState => ({
-            formState: previousState.formState.withMutations(state => {
-                state.set('state', FormState.Ready);
+            formState: previousState.formState.withMutations(mutState => {
+                mutState.set('state', FormState.Ready);
 
-                state.update('data', stateData => stateData.withMutations(mutableStateData => {
+                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
                     for (const key in data) {
-                        mutableStateData.set(key, Immutable.Map({
+                        mutStateData.set(key, Immutable.Map({
                             value: data[key]
                         }));
                     }
-
-                    this.validateFormValues(mutableStateData);
                 }));
+                
+                this.validateForm(mutState);
             })
         }));
     };
 
+
+    // formValidateResolve is called by "validateForm" once client receives validation response from server that does not
+    // trigger another server validation
+    let formValidateResolve = null;
+
+    const scheduleValidateForm = (self) => {
+        setTimeout(() => {
+            self.setState(previousState => ({
+                formState: previousState.formState.withMutations(mutState => {
+                    self.validateForm(mutState);
+                })
+            }));
+        }, 0);
+    };
+
+    inst.waitForFormServerValidated = async function() {
+        if (!this.isFormServerValidated()) {
+            await new Promise(resolve => { formValidateResolve = resolve; });
+        }
+    };
+
+    inst.validateForm = function(mutState) {
+        const serverValidation = this.state.formStateServerValidation;
+
+        if (!mutState.get('isServerValidationRunning') && serverValidation) {
+            const payload = {};
+            let payloadNotEmpty = false;
+
+            for (const attr of serverValidation.attrs) {
+                const currValue = mutState.getIn(['data', attr, 'value']);
+                const serverValue = mutState.getIn(['data', attr, 'serverValue']);
+
+                // This really assumes that all form values are preinitialized (i.e. not undef)
+                if (currValue !== serverValue) {
+                    mutState.setIn(['data', attr, 'serverValidated'], false);
+                    payload[attr] = currValue;
+                    payloadNotEmpty = true;
+                }
+            }
+
+            if (payloadNotEmpty) {
+                mutState.set('isServerValidationRunning', true);
+
+                axios.post(serverValidation.url, payload)
+                    .then(response => {
+
+                        this.setState(previousState => ({
+                            formState: previousState.formState.withMutations(mutState => {
+                                mutState.set('isServerValidationRunning', false);
+
+                                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                                    for (const attr in payload) {
+                                        mutStateData.setIn([attr, 'serverValue'], payload[attr]);
+
+                                        if (payload[attr] === mutState.getIn(['data', attr, 'value'])) {
+                                            mutStateData.setIn([attr, 'serverValidated'], true);
+                                            mutStateData.setIn([attr, 'serverValidation'], response.data[attr] || true);
+                                        }
+                                    }
+                                }));
+                            })
+                        }));
+
+                        scheduleValidateForm(this);
+                    })
+                    .catch(error => {
+                        console.log('Ignoring unhandled error in "validateForm": ' + error);
+                        scheduleValidateForm(this);
+                    });
+            } else {
+                if (formValidateResolve) {
+                    const resolve = formValidateResolve;
+                    formValidateResolve = null;
+                    resolve();
+                }
+            }
+        }
+
+        if (this.localValidateFormValues) {
+            mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                this.localValidateFormValues(mutStateData);
+            }));
+        }
+    };
+
     inst.updateFormValue = function(key, value) {
         this.setState(previousState => ({
-            formState: previousState.formState.update('data', stateData => stateData.withMutations(mutableStateData => {
-                mutableStateData.setIn([key, 'value'], value);
-                this.validateFormValues(mutableStateData);
-            }))
+            formState: previousState.formState.withMutations(mutState => {
+                mutState.setIn(['data', key, 'value'], value);
+                this.validateForm(mutState);
+            })
         }));
     };
 
@@ -415,6 +506,10 @@ function withForm(target) {
 
     inst.isFormWithoutErrors = function() {
         return !this.state.formState.get('data').find(attr => attr.get('error'));
+    };
+
+    inst.isFormServerValidated = function() {
+        return this.state.formStateServerValidation.attrs.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
     };
 
     inst.getFormStatusMessageText = function() {

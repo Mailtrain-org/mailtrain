@@ -7,7 +7,7 @@ import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
-import { ModalDialog } from "../lib/bootstrap-components";
+import { ModalDialog } from '../lib/bootstrap-components';
 
 @translate()
 @withForm
@@ -20,7 +20,7 @@ export default class CUD extends Component {
         this.state = {};
 
         if (props.edit) {
-            this.state.nsId = parseInt(props.match.params.nsId);
+            this.state.entityId = parseInt(props.match.params.id);
         }
 
         this.initFormState();
@@ -29,7 +29,7 @@ export default class CUD extends Component {
     }
 
     isEditGlobal() {
-        return this.state.nsId === 1;
+        return this.state.entityId === 1;
     }
 
     isDelete() {
@@ -40,7 +40,7 @@ export default class CUD extends Component {
         for (let idx = 0; idx < data.length; idx++) {
             const entry = data[idx];
 
-            if (entry.key === this.state.nsId) {
+            if (entry.key === this.state.entityId) {
                 if (entry.children.length > 0) {
                     this.hasChildren = true;
                 }
@@ -57,7 +57,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadTreeData() {
-        axios.get("/namespaces/rest/namespacesTree")
+        axios.get('/namespaces/rest/namespacesTree')
             .then(response => {
 
                 response.data.expanded = true;
@@ -75,7 +75,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.state.nsId}`, data => {
+        await this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.state.entityId}`, data => {
             if (data.parent) data.parent = data.parent.toString();
         });
     }
@@ -96,7 +96,7 @@ export default class CUD extends Component {
         }
     }
 
-    validateFormValues(state) {
+    localValidateFormValues(state) {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value']).trim()) {
@@ -121,7 +121,7 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (edit) {
             sendMethod = FormSendMethod.PUT;
-            url = `/namespaces/rest/namespaces/${this.state.nsId}`
+            url = `/namespaces/rest/namespaces/${this.state.entityId}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/namespaces/rest/namespaces'
@@ -159,11 +159,11 @@ export default class CUD extends Component {
     }
 
     async showDeleteModal() {
-        this.navigateTo(`/namespaces/edit/${this.state.nsId}/delete`);
+        this.navigateTo(`/namespaces/edit/${this.state.entityId}/delete`);
     }
 
     async hideDeleteModal() {
-        this.navigateTo(`/namespaces/edit/${this.state.nsId}`);
+        this.navigateTo(`/namespaces/edit/${this.state.entityId}`);
     }
 
     async performDelete() {
@@ -175,7 +175,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Deleting namespace...'));
 
-            await axios.delete(`/namespaces/rest/namespaces/${this.state.nsId}`);
+            await axios.delete(`/namespaces/rest/namespaces/${this.state.entityId}`);
 
             this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace deleted'));
 

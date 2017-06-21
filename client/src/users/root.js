@@ -14,18 +14,18 @@ const getStructure = t => ({
         title: t('Home'),
         externalLink: '/',
         children: {
-            'namespaces': {
-                title: t('Namespaces'),
-                link: '/namespaces',
+            'users': {
+                title: t('Users'),
+                link: '/users',
                 component: List,
                 children: {
                     'edit' : {
-                        title: t('Edit Namespace'),
+                        title: t('Edit User'),
                         params: [':id', ':action?'],
                         render: props => (<CUD edit {...props} />)
                     },
                     'create' : {
-                        title: t('Create Namespace'),
+                        title: t('Create User'),
                         render: props => (<CUD {...props} />)
                     }
                 }
@@ -36,7 +36,7 @@ const getStructure = t => ({
 
 export default function() {
     ReactDOM.render(
-        <I18nextProvider i18n={ i18n }><Section root='/namespaces' structure={getStructure}/></I18nextProvider>,
+        <I18nextProvider i18n={ i18n }><Section root='/users' structure={getStructure}/></I18nextProvider>,
         document.getElementById('root')
     );
 };

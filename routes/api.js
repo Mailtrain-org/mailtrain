@@ -1,6 +1,6 @@
 'use strict';
 
-let users = require('../lib/models/users');
+let users = require('../lib/models/users-legacy');
 let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
 let blacklist = require('../lib/models/blacklist');

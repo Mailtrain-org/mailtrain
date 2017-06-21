@@ -21,7 +21,7 @@ const passport = require('./lib/passport');
 const tools = require('./lib/tools');
 
 const routes = require('./routes/index');
-const users = require('./routes/users');
+const usersOld = require('./routes/users-legacy');
 const lists = require('./routes/lists');
 const settings = require('./routes/settings');
 const settingsModel = require('./lib/models/settings');
@@ -42,7 +42,9 @@ const grapejs = require('./routes/grapejs');
 const mosaico = require('./routes/mosaico');
 const reports = require('./routes/reports');
 const reportsTemplates = require('./routes/report-templates');
+
 const namespaces = require('./routes/namespaces');
+const users = require('./routes/users');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -206,7 +208,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/users', usersOld);
 app.use('/lists', lists);
 app.use('/templates', templates);
 app.use('/campaigns', campaigns);
@@ -224,7 +226,9 @@ app.use('/api', api);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
+
 app.use('/namespaces', namespaces);
+app.use('/users', users);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/reports', reports);

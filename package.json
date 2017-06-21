@@ -103,6 +103,7 @@
     "npmlog": "^4.0.2",
     "object-hash": "^1.1.7",
     "openpgp": "^2.5.3",
+    "owasp-password-strength-test": "github:bures/owasp-password-strength-test",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "premailer-api": "^1.0.4",

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import jQuery from 'jquery';
 import '../../public/jquery/jquery-ui-1.12.1.min.js';
-import '../../public/fancytree/jquery.fancytree-all.js';
+import '../../public/fancytree/jquery.fancytree-all.min.js';
 import '../../public/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.css';
 import axios from './axios';
@@ -108,12 +108,13 @@ class TreeTable extends Component {
                 const tdList = jQuery(node.tr).find(">td");
 
                 const linksContainer = jQuery('<span class="mt-action-links"/>');
-                const links = actionLinks.map(({label, link}) => {
-                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href="">{label}</a>);
+                for (const {label, link} of actionLinks) {
+                    const dest = link(node.key);
+                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href={dest}>{label}</a>);
                     const lnk = jQuery(lnkHtml);
-                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(link(node.key)) });
+                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(dest) });
                     linksContainer.append(lnk);
-                });
+                }
 
                 tdList.eq(1).html(linksContainer);
             };

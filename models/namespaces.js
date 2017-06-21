@@ -1,12 +1,11 @@
 'use strict';
 
-const knex = require('../knex');
+const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
-const { enforce, filterObject } = require('../helpers');
-const interoperableErrors = require('../../shared/interoperable-errors');
+const { enforce, filterObject } = require('../lib/helpers');
+const interoperableErrors = require('../shared/interoperable-errors');
 
-const allowedKeys = new Set(['id', 'name', 'description', 'parent']);
-const allowedUpdateKeys = new Set(['name', 'description', 'parent']);
+const allowedKeys = new Set(['name', 'description', 'parent']);
 
 async function list() {
     return await knex('namespaces');
@@ -54,7 +53,7 @@ async function updateWithConsistencyCheck(ns) {
             }
         }
 
-        await tx('namespaces').where('id', ns.id).update(filterObject(ns, allowedUpdateKeys));
+        await tx('namespaces').where('id', ns.id).update(filterObject(ns, allowedKeys));
     });
 }
 

@@ -38,6 +38,11 @@ class ChildDetectedError extends InteroperableError {
     }
 }
 
+class DuplicitNameError extends InteroperableError {
+    constructor(msg, data) {
+        super('DuplicitNameError', msg, data);
+    }
+}
 
 const errorTypes = {
     InteroperableError,
@@ -45,7 +50,8 @@ const errorTypes = {
     ChangedError,
     NotFoundError,
     LoopDetectedError,
-    ChildDetectedError
+    ChildDetectedError,
+    DuplicitNameError
 };
 
 function deserialize(errorObj) {

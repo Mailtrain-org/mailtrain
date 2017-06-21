@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack --watch --watch-poll",
+    "watch": "webpack --watch",
     "locales": "for moFile in ../languages/*.mo; do lng=`basename $moFile .mo`; i18next-conv -s $moFile -t locales/$lng/common.json -l $lng; done"
   },
   "repository": {
@@ -17,9 +17,14 @@
   "homepage": "https://mailtrain.org/",
   "dependencies": {
     "axios": "^0.16.1",
+    "datatables.net": "^1.10.15",
+    "datatables.net-bs": "^1.10.15",
+    "datatables.net-select": "^1.2.2",
+    "datatables.net-select-bs": "^1.2.2",
     "i18next": "^8.3.0",
     "i18next-xhr-backend": "^1.4.1",
     "immutable": "^3.8.1",
+    "owasp-password-strength-test": "github:bures/owasp-password-strength-test",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",

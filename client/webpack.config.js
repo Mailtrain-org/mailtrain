@@ -3,7 +3,8 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        namespaces: ['babel-polyfill', './src/namespaces/root.js']
+        namespaces: ['babel-polyfill', './src/namespaces/root.js'],
+        users: ['babel-polyfill', './src/users/root.js']
     },
     output: {
         library: 'MailtrainReactBody',
@@ -24,5 +25,9 @@ module.exports = {
     plugins: [
 //        new webpack.optimize.UglifyJsPlugin(),
         new webpack.optimize.CommonsChunkPlugin('common')
-    ]
+    ],
+    watchOptions: {
+        ignored: 'node_modules/',
+        poll: 1000
+    }
 };
