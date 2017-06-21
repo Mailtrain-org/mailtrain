@@ -375,6 +375,7 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
         };
 
         const dirName = getDirName();
+        const serviceUrlParts = url.parse(serviceUrl);
 
         if (dirName === false) {
             return res.status(500).send(_('Invalid resource type or ID'));
@@ -391,7 +392,8 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
             uploadDir: path.join(__dirname, '..', 'public', req.query.editor, 'uploads', dirName),
             uploadUrl: '/' + req.query.editor + '/uploads/' + dirName, // must be root relative
             acceptFileTypes: /\.(gif|jpe?g|png)$/i,
-            hostname: url.parse(serviceUrl).host // include port
+            hostname: serviceUrlParts.host, // include port
+            ssl: serviceUrlParts.protocol === 'https:'
         };
 
         const mockres = httpMocks.createResponse({
