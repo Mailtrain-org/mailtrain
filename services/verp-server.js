@@ -29,7 +29,7 @@ let server = new SMTPServer({
             let user = address.address.split('@').shift();
             let host = address.address.split('@').pop();
 
-            if (host !== configItems.verpHostname || !/^[a-z0-9_\-]+\.[a-z0-9_\-]+\.[a-z0-9_\-]+$/i.test(user)) {
+            if (host !== configItems.verpHostname || !/^[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+$/i.test(user)) {
                 err = new Error('Unknown user ' + address.address);
                 err.responseCode = 510;
                 return callback(err);
