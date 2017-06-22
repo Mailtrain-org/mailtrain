@@ -147,6 +147,9 @@ module.exports = callback => {
         }
         let host = hosts[pos++];
         server.listen(config.verp.port, host, () => {
+            if (started) {
+                return server.close();
+            }
             log.info('VERP', 'Server listening on %s:%s', host || '*', config.verp.port);
             setImmediate(startNextHost);
         });

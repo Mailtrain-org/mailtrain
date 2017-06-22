@@ -99,6 +99,9 @@ module.exports = callback => {
     });
 
     server.listen(config.postfixbounce.port, config.postfixbounce.host, () => {
+        if (started) {
+            return server.close();
+        }
         started = true;
         log.info('POSTFIXBOUNCE', 'Server listening on port %s', config.postfixbounce.port);
         setImmediate(callback);
