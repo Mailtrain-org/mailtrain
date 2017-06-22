@@ -164,6 +164,10 @@ let mailBoxServer = http.createServer((req, res) => {
     });
 });
 
+mailBoxServer.on('error', err => {
+    log.error('Test SMTP Mailbox Server', err);
+});
+
 module.exports = callback => {
     if (config.testserver.enabled) {
         server.listen(config.testserver.port, config.testserver.host, () => {
