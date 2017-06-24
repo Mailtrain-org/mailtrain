@@ -22,8 +22,10 @@ services:
       - mailtrain-node-config:/app/config
       - mailtrain-node-data:/app/public/grapejs/uploads
       - mailtrain-node-data:/app/public/mosaico/uploads
+      - mailtrain-node-reports:/app/protected/reports
 volumes:
   mailtrain-mysq-data: {}
   mailtrain-redis-data: {}
   mailtrain-node-data: {}
   mailtrain-node-config: {}
+  mailtrain-node-reports: {}
