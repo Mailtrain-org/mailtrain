@@ -9,5 +9,5 @@ RUN npm install --no-progress --production && npm install --no-progress passport
 # to download and install all the NPM dependencies every time there's a change in the source code
 COPY . /app
 EXPOSE 3000
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["bash", "/app/docker-entrypoint.sh"]
 CMD ["node", "index.js"]
