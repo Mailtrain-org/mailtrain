@@ -6,6 +6,7 @@ let net = require('net');
 let campaigns = require('../lib/models/campaigns');
 
 let seenIds = new Set();
+let queueIds = {};
 
 let server = net.createServer(socket => {
     let remainder = '';
@@ -28,7 +29,7 @@ let server = net.createServer(socket => {
                 return readNextChunk();
             }
             let line = lines[pos++];
-            let match = /\bstatus=bounced\b/.test(line) && line.match(/\bpostfix\/\w+\[\d+\]:\s*([^:]+)/);
+            let match = /\bstatus=(bounced|sent)\b/.test(line) && line.match(/\bpostfix\/\w+\[\d+\]:\s*([^:]+).*?status=(\w+)/);
             if (match) {
                 let queueId = match[1];
 
@@ -36,6 +37,23 @@ let server = net.createServer(socket => {
                     return checkNextLine();
                 }
                 seenIds.add(queueId);
+
+                // Losacno: Check for local requeue
+                let status = match[2];
+                log.verbose('POSTFIXBOUNCE', 'Checking message %s for local requeue (status: %s)', queueId, status);
+                if ( status == 'sent' ) {
+                    let queued = / relay=127\.0\.0\.1/.test(line) && line.match(/ queued as (\w+)\)/);
+                    if ( queued ) {
+                        log.verbose('POSTFIXBOUNCE', 'Marked message %s as locally requeued as %s', queueId, queued[1]);
+                        queueIds[queued[1]] = queueId;
+                    }
+                    return checkNextLine();
+                } else {
+                    if ( queueId in queueIds ) {
+                        log.verbose('POSTFIXBOUNCE', 'Message %s was requeued from %s', queueId, queueIds[queueId]);
+                        queueId = queueIds[queueId];
+                    }
+                }
 
                 campaigns.findMailByResponse(queueId, (err, message) => {
                     if (err || !message) {
