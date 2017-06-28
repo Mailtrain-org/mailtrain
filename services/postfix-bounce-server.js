@@ -41,18 +41,16 @@ let server = net.createServer(socket => {
                 // Losacno: Check for local requeue
                 let status = match[2];
                 log.verbose('POSTFIXBOUNCE', 'Checking message %s for local requeue (status: %s)', queueId, status);
-                if ( status == 'sent' ) {
+                if ( status === 'sent' ) {
                     let queued = / relay=127\.0\.0\.1/.test(line) && line.match(/ queued as (\w+)\)/);
                     if ( queued ) {
                         log.verbose('POSTFIXBOUNCE', 'Marked message %s as locally requeued as %s', queueId, queued[1]);
                         queueIds[queued[1]] = queueId;
                     }
                     return checkNextLine();
-                } else {
-                    if ( queueId in queueIds ) {
-                        log.verbose('POSTFIXBOUNCE', 'Message %s was requeued from %s', queueId, queueIds[queueId]);
-                        queueId = queueIds[queueId];
-                    }
+                } else if ( queueId in queueIds ) {
+                    log.verbose('POSTFIXBOUNCE', 'Message %s was requeued from %s', queueId, queueIds[queueId]);
+                    queueId = queueIds[queueId];
                 }
 
                 campaigns.findMailByResponse(queueId, (err, message) => {
