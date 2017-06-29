@@ -18,3 +18,7 @@
 .mt-action-links > a:last-child {
     margin-right: 0px;
 }
+
+.form-horizontal .control-label {
+    display: block;
+}

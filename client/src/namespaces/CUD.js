@@ -23,7 +23,7 @@ export default class CUD extends Component {
             this.state.entityId = parseInt(props.match.params.id);
         }
 
-        this.initFormState();
+        this.initForm();
         this.hasChildren = false;
 
     }

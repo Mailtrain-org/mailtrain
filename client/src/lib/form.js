@@ -112,7 +112,12 @@ class InputField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        placeholder: PropTypes.string
+        placeholder: PropTypes.string,
+        type: PropTypes.string
+    }
+
+    static defaultProps = {
+        type: 'text'
     }
 
     static contextTypes = {
@@ -125,8 +130,13 @@ class InputField extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
+        let type = 'text';
+        if (props.type === 'password') {
+            type = 'password';
+        }
+
         return wrapInput(id, htmlId, owner, props.label,
-            <input type="text" value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+            <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );
     }
 }
@@ -272,12 +282,10 @@ function withForm(target) {
         isServerValidationRunning: false
     });
 
-    inst.initFormState = function(serverValidationUrl, serverValidationAttrs) {
+    inst.initForm = function(settings) {
         const state = this.state || {};
         state.formState = cleanFormState;
-        if (serverValidationUrl) {
-            state.formStateServerValidation = { url: serverValidationUrl, attrs: serverValidationAttrs };
-        }
+        state.formSettings = settings;
         this.state = state;
     };
 
@@ -375,13 +383,17 @@ function withForm(target) {
     };
 
     inst.validateForm = function(mutState) {
-        const serverValidation = this.state.formStateServerValidation;
+        const settings = this.state.formSettings;
 
-        if (!mutState.get('isServerValidationRunning') && serverValidation) {
+        if (!mutState.get('isServerValidationRunning') && settings.serverValidation) {
             const payload = {};
             let payloadNotEmpty = false;
 
-            for (const attr of serverValidation.attrs) {
+            for (const attr of settings.serverValidation.extra || []) {
+                payload[attr] = mutState.getIn(['data', attr, 'value']);
+            }
+
+            for (const attr of settings.serverValidation.changed) {
                 const currValue = mutState.getIn(['data', attr, 'value']);
                 const serverValue = mutState.getIn(['data', attr, 'serverValue']);
 
@@ -396,7 +408,7 @@ function withForm(target) {
             if (payloadNotEmpty) {
                 mutState.set('isServerValidationRunning', true);
 
-                axios.post(serverValidation.url, payload)
+                axios.post(settings.serverValidation.url, payload)
                     .then(response => {
 
                         this.setState(previousState => ({
@@ -420,6 +432,11 @@ function withForm(target) {
                     })
                     .catch(error => {
                         console.log('Ignoring unhandled error in "validateForm": ' + error);
+
+                        this.setState(previousState => ({
+                            formState: previousState.formState.set('isServerValidationRunning', false)
+                        }));
+
                         scheduleValidateForm(this);
                     });
             } else {
@@ -509,7 +526,7 @@ function withForm(target) {
     };
 
     inst.isFormServerValidated = function() {
-        return this.state.formStateServerValidation.attrs.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
+        return this.state.formSettings.serverValidation.changed.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
     };
 
     inst.getFormStatusMessageText = function() {

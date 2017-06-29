@@ -7,8 +7,8 @@ exports.up = function(knex, Promise) {
             if (!exists) {
                 return knex.schema.createTable('users', table => {
                     table.increments('id').primary();
-                    table.string('username').notNullable().defaultTo('');
-                    table.string('password').notNullable().defaultTo('');
+                    table.string('username').notNullable();
+                    table.string('password').notNullable();
                     table.string('email').notNullable();
                     table.string('access_token', 40).index();
                     table.string('reset_token').index();

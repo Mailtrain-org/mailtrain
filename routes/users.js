@@ -5,7 +5,6 @@ const router = require('../lib/router-async').create();
 const _ = require('../lib/translate')._;
 const users = require('../models/users');
 const interoperableErrors = require('../shared/interoperable-errors');
-const tools = require('../lib/tools-async');
 
 
 router.all('/rest/*', (req, res, next) => {
@@ -42,38 +41,8 @@ router.deleteAsync('/rest/users/:userId', passport.csrfProtection, async (req, r
 });
 
 router.postAsync('/rest/validate', async (req, res) => {
-    const data = {};
-
-    if (req.body.username) {
-        data.username = {};
-
-        try {
-            await users.getByUsername(req.body.username);
-            data.username.exists = true;
-        } catch (error) {
-            if (error instanceof interoperableErrors.NotFoundError) {
-                data.username.exists = false;
-            } else {
-                throw error;
-            }
-        }
-    }
-
-    if (req.body.email) {
-        data.email = {};
-
-        try {
-            await tools.validateEmail(req.body.email);
-            data.email.invalid = false;
-        } catch (error) {
-            console.log(error);
-            data.email.invalid = true;
-        }
-    }
-
-    return res.json(data);
+    return res.json(await users.serverValidate(req.body));
 });
-
 
 router.postAsync('/rest/usersTable', async (req, res) => {
     return res.json(await users.listDTAjax(req.body));

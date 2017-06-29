@@ -8,6 +8,7 @@ import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
+import validators from '../../../shared/validators';
 import { ModalDialog } from '../lib/bootstrap-components';
 
 @translate()
@@ -26,7 +27,13 @@ export default class CUD extends Component {
             this.state.entityId = parseInt(props.match.params.id);
         }
 
-        this.initFormState('/users/rest/validate', ['username', 'email']);
+        this.initForm({
+            serverValidation: {
+                url: '/users/rest/validate',
+                changed: ['username', 'email'],
+                extra: ['id']
+            }
+        });
         this.hasChildren = false;
     }
 
@@ -36,7 +43,10 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL(`/users/rest/users/${this.state.entityId}`);
+        await this.getFormValuesFromURL(`/users/rest/users/${this.state.entityId}`, data => {
+            data.password = '';
+            data.password2 = '';
+        });
     }
 
     componentDidMount() {
@@ -46,7 +56,9 @@ export default class CUD extends Component {
             this.populateFormValues({
                 username: '',
                 name: '',
-                email: ''
+                email: '',
+                password: '',
+                password2: ''
             });
         }
     }
@@ -57,12 +69,11 @@ export default class CUD extends Component {
 
 
         const username = state.getIn(['username', 'value']);
-        const usernamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_\-.]*$/;
         const usernameServerValidation = state.getIn(['username', 'serverValidation']);
 
         if (!username) {
             state.setIn(['username', 'error'], t('User name must not be empty'));
-        } else if (!usernamePattern.test(username)) {
+        } else if (!validators.usernameValid(username)) {
             state.setIn(['username', 'error'], t('User name may contain only the following characters: A-Z, a-z, 0-9, "_", "-", "." and may start only with A-Z, a-z, 0-9.'));
         } else if (!usernameServerValidation || usernameServerValidation.exists) {
             state.setIn(['username', 'error'], t('The user name already exists in the system.'));
@@ -132,7 +143,9 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Saving user ...'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
+            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+                delete data.password2;
+            });
 
             if (submitSuccessful) {
                 this.navigateToWithFlashMessage('/users', 'success', t('User saved'));
@@ -179,10 +192,11 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
+        const isAdmin = this.getFormValue('id') === 1;
 
         return (
             <div>
-                {edit &&
+                {edit && !isAdmin &&
                     <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
                         { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
                         { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
@@ -197,12 +211,12 @@ export default class CUD extends Component {
                     <InputField id="username" label={t('User Name')}/>
                     <InputField id="name" label={t('Full Name')}/>
                     <InputField id="email" label={t('Email')}/>
-                    <InputField id="password" label={t('Password')}/>
-                    <InputField id="password2" label={t('Repeat Password')}/>
+                    <InputField id="password" label={t('Password')} type="password" />
+                    <InputField id="password2" label={t('Repeat Password')} type="password" />
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <Button className="btn-danger" icon="remove" label={t('Delete User')}
+                        {edit && !isAdmin && <Button className="btn-danger" icon="remove" label={t('Delete User')}
                                          onClickAsync={::this.showDeleteModal}/>}
                     </ButtonRow>
                 </Form>
