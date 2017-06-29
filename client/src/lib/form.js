@@ -285,7 +285,7 @@ function withForm(target) {
     inst.initForm = function(settings) {
         const state = this.state || {};
         state.formState = cleanFormState;
-        state.formSettings = settings;
+        state.formSettings = settings || {};
         this.state = state;
     };
 
@@ -526,7 +526,7 @@ function withForm(target) {
     };
 
     inst.isFormServerValidated = function() {
-        return this.state.formSettings.serverValidation.changed.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
+        return !this.state.formSettings.serverValidation || this.state.formSettings.serverValidation.changed.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
     };
 
     inst.getFormStatusMessageText = function() {
