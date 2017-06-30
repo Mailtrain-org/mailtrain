@@ -9,9 +9,12 @@ const validators = require('../shared/validators');
 const dtHelpers = require('../lib/dt-helpers');
 const tools = require('../lib/tools-async');
 const Promise = require('bluebird');
-const bcryptHash = Promise.promisify(require('bcrypt-nodejs').hash);
+const bcrypt = require('bcrypt-nodejs');
+const bcryptHash = Promise.promisify(bcrypt.hash);
+const bcryptCompare = Promise.promisify(bcrypt.compare);
 
 const allowedKeys = new Set(['username', 'name', 'email', 'password']);
+const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
 
 function hash(user) {
     return hasher.hash(filterObject(user, allowedKeys));
@@ -30,10 +33,10 @@ async function getById(userId) {
     return user;
 }
 
-async function serverValidate(data) {
+async function serverValidate(data, isOwnAccount) {
     const result = {};
 
-    if (data.username) {
+    if (!isOwnAccount && data.username) {
         const query = knex('users').select(['id']).where('username', data.username);
 
         if (data.id) {
@@ -47,9 +50,26 @@ async function serverValidate(data) {
         };
     }
 
+    if (isOwnAccount && data.currentPassword) {
+        const user = await knex('users').select(['id', 'password']).where('id', data.id).first();
+
+        result.currentPassword = {};
+        result.currentPassword.incorrect = !await bcryptCompare(data.currentPassword, user.password);
+    }
+
     if (data.email) {
+        const query = knex('users').select(['id']).where('email', data.email);
+
+        if (data.id) {
+            // Id is not set in entity creation form
+            query.andWhereNot('id', data.id);
+        }
+
+        const user = await query.first();
+
         result.email = {};
         result.email.invalid = await tools.validateEmail(data.email) !== 0;
+        result.email.exists = !!user;
     }
 
     return result;
@@ -59,18 +79,34 @@ async function listDTAjax(params) {
     return await dtHelpers.ajaxList(params, tx => tx('users'), ['users.id', 'users.username', 'users.name']);
 }
 
-async function _validateAndPreprocess(user, isCreate) {
-    enforce(validators.usernameValid(user.username), 'Invalid username');
+async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
+    enforce(await tools.validateEmail(user.email) === 0, 'Invalid email');
 
-    const otherUserWithSameUsernameQuery = knex('users').where('username', user.username);
+    const otherUserWithSameEmailQuery = tx('users').where('email', user.email);
     if (user.id) {
-        otherUserWithSameUsernameQuery.andWhereNot('id', user.id);
+        otherUserWithSameEmailQuery.andWhereNot('id', user.id);
     }
 
-    const otherUserWithSameUsername = await otherUserWithSameUsernameQuery.first();
+    const otherUserWithSameUsername = await otherUserWithSameEmailQuery.first();
     if (otherUserWithSameUsername) {
-        throw new interoperableErrors.DuplicitNameError();
+        throw new interoperableErrors.DuplicitEmailError();
     }
+
+
+    if (!isOwnAccount) {
+        enforce(validators.usernameValid(user.username), 'Invalid username');
+
+        const otherUserWithSameUsernameQuery = tx('users').where('username', user.username);
+        if (user.id) {
+            otherUserWithSameUsernameQuery.andWhereNot('id', user.id);
+        }
+
+        const otherUserWithSameUsername = await otherUserWithSameUsernameQuery.first();
+        if (otherUserWithSameUsername) {
+            throw new interoperableErrors.DuplicitNameError();
+        }
+    }
+
 
     enforce(!isCreate || user.password.length > 0, 'Password not set');
 
@@ -85,21 +121,21 @@ async function _validateAndPreprocess(user, isCreate) {
     } else {
         delete user.password;
     }
-
-    enforce(await tools.validateEmail(user.email) === 0, 'Invalid email');
 }
 
 
 async function create(user) {
-    _validateAndPreprocess(user, true);
-    const userId = await knex('users').insert(filterObject(user, allowedKeys));
-    return userId;
+    await knex.transaction(async tx => {
+        await _validateAndPreprocess(tx, user, true);
+        const userId = await tx('users').insert(filterObject(user, allowedKeys));
+        return userId;
+    });
 }
 
-async function updateWithConsistencyCheck(user) {
-    _validateAndPreprocess(user, false);
-
+async function updateWithConsistencyCheck(user, isOwnAccount) {
     await knex.transaction(async tx => {
+        await _validateAndPreprocess(tx, user, false, isOwnAccount);
+
         const existingUser = await tx('users').select(['id', 'username', 'name', 'email', 'password']).where('id', user.id).first();
         if (!user) {
             throw new interoperableErrors.NotFoundError();
@@ -110,7 +146,18 @@ async function updateWithConsistencyCheck(user) {
             throw new interoperableErrors.ChangedError();
         }
 
-        await tx('users').where('id', user.id).update(filterObject(user, allowedKeys));
+        if (isOwnAccount && user.password) {
+            console.log(user.currentPassword);
+            console.log(existingUser.password);
+
+            if (!await bcryptCompare(user.currentPassword, existingUser.password)) {
+                // This is not an interoperable error because current password is verified in account-validate.
+                // A change of password between account-validate and submit would be signalled by ChangedError
+                throw new Error('Incorrect password');
+            }
+        }
+
+        await tx('users').where('id', user.id).update(filterObject(user, isOwnAccount ? ownAccountAllowedKeys : allowedKeys));
     });
 }
 

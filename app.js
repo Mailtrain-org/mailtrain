@@ -45,6 +45,7 @@ const reportsTemplates = require('./routes/report-templates');
 
 const namespaces = require('./routes/namespaces');
 const users = require('./routes/users');
+const account = require('./routes/account');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -229,6 +230,7 @@ app.use('/mosaico', mosaico);
 
 app.use('/namespaces', namespaces);
 app.use('/users', users);
+app.use('/account', account);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/reports', reports);

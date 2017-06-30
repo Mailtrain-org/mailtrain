@@ -94,7 +94,26 @@ class Form extends Component {
     }
 }
 
-function wrapInput(id, htmlId, owner, label, input) {
+class Fieldset extends Component {
+    static propTypes = {
+        label: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        return (
+            <fieldset>
+                {props.label ? <legend>{props.label}</legend> : null}
+                {props.children}
+            </fieldset>
+            );
+    }
+}
+
+function wrapInput(id, htmlId, owner, label, help, input) {
+    const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
+
     return (
         <div className={owner.addFormValidationClass('form-group', id)} >
             <div className="col-sm-2">
@@ -103,7 +122,8 @@ function wrapInput(id, htmlId, owner, label, input) {
             <div className="col-sm-10">
                 {input}
             </div>
-            <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{owner.getFormValidationMessage(id)}</div>
+            {helpBlock}
+            <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>
         </div>
     );
 }
@@ -113,7 +133,8 @@ class InputField extends Component {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
-        type: PropTypes.string
+        type: PropTypes.string,
+        help: PropTypes.string
     }
 
     static defaultProps = {
@@ -135,7 +156,7 @@ class InputField extends Component {
             type = 'password';
         }
 
-        return wrapInput(id, htmlId, owner, props.label,
+        return wrapInput(id, htmlId, owner, props.label, props.help,
             <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );
     }
@@ -145,7 +166,8 @@ class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        placeholder: PropTypes.string
+        placeholder: PropTypes.string,
+        help: PropTypes.string
     }
 
     static contextTypes = {
@@ -158,7 +180,7 @@ class TextArea extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInput(id, htmlId, owner, props.label,
+        return wrapInput(id, htmlId, owner, props.label, props.help,
             <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
@@ -238,7 +260,8 @@ class TreeTableSelect extends Component {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         dataUrl: PropTypes.string,
-        data: PropTypes.array
+        data: PropTypes.array,
+        help: PropTypes.string
     }
 
     static contextTypes = {
@@ -256,16 +279,8 @@ class TreeTableSelect extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return (
-            <div className={owner.addFormValidationClass('form-group', id)} >
-                <div className="col-sm-2">
-                    <label htmlFor={htmlId} className="control-label">{props.label}</label>
-                </div>
-                <div className="col-sm-10">
-                    <TreeTable data={this.props.data} dataUrl={this.props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
-                </div>
-                <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{owner.getFormValidationMessage(id)}</div>
-            </div>
+        return wrapInput(id, htmlId, owner, props.label, props.help,
+            <TreeTable data={this.props.data} dataUrl={this.props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
         );
     }
 }
@@ -546,6 +561,14 @@ function withForm(target) {
         }));
     };
 
+    inst.clearFormStatusMessage = function() {
+        this.setState(previousState => ({
+            formState: previousState.formState.withMutations(map => {
+                map.set('statusMessageText', '');
+            })
+        }));
+    };
+
     inst.enableForm = function() {
         this.setState(previousState => ({formState: previousState.formState.set('isDisabled', false)}));
     };
@@ -565,6 +588,7 @@ function withForm(target) {
 export {
     withForm,
     Form,
+    Fieldset,
     InputField,
     TextArea,
     ButtonRow,

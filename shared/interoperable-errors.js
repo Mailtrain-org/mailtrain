@@ -44,6 +44,12 @@ class DuplicitNameError extends InteroperableError {
     }
 }
 
+class DuplicitEmailError extends InteroperableError {
+    constructor(msg, data) {
+        super('DuplicitEmailError', msg, data);
+    }
+}
+
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
@@ -51,7 +57,8 @@ const errorTypes = {
     NotFoundError,
     LoopDetectedError,
     ChildDetectedError,
-    DuplicitNameError
+    DuplicitNameError,
+    DuplicitEmailError
 };
 
 function deserialize(errorObj) {

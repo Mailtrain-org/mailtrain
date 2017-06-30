@@ -4,7 +4,8 @@ const path = require('path');
 module.exports = {
     entry: {
         namespaces: ['babel-polyfill', './src/namespaces/root.js'],
-        users: ['babel-polyfill', './src/users/root.js']
+        users: ['babel-polyfill', './src/users/root.js'],
+        account: ['babel-polyfill', './src/account/root.js']
     },
     output: {
         library: 'MailtrainReactBody',

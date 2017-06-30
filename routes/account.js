@@ -17,35 +17,24 @@ router.all('/rest/*', (req, res, next) => {
     next();
 });
 
-router.getAsync('/rest/users/:userId', async (req, res) => {
-    const user = await users.getById(req.params.userId);
+router.getAsync('/rest/account', async (req, res) => {
+    const user = await users.getById(req.user.id);
     return res.json(user);
 });
 
-router.postAsync('/rest/users', passport.csrfProtection, async (req, res) => {
-    await users.create(req.body);
+router.postAsync('/rest/account', passport.csrfProtection, async (req, res) => {
+    const data = req.body;
+    data.id = req.user.id;
+
+    await users.updateWithConsistencyCheck(req.body, true);
     return res.json();
 });
 
-router.putAsync('/rest/users/:userId', passport.csrfProtection, async (req, res) => {
-    const user = req.body;
-    user.id = parseInt(req.params.userId);
+router.postAsync('/rest/account-validate', async (req, res) => {
+    const data = req.body;
+    data.id = req.user.id;
 
-    await users.updateWithConsistencyCheck(user);
-    return res.json();
-});
-
-router.deleteAsync('/rest/users/:userId', passport.csrfProtection, async (req, res) => {
-    await users.remove(req.params.userId);
-    return res.json();
-});
-
-router.postAsync('/rest/users-validate', async (req, res) => {
-    return res.json(await users.serverValidate(req.body));
-});
-
-router.postAsync('/rest/users-table', async (req, res) => {
-    return res.json(await users.listDTAjax(req.body));
+    return res.json(await users.serverValidate(data, true));
 });
 
 
@@ -60,8 +49,8 @@ router.all('/*', (req, res, next) => {
 
 router.getAsync('/*', passport.csrfProtection, async (req, res) => {
     res.render('react-root', {
-        title: _('Users'),
-        reactEntryPoint: 'users',
+        title: _('Account'),
+        reactEntryPoint: 'account',
         reactCsrfToken: req.csrfToken()
     });
 });

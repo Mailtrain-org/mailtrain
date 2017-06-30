@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { Title, Toolbar, NavButton } from '../lib/page';
-import { Table, TableSelectMode } from '../lib/table';
+import { Table } from '../lib/table';
 
 @translate()
 export default class List extends Component {
@@ -31,7 +31,7 @@ export default class List extends Component {
 
                 <Title>{t('Users')}</Title>
 
-                <Table withHeader dataUrl="/users/rest/usersTable" columns={columns} actionLinks={actionLinks} />
+                <Table withHeader dataUrl="/users/rest/users-table" columns={columns} actionLinks={actionLinks} />
             </div>
         );
     }

@@ -39,7 +39,7 @@ router.deleteAsync('/rest/namespaces/:nsId', passport.csrfProtection, async (req
     return res.json();
 });
 
-router.getAsync('/rest/namespacesTree', async (req, res) => {
+router.getAsync('/rest/namespaces-tree', async (req, res) => {
     const entries = {};
     let root; // Only the Root namespace is without a parent
     const rows = await namespaces.list();

@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { withPageHelpers, Title } from '../lib/page'
-import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button, TreeTableSelect } from '../lib/form';
+import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
@@ -29,12 +29,11 @@ export default class CUD extends Component {
 
         this.initForm({
             serverValidation: {
-                url: '/users/rest/validate',
+                url: '/users/rest/users-validate',
                 changed: ['username', 'email'],
                 extra: ['id']
             }
         });
-        this.hasChildren = false;
     }
 
     isDelete() {
@@ -89,6 +88,8 @@ export default class CUD extends Component {
             state.setIn(['email', 'error'], t('Email must not be empty'));
         } else if (!emailServerValidation || emailServerValidation.invalid) {
             state.setIn(['email', 'error'], t('Invalid email address.'));
+        } else if (!emailServerValidation || emailServerValidation.exists) {
+            state.setIn(['email', 'error'], t('The email is already associated with another user in the system.'));
         } else {
             state.setIn(['email', 'error'], null);
         }
@@ -106,8 +107,6 @@ export default class CUD extends Component {
         const password = state.getIn(['password', 'value']) || '';
         const password2 = state.getIn(['password2', 'value']) || '';
 
-        const passwordResults = this.passwordValidator.test(password);
-
         let passwordMsgs = [];
 
         if (!edit && !password) {
@@ -115,6 +114,7 @@ export default class CUD extends Component {
         }
 
         if (password) {
+            const passwordResults = this.passwordValidator.test(password);
             passwordMsgs.push(...passwordResults.errors);
         }
 
@@ -154,11 +154,21 @@ export default class CUD extends Component {
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
             }
         } catch (error) {
-            if (error instanceof interoperableErrors.LoopDetectedError) {
+            if (error instanceof interoperableErrors.DuplicitNameError) {
                 this.setFormStatusMessage('danger',
                     <span>
                         <strong>{t('Your updates cannot be saved.')}</strong>{' '}
                         {t('The username is already assigned to another user.')}
+                    </span>
+                );
+                return;
+            }
+
+            if (error instanceof interoperableErrors.DuplicitEmailError) {
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('The email is already assigned to another user.')}
                     </span>
                 );
                 return;

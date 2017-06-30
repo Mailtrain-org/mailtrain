@@ -57,7 +57,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadTreeData() {
-        axios.get('/namespaces/rest/namespacesTree')
+        axios.get('/namespaces/rest/namespaces-tree')
             .then(response => {
 
                 response.data.expanded = true;
