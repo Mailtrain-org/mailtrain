@@ -8,10 +8,13 @@
 <form class="form-horizontal" method="post" action="/blacklist/ajax/add">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" name="next" value="/blacklist">
-    <div class="col-sm-4">
-        <input type="text" class="form-control input-md" name="email" id="add-email-input" value="" placeholder="{{#translate}}Add email to blacklist{{/translate}}">
+    <div class="form-group">
+        <div class="col-sm-4 col-xs-8">
+            <input type="text" class="form-control input-md" name="email" id="add-email-input" value="" placeholder="{{#translate}}Add email to blacklist{{/translate}}">
+        </div>
+        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>{{#translate}}Add{{/translate}}</button>
     </div>
-    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>{{#translate}}Add{{/translate}}</button>
+    <p class="help-block">A blacklisted email address will not receive messages from any campaign. The blacklist does not apply to transactional messages.</p>
 </form>
 
 <form class="form-horizontal" id="delete-email-form" method="post" action="/blacklist/ajax/delete">
