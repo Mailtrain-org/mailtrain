@@ -142,6 +142,41 @@
 <pre>curl -XPOST {{serviceUrl}}api/delete/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com'</pre>
 
+<!--//UPDATE------------>
+
+<h3>POST /api/update/:listId – {{#translate}}Updates an existing subscription{{/translate}}</h3>
+
+<p>
+    {{#translate}}This API updates an existing subscription with the supplied arguments.{{/translate}}
+</p>
+
+<p>
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+</ul>
+
+<p>
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>EMAIL</strong> – {{#translate}}subscriber's email address{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)</li>
+    <li><strong>FIRST_NAME</strong> – {{#translate}}subscriber's first name{{/translate}}</li>
+    <li><strong>LAST_NAME</strong> – {{#translate}}subscriber's last name{{/translate}}</li>
+    <li><strong>TIMEZONE</strong> – {{#translate}}subscriber's timezone (eg. "Europe/Tallinn", "PST" or "UTC"). If not set defaults to "UTC"{{/translate}}</li>
+    <li><strong>MERGE_TAG_VALUE</strong> – {{#translate}}custom field value. Use yes/no for option group values (checkboxes, radios, drop downs){{/translate}}</li>
+</ul>
+
+<p>
+    <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XPOST {{serviceUrl}}api/update/B16uVTdW?access_token={{accessToken}} \
+--data 'EMAIL=test@example.com'</pre>
+
+<!--//----------->
+
 <h3>GET /api/blacklist/get – {{#translate}}Get list of blacklisted emails{{/translate}}</h3>
 
 <p>
