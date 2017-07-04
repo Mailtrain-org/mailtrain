@@ -315,6 +315,126 @@ router.post('/delete/:listId', (req, res) => {
     });
 });
 
+router.post('/update/:listId', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            log.error('API', err);
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+        if (!input.EMAIL) {
+            res.status(400);
+            return res.json({
+                error: 'Missing EMAIL',
+                data: []
+            });
+        }
+
+        tools.validateEmail(input.EMAIL, false, err => {
+
+            if (err) {
+                log.error('API', err);
+                res.status(400);
+                return res.json({
+                    error: err.message || err,
+                    data: {
+                        success: false
+                    }
+                });
+            }
+
+            subscriptions.getByEmail(list.id, input.EMAIL, (err, subscription) => {
+
+                if (err) {
+                    log.error('API', err);
+                    res.status(400);
+                    return res.json({
+                        error: err.message || err,
+                        data: {
+                            success: false
+                        }
+                    });
+                }
+
+                let updateObject = {
+                    email: input.EMAIL
+                };
+
+                if (input.FIRST_NAME) {
+                    updateObject.first_name = (input.FIRST_NAME || '').toString().trim();
+                }
+
+                if (input.LAST_NAME) {
+                    updateObject.last_name = (input.LAST_NAME || '').toString().trim();
+                }
+
+                if (input.TIMEZONE) {
+                    updateObject.tz = (input.TIMEZONE || '').toString().trim();
+                }
+
+                fields.list(list.id, (err, fieldList) => {
+
+                    if (err && !fieldList) {
+                        fieldList = [];
+                    }
+
+                    fieldList.forEach(field => {
+
+                        if (input.hasOwnProperty(field.key) && field.column) {
+                            updateObject[field.column] = input[field.key];
+                        } else if (field.options) {
+                            for (let i = 0, len = field.options.length; i < len; i++) {
+                                if (input.hasOwnProperty(field.options[i].key) && field.options[i].column) {
+                                    let value = input[field.options[i].key];
+                                    if (field.options[i].type === 'option') {
+                                        value = ['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0 ? '' : '1';
+                                    }
+                                    updateObject[field.options[i].column] = value;
+                                }
+                            }
+                        }
+                    });
+
+                    subscriptions.update(list.id, subscription.cid, updateObject, false, (err, response) => {
+                        if (err) {
+                            log.error('API', err);
+                            res.status(500);
+                            return res.json({
+                                error: err.message || err,
+                                data: {
+                                    id: subscription.cid,
+                                    success: false
+                                }
+                            });
+                        }
+                        res.status(200);
+                        res.json({
+                            data: {
+                                id: subscription.cid,
+                                success: response
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+
 router.post('/field/:listId', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
