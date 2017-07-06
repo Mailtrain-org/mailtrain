@@ -142,6 +142,45 @@
 <pre>curl -XPOST {{serviceUrl}}api/delete/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAIL=test@example.com'</pre>
 
+<h3>POST /api/field/:listId – {{#translate}}Add new custom field{{/translate}}</h3>
+
+<p>
+    {{#translate}}This API call creates a new custom field for a list.{{/translate}}
+</p>
+
+<p>
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+</ul>
+
+<p>
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>NAME</strong> – {{#translate}}field name{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)</li>
+    <li><strong>TYPE</strong> – {{#translate}}one of the following types:{{/translate}}
+        <ul>
+            {{#each allowedTypes}}
+                <li>
+                    <strong>{{type}}</strong> {{description}}
+                </li>
+            {{/each}}
+        </ul>
+    </li>
+    <li><strong>GROUP</strong> – {{#translate}}If the type is 'option' then you also need to specify the parent element ID{{/translate}}</li>
+    <li><strong>GROUP_TEMPLATE</strong> – {{#translate}}Template for the group element. If not set, then values of the elements are joined with commas{{/translate}}</li>
+    <li><strong>VISIBLE</strong> – yes/no, {{#translate}}if not visible then the subscriber can not view or modify this value at the profile page{{/translate}}</li>
+</ul>
+
+<p>
+    <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XPOST {{serviceUrl}}api/field/B16uVTdW?access_token={{accessToken}} \
+--data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>
+
 <h3>GET /api/blacklist/get – {{#translate}}Get list of blacklisted emails{{/translate}}</h3>
 
 <p>
