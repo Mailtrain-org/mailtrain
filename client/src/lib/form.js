@@ -194,7 +194,7 @@ class CheckBox extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInputInline(id, htmlId, owner, 'checkbox', props.label, props.help,
-            <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => {console.log(evt); /* FIXME owner.updateFormValue(id, evt.target.value)*/ }}/>
+            <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onClick={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
         );
     }
 }

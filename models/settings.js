@@ -1,7 +1,5 @@
 'use strict';
 
-'use strict';
-
 const knex = require('../lib/knex');
 const tools = require('../lib/tools');
 
@@ -15,11 +13,11 @@ async function get(keyOrKeys) {
 
     keys = keys.map(key => tools.toDbKey(key));
 
-    const result = await knex('settings').whereIn('key', keys);
+    const rows = await knex('settings').select(['key', 'value']).whereIn('key', keys);
 
     const settings = {};
-    for (const key of keys) {
-        settings[tools.fromDbKey(key)] = result[key];
+    for (const row of rows) {
+        settings[tools.fromDbKey(row.key)] = row.value;
     }
 
     if (!Array.isArray(keyOrKeys)) {

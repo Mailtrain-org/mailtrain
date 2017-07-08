@@ -10,6 +10,8 @@ const dtHelpers = require('../lib/dt-helpers');
 const tools = require('../lib/tools-async');
 let crypto = require('crypto');
 const settings = require('./settings');
+const urllib = require('url');
+const _ = require('../lib/translate')._;
 
 const bluebird = require('bluebird');
 
@@ -23,12 +25,13 @@ const mailerSendMail = bluebird.promisify(mailer.sendMail);
 const allowedKeys = new Set(['username', 'name', 'email', 'password']);
 const allowedKeysExternal = new Set(['username']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
+const hashKeys = new Set(['username', 'name', 'email']);
 
-const passport = require('../../lib/passport');
+const passport = require('../lib/passport');
 
 
 function hash(user) {
-    return hasher.hash(filterObject(user, allowedKeys));
+    return hasher.hash(filterObject(user, hashKeys));
 }
 
 async function _getBy(key, value, extraColumns) {
@@ -170,7 +173,7 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
         }
 
         const existingUserHash = hash(existingUser);
-        if (existingUserHash != user.originalHash) {
+        if (existingUserHash !== user.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
@@ -201,13 +204,22 @@ async function getByUsername(username) {
 }
 
 async function getByUsernameIfPasswordMatch(username, password) {
-    const user = await _getBy('username', username, ['password']);
+    try {
+        const user = await _getBy('username', username, ['password']);
 
-    if (!await bcryptCompare(password, user.password)) {
-        throw new interoperableErrors.IncorrectPasswordError();
+        if (!await bcryptCompare(password, user.password)) {
+            throw new interoperableErrors.IncorrectPasswordError();
+        }
+
+        return user;
+
+    } catch (err) {
+        if (err instanceof interoperableErrors.NotFoundError) {
+            throw new interoperableErrors.IncorrectPasswordError();
+        }
+
+        throw err;
     }
-
-    return user;
 }
 
 async function getAccessToken(userId) {
@@ -258,7 +270,7 @@ async function sendPasswordReset(usernameOrEmail) {
                     title: 'Mailtrain',
                     username: user.username,
                     name: user.name,
-                    confirmUrl: urllib.resolve(serviceUrl, `/account/reset-link/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
+                    confirmUrl: urllib.resolve(serviceUrl, `/account/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
                 }
             });
         }
@@ -273,7 +285,7 @@ async function isPasswordResetTokenValid(username, resetToken) {
     return !!user;
 }
 
-async function resetPassword(username, resetToken, password) {R
+async function resetPassword(username, resetToken, password) {
     enforce(passport.isAuthMethodLocal, 'Local user management is required');
 
     await knex.transaction(async tx => {

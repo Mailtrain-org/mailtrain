@@ -47,7 +47,7 @@ export default class Forget extends Component {
         const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, '/rest/password-reset-send');
 
         if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/login', 'success', t('If the username / email exists in the system, password reset link will be sent to the registered email.'));
+            this.navigateToWithFlashMessage('/account/login', 'success', t('If the username / email exists in the system, password reset link will be sent to the registered email.'));
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('Please enter your username / email and try again.'));

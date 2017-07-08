@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { translate, Trans } from 'react-i18next';
 import { withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import URL from 'url-parse';
@@ -23,7 +23,9 @@ export default class API extends Component {
     @withAsyncErrorHandler
     async loadAccessToken() {
         const response = await axios.get('/rest/access-token');
-        this.setState('accessToken', response.data);
+        this.setState({
+            accessToken: response.data
+        });
     }
 
     componentDidMount() {
@@ -32,7 +34,9 @@ export default class API extends Component {
 
     async resetAccessToken() {
         const response = await axios.post('/rest/access-token-reset');
-        this.setState('accessToken', response.data);
+        this.setState({
+            accessToken: response.data
+        });
     }
 
     render() {
@@ -42,33 +46,36 @@ export default class API extends Component {
         const serviceUrl = thisUrl.origin + '/';
         const accessToken = this.state.accessToken || 'ACCESS_TOKEN';
 
+        let accessTokenMsg;
+        if (this.state.accessToken) {
+            accessTokenMsg = <div>{t('Personal access token') + ': '}<code>{accessToken}</code></div>;
+        } else {
+            accessTokenMsg = <div>{t('Access token not yet generated')}</div>;
+        }
+
         return (
             <div>
                 <Title>{t('Sign in')}</Title>
 
 
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div class="pull-right">
+                <div className="panel panel-default">
+                    <div className="panel-body">
+                        <div className="pull-right">
                             <Button label={this.state.accessToken ? t('Reset Access Token') : t('Generate Access Token')} icon="retweet" className="btn-info" onClickAsync={::this.resetAccessToken} />
                         </div>
-                        { this.state.accessToken ?
-                            <div>{t('Personal access token:')} <code>{accessToken}</code></div>
-                          :
-                            <div>{t('Access token not yet generated')}</div>
-                        }
+                        {accessTokenMsg}
                     </div>
                 </div>
 
-                <div class="well">
+                <div className="well">
                     <h3>{t('Notes about the API')}</h3>
 
                     <ul>
                         <li>
-                            {t('API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.')}
+                            <Trans>API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.</Trans>
                         </li>
                         <li>
-                            {t('You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code> is not supported.')}
+                            <Trans>You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code> is not supported.</Trans>
                         </li>
                     </ul>
                 </div>
@@ -183,9 +190,11 @@ export default class API extends Component {
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('your personal access token')}
+                        <ul>
                         <li><strong>start</strong> – {t('Start position')} (<em>{t('optional, default 0')}</em>)</li>
                         <li><strong>limit</strong> – {t('limit emails count in response')} (<em>{t('optional, default 10000')}</em>)</li>
                         <li><strong>search</strong> – {t('filter by part of email')} (<em>{t('optional, default ""')}</em>)</li>
+                        </ul>
                     </li>
                 </ul>
 

@@ -8,6 +8,7 @@ import {
 } from '../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import passwordValidator from '../../../shared/password-validator';
+import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
@@ -120,6 +121,7 @@ export default class Account extends Component {
 
                 this.clearFormStatusMessage();
             } else {
+                this.enableForm();
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
             }
         } catch (error) {

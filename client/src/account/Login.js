@@ -9,6 +9,7 @@ import {
 } from '../lib/form';
 import { withErrorHandling } from '../lib/error-handling';
 import URL from 'url-parse';
+import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
@@ -61,9 +62,10 @@ export default class Login extends Component {
 
             if (submitSuccessful) {
                 const query = new URL(this.props.location.search, true).query;
+                const nextUrl = query.next || '/';
 
                 /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
-                window.location = query.next;
+                window.location = nextUrl;
             } else {
                 this.setFormStatusMessage('warning', t('Please enter your credentials and try again.'));
             }

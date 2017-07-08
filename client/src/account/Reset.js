@@ -3,12 +3,14 @@
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { withPageHelpers, Title } from '../lib/page'
+import { Link } from 'react-router-dom'
 import {
     withForm, Form, Fieldset, FormSendMethod, InputField, ButtonRow, Button
 } from '../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import passwordValidator from '../../../shared/password-validator';
 import axios from '../lib/axios';
+import interoperableErrors from '../../../shared/interoperable-errors';
 
 const ResetTokenValidationState = {
     PENDING: 0,
@@ -34,7 +36,7 @@ export default class Account extends Component {
     }
 
     @withAsyncErrorHandler
-    async loadAccessToken() {
+    async validateResetToken() {
         const params = this.props.match.params;
 
         const response = await axios.post('/rest/password-reset-validate', {
@@ -42,7 +44,9 @@ export default class Account extends Component {
             resetToken: params.resetToken
         });
 
-        this.setState('resetTokenValidationState', response.data ? ResetTokenValidationState.VALID : ResetTokenValidationState.INVALID);
+        this.setState({
+            resetTokenValidationState: response.data ? ResetTokenValidationState.VALID : ResetTokenValidationState.INVALID
+        });
     }
 
     componentDidMount() {
@@ -54,6 +58,8 @@ export default class Account extends Component {
             password: '',
             password2: ''
         });
+
+        this.validateResetToken();
     }
 
     localValidateFormValues(state) {
@@ -64,7 +70,7 @@ export default class Account extends Component {
 
         let passwordMsgs = [];
 
-        if (password || currentPassword) {
+        if (password) {
             const passwordResults = this.passwordValidator.test(password);
             passwordMsgs.push(...passwordResults.errors);
         }
@@ -91,6 +97,7 @@ export default class Account extends Component {
             if (submitSuccessful) {
                 this.navigateToWithFlashMessage('/account/login', 'success', t('Password reset'));
             } else {
+                this.enableForm();
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
             }
         } catch (error) {
@@ -98,7 +105,7 @@ export default class Account extends Component {
                 this.setFormStatusMessage('danger',
                     <span>
                         <strong>{t('Your password cannot be reset.')}</strong>{' '}
-                        {t('The reset token has expired.')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Click here to request a new password reset link.')}</Link>
+                        {t('The password reset token has expired.')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Click here to request a new password reset link.')}</Link>
                     </span>
                 );
                 return;
@@ -113,9 +120,17 @@ export default class Account extends Component {
 
         if (this.state.resetTokenValidationState === ResetTokenValidationState.PENDING) {
             return (
-                <div>{t('Validating password reset token ...')}</div>
-            )
+                <p>{t('Validating password reset token ...')}</p>
+            );
+
         } else if (this.state.resetTokenValidationState === ResetTokenValidationState.INVALID) {
+            return (
+                <div>
+                    <Title>{t('The password cannot be reset')}</Title>
+
+                    <p>{t('The password reset token has expired.')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Click here to request a new password reset link.')}</Link></p>
+                </div>
+            );
 
         } else {
             return (

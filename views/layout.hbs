@@ -24,7 +24,7 @@
 
         <script>
             window.csfrToken = '{{reactCsrfToken}}';
-            window.mailtrainConfig = {{mailtrainConfig}};
+            window.mailtrainConfig = {{{mailtrainConfig}}};
         </script>
 
         <script src="/mailtrain/{{reactEntryPoint}}.js"></script>
@@ -75,35 +75,45 @@
                             <li><a href="{{url}}">{{title}}</a></li>
                         {{/if}}
                     {{/each}}
+
+                    {{#if admin }}
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="/users">
+                                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {{#translate}}Users{{/translate}}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/namespaces">
+                                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {{#translate}}Namespaces{{/translate}}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/settings">
+                                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {{#translate}}Settings{{/translate}}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/blacklist">
+                                            <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> {{#translate}}Blacklist{{/translate}}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/account/api">
+                                            <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> {{#translate}}API{{/translate}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    {{/if}}
+
                     <li><a href="https://github.com/Mailtrain-org/mailtrain/wiki"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> {{#translate}}Wiki{{/translate}}</a></li>
                     <li><a href="https://mailtrain.wordpress.com/"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> {{#translate}}Blog{{/translate}}</a></li>
                 </ul>
-
-
-                {{#if admin }}
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="/settings">
-                                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {{#translate}}Settings{{/translate}}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/blacklist">
-                                        <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> {{#translate}}Blacklist{{/translate}}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/account/api">
-                                        <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> {{#translate}}API{{/translate}}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                {{/if}}
 
 
                 {{#if user }}

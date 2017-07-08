@@ -17,7 +17,7 @@ const postfixBounceServer = require('./services/postfix-bounce-server');
 const tzupdate = require('./services/tzupdate');
 const feedcheck = require('./services/feedcheck');
 const dbcheck = require('./lib/dbcheck');
-const tools = require('./lib/tools');
+const senders = require('./lib/senders');
 const reportProcessor = require('./lib/report-processor');
 const executor = require('./lib/executor');
 const privilegeHelpers = require('./lib/privilege-helpers');
@@ -92,11 +92,11 @@ function spawnSenders(callback) {
 
         let child = fork(__dirname + '/services/sender.js', []);
         let pid = child.pid;
-        tools.workers.add(child);
+        senders.workers.add(child);
 
         child.on('close', (code, signal) => {
             spawned--;
-            tools.workers.delete(child);
+            senders.workers.delete(child);
             log.error('Child', 'Sender process %s exited with %s', pid, code || signal);
             // Respawn after 5 seconds
             setTimeout(() => spawnSender(), 5 * 1000).unref();

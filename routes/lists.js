@@ -48,7 +48,7 @@ let moment = require('moment-timezone');
 router.all('/*', (req, res, next) => {
     if (!req.user) {
         req.flash('danger', _('Need to be logged in to access restricted content'));
-        return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
+        return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('lists');
     next();

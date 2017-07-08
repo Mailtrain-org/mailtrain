@@ -13,6 +13,7 @@ let upload = multer();
 let aws = require('aws-sdk');
 let util = require('util');
 let _ = require('../lib/translate')._;
+const senders = require('../lib/senders');
 
 let settings = require('../lib/models/settings');
 
@@ -21,7 +22,7 @@ let allowedKeys = ['service_url', 'smtp_hostname', 'smtp_port', 'smtp_encryption
 router.all('/*', (req, res, next) => {
     if (!req.user) {
         req.flash('danger', _('Need to be logged in to access restricted content'));
-        return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
+        return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
     }
     res.setSelectedMenu('/settings');
     next();
@@ -107,7 +108,7 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
     let storeSettings = () => {
         if (i >= keys.length) {
             mailer.update();
-            tools.workers.forEach(worker => {
+            senders.workers.forEach(worker => {
                 worker.send({
                     reload: true
                 });

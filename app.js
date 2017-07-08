@@ -239,7 +239,6 @@ app.use('/account', accountLegacyIntegration);
 
 
 app.all('/rest/*', (req, res, next) => {
-    console.log('njr');
     req.needsJSONResponse = true;
     next();
 });
@@ -264,9 +263,9 @@ app.use((req, res, next) => {
 
 // error handlers
 
-// development error handler
-// will print stacktrace
 if (app.get('env') === 'development') {
+    // development error handler
+    // will print stacktrace
     app.use((err, req, res, next) => {
         if (!err) {
             return next();
@@ -278,12 +277,13 @@ if (app.get('env') === 'development') {
                 error: err
             };
 
-            if (err instanceof InteroperableError) {
+            if (err instanceof interoperableErrors.InteroperableError) {
                 resp.type = err.type;
                 resp.data = err.data;
             }
 
             res.status(err.status || 500).json(resp);
+
         } else {
             res.status(err.status || 500);
             res.render('error', {
@@ -293,34 +293,36 @@ if (app.get('env') === 'development') {
         }
 
     });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use((err, req, res, next) => {
-    if (!err) {
-        return next();
-    }
-
-    if (req.needsJSONResponse) {
-        const resp = {
-            message: err.message,
-            error: {}
-        };
-
-        if (err instanceof interoperableErrors.InteroperableError) {
-            resp.type = err.type;
-            resp.data = err.data;
+} else {
+    // production error handler
+    // no stacktraces leaked to user
+    app.use((err, req, res, next) => {
+        if (!err) {
+            return next();
         }
 
-        res.status(err.status || 500).json(resp);
-    } else {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: {}
-        });
-    }
-});
+        if (req.needsJSONResponse) {
+            const resp = {
+                message: err.message,
+                error: {}
+            };
+
+            if (err instanceof interoperableErrors.InteroperableError) {
+                resp.type = err.type;
+                resp.data = err.data;
+            }
+
+            res.status(err.status || 500).json(resp);
+
+        } else {
+            res.status(err.status || 500);
+            res.render('error', {
+                message: err.message,
+                error: {}
+            });
+        }
+    });
+}
+
 
 module.exports = app;

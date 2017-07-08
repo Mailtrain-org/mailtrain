@@ -3,7 +3,6 @@
 const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const users = require('../../models/users');
-const interoperableErrors = require('../../shared/interoperable-errors');
 
 const router = require('../../lib/router-async').create();
 

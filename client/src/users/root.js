@@ -20,7 +20,7 @@ const getStructure = t => {
                 render: props => (<CUD edit {...props} />)
         };
 
-        subPahts.create = {
+        subPaths.create = {
             title: t('Create User'),
                 render: props => (<CUD {...props} />)
         };

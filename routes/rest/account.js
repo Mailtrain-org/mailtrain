@@ -9,6 +9,7 @@ const router = require('../../lib/router-async').create();
 
 router.getAsync('/account', passport.loggedIn, async (req, res) => {
     const user = await users.getById(req.user.id);
+    user.hash = users.hash(user);
     return res.json(user);
 });
 
@@ -20,7 +21,7 @@ router.postAsync('/account', passport.loggedIn, passport.csrfProtection, async (
     return res.json();
 });
 
-router.postAsync('/account-validate', passport.loggedIn, async (req, res) => {
+router.postAsync('/account-validate', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const data = req.body;
     data.id = req.user.id;
 
@@ -39,20 +40,20 @@ router.postAsync('/access-token-reset', passport.loggedIn, passport.csrfProtecti
 });
 
 
-router.post('/login', passport.restLogin);
-router.post('/logout', passport.restLogout); // TODO - this endpoint is currently not in use. It will become relevant once we switch to SPA
+router.post('/login', passport.csrfProtection, passport.restLogin);
+router.post('/logout', passport.csrfProtection, passport.restLogout); // TODO - this endpoint is currently not in use. It will become relevant once we switch to SPA
 
-router.postAsync('/password-reset-send', async (req, res) => {
-    await users.sendPasswordReset(req.body.username);
+router.postAsync('/password-reset-send', passport.csrfProtection, async (req, res) => {
+    await users.sendPasswordReset(req.body.usernameOrEmail);
     return res.json();
 });
 
-router.getAsync('/password-reset-validate', async (req, res) => {
+router.postAsync('/password-reset-validate', passport.csrfProtection, async (req, res) => {
     const isValid = await users.isPasswordResetTokenValid(req.body.username, req.body.resetToken);
     return res.json(isValid);
 })
 
-router.getAsync('/password-reset', async (req, res) => {
+router.postAsync('/password-reset', passport.csrfProtection, async (req, res) => {
     await users.resetPassword(req.body.username, req.body.resetToken, req.body.password);
     return res.json();
 })

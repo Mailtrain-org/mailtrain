@@ -64,7 +64,7 @@ const getStructure = t => {
 
 export default function() {
     ReactDOM.render(
-        <I18nextProvider i18n={ i18n }><Section root='/account' structure={getStructure}/></I18nextProvider>,
+        <I18nextProvider i18n={ i18n }><Section root='/account/login' structure={getStructure}/></I18nextProvider>,
         document.getElementById('root')
     );
 };
