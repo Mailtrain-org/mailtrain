@@ -16,12 +16,12 @@ import mailtrainConfig from 'mailtrainConfig';
 
 const getStructure = t => {
     const subPaths = {
-        'login': {
+        login: {
             title: t('Sign in'),
             link: '/account/login',
             component: Login,
         },
-        'api': {
+        api: {
             title: t('API'),
             link: '/account/api',
             component: API

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { translate, Trans } from 'react-i18next';
 import { withPageHelpers, Title } from '../lib/page'
 import {
     withForm, Form, Fieldset, FormSendMethod, InputField, ButtonRow, Button
@@ -185,11 +185,15 @@ export default class Account extends Component {
                 </div>
             );
         } else {
-            <div>
-                <Title>{t('Account')}</Title>
+            return (
+                <div>
+                    <Title>{t('Account')}</Title>
 
-                <p>Account management is not possible because Mailtrain is configured to use externally managed users.</p>
-            </div>
+                    <p>{t('Account management is not possible because Mailtrain is configured to use externally managed users.')}</p>
+
+                    {mailtrainConfig.externalPasswordResetLink && <p><Trans>If you want to change the password, use <a href={mailtrainConfig.externalPasswordResetLink}>this link</a>.</Trans></p>}
+                </div>
+            );
         }
     }
 }

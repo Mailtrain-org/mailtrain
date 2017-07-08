@@ -89,6 +89,13 @@ export default class Login extends Component {
     render() {
         const t = this.props.t;
 
+        let passwordResetLink;
+        if (mailtrainConfig.isAuthMethodLocal) {
+            passwordResetLink = <Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Forgot your password?')}</Link>;
+        } else if (mailtrainConfig.externalPasswordResetLink) {
+            passwordResetLink = <a href={mailtrainConfig.externalPasswordResetLink}>{t('Forgot your password?')}</a>;
+        }
+
         return (
             <div>
                 <Title>{t('Sign in')}</Title>
@@ -100,7 +107,7 @@ export default class Login extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Sign in')}/>
-                        {mailtrainConfig.isAuthMethodLocal && <Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Forgot your password?')}</Link>}
+                        {passwordResetLink}
                     </ButtonRow>
                 </Form>
             </div>
