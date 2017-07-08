@@ -29,7 +29,8 @@
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-i18next": "^4.1.0",
-    "react-router-dom": "^4.1.1"
+    "react-router-dom": "^4.1.1",
+    "url-parse": "^1.1.9"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

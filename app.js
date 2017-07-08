@@ -21,7 +21,6 @@ const passport = require('./lib/passport');
 const tools = require('./lib/tools');
 
 const routes = require('./routes/index');
-const usersOld = require('./routes/users-legacy');
 const lists = require('./routes/lists');
 const settings = require('./routes/settings');
 const settingsModel = require('./lib/models/settings');
@@ -43,9 +42,13 @@ const mosaico = require('./routes/mosaico');
 const reports = require('./routes/reports');
 const reportsTemplates = require('./routes/report-templates');
 
-const namespaces = require('./routes/namespaces');
-const users = require('./routes/users');
-const account = require('./routes/account');
+const namespaces = require('./routes/rest/namespaces');
+const users = require('./routes/rest/users');
+const account = require('./routes/rest/account');
+
+const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
+const usersLegacyIntegration = require('./routes/users-legacy-integration');
+const accountLegacyIntegration = require('./routes/account-legacy-integration');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -168,6 +171,7 @@ passport.setup(app);
 app.use((req, res, next) => {
     res.locals.flash = req.flash.bind(req);
     res.locals.user = req.user;
+    res.locals.admin = req.user && req.user.id == 1; // FIXME, this should verify the admin privileges and set this accordingly
     res.locals.ldap = {
         enabled: config.ldap.enabled,
         passwordresetlink: config.ldap.passwordresetlink
@@ -209,7 +213,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/', routes);
-app.use('/users', usersOld);
 app.use('/lists', lists);
 app.use('/templates', templates);
 app.use('/campaigns', campaigns);
@@ -228,9 +231,24 @@ app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
 
-app.use('/namespaces', namespaces);
-app.use('/users', users);
-app.use('/account', account);
+/* FIXME - this should be removed once we bind the ReactJS client to / */
+app.use('/users', usersLegacyIntegration);
+app.use('/namespaces', namespacesLegacyIntegration);
+app.use('/account', accountLegacyIntegration);
+/* ------------------------------------------------------------------- */
+
+
+app.all('/rest/*', (req, res, next) => {
+    console.log('njr');
+    req.needsJSONResponse = true;
+    next();
+});
+
+app.use('/rest', namespaces);
+app.use('/rest', users);
+app.use('/rest', account);
+
+
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/reports', reports);

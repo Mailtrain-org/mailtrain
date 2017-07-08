@@ -21,7 +21,8 @@ module.exports = {
     },
     externals: {
         jquery: 'jQuery',
-        csfrToken: 'csfrToken'
+        csfrToken: 'csfrToken',
+        mailtrainConfig: 'mailtrainConfig'
     },
     plugins: [
 //        new webpack.optimize.UglifyJsPlugin(),

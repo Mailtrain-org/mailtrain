@@ -128,6 +128,20 @@ function wrapInput(id, htmlId, owner, label, help, input) {
     );
 }
 
+function wrapInputInline(id, htmlId, owner, containerClass, label, help, input) {
+    const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
+
+    return (
+        <div className={owner.addFormValidationClass('form-group', id)} >
+            <div className={"col-sm-10 col-sm-offset-2 " + containerClass }>
+                <label>{input} {label}</label>
+            </div>
+            {helpBlock}
+            <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>
+        </div>
+    );
+}
+
 class InputField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -162,6 +176,29 @@ class InputField extends Component {
     }
 }
 
+class CheckBox extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.string
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        return wrapInputInline(id, htmlId, owner, 'checkbox', props.label, props.help,
+            <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => {console.log(evt); /* FIXME owner.updateFormValue(id, evt.target.value)*/ }}/>
+        );
+    }
+}
+
 class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -186,14 +223,31 @@ class TextArea extends Component {
     }
 }
 
-class ButtonRow extends Component {
+class AlignedRow extends Component {
+    static propTypes = {
+        className: PropTypes.string
+    }
+
+    static defaultProps = {
+        className: ''
+    }
+
     render() {
         return (
             <div className="form-group">
-                <div className="col-sm-10 col-sm-offset-2 mt-button-row">
+                <div className={"col-sm-10 col-sm-offset-2 " + this.props.className}>
                     {this.props.children}
                 </div>
             </div>
+        );
+    }
+}
+
+
+class ButtonRow extends Component {
+    render() {
+        return (
+            <AlignedRow className="mt-button-row">{this.props.children}</AlignedRow>
         );
     }
 }
@@ -202,7 +256,6 @@ class ButtonRow extends Component {
 class Button extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
-        onClick: PropTypes.func,
         label: PropTypes.string,
         icon: PropTypes.string,
         className: PropTypes.string,
@@ -215,12 +268,7 @@ class Button extends Component {
 
     @withAsyncErrorHandler
     async onClick(evt) {
-        if (this.props.onClick) {
-            evt.preventDefault();
-
-            onClick(evt);
-
-        } else if (this.props.onClickAsync) {
+        if (this.props.onClickAsync) {
             evt.preventDefault();
 
             this.context.formStateOwner.disableForm();
@@ -254,6 +302,7 @@ class Button extends Component {
         );
     }
 }
+
 
 class TreeTableSelect extends Component {
     static propTypes = {
@@ -296,6 +345,93 @@ function withForm(target) {
         data: Immutable.Map(),
         isServerValidationRunning: false
     });
+
+    // formValidateResolve is called by "validateForm" once client receives validation response from server that does not
+    // trigger another server validation
+    let formValidateResolve = null;
+
+    function scheduleValidateForm(self) {
+        setTimeout(() => {
+            self.setState(previousState => ({
+                formState: previousState.formState.withMutations(mutState => {
+                    validateFormState(self, mutState);
+                })
+            }));
+        }, 0);
+    }
+
+    function validateFormState(self, mutState) {
+        const settings = self.state.formSettings;
+
+        if (!mutState.get('isServerValidationRunning') && settings.serverValidation) {
+            const payload = {};
+            let payloadNotEmpty = false;
+
+            for (const attr of settings.serverValidation.extra || []) {
+                payload[attr] = mutState.getIn(['data', attr, 'value']);
+            }
+
+            for (const attr of settings.serverValidation.changed) {
+                const currValue = mutState.getIn(['data', attr, 'value']);
+                const serverValue = mutState.getIn(['data', attr, 'serverValue']);
+
+                // This really assumes that all form values are preinitialized (i.e. not undef)
+                if (currValue !== serverValue) {
+                    mutState.setIn(['data', attr, 'serverValidated'], false);
+                    payload[attr] = currValue;
+                    payloadNotEmpty = true;
+                }
+            }
+
+            if (payloadNotEmpty) {
+                mutState.set('isServerValidationRunning', true);
+
+                axios.post(settings.serverValidation.url, payload)
+                    .then(response => {
+
+                        self.setState(previousState => ({
+                            formState: previousState.formState.withMutations(mutState => {
+                                mutState.set('isServerValidationRunning', false);
+
+                                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                                    for (const attr in payload) {
+                                        mutStateData.setIn([attr, 'serverValue'], payload[attr]);
+
+                                        if (payload[attr] === mutState.getIn(['data', attr, 'value'])) {
+                                            mutStateData.setIn([attr, 'serverValidated'], true);
+                                            mutStateData.setIn([attr, 'serverValidation'], response.data[attr] || true);
+                                        }
+                                    }
+                                }));
+                            })
+                        }));
+
+                        scheduleValidateForm(self);
+                    })
+                    .catch(error => {
+                        console.log('Ignoring unhandled error in "validateFormState": ' + error);
+
+                        self.setState(previousState => ({
+                            formState: previousState.formState.set('isServerValidationRunning', false)
+                        }));
+
+                        scheduleValidateForm(self);
+                    });
+            } else {
+                if (formValidateResolve) {
+                    const resolve = formValidateResolve;
+                    formValidateResolve = null;
+                    resolve();
+                }
+            }
+        }
+
+        if (self.localValidateFormValues) {
+            mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                self.localValidateFormValues(mutStateData);
+            }));
+        }
+    }
 
     inst.initForm = function(settings) {
         const state = this.state || {};
@@ -345,12 +481,15 @@ function withForm(target) {
                 mutator(data);
             }
 
+            let response;
             if (method === FormSendMethod.PUT) {
-                await axios.put(url, data);
+                response = await axios.put(url, data);
             } else if (method === FormSendMethod.POST) {
-                await axios.post(url, data);
+                response = await axios.post(url, data);
             }
-            return true;
+
+            return response.data || true;
+
         } else {
             this.showFormValidation();
             return false;
@@ -371,24 +510,9 @@ function withForm(target) {
                     }
                 }));
                 
-                this.validateForm(mutState);
+                validateFormState(this, mutState);
             })
         }));
-    };
-
-
-    // formValidateResolve is called by "validateForm" once client receives validation response from server that does not
-    // trigger another server validation
-    let formValidateResolve = null;
-
-    const scheduleValidateForm = (self) => {
-        setTimeout(() => {
-            self.setState(previousState => ({
-                formState: previousState.formState.withMutations(mutState => {
-                    self.validateForm(mutState);
-                })
-            }));
-        }, 0);
     };
 
     inst.waitForFormServerValidated = async function() {
@@ -397,84 +521,15 @@ function withForm(target) {
         }
     };
 
-    inst.validateForm = function(mutState) {
-        const settings = this.state.formSettings;
-
-        if (!mutState.get('isServerValidationRunning') && settings.serverValidation) {
-            const payload = {};
-            let payloadNotEmpty = false;
-
-            for (const attr of settings.serverValidation.extra || []) {
-                payload[attr] = mutState.getIn(['data', attr, 'value']);
-            }
-
-            for (const attr of settings.serverValidation.changed) {
-                const currValue = mutState.getIn(['data', attr, 'value']);
-                const serverValue = mutState.getIn(['data', attr, 'serverValue']);
-
-                // This really assumes that all form values are preinitialized (i.e. not undef)
-                if (currValue !== serverValue) {
-                    mutState.setIn(['data', attr, 'serverValidated'], false);
-                    payload[attr] = currValue;
-                    payloadNotEmpty = true;
-                }
-            }
-
-            if (payloadNotEmpty) {
-                mutState.set('isServerValidationRunning', true);
-
-                axios.post(settings.serverValidation.url, payload)
-                    .then(response => {
-
-                        this.setState(previousState => ({
-                            formState: previousState.formState.withMutations(mutState => {
-                                mutState.set('isServerValidationRunning', false);
-
-                                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
-                                    for (const attr in payload) {
-                                        mutStateData.setIn([attr, 'serverValue'], payload[attr]);
-
-                                        if (payload[attr] === mutState.getIn(['data', attr, 'value'])) {
-                                            mutStateData.setIn([attr, 'serverValidated'], true);
-                                            mutStateData.setIn([attr, 'serverValidation'], response.data[attr] || true);
-                                        }
-                                    }
-                                }));
-                            })
-                        }));
-
-                        scheduleValidateForm(this);
-                    })
-                    .catch(error => {
-                        console.log('Ignoring unhandled error in "validateForm": ' + error);
-
-                        this.setState(previousState => ({
-                            formState: previousState.formState.set('isServerValidationRunning', false)
-                        }));
-
-                        scheduleValidateForm(this);
-                    });
-            } else {
-                if (formValidateResolve) {
-                    const resolve = formValidateResolve;
-                    formValidateResolve = null;
-                    resolve();
-                }
-            }
-        }
-
-        if (this.localValidateFormValues) {
-            mutState.update('data', stateData => stateData.withMutations(mutStateData => {
-                this.localValidateFormValues(mutStateData);
-            }));
-        }
+    inst.scheduleFormRevalidate = function() {
+        scheduleValidateForm(this);
     };
 
     inst.updateFormValue = function(key, value) {
         this.setState(previousState => ({
             formState: previousState.formState.withMutations(mutState => {
                 mutState.setIn(['data', key, 'value'], value);
-                this.validateForm(mutState);
+                validateFormState(this, mutState);
             })
         }));
     };
@@ -590,7 +645,9 @@ export {
     Form,
     Fieldset,
     InputField,
+    CheckBox,
     TextArea,
+    AlignedRow,
     ButtonRow,
     Button,
     TreeTableSelect,

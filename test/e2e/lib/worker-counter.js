@@ -1,7 +1,5 @@
 'use strict';
 
-const Promise = require('bluebird');
-
 class WorkerCounter {
     constructor() {
         this.counter = 0;

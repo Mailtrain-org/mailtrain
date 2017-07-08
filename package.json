@@ -97,6 +97,7 @@
     "node-gettext": "^2.0.0-rc.1",
     "node-mocks-http": "^1.6.1",
     "node-object-hash": "^1.2.0",
+    "nodeify": "^1.0.1",
     "nodemailer": "^4.0.1",
     "nodemailer-openpgp": "^1.0.2",
     "npmlog": "^4.0.2",

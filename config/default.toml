@@ -119,6 +119,8 @@ baseDN="ou=users,dc=company"
 filter="(|(username={{username}})(mail={{username}}))"
 #Username field in LDAP (uid/cn/username)
 uidTag="username"
+# nameTag identifies the attribute to be used for user's full name
+nameTag="username"
 passwordresetlink=""
 
 [postfixbounce]

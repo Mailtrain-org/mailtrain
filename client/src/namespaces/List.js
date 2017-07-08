@@ -25,7 +25,7 @@ export default class List extends Component {
 
                 <Title>{t('Namespaces')}</Title>
 
-                <TreeTable withHeader dataUrl="/namespaces/rest/namespaces-tree" actionLinks={actionLinks} />
+                <TreeTable withHeader dataUrl="/rest/namespaces-tree" actionLinks={actionLinks} />
             </div>
         );
     }

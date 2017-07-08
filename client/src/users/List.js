@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { Title, Toolbar, NavButton } from '../lib/page';
 import { Table } from '../lib/table';
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 export default class List extends Component {
@@ -19,9 +20,12 @@ export default class List extends Component {
 
         const columns = [
             { data: 0, title: "#" },
-            { data: 1, title: "Username" },
-            { data: 2, title: "Full Name" }
+            { data: 1, title: "Username" }
         ];
+
+        if (mailtrainConfig.isAuthMethodLocal) {
+            columns.push({ data: 2, title: "Full Name" });
+        }
 
         return (
             <div>
@@ -31,7 +35,7 @@ export default class List extends Component {
 
                 <Title>{t('Users')}</Title>
 
-                <Table withHeader dataUrl="/users/rest/users-table" columns={columns} actionLinks={actionLinks} />
+                <Table withHeader dataUrl="/rest/users-table" columns={columns} actionLinks={actionLinks} />
             </div>
         );
     }

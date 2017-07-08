@@ -14,17 +14,17 @@ const getStructure = t => ({
         title: t('Home'),
         externalLink: '/',
         children: {
-            'namespaces': {
+            namespaces: {
                 title: t('Namespaces'),
                 link: '/namespaces',
                 component: List,
                 children: {
-                    'edit' : {
+                    edit : {
                         title: t('Edit Namespace'),
                         params: [':id', ':action?'],
                         render: props => (<CUD edit {...props} />)
                     },
-                    'create' : {
+                    create : {
                         title: t('Create Namespace'),
                         render: props => (<CUD {...props} />)
                     }

@@ -21,8 +21,6 @@ async function getById(nsId) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    ns.hash = hash(ns);
-
     return ns;
 }
 

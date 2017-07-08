@@ -3,7 +3,7 @@
 let passport = require('../lib/passport');
 let express = require('express');
 let router = new express.Router();
-let users = require('../lib/models/users-legacy');
+let users = require('../lib/models/users-legacy-REMOVE');
 let fields = require('../lib/models/fields');
 let settings = require('../lib/models/settings');
 let _ = require('../lib/translate')._;
@@ -112,35 +112,6 @@ router.post('/api/reset-token', passport.parseForm, passport.csrfProtection, (re
             req.flash('info', _('Access token not updated'));
         }
         return res.redirect('/users/api');
-    });
-});
-
-router.all('/account', (req, res, next) => {
-    if (!req.user) {
-        req.flash('danger', _('Need to be logged in to access restricted content'));
-        return res.redirect('/users/login?next=' + encodeURIComponent(req.originalUrl));
-    }
-    next();
-});
-
-router.get('/account', passport.csrfProtection, (req, res) => {
-    let data = {
-        csrfToken: req.csrfToken(),
-        email: req.user.email
-    };
-    res.render('users/account', data);
-});
-
-router.post('/account', passport.parseForm, passport.csrfProtection, (req, res) => {
-    users.update(Number(req.user.id), req.body, (err, success) => {
-        if (err) {
-            req.flash('danger', err.message || err);
-        } else if (success) {
-            req.flash('success', _('Account information updated'));
-        } else {
-            req.flash('info', _('Account information not updated'));
-        }
-        return res.redirect('/users/account');
     });
 });
 

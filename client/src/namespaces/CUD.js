@@ -57,7 +57,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadTreeData() {
-        axios.get('/namespaces/rest/namespaces-tree')
+        axios.get('/rest/namespaces-tree')
             .then(response => {
 
                 response.data.expanded = true;
@@ -75,7 +75,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL(`/namespaces/rest/namespaces/${this.state.entityId}`, data => {
+        await this.getFormValuesFromURL(`/rest/namespaces/${this.state.entityId}`, data => {
             if (data.parent) data.parent = data.parent.toString();
         });
     }
@@ -121,10 +121,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (edit) {
             sendMethod = FormSendMethod.PUT;
-            url = `/namespaces/rest/namespaces/${this.state.entityId}`
+            url = `/rest/namespaces/${this.state.entityId}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/namespaces/rest/namespaces'
+            url = '/rest/namespaces'
         }
 
         try {
@@ -175,7 +175,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Deleting namespace...'));
 
-            await axios.delete(`/namespaces/rest/namespaces/${this.state.entityId}`);
+            await axios.delete(`/rest/namespaces/${this.state.entityId}`);
 
             this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace deleted'));
 

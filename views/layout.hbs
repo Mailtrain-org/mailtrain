@@ -24,6 +24,7 @@
 
         <script>
             window.csfrToken = '{{reactCsrfToken}}';
+            window.mailtrainConfig = {{mailtrainConfig}};
         </script>
 
         <script src="/mailtrain/{{reactEntryPoint}}.js"></script>
@@ -78,19 +79,12 @@
                     <li><a href="https://mailtrain.wordpress.com/"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> {{#translate}}Blog{{/translate}}</a></li>
                 </ul>
 
-                {{#if user }}
 
-                    <ul class="nav navbar-nav navbar-right">
+                {{#if admin }}
+                    <ul class="nav navbar-nav">
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{user.username}} <span class="caret"></span>
-                            </a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration<span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li>
-                                    <a href="/users/account">
-                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{#translate}}Account{{/translate}}
-                                    </a>
-                                </li>
                                 <li>
                                     <a href="/settings">
                                         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {{#translate}}Settings{{/translate}}
@@ -102,12 +96,30 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/users/api">
+                                    <a href="/account/api">
                                         <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> {{#translate}}API{{/translate}}
                                     </a>
                                 </li>
+                            </ul>
+                        </li>
+                    </ul>
+                {{/if}}
+
+
+                {{#if user }}
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{user.username}} <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
                                 <li>
-                                    <a href="/users/logout">
+                                    <a href="/account">
+                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{#translate}}Account{{/translate}}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/account/logout">
                                         <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> {{#translate}}Log out{{/translate}}
                                     </a>
                                 </li>
@@ -119,7 +131,7 @@
 
                     <ul class="nav navbar-nav navbar-right">
                         <li>
-                            <a href="/users/login" role="button" aria-haspopup="true" aria-expanded="false">
+                            <a href="/account/login" role="button" aria-haspopup="true" aria-expanded="false">
                                 <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> {{#translate}}Sign in{{/translate}}
                             </a>
                         </li>

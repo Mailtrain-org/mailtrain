@@ -74,6 +74,32 @@ class Button extends Component {
 }
 
 
+@withErrorHandling
+class ActionLink extends Component {
+    static propTypes = {
+        onClickAsync: PropTypes.func,
+        className: PropTypes.string
+    }
+
+    @withAsyncErrorHandler
+    async onClick(evt) {
+        if (this.props.onClickAsync) {
+            evt.preventDefault();
+
+            await this.props.onClickAsync(evt);
+        }
+    }
+
+    render() {
+        const props = this.props;
+
+        return (
+            <a href="" className={props.className} onClick={::this.onClick}>{props.children}</a>
+        );
+    }
+}
+
+
 @translate()
 @withErrorHandling
 class ModalDialog extends Component {
@@ -184,6 +210,7 @@ class ModalDialog extends Component {
 
 export {
     Button,
+    ActionLink,
     DismissibleAlert,
     ModalDialog
 };

@@ -8,29 +8,47 @@ const passwordValidator = require('../shared/password-validator')();
 const validators = require('../shared/validators');
 const dtHelpers = require('../lib/dt-helpers');
 const tools = require('../lib/tools-async');
-const Promise = require('bluebird');
+let crypto = require('crypto');
+const settings = require('./settings');
+
+const bluebird = require('bluebird');
+
 const bcrypt = require('bcrypt-nodejs');
-const bcryptHash = Promise.promisify(bcrypt.hash);
-const bcryptCompare = Promise.promisify(bcrypt.compare);
+const bcryptHash = bluebird.promisify(bcrypt.hash);
+const bcryptCompare = bluebird.promisify(bcrypt.compare);
+
+const mailer = require('../lib/mailer');
+const mailerSendMail = bluebird.promisify(mailer.sendMail);
 
 const allowedKeys = new Set(['username', 'name', 'email', 'password']);
+const allowedKeysExternal = new Set(['username']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
+
+const passport = require('../../lib/passport');
+
 
 function hash(user) {
     return hasher.hash(filterObject(user, allowedKeys));
 }
 
-async function getById(userId) {
-    const user = await knex('users').select(['id', 'username', 'name', 'email', 'password']).where('id', userId).first();
+async function _getBy(key, value, extraColumns) {
+    const columns = ['id', 'username', 'name', 'email'];
+
+    if (extraColumns) {
+        columns.push(...extraColumns);
+    }
+
+    const user = await knex('users').select(columns).where(key, value).first();
+
     if (!user) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    user.hash = hash(user);
-
-    delete(user.password);
-
     return user;
+}
+
+async function getById(userId) {
+    return await _getBy('id', userId);
 }
 
 async function serverValidate(data, isOwnAccount) {
@@ -123,8 +141,9 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
     }
 }
 
-
 async function create(user) {
+    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+
     await knex.transaction(async tx => {
         await _validateAndPreprocess(tx, user, true);
         const userId = await tx('users').insert(filterObject(user, allowedKeys));
@@ -132,7 +151,16 @@ async function create(user) {
     });
 }
 
+async function createExternal(user) {
+    enforce(!passport.isAuthMethodLocal, 'External user management is required');
+
+    const userId = await knex('users').insert(filterObject(user, allowedKeysExternal));
+    return userId;
+}
+
 async function updateWithConsistencyCheck(user, isOwnAccount) {
+    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+
     await knex.transaction(async tx => {
         await _validateAndPreprocess(tx, user, false, isOwnAccount);
 
@@ -147,13 +175,8 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
         }
 
         if (isOwnAccount && user.password) {
-            console.log(user.currentPassword);
-            console.log(existingUser.password);
-
             if (!await bcryptCompare(user.currentPassword, existingUser.password)) {
-                // This is not an interoperable error because current password is verified in account-validate.
-                // A change of password between account-validate and submit would be signalled by ChangedError
-                throw new Error('Incorrect password');
+                throw new interoperableErrors.IncorrectPasswordError();
             }
         }
 
@@ -162,17 +185,139 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
 }
 
 async function remove(userId) {
+    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+
     // FIXME: enforce that userId is not the current user
     enforce(userId !== 1, 'Admin cannot be deleted');
     await knex('users').where('id', userId).del();
 }
+
+async function getByAccessToken(accessToken) {
+    return await _getBy('access_token', accessToken);
+}
+
+async function getByUsername(username) {
+    return await _getBy('username', username);
+}
+
+async function getByUsernameIfPasswordMatch(username, password) {
+    const user = await _getBy('username', username, ['password']);
+
+    if (!await bcryptCompare(password, user.password)) {
+        throw new interoperableErrors.IncorrectPasswordError();
+    }
+
+    return user;
+}
+
+async function getAccessToken(userId) {
+    const user = await _getBy('id', userId, ['access_token']);
+    return user.access_token;
+}
+
+async function resetAccessToken(userId) {
+    const token = crypto.randomBytes(20).toString('hex').toLowerCase();
+
+    const affectedRows = await knex('users').where({id: userId}).update({access_token: token});
+
+    if (!affectedRows) {
+        throw new interoperableErrors.NotFoundError();
+    }
+
+    return token;
+}
+
+async function sendPasswordReset(usernameOrEmail) {
+    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+
+    await knex.transaction(async tx => {
+        const user = await tx('users').where('username', usernameOrEmail).orWhere('email', usernameOrEmail).select(['id', 'username', 'email', 'name']).first();
+
+        if (user) {
+            const resetToken = crypto.randomBytes(16).toString('base64').replace(/[^a-z0-9]/gi, '');
+
+            await tx('users').where('id', user.id).update({
+                reset_token: resetToken,
+                reset_expire: new Date(Date.now() + 60 * 60 * 1000)
+            });
+
+            const { serviceUrl, adminEmail } = await settings.get(['serviceUrl', 'adminEmail']);
+
+            await mailer.sendMail({
+                from: {
+                    address: adminEmail
+                },
+                to: {
+                    address: user.email
+                },
+                subject: _('Mailer password change request')
+            }, {
+                html: 'emails/password-reset-html.hbs',
+                text: 'emails/password-reset-text.hbs',
+                data: {
+                    title: 'Mailtrain',
+                    username: user.username,
+                    name: user.name,
+                    confirmUrl: urllib.resolve(serviceUrl, `/account/reset-link/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
+                }
+            });
+        }
+        // We intentionally silently ignore the situation when user is not found. This is not to reveal if a user exists in the system.
+    });
+}
+
+async function isPasswordResetTokenValid(username, resetToken) {
+    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+
+    const user = await knex('users').select(['id']).where({username, reset_token: resetToken}).andWhere('reset_expire', '>', new Date()).first();
+    return !!user;
+}
+
+async function resetPassword(username, resetToken, password) {R
+    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+
+    await knex.transaction(async tx => {
+        const user = await tx('users').select(['id']).where({
+            username,
+            reset_token: resetToken
+        }).andWhere('reset_expire', '>', new Date()).first();
+
+        if (user) {
+            const passwordValidatorResults = passwordValidator.test(password);
+            if (passwordValidatorResults.errors.length > 0) {
+                // This is not an interoperable error because this is not supposed to happen unless the client is tampered with.
+                throw new Error('Invalid password');
+            }
+
+            password = await bcryptHash(password, null, null);
+
+            await tx('users').where({username}).update({
+                password,
+                reset_token: null,
+                reset_expire: null
+            });
+        } else {
+            throw new interoperableErrors.InvalidToken();
+        }
+    });
+}
+
 
 module.exports = {
     listDTAjax,
     remove,
     updateWithConsistencyCheck,
     create,
+    createExternal,
     hash,
     getById,
-    serverValidate
+    serverValidate,
+    getByAccessToken,
+    getByUsername,
+    getByUsernameIfPasswordMatch,
+    getAccessToken,
+    resetAccessToken,
+    sendPasswordReset,
+    isPasswordResetTokenValid,
+    resetPassword
 };

@@ -202,7 +202,8 @@ class SectionContent extends Component {
 
     errorHandler(error) {
         if (error instanceof interoperableErrors.NotLoggedInError) {
-            window.location = '/users/login?next=' + encodeURIComponent(this.props.root);
+            /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
+            window.location = '/account/login?next=' + encodeURIComponent(this.props.root);
         } else if (error.response && error.response.data && error.response.data.message) {
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);
         } else {
@@ -293,7 +294,6 @@ class NavButton extends Component {
         );
     }
 }
-
 
 function withPageHelpers(target) {
     withErrorHandling(target);

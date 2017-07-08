@@ -29,7 +29,7 @@ export default class CUD extends Component {
 
         this.initForm({
             serverValidation: {
-                url: '/users/rest/users-validate',
+                url: '/rest/users-validate',
                 changed: ['username', 'email'],
                 extra: ['id']
             }
@@ -42,7 +42,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL(`/users/rest/users/${this.state.entityId}`, data => {
+        await this.getFormValuesFromURL(`/rest/users/${this.state.entityId}`, data => {
             data.password = '';
             data.password2 = '';
         });
@@ -66,7 +66,6 @@ export default class CUD extends Component {
         const t = this.props.t;
         const edit = this.props.edit;
 
-
         const username = state.getIn(['username', 'value']);
         const usernameServerValidation = state.getIn(['username', 'serverValidation']);
 
@@ -88,8 +87,6 @@ export default class CUD extends Component {
             state.setIn(['email', 'error'], t('Email must not be empty'));
         } else if (!emailServerValidation || emailServerValidation.invalid) {
             state.setIn(['email', 'error'], t('Invalid email address.'));
-        } else if (!emailServerValidation || emailServerValidation.exists) {
-            state.setIn(['email', 'error'], t('The email is already associated with another user in the system.'));
         } else {
             state.setIn(['email', 'error'], null);
         }
@@ -107,6 +104,8 @@ export default class CUD extends Component {
         const password = state.getIn(['password', 'value']) || '';
         const password2 = state.getIn(['password2', 'value']) || '';
 
+        const passwordResults = this.passwordValidator.test(password);
+
         let passwordMsgs = [];
 
         if (!edit && !password) {
@@ -114,7 +113,6 @@ export default class CUD extends Component {
         }
 
         if (password) {
-            const passwordResults = this.passwordValidator.test(password);
             passwordMsgs.push(...passwordResults.errors);
         }
 
@@ -133,10 +131,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (edit) {
             sendMethod = FormSendMethod.PUT;
-            url = `/users/rest/users/${this.state.entityId}`
+            url = `/rest/users/${this.state.entityId}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/users/rest/users'
+            url = '/rest/users'
         }
 
         try {
@@ -194,7 +192,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('Deleting user...'));
 
-        await axios.delete(`/users/rest/users/${this.state.entityId}`);
+        await axios.delete(`/rest/users/${this.state.entityId}`);
 
         this.navigateToWithFlashMessage('/users', 'success', t('User deleted'));
     }

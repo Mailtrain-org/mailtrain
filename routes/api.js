@@ -1,18 +1,18 @@
 'use strict';
 
-let users = require('../lib/models/users-legacy');
+let users = require('../models/users');
 let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
 let blacklist = require('../lib/models/blacklist');
 let subscriptions = require('../lib/models/subscriptions');
 let confirmations = require('../lib/models/confirmations');
 let tools = require('../lib/tools');
-let express = require('express');
 let log = require('npmlog');
-let router = new express.Router();
+const router = require('../lib/router-async').create();
 let mailHelpers = require('../lib/subscription-mail-helpers');
+const interoperableErrors = require('../shared/interoperable-errors');
 
-router.all('/*', (req, res, next) => {
+router.allAsync('/*', async (req, res, next) => {
     if (!req.query.access_token) {
         res.status(403);
         return res.json({
@@ -21,24 +21,24 @@ router.all('/*', (req, res, next) => {
         });
     }
 
-    users.findByAccessToken(req.query.access_token, (err, user) => {
-        if (err) {
+    try {
+        await users.getByAccessToken(req.query.access_token);
+        next();
+    } catch (err) {
+        if (err instanceof interoperableErrors.NotFoundError) {
+            res.status(403);
+            return res.json({
+                error: 'Invalid or expired access_token',
+                data: []
+            });
+        } else {
             res.status(500);
             return res.json({
                 error: err.message || err,
                 data: []
             });
         }
-        if (!user) {
-            res.status(403);
-            return res.json({
-                error: 'Invalid or expired access_token',
-                data: []
-            });
-        }
-        next();
-    });
-
+    }
 });
 
 router.post('/subscribe/:listId', (req, res) => {
