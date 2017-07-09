@@ -187,11 +187,11 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
     });
 }
 
-async function remove(userId) {
+async function remove(context, userId) {
     enforce(passport.isAuthMethodLocal, 'Local user management is required');
-
-    // FIXME: enforce that userId is not the current user
     enforce(userId !== 1, 'Admin cannot be deleted');
+    enforce(context.user.id !== userId, 'User cannot delete himself/herself');
+
     await knex('users').where('id', userId).del();
 }
 
@@ -255,7 +255,7 @@ async function sendPasswordReset(usernameOrEmail) {
 
             const { serviceUrl, adminEmail } = await settings.get(['serviceUrl', 'adminEmail']);
 
-            await mailer.sendMail({
+            await mailerSendMail({
                 from: {
                     address: adminEmail
                 },

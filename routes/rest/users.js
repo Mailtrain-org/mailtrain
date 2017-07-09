@@ -27,7 +27,7 @@ router.putAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, as
 });
 
 router.deleteAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await users.remove(req.params.userId);
+    await users.remove(req.context, req.params.userId);
     return res.json();
 });
 

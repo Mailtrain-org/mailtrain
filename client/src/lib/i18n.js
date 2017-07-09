@@ -1,12 +1,13 @@
 import i18n from 'i18next';
 import XHR from 'i18next-xhr-backend';
 // import Cache from 'i18next-localstorage-cache';
+import mailtrainConfig from 'mailtrainConfig';
 
 i18n
     .use(XHR)
     // .use(Cache)
     .init({
-        lng: 'en', // FIXME set language from mailtrain (ideally from react-root.hbs)
+        lng: mailtrainConfig.language,
 
         wait: true, // globally set to wait for loaded translations in translate hoc
 

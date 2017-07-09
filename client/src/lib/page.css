@@ -22,3 +22,7 @@
 .form-horizontal .control-label {
     display: block;
 }
+
+.ace_editor {
+    border: 1px solid #ccc;
+}

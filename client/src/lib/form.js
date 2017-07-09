@@ -10,6 +10,13 @@ import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import { TreeTable, TreeSelectMode } from './tree';
 
+import brace from 'brace';
+import AceEditor from 'react-ace';
+import 'brace/mode/javascript';
+import 'brace/mode/json';
+import 'brace/mode/handlebars';
+import 'brace/theme/github';
+
 const FormState = {
     Loading: 0,
     LoadingWithNotice: 1,
@@ -40,18 +47,9 @@ class Form extends Component {
         };
     }
 
-    @withAsyncErrorHandler
-    async onSubmit(evt) {
-        const t = this.props.t;
-
-        const owner = this.props.stateOwner;
-        
+    static async handleChangedError(owner, fn) {
         try {
-            evt.preventDefault();
-
-            if (this.props.onSubmitAsync) {
-                await this.props.onSubmitAsync(evt);
-            }
+            await fn();
         } catch (error) {
             if (error instanceof interoperableErrors.ChangedError) {
                 owner.disableForm();
@@ -65,6 +63,19 @@ class Form extends Component {
             }
 
             throw error;
+        }
+    }
+
+    @withAsyncErrorHandler
+    async onSubmit(evt) {
+        const t = this.props.t;
+
+        const owner = this.props.stateOwner;
+        
+        evt.preventDefault();
+
+        if (this.props.onSubmitAsync) {
+            await Form.handleChangedError(owner, async () => await this.props.onSubmitAsync(evt));
         }
     }
 
@@ -148,7 +159,7 @@ class InputField extends Component {
         label: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         type: PropTypes.string,
-        help: PropTypes.string
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
     }
 
     static defaultProps = {
@@ -180,7 +191,7 @@ class CheckBox extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        help: PropTypes.string
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
     }
 
     static contextTypes = {
@@ -203,8 +214,7 @@ class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        placeholder: PropTypes.string,
-        help: PropTypes.string
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
     }
 
     static contextTypes = {
@@ -222,6 +232,35 @@ class TextArea extends Component {
         );
     }
 }
+
+class Dropdown extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        options: PropTypes.array.isRequired
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    render() {
+        const props = this.props;
+
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+        const options = props.options.map(option => <option key={option.key} value={option.key}>{option.label}</option>);
+
+        return wrapInput(id, htmlId, owner, props.label, props.help,
+            <select id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
+                {options}
+            </select>
+        );
+    }
+}
+
 
 class AlignedRow extends Component {
     static propTypes = {
@@ -310,7 +349,7 @@ class TreeTableSelect extends Component {
         label: PropTypes.string.isRequired,
         dataUrl: PropTypes.string,
         data: PropTypes.array,
-        help: PropTypes.string
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
     }
 
     static contextTypes = {
@@ -330,6 +369,42 @@ class TreeTableSelect extends Component {
 
         return wrapInput(id, htmlId, owner, props.label, props.help,
             <TreeTable data={this.props.data} dataUrl={this.props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+        );
+    }
+}
+
+class ACEEditor extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        height: PropTypes.string,
+        mode: PropTypes.string
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        return wrapInput(id, htmlId, owner, props.label, props.help,
+            <AceEditor
+                id={htmlId}
+                mode={props.mode}
+                theme="github"
+                onChange={data => owner.updateFormValue(id, data)}
+                fontSize={12}
+                width="100%"
+                height={props.height}
+                showPrintMargin={false}
+                value={owner.getFormValue(id)}
+                tabSize={2}
+            />
         );
     }
 }
@@ -647,9 +722,11 @@ export {
     InputField,
     CheckBox,
     TextArea,
+    Dropdown,
     AlignedRow,
     ButtonRow,
     Button,
     TreeTableSelect,
+    ACEEditor,
     FormSendMethod
 }

@@ -188,15 +188,16 @@ logger=false
 browser="phantomjs"
 
 
-[shares.list.master]
+[roles.list.master]
 name="Master"
 description="All permissions"
 permissions=["view"]
 
-[shares.namespace.master]
+[roles.namespace.master]
 name="Master"
 description="All permissions"
+permissions=["view", "edit", "create", "delete", "create list"]
 
-[shares.namespace.master.permissions]
+[roles.namespace.master.childperms]
 list=["view"]
 namespace=["view", "edit", "create", "delete", "create list"]

@@ -10,6 +10,7 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
 import validators from '../../../shared/validators';
 import { ModalDialog } from '../lib/bootstrap-components';
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withForm
@@ -200,11 +201,12 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
-        const isAdmin = this.getFormValue('id') === 1;
+        const userId = this.getFormValue('id');
+        const canDelete = userId !== 1 && mailtrainConfig.userId !== userId;
 
         return (
             <div>
-                {edit && !isAdmin &&
+                {edit && canDelete &&
                     <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
                         { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
                         { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
@@ -224,7 +226,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && !isAdmin && <Button className="btn-danger" icon="remove" label={t('Delete User')}
+                        {edit && canDelete && <Button className="btn-danger" icon="remove" label={t('Delete User')}
                                          onClickAsync={::this.showDeleteModal}/>}
                     </ButtonRow>
                 </Form>

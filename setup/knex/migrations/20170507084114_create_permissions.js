@@ -3,41 +3,41 @@ const config = require('../config');
 exports.up = function(knex, Promise) {
     return knex.schema.createTable('shares_list', table => {
             table.increments('id').primary();
-            table.integer('list').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
+            table.integer('entity').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
             table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
-            table.integer('level').notNullable();
-            table.unique(['list', 'user']);
+            table.integer('role', 64).notNullable();
+            table.unique(['entity', 'user']);
         })
 
         .createTable('shares_namespace', table => {
             table.increments('id').primary();
-            table.integer('namespace').unsigned().notNullable().references('namespaces.id').onDelete('CASCADE');
+            table.integer('entity').unsigned().notNullable().references('namespaces.id').onDelete('CASCADE');
             table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
-            table.string('level', 64).notNullable();
-            table.unique(['namespace', 'user']);
+            table.string('role', 64).notNullable();
+            table.unique(['entity', 'user']);
         })
 
         .createTable('permissions_list', table => {
             table.increments('id').primary();
-            table.integer('list').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
+            table.integer('entity').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
             table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
-            table.string('permission', 64).notNullable();
-            table.unique(['list', 'user', 'permission']);
+            table.string('operation', 64).notNullable();
+            table.unique(['entity', 'user', 'operation']);
         })
 
         .createTable('permissions_namespace', table => {
             table.increments('id').primary();
-            table.integer('namespace').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
+            table.integer('entity').unsigned().notNullable().references('namespaces.id').onDelete('CASCADE');
             table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
-            table.string('permission', 64).notNullable();
-            table.unique(['namespace', 'user', 'permission']);
+            table.string('operation', 64).notNullable();
+            table.unique(['entity', 'user', 'operation']);
         })
 
         .then(() => knex('shares_namespace').insert({
             id: 1,
-            namespace: 1,
+            entity: 1,
             user: 1,
-            level: 'master'
+            role: 'master'
         }))
 
         ;

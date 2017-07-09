@@ -73,6 +73,33 @@ class Button extends Component {
     }
 }
 
+class DropdownMenu extends Component {
+    static propTypes = {
+        label: PropTypes.string,
+        className: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        let className = 'btn dropdown-toggle';
+        if (props.className) {
+            className = className + ' ' + props.className;
+        }
+
+        return (
+            <div className="btn-group">
+                <button type="button" className={className} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {props.label}{' '}<span className="caret"></span>
+                </button>
+                <ul className="dropdown-menu">
+                    {props.children}
+                </ul>
+
+            </div>
+        );
+    }
+}
 
 @withErrorHandling
 class ActionLink extends Component {
@@ -210,6 +237,7 @@ class ModalDialog extends Component {
 
 export {
     Button,
+    DropdownMenu,
     ActionLink,
     DismissibleAlert,
     ModalDialog

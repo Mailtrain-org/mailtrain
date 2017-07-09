@@ -295,6 +295,20 @@ class NavButton extends Component {
     }
 }
 
+class DropdownLink extends Component {
+    static propTypes = {
+        to: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        return (
+            <li><Link to={props.to}>{props.children}</Link></li>
+        );
+    }
+}
+
 function withPageHelpers(target) {
     withErrorHandling(target);
 
@@ -340,5 +354,6 @@ export {
     Title,
     Toolbar,
     NavButton,
+    DropdownLink,
     withPageHelpers
 };
