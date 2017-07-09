@@ -199,23 +199,23 @@ export default class API extends Component {
                     <li><strong>NAME</strong> – {t('field name')} (<em>{t('required')}</em>)</li>
                     <li><strong>TYPE</strong> – {t('one of the following types:')}
                         <ul>
-                            <li><strong>text</strong> Text</li>
-                            <li><strong>website</strong> Website</li>
-                            <li><strong>longtext</strong> Multi-line text</li>
-                            <li><strong>gpg</strong> GPG Public Key</li>
-                            <li><strong>number</strong> Number</li>
-                            <li><strong>radio</strong> Radio Buttons</li>
-                            <li><strong>checkbox</strong> Checkboxes</li>
-                            <li><strong>dropdown</strong> Drop Down</li>
-                            <li><strong>date-us</strong> Date (MM/DD/YYY)</li>
-                            <li><strong>date-eur</strong> Date (DD/MM/YYYY)</li>
-                            <li><strong>birthday-us</strong> Birthday (MM/DD)</li>
-                            <li><strong>birthday-eur</strong> Birthday (DD/MM)</li>
-                            <li><strong>json</strong> JSON value for custom rendering</li>
-                            <li><strong>option</strong> Option</li>
+                            <li><strong>text</strong> &ndash; Text</li>
+                            <li><strong>website</strong> &ndash; Website</li>
+                            <li><strong>longtext</strong> &ndash; Multi-line text</li>
+                            <li><strong>gpg</strong> &ndash; GPG Public Key</li>
+                            <li><strong>number</strong> &ndash; Number</li>
+                            <li><strong>radio</strong> &ndash; Radio Buttons</li>
+                            <li><strong>checkbox</strong> &ndash; Checkboxes</li>
+                            <li><strong>dropdown</strong> &ndash; Drop Down</li>
+                            <li><strong>date-us</strong> &ndash; Date (MM/DD/YYY)</li>
+                            <li><strong>date-eur</strong> &ndash; Date (DD/MM/YYYY)</li>
+                            <li><strong>birthday-us</strong> &ndash; Birthday (MM/DD)</li>
+                            <li><strong>birthday-eur</strong> &ndash; Birthday (DD/MM)</li>
+                            <li><strong>json</strong> &ndash; JSON value for custom rendering</li>
+                            <li><strong>option</strong> &ndash; Option</li>
                         </ul>
                     </li>
-                    <li><strong>GROUP</strong> – {t('If the type is 'option' then you also need to specify the parent element ID')}</li>
+                    <li><strong>GROUP</strong> – {t('If the type is \'option\' then you also need to specify the parent element ID')}</li>
                     <li><strong>GROUP_TEMPLATE</strong> – {t('Template for the group element. If not set, then values of the elements are joined with commas')}</li>
                     <li><strong>VISIBLE</strong> – yes/no, {t('if not visible then the subscriber can not view or modify this value at the profile page')}</li>
                 </ul>
@@ -224,7 +224,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST {{serviceUrl}}api/field/B16uVTdW?access_token={{accessToken}} \
+                <pre>curl -XPOST {serviceUrl}api/field/B16uVTdW?access_token={accessToken} \
 --data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>
 
                 <h3>GET /api/blacklist/get – {t('Get list of blacklisted emails')}</h3>
