@@ -70,17 +70,40 @@ let server = net.createServer(socket => {
     });
 });
 
-server.on('error', err => {
-    log.error('POSTFIXBOUNCE', err && err.stack);
-});
-
 module.exports = callback => {
-    if (config.postfixbounce.enabled) {
-        server.listen(config.postfixbounce.port, config.postfixbounce.host, () => {
-            log.info('POSTFIXBOUNCE', 'Server listening on port %s', config.postfixbounce.port);
-            setImmediate(callback);
-        });
-    } else {
-        setImmediate(callback);
+    if (!config.postfixbounce.enabled) {
+        return setImmediate(callback);
     }
+
+    let started = false;
+
+    server.on('error', err => {
+        const port = config.postfixbounce.port;
+        const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+        switch (err.code) {
+            case 'EACCES':
+                log.error('POSTFIXBOUNCE', '%s requires elevated privileges.', bind);
+                break;
+            case 'EADDRINUSE':
+                log.error('POSTFIXBOUNCE', '%s is already in use', bind);
+                break;
+            default:
+                log.error('POSTFIXBOUNCE', err);
+        }
+
+        if (!started) {
+            started = true;
+            return callback(err);
+        }
+    });
+
+    server.listen(config.postfixbounce.port, config.postfixbounce.host, () => {
+        if (started) {
+            return server.close();
+        }
+        started = true;
+        log.info('POSTFIXBOUNCE', 'Server listening on port %s', config.postfixbounce.port);
+        setImmediate(callback);
+    });
 };

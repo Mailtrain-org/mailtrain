@@ -1,0 +1,14 @@
+version: '2'
+services:
+  mysql:
+    restart: always
+  redis:
+    restart: always
+  mailtrain:
+    build: ./
+    # volumes:
+      # - ./:/app
+    ports:
+      - "3000:3000"
+    restart: always
+  

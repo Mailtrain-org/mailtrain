@@ -29,7 +29,7 @@ let server = new SMTPServer({
             let user = address.address.split('@').shift();
             let host = address.address.split('@').pop();
 
-            if (host !== configItems.verpHostname || !/^[a-z0-9_\-]+\.[a-z0-9_\-]+\.[a-z0-9_\-]+$/i.test(user)) {
+            if (host !== configItems.verpHostname || !/^[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+$/i.test(user)) {
                 err = new Error('Unknown user ' + address.address);
                 err.responseCode = 510;
                 return callback(err);
@@ -99,15 +99,36 @@ let server = new SMTPServer({
     }
 });
 
-server.on('error', err => {
-    log.error('VERP', err);
-    server.close();
-});
-
 module.exports = callback => {
     if (!config.verp.enabled) {
         return setImmediate(callback);
     }
+
+    let started = false;
+
+    server.on('error', err => {
+        const port = config.verp.port;
+        const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+        switch (err.code) {
+            case 'EACCES':
+                log.error('VERP', '%s requires elevated privileges', bind);
+                break;
+            case 'EADDRINUSE':
+                log.error('VERP', '%s is already in use', bind);
+                break;
+            case 'ECONNRESET': // Usually happens when a client does not disconnect cleanly
+            case 'EPIPE': // Remote connection was closed before the server attempted to send data
+            default:
+                log.error('VERP', err);
+        }
+
+        if (!started) {
+            started = true;
+            return callback(err);
+        }
+    });
+
     let hosts;
     if (typeof config.verp.host === 'string' && config.verp.host) {
         hosts = config.verp.host.trim().split(',').map(host => host.trim()).filter(host => host.trim());
@@ -121,10 +142,14 @@ module.exports = callback => {
     let pos = 0;
     let startNextHost = () => {
         if (pos >= hosts.length) {
+            started = true;
             return setImmediate(callback);
         }
         let host = hosts[pos++];
         server.listen(config.verp.port, host, () => {
+            if (started) {
+                return server.close();
+            }
             log.info('VERP', 'Server listening on %s:%s', host || '*', config.verp.port);
             setImmediate(startNextHost);
         });

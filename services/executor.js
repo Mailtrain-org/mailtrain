@@ -37,14 +37,14 @@ function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
                 return;
             }
 
-            privilegeHelpers.ensureMailtrainOwner(outFile, (err) => {
+            privilegeHelpers.ensureMailtrainOwner(outFile, err => {
                 if (err) {
-                    log.warn('Executor', 'Cannot change owner of output file of process tid:%s.', tid)
+                    log.warn('Executor', 'Cannot change owner of output file of process tid:%s.', tid);
                 }
 
-                privilegeHelpers.ensureMailtrainOwner(errFile, (err) => {
+                privilegeHelpers.ensureMailtrainOwner(errFile, err => {
                     if (err) {
-                        log.warn('Executor', 'Cannot change owner of error output file of process tid:%s.', tid)
+                        log.warn('Executor', 'Cannot change owner of error output file of process tid:%s.', tid);
                     }
 
                     const options = {
@@ -79,12 +79,12 @@ function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
                         delete processes[tid];
                         log.info('Executor', 'Process tid:%s pid:%s exited with code %s signal %s.', tid, pid, code, signal);
 
-                        fs.close(outFd, (err) => {
+                        fs.close(outFd, err => {
                             if (err) {
                                 log.error('Executor', err);
                             }
 
-                            fs.close(errFd, (err) => {
+                            fs.close(errFd, err => {
                                 if (err) {
                                     log.error('Executor', err);
                                 }
