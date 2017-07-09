@@ -9,6 +9,7 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import { TreeTable, TreeSelectMode } from './tree';
+import { Table, TableSelectMode } from './table';
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -57,6 +58,17 @@ class Form extends Component {
                     <span>
                         <strong>{t('Your updates cannot be saved.')}</strong>{' '}
                         {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                    </span>
+                );
+                return;
+            }
+
+            if (error instanceof interoperableErrors.NotFoundError) {
+                owner.disableForm();
+                owner.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('It seems that someone else has deleted the entity in the meantime.')}
                     </span>
                 );
                 return;
@@ -368,7 +380,46 @@ class TreeTableSelect extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.label, props.help,
-            <TreeTable data={this.props.data} dataUrl={this.props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+            <TreeTable data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+        );
+    }
+}
+
+class TableSelect extends Component {
+    static propTypes = {
+        dataUrl: PropTypes.string,
+        data: PropTypes.array,
+        columns: PropTypes.array,
+        selectionKeyIndex: PropTypes.number,
+        selectMode: PropTypes.number,
+        withHeader: PropTypes.bool,
+
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }
+
+    static defaultProps = {
+        selectMode: TableSelectMode.SINGLE
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    async onSelectionChangedAsync(sel) {
+        const owner = this.context.formStateOwner;
+        owner.updateFormValue(this.props.id, sel);
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        return wrapInput(id, htmlId, owner, props.label, props.help,
+            <Table data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
         );
     }
 }
@@ -727,6 +778,8 @@ export {
     ButtonRow,
     Button,
     TreeTableSelect,
+    TableSelect,
+    TableSelectMode,
     ACEEditor,
     FormSendMethod
 }

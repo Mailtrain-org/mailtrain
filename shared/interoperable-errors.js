@@ -56,9 +56,15 @@ class IncorrectPasswordError extends InteroperableError {
     }
 }
 
-class InvalidToken extends InteroperableError {
+class InvalidTokenError extends InteroperableError {
     constructor(msg, data) {
-        super('InvalidToken', msg, data);
+        super('InvalidTokenError', msg, data);
+    }
+}
+
+class DependencyNotFoundError extends InteroperableError {
+    constructor(msg, data) {
+        super('DependencyNotFound', msg, data);
     }
 }
 
@@ -72,7 +78,8 @@ const errorTypes = {
     DuplicitNameError,
     DuplicitEmailError,
     IncorrectPasswordError,
-    InvalidToken
+    InvalidTokenError,
+    DependencyNotFoundError
 };
 
 function deserialize(errorObj) {

@@ -2,11 +2,11 @@
 
 import React, { Component } from 'react';
 import { translate, Trans } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
-import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEditor, ButtonRow, Button } from '../lib/form';
-import axios from '../lib/axios';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { ModalDialog } from '../lib/bootstrap-components';
+import { withPageHelpers, Title } from '../../lib/page'
+import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEditor, ButtonRow, Button } from '../../lib/form';
+import axios from '../../lib/axios';
+import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
+import { ModalDialog } from '../../lib/bootstrap-components';
 
 @translate()
 @withForm

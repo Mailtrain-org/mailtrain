@@ -52,6 +52,7 @@ class Table extends Component {
         columns: PropTypes.array,
         selectMode: PropTypes.number,
         selection: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
+        selectionKeyIndex: PropTypes.number,
         onSelectionChangedAsync: PropTypes.func,
         actionLinks: PropTypes.array,
         withHeader: PropTypes.bool
@@ -59,6 +60,10 @@ class Table extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.selection !== nextProps.selection || this.props.data != nextProps.data || this.props.dataUrl != nextProps.dataUrl;
+    }
+
+    static defaultProps = {
+        selectionKeyIndex: 0
     }
 
     componentDidMount() {
@@ -108,10 +113,7 @@ class Table extends Component {
             dtOptions.data = this.props.data;
         } else {
             dtOptions.serverSide = true;
-            dtOptions.ajax = {
-                url: this.props.dataUrl,
-                type: 'POST'
-            };
+            dtOptions.ajax = ::this.fetchData;
         }
 
         this.table = jQuery(this.domTable).DataTable(dtOptions);
@@ -120,6 +122,13 @@ class Table extends Component {
         this.table.on('deselect.dt', ::this.onSelect);
 
         this.updateSelection();
+    }
+
+    @withAsyncErrorHandler
+    async fetchData(data, callback) {
+        // This custom ajax fetch function allows us to properly handle the case when the user is not authenticated.
+        const response = await axios.post(this.props.dataUrl, data);
+        callback(response.data);
     }
 
     componentDidUpdate() {
@@ -132,23 +141,35 @@ class Table extends Component {
     }
 
     updateSelection() {
-        /*
-        const tree = this.tree;
-        if (this.selectMode === TableSelectMode.MULTI) {
-            const selectSet = new Set(this.props.selection);
-
-            tree.enableUpdate(false);
-            tree.visit(node => node.setSelected(selectSet.has(node.key)));
-            tree.enableUpdate(true);
-
-        } else if (this.selectMode === TableSelectMode.SINGLE) {
-            this.tree.activateKey(this.props.selection);
+        let selArray = [];
+        if (this.selectMode === TableSelectMode.SINGLE) {
+            selArray = [this.props.selection];
+        } else if (this.selectMode === TableSelectMode.MULTI) {
+            selArray = this.props.selection;
         }
-        */
+
+        const selSet = new Set(selArray);
+
+        const selectionKeyIndex = this.props.selectionKeyIndex;
+
+        this.table.rows({ selected: true }).every(function() {
+            const key = this.data()[selectionKeyIndex];
+            if (!selSet.has(key)) {
+                this.deselect();
+            }
+
+            selSet.delete(key);
+        });
+
+        this.table.rows((idx, data, node) => selSet.has(data[selectionKeyIndex])).select();
     }
 
     async onSelect(event, data) {
-        const sel = this.table.rows( { selected: true } ).data();
+        let sel = this.table.rows( { selected: true } ).data().toArray().map(item => item[this.props.selectionKeyIndex]);
+
+        if (this.selectMode === TableSelectMode.SINGLE) {
+            sel = sel.length ? sel[0] : null;
+        }
 
         if (this.props.onSelectionChangedAsync) {
             await this.props.onSelectionChangedAsync(sel);

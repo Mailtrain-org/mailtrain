@@ -27,7 +27,7 @@ router.putAsync('/report-templates/:reportTemplateId', passport.loggedIn, passpo
 });
 
 router.deleteAsync('/report-templates/:reportTemplateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await reportTemplates.remove(req.context, req.params.reportTemplateId);
+    await reportTemplates.remove(req.params.reportTemplateId);
     return res.json();
 });
 

@@ -126,10 +126,9 @@ server.on('listening', () => {
                         triggers(() => {
                             spawnSenders(() => {
                                 feedcheck(() => {
-                                    postfixBounceServer(() => {
-                                        reportProcessor.init(() => {
-                                            log.info('Service', 'All services started');
-                                        });
+                                    postfixBounceServer(async () => {
+                                        await reportProcessor.init();
+                                        log.info('Service', 'All services started');
                                     });
                                 });
                             });

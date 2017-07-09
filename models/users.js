@@ -30,8 +30,8 @@ const hashKeys = new Set(['username', 'name', 'email']);
 const passport = require('../lib/passport');
 
 
-function hash(user) {
-    return hasher.hash(filterObject(user, hashKeys));
+function hash(entity) {
+    return hasher.hash(filterObject(entity, hashKeys));
 }
 
 async function _getBy(key, value, extraColumns) {
@@ -50,8 +50,8 @@ async function _getBy(key, value, extraColumns) {
     return user;
 }
 
-async function getById(userId) {
-    return await _getBy('id', userId);
+async function getById(id) {
+    return await _getBy('id', id);
 }
 
 async function serverValidate(data, isOwnAccount) {
@@ -309,7 +309,7 @@ async function resetPassword(username, resetToken, password) {
                 reset_expire: null
             });
         } else {
-            throw new interoperableErrors.InvalidToken();
+            throw new interoperableErrors.InvalidTokenError();
         }
     });
 }

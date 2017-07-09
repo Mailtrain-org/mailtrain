@@ -10,6 +10,6 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-clientHelpers.registerRootRoute(router, _('Account'), 'account');
+clientHelpers.registerRootRoute(router, 'account', _('Account'));
 
 module.exports = router;

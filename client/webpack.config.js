@@ -6,7 +6,7 @@ module.exports = {
         namespaces: ['babel-polyfill', './src/namespaces/root.js'],
         users: ['babel-polyfill', './src/users/root.js'],
         account: ['babel-polyfill', './src/account/root.js'],
-        reportTemplates: ['babel-polyfill', './src/report-templates/root.js']
+        reports: ['babel-polyfill', './src/reports/root.js']
     },
     output: {
         library: 'MailtrainReactBody',

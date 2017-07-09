@@ -2,38 +2,50 @@
 
 const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
-const reportTemplates = require('../../models/report-templates');
+const reports = require('../../models/reports');
+const reportProcessor = require('../../lib/report-processor');
 
 const router = require('../../lib/router-async').create();
 
 
-router.getAsync('/report-templates/:reportTemplateId', passport.loggedIn, async (req, res) => {
-    const reportTemplate = await reportTemplates.getById(req.params.reportTemplateId);
-    reportTemplate.hash = reportTemplates.hash(reportTemplate);
-    return res.json(reportTemplate);
+router.getAsync('/reports/:reportId', passport.loggedIn, async (req, res) => {
+    const report = await reports.getById(req.params.reportId);
+    report.hash = reports.hash(report);
+    return res.json(report);
 });
 
-router.postAsync('/report-templates', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await reportTemplates.create(req.body);
+router.postAsync('/reports', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    await reports.create(req.body);
     return res.json();
 });
 
-router.putAsync('/report-templates/:reportTemplateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    const reportTemplate = req.body;
-    reportTemplate.id = parseInt(req.params.reportTemplateId);
+router.putAsync('/reports/:reportId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    const report = req.body;
+    report.id = parseInt(req.params.reportId);
 
-    await reportTemplates.updateWithConsistencyCheck(reportTemplate);
+    await reports.updateWithConsistencyCheck(report);
     return res.json();
 });
 
-router.deleteAsync('/report-templates/:reportTemplateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await reportTemplates.remove(req.context, req.params.reportTemplateId);
+router.deleteAsync('/reports/:reportId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    await reports.remove(req.params.reportId);
     return res.json();
 });
 
-router.postAsync('/report-templates-table', passport.loggedIn, async (req, res) => {
-    return res.json(await reportTemplates.listDTAjax(req.body));
+router.postAsync('/reports-table', passport.loggedIn, async (req, res) => {
+    return res.json(await reports.listDTAjax(req.body));
 });
+
+router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    await reportProcessor.start(req.params.id);
+    // TODO
+});
+
+router.postAsync('/report-stop/:id', async (req, res) => {
+    await reportProcessor.stop(req.params.id);
+    // TODO
+});
+
 
 
 module.exports = router;

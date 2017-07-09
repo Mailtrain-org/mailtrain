@@ -5,6 +5,6 @@ const clientHelpers = require('../lib/client-helpers');
 
 const router = require('../lib/router-async').create();
 
-clientHelpers.registerRootRoute(router, _('Namespaces'), 'namespaces');
+clientHelpers.registerRootRoute(router, 'namespaces', _('Namespaces'));
 
 module.exports = router;

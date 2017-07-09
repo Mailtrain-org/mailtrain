@@ -2,9 +2,9 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { DropdownMenu } from '../lib/bootstrap-components';
-import { Title, Toolbar, DropdownLink } from '../lib/page';
-import { Table } from '../lib/table';
+import { DropdownMenu } from '../../lib/bootstrap-components';
+import { Title, Toolbar, DropdownLink } from '../../lib/page';
+import { Table } from '../../lib/table';
 import moment from 'moment';
 
 @translate()

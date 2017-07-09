@@ -101,7 +101,7 @@ export default class Account extends Component {
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
             }
         } catch (error) {
-            if (error instanceof interoperableErrors.InvalidToken) {
+            if (error instanceof interoperableErrors.InvalidTokenError) {
                 this.setFormStatusMessage('danger',
                     <span>
                         <strong>{t('Your password cannot be reset.')}</strong>{' '}

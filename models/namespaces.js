@@ -11,60 +11,74 @@ async function list() {
     return await knex('namespaces');
 }
 
-function hash(ns) {
-    return hasher.hash(filterObject(ns, allowedKeys));
+function hash(entity) {
+    return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getById(nsId) {
-    const ns = await knex('namespaces').where('id', nsId).first();
-    if (!ns) {
+async function getById(id) {
+    const entity = await knex('namespaces').where('id', id).first();
+    if (!entity) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    return ns;
+    return entity;
 }
 
-async function create(ns) {
-    const nsId = await knex('namespaces').insert(filterObject(ns, allowedKeys));
-    return nsId;
+async function create(entity) {
+    await knex.transaction(async tx => {
+        const id = await tx('namespaces').insert(filterObject(entity, allowedKeys));
+
+        if (entity.parent) {
+            if (!await tx('namespaces').select(['id']).where('id', entity.parent).first()) {
+                throw new interoperableErrors.DependencyNotFoundError();
+            }
+        }
+
+        return id;
+    });
 }
 
-async function updateWithConsistencyCheck(ns) {
-    enforce(ns.id !== 1 || ns.parent === null, 'Cannot assign a parent to the root namespace.');
+async function updateWithConsistencyCheck(entity) {
+    enforce(entity.id !== 1 || entity.parent === null, 'Cannot assign a parent to the root namespace.');
 
     await knex.transaction(async tx => {
-        const existingNs = await tx('namespaces').where('id', ns.id).first();
-        if (!ns) {
+        const existing = await tx('namespaces').where('id', entity.id).first();
+        if (!entity) {
             throw new interoperableErrors.NotFoundError();
         }
 
-        const existingNsHash = hash(existingNs);
-        if (existingNsHash != ns.originalHash) {
+        const existingHash = hash(existing);
+        if (existingHash != entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
-        let iter = ns;
+        let iter = entity;
         while (iter.parent != null) {
             iter = await tx('namespaces').where('id', iter.parent).first();
-            if (iter.id == ns.id) {
+
+            if (!iter) {
+                throw new interoperableErrors.DependencyNotFoundError();
+            }
+
+            if (iter.id == entity.id) {
                 throw new interoperableErrors.LoopDetectedError();
             }
         }
 
-        await tx('namespaces').where('id', ns.id).update(filterObject(ns, allowedKeys));
+        await tx('namespaces').where('id', entity.id).update(filterObject(entity, allowedKeys));
     });
 }
 
-async function remove(nsId) {
-    enforce(nsId !== 1, 'Cannot delete the root namespace.');
+async function remove(id) {
+    enforce(id !== 1, 'Cannot delete the root namespace.');
 
     await knex.transaction(async tx => {
-        const childNs = await tx('namespaces').where('parent', nsId).first();
+        const childNs = await tx('namespaces').where('parent', id).first();
         if (childNs) {
             throw new interoperableErrors.ChildDetectedError();
         }
 
-        await tx('namespaces').where('id', nsId).del();
+        await tx('namespaces').where('id', id).del();
     });
 }
 

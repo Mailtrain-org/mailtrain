@@ -39,17 +39,17 @@ const blacklist = require('./routes/blacklist');
 const editorapi = require('./routes/editorapi');
 const grapejs = require('./routes/grapejs');
 const mosaico = require('./routes/mosaico');
-const reports = require('./routes/reports');
 
 const namespaces = require('./routes/rest/namespaces');
 const users = require('./routes/rest/users');
 const account = require('./routes/rest/account');
 const reportTemplates = require('./routes/rest/report-templates');
+const reports = require('./routes/rest/reports');
 
 const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
 const usersLegacyIntegration = require('./routes/users-legacy-integration');
 const accountLegacyIntegration = require('./routes/account-legacy-integration');
-const reportTemplatesLegacyIntegration = require('./routes/report-templates-legacy-integration');
+const reportsLegacyIntegration = require('./routes/reports-legacy-integration');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -246,7 +246,7 @@ app.use('/namespaces', namespacesLegacyIntegration);
 app.use('/account', accountLegacyIntegration);
 
 if (config.reports && config.reports.enabled === true) {
-    app.use('/report-templates', reportTemplatesLegacyIntegration);
+    app.use('/reports', reportsLegacyIntegration);
 }
 
 /* ------------------------------------------------------------------- */
@@ -263,10 +263,7 @@ app.use('/rest', account);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportTemplates);
-}
-
-if (config.reports && config.reports.enabled === true) {
-    app.use('/reports', reports);
+    app.use('/rest', reports);
 }
 
 // catch 404 and forward to error handler

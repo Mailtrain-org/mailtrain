@@ -1,6 +1,6 @@
 'use strict';
 
-const reports = require('../../lib/models/reports');
+const reports = require('../../lib/models/reports-REMOVE');
 const reportTemplates = require('../../lib/models/report-templates');
 const lists = require('../../lib/models/lists');
 const subscriptions = require('../../lib/models/subscriptions');
