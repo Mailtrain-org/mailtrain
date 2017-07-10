@@ -11,8 +11,6 @@ import '../../public/jquery/jquery-ui-1.12.1.min.js';
 import 'datatables.net';
 import 'datatables.net-bs';
 import 'datatables.net-bs/css/dataTables.bootstrap.css';
-import 'datatables.net-select';
-import 'datatables.net-select-bs/css/select.bootstrap.css';
 
 import './table.css';
 import axios from './axios';
@@ -37,13 +35,7 @@ const TableSelectMode = {
 class Table extends Component {
     constructor(props) {
         super(props);
-
-        // Select Mode simply cannot be changed later. This is just to make sure we avoid inconsistencies if someone changes it anyway.
-        this.selectMode = this.props.selectMode;
-    }
-
-    static defaultProps = {
-        selectMode: TableSelectMode.NONE 
+        this.selectionMap = this.getSelectionMap(props);
     }
 
     static propTypes = {
@@ -54,20 +46,121 @@ class Table extends Component {
         selection: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
         selectionKeyIndex: PropTypes.number,
         onSelectionChangedAsync: PropTypes.func,
+        onSelectionDataAsync: PropTypes.func,
         actionLinks: PropTypes.array,
         withHeader: PropTypes.bool
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        return this.props.selection !== nextProps.selection || this.props.data != nextProps.data || this.props.dataUrl != nextProps.dataUrl;
-    }
-
     static defaultProps = {
+        selectMode: TableSelectMode.NONE,
         selectionKeyIndex: 0
     }
 
-    componentDidMount() {
+    getSelectionMap(props) {
+        let selArray = [];
+        if (props.selectMode === TableSelectMode.SINGLE) {
+            if (props.selection !== null && props.selection !== undefined) {
+                selArray = [props.selection];
+            } else {
+                selArray = [];
+            }
+        } else if (props.selectMode === TableSelectMode.MULTI) {
+            selArray = props.selection;
+        }
 
+        const selMap = new Map();
+
+        for (const elem of selArray) {
+            selMap.set(elem, undefined);
+        }
+
+        if (this.table) {
+            const self = this;
+            this.table.rows().every(function() {
+                const data = this.data();
+                const key = data[self.props.selectionKeyIndex];
+                if (selMap.has(key)) {
+                    selMap.set(key, data);
+                }
+            });
+        }
+
+        return selMap;
+    }
+
+    updateSelectInfo() {
+        const t = this.props.t;
+
+        const count = this.selectionMap.size;
+        if (this.selectionMap.size > 0) {
+            const jqInfo = jQuery('<span>' + t('{{ count }} entries selected.', { count }) + ' </span>');
+            const jqDeselectLink = jQuery('<a href="">Deselect all.</a>').on('click', ::this.deselectAll);
+
+            this.jqSelectInfo.empty().append(jqInfo).append(jqDeselectLink);
+        } else {
+            this.jqSelectInfo.empty();
+        }
+    }
+
+    @withAsyncErrorHandler
+    async fetchData(data, callback) {
+        // This custom ajax fetch function allows us to properly handle the case when the user is not authenticated.
+        const response = await axios.post(this.props.dataUrl, data);
+        callback(response.data);
+    }
+
+    @withAsyncErrorHandler
+    async fetchSelectionData() {
+        if (this.props.onSelectionDataAsync) {
+            const keysToFetch = [];
+            for (const pair of this.selectionMap.entries()) {
+                if (!pair[1]) {
+                    keysToFetch.push(pair[0]);
+                }
+            }
+
+            if (keysToFetch.length > 0) {
+                const response = await axios.post(this.props.dataUrl, {
+                    operation: 'getBy',
+                    column: this.props.selectionKeyIndex,
+                    values: keysToFetch
+                });
+
+                console.log(response.data);
+
+                for (const row of response.data) {
+                    const key = row[this.props.selectionKeyIndex];
+                    if (this.selectionMap.has(key)) {
+                        this.selectionMap.set(key, row);
+                    }
+                }
+            }
+
+            this.notifySelection(this.props.onSelectionDataAsync, this.selectionMap);
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const nextSelectionMap = this.getSelectionMap(nextProps);
+
+        let updateDueToSelectionChange = false;
+        if (nextSelectionMap.size !== this.selectionMap.size) {
+            updateDueToSelectionChange = true;
+        } else {
+            for (const key of this.selectionMap.keys()) {
+                if (!nextSelectionMap.has(key)) {
+                    updateDueToSelectionChange = true;
+                    break;
+                }
+            }
+        }
+
+        this.selectionMap = nextSelectionMap;
+
+        return updateDueToSelectionChange || this.props.data != nextProps.data || this.props.dataUrl != nextProps.dataUrl;
+    }
+
+    componentDidMount() {
         const columns = this.props.columns.slice();
 
         if (this.props.actionLinks) {
@@ -99,15 +192,43 @@ class Table extends Component {
             columns
         };
 
-        if (this.selectMode === TableSelectMode.MULTI) {
-            dtOptions.select = {
-                style: 'os'
+        const self = this;
+        dtOptions.createdRow = function(row, data) {
+            const rowKey = data[self.props.selectionKeyIndex];
+
+            if (self.selectionMap.has(rowKey)) {
+                jQuery(row).addClass('selected');
             }
-        } else if (this.selectMode === TableSelectMode.SINGLE) {
-            dtOptions.select = {
-                style: 'single'
-            }
-        }
+
+            jQuery(row).on('click', () => {
+                const selectionMap = self.selectionMap;
+
+                if (self.props.selectMode === TableSelectMode.SINGLE) {
+                    if (selectionMap.size !== 1 || !selectionMap.has(rowKey)) {
+                        self.notifySelection(self.props.onSelectionChangedAsync, new Map([[rowKey, data]]));
+                    }
+
+                } else if (self.props.selectMode === TableSelectMode.MULTI) {
+                    const newSelMap = new Map(selectionMap);
+
+                    if (selectionMap.has(rowKey)) {
+                        newSelMap.delete(rowKey);
+                    } else {
+                        newSelMap.set(rowKey, data);
+                    }
+
+                    self.notifySelection(self.props.onSelectionChangedAsync, newSelMap);
+                }
+            });
+        };
+
+        dtOptions.initComplete = function() {
+            self.jqSelectInfo = jQuery('<div class="dataTable_selection_info"/>');
+            const jqWrapper = jQuery(self.domTable).parents('.dataTables_wrapper');
+            jQuery('.dataTables_info', jqWrapper).after(self.jqSelectInfo);
+
+            self.updateSelectInfo();
+        };
 
         if (this.props.data) {
             dtOptions.data = this.props.data;
@@ -118,70 +239,70 @@ class Table extends Component {
 
         this.table = jQuery(this.domTable).DataTable(dtOptions);
 
-        this.table.on('select.dt', ::this.onSelect);
-        this.table.on('deselect.dt', ::this.onSelect);
-
-        this.updateSelection();
-    }
-
-    @withAsyncErrorHandler
-    async fetchData(data, callback) {
-        // This custom ajax fetch function allows us to properly handle the case when the user is not authenticated.
-        const response = await axios.post(this.props.dataUrl, data);
-        callback(response.data);
+        this.fetchSelectionData();
     }
 
     componentDidUpdate() {
         if (this.props.data) {
             this.table.clear();
             this.table.rows.add(this.props.data);
+
+        } else {
+            const self = this;
+            this.table.rows().every(function() {
+                const key = this.data()[self.props.selectionKeyIndex];
+                if (self.selectionMap.has(key)) {
+                    jQuery(this.node()).addClass('selected');
+                } else {
+                    jQuery(this.node()).removeClass('selected');
+                }
+            });
         }
 
-        this.updateSelection();
+        this.updateSelectInfo();
+        this.fetchSelectionData();
     }
 
-    updateSelection() {
-        let selArray = [];
-        if (this.selectMode === TableSelectMode.SINGLE) {
-            selArray = [this.props.selection];
-        } else if (this.selectMode === TableSelectMode.MULTI) {
-            selArray = this.props.selection;
-        }
+    async notifySelection(eventCallback, newSelectionMap) {
+        if (eventCallback) {
+            const selPairs = Array.from(newSelectionMap).sort((l, r) => l[0] - r[0]);
 
-        const selSet = new Set(selArray);
+            let data = selPairs.map(entry => entry[1]);
+            let sel = selPairs.map(entry => entry[0]);
 
-        const selectionKeyIndex = this.props.selectionKeyIndex;
-
-        this.table.rows({ selected: true }).every(function() {
-            const key = this.data()[selectionKeyIndex];
-            if (!selSet.has(key)) {
-                this.deselect();
+            if (this.props.selectMode === TableSelectMode.SINGLE) {
+                if (sel.length) {
+                    sel = sel[0];
+                    data = data[0];
+                } else {
+                    sel = null;
+                    data = null;
+                }
             }
 
-            selSet.delete(key);
-        });
-
-        this.table.rows((idx, data, node) => selSet.has(data[selectionKeyIndex])).select();
+            await eventCallback(sel, data);
+        }
     }
 
-    async onSelect(event, data) {
-        let sel = this.table.rows( { selected: true } ).data().toArray().map(item => item[this.props.selectionKeyIndex]);
-
-        if (this.selectMode === TableSelectMode.SINGLE) {
-            sel = sel.length ? sel[0] : null;
-        }
-
-        if (this.props.onSelectionChangedAsync) {
-            await this.props.onSelectionChangedAsync(sel);
-        }
+    async deselectAll(evt) {
+        evt.preventDefault();
+        this.notifySelection(this.props.onSelectionChangedAsync, new Map());
     }
 
     render() {
         const t = this.props.t;
         const props = this.props;
 
+        let className = 'table table-striped table-bordered';
+
+        if (this.props.selectMode !== TableSelectMode.NONE) {
+            className += ' table-hover';
+        }
+
         return (
-            <table ref={(domElem) => { this.domTable = domElem; }} className="table table-striped table-bordered" cellSpacing="0" width="100%" />
+            <div>
+                <table ref={(domElem) => { this.domTable = domElem; }} className={className} cellSpacing="0" width="100%" />
+            </div>
         );
     }
 }

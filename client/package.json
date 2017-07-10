@@ -19,8 +19,6 @@
     "axios": "^0.16.2",
     "datatables.net": "^1.10.15",
     "datatables.net-bs": "^1.10.15",
-    "datatables.net-select": "^1.2.2",
-    "datatables.net-select-bs": "^1.2.2",
     "i18next": "^8.4.3",
     "i18next-xhr-backend": "^1.4.2",
     "immutable": "^3.8.1",

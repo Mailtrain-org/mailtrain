@@ -10,6 +10,7 @@ import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import { TreeTable, TreeSelectMode } from './tree';
 import { Table, TableSelectMode } from './table';
+import { Button as ActionButton } from "./bootstrap-components";
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -385,14 +386,25 @@ class TreeTableSelect extends Component {
     }
 }
 
+@translate()
 class TableSelect extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            selectedLabel: '',
+            open: false
+        };
+    }
+
     static propTypes = {
         dataUrl: PropTypes.string,
-        data: PropTypes.array,
         columns: PropTypes.array,
         selectionKeyIndex: PropTypes.number,
+        selectionLabelIndex: PropTypes.number,
         selectMode: PropTypes.number,
         withHeader: PropTypes.bool,
+        dropdown: PropTypes.bool,
 
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
@@ -400,16 +412,37 @@ class TableSelect extends Component {
     }
 
     static defaultProps = {
-        selectMode: TableSelectMode.SINGLE
+        selectMode: TableSelectMode.SINGLE,
+        selectionLabelIndex: 0
     }
 
     static contextTypes = {
         formStateOwner: PropTypes.object.isRequired
     }
 
-    async onSelectionChangedAsync(sel) {
+    async onSelectionChangedAsync(sel, data) {
+        if (this.props.selectMode === TableSelectMode.SINGLE && this.props.dropdown) {
+            this.setState({
+                open: false
+            });
+        }
+
         const owner = this.context.formStateOwner;
         owner.updateFormValue(this.props.id, sel);
+    }
+
+    async onSelectionDataAsync(sel, data) {
+        if (this.props.selectMode === TableSelectMode.SINGLE && this.props.dropdown) {
+            this.setState({
+                selectedLabel: data ? data[this.props.selectionLabelIndex] : ''
+            });
+        }
+    }
+
+    async toggleOpen() {
+        this.setState({
+            open: !this.state.open
+        });
     }
 
     render() {
@@ -417,10 +450,31 @@ class TableSelect extends Component {
         const owner = this.context.formStateOwner;
         const id = this.props.id;
         const htmlId = 'form_' + id;
+        const t = props.t;
 
-        return wrapInput(id, htmlId, owner, props.label, props.help,
-            <Table data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
-        );
+        if (props.dropdown) {
+            return wrapInput(id, htmlId, owner, props.label, props.help,
+                <div>
+                    <div className="input-group mt-tableselect-dropdown">
+                        <input type="text" className="form-control" value={this.state.selectedLabel} readOnly onClick={::this.toggleOpen}/>
+                        <span className="input-group-btn">
+                            <ActionButton label={t('Select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
+                        </span>
+                    </div>
+                    <div className={'mt-tableselect-table' + (this.state.open ? '' : ' mt-tableselect-table-hidden')}>
+                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                    </div>
+                </div>
+            );
+        } else {
+            return wrapInput(id, htmlId, owner, props.label, props.help,
+                <div>
+                    <div>
+                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                    </div>
+                </div>
+            );
+        }
     }
 }
 

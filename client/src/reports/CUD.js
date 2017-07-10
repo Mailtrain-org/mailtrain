@@ -141,7 +141,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
                     <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
 
-                    <TableSelect id="report_template" label={t('Report Template')} withHeader dataUrl="/rest/report-templates-table" columns={columns} />
+                    <TableSelect id="report_template" label={t('Report Template')} withHeader dropdown dataUrl="/rest/report-templates-table" columns={columns} selectionLabelIndex={1} />
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>

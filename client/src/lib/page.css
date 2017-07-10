@@ -26,3 +26,16 @@
 .ace_editor {
     border: 1px solid #ccc;
 }
+
+.mt-tableselect-dropdown {
+    margin-bottom: 15px;
+}
+
+.mt-tableselect-table.mt-tableselect-table-hidden {
+    visibility: hidden;
+    height: 0px;
+}
+
+.mt-tableselect-dropdown input[readonly] {
+    background-color: white;
+}
