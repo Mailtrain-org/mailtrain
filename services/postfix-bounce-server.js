@@ -44,7 +44,8 @@ let server = net.createServer(socket => {
                 log.verbose('POSTFIXBOUNCE', 'Checking message %s for local requeue (status: %s)', queueId, status);
                 if ( status === 'sent' ) {
                     // Save new queueId to update message's previous queueId (thanks @mfechner )
-                    if ( queued = / relay=127\.0\.0\.1/.test(line) && line.match(/status=sent \((.*)\)/) ) {
+                    queued = / relay=127\.0\.0\.1/.test(line) && line.match(/status=sent \((.*)\)/);
+                    if ( queued ) {
                         queued = queued[1];
                         queued_as = queued.match(/ queued as (\w+)/);
                         queued_as = queued_as[1];
