@@ -45,6 +45,7 @@ class Table extends Component {
         selectMode: PropTypes.number,
         selection: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
         selectionKeyIndex: PropTypes.number,
+        selectionAsArray: PropTypes.bool,
         onSelectionChangedAsync: PropTypes.func,
         onSelectionDataAsync: PropTypes.func,
         actionLinks: PropTypes.array,
@@ -58,14 +59,14 @@ class Table extends Component {
 
     getSelectionMap(props) {
         let selArray = [];
-        if (props.selectMode === TableSelectMode.SINGLE) {
+        if (props.selectMode === TableSelectMode.SINGLE && !this.props.selectionAsArray) {
             if (props.selection !== null && props.selection !== undefined) {
                 selArray = [props.selection];
             } else {
                 selArray = [];
             }
-        } else if (props.selectMode === TableSelectMode.MULTI) {
-            selArray = props.selection;
+        } else if ((props.selectMode === TableSelectMode.SINGLE && this.props.selectionAsArray) || props.selectMode === TableSelectMode.MULTI) {
+            selArray = props.selection || [];
         }
 
         const selMap = new Map();
@@ -125,8 +126,6 @@ class Table extends Component {
                     column: this.props.selectionKeyIndex,
                     values: keysToFetch
                 });
-
-                console.log(response.data);
 
                 for (const row of response.data) {
                     const key = row[this.props.selectionKeyIndex];
@@ -270,7 +269,7 @@ class Table extends Component {
             let data = selPairs.map(entry => entry[1]);
             let sel = selPairs.map(entry => entry[0]);
 
-            if (this.props.selectMode === TableSelectMode.SINGLE) {
+            if (this.props.selectMode === TableSelectMode.SINGLE && !this.props.selectionAsArray) {
                 if (sel.length) {
                     sel = sel[0];
                     data = data[0];

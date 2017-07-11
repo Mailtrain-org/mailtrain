@@ -402,6 +402,7 @@ class TableSelect extends Component {
         columns: PropTypes.array,
         selectionKeyIndex: PropTypes.number,
         selectionLabelIndex: PropTypes.number,
+        selectionAsArray: PropTypes.bool,
         selectMode: PropTypes.number,
         withHeader: PropTypes.bool,
         dropdown: PropTypes.bool,
@@ -432,9 +433,19 @@ class TableSelect extends Component {
     }
 
     async onSelectionDataAsync(sel, data) {
-        if (this.props.selectMode === TableSelectMode.SINGLE && this.props.dropdown) {
+        if (this.props.dropdown) {
+            let label;
+
+            if (!data) {
+                label = '';
+            } else if (this.props.selectMode === TableSelectMode.SINGLE && !this.props.selectionAsArray) {
+                label = data[this.props.selectionLabelIndex];
+            } else {
+                label = data.map(entry => entry[this.props.selectionLabelIndex]).join('; ');
+            }
+
             this.setState({
-                selectedLabel: data ? data[this.props.selectionLabelIndex] : ''
+                selectedLabel: label
             });
         }
     }
@@ -462,7 +473,7 @@ class TableSelect extends Component {
                         </span>
                     </div>
                     <div className={'mt-tableselect-table' + (this.state.open ? '' : ' mt-tableselect-table-hidden')}>
-                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
@@ -470,7 +481,7 @@ class TableSelect extends Component {
             return wrapInput(id, htmlId, owner, props.label, props.help,
                 <div>
                     <div>
-                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
@@ -706,12 +717,24 @@ function withForm(target) {
     };
 
     inst.updateFormValue = function(key, value) {
-        this.setState(previousState => ({
-            formState: previousState.formState.withMutations(mutState => {
-                mutState.setIn(['data', key, 'value'], value);
-                validateFormState(this, mutState);
-            })
-        }));
+        this.setState(previousState => {
+            const oldValue = previousState.formState.getIn(['data', key, 'value']);
+
+            let newState = {
+                formState: previousState.formState.withMutations(mutState => {
+                    mutState.setIn(['data', key, 'value'], value);
+                    validateFormState(this, mutState);
+                })
+            };
+
+            const onChangeCallbacks = this.state.formSettings.onChange || {};
+
+            if (onChangeCallbacks[key]) {
+                onChangeCallbacks[key](newState, key, oldValue, value);
+            }
+
+            return newState;
+        });
     };
 
     inst.getFormValue = function(name) {

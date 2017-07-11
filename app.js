@@ -40,11 +40,13 @@ const editorapi = require('./routes/editorapi');
 const grapejs = require('./routes/grapejs');
 const mosaico = require('./routes/mosaico');
 
-const namespaces = require('./routes/rest/namespaces');
-const users = require('./routes/rest/users');
-const account = require('./routes/rest/account');
-const reportTemplates = require('./routes/rest/report-templates');
-const reports = require('./routes/rest/reports');
+const namespacesRest = require('./routes/rest/namespaces');
+const usersRest = require('./routes/rest/users');
+const accountRest = require('./routes/rest/account');
+const reportTemplatesRest = require('./routes/rest/report-templates');
+const reportsRest = require('./routes/rest/reports');
+const campaignsRest = require('./routes/rest/campaigns');
+const listsRest = require('./routes/rest/lists');
 
 const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
 const usersLegacyIntegration = require('./routes/users-legacy-integration');
@@ -257,13 +259,15 @@ app.all('/rest/*', (req, res, next) => {
     next();
 });
 
-app.use('/rest', namespaces);
-app.use('/rest', users);
-app.use('/rest', account);
+app.use('/rest', namespacesRest);
+app.use('/rest', usersRest);
+app.use('/rest', accountRest);
+app.use('/rest', campaignsRest);
+app.use('/rest', listsRest);
 
 if (config.reports && config.reports.enabled === true) {
-    app.use('/rest', reportTemplates);
-    app.use('/rest', reports);
+    app.use('/rest', reportTemplatesRest);
+    app.use('/rest', reportsRest);
 }
 
 // catch 404 and forward to error handler

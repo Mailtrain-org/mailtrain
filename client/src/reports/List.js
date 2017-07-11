@@ -21,7 +21,7 @@ export default class List extends Component {
             { data: 1, title: t('Name') },
             { data: 2, title: t('Template') },
             { data: 3, title: t('Description') },
-            { data: 4, title: t('Created'), render: data => moment(data).fromNow() }
+            { data: 4, title: t('Last Run'), render: data => data ? moment(data).fromNow() : t('Not run yet') }
         ];
 
         return (

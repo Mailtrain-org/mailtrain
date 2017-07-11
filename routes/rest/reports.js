@@ -9,7 +9,7 @@ const router = require('../../lib/router-async').create();
 
 
 router.getAsync('/reports/:reportId', passport.loggedIn, async (req, res) => {
-    const report = await reports.getById(req.params.reportId);
+    const report = await reports.getByIdWithUserFields(req.params.reportId);
     report.hash = reports.hash(report);
     return res.json(report);
 });

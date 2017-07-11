@@ -269,9 +269,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('Saving report template ...'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            delete data.password2;
-        });
+        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitSuccessful) {
             if (stay) {

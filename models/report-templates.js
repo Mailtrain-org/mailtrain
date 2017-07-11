@@ -50,11 +50,21 @@ async function remove(id) {
     await knex('report_templates').where('id', id).del();
 }
 
+async function getUserFieldsById(id) {
+    const entity = await knex('report_templates').select(['user_fields']).where('id', id).first();
+    if (!entity) {
+        throw new interoperableErrors.NotFoundError();
+    }
+
+    return JSON.parse(entity.user_fields);
+}
+
 module.exports = {
     hash,
     getById,
     listDTAjax,
     create,
     updateWithConsistencyCheck,
-    remove
+    remove,
+    getUserFieldsById
 };

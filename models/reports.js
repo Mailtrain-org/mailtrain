@@ -21,11 +21,14 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getById(id) {
-    const entity = await knex('reports').where('id', id).first();
+async function getByIdWithUserFields(id) {
+    const entity = await knex('reports').where('reports.id', id).innerJoin('report_templates', 'reports.report_template', 'report_templates.id').select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'report_templates.user_fields']).first();
     if (!entity) {
         throw new interoperableErrors.NotFoundError();
     }
+
+    entity.user_fields = JSON.parse(entity.user_fields);
+    entity.params = JSON.parse(entity.params);
 
     return entity;
 }
@@ -36,11 +39,13 @@ async function listDTAjax(params) {
 
 async function create(entity) {
     await knex.transaction(async tx => {
-        const id = await tx('reports').insert(filterObject(entity, allowedKeys));
-
         if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
             throw new interoperableErrors.DependencyNotFoundError();
         }
+
+        entity.params = JSON.stringify(entity.params);
+
+        const id = await tx('reports').insert(filterObject(entity, allowedKeys));
 
         return id;
     });
@@ -53,6 +58,8 @@ async function updateWithConsistencyCheck(entity) {
             throw new interoperableErrors.NotFoundError();
         }
 
+        existing.params = JSON.parse(existing.params);
+
         const existingHash = hash(existing);
         if (existingHash != entity.originalHash) {
             throw new interoperableErrors.ChangedError();
@@ -61,6 +68,8 @@ async function updateWithConsistencyCheck(entity) {
         if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
             throw new interoperableErrors.DependencyNotFoundError();
         }
+
+        entity.params = JSON.stringify(entity.params);
 
         await tx('reports').where('id', entity.id).update(filterObject(entity, allowedKeys));
     });
@@ -87,7 +96,7 @@ async function bulkChangeState(oldState, newState) {
 module.exports = {
     ReportState,
     hash,
-    getById,
+    getByIdWithUserFields,
     listDTAjax,
     create,
     updateWithConsistencyCheck,

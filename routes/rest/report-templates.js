@@ -35,5 +35,10 @@ router.postAsync('/report-templates-table', passport.loggedIn, async (req, res) 
     return res.json(await reportTemplates.listDTAjax(req.body));
 });
 
+router.getAsync('/report-template-user-fields/:reportTemplateId', passport.loggedIn, async (req, res) => {
+    const userFields = await reportTemplates.getUserFieldsById(req.params.reportTemplateId);
+    return res.json(userFields);
+});
+
 
 module.exports = router;
