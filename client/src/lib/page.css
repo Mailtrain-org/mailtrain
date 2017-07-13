@@ -11,11 +11,11 @@
     padding-bottom: 5px;
 }
 
-.mt-action-links > a {
+.mt-action-links > * {
     margin-right: 8px;
 }
 
-.mt-action-links > a:last-child {
+.mt-action-links > *:last-child {
     margin-right: 0px;
 }
 

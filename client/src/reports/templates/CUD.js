@@ -57,17 +57,8 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'campaigns.results(inputs.campaign, ["*"], "", (err, results) => {\n' +
-                        '  if (err) {\n' +
-                        '    return callback(err);\n' +
-                        '  }\n' +
-                        '\n' +
-                        '  const data = {\n' +
-                        '    results: results\n' +
-                        '  };\n' +
-                        '\n' +
-                        '  return callback(null, data);\n' +
-                        '});',
+                        'const results = await campaigns.getResults(inputs.campaign, ["*"]);\n' +
+                        'render({ results });',
                     hbs:
                         '<h2>{{title}}</h2>\n' +
                         '\n' +
@@ -115,21 +106,17 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'campaigns.results(inputs.campaign, ["custom_country", "count(*) AS count_all", "SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"], "GROUP BY custom_country", (err, results) => {\n' +
-                        '  if (err) {\n' +
-                        '    return callback(err);\n' +
-                        '  }\n' +
+                        'const results = await campaigns.getResults(inputs.campaign, ["custom_country"], query =>\n' +
+                        '  query.count("* AS count_all")\n' +
+                        '    .select(knex.raw("SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"))\n' +
+                        '    .groupBy("custom_country")\n' +
+                        ');\n' +
                         '\n' +
-                        '  for (let row of results) {\n' +
-                        '    row["percentage"] = Math.round((row.count_opened / row.count_all) * 100);\n' +
-                        '  }\n' +
+                        'for (const row of results) {\n' +
+                        '    row.percentage = Math.round((row.count_opened / row.count_all) * 100);\n' +
+                        '}\n' +
                         '\n' +
-                        '  let data = {\n' +
-                        '    results: results\n' +
-                        '  };\n' +
-                        '\n' +
-                        '  return callback(null, data);\n' +
-                        '});',
+                        'render({ results });',
                     hbs:
                         '<h2>{{title}}</h2>\n' +
                         '\n' +
@@ -189,17 +176,8 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'subscriptions.list(inputs.list.id,0,0, (err, results) => {\n' +
-                        '  if (err) {\n' +
-                        '    return callback(err);\n' +
-                        '  }\n' +
-                        '\n' +
-                        '  let data = {\n' +
-                        '    results: results\n' +
-                        '  };\n' +
-                        '\n' +
-                        '  return callback(null, data);\n' +
-                        '});',
+                        'const results = await subscriptions.list(inputs.list.id);\n' +
+                        'render({ results });',
                     hbs:
                         '{{#each results}}\n' +
                         '{{firstName}},{{lastName}},{{email}}\n' +
@@ -246,11 +224,11 @@ export default class CUD extends Component {
     }
 
     async submitAndStay() {
-        await Form.handleChangedError(this, async () => await this.doSubmit(true));
+        await this.formHandleChangedError(async () => await this.doSubmit(true));
     }
 
     async submitAndLeave() {
-        await Form.handleChangedError(this, async () => await this.doSubmit(false));
+        await this.formHandleChangedError(async () => await this.doSubmit(false));
     }
 
     async doSubmit(stay) {
@@ -273,6 +251,7 @@ export default class CUD extends Component {
 
         if (submitSuccessful) {
             if (stay) {
+                await this.loadFormValues();
                 this.enableForm();
                 this.setFormStatusMessage('success', t('Report template saved'));
             } else {

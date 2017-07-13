@@ -10,10 +10,10 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        const actionLinks = [
+        const actions = key => [
             {
                 label: 'Edit',
-                link: key => '/namespaces/edit/' + key
+                link: '/namespaces/edit/' + key
             }
         ];
 
@@ -25,7 +25,7 @@ export default class List extends Component {
 
                 <Title>{t('Namespaces')}</Title>
 
-                <TreeTable withHeader dataUrl="/rest/namespaces-tree" actionLinks={actionLinks} />
+                <TreeTable withHeader dataUrl="/rest/namespaces-tree" actions={actions} />
             </div>
         );
     }

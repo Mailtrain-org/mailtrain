@@ -49,36 +49,6 @@ class Form extends Component {
         };
     }
 
-    static async handleChangedError(owner, fn) {
-        try {
-            await fn();
-        } catch (error) {
-            if (error instanceof interoperableErrors.ChangedError) {
-                owner.disableForm();
-                owner.setFormStatusMessage('danger',
-                    <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
-                    </span>
-                );
-                return;
-            }
-
-            if (error instanceof interoperableErrors.NotFoundError) {
-                owner.disableForm();
-                owner.setFormStatusMessage('danger',
-                    <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that someone else has deleted the entity in the meantime.')}
-                    </span>
-                );
-                return;
-            }
-
-            throw error;
-        }
-    }
-
     @withAsyncErrorHandler
     async onSubmit(evt) {
         const t = this.props.t;
@@ -88,7 +58,7 @@ class Form extends Component {
         evt.preventDefault();
 
         if (this.props.onSubmitAsync) {
-            await Form.handleChangedError(owner, async () => await this.props.onSubmitAsync(evt));
+            await this.formHandleChangedError(async () => await this.props.onSubmitAsync(evt));
         }
     }
 
@@ -520,6 +490,7 @@ class ACEEditor extends Component {
                 showPrintMargin={false}
                 value={owner.getFormValue(id)}
                 tabSize={2}
+                setOptions={{useWorker: false}} // This disables syntax check because it does not always work well (e.g. in case of JS code in report templates)
             />
         );
     }
@@ -837,6 +808,37 @@ function withForm(target) {
 
     inst.isFormDisabled = function() {
         return this.state.formState.get('isDisabled');
+    };
+
+    inst.formHandleChangedError = async function(fn) {
+        const t = this.props.t;
+        try {
+            await fn();
+        } catch (error) {
+            if (error instanceof interoperableErrors.ChangedError) {
+                this.disableForm();
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                    </span>
+                );
+                return;
+            }
+
+            if (error instanceof interoperableErrors.NotFoundError) {
+                this.disableForm();
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('It seems that someone else has deleted the entity in the meantime.')}
+                    </span>
+                );
+                return;
+            }
+
+            throw error;
+        }
     };
 
     return target;

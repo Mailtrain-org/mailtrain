@@ -65,7 +65,7 @@ class TreeTable extends Component {
         selectMode: PropTypes.number,
         selection: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
         onSelectionChangedAsync: PropTypes.func,
-        actionLinks: PropTypes.array,
+        actions: PropTypes.func,
         withHeader: PropTypes.bool
     }
 
@@ -100,19 +100,18 @@ class TreeTable extends Component {
         };
 
         let createNodeFn;
-        if (this.props.actionLinks) {
-            const actionLinks = this.props.actionLinks;
-
+        if (this.props.actions) {
             createNodeFn = (event, data) => {
                 const node = data.node;
                 const tdList = jQuery(node.tr).find(">td");
 
                 const linksContainer = jQuery('<span class="mt-action-links"/>');
-                for (const {label, link} of actionLinks) {
-                    const dest = link(node.key);
-                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href={dest}>{label}</a>);
+
+                const actions = this.props.actions(node.key);
+                for (const {label, link} of actions) {
+                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href={link}>{label}</a>);
                     const lnk = jQuery(lnkHtml);
-                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(dest) });
+                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(link) });
                     linksContainer.append(lnk);
                 }
 
@@ -202,7 +201,7 @@ class TreeTable extends Component {
     render() {
         const t = this.props.t;
         const props = this.props;
-        const actionLinks = props.actionLinks;
+        const actions = props.actions;
         const withHeader = props.withHeader;
 
         let containerClass = 'mt-treetable-container';
@@ -223,14 +222,14 @@ class TreeTable extends Component {
                         <thead>
                             <tr>
                                 <th>{t('Name')}</th>
-                                {actionLinks && <th></th>}
+                                {actions && <th></th>}
                             </tr>
                         </thead>
                     }
                     <tbody>
                     <tr>
                         <td></td>
-                        {actionLinks && <td></td>}
+                        {actions && <td></td>}
                     </tr>
                     </tbody>
                 </table>

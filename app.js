@@ -40,6 +40,9 @@ const editorapi = require('./routes/editorapi');
 const grapejs = require('./routes/grapejs');
 const mosaico = require('./routes/mosaico');
 
+// These are routes for the new React-based client
+const reports = require('./routes/reports');
+
 const namespacesRest = require('./routes/rest/namespaces');
 const usersRest = require('./routes/rest/users');
 const accountRest = require('./routes/rest/account');
@@ -242,17 +245,21 @@ app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
 
+
+if (config.reports && config.reports.enabled === true) {
+    app.use('/reports', reports);
+}
+
 /* FIXME - this should be removed once we bind the ReactJS client to / */
 app.use('/users', usersLegacyIntegration);
 app.use('/namespaces', namespacesLegacyIntegration);
 app.use('/account', accountLegacyIntegration);
 
 if (config.reports && config.reports.enabled === true) {
+    app.use('/reports', reports);
     app.use('/reports', reportsLegacyIntegration);
 }
-
 /* ------------------------------------------------------------------- */
-
 
 app.all('/rest/*', (req, res, next) => {
     req.needsJSONResponse = true;
@@ -301,11 +308,16 @@ if (app.get('env') === 'development') {
             res.status(err.status || 500).json(resp);
 
         } else {
-            res.status(err.status || 500);
-            res.render('error', {
-                message: err.message,
-                error: err
-            });
+            if (err instanceof interoperableErrors.NotLoggedInError) {
+                req.flash('danger', _('Need to be logged in to access restricted content'));
+                return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
+            } else {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
         }
 
     });
@@ -331,11 +343,16 @@ if (app.get('env') === 'development') {
             res.status(err.status || 500).json(resp);
 
         } else {
-            res.status(err.status || 500);
-            res.render('error', {
-                message: err.message,
-                error: {}
-            });
+            if (err instanceof interoperableErrors.NotLoggedInError) {
+                req.flash('danger', _('Need to be logged in to access restricted content'));
+                return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
+            } else {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: {}
+                });
+            }
         }
     });
 }

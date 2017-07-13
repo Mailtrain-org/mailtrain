@@ -5,24 +5,19 @@ const hasher = require('node-object-hash')();
 const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
+const fields = require('./fields');
+
+const ReportState = require('../shared/reports').ReportState;
 
 const allowedKeys = new Set(['name', 'description', 'report_template', 'params']);
-
-const ReportState = {
-    SCHEDULED: 0,
-    PROCESSING: 1,
-    FINISHED: 2,
-    FAILED: 3,
-    MAX: 4
-};
 
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getByIdWithUserFields(id) {
-    const entity = await knex('reports').where('reports.id', id).innerJoin('report_templates', 'reports.report_template', 'report_templates.id').select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'report_templates.user_fields']).first();
+async function getByIdWithTemplate(id) {
+    const entity = await knex('reports').where('reports.id', id).innerJoin('report_templates', 'reports.report_template', 'report_templates.id').select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'reports.state', 'report_templates.user_fields', 'report_templates.mime_type', 'report_templates.hbs', 'report_templates.js']).first();
     if (!entity) {
         throw new interoperableErrors.NotFoundError();
     }
@@ -34,10 +29,11 @@ async function getByIdWithUserFields(id) {
 }
 
 async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(params, tx => tx('reports').innerJoin('report_templates', 'reports.report_template', 'report_templates.id'), ['reports.id', 'reports.name', 'report_templates.name', 'reports.description', 'reports.last_run', 'reports.state']);
+    return await dtHelpers.ajaxList(params, tx => tx('reports').innerJoin('report_templates', 'reports.report_template', 'report_templates.id'), ['reports.id', 'reports.name', 'report_templates.name', 'reports.description', 'reports.last_run', 'reports.state', 'report_templates.mime_type']);
 }
 
 async function create(entity) {
+    let id;
     await knex.transaction(async tx => {
         if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
             throw new interoperableErrors.DependencyNotFoundError();
@@ -45,10 +41,12 @@ async function create(entity) {
 
         entity.params = JSON.stringify(entity.params);
 
-        const id = await tx('reports').insert(filterObject(entity, allowedKeys));
-
-        return id;
+        id = await tx('reports').insert(filterObject(entity, allowedKeys));
     });
+
+    const reportProcessor = require('../lib/report-processor');
+    await reportProcessor.start(id);
+    return id;
 }
 
 async function updateWithConsistencyCheck(entity) {
@@ -71,8 +69,15 @@ async function updateWithConsistencyCheck(entity) {
 
         entity.params = JSON.stringify(entity.params);
 
-        await tx('reports').where('id', entity.id).update(filterObject(entity, allowedKeys));
+        const filteredUpdates = filterObject(entity, allowedKeys);
+        filteredUpdates.state = ReportState.SCHEDULED;
+
+        await tx('reports').where('id', entity.id).update(filteredUpdates);
     });
+
+    // This require is here to avoid cyclic dependency
+    const reportProcessor = require('../lib/report-processor');
+    await reportProcessor.start(entity.id);
 }
 
 async function remove(id) {
@@ -92,16 +97,68 @@ async function bulkChangeState(oldState, newState) {
 }
 
 
+const campaignFieldsMapping = {
+    tracker_count: 'tracker.count',
+    country: 'tracker.country',
+    device_type: 'tracker.device_type',
+    status: 'campaign.status',
+    first_name: 'subscribers.first_name',
+    last_name: 'subscribers.last_name',
+    email: 'subscribers.email'
+};
+
+function customFieldName(id) {
+    return id.replace(/MERGE_/, 'CUSTOM_').toLowerCase();
+}
+
+async function getCampaignResults(campaign, select, extra) {
+    const fieldList = await fields.list(campaign.list);
+
+    const fieldsMapping = fieldList.reduce((map, field) => {
+        /* Dropdowns and checkboxes are aggregated. As such, they have field.column == null and the options are in field.options.
+           TODO - For the time being, we ignore groupped fields. */
+        if (field.column) {
+            map[customFieldName(field.key)] = 'subscribers.' + field.column;
+        }
+        return map;
+    }, Object.assign({}, campaignFieldsMapping));
+
+    let selFields = [];
+    for (let idx = 0; idx < select.length; idx++) {
+        const item = select[idx];
+        if (item in fieldsMapping) {
+            selFields.push(fieldsMapping[item] + ' AS ' + item);
+        } else if (item === '*') {
+            selFields = selFields.concat(Object.keys(fieldsMapping).map(item => fieldsMapping[item] + ' AS ' + item));
+        } else {
+            selFields.push(item);
+        }
+    }
+
+    let query = knex(`subscription__${campaign.list} AS subscribers`)
+        .innerJoin(`campaign__${campaign.id} AS campaign`, 'subscribers.id', 'campaign.subscription')
+        .leftJoin(`campaign_tracker__${campaign.id} AS tracker`, 'subscribers.id', 'tracker.subscriber')
+        .select(selFields);
+
+    if (extra) {
+        query = extra(query);
+    }
+
+    return await query;
+}
+
+
 
 module.exports = {
     ReportState,
     hash,
-    getByIdWithUserFields,
+    getByIdWithTemplate,
     listDTAjax,
     create,
     updateWithConsistencyCheck,
     remove,
     updateFields,
     listByState,
-    bulkChangeState
+    bulkChangeState,
+    getCampaignResults
 };

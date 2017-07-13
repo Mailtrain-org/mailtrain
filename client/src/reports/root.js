@@ -8,6 +8,8 @@ import i18n from '../lib/i18n';
 import { Section } from '../lib/page'
 import ReportsCUD from './CUD'
 import ReportsList from './List'
+import ReportsView from './View'
+import ReportsOutput from './Output'
 import ReportTemplatesCUD from './templates/CUD'
 import ReportTemplatesList from './templates/List'
 
@@ -32,6 +34,16 @@ const getStructure = t => {
                         create: {
                             title: t('Create Report'),
                             render: props => (<ReportsCUD {...props} />)
+                        },
+                        view: {
+                            title: t('View Report'),
+                            params: [':id' ],
+                            render: props => (<ReportsView {...props} />)
+                        },
+                        output: {
+                            title: t('View Report Output'),
+                            params: [':id' ],
+                            render: props => (<ReportsOutput {...props} />)
                         },
                         'templates': {
                             title: t('Templates'),

@@ -12,10 +12,12 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        const actionLinks = [{
-            label: 'Edit',
-            link: data => '/reports/templates/edit/' + data[0]
-        }];
+        const actions = data => [
+            {
+                label: 'Edit',
+                link: '/reports/templates/edit/' + data[0]
+            }
+        ];
 
         const columns = [
             { data: 0, title: "#" },
@@ -37,7 +39,7 @@ export default class List extends Component {
 
                 <Title>{t('Report Templates')}</Title>
 
-                <Table withHeader dataUrl="/rest/report-templates-table" columns={columns} actionLinks={actionLinks} />
+                <Table withHeader dataUrl="/rest/report-templates-table" columns={columns} actions={actions} />
             </div>
         );
     }

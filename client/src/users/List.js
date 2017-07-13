@@ -11,7 +11,7 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        let actionLinks;
+        let actions;
 
         const columns = [
             { data: 0, title: "#" },
@@ -21,10 +21,12 @@ export default class List extends Component {
         if (mailtrainConfig.isAuthMethodLocal) {
             columns.push({ data: 2, title: "Full Name" });
 
-            actionLinks = [{
-                label: 'Edit',
-                link: data => '/users/edit/' + data[0]
-            }];
+            actions = data => [
+                {
+                    label: 'Edit',
+                    link: '/users/edit/' + data[0]
+                }
+            ];
         }
 
         return (
@@ -35,7 +37,7 @@ export default class List extends Component {
 
                 <Title>{t('Users')}</Title>
 
-                <Table withHeader dataUrl="/rest/users-table" columns={columns} actionLinks={actionLinks} />
+                <Table withHeader dataUrl="/rest/users-table" columns={columns} actions={actions} />
             </div>
         );
     }

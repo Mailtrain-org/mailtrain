@@ -4,12 +4,13 @@ const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const reports = require('../../models/reports');
 const reportProcessor = require('../../lib/report-processor');
+const fileHelpers = require('../../lib/file-helpers');
 
 const router = require('../../lib/router-async').create();
 
 
 router.getAsync('/reports/:reportId', passport.loggedIn, async (req, res) => {
-    const report = await reports.getByIdWithUserFields(req.params.reportId);
+    const report = await reports.getByIdWithTemplate(req.params.reportId);
     report.hash = reports.hash(report);
     return res.json(report);
 });
@@ -38,14 +39,23 @@ router.postAsync('/reports-table', passport.loggedIn, async (req, res) => {
 
 router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     await reportProcessor.start(req.params.id);
-    // TODO
+    res.json();
 });
 
 router.postAsync('/report-stop/:id', async (req, res) => {
     await reportProcessor.stop(req.params.id);
-    // TODO
+    res.json();
 });
 
+router.getAsync('/report-content/:id', async (req, res) => {
+    const report = await reports.getByIdWithTemplate(req.params.id);
+    res.sendFile(fileHelpers.getReportContentFile(report));
+});
+
+router.getAsync('/report-output/:id', async (req, res) => {
+    const report = await reports.getByIdWithTemplate(req.params.id);
+    res.sendFile(fileHelpers.getReportOutputFile(report));
+});
 
 
 module.exports = router;

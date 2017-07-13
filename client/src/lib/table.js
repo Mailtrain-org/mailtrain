@@ -29,7 +29,7 @@ const TableSelectMode = {
 };
 
 
-@translate()
+@translate(null, { withRef: true })
 @withPageHelpers
 @withErrorHandling
 class Table extends Component {
@@ -48,13 +48,20 @@ class Table extends Component {
         selectionAsArray: PropTypes.bool,
         onSelectionChangedAsync: PropTypes.func,
         onSelectionDataAsync: PropTypes.func,
-        actionLinks: PropTypes.array,
-        withHeader: PropTypes.bool
+        actions: PropTypes.func,
+        withHeader: PropTypes.bool,
+        refreshInterval: PropTypes.number
     }
 
     static defaultProps = {
         selectMode: TableSelectMode.NONE,
         selectionKeyIndex: 0
+    }
+
+    refresh() {
+        if (this.table) {
+            this.table.rows().draw('page');
+        }
     }
 
     getSelectionMap(props) {
@@ -162,17 +169,56 @@ class Table extends Component {
     componentDidMount() {
         const columns = this.props.columns.slice();
 
-        if (this.props.actionLinks) {
-            const actionLinks = this.props.actionLinks;
-
+        if (this.props.actions) {
             const createdCellFn = (td, data) => {
                 const linksContainer = jQuery('<span class="mt-action-links"/>');
-                for (const {label, link} of actionLinks) {
-                    const dest = link(data);
-                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href={dest}>{label}</a>);
-                    const lnk = jQuery(lnkHtml);
-                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(dest) });
-                    linksContainer.append(lnk);
+
+                let actions = this.props.actions(data);
+                let options = {};
+
+                if (!Array.isArray(actions)) {
+                    options = actions;
+                    actions = actions.actions;
+                }
+
+                for (const action of actions) {
+                    if (action.action) {
+                        const html = ReactDOMServer.renderToStaticMarkup(<a href="">{action.label}</a>);
+                        const elem = jQuery(html);
+                        elem.click((evt) => { evt.preventDefault(); action.action(this) });
+                        linksContainer.append(elem);
+
+                    } else if (action.link) {
+                        const html = ReactDOMServer.renderToStaticMarkup(<a href={action.link}>{action.label}</a>);
+                        const elem = jQuery(html);
+                        elem.click((evt) => { evt.preventDefault(); this.navigateTo(action.link) });
+                        linksContainer.append(elem);
+
+                    } else if (action.href) {
+                        const html = ReactDOMServer.renderToStaticMarkup(<a href={action.href}>{action.label}</a>);
+                        const elem = jQuery(html);
+                        linksContainer.append(elem);
+
+                    } else {
+                        const html = ReactDOMServer.renderToStaticMarkup(action.label);
+                        const elem = jQuery(html);
+                        linksContainer.append(elem);
+                    }
+                }
+
+                if (options.refreshTimeout) {
+                    const currentMS = Date.now();
+
+                    if (!this.refreshTimeoutAt || this.refreshTimeoutAt > currentMS + options.refreshTimeout) {
+                        clearTimeout(this.refreshTimeoutId);
+
+                        this.refreshTimeoutAt = currentMS + options.refreshTimeout;
+
+                        this.refreshTimeoutId = setTimeout(() => {
+                            this.refreshTimeoutAt = 0;
+                            this.refresh();
+                        }, options.refreshTimeout);
+                    }
                 }
 
                 jQuery(td).html(linksContainer);
@@ -237,6 +283,15 @@ class Table extends Component {
         }
 
         this.table = jQuery(this.domTable).DataTable(dtOptions);
+
+        if (this.props.refreshInterval) {
+            this.refreshIntervalId = setInterval(() => this.refresh(), this.props.refreshInterval);
+        }
+
+        this.table.on('destroy.dt', () => {
+           clearInterval(this.refreshIntervalId);
+           clearTimeout(this.refreshTimeoutId);
+        });
 
         this.fetchSelectionData();
     }
@@ -305,6 +360,14 @@ class Table extends Component {
         );
     }
 }
+
+/*
+  Refreshes the table. This method is provided to allow programmatic refresh from a handler outside the table.
+  The reference to the table can be obtained by ref.
+ */
+Table.prototype.refresh = function() {
+    this.getWrappedInstance().refresh()
+};
 
 export {
     Table,
