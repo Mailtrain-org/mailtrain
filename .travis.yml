@@ -2,7 +2,7 @@ dist: trusty
 sudo: required
 language: node_js
 node_js:
-  - 7
+  - 8
 services:
   - mysql
 before_install:
