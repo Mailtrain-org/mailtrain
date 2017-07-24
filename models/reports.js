@@ -6,10 +6,11 @@ const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const fields = require('./fields');
+const namespaceHelpers = require('../lib/namespace-helpers');
 
 const ReportState = require('../shared/reports').ReportState;
 
-const allowedKeys = new Set(['name', 'description', 'report_template', 'params']);
+const allowedKeys = new Set(['name', 'description', 'report_template', 'params', 'namespace']);
 
 
 function hash(entity) {
@@ -17,7 +18,12 @@ function hash(entity) {
 }
 
 async function getByIdWithTemplate(id) {
-    const entity = await knex('reports').where('reports.id', id).innerJoin('report_templates', 'reports.report_template', 'report_templates.id').select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'reports.state', 'report_templates.user_fields', 'report_templates.mime_type', 'report_templates.hbs', 'report_templates.js']).first();
+    const entity = await knex('reports')
+        .where('reports.id', id)
+        .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
+        .select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'reports.state', 'reports.namespace', 'report_templates.user_fields', 'report_templates.mime_type', 'report_templates.hbs', 'report_templates.js'])
+        .first();
+
     if (!entity) {
         throw new interoperableErrors.NotFoundError();
     }
@@ -29,12 +35,20 @@ async function getByIdWithTemplate(id) {
 }
 
 async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(params, tx => tx('reports').innerJoin('report_templates', 'reports.report_template', 'report_templates.id'), ['reports.id', 'reports.name', 'report_templates.name', 'reports.description', 'reports.last_run', 'reports.state', 'report_templates.mime_type']);
+    return await dtHelpers.ajaxList(
+        params,
+        tx => tx('reports')
+            .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
+            .innerJoin('namespaces', 'namespaces.id', 'reports.namespace'),
+        ['reports.id', 'reports.name', 'report_templates.name', 'reports.description', 'reports.last_run', 'namespaces.name', 'reports.state', 'report_templates.mime_type']
+    );
 }
 
 async function create(entity) {
     let id;
     await knex.transaction(async tx => {
+        await namespaceHelpers.validateEntity(tx, entity);
+
         if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
             throw new interoperableErrors.DependencyNotFoundError();
         }
@@ -66,6 +80,8 @@ async function updateWithConsistencyCheck(entity) {
         if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
             throw new interoperableErrors.DependencyNotFoundError();
         }
+
+        await namespaceHelpers.validateEntity(tx, entity);
 
         entity.params = JSON.stringify(entity.params);
 

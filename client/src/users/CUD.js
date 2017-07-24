@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { translate } from 'react-i18next';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
-import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button } from '../lib/form';
+import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TreeTableSelect } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
@@ -12,6 +12,7 @@ import passwordValidator from '../../../shared/password-validator';
 import validators from '../../../shared/validators';
 import { ModalDialog } from '../lib/bootstrap-components';
 import mailtrainConfig from 'mailtrainConfig';
+import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 
 @translate()
 @withForm
@@ -64,7 +65,8 @@ export default class CUD extends Component {
                 name: '',
                 email: '',
                 password: '',
-                password2: ''
+                password2: '',
+                namespace: null
             });
         }
     }
@@ -129,6 +131,8 @@ export default class CUD extends Component {
 
         state.setIn(['password', 'error'], passwordMsgs.length > 0 ? passwordMsgs : null);
         state.setIn(['password2', 'error'], password !== password2 ? t('Passwords must match') : null);
+
+        validateNamespace(t, state);
     }
 
     async submitHandler() {
@@ -229,6 +233,7 @@ export default class CUD extends Component {
                     <InputField id="email" label={t('Email')}/>
                     <InputField id="password" label={t('Password')} type="password" />
                     <InputField id="password2" label={t('Repeat Password')} type="password" />
+                    <NamespaceSelect/>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>

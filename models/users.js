@@ -22,12 +22,16 @@ const bcryptCompare = bluebird.promisify(bcrypt.compare);
 const mailer = require('../lib/mailer');
 const mailerSendMail = bluebird.promisify(mailer.sendMail);
 
-const allowedKeys = new Set(['username', 'name', 'email', 'password']);
+const passport = require('../lib/passport');
+
+const namespaceHelpers = require('../lib/namespace-helpers');
+
+const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace']);
 const allowedKeysExternal = new Set(['username']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
-const hashKeys = new Set(['username', 'name', 'email']);
+const hashKeys = new Set(['username', 'name', 'email', 'namespace']);
 
-const passport = require('../lib/passport');
+const defaultNamespace = 1;
 
 
 function hash(entity) {
@@ -35,7 +39,7 @@ function hash(entity) {
 }
 
 async function _getBy(key, value, extraColumns) {
-    const columns = ['id', 'username', 'name', 'email'];
+    const columns = ['id', 'username', 'name', 'email', 'namespace'];
 
     if (extraColumns) {
         columns.push(...extraColumns);
@@ -97,19 +101,24 @@ async function serverValidate(data, isOwnAccount) {
 }
 
 async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(params, tx => tx('users'), ['users.id', 'users.username', 'users.name']);
+    return await dtHelpers.ajaxList(
+        params,
+        tx => tx('users').innerJoin('namespaces', 'namespaces.id', 'users.namespace'),
+        ['users.id', 'users.username', 'users.name', 'namespaces.name']
+    );
 }
 
 async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
     enforce(await tools.validateEmail(user.email) === 0, 'Invalid email');
+
+    await namespaceHelpers.validateEntity(tx, user);
 
     const otherUserWithSameEmailQuery = tx('users').where('email', user.email);
     if (user.id) {
         otherUserWithSameEmailQuery.andWhereNot('id', user.id);
     }
 
-    const otherUserWithSameUsername = await otherUserWithSameEmailQuery.first();
-    if (otherUserWithSameUsername) {
+    if (await otherUserWithSameEmailQuery.first()) {
         throw new interoperableErrors.DuplicitEmailError();
     }
 
@@ -122,8 +131,7 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
             otherUserWithSameUsernameQuery.andWhereNot('id', user.id);
         }
 
-        const otherUserWithSameUsername = await otherUserWithSameUsernameQuery.first();
-        if (otherUserWithSameUsername) {
+        if (await otherUserWithSameUsernameQuery.first()) {
             throw new interoperableErrors.DuplicitNameError();
         }
     }
@@ -157,7 +165,10 @@ async function create(user) {
 async function createExternal(user) {
     enforce(!passport.isAuthMethodLocal, 'External user management is required');
 
-    const userId = await knex('users').insert(filterObject(user, allowedKeysExternal));
+    const filteredUser = filterObject(user, allowedKeysExternal);
+    filteredUser.namespace = defaultNamespace;
+
+    const userId = await knex('users').insert(filteredUser);
     return userId;
 }
 
@@ -167,7 +178,7 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
     await knex.transaction(async tx => {
         await _validateAndPreprocess(tx, user, false, isOwnAccount);
 
-        const existingUser = await tx('users').select(['id', 'username', 'name', 'email', 'password']).where('id', user.id).first();
+        const existingUser = await tx('users').where('id', user.id).first();
         if (!user) {
             throw new interoperableErrors.NotFoundError();
         }

@@ -149,14 +149,14 @@ class TreeTable extends Component {
     updateSelection() {
         const tree = this.tree;
         if (this.selectMode === TreeSelectMode.MULTI) {
-            const selectSet = new Set(this.props.selection);
+            const selectSet = new Set(this.props.selection.map(key => this.stringifyKey(key)));
 
             tree.enableUpdate(false);
             tree.visit(node => node.setSelected(selectSet.has(node.key)));
             tree.enableUpdate(true);
 
         } else if (this.selectMode === TreeSelectMode.SINGLE) {
-            this.tree.activateKey(this.props.selection);
+            this.tree.activateKey(this.stringifyKey(this.props.selection));
         }
     }
 
@@ -167,9 +167,26 @@ class TreeTable extends Component {
         }
     }
 
+    stringifyKey(key) {
+        if (key !== null && key !== undefined) {
+            return key.toString();
+        } else {
+            return key;
+        }
+    }
+
+    destringifyKey(key) {
+        if (/^(\-|\+)?([0-9]+|Infinity)$/.test(key)) {
+            return Number(key);
+        } else {
+            return key;
+        }
+    }
+
     // Single-select
     onActivate(event, data) {
-        const selection = this.tree.getActiveNode().key;
+        const selection = this.destringifyKey(this.tree.getActiveNode().key);
+
         if (selection !== this.props.selection) {
             this.onSelectionChanged(selection);
         }
@@ -177,7 +194,7 @@ class TreeTable extends Component {
 
     // Multi-select
     onSelect(event, data) {
-        const newSel = this.tree.getSelectedNodes().map(node => node.key).sort();
+        const newSel = this.tree.getSelectedNodes().map(node => this.destringifyKey(node.key)).sort();
         const oldSel = this.props.selection;
 
         let updated = false;

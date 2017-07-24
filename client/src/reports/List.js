@@ -32,9 +32,9 @@ export default class List extends Component {
         const actions = data => {
             let view, startStop, refreshTimeout;
 
-            const state = data[5];
+            const state = data[6];
             const id = data[0];
-            const mimeType = data[6];
+            const mimeType = data[7];
             
             if (state === ReportState.PROCESSING || state === ReportState.SCHEDULED) {
                 view = {
@@ -98,7 +98,8 @@ export default class List extends Component {
             { data: 1, title: t('Name') },
             { data: 2, title: t('Template') },
             { data: 3, title: t('Description') },
-            { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' }
+            { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' },
+            { data: 5, title: t('Namespace') }
         ];
 
         return (

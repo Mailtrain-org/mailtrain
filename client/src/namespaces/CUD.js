@@ -81,9 +81,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/namespaces/${this.state.entityId}`, data => {
-            if (data.parent) data.parent = data.parent.toString();
-        });
+        await this.getFormValuesFromURL(`/rest/namespaces/${this.state.entityId}`);
     }
 
     componentDidMount() {
@@ -93,7 +91,7 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                parent: null
+                namespace: null
             });
         }
 
@@ -112,10 +110,10 @@ export default class CUD extends Component {
         }
 
         if (!this.isEditGlobal()) {
-            if (!state.getIn(['parent', 'value'])) {
-                state.setIn(['parent', 'error'], t('Parent Namespace must be selected'));
+            if (!state.getIn(['namespace', 'value'])) {
+                state.setIn(['namespace', 'error'], t('Parent Namespace must be selected'));
             } else {
-                state.setIn(['parent', 'error'], null);
+                state.setIn(['namespace', 'error'], null);
             }
         }
     }
@@ -137,9 +135,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Saving namespace ...'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                if (data.parent) data.parent = parseInt(data.parent);
-            });
+            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
             if (submitSuccessful) {
                 this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace saved'));
@@ -232,7 +228,7 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('Description')}/>
 
                     {!this.isEditGlobal() &&
-                    <TreeTableSelect id="parent" label={t('Parent Namespace')} data={this.state.treeData}/>}
+                    <TreeTableSelect id="namespace" label={t('Parent Namespace')} data={this.state.treeData}/>}
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>

@@ -35,6 +35,8 @@ export default class List extends Component {
             ];
         }
 
+        columns.push({ data: 3, title: "Namespace" });
+
         return (
             <div>
                 <Toolbar>

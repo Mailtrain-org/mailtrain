@@ -49,14 +49,14 @@ router.getAsync('/namespaces-tree', passport.loggedIn, async (req, res) => {
             entry = entries[row.id];
         }
 
-        if (row.parent) {
-            if (!entries[row.parent]) {
-                entries[row.parent] = {
+        if (row.namespace) {
+            if (!entries[row.namespace]) {
+                entries[row.namespace] = {
                     children: []
                 };
             }
 
-            entries[row.parent].children.push(entry);
+            entries[row.namespace].children.push(entry);
 
         } else {
             root = entry;

@@ -8,6 +8,7 @@ import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEdit
 import axios from '../../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { ModalDialog } from '../../lib/bootstrap-components';
+import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
 
 @translate()
 @withForm
@@ -50,6 +51,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report listing all subscribers along with their statistics.',
+                    namespace: null,
                     mime_type: 'text/html',
                     user_fields:
                         '[\n' +
@@ -99,6 +101,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report with results are aggregated by some "Country" custom field.',
+                    namespace: null,
                     mime_type: 'text/html',
                     user_fields:
                         '[\n' +
@@ -169,6 +172,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Exports a list as a CSV file.',
+                    namespace: null,
                     mime_type: 'text/csv',
                     user_fields:
                         '[\n' +
@@ -193,6 +197,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: '',
+                    namespace: null,
                     mime_type: 'text/html',
                     user_fields: '',
                     js: '',
@@ -226,6 +231,8 @@ export default class CUD extends Component {
                 state.setIn(['user_fields', 'error'], t('Syntax error in the user fields specification'));
             }
         }
+
+        validateNamespace(t, state);
     }
 
     async submitAndStay() {
@@ -310,6 +317,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
                     <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
                     <Dropdown id="mime_type" label={t('Type')} options={[{key: 'text/html', label: t('HTML')}, {key: 'text/csv', label: t('CSV')}]}/>
+                    <NamespaceSelect/>
                     <ACEEditor id="user_fields" height="250px" mode="json" label={t('User selectable fields')} help={t('JSON specification of user selectable fields.')}/>
                     <ACEEditor id="js" height="700px" mode="javascript" label={t('Data processing code')} help={<Trans>Write the body of the JavaScript function with signature <code>function(inputs, callback)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
                     <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('Rendering template')} help={<Trans>Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>

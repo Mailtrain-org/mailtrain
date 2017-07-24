@@ -33,7 +33,8 @@ export default class List extends Component {
             { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('Created'), render: data => moment(data).fromNow() }
+            { data: 3, title: t('Created'), render: data => moment(data).fromNow() },
+            { data: 4, title: t('Namespace') }
         ];
 
         return (

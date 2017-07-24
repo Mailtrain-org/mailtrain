@@ -5,7 +5,7 @@ const hasher = require('node-object-hash')();
 const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 
-const allowedKeys = new Set(['name', 'description', 'parent']);
+const allowedKeys = new Set(['name', 'description', 'namespace']);
 
 async function list() {
     return await knex('namespaces');
@@ -28,8 +28,8 @@ async function create(entity) {
     await knex.transaction(async tx => {
         const id = await tx('namespaces').insert(filterObject(entity, allowedKeys));
 
-        if (entity.parent) {
-            if (!await tx('namespaces').select(['id']).where('id', entity.parent).first()) {
+        if (entity.namespace) {
+            if (!await tx('namespaces').select(['id']).where('id', entity.namespace).first()) {
                 throw new interoperableErrors.DependencyNotFoundError();
             }
         }
@@ -39,7 +39,7 @@ async function create(entity) {
 }
 
 async function updateWithConsistencyCheck(entity) {
-    enforce(entity.id !== 1 || entity.parent === null, 'Cannot assign a parent to the root namespace.');
+    enforce(entity.id !== 1 || entity.namespace === null, 'Cannot assign a parent to the root namespace.');
 
     await knex.transaction(async tx => {
         const existing = await tx('namespaces').where('id', entity.id).first();
@@ -53,8 +53,8 @@ async function updateWithConsistencyCheck(entity) {
         }
 
         let iter = entity;
-        while (iter.parent != null) {
-            iter = await tx('namespaces').where('id', iter.parent).first();
+        while (iter.namespace != null) {
+            iter = await tx('namespaces').where('id', iter.namespace).first();
 
             if (!iter) {
                 throw new interoperableErrors.DependencyNotFoundError();
@@ -73,7 +73,7 @@ async function remove(id) {
     enforce(id !== 1, 'Cannot delete the root namespace.');
 
     await knex.transaction(async tx => {
-        const childNs = await tx('namespaces').where('parent', id).first();
+        const childNs = await tx('namespaces').where('namespace', id).first();
         if (childNs) {
             throw new interoperableErrors.ChildDetectedError();
         }

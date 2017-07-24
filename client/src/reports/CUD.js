@@ -12,6 +12,7 @@ import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import { ModalDialog } from '../lib/bootstrap-components';
 import moment from 'moment';
+import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 
 @translate()
 @withForm
@@ -76,6 +77,7 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 report_template: null,
+                namespace: null,
                 user_fields: null
             });
         }
@@ -122,6 +124,8 @@ export default class CUD extends Component {
                 }
             }
         }
+
+        validateNamespace(t, state);
     }
 
     async submitHandler() {
@@ -191,7 +195,7 @@ export default class CUD extends Component {
         const t = this.props.t;
         const edit = this.props.edit;
 
-        const columns = [
+        const reportTemplateColumns = [
             { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
@@ -258,7 +262,9 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
                     <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
 
-                    <TableSelect id="report_template" label={t('Report Template')} withHeader dropdown dataUrl="/rest/report-templates-table" columns={columns} selectionLabelIndex={1}/>
+                    <TableSelect id="report_template" label={t('Report Template')} withHeader dropdown dataUrl="/rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
+
+                    <NamespaceSelect/>
 
                     {userFieldsSpec ?
                         userFields.length > 0 &&
