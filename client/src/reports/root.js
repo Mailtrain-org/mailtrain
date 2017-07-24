@@ -47,6 +47,11 @@ const getStructure = t => {
                             params: [':id' ],
                             render: props => (<ReportsOutput {...props} />)
                         },
+                        share: {
+                            title: t('Share Report'),
+                            params: [':id'],
+                            render: props => (<Share title={entity => t('Share Report "{{name}}"', {name: entity.name})} getUrl={id => `/rest/reports/${id}`} entityTypeId="report" {...props} />)
+                        },
                         'templates': {
                             title: t('Templates'),
                             link: '/reports/templates',

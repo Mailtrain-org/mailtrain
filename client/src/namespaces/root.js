@@ -8,6 +8,7 @@ import i18n from '../lib/i18n';
 import { Section } from '../lib/page';
 import CUD from './CUD';
 import List from './List';
+import Share from '../shares/Share';
 
 const getStructure = t => ({
     '': {
@@ -27,6 +28,11 @@ const getStructure = t => ({
                     create : {
                         title: t('Create Namespace'),
                         render: props => (<CUD {...props} />)
+                    },
+                    share: {
+                        title: t('Share Namespace'),
+                        params: [':id'],
+                        render: props => (<Share title={entity => t('Share Namespace "{{name}}"', {name: entity.name})} getUrl={id => `/rest/namespaces/${id}`} entityTypeId="namespace" {...props} />)
                     }
                 }
             }

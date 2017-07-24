@@ -6,6 +6,7 @@ const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const namespaceHelpers = require('../lib/namespace-helpers');
+const shares = require('./shares');
 
 const allowedKeys = new Set(['name', 'description', 'mime_type', 'user_fields', 'js', 'hbs', 'namespace']);
 
@@ -33,7 +34,11 @@ async function listDTAjax(params) {
 async function create(entity) {
     await knex.transaction(async tx => {
         await namespaceHelpers.validateEntity(tx, entity);
+
         const id = await tx('report_templates').insert(filterObject(entity, allowedKeys));
+
+        await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: id });
+
         return id;
     });
 }
@@ -53,6 +58,8 @@ async function updateWithConsistencyCheck(entity) {
         await namespaceHelpers.validateEntity(tx, entity);
 
         await tx('report_templates').where('id', entity.id).update(filterObject(entity, allowedKeys));
+
+        await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: entity.id });
     });
 }
 

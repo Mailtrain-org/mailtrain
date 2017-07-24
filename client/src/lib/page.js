@@ -210,7 +210,8 @@ class SectionContent extends Component {
 
     errorHandler(error) {
         if (error instanceof interoperableErrors.NotLoggedInError) {
-            this.ensureAuthenticated();
+            /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
+            window.location = '/account/login?next=' + encodeURIComponent(this.props.root);
         } else if (error.response && error.response.data && error.response.data.message) {
             console.error(error);
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);

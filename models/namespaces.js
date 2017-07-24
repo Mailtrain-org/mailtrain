@@ -4,6 +4,7 @@ const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
 const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
+const shares = require('./shares');
 
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
@@ -33,6 +34,9 @@ async function create(entity) {
                 throw new interoperableErrors.DependencyNotFoundError();
             }
         }
+
+        // We don't have to rebuild all entity types, because no entity can be a child of the namespace at this moment.
+        await shares.rebuildPermissions(tx, { entityTypeId: 'namespace', entityId: id });
 
         return id;
     });
@@ -66,6 +70,8 @@ async function updateWithConsistencyCheck(entity) {
         }
 
         await tx('namespaces').where('id', entity.id).update(filterObject(entity, allowedKeys));
+
+        await shares.rebuildPermissions(tx);
     });
 }
 

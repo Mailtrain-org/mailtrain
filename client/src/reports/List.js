@@ -88,6 +88,10 @@ export default class List extends Component {
                     {
                         label: <span className="glyphicon glyphicon-wrench" aria-hidden="true" title="Edit"></span>,
                         link: `/reports/edit/${id}`
+                    },
+                    {
+                        label: <span className="glyphicon glyphicon-share" aria-hidden="true" title="Share"></span>,
+                        link: `/reports/share/${id}`
                     }
                 ]
             };

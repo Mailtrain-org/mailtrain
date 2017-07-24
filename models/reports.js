@@ -7,6 +7,7 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const fields = require('./fields');
 const namespaceHelpers = require('../lib/namespace-helpers');
+const shares = require('./shares');
 
 const ReportState = require('../shared/reports').ReportState;
 
@@ -56,6 +57,8 @@ async function create(entity) {
         entity.params = JSON.stringify(entity.params);
 
         id = await tx('reports').insert(filterObject(entity, allowedKeys));
+
+        await shares.rebuildPermissions(tx, { entityTypeId: 'report', entityId: id });
     });
 
     const reportProcessor = require('../lib/report-processor');
@@ -89,6 +92,8 @@ async function updateWithConsistencyCheck(entity) {
         filteredUpdates.state = ReportState.SCHEDULED;
 
         await tx('reports').where('id', entity.id).update(filteredUpdates);
+
+        await shares.rebuildPermissions(tx, { entityTypeId: 'report', entityId: entity.id });
     });
 
     // This require is here to avoid cyclic dependency

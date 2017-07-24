@@ -20,6 +20,10 @@ export default class List extends Component {
             {
                 label: 'Edit',
                 link: '/namespaces/edit/' + key
+            },
+            {
+                label: 'Share',
+                link: '/namespaces/share/' + key
             }
         ];
 

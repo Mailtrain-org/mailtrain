@@ -193,16 +193,23 @@ name="Master"
 description="All permissions"
 permissions=["view", "edit", "delete"]
 
-#[roles.list.master]
-#name="Master"
-#description="All permissions"
-#permissions=["view"]
-#
-#[roles.namespace.master]
-#name="Master"
-#description="All permissions"
-#permissions=["view", "edit", "create", "delete", "create list"]
-#
-#[roles.namespace.master.childperms]
-#list=["view"]
-#namespace=["view", "edit", "create", "delete", "create list"]
+[roles.report.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete"]
+
+[roles.list.master]
+name="Master"
+description="All permissions"
+permissions=["view"]
+
+[roles.namespace.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "create", "delete", "create list"]
+
+[roles.namespace.master.childperms]
+reportTemplate=["view", "edit", "delete"]
+report=["view", "edit", "delete"]
+list=["view"]
+namespace=["view", "edit", "create", "delete", "create list"]
