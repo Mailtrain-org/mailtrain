@@ -3,12 +3,18 @@
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { DropdownMenu } from '../../lib/bootstrap-components';
-import { Title, Toolbar, DropdownLink } from '../../lib/page';
+import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, DropdownLink } from '../../lib/page';
 import { Table } from '../../lib/table';
 import moment from 'moment';
 
 @translate()
+@withPageHelpers
+@requiresAuthenticatedUser
 export default class List extends Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         const t = this.props.t;
 
@@ -16,6 +22,10 @@ export default class List extends Component {
             {
                 label: 'Edit',
                 link: '/reports/templates/edit/' + data[0]
+            },
+            {
+                label: 'Share',
+                link: '/reports/templates/share/' + data[0]
             }
         ];
 

@@ -356,7 +356,7 @@ class TreeTableSelect extends Component {
     }
 }
 
-@translate()
+@translate(null, { withRef: true })
 class TableSelect extends Component {
     constructor(props) {
         super(props);
@@ -369,6 +369,7 @@ class TableSelect extends Component {
 
     static propTypes = {
         dataUrl: PropTypes.string,
+        data: PropTypes.array,
         columns: PropTypes.array,
         selectionKeyIndex: PropTypes.number,
         selectionLabelIndex: PropTypes.number,
@@ -426,6 +427,10 @@ class TableSelect extends Component {
         });
     }
 
+    refresh() {
+        this.table.refresh();
+    }
+
     render() {
         const props = this.props;
         const owner = this.context.formStateOwner;
@@ -443,7 +448,7 @@ class TableSelect extends Component {
                         </span>
                     </div>
                     <div className={'mt-tableselect-table' + (this.state.open ? '' : ' mt-tableselect-table-hidden')}>
-                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
@@ -451,13 +456,22 @@ class TableSelect extends Component {
             return wrapInput(id, htmlId, owner, props.label, props.help,
                 <div>
                     <div>
-                        <Table dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
         }
     }
 }
+
+/*
+ Refreshes the table. This method is provided to allow programmatic refresh from a handler outside the table.
+ The reference to the table can be obtained by ref.
+ */
+TableSelect.prototype.refresh = function() {
+    this.getWrappedInstance().refresh()
+};
+
 
 class ACEEditor extends Component {
     static propTypes = {

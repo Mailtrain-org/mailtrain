@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { translate, Trans } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import {
     withForm, Form, Fieldset, FormSendMethod, InputField, ButtonRow, Button
 } from '../lib/form';
@@ -15,6 +15,7 @@ import mailtrainConfig from 'mailtrainConfig';
 @withForm
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class Account extends Component {
     constructor(props) {
         super(props);
@@ -120,6 +121,8 @@ export default class Account extends Component {
                 this.updateFormValue('currentPassword', '');
 
                 this.clearFormStatusMessage();
+                this.enableForm();
+
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));

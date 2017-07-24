@@ -1,8 +1,9 @@
 'use strict';
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { translate } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
 import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
@@ -16,6 +17,7 @@ import mailtrainConfig from 'mailtrainConfig';
 @withForm
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class CUD extends Component {
     constructor(props) {
         super(props);
@@ -35,6 +37,10 @@ export default class CUD extends Component {
                 extra: ['id']
             }
         });
+    }
+
+    static propTypes = {
+        edit: PropTypes.bool
     }
 
     isDelete() {

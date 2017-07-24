@@ -2,12 +2,18 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { Title, Toolbar, NavButton } from '../lib/page';
+import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
 import { Table } from '../lib/table';
 import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
+@withPageHelpers
+@requiresAuthenticatedUser
 export default class List extends Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         const t = this.props.t;
 

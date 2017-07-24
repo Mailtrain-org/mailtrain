@@ -23,7 +23,7 @@ function handleError(that, error) {
 function withErrorHandling(target) {
     const inst = target.prototype;
 
-    if (inst._withErrorHandlingApplied) return;
+    if (inst._withErrorHandlingApplied) return target;
     inst._withErrorHandlingApplied = true;
 
     const contextTypes = target.contextTypes || {};

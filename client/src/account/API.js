@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { translate, Trans } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import URL from 'url-parse';
 import axios from '../lib/axios';
@@ -11,6 +11,7 @@ import { Button } from '../lib/bootstrap-components';
 @translate()
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class API extends Component {
     constructor(props) {
         super(props);

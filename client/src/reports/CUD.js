@@ -1,8 +1,9 @@
 'use strict';
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { translate, Trans } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
 import {
     withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, TableSelectMode, ButtonRow, Button,
     Fieldset
@@ -16,6 +17,7 @@ import moment from 'moment';
 @withForm
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class CUD extends Component {
     constructor(props) {
         super(props);
@@ -31,6 +33,10 @@ export default class CUD extends Component {
                 report_template: ::this.onReportTemplateChange
             }
         });
+    }
+
+    static propTypes = {
+        edit: PropTypes.bool
     }
 
     isDelete() {

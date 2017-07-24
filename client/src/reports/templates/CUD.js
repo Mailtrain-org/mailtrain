@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { translate, Trans } from 'react-i18next';
 import { withPageHelpers, Title } from '../../lib/page'
 import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEditor, ButtonRow, Button } from '../../lib/form';
@@ -23,6 +24,10 @@ export default class CUD extends Component {
         }
 
         this.initForm();
+    }
+
+    static propTypes = {
+        edit: PropTypes.bool
     }
 
     isDelete() {

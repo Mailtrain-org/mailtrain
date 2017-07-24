@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { withPageHelpers, Title } from '../lib/page'
 import {
-    withForm, Form, FormSendMethod, InputField, CheckBox, ButtonRow, Button, AlignedRow
+    withForm, Form, FormSendMethod, InputField, ButtonRow, Button
 } from '../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 

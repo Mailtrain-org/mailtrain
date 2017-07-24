@@ -50,6 +50,7 @@ const reportTemplatesRest = require('./routes/rest/report-templates');
 const reportsRest = require('./routes/rest/reports');
 const campaignsRest = require('./routes/rest/campaigns');
 const listsRest = require('./routes/rest/lists');
+const sharesRest = require('./routes/rest/shares');
 
 const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
 const usersLegacyIntegration = require('./routes/users-legacy-integration');
@@ -271,6 +272,7 @@ app.use('/rest', usersRest);
 app.use('/rest', accountRest);
 app.use('/rest', campaignsRest);
 app.use('/rest', listsRest);
+app.use('/rest', sharesRest);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportTemplatesRest);

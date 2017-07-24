@@ -2,13 +2,14 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
 
 @translate()
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class Output extends Component {
     constructor(props) {
         super(props);

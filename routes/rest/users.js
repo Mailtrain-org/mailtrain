@@ -39,5 +39,4 @@ router.postAsync('/users-table', passport.loggedIn, async (req, res) => {
     return res.json(await users.listDTAjax(req.body));
 });
 
-
 module.exports = router;

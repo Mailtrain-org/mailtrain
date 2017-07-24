@@ -188,16 +188,21 @@ logger=false
 browser="phantomjs"
 
 
-[roles.list.master]
+[roles.reportTemplate.master]
 name="Master"
 description="All permissions"
-permissions=["view"]
+permissions=["view", "edit", "delete"]
 
-[roles.namespace.master]
-name="Master"
-description="All permissions"
-permissions=["view", "edit", "create", "delete", "create list"]
-
-[roles.namespace.master.childperms]
-list=["view"]
-namespace=["view", "edit", "create", "delete", "create list"]
+#[roles.list.master]
+#name="Master"
+#description="All permissions"
+#permissions=["view"]
+#
+#[roles.namespace.master]
+#name="Master"
+#description="All permissions"
+#permissions=["view", "edit", "create", "delete", "create list"]
+#
+#[roles.namespace.master.childperms]
+#list=["view"]
+#namespace=["view", "edit", "create", "delete", "create list"]

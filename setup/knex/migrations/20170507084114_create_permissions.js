@@ -5,14 +5,6 @@ exports.up = function(knex, Promise) {
             table.increments('id').primary();
             table.integer('entity').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
             table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
-            table.integer('role', 64).notNullable();
-            table.unique(['entity', 'user']);
-        })
-
-        .createTable('shares_namespace', table => {
-            table.increments('id').primary();
-            table.integer('entity').unsigned().notNullable().references('namespaces.id').onDelete('CASCADE');
-            table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
             table.string('role', 64).notNullable();
             table.unique(['entity', 'user']);
         })
@@ -23,6 +15,30 @@ exports.up = function(knex, Promise) {
             table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
             table.string('operation', 64).notNullable();
             table.unique(['entity', 'user', 'operation']);
+        })
+
+        .createTable('shares_report_template', table => {
+            table.increments('id').primary();
+            table.integer('entity').unsigned().notNullable().references('report_templates.id').onDelete('CASCADE');
+            table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
+            table.string('role', 64).notNullable();
+            table.unique(['entity', 'user']);
+        })
+
+        .createTable('permissions_report_template', table => {
+            table.increments('id').primary();
+            table.integer('entity').unsigned().notNullable().references('report_templates.id').onDelete('CASCADE');
+            table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
+            table.string('operation', 64).notNullable();
+            table.unique(['entity', 'user', 'operation']);
+        })
+
+        .createTable('shares_namespace', table => {
+            table.increments('id').primary();
+            table.integer('entity').unsigned().notNullable().references('namespaces.id').onDelete('CASCADE');
+            table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
+            table.string('role', 64).notNullable();
+            table.unique(['entity', 'user']);
         })
 
         .createTable('permissions_namespace', table => {

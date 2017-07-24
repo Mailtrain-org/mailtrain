@@ -39,3 +39,8 @@
 .mt-tableselect-dropdown input[readonly] {
     background-color: white;
 }
+
+h3.legend {
+    font-size: 21px;
+    margin-bottom: 20px;
+}

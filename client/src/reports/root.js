@@ -5,13 +5,15 @@ import ReactDOM from 'react-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../lib/i18n';
 
-import { Section } from '../lib/page'
-import ReportsCUD from './CUD'
-import ReportsList from './List'
-import ReportsView from './View'
-import ReportsOutput from './Output'
-import ReportTemplatesCUD from './templates/CUD'
-import ReportTemplatesList from './templates/List'
+import { Section } from '../lib/page';
+import ReportsCUD from './CUD';
+import ReportsList from './List';
+import ReportsView from './View';
+import ReportsOutput from './Output';
+import ReportTemplatesCUD from './templates/CUD';
+import ReportTemplatesList from './templates/List';
+import Share from '../shares/Share';
+
 
 const getStructure = t => {
     const subPaths = {};
@@ -59,11 +61,16 @@ const getStructure = t => {
                                     title: t('Create Report Template'),
                                     params: [':wizard?'],
                                     render: props => (<ReportTemplatesCUD {...props} />)
+                                },
+                                share: {
+                                    title: t('Share Report Template'),
+                                    params: [':id'],
+                                    render: props => (<Share title={entity => t('Share Report Template "{{name}}"', {name: entity.name})} getUrl={id => `/rest/report-templates/${id}`} entityTypeId="reportTemplate" {...props} />)
                                 }
                             }
                         }
                     }
-                },
+                }
             }
         }
     }

@@ -6,7 +6,6 @@ import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 
 import jQuery from 'jquery';
-import '../../public/jquery/jquery-ui-1.12.1.min.js';
 
 import 'datatables.net';
 import 'datatables.net-bs';
@@ -82,13 +81,20 @@ class Table extends Component {
             selMap.set(elem, undefined);
         }
 
-        if (this.table) {
-            const self = this;
-            this.table.rows().every(function() {
-                const data = this.data();
-                const key = data[self.props.selectionKeyIndex];
+        if (props.data) {
+            for (const rowData of props.data) {
+                const key = rowData[props.selectionKeyIndex];
                 if (selMap.has(key)) {
-                    selMap.set(key, data);
+                    selMap.set(key, rowData);
+                }
+            }
+
+        } else if (this.table) {
+            this.table.rows().every(function() {
+                const rowData = this.data();
+                const key = rowData[props.selectionKeyIndex];
+                if (selMap.has(key)) {
+                    selMap.set(key, rowData);
                 }
             });
         }
@@ -118,26 +124,28 @@ class Table extends Component {
     }
 
     @withAsyncErrorHandler
-    async fetchSelectionData() {
+    async fetchAndNotifySelectionData() {
         if (this.props.onSelectionDataAsync) {
-            const keysToFetch = [];
-            for (const pair of this.selectionMap.entries()) {
-                if (!pair[1]) {
-                    keysToFetch.push(pair[0]);
+            if (!this.props.data) {
+                const keysToFetch = [];
+                for (const pair of this.selectionMap.entries()) {
+                    if (!pair[1]) {
+                        keysToFetch.push(pair[0]);
+                    }
                 }
-            }
 
-            if (keysToFetch.length > 0) {
-                const response = await axios.post(this.props.dataUrl, {
-                    operation: 'getBy',
-                    column: this.props.selectionKeyIndex,
-                    values: keysToFetch
-                });
+                if (keysToFetch.length > 0) {
+                    const response = await axios.post(this.props.dataUrl, {
+                        operation: 'getBy',
+                        column: this.props.selectionKeyIndex,
+                        values: keysToFetch
+                    });
 
-                for (const row of response.data) {
-                    const key = row[this.props.selectionKeyIndex];
-                    if (this.selectionMap.has(key)) {
-                        this.selectionMap.set(key, row);
+                    for (const row of response.data) {
+                        const key = row[this.props.selectionKeyIndex];
+                        if (this.selectionMap.has(key)) {
+                            this.selectionMap.set(key, row);
+                        }
                     }
                 }
             }
@@ -293,7 +301,7 @@ class Table extends Component {
            clearTimeout(this.refreshTimeoutId);
         });
 
-        this.fetchSelectionData();
+        this.fetchAndNotifySelectionData();
     }
 
     componentDidUpdate() {
@@ -314,7 +322,7 @@ class Table extends Component {
         }
 
         this.updateSelectInfo();
-        this.fetchSelectionData();
+        this.fetchAndNotifySelectionData();
     }
 
     async notifySelection(eventCallback, newSelectionMap) {

@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { withPageHelpers, Title } from '../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
 import { ReportState } from '../../../shared/reports';
@@ -10,6 +10,7 @@ import { ReportState } from '../../../shared/reports';
 @translate()
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class View extends Component {
     constructor(props) {
         super(props);

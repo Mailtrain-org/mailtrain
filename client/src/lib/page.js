@@ -9,6 +9,7 @@ import './page.css';
 import { withErrorHandling } from './error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import { DismissibleAlert, Button } from './bootstrap-components';
+import mailtrainConfig from 'mailtrainConfig';
 
 
 class PageContent extends Component {
@@ -200,10 +201,16 @@ class SectionContent extends Component {
         this.setFlashMessage(severity, text);
     }
 
-    errorHandler(error) {
-        if (error instanceof interoperableErrors.NotLoggedInError) {
+    ensureAuthenticated() {
+        if (!mailtrainConfig.isAuthenticated) {
             /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
             window.location = '/account/login?next=' + encodeURIComponent(this.props.root);
+        }
+    }
+
+    errorHandler(error) {
+        if (error instanceof interoperableErrors.NotLoggedInError) {
+            this.ensureAuthenticated();
         } else if (error.response && error.response.data && error.response.data.message) {
             console.error(error);
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);
@@ -312,7 +319,7 @@ class DropdownLink extends Component {
 }
 
 function withPageHelpers(target) {
-    withErrorHandling(target);
+    target = withErrorHandling(target);
 
     const inst = target.prototype;
 
@@ -346,9 +353,24 @@ function withPageHelpers(target) {
         return this.context.sectionContent.navigateToWithFlashMessage(path, severity, text);
     }
 
-    inst.axios
-
     return target;
+}
+
+function requiresAuthenticatedUser(target) {
+    const comp1 = withPageHelpers(target);
+
+    function comp2(props, context) {
+        comp1.call(this, props, context);
+        context.sectionContent.ensureAuthenticated();
+    }
+
+    comp2.prototype = comp1.prototype;
+
+    for (const attr in comp1) {
+        comp2[attr] = comp1[attr];
+    }
+
+    return comp2;
 }
 
 export {
@@ -357,5 +379,6 @@ export {
     Toolbar,
     NavButton,
     DropdownLink,
-    withPageHelpers
+    withPageHelpers,
+    requiresAuthenticatedUser
 };

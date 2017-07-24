@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { Title, Toolbar, NavButton } from '../lib/page';
+import { withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
 import { Table } from '../lib/table';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import moment from 'moment';
@@ -11,6 +11,7 @@ import { ReportState } from '../../../shared/reports';
 
 @translate()
 @withErrorHandling
+@withPageHelpers
 export default class List extends Component {
 
     @withAsyncErrorHandler
