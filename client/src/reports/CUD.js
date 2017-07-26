@@ -245,6 +245,8 @@ export default class CUD extends Component {
             }
         }
 
+        // FIXME - filter namespaces by permission
+
         return (
             <div>
                 {edit &&

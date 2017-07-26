@@ -8,7 +8,7 @@ const router = require('../../lib/router-async').create();
 
 
 router.getAsync('/account', passport.loggedIn, async (req, res) => {
-    const user = await users.getById(req.user.id);
+    const user = await users.getByIdNoPerms(req.user.id);
     user.hash = users.hash(user);
     return res.json(user);
 });

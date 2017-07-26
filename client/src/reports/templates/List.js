@@ -4,30 +4,65 @@ import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import { DropdownMenu } from '../../lib/bootstrap-components';
 import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, DropdownLink } from '../../lib/page';
+import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
+import axios from '../../lib/axios';
 import moment from 'moment';
 
 @translate()
 @withPageHelpers
+@withErrorHandling
 @requiresAuthenticatedUser
 export default class List extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {};
+    }
+
+    @withAsyncErrorHandler
+    async fetchPermissions() {
+        const request = {
+            createReportTemplate: {
+                entityTypeId: 'namespace',
+                requiredOperations: ['createReportTemplate']
+            }
+        };
+
+        const result = await axios.post('/rest/permissions-check', request);
+
+        this.setState({
+            createPermitted: result.data.createReportTemplate
+        });
+    }
+
+    componentDidMount() {
+        this.fetchPermissions();
     }
 
     render() {
         const t = this.props.t;
 
-        const actions = data => [
-            {
-                label: 'Edit',
-                link: '/reports/templates/edit/' + data[0]
-            },
-            {
-                label: 'Share',
-                link: '/reports/templates/share/' + data[0]
+        const actions = data => {
+            const actions = [];
+            const perms = data[5];
+
+            if (perms.includes('view')) {
+                actions.push({
+                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    link: '/reports/templates/edit/' + data[0]
+                });
             }
-        ];
+
+            if (perms.includes('share')) {
+                actions.push({
+                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                    link: '/reports/templates/share/' + data[0]
+                });
+            }
+
+            return actions;
+        };
 
         const columns = [
             { data: 0, title: "#" },
@@ -39,14 +74,16 @@ export default class List extends Component {
 
         return (
             <div>
-                <Toolbar>
-                    <DropdownMenu className="btn-primary" label={t('Create Report Template')}>
-                        <DropdownLink to="/reports/templates/create">{t('Blank')}</DropdownLink>
-                        <DropdownLink to="/reports/templates/create/subscribers-all">{t('All Subscribers')}</DropdownLink>
-                        <DropdownLink to="/reports/templates/create/subscribers-grouped">{t('Grouped Subscribers')}</DropdownLink>
-                        <DropdownLink to="/reports/templates/create/export-list-csv">{t('Export List as CSV')}</DropdownLink>
-                    </DropdownMenu>
-                </Toolbar>
+                {this.state.createPermitted &&
+                    <Toolbar>
+                        <DropdownMenu className="btn-primary" label={t('Create Report Template')}>
+                            <DropdownLink to="/reports/templates/create">{t('Blank')}</DropdownLink>
+                            <DropdownLink to="/reports/templates/create/subscribers-all">{t('All Subscribers')}</DropdownLink>
+                            <DropdownLink to="/reports/templates/create/subscribers-grouped">{t('Grouped Subscribers')}</DropdownLink>
+                            <DropdownLink to="/reports/templates/create/export-list-csv">{t('Export List as CSV')}</DropdownLink>
+                        </DropdownMenu>
+                    </Toolbar>
+                }
 
                 <Title>{t('Report Templates')}</Title>
 

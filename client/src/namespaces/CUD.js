@@ -35,7 +35,7 @@ export default class CUD extends Component {
     }
 
     isEditGlobal() {
-        return this.state.entityId === 1;
+        return this.state.entityId === 1; /* Global namespace id */
     }
 
     isDelete() {

@@ -14,7 +14,9 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getById(id) {
+async function getById(context, id) {
+    await shares.enforceEntityPermission(context, 'reportTemplate', id, 'view');
+
     const entity = await knex('report_templates').where('id', id).first();
     if (!entity) {
         throw new interoperableErrors.NotFoundError();
@@ -23,15 +25,19 @@ async function getById(id) {
     return entity;
 }
 
-async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(
+async function listDTAjax(context, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'reportTemplate', requiredOperations: ['view'] }],
         params,
-        tx => tx('report_templates').innerJoin('namespaces', 'namespaces.id', 'report_templates.namespace'),
-        ['report_templates.id', 'report_templates.name', 'report_templates.description', 'report_templates.created', 'namespaces.name']
+        builder => builder.from('report_templates').innerJoin('namespaces', 'namespaces.id', 'report_templates.namespace'),
+        [ 'report_templates.id', 'report_templates.name', 'report_templates.description', 'report_templates.created', 'namespaces.name' ]
     );
 }
 
-async function create(entity) {
+async function create(context, entity) {
+    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReportTemplate');
+
     await knex.transaction(async tx => {
         await namespaceHelpers.validateEntity(tx, entity);
 
@@ -43,10 +49,12 @@ async function create(entity) {
     });
 }
 
-async function updateWithConsistencyCheck(entity) {
+async function updateWithConsistencyCheck(context, entity) {
+    await shares.enforceEntityPermission(context, 'reportTemplate', entity.id, 'edit');
+
     await knex.transaction(async tx => {
         const existing = await tx('report_templates').where('id', entity.id).first();
-        if (!entity) {
+        if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
@@ -57,17 +65,26 @@ async function updateWithConsistencyCheck(entity) {
 
         await namespaceHelpers.validateEntity(tx, entity);
 
+        if (existing.namespace !== entity.namespace) {
+            await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReport');
+            await shares.enforceEntityPermission(context, 'reportTemplate', entity.id, 'delete');
+        }
+
         await tx('report_templates').where('id', entity.id).update(filterObject(entity, allowedKeys));
 
         await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: entity.id });
     });
 }
 
-async function remove(id) {
+async function remove(context, id) {
+    await shares.enforceEntityPermission(context, 'reportTemplate', id, 'delete');
+
     await knex('report_templates').where('id', id).del();
 }
 
-async function getUserFieldsById(id) {
+async function getUserFieldsById(context, id) {
+    await shares.enforceEntityPermission(context, 'reportTemplate', id, 'view');
+
     const entity = await knex('report_templates').select(['user_fields']).where('id', id).first();
     if (!entity) {
         throw new interoperableErrors.NotFoundError();

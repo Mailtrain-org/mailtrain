@@ -4,7 +4,7 @@ exports.up = function(knex, Promise) {
         table.string('name');
         table.string('password').alter();
     })
-    .then(() => knex('users').where('id', 1).update({
+    .then(() => knex('users').where('id', 1 /* Admin user id */).update({
         name: 'Administrator'
     }));
 };

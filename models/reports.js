@@ -18,7 +18,13 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getByIdWithTemplate(id) {
+async function getByIdWithTemplate(context, id) {
+    await shares.enforceEntityPermission(context, 'report', id, 'view');
+
+    return await getByIdWithTemplateNoPerms(id);
+}
+
+async function getByIdWithTemplateNoPerms(id) {
     const entity = await knex('reports')
         .where('reports.id', id)
         .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
@@ -35,17 +41,28 @@ async function getByIdWithTemplate(id) {
     return entity;
 }
 
-async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(
+async function listDTAjax(context, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [
+            { entityTypeId: 'report', requiredOperations: ['view'] },
+            { entityTypeId: 'reportTemplate', requiredOperations: ['view'] }
+        ],
         params,
-        tx => tx('reports')
+        builder => builder.from('reports')
             .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
             .innerJoin('namespaces', 'namespaces.id', 'reports.namespace'),
-        ['reports.id', 'reports.name', 'report_templates.name', 'reports.description', 'reports.last_run', 'namespaces.name', 'reports.state', 'report_templates.mime_type']
+        [
+            'reports.id', 'reports.name', 'report_templates.name', 'reports.description',
+            'reports.last_run', 'namespaces.name', 'reports.state', 'report_templates.mime_type'
+        ]
     );
 }
 
-async function create(entity) {
+async function create(context, entity) {
+    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReport');
+    await shares.enforceEntityPermission(context, 'reportTemplate', entity.report_template, 'execute');
+
     let id;
     await knex.transaction(async tx => {
         await namespaceHelpers.validateEntity(tx, entity);
@@ -66,10 +83,13 @@ async function create(entity) {
     return id;
 }
 
-async function updateWithConsistencyCheck(entity) {
+async function updateWithConsistencyCheck(context, entity) {
+    await shares.enforceEntityPermission(context, 'report', entity.id, 'edit');
+    await shares.enforceEntityPermission(context, 'reportTemplate', entity.report_template, 'execute');
+
     await knex.transaction(async tx => {
         const existing = await tx('reports').where('id', entity.id).first();
-        if (!entity) {
+        if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
@@ -86,6 +106,11 @@ async function updateWithConsistencyCheck(entity) {
 
         await namespaceHelpers.validateEntity(tx, entity);
 
+        if (existing.namespace !== entity.namespace) {
+            await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReport');
+            await shares.enforceEntityPermission(context, 'report', entity.id, 'delete');
+        }
+
         entity.params = JSON.stringify(entity.params);
 
         const filteredUpdates = filterObject(entity, allowedKeys);
@@ -101,7 +126,9 @@ async function updateWithConsistencyCheck(entity) {
     await reportProcessor.start(entity.id);
 }
 
-async function remove(id) {
+async function remove(context, id) {
+    await shares.enforceEntityPermission(context, 'report', id, 'delete');
+
     await knex('reports').where('id', id).del();
 }
 
@@ -132,7 +159,7 @@ function customFieldName(id) {
     return id.replace(/MERGE_/, 'CUSTOM_').toLowerCase();
 }
 
-async function getCampaignResults(campaign, select, extra) {
+async function getCampaignResults(context, campaign, select, extra) {
     const fieldList = await fields.list(campaign.list);
 
     const fieldsMapping = fieldList.reduce((map, field) => {
@@ -174,6 +201,7 @@ module.exports = {
     ReportState,
     hash,
     getByIdWithTemplate,
+    getByIdWithTemplateNoPerms,
     listDTAjax,
     create,
     updateWithConsistencyCheck,

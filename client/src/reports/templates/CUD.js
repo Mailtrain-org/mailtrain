@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { translate, Trans } from 'react-i18next';
-import { withPageHelpers, Title } from '../../lib/page'
+import { requiresAuthenticatedUser, withPageHelpers, Title } from '../../lib/page'
 import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEditor, ButtonRow, Button } from '../../lib/form';
 import axios from '../../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
@@ -14,6 +14,7 @@ import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
 @withForm
 @withPageHelpers
 @withErrorHandling
+@requiresAuthenticatedUser
 export default class CUD extends Component {
     constructor(props) {
         super(props);
@@ -299,6 +300,8 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
+
+        // FIXME - filter namespaces by permission
 
         return (
             <div>

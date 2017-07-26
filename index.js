@@ -21,6 +21,8 @@ const senders = require('./lib/senders');
 const reportProcessor = require('./lib/report-processor');
 const executor = require('./lib/executor');
 const privilegeHelpers = require('./lib/privilege-helpers');
+const knex = require('./lib/knex');
+const shares = require('./models/shares');
 
 let port = config.www.port;
 let host = config.www.host;
@@ -37,19 +39,6 @@ app.set('port', port);
  */
 
 let server = http.createServer(app);
-
-// Check if database needs upgrading before starting the server
-dbcheck(err => {
-    if (err) {
-        log.error('DB', err.message || err);
-        return process.exit(1);
-    }
-    /**
-     * Listen on provided port, on all network interfaces.
-     */
-    server.listen(port, host);
-});
-
 
 server.on('error', err => {
     if (err.syscall !== 'listen') {
@@ -145,3 +134,20 @@ server.on('listening', () => {
         startNextServices();
     }
 });
+
+
+// Check if database needs upgrading before starting the server
+// First, the legacy migration
+dbcheck(err => {
+    if (err) {
+        log.error('DB', err.message || err);
+        return process.exit(1);
+    }
+
+    // And now the current migration with Knex
+    knex.migrate.latest()
+        .then(() => shares.rebuildPermissions())
+        .then(() => server.listen(port, host)); // Listen on provided port, on all network interfaces.
+});
+
+

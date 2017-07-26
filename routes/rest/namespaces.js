@@ -8,7 +8,7 @@ const router = require('../../lib/router-async').create();
 
 
 router.getAsync('/namespaces/:nsId', passport.loggedIn, async (req, res) => {
-    const ns = await namespaces.getById(req.params.nsId);
+    const ns = await namespaces.getById(req.context, req.params.nsId);
 
     ns.hash = namespaces.hash(ns);
 
@@ -16,7 +16,7 @@ router.getAsync('/namespaces/:nsId', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/namespaces', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await namespaces.create(req.body);
+    await namespaces.create(req.context, req.body);
     return res.json();
 });
 
@@ -24,16 +24,19 @@ router.putAsync('/namespaces/:nsId', passport.loggedIn, passport.csrfProtection,
     const ns = req.body;
     ns.id = parseInt(req.params.nsId);
 
-    await namespaces.updateWithConsistencyCheck(ns);
+    await namespaces.updateWithConsistencyCheck(req.context, ns);
     return res.json();
 });
 
 router.deleteAsync('/namespaces/:nsId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await namespaces.remove(req.params.nsId);
+    await namespaces.remove(req.context, req.params.nsId);
     return res.json();
 });
 
 router.getAsync('/namespaces-tree', passport.loggedIn, async (req, res) => {
+
+    // FIXME - process permissions
+
     const entries = {};
     let root; // Only the Root namespace is without a parent
     const rows = await namespaces.list();

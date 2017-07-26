@@ -13,6 +13,7 @@ const vm = require('vm');
 const log = require('npmlog');
 const fs = require('fs');
 const knex = require('../../lib/knex');
+const contextHelpers = require('../../lib/context-helpers');
 
 
 handlebarsHelpers.registerHelpers(handlebars);
@@ -25,9 +26,11 @@ const userFieldGetters = {
 
 async function main() {
     try {
+        const context = contextHelpers.getServiceContext();
+
         const reportId = Number(process.argv[2]);
 
-        const report = await reports.getByIdWithTemplate(reportId);
+        const report = await reports.getByIdWithTemplate(context, reportId);
 
         const inputs = {};
 
@@ -50,7 +53,7 @@ async function main() {
         }
 
         const campaignsProxy = {
-            getResults: reports.getCampaignResults,
+            getResults: (campaign, select, extra) => reports.getCampaignResults(context, campaign, select, extra),
             getById: campaigns.getById
         };
 

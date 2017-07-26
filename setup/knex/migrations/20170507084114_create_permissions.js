@@ -21,12 +21,7 @@ exports.up = function(knex, Promise) {
             });
     }
 
-    schema = schema.then(() => knex('shares_namespace').insert({
-            id: 1,
-            entity: 1,
-            user: 1,
-            role: 'master'
-        }));
+    /* The global share for admin is set automatically in rebuild permissions, which is called upon every start */
 
     return schema;
 };

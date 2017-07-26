@@ -1,55 +1,39 @@
 'use strict';
 
+let _ = require('../lib/translate')._;
 const knex = require('../lib/knex');
 const config = require('config');
 const { enforce } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
+const permissions = require('../lib/permissions');
 const interoperableErrors = require('../shared/interoperable-errors');
 
-const entityTypes = {
-    namespace: {
-        entitiesTable: 'namespaces',
-        sharesTable: 'shares_namespace',
-        permissionsTable: 'permissions_namespace'
-    },
-    report: {
-        entitiesTable: 'reports',
-        sharesTable: 'shares_report',
-        permissionsTable: 'permissions_report'
-    },
-    reportTemplate: {
-        entitiesTable: 'report_templates',
-        sharesTable: 'shares_report_template',
-        permissionsTable: 'permissions_report_template'
-    }
-};
 
-function getEntityType(entityTypeId) {
-    const entityType = entityTypes[entityTypeId];
+async function listDTAjax(context, entityTypeId, entityId, params) {
+    const entityType = permissions.getEntityType(entityTypeId);
 
-    if (!entityType) {
-        throw new Error(`Unknown entity type ${entityTypeId}`);
-    }
+    await enforceEntityPermission(context, entityTypeId, entityId, 'share');
 
-    return entityType
+    return await dtHelpers.ajaxList(params, builder => builder.from(entityType.sharesTable).innerJoin('users', entityType.sharesTable + '.user', 'users.id').where(`${entityType.sharesTable}.entity`, entityId), [entityType.sharesTable + '.id', 'users.username', 'users.name', entityType.sharesTable + '.role', 'users.id']);
 }
 
-async function listDTAjax(entityTypeId, entityId, params) {
-    const entityType = getEntityType(entityTypeId);
-    return await dtHelpers.ajaxList(params, tx => tx(entityType.sharesTable).innerJoin('users', entityType.sharesTable + '.user', 'users.id').where(`${entityType.sharesTable}.entity`, entityId), [entityType.sharesTable + '.id', 'users.username', 'users.name', entityType.sharesTable + '.role', 'users.id']);
-}
+async function listUnassignedUsersDTAjax(context, entityTypeId, entityId, params) {
+    const entityType = permissions.getEntityType(entityTypeId);
 
-async function listUnassignedUsersDTAjax(entityTypeId, entityId, params) {
-    const entityType = getEntityType(entityTypeId);
+    await enforceEntityPermission(context, entityTypeId, entityId, 'share');
+
     return await dtHelpers.ajaxList(
         params,
-        tx => tx('users').whereNotExists(function() { return this.select('*').from(entityType.sharesTable).whereRaw(`users.id = ${entityType.sharesTable}.user`).andWhere(`${entityType.sharesTable}.entity`, entityId); }),
+        builder => builder.from('users').whereNotExists(function() { return this.select('*').from(entityType.sharesTable).whereRaw(`users.id = ${entityType.sharesTable}.user`).andWhere(`${entityType.sharesTable}.entity`, entityId); }),
         ['users.id', 'users.username', 'users.name']);
 }
 
 
-async function assign(entityTypeId, entityId, userId, role) {
-    const entityType = getEntityType(entityTypeId);
+async function assign(context, entityTypeId, entityId, userId, role) {
+    const entityType = permissions.getEntityType(entityTypeId);
+
+    await enforceEntityPermission(context, entityTypeId, entityId, 'share');
+
     await knex.transaction(async tx => {
         enforce(await tx('users').where('id', userId).select('id').first(), 'Invalid user id');
         enforce(await tx(entityType.entitiesTable).where('id', entityId).select('id').first(), 'Invalid entity id');
@@ -79,26 +63,92 @@ async function assign(entityTypeId, entityId, userId, role) {
     });
 }
 
-async function rebuildPermissions(tx, restriction) {
-    restriction = restriction || {};
+async function _rebuildPermissions(tx, restriction) {
+    const namespaceEntityType = permissions.getEntityType('namespace');
 
+    // Collect entity types we care about
     let restrictedEntityTypes;
     if (restriction.entityTypeId) {
+        const entityType = permissions.getEntityType(restriction.entityTypeId);
         restrictedEntityTypes = {
-            [restriction.entityTypeId]: entityTypes[restriction.entityTypeId]
+            [restriction.entityTypeId]: entityType
         };
     } else {
-        restrictedEntityTypes = entityTypes;
+        restrictedEntityTypes = permissions.getEntityTypes();
     }
 
 
-    const namespaces = await tx('namespaces').select(['id', 'namespace']);
+    // Change user 1 role to global role that has admin===true
+    let adminRole;
+    for (const role in config.roles.global) {
+        if (config.roles.global[role].admin) {
+            adminRole = role;
+            break;
+        }
+    }
 
+    if (adminRole) {
+        await tx('users').update('role', adminRole).where('id', 1 /* Admin user id */);
+    }
+
+
+    // Reset root and own namespace shares as per the user roles
+    const usersWithRoleInOwnNamespaceQuery = tx('users')
+        .leftJoin(namespaceEntityType.sharesTable, {
+            'users.id': `${namespaceEntityType.sharesTable}.user`,
+            'users.namespace': `${namespaceEntityType.sharesTable}.entity`
+        })
+        .select(['users.id', 'users.namespace', 'users.role as userRole', `${namespaceEntityType.sharesTable}.role`]);
+    if (restriction.userId) {
+        usersWithRoleInOwnNamespaceQuery.where('user', restriction.userId);
+    }
+    const usersWithRoleInOwnNamespace = await usersWithRoleInOwnNamespaceQuery;
+
+    for (const user of usersWithRoleInOwnNamespace) {
+        const roleConf = config.roles.global[user.userRole];
+
+        if (roleConf) {
+            const desiredRole = roleConf.ownNamespaceRole;
+            if (desiredRole && user.role !== desiredRole) {
+                await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: user.namespace }).del();
+                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: user.namespace, role: desiredRole });
+            }
+        }
+    }
+
+
+    const usersWithRoleInRootNamespaceQuery = tx('users')
+        .leftJoin(namespaceEntityType.sharesTable, 'users.id', `${namespaceEntityType.sharesTable}.user`)
+        .where(`${namespaceEntityType.sharesTable}.entity`, 1 /* Global namespace id */)
+        .select(['users.id', 'users.role as userRole', `${namespaceEntityType.sharesTable}.role`]);
+    if (restriction.userId) {
+        usersWithRoleInRootNamespaceQuery.andWhere('user', restriction.userId);
+    }
+    const usersWithRoleInRootNamespace = await usersWithRoleInRootNamespaceQuery;
+
+    for (const user of usersWithRoleInRootNamespace) {
+        const roleConf = config.roles.global[user.userRole];
+
+        if (roleConf) {
+            const desiredRole = roleConf.rootNamespaceRole;
+            if (desiredRole && user.role !== desiredRole) {
+                await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: 1 /* Global namespace id */ }).del();
+                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: 1 /* Global namespace id */, role: desiredRole });
+            }
+        }
+    }
+
+
+
+    // Build the map of all namespaces
     // nsMap is a map of namespaces - each of the following shape:
     // .id - id of the namespace
     // .namespace - id of the parent or null if no parent
     // .userPermissions - Map userId -> [entityTypeId] -> array of permissions
     // .transitiveUserPermissions - the same as above, but taking into account transitive permission obtained from namespace parents
+
+    const namespaces = await tx('namespaces').select(['id', 'namespace']);
+
     const nsMap = new Map();
     for (const namespace of namespaces) {
         namespace.userPermissions = new Map();
@@ -106,9 +156,9 @@ async function rebuildPermissions(tx, restriction) {
     }
 
     // This populates .userPermissions
-    const nsSharesQuery = tx(entityTypes.namespace.sharesTable).select(['entity', 'user', 'role']);
+    const nsSharesQuery = tx(namespaceEntityType.sharesTable).select(['entity', 'user', 'role']);
     if (restriction.userId) {
-        nsSharesQuery.andWhere('user', restriction.userId);
+        nsSharesQuery.where('user', restriction.userId);
     }
 
     const nsShares = await nsSharesQuery;
@@ -120,10 +170,10 @@ async function rebuildPermissions(tx, restriction) {
 
         for (const entityTypeId in restrictedEntityTypes) {
             if (config.roles.namespace[nsShare.role] &&
-                config.roles.namespace[nsShare.role].childperms &&
-                config.roles.namespace[nsShare.role].childperms[entityTypeId]) {
+                config.roles.namespace[nsShare.role].children &&
+                config.roles.namespace[nsShare.role].children[entityTypeId]) {
 
-                userPerms[entityTypeId] = new Set(config.roles.namespace[nsShare.role].childperms[entityTypeId]);
+                userPerms[entityTypeId] = new Set(config.roles.namespace[nsShare.role].children[entityTypeId]);
 
             } else {
                 userPerms[entityTypeId] = new Set();
@@ -174,22 +224,22 @@ async function rebuildPermissions(tx, restriction) {
     }
 
 
-    // This reads direct shares from DB, joins it with the permissions from namespaces and stores the permissions into DB
+    // This reads direct shares from DB, joins each with the permissions from namespaces and stores the permissions into DB
     for (const entityTypeId in restrictedEntityTypes) {
         const entityType = restrictedEntityTypes[entityTypeId];
 
         const expungeQuery = tx(entityType.permissionsTable).del();
         if (restriction.entityId) {
-            expungeQuery.andWhere('entity', restriction.entityId);
+            expungeQuery.where('entity', restriction.entityId);
         }
         if (restriction.userId) {
-            expungeQuery.andWhere('user', restriction.userId);
+            expungeQuery.where('user', restriction.userId);
         }
         await expungeQuery;
 
         const entitiesQuery = tx(entityType.entitiesTable).select(['id', 'namespace']);
         if (restriction.entityId) {
-            entitiesQuery.andWhere('id', restriction.entityId);
+            entitiesQuery.where('id', restriction.entityId);
         }
         const entities = await entitiesQuery;
 
@@ -199,7 +249,7 @@ async function rebuildPermissions(tx, restriction) {
             if (entity.namespace) { // The root namespace has not parent namespace, thus the test
                 const transitiveUserPermissions = nsMap.get(entity.namespace).transitiveUserPermissions;
                 for (const transitivePermsPair of transitiveUserPermissions.entries()) {
-                    permsPerUser.set(transitivePermsPair[0], [...transitivePermsPair[1][entityTypeId]]);
+                    permsPerUser.set(transitivePermsPair[0], new Set(transitivePermsPair[1][entityTypeId]));
                 }
             }
 
@@ -242,9 +292,96 @@ async function rebuildPermissions(tx, restriction) {
     }
 }
 
+
+async function rebuildPermissions(tx, restriction) {
+    restriction = restriction || {};
+
+    if (tx) {
+        await _rebuildPermissions(tx, restriction);
+    } else {
+        await knex.transaction(async tx => {
+            await _rebuildPermissions(tx, restriction);
+        });
+    }
+}
+
+function throwPermissionDenied() {
+    throw new interoperableErrors.PermissionDeniedError(_('Permission denied'));
+}
+
+function enforceGlobalPermission(context, requiredOperations) {
+    if (typeof requiredOperations === 'string') {
+        requiredOperations = [ requiredOperations ];
+    }
+
+    const roleSpec = config.roles.global[context.user.role];
+    if (roleSpec) {
+        for (const requiredOperation of requiredOperations) {
+            if (roleSpec.permissions.includes(requiredOperation)) {
+                return;
+            }
+        }
+    }
+
+    throwPermissionDenied();
+}
+
+async function _checkPermission(context, entityTypeId, entityId, requiredOperations) {
+    const entityType = permissions.getEntityType(entityTypeId);
+
+    if (typeof requiredOperations === 'string') {
+        requiredOperations = [ requiredOperations ];
+    }
+
+    const permsQuery = await knex(entityType.permissionsTable)
+        .where('user', context.user.id)
+        .whereIn('operation', requiredOperations);
+
+    if (entityId) {
+        permsQuery.andWhere('entity', entityId);
+    }
+
+    const perms = await permsQuery.first();
+
+    return !!perms;
+}
+
+async function checkEntityPermission(context, entityTypeId, entityId, requiredOperations) {
+    if (!entityId) {
+        return false;
+    }
+
+    return await _checkEntityPermission(context, entityTypeId, entityId, requiredOperations);
+}
+
+async function checkTypePermission(context, entityTypeId, requiredOperations) {
+    return await _checkEntityPermission(context, entityTypeId, null, requiredOperations);
+}
+
+async function enforceEntityPermission(context, entityTypeId, entityId, requiredOperations) {
+    const perms = await checkEntityPermission(context, entityTypeId, entityId, requiredOperations);
+    if (!perms) {
+        throwPermissionDenied();
+    }
+}
+
+async function enforceTypePermission(context, entityTypeId, requiredOperations) {
+    const perms = await checkTypePermission(context, entityTypeId, requiredOperations);
+    if (!perms) {
+        throwPermissionDenied();
+    }
+}
+
+
 module.exports = {
     listDTAjax,
     listUnassignedUsersDTAjax,
     assign,
-    rebuildPermissions
+    rebuildPermissions,
+    enforceEntityPermission,
+    enforceTypePermission,
+    checkEntityPermission,
+    checkTypePermission,
+    enforceGlobalPermission,
+    throwPermissionDenied
 };

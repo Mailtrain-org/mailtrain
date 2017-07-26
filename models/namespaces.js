@@ -16,7 +16,9 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getById(id) {
+async function getById(context, id) {
+    await shares.enforceEntityPermission(context, 'namespace', id, 'view');
+
     const entity = await knex('namespaces').where('id', id).first();
     if (!entity) {
         throw new interoperableErrors.NotFoundError();
@@ -25,15 +27,16 @@ async function getById(id) {
     return entity;
 }
 
-async function create(entity) {
-    await knex.transaction(async tx => {
-        const id = await tx('namespaces').insert(filterObject(entity, allowedKeys));
+async function create(context, entity) {
+    enforce(entity.namespace, 'Parent namespace must be set');
+    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createNamespace');
 
-        if (entity.namespace) {
-            if (!await tx('namespaces').select(['id']).where('id', entity.namespace).first()) {
-                throw new interoperableErrors.DependencyNotFoundError();
-            }
+    await knex.transaction(async tx => {
+        if (!await tx('namespaces').select(['id']).where('id', entity.namespace).first()) {
+            throw new interoperableErrors.DependencyNotFoundError();
         }
+
+        const id = await tx('namespaces').insert(filterObject(entity, allowedKeys));
 
         // We don't have to rebuild all entity types, because no entity can be a child of the namespace at this moment.
         await shares.rebuildPermissions(tx, { entityTypeId: 'namespace', entityId: id });
@@ -42,12 +45,13 @@ async function create(entity) {
     });
 }
 
-async function updateWithConsistencyCheck(entity) {
+async function updateWithConsistencyCheck(context, entity) {
     enforce(entity.id !== 1 || entity.namespace === null, 'Cannot assign a parent to the root namespace.');
+    await shares.enforceEntityPermission(context, 'namespace', entity.id, 'edit');
 
     await knex.transaction(async tx => {
         const existing = await tx('namespaces').where('id', entity.id).first();
-        if (!entity) {
+        if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
@@ -75,8 +79,9 @@ async function updateWithConsistencyCheck(entity) {
     });
 }
 
-async function remove(id) {
+async function remove(context, id) {
     enforce(id !== 1, 'Cannot delete the root namespace.');
+    await shares.enforceEntityPermission(context, 'namespace', id, 'delete');
 
     await knex.transaction(async tx => {
         const childNs = await tx('namespaces').where('namespace', id).first();

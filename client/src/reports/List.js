@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
+import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
 import { Table } from '../lib/table';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import moment from 'moment';
@@ -12,7 +12,42 @@ import { ReportState } from '../../../shared/reports';
 @translate()
 @withErrorHandling
 @withPageHelpers
+@requiresAuthenticatedUser
 export default class List extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {};
+    }
+
+    @withAsyncErrorHandler
+    async fetchPermissions() {
+        const request = {
+            createReport: {
+                entityTypeId: 'namespace',
+                requiredOperations: ['createReport']
+            },
+            executeReportTemplate: {
+                entityTypeId: 'reportTemplate',
+                requiredOperations: ['execute']
+            },
+            viewReportTemplate: {
+                entityTypeId: 'reportTemplate',
+                requiredOperations: ['view']
+            },
+        };
+
+        const result = await axios.post('/rest/permissions-check', request);
+
+        this.setState({
+            createPermitted: result.data.createReport && result.data.executeReportTemplate,
+            templatesPermitted: result.data.viewReportTemplate
+        });
+    }
+
+    componentDidMount() {
+        this.fetchPermissions();
+    }
 
     @withAsyncErrorHandler
     async stop(table, id) {
@@ -30,14 +65,18 @@ export default class List extends Component {
         const t = this.props.t;
 
         const actions = data => {
-            let view, startStop, refreshTimeout;
+            const actions = [];
+            const perms = data[8];
+            const permsReportTemplate = data[9];
+
+            let viewContent, startStop, refreshTimeout;
 
             const state = data[6];
             const id = data[0];
             const mimeType = data[7];
             
             if (state === ReportState.PROCESSING || state === ReportState.SCHEDULED) {
-                view = {
+                viewContent = {
                     label: <span className="glyphicon glyphicon-hourglass" aria-hidden="true" title="Processing"></span>,
                 };
 
@@ -49,12 +88,12 @@ export default class List extends Component {
                 refreshTimeout = 1000;
             } else if (state === ReportState.FINISHED) {
                 if (mimeType === 'text/html') {
-                    view = {
+                    viewContent = {
                         label: <span className="glyphicon glyphicon-eye-open" aria-hidden="true" title="View"></span>,
                         link: `reports/view/${id}`
                     };
                 } else if (mimeType === 'text/csv') {
-                    view = {
+                    viewContent = {
                         label: <span className="glyphicon glyphicon-download-alt" aria-hidden="true" title="Download"></span>,
                         href: `reports/download/${id}`
                     };
@@ -66,7 +105,7 @@ export default class List extends Component {
                 };
 
             } else if (state === ReportState.FAILED) {
-                view = {
+                viewContent = {
                     label: <span className="glyphicon glyphicon-thumbs-down" aria-hidden="true" title="Report generation failed"></span>,
                 };
 
@@ -76,25 +115,38 @@ export default class List extends Component {
                 };
             }
 
-            return {
-                refreshTimeout,
-                actions: [
-                    view,
+            if (perms.includes('viewContent')) {
+                actions.push(viewContent);
+            }
+
+            if (perms.includes('viewOutput')) {
+                actions.push(
                     {
                         label: <span className="glyphicon glyphicon-modal-window" aria-hidden="true" title="View console output"></span>,
                         link: `reports/output/${id}`
-                    },
-                    startStop,
-                    {
-                        label: <span className="glyphicon glyphicon-wrench" aria-hidden="true" title="Edit"></span>,
-                        link: `/reports/edit/${id}`
-                    },
-                    {
-                        label: <span className="glyphicon glyphicon-share" aria-hidden="true" title="Share"></span>,
-                        link: `/reports/share/${id}`
                     }
-                ]
-            };
+                );
+            }
+
+            if (perms.includes('execute') && permsReportTemplate.includes('execute')) {
+                actions.push(startStop);
+            }
+
+            if (perms.includes('edit') && permsReportTemplate.includes('execute')) {
+                actions.push({
+                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    link: `/reports/edit/${id}`
+                });
+            }
+
+            if (perms.includes('share')) {
+                actions.push({
+                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                    link: `/reports/share/${id}`
+                });
+            }
+
+            return { refreshTimeout, actions };
         };
 
         const columns = [
@@ -106,11 +158,16 @@ export default class List extends Component {
             { data: 5, title: t('Namespace') }
         ];
 
+
         return (
             <div>
                 <Toolbar>
-                    <NavButton linkTo="/reports/create" className="btn-primary" icon="plus" label={t('Create Report')}/>
-                    <NavButton linkTo="/reports/templates" className="btn-primary" label={t('Report Templates')}/>
+                    {this.state.createPermitted &&
+                        <NavButton linkTo="/reports/create" className="btn-primary" icon="plus" label={t('Create Report')}/>
+                    }
+                    {this.state.templatesPermitted &&
+                        <NavButton linkTo="/reports/templates" className="btn-primary" label={t('Report Templates')}/>
+                    }
                 </Toolbar>
 
                 <Title>{t('Reports')}</Title>

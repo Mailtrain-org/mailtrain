@@ -1,11 +1,11 @@
 'use strict';
 
+const config = require('config');
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
 const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const passwordValidator = require('../shared/password-validator')();
-const validators = require('../shared/validators');
 const dtHelpers = require('../lib/dt-helpers');
 const tools = require('../lib/tools-async');
 let crypto = require('crypto');
@@ -26,20 +26,19 @@ const passport = require('../lib/passport');
 
 const namespaceHelpers = require('../lib/namespace-helpers');
 
-const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace']);
-const allowedKeysExternal = new Set(['username']);
+const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace', 'role']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
-const hashKeys = new Set(['username', 'name', 'email', 'namespace']);
-
-const defaultNamespace = 1;
+const allowedKeysExternal = new Set(['username', 'namespace', 'role']);
+const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
+const shares = require('../../models/shares');
 
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
 }
 
-async function _getBy(key, value, extraColumns) {
-    const columns = ['id', 'username', 'name', 'email', 'namespace'];
+async function _getBy(context, key, value, extraColumns) {
+    const columns = ['id', 'username', 'name', 'email', 'namespace', 'role'];
 
     if (extraColumns) {
         columns.push(...extraColumns);
@@ -48,18 +47,34 @@ async function _getBy(key, value, extraColumns) {
     const user = await knex('users').select(columns).where(key, value).first();
 
     if (!user) {
-        throw new interoperableErrors.NotFoundError();
+        if (context) {
+            shares.throwPermissionDenied();
+        } else {
+            throw new interoperableErrors.NotFoundError();
+        }
+    }
+
+    if (context) {
+        await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
     }
 
     return user;
 }
 
-async function getById(id) {
-    return await _getBy('id', id);
+async function getById(context, id) {
+    return await _getBy(context, 'id', id);
 }
 
-async function serverValidate(data, isOwnAccount) {
+async function getByIdNoPerms(id) {
+    return await _getBy(null, 'id', id);
+}
+
+async function serverValidate(context, data, isOwnAccount) {
     const result = {};
+
+    if (!isOwnAccount) {
+        await shares.enforceTypePermission(context, 'namespace', 'manageUsers');
+    }
 
     if (!isOwnAccount && data.username) {
         const query = knex('users').select(['id']).where('username', data.username);
@@ -100,11 +115,17 @@ async function serverValidate(data, isOwnAccount) {
     return result;
 }
 
-async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(
+async function listDTAjax(context, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'namespace', requiredOperations: ['manageUsers'] }],
         params,
-        tx => tx('users').innerJoin('namespaces', 'namespaces.id', 'users.namespace'),
-        ['users.id', 'users.username', 'users.name', 'namespaces.name']
+        builder => builder.from('users').innerJoin('namespaces', 'namespaces.id', 'users.namespace'),
+        ['users.id', 'users.username', 'users.name', 'namespaces.name', 'users.role'],
+        data => {
+            const role = data[4];
+            data[4] = config.roles.global[role] ? config.roles.global[role].name : role;
+        }
     );
 }
 
@@ -124,8 +145,6 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
 
 
     if (!isOwnAccount) {
-        enforce(validators.usernameValid(user.username), 'Invalid username');
-
         const otherUserWithSameUsernameQuery = tx('users').where('username', user.username);
         if (user.id) {
             otherUserWithSameUsernameQuery.andWhereNot('id', user.id);
@@ -136,6 +155,7 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
         }
     }
 
+    enforce(user.role in config.roles.global, 'Unknown role');
 
     enforce(!isCreate || user.password.length > 0, 'Password not set');
 
@@ -153,70 +173,89 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
 }
 
 async function create(user) {
-    enforce(passport.isAuthMethodLocal, 'Local user management is required');
+    await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
 
     await knex.transaction(async tx => {
-        await _validateAndPreprocess(tx, user, true);
-        const userId = await tx('users').insert(filterObject(user, allowedKeys));
-        return userId;
+        if (passport.isAuthMethodLocal) {
+            await _validateAndPreprocess(tx, user, true);
+            const userId = await tx('users').insert(filterObject(user, allowedKeys));
+            return userId;
+
+        } else {
+            const filteredUser = filterObject(user, allowedKeysExternal);
+            enforce(user.role in config.roles.global, 'Unknown role');
+            await namespaceHelpers.validateEntity(tx, user);
+            const userId = await knex('users').insert(filteredUser);
+            return userId;
+        }
     });
 }
 
-async function createExternal(user) {
-    enforce(!passport.isAuthMethodLocal, 'External user management is required');
-
-    const filteredUser = filterObject(user, allowedKeysExternal);
-    filteredUser.namespace = defaultNamespace;
-
-    const userId = await knex('users').insert(filteredUser);
-    return userId;
-}
-
 async function updateWithConsistencyCheck(user, isOwnAccount) {
-    enforce(passport.isAuthMethodLocal, 'Local user management is required');
-
     await knex.transaction(async tx => {
-        await _validateAndPreprocess(tx, user, false, isOwnAccount);
-
-        const existingUser = await tx('users').where('id', user.id).first();
-        if (!user) {
-            throw new interoperableErrors.NotFoundError();
+        const existing = await tx('users').where('id', user.id).first();
+        if (!existing) {
+            shares.throwPermissionDenied();
         }
 
-        const existingUserHash = hash(existingUser);
-        if (existingUserHash !== user.originalHash) {
+        const existingHash = hash(existing);
+        if (existingHash !== user.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
-        if (isOwnAccount && user.password) {
-            if (!await bcryptCompare(user.currentPassword, existingUser.password)) {
-                throw new interoperableErrors.IncorrectPasswordError();
-            }
+        if (!isOwnAccount) {
+            await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
+            await shares.enforceEntityPermission(context, 'namespace', existing.namespace, 'manageUsers');
         }
 
-        await tx('users').where('id', user.id).update(filterObject(user, isOwnAccount ? ownAccountAllowedKeys : allowedKeys));
+        if (passport.isAuthMethodLocal) {
+            await _validateAndPreprocess(tx, user, false, isOwnAccount);
+
+            if (isOwnAccount && user.password) {
+                if (!await bcryptCompare(user.currentPassword, existing.password)) {
+                    throw new interoperableErrors.IncorrectPasswordError();
+                }
+            }
+
+            await tx('users').where('id', user.id).update(filterObject(user, isOwnAccount ? ownAccountAllowedKeys : allowedKeys));
+
+        } else {
+            enforce(isOwnAccount, 'Local user management is required');
+            enforce(user.role in config.roles.global, 'Unknown role');
+            await namespaceHelpers.validateEntity(tx, user);
+
+            await tx('users').where('id', user.id).update(filterObject(user, allowedKeysExternal));
+        }
     });
 }
 
 async function remove(context, userId) {
-    enforce(passport.isAuthMethodLocal, 'Local user management is required');
     enforce(userId !== 1, 'Admin cannot be deleted');
     enforce(context.user.id !== userId, 'User cannot delete himself/herself');
 
-    await knex('users').where('id', userId).del();
+    await knex.transaction(async tx => {
+        const existing = await tx('users').where('id', userId).first();
+        if (!existing) {
+            shares.throwPermissionDenied();
+        }
+
+        await shares.enforceEntityPermission(context, 'namespace', existing.namespace, 'manageUsers');
+
+        await knex('users').where('id', userId).del();
+    });
 }
 
 async function getByAccessToken(accessToken) {
-    return await _getBy('access_token', accessToken);
+    return await _getBy(null, 'access_token', accessToken);
 }
 
 async function getByUsername(username) {
-    return await _getBy('username', username);
+    return await _getBy(null, 'username', username);
 }
 
 async function getByUsernameIfPasswordMatch(username, password) {
     try {
-        const user = await _getBy('username', username, ['password']);
+        const user = await _getBy(null, 'username', username, ['password']);
 
         if (!await bcryptCompare(password, user.password)) {
             throw new interoperableErrors.IncorrectPasswordError();
@@ -234,19 +273,13 @@ async function getByUsernameIfPasswordMatch(username, password) {
 }
 
 async function getAccessToken(userId) {
-    const user = await _getBy('id', userId, ['access_token']);
+    const user = await _getBy(null, 'id', userId, ['access_token']);
     return user.access_token;
 }
 
 async function resetAccessToken(userId) {
     const token = crypto.randomBytes(20).toString('hex').toLowerCase();
-
-    const affectedRows = await knex('users').where({id: userId}).update({access_token: token});
-
-    if (!affectedRows) {
-        throw new interoperableErrors.NotFoundError();
-    }
-
+    await knex('users').where({id: userId}).update({access_token: token});
     return token;
 }
 
@@ -331,9 +364,9 @@ module.exports = {
     remove,
     updateWithConsistencyCheck,
     create,
-    createExternal,
     hash,
     getById,
+    getByIdNoPerms,
     serverValidate,
     getByAccessToken,
     getByUsername,

@@ -9,7 +9,7 @@ exports.up = function(knex, Promise) {
             table.integer('namespace').unsigned().references('namespaces.id').onDelete('CASCADE');
         })
         .then(() => knex('namespaces').insert({
-            id: 1,
+            id: 1, /* Global namespace id */
             name: 'Global',
             description: 'Global namespace'
         }));
@@ -20,7 +20,7 @@ exports.up = function(knex, Promise) {
                 table.integer('namespace').unsigned().notNullable();
             }))
             .then(() => knex(`${entityType}s`).update({
-                namespace: 1
+                namespace: 1 /* Global namespace id */
             }))
             .then(() => knex.schema.table(`${entityType}s`, table => {
                 table.foreign('namespace').references('namespaces.id').onDelete('CASCADE');

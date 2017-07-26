@@ -1,14 +1,16 @@
 'use strict';
 
+const config = require('config');
 const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const users = require('../../models/users');
+const shares = require('../../models/shares');
 
 const router = require('../../lib/router-async').create();
 
 
 router.getAsync('/users/:userId', passport.loggedIn, async (req, res) => {
-    const user = await users.getById(req.params.userId);
+    const user = await users.getById(req.context, req.params.userId);
     user.hash = users.hash(user);
     return res.json(user);
 });
@@ -32,11 +34,12 @@ router.deleteAsync('/users/:userId', passport.loggedIn, passport.csrfProtection,
 });
 
 router.postAsync('/users-validate', passport.loggedIn, async (req, res) => {
-    return res.json(await users.serverValidate(req.body));
+    return res.json(await users.serverValidate(req.context, req.body));
 });
 
 router.postAsync('/users-table', passport.loggedIn, async (req, res) => {
-    return res.json(await users.listDTAjax(req.body));
+    return res.json(await users.listDTAjax(req.context, req.body));
 });
+
 
 module.exports = router;

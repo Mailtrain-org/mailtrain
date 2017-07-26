@@ -68,6 +68,12 @@ class DependencyNotFoundError extends InteroperableError {
     }
 }
 
+class PermissionDeniedError extends InteroperableError {
+    constructor(msg, data) {
+        super('PermissionDeniedError', msg, data);
+    }
+}
+
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
@@ -79,7 +85,8 @@ const errorTypes = {
     DuplicitEmailError,
     IncorrectPasswordError,
     InvalidTokenError,
-    DependencyNotFoundError
+    DependencyNotFoundError,
+    PermissionDeniedError
 };
 
 function deserialize(errorObj) {

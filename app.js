@@ -19,6 +19,7 @@ const handlebarsHelpers = require('./lib/handlebars-helpers');
 const compression = require('compression');
 const passport = require('./lib/passport');
 const tools = require('./lib/tools');
+const contextHelpers = require('./lib/context-helpers');
 
 const routes = require('./routes/index');
 const lists = require('./routes/lists');
@@ -220,11 +221,8 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-   req.context = {
-       user: req.user
-   };
-
-   next();
+    req.context = contextHelpers.getRequestContext(req);
+    next();
 });
 
 app.use('/', routes);

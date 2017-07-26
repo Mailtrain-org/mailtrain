@@ -5,7 +5,7 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 
 async function listDTAjax(params) {
-    return await dtHelpers.ajaxList(params, tx => tx('campaigns'), ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.status', 'campaigns.created']);
+    return await dtHelpers.ajaxList(params, builder => builder.from('campaigns'), ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.status', 'campaigns.created']);
 }
 
 async function getById(id) {

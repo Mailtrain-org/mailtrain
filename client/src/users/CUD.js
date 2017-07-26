@@ -4,12 +4,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { translate } from 'react-i18next';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
-import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TreeTableSelect } from '../lib/form';
+import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TableSelect } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
-import validators from '../../../shared/validators';
 import { ModalDialog } from '../lib/bootstrap-components';
 import mailtrainConfig from 'mailtrainConfig';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
@@ -25,7 +24,9 @@ export default class CUD extends Component {
 
         this.passwordValidator = passwordValidator(props.t);
 
-        this.state = {};
+        this.state = {
+            globalRoles: []
+        };
 
         if (props.edit) {
             this.state.entityId = parseInt(props.match.params.id);
@@ -46,6 +47,14 @@ export default class CUD extends Component {
 
     isDelete() {
         return this.props.match.params.action === 'delete';
+    }
+
+    @withAsyncErrorHandler
+    async fetchGlobalRoles() {
+        const result = await axios.get('/rest/users-global-roles');
+        this.setState({
+            globalRoles: result.data
+        });
     }
 
     @withAsyncErrorHandler
@@ -80,8 +89,6 @@ export default class CUD extends Component {
 
         if (!username) {
             state.setIn(['username', 'error'], t('User name must not be empty'));
-        } else if (!validators.usernameValid(username)) {
-            state.setIn(['username', 'error'], t('User name may contain only the following characters: A-Z, a-z, 0-9, "_", "-", "." and may start only with A-Z, a-z, 0-9.'));
         } else if (!usernameServerValidation || usernameServerValidation.exists) {
             state.setIn(['username', 'error'], t('The user name already exists in the system.'));
         } else {
@@ -214,6 +221,20 @@ export default class CUD extends Component {
         const userId = this.getFormValue('id');
         const canDelete = userId !== 1 && mailtrainConfig.userId !== userId;
 
+        const roles = mailtrainConfig.roles.global;
+
+        const rolesColumns = [
+            { data: 1, title: "Name" },
+            { data: 2, title: "Description" },
+        ];
+
+
+        const rolesData = [];
+        for (const key in roles) {
+            const role = roles[key];
+            rolesData.push([ key, role.name, role.description ]);
+        }
+
         return (
             <div>
                 {edit && canDelete &&
@@ -229,10 +250,15 @@ export default class CUD extends Component {
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="username" label={t('User Name')}/>
-                    <InputField id="name" label={t('Full Name')}/>
-                    <InputField id="email" label={t('Email')}/>
-                    <InputField id="password" label={t('Password')} type="password" />
-                    <InputField id="password2" label={t('Repeat Password')} type="password" />
+                    {mailtrainConfig.isAuthMethodLocal &&
+                        <div>
+                            <InputField id="name" label={t('Full Name')}/>
+                            <InputField id="email" label={t('Email')}/>
+                            <InputField id="password" label={t('Password')} type="password"/>
+                            <InputField id="password2" label={t('Repeat Password')} type="password"/>
+                        </div>
+                    }
+                    <TableSelect id="role" label={t('Role')} withHeader dropdown data={rolesData} columns={rolesColumns} selectionLabelIndex={1}/>
                     <NamespaceSelect/>
 
                     <ButtonRow>
