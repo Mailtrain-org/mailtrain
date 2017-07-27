@@ -173,15 +173,13 @@ async function create(context, user) {
         await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
     }
 
+    let id;
     await knex.transaction(async tx => {
         if (passport.isAuthMethodLocal) {
             await _validateAndPreprocess(tx, user, true);
 
-            const userId = await tx('users').insert(filterObject(user, allowedKeys));
-
-            await shares.rebuildPermissions(tx, { userId });
-
-            return userId;
+            const ids = await tx('users').insert(filterObject(user, allowedKeys));
+            id = ids[0];
 
         } else {
             const filteredUser = filterObject(user, allowedKeysExternal);
@@ -189,18 +187,19 @@ async function create(context, user) {
 
             await namespaceHelpers.validateEntity(tx, user);
 
-            const userId = await tx('users').insert(filteredUser);
-
-            await shares.rebuildPermissions(tx, { userId });
-
-            return userId;
+            const ids = await tx('users').insert(filteredUser);
+            id = ids[0];
         }
+
+        await shares.rebuildPermissions(tx, { userId: id });
     });
+
+    return id;
 }
 
 async function updateWithConsistencyCheck(context, user, isOwnAccount) {
     await knex.transaction(async tx => {
-        const existing = await tx('users').where(['id', 'namespace', 'role'], user.id).first();
+        const existing = await tx('users').where('id', user.id).first();
         if (!existing) {
             shares.throwPermissionDenied();
         }
@@ -226,7 +225,7 @@ async function updateWithConsistencyCheck(context, user, isOwnAccount) {
 
             await tx('users').where('id', user.id).update(filterObject(user, isOwnAccount ? ownAccountAllowedKeys : allowedKeys));
         } else {
-            enforce(isOwnAccount, 'Local user management is required');
+            enforce(!isOwnAccount, 'Local user management is required');
             enforce(user.role in config.roles.global, 'Unknown role');
             await namespaceHelpers.validateEntity(tx, user);
 

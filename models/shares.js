@@ -129,17 +129,22 @@ async function _rebuildPermissions(tx, restriction) {
     }
 
 
-    // Change user 1 role to global role that has admin===true
-    let adminRole;
-    for (const role in config.roles.global) {
-        if (config.roles.global[role].admin) {
-            adminRole = role;
-            break;
+    // To prevent users locking out themselves, we consider user with id 1 to be the admin and always assign it
+    // the admin role. The admin role is a global role that has admin===true
+    // If this behavior is not desired, it is enough to delete the user with id 1.
+    const adminUser = await tx('users').where('id', 1 /* Admin user id */).first();
+    if (adminUser) {
+        let adminRole;
+        for (const role in config.roles.global) {
+            if (config.roles.global[role].admin) {
+                adminRole = role;
+                break;
+            }
         }
-    }
 
-    if (adminRole) {
-        await tx('users').update('role', adminRole).where('id', 1 /* Admin user id */);
+        if (adminRole) {
+            await tx('users').update('role', adminRole).where('id', 1 /* Admin user id */);
+        }
     }
 
 

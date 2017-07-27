@@ -118,11 +118,12 @@ export default class Share extends Component {
             }
         ];
 
-        const sharesColumns = [
-            { data: 0, title: t('Username') },
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Role') }
-        ];
+        const sharesColumns = [];
+        sharesColumns.push({ data: 0, title: t('Username') });
+        if (mailtrainConfig.isAuthMethodLocal) {
+            sharesColumns.push({ data: 1, title: t('Name') });
+        }
+        sharesColumns.push({ data: 2, title: t('Role') });
 
 
         let usersLabelIndex = 1;

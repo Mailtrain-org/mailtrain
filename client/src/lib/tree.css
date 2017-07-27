@@ -24,6 +24,9 @@
     border-top: 0px none;
 }
 
+.mt-treetable-container .mt-treetable-title {
+    min-width: 150px;
+}
 
 .form-group .mt-treetable-container {
     border: 1px solid #cccccc;

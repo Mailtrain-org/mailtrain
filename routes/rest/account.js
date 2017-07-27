@@ -25,7 +25,7 @@ router.postAsync('/account-validate', passport.loggedIn, passport.csrfProtection
     const data = req.body;
     data.id = req.user.id;
 
-    return res.json(await users.serverValidate(data, true));
+    return res.json(await users.serverValidate(req.context, data, true));
 });
 
 router.getAsync('/access-token', passport.loggedIn, async (req, res) => {

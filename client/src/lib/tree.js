@@ -49,13 +49,15 @@ class TreeTable extends Component {
         const response = await axios.get(dataUrl);
         const treeData = response.data;
 
-        treeData.expanded = true;
-        for (const child of treeData.children) {
-            child.expanded = true;
+        for (const root of treeData) {
+            root.expanded = true;
+            for (const child of root.children) {
+                child.expanded = true;
+            }
         }
 
         this.setState({
-            treeData: [ response.data ]
+            treeData
         });
     }
 
@@ -66,7 +68,8 @@ class TreeTable extends Component {
         selection: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.number]),
         onSelectionChangedAsync: PropTypes.func,
         actions: PropTypes.func,
-        withHeader: PropTypes.bool
+        withHeader: PropTypes.bool,
+        withDescription: PropTypes.bool
     }
 
     componentWillReceiveProps(nextProps) {
@@ -100,26 +103,35 @@ class TreeTable extends Component {
         };
 
         let createNodeFn;
-        if (this.props.actions) {
-            createNodeFn = (event, data) => {
-                const node = data.node;
-                const tdList = jQuery(node.tr).find(">td");
+        createNodeFn = (event, data) => {
+            const node = data.node;
+            const tdList = jQuery(node.tr).find(">td");
 
+            let tdIdx = 1;
+
+            if (this.props.withDescription) {
+                const descHtml = ReactDOMServer.renderToStaticMarkup(<div>{node.data.description}</div>);
+                tdList.eq(tdIdx).html(descHtml);
+                tdIdx += 1;
+            }
+
+            if (this.props.actions) {
                 const linksContainer = jQuery('<span class="mt-action-links"/>');
 
-                const actions = this.props.actions(node.key);
+                const actions = this.props.actions(node);
                 for (const {label, link} of actions) {
                     const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href={link}>{label}</a>);
                     const lnk = jQuery(lnkHtml);
-                    lnk.click((evt) => { evt.preventDefault(); this.navigateTo(link) });
+                    lnk.click((evt) => {
+                        evt.preventDefault();
+                        this.navigateTo(link)
+                    });
                     linksContainer.append(lnk);
                 }
-
-                tdList.eq(1).html(linksContainer);
-            };
-        } else {
-            createNodeFn = (event, data) => {};
-        }
+                tdList.eq(tdIdx).html(linksContainer);
+                tdIdx += 1;
+            }
+        };
 
         this.tree = jQuery(this.domTable).fancytree({
             extensions: ['glyph', 'table'],
@@ -220,6 +232,7 @@ class TreeTable extends Component {
         const props = this.props;
         const actions = props.actions;
         const withHeader = props.withHeader;
+        const withDescription = props.withDescription;
 
         let containerClass = 'mt-treetable-container';
         if (this.selectMode === TreeSelectMode.NONE) {
@@ -238,7 +251,8 @@ class TreeTable extends Component {
                     {props.withHeader &&
                         <thead>
                             <tr>
-                                <th>{t('Name')}</th>
+                                <th className="mt-treetable-title">{t('Name')}</th>
+                                {withDescription && <th>{t('Description')}</th>}
                                 {actions && <th></th>}
                             </tr>
                         </thead>
@@ -246,6 +260,7 @@ class TreeTable extends Component {
                     <tbody>
                     <tr>
                         <td></td>
+                        {withDescription && <td></td>}
                         {actions && <td></td>}
                     </tr>
                     </tbody>

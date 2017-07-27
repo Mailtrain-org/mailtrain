@@ -329,7 +329,6 @@ if (app.get('env') === 'development') {
             return next();
         }
 
-        console.log(err);
         if (req.needsJSONResponse) {
             const resp = {
                 message: err.message,

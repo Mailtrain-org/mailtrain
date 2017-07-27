@@ -35,41 +35,9 @@ router.deleteAsync('/namespaces/:nsId', passport.loggedIn, passport.csrfProtecti
 
 router.getAsync('/namespaces-tree', passport.loggedIn, async (req, res) => {
 
-    // FIXME - process permissions
+    const tree = await namespaces.listTree(req.context);
 
-    const entries = {};
-    let root; // Only the Root namespace is without a parent
-    const rows = await namespaces.list();
-
-    for (let row of rows) {
-        let entry;
-        if (!entries[row.id]) {
-            entry = {
-                children: []
-            };
-            entries[row.id] = entry;
-        } else {
-            entry = entries[row.id];
-        }
-
-        if (row.namespace) {
-            if (!entries[row.namespace]) {
-                entries[row.namespace] = {
-                    children: []
-                };
-            }
-
-            entries[row.namespace].children.push(entry);
-
-        } else {
-            root = entry;
-        }
-
-        entry.title = row.name;
-        entry.key = row.id;
-    }
-
-    return res.json(root);
+    return res.json(tree);
 });
 
 

@@ -71,7 +71,8 @@ async function create(context, entity) {
 
         entity.params = JSON.stringify(entity.params);
 
-        id = await tx('reports').insert(filterObject(entity, allowedKeys));
+        const ids = await tx('reports').insert(filterObject(entity, allowedKeys));
+        id = ids[0];
 
         await shares.rebuildPermissions(tx, { entityTypeId: 'report', entityId: id });
     });

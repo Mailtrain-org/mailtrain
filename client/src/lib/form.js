@@ -585,13 +585,14 @@ function withForm(target) {
                         scheduleValidateForm(self);
                     })
                     .catch(error => {
-                        console.log('Ignoring unhandled error in "validateFormState": ' + error);
+                        console.log('Error in "validateFormState": ' + error);
 
                         self.setState(previousState => ({
                             formState: previousState.formState.set('isServerValidationRunning', false)
                         }));
 
-                        scheduleValidateForm(self);
+                        // TODO: It might be good not to give up immediatelly, but retry a couple of times
+                        // scheduleValidateForm(self);
                     });
             } else {
                 if (formValidateResolve) {

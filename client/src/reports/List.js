@@ -31,6 +31,10 @@ export default class List extends Component {
                 entityTypeId: 'reportTemplate',
                 requiredOperations: ['execute']
             },
+            createReportTemplate: {
+                entityTypeId: 'namespace',
+                requiredOperations: ['createReportTemplate']
+            },
             viewReportTemplate: {
                 entityTypeId: 'reportTemplate',
                 requiredOperations: ['view']
@@ -41,7 +45,7 @@ export default class List extends Component {
 
         this.setState({
             createPermitted: result.data.createReport && result.data.executeReportTemplate,
-            templatesPermitted: result.data.viewReportTemplate
+            templatesPermitted: result.data.createReportTemplate || result.data.viewReportTemplate
         });
     }
 

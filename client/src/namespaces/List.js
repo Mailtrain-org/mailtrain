@@ -16,16 +16,25 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        const actions = key => [
-            {
-                label: 'Edit',
-                link: '/namespaces/edit/' + key
-            },
-            {
-                label: 'Share',
-                link: '/namespaces/share/' + key
+        const actions = node => {
+            const actions = [];
+
+            if (node.data.permissions.includes('edit')) {
+                actions.push({
+                    label: 'Edit',
+                    link: '/namespaces/edit/' + node.key
+                });
             }
-        ];
+
+            if (node.data.permissions.includes('share')) {
+                actions.push({
+                    label: 'Share',
+                    link: '/namespaces/share/' + node.key
+                });
+            }
+
+            return actions;
+        };
 
         return (
             <div>
@@ -35,7 +44,7 @@ export default class List extends Component {
 
                 <Title>{t('Namespaces')}</Title>
 
-                <TreeTable withHeader dataUrl="/rest/namespaces-tree" actions={actions} />
+                <TreeTable withHeader withDescription dataUrl="/rest/namespaces-tree" actions={actions} />
             </div>
         );
     }

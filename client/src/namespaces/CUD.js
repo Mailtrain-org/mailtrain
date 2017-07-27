@@ -66,8 +66,10 @@ export default class CUD extends Component {
         axios.get('/rest/namespaces-tree')
             .then(response => {
 
-                response.data.expanded = true;
-                const data = [response.data];
+                const data = response.data;
+                for (const root of data) {
+                    root.expanded = true;
+                }
 
                 if (this.props.edit && !this.isEditGlobal()) {
                     this.removeNsIdSubtree(data);

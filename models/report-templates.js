@@ -38,15 +38,17 @@ async function listDTAjax(context, params) {
 async function create(context, entity) {
     await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReportTemplate');
 
+    let id;
     await knex.transaction(async tx => {
         await namespaceHelpers.validateEntity(tx, entity);
 
-        const id = await tx('report_templates').insert(filterObject(entity, allowedKeys));
+        const ids = await tx('report_templates').insert(filterObject(entity, allowedKeys));
+        id = ids[0];
 
         await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: id });
-
-        return id;
     });
+
+    return id;
 }
 
 async function updateWithConsistencyCheck(context, entity) {

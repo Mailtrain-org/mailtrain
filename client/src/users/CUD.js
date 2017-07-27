@@ -33,7 +33,7 @@ export default class CUD extends Component {
         this.initForm({
             serverValidation: {
                 url: '/rest/users-validate',
-                changed: ['username', 'email'],
+                changed: mailtrainConfig.isAuthMethodLocal ? ['username', 'email'] : ['username'],
                 extra: ['id']
             }
         });
@@ -86,48 +86,50 @@ export default class CUD extends Component {
         }
 
 
-        const email = state.getIn(['email', 'value']);
-        const emailServerValidation = state.getIn(['email', 'serverValidation']);
+        if (mailtrainConfig.isAuthMethodLocal) {
+            const email = state.getIn(['email', 'value']);
+            const emailServerValidation = state.getIn(['email', 'serverValidation']);
 
-        if (!email) {
-            state.setIn(['email', 'error'], t('Email must not be empty'));
-        } else if (!emailServerValidation || emailServerValidation.invalid) {
-            state.setIn(['email', 'error'], t('Invalid email address.'));
-        } else {
-            state.setIn(['email', 'error'], null);
+            if (!email) {
+                state.setIn(['email', 'error'], t('Email must not be empty'));
+            } else if (!emailServerValidation || emailServerValidation.invalid) {
+                state.setIn(['email', 'error'], t('Invalid email address.'));
+            } else {
+                state.setIn(['email', 'error'], null);
+            }
+
+
+            const name = state.getIn(['name', 'value']);
+
+            if (!name) {
+                state.setIn(['name', 'error'], t('Full name must not be empty'));
+            } else {
+                state.setIn(['name', 'error'], null);
+            }
+
+
+            const password = state.getIn(['password', 'value']) || '';
+            const password2 = state.getIn(['password2', 'value']) || '';
+
+            const passwordResults = this.passwordValidator.test(password);
+
+            let passwordMsgs = [];
+
+            if (!edit && !password) {
+                passwordMsgs.push(t('Password must not be empty'));
+            }
+
+            if (password) {
+                passwordMsgs.push(...passwordResults.errors);
+            }
+
+            if (passwordMsgs.length > 1) {
+                passwordMsgs = passwordMsgs.map((msg, idx) => <div key={idx}>{msg}</div>)
+            }
+
+            state.setIn(['password', 'error'], passwordMsgs.length > 0 ? passwordMsgs : null);
+            state.setIn(['password2', 'error'], password !== password2 ? t('Passwords must match') : null);
         }
-
-
-        const name = state.getIn(['name', 'value']);
-
-        if (!name) {
-            state.setIn(['name', 'error'], t('Full name must not be empty'));
-        } else {
-            state.setIn(['name', 'error'], null);
-        }
-
-
-        const password = state.getIn(['password', 'value']) || '';
-        const password2 = state.getIn(['password2', 'value']) || '';
-
-        const passwordResults = this.passwordValidator.test(password);
-
-        let passwordMsgs = [];
-
-        if (!edit && !password) {
-            passwordMsgs.push(t('Password must not be empty'));
-        }
-
-        if (password) {
-            passwordMsgs.push(...passwordResults.errors);
-        }
-
-        if (passwordMsgs.length > 1) {
-           passwordMsgs = passwordMsgs.map((msg, idx) => <div key={idx}>{msg}</div>)
-        }
-
-        state.setIn(['password', 'error'], passwordMsgs.length > 0 ? passwordMsgs : null);
-        state.setIn(['password2', 'error'], password !== password2 ? t('Passwords must match') : null);
 
         validateNamespace(t, state);
     }
