@@ -523,7 +523,7 @@ let sendLoop = () => {
                                             }
                                         }
 
-                                        let status = err ? 2 : 1;
+                                        let status = err ? 3 : 1;
                                         let response = err && (err.response || err.message) || info.response || info.messageId;
                                         let responseId = response.split(/\s+/).pop();
 
@@ -533,7 +533,7 @@ let sendLoop = () => {
                                                 return;
                                             }
 
-                                            let query = 'UPDATE `campaigns` SET `delivered`=`delivered`+1 ' + (status === 2 ? ', `bounced`=`bounced`+1 ' : '') + ' WHERE id=? LIMIT 1';
+                                            let query = 'UPDATE `campaigns` SET `delivered`=`delivered`+1 ' + (status === 3 ? ', `bounced`=`bounced`+1 ' : '') + ' WHERE id=? LIMIT 1';
 
                                             connection.query(query, [message.campaignId], err => {
                                                 if (err) {
