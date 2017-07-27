@@ -110,19 +110,18 @@ export default class Share extends Component {
 
     render() {
         const t = this.props.t;
-        const roles = mailtrainConfig.roles[this.props.entityTypeId];
 
         const actions = data => [
             {
                 label: 'Delete',
-                action: () => this.deleteShare(data[4])
+                action: () => this.deleteShare(data[3])
             }
         ];
 
         const sharesColumns = [
-            { data: 1, title: t('Username') },
-            { data: 2, title: t('Name') },
-            { data: 3, title: t('Role'), render: data => roles[data] ? roles[data].name : data }
+            { data: 0, title: t('Username') },
+            { data: 1, title: t('Name') },
+            { data: 2, title: t('Role') }
         ];
 
 
@@ -144,13 +143,6 @@ export default class Share extends Component {
         ];
 
 
-        const rolesData = [];
-        for (const key in roles) {
-            const role = roles[key];
-            rolesData.push([ key, role.name, role.description ]);
-        }
-
-
         if (this.state.entity) {
             return (
                 <div>
@@ -158,8 +150,8 @@ export default class Share extends Component {
 
                     <h3 className="legend">{t('Add User')}</h3>
                     <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                        <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('User')} withHeader dropdown dataUrl={`/rest/shares-users-table/${this.props.entityTypeId}/${this.state.entityId}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
-                        <TableSelect id="role" label={t('Role')} withHeader dropdown data={rolesData} columns={rolesColumns} selectionLabelIndex={1}/>
+                        <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('User')} withHeader dropdown dataUrl={`/rest/shares-unassigned-users-table/${this.props.entityTypeId}/${this.state.entityId}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
+                        <TableSelect id="role" label={t('Role')} withHeader dropdown dataUrl={`/rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
 
                         <ButtonRow>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Share')}/>
@@ -169,7 +161,7 @@ export default class Share extends Component {
                     <hr/>
                     <h3 className="legend">{t('Existing Users')}</h3>
 
-                    <Table ref={node => this.sharesTable = node} withHeader dataUrl={`/rest/shares-table/${this.props.entityTypeId}/${this.state.entityId}`} columns={sharesColumns} actions={actions}/>
+                    <Table ref={node => this.sharesTable = node} withHeader dataUrl={`/rest/shares-table-by-entity/${this.props.entityTypeId}/${this.state.entityId}`} columns={sharesColumns} actions={actions}/>
                 </div>
             );
         } else {

@@ -71,6 +71,7 @@ class DependencyNotFoundError extends InteroperableError {
 class PermissionDeniedError extends InteroperableError {
     constructor(msg, data) {
         super('PermissionDeniedError', msg, data);
+        this.status = 403;
     }
 }
 

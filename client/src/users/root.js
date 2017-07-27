@@ -8,24 +8,9 @@ import i18n from '../lib/i18n';
 import { Section } from '../lib/page';
 import CUD from './CUD';
 import List from './List';
-import mailtrainConfig from 'mailtrainConfig';
+import UserShares from '../shares/UserShares';
 
 const getStructure = t => {
-    const subPaths = {};
-
-    if (mailtrainConfig.isAuthMethodLocal) {
-        subPaths.edit = {
-            title: t('Edit User'),
-                params: [':id', ':action?'],
-                render: props => (<CUD edit {...props} />)
-        };
-
-        subPaths.create = {
-            title: t('Create User'),
-                render: props => (<CUD {...props} />)
-        };
-    }
-
     return {
         '': {
             title: t('Home'),
@@ -35,7 +20,22 @@ const getStructure = t => {
                     title: t('Users'),
                     link: '/users',
                     component: List,
-                    children: subPaths
+                    children: {
+                        edit: {
+                            title: t('Edit User'),
+                            params: [':id', ':action?'],
+                            render: props => (<CUD edit {...props} />)
+                        },
+                        create: {
+                            title: t('Create User'),
+                            render: props => (<CUD {...props} />)
+                        },
+                        shares: {
+                            title: t('User Shares'),
+                            params: [':id' ],
+                            component: UserShares
+                        }
+                    }
                 }
             }
         }

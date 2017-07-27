@@ -146,8 +146,9 @@ dbcheck(err => {
 
     // And now the current migration with Knex
     knex.migrate.latest()
-        .then(() => shares.rebuildPermissions())
-        .then(() => server.listen(port, host)); // Listen on provided port, on all network interfaces.
+    .then(() => shares.regenerateRoleNamesTable())
+    .then(() => shares.rebuildPermissions())
+    .then(() => server.listen(port, host)); // Listen on provided port, on all network interfaces.
 });
 
 

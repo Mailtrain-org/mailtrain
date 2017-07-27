@@ -16,7 +16,7 @@ router.getAsync('/users/:userId', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/users', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await users.create(req.body);
+    await users.create(req.context, req.body);
     return res.json();
 });
 
@@ -24,7 +24,7 @@ router.putAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, as
     const user = req.body;
     user.id = parseInt(req.params.userId);
 
-    await users.updateWithConsistencyCheck(user);
+    await users.updateWithConsistencyCheck(req.context, user);
     return res.json();
 });
 

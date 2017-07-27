@@ -19,12 +19,10 @@ function hash(entity) {
 }
 
 async function getByIdWithTemplate(context, id) {
-    await shares.enforceEntityPermission(context, 'report', id, 'view');
+    if (context) {
+        await shares.enforceEntityPermission(context, 'report', id, 'view');
+    }
 
-    return await getByIdWithTemplateNoPerms(id);
-}
-
-async function getByIdWithTemplateNoPerms(id) {
     const entity = await knex('reports')
         .where('reports.id', id)
         .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
@@ -201,7 +199,6 @@ module.exports = {
     ReportState,
     hash,
     getByIdWithTemplate,
-    getByIdWithTemplateNoPerms,
     listDTAjax,
     create,
     updateWithConsistencyCheck,

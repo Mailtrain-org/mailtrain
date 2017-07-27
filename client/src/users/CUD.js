@@ -24,9 +24,7 @@ export default class CUD extends Component {
 
         this.passwordValidator = passwordValidator(props.t);
 
-        this.state = {
-            globalRoles: []
-        };
+        this.state = {};
 
         if (props.edit) {
             this.state.entityId = parseInt(props.match.params.id);
@@ -47,14 +45,6 @@ export default class CUD extends Component {
 
     isDelete() {
         return this.props.match.params.action === 'delete';
-    }
-
-    @withAsyncErrorHandler
-    async fetchGlobalRoles() {
-        const result = await axios.get('/rest/users-global-roles');
-        this.setState({
-            globalRoles: result.data
-        });
     }
 
     @withAsyncErrorHandler
@@ -221,19 +211,11 @@ export default class CUD extends Component {
         const userId = this.getFormValue('id');
         const canDelete = userId !== 1 && mailtrainConfig.userId !== userId;
 
-        const roles = mailtrainConfig.roles.global;
-
         const rolesColumns = [
             { data: 1, title: "Name" },
             { data: 2, title: "Description" },
         ];
 
-
-        const rolesData = [];
-        for (const key in roles) {
-            const role = roles[key];
-            rolesData.push([ key, role.name, role.description ]);
-        }
 
         return (
             <div>
@@ -258,7 +240,7 @@ export default class CUD extends Component {
                             <InputField id="password2" label={t('Repeat Password')} type="password"/>
                         </div>
                     }
-                    <TableSelect id="role" label={t('Role')} withHeader dropdown data={rolesData} columns={rolesColumns} selectionLabelIndex={1}/>
+                    <TableSelect id="role" label={t('Role')} withHeader dropdown dataUrl={'/rest/shares-roles-table/global'} columns={rolesColumns} selectionLabelIndex={1}/>
                     <NamespaceSelect/>
 
                     <ButtonRow>

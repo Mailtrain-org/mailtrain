@@ -30,7 +30,7 @@ const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
 const allowedKeysExternal = new Set(['username', 'namespace', 'role']);
 const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
-const shares = require('../../models/shares');
+const shares = require('./shares');
 
 
 function hash(entity) {
@@ -63,10 +63,6 @@ async function _getBy(context, key, value, extraColumns) {
 
 async function getById(context, id) {
     return await _getBy(context, 'id', id);
-}
-
-async function getByIdNoPerms(id) {
-    return await _getBy(null, 'id', id);
 }
 
 async function serverValidate(context, data, isOwnAccount) {
@@ -120,12 +116,12 @@ async function listDTAjax(context, params) {
         context,
         [{ entityTypeId: 'namespace', requiredOperations: ['manageUsers'] }],
         params,
-        builder => builder.from('users').innerJoin('namespaces', 'namespaces.id', 'users.namespace'),
-        ['users.id', 'users.username', 'users.name', 'namespaces.name', 'users.role'],
-        data => {
-            const role = data[4];
-            data[4] = config.roles.global[role] ? config.roles.global[role].name : role;
-        }
+        builder => builder
+            .from('users')
+            .innerJoin('namespaces', 'namespaces.id', 'users.namespace')
+            .innerJoin('generated_role_names', 'generated_role_names.role', 'users.role')
+            .where('generated_role_names.entity_type', 'global'),
+        [ 'users.id', 'users.username', 'users.name', 'namespaces.name', 'generated_role_names.name' ]
     );
 }
 
@@ -172,28 +168,39 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
     }
 }
 
-async function create(user) {
-    await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
+async function create(context, user) {
+    if (context) { // Is also called internally from ldap handling in passport
+        await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
+    }
 
     await knex.transaction(async tx => {
         if (passport.isAuthMethodLocal) {
             await _validateAndPreprocess(tx, user, true);
+
             const userId = await tx('users').insert(filterObject(user, allowedKeys));
+
+            await shares.rebuildPermissions(tx, { userId });
+
             return userId;
 
         } else {
             const filteredUser = filterObject(user, allowedKeysExternal);
             enforce(user.role in config.roles.global, 'Unknown role');
+
             await namespaceHelpers.validateEntity(tx, user);
-            const userId = await knex('users').insert(filteredUser);
+
+            const userId = await tx('users').insert(filteredUser);
+
+            await shares.rebuildPermissions(tx, { userId });
+
             return userId;
         }
     });
 }
 
-async function updateWithConsistencyCheck(user, isOwnAccount) {
+async function updateWithConsistencyCheck(context, user, isOwnAccount) {
     await knex.transaction(async tx => {
-        const existing = await tx('users').where('id', user.id).first();
+        const existing = await tx('users').where(['id', 'namespace', 'role'], user.id).first();
         if (!existing) {
             shares.throwPermissionDenied();
         }
@@ -218,7 +225,6 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
             }
 
             await tx('users').where('id', user.id).update(filterObject(user, isOwnAccount ? ownAccountAllowedKeys : allowedKeys));
-
         } else {
             enforce(isOwnAccount, 'Local user management is required');
             enforce(user.role in config.roles.global, 'Unknown role');
@@ -226,6 +232,15 @@ async function updateWithConsistencyCheck(user, isOwnAccount) {
 
             await tx('users').where('id', user.id).update(filterObject(user, allowedKeysExternal));
         }
+
+        // Removes the default shares based on the user role and rebuilds permissions.
+        // rebuildPermissions adds the default shares based on the user role, which will reflect the changes
+        // done to the user.
+        if (existing.namespace !== user.namespace || existing.role !== user.role) {
+            await shares.removeDefaultShares(tx, existing);
+        }
+
+        await shares.rebuildPermissions(tx, { userId: user.id });
     });
 }
 
@@ -241,7 +256,7 @@ async function remove(context, userId) {
 
         await shares.enforceEntityPermission(context, 'namespace', existing.namespace, 'manageUsers');
 
-        await knex('users').where('id', userId).del();
+        await tx('users').where('id', userId).del();
     });
 }
 
@@ -366,7 +381,6 @@ module.exports = {
     create,
     hash,
     getById,
-    getByIdNoPerms,
     serverValidate,
     getByAccessToken,
     getByUsername,

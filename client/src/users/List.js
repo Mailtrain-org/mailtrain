@@ -21,6 +21,10 @@ export default class List extends Component {
             {
                 label: 'Edit',
                 link: '/users/edit/' + data[0]
+            },
+            {
+                label: 'Shares',
+                link: '/users/shares/' + data[0]
             }
         ];
 
@@ -34,6 +38,7 @@ export default class List extends Component {
         }
 
         columns.push({ data: 3, title: "Namespace" });
+        columns.push({ data: 4, title: "Role" });
 
         return (
             <div>

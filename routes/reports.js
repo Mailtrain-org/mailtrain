@@ -11,7 +11,7 @@ const router = require('../lib/router-async').create();
 router.getAsync('/download/:id', passport.loggedIn, async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
 
-    const report = await reports.getByIdWithTemplateNoPerms(req.params.id);
+    const report = await reports.getByIdWithTemplate(null, req.params.id);
 
     if (report.state == reports.ReportState.FINISHED) {
         const headers = {

@@ -3,16 +3,24 @@
 const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const shares = require('../../models/shares');
-const permissions = require('../../lib/permissions')
+const permissions = require('../../lib/permissions');
 
 const router = require('../../lib/router-async').create();
 
-router.postAsync('/shares-table/:entityTypeId/:entityId', passport.loggedIn, async (req, res) => {
-    return res.json(await shares.listDTAjax(req.context, req.params.entityTypeId, req.params.entityId, req.body));
+router.postAsync('/shares-table-by-entity/:entityTypeId/:entityId', passport.loggedIn, async (req, res) => {
+    return res.json(await shares.listByEntityDTAjax(req.context, req.params.entityTypeId, req.params.entityId, req.body));
 });
 
-router.postAsync('/shares-users-table/:entityTypeId/:entityId', passport.loggedIn, async (req, res) => {
+router.postAsync('/shares-table-by-user/:entityTypeId/:userId', passport.loggedIn, async (req, res) => {
+    return res.json(await shares.listByUserDTAjax(req.context, req.params.entityTypeId, req.params.userId, req.body));
+});
+
+router.postAsync('/shares-unassigned-users-table/:entityTypeId/:entityId', passport.loggedIn, async (req, res) => {
     return res.json(await shares.listUnassignedUsersDTAjax(req.context, req.params.entityTypeId, req.params.entityId, req.body));
+});
+
+router.postAsync('/shares-roles-table/:entityTypeId', passport.loggedIn, async (req, res) => {
+    return res.json(await shares.listRolesDTAjax(req.context, req.params.entityTypeId, req.body));
 });
 
 router.putAsync('/shares', passport.loggedIn, async (req, res) => {
