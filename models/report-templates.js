@@ -66,11 +66,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         await namespaceHelpers.validateEntity(tx, entity);
-
-        if (existing.namespace !== entity.namespace) {
-            await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReport');
-            await shares.enforceEntityPermission(context, 'reportTemplate', entity.id, 'delete');
-        }
+        await namespaceHelpers.validateMove(context, entity, existing, 'reportTemplate', 'createReportTemplate', 'delete');
 
         await tx('report_templates').where('id', entity.id).update(filterObject(entity, allowedKeys));
 

@@ -109,7 +109,7 @@ function wrapInput(id, htmlId, owner, label, help, input) {
     const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
 
     return (
-        <div className={owner.addFormValidationClass('form-group', id)} >
+        <div className={id ? owner.addFormValidationClass('form-group', id) : 'form-group'} >
             <div className="col-sm-2">
                 <label htmlFor={htmlId} className="control-label">{label}</label>
             </div>
@@ -117,23 +117,45 @@ function wrapInput(id, htmlId, owner, label, help, input) {
                 {input}
             </div>
             {helpBlock}
-            <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>
+            {id && <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>}
         </div>
     );
 }
 
-function wrapInputInline(id, htmlId, owner, containerClass, label, help, input) {
+function wrapInputInline(id, htmlId, owner, containerClass, label, text, help, input) {
     const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
 
     return (
-        <div className={owner.addFormValidationClass('form-group', id)} >
-            <div className={"col-sm-10 col-sm-offset-2 " + containerClass }>
-                <label>{input} {label}</label>
+        <div className={id ? owner.addFormValidationClass('form-group', id) : 'form-group'} >
+            <div className="col-sm-2">
+                <label className="control-label">{label}</label>
+            </div>
+            <div className={"col-sm-10 " + containerClass }>
+                <label>{input} {text}</label>
             </div>
             {helpBlock}
-            <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>
+            {id && <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>}
         </div>
     );
+}
+
+class StaticField extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        return wrapInput(null, htmlId, owner, props.label, props.help,
+            <div id={htmlId} className="form-control" aria-describedby={htmlId + '_help'}>{props.children}</div>
+        );
+    }
 }
 
 class InputField extends Component {
@@ -173,7 +195,8 @@ class InputField extends Component {
 class CheckBox extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
+        label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
     }
 
@@ -187,8 +210,8 @@ class CheckBox extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInputInline(id, htmlId, owner, 'checkbox', props.label, props.help,
-            <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onClick={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+        return wrapInputInline(id, htmlId, owner, 'checkbox', props.label, props.text, props.help,
+            <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
         );
     }
 }
@@ -864,6 +887,7 @@ export {
     withForm,
     Form,
     Fieldset,
+    StaticField,
     InputField,
     CheckBox,
     TextArea,

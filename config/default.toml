@@ -200,31 +200,37 @@ permissions=["rebuildPermissions"]
 rootNamespaceRole="master"
 
 
-[roles.reportTemplate.master]
+[roles.namespace.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "execute"]
+permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
+
+[roles.namespace.master.children]
+list=["view", "edit", "delete"]
+customForm=["view", "edit", "delete"]
+report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
+reportTemplate=["view", "edit", "delete", "share", "execute"]
+namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
+
+[roles.list.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete"]
+
+[roles.customForm.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete"]
 
 [roles.report.master]
 name="Master"
 description="All permissions"
 permissions=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 
-[roles.list.master]
+[roles.reportTemplate.master]
 name="Master"
 description="All permissions"
-permissions=[]
-
-[roles.namespace.master]
-name="Master"
-description="All permissions"
-permissions=["view", "edit", "delete", "share", "createNamespace", "createReportTemplate", "createReport", "manageUsers"]
-
-[roles.namespace.master.children]
-reportTemplate=["view", "edit", "delete", "share", "execute"]
-report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
-list=[]
-namespace=["view", "edit", "delete", "share", "createNamespace", "createReportTemplate", "createReport", "manageUsers"]
+permissions=["view", "edit", "delete", "share", "execute"]
 
 
 

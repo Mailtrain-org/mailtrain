@@ -19,9 +19,7 @@ function hash(entity) {
 }
 
 async function getByIdWithTemplate(context, id) {
-    if (context) {
-        await shares.enforceEntityPermission(context, 'report', id, 'view');
-    }
+    await shares.enforceEntityPermission(context, 'report', id, 'view');
 
     const entity = await knex('reports')
         .where('reports.id', id)
@@ -104,11 +102,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         await namespaceHelpers.validateEntity(tx, entity);
-
-        if (existing.namespace !== entity.namespace) {
-            await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReport');
-            await shares.enforceEntityPermission(context, 'report', entity.id, 'delete');
-        }
+        await namespaceHelpers.validateMove(context, entity, existing, 'report', 'createReport', 'delete');
 
         entity.params = JSON.stringify(entity.params);
 

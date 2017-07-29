@@ -31,7 +31,7 @@ const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
 const allowedKeysExternal = new Set(['username', 'namespace', 'role']);
 const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
 const shares = require('./shares');
-
+const contextHelpers = require('../lib/context-helpers');
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
@@ -54,9 +54,7 @@ async function _getBy(context, key, value, extraColumns) {
         }
     }
 
-    if (context) {
-        await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
-    }
+    await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
 
     return user;
 }
@@ -260,16 +258,16 @@ async function remove(context, userId) {
 }
 
 async function getByAccessToken(accessToken) {
-    return await _getBy(null, 'access_token', accessToken);
+    return await _getBy(contextHelpers.getAdminContext(), 'access_token', accessToken);
 }
 
 async function getByUsername(username) {
-    return await _getBy(null, 'username', username);
+    return await _getBy(contextHelpers.getAdminContext(), 'username', username);
 }
 
 async function getByUsernameIfPasswordMatch(username, password) {
     try {
-        const user = await _getBy(null, 'username', username, ['password']);
+        const user = await _getBy(contextHelpers.getAdminContext(), 'username', username, ['password']);
 
         if (!await bcryptCompare(password, user.password)) {
             throw new interoperableErrors.IncorrectPasswordError();
@@ -287,7 +285,7 @@ async function getByUsernameIfPasswordMatch(username, password) {
 }
 
 async function getAccessToken(userId) {
-    const user = await _getBy(null, 'id', userId, ['access_token']);
+    const user = await _getBy(contextHelpers.getAdminContext(), 'id', userId, ['access_token']);
     return user.access_token;
 }
 

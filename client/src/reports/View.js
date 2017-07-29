@@ -23,8 +23,9 @@ export default class View extends Component {
     @withAsyncErrorHandler
     async loadContent() {
         const id = parseInt(this.props.match.params.id);
-        const contentResp = await axios.get(`/rest/report-content/${id}`);
-        const reportResp = await axios.get(`/rest/reports/${id}`);
+        const contentRespPromise = axios.get(`/rest/report-content/${id}`);
+        const reportRespPromise = axios.get(`/rest/reports/${id}`);
+        const [contentResp, reportResp] = await Promise.all([contentRespPromise, reportRespPromise]);
 
         this.setState({
             content: contentResp.data,

@@ -147,7 +147,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving report template ...'));
+        this.setFormStatusMessage('info', t('Saving report ...'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             const params = {};
@@ -244,8 +244,6 @@ export default class CUD extends Component {
                 }
             }
         }
-
-        // FIXME - filter namespaces by permission
 
         return (
             <div>

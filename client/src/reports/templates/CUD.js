@@ -301,8 +301,6 @@ export default class CUD extends Component {
         const t = this.props.t;
         const edit = this.props.edit;
 
-        // FIXME - filter namespaces by permission
-
         return (
             <div>
                 {edit &&

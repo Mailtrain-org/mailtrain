@@ -22,7 +22,7 @@ async function listByEntityDTAjax(context, entityTypeId, entityId, params) {
             .innerJoin('generated_role_names', 'generated_role_names.role', 'users.role')
             .where('generated_role_names.entity_type', entityTypeId)
             .where(`${entityType.sharesTable}.entity`, entityId),
-        [ 'users.username', 'users.name', 'generated_role_names.name', 'users.id' ]
+        [ 'users.username', 'users.name', 'generated_role_names.name', 'users.id', entityType.sharesTable + '.auto' ]
     );
 }
 
@@ -46,7 +46,7 @@ async function listByUserDTAjax(context, entityTypeId, userId, params) {
             .innerJoin('generated_role_names', 'generated_role_names.role', entityType.sharesTable + '.role')
             .where('generated_role_names.entity_type', entityTypeId)
             .where(entityType.sharesTable + '.user', userId),
-        [ entityType.entitiesTable + '.name', 'generated_role_names.name', entityType.entitiesTable + '.id' ]
+        [ entityType.entitiesTable + '.name', 'generated_role_names.name', entityType.entitiesTable + '.id', entityType.sharesTable + '.auto' ]
     );
 }
 
@@ -167,7 +167,7 @@ async function _rebuildPermissions(tx, restriction) {
             const desiredRole = roleConf.ownNamespaceRole;
             if (desiredRole && user.role !== desiredRole) {
                 await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: user.namespace }).del();
-                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: user.namespace, role: desiredRole });
+                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: user.namespace, role: desiredRole, auto: true });
             }
         }
     }
@@ -191,7 +191,7 @@ async function _rebuildPermissions(tx, restriction) {
             const desiredRole = roleConf.rootNamespaceRole;
             if (desiredRole && user.role !== desiredRole) {
                 await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: 1 /* Global namespace id */ }).del();
-                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: 1 /* Global namespace id */, role: desiredRole });
+                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: 1 /* Global namespace id */, role: desiredRole, auto: 1 });
             }
         }
     }
@@ -268,7 +268,7 @@ async function _rebuildPermissions(tx, restriction) {
                         }
                     }
                 } else {
-                    const userPerms = {}
+                    const userPerms = {};
                     ns.transitiveUserPermissions.set(user, userPerms);
 
                     for (const entityTypeId in restrictedEntityTypes) {
@@ -407,6 +407,10 @@ async function removeDefaultShares(tx, user) {
 }
 
 function enforceGlobalPermission(context, requiredOperations) {
+    if (context.user.admin) { // This handles the getAdminContext() case
+        return;
+    }
+
     if (typeof requiredOperations === 'string') {
         requiredOperations = [ requiredOperations ];
     }
@@ -424,6 +428,10 @@ function enforceGlobalPermission(context, requiredOperations) {
 }
 
 async function _checkPermission(context, entityTypeId, entityId, requiredOperations) {
+    if (context.user.admin) { // This handles the getAdminContext() case
+        return true;
+    }
+
     const entityType = permissions.getEntityType(entityTypeId);
 
     if (typeof requiredOperations === 'string') {

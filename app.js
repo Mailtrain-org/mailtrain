@@ -22,14 +22,14 @@ const tools = require('./lib/tools');
 const contextHelpers = require('./lib/context-helpers');
 
 const routes = require('./routes/index');
-const lists = require('./routes/lists');
+const lists = require('./routes/lists-legacy');
 const settings = require('./routes/settings');
 const settingsModel = require('./lib/models/settings');
 const templates = require('./routes/templates');
 const campaigns = require('./routes/campaigns');
 const links = require('./routes/links');
 const fields = require('./routes/fields');
-const forms = require('./routes/forms');
+const forms = require('./routes/forms-legacy');
 const segments = require('./routes/segments');
 const triggers = require('./routes/triggers');
 const webhooks = require('./routes/webhooks');
@@ -51,12 +51,14 @@ const reportTemplatesRest = require('./routes/rest/report-templates');
 const reportsRest = require('./routes/rest/reports');
 const campaignsRest = require('./routes/rest/campaigns');
 const listsRest = require('./routes/rest/lists');
+const formsRest = require('./routes/rest/forms');
 const sharesRest = require('./routes/rest/shares');
 
 const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
 const usersLegacyIntegration = require('./routes/users-legacy-integration');
 const accountLegacyIntegration = require('./routes/account-legacy-integration');
 const reportsLegacyIntegration = require('./routes/reports-legacy-integration');
+const listsLegacyIntegration = require('./routes/lists-legacy-integration');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -253,6 +255,7 @@ if (config.reports && config.reports.enabled === true) {
 app.use('/users', usersLegacyIntegration);
 app.use('/namespaces', namespacesLegacyIntegration);
 app.use('/account', accountLegacyIntegration);
+app.use('/lists', listsLegacyIntegration);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/reports', reports);
@@ -270,6 +273,7 @@ app.use('/rest', usersRest);
 app.use('/rest', accountRest);
 app.use('/rest', campaignsRest);
 app.use('/rest', listsRest);
+app.use('/rest', formsRest);
 app.use('/rest', sharesRest);
 
 if (config.reports && config.reports.enabled === true) {
@@ -329,6 +333,7 @@ if (app.get('env') === 'development') {
             return next();
         }
 
+        console.log(err);
         if (req.needsJSONResponse) {
             const resp = {
                 message: err.message,

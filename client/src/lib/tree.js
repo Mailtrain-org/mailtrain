@@ -109,6 +109,8 @@ class TreeTable extends Component {
 
             let tdIdx = 1;
 
+            // FIXME, sift title through renderToStaticMarkup in order to sanitize the HTML
+
             if (this.props.withDescription) {
                 const descHtml = ReactDOMServer.renderToStaticMarkup(<div>{node.data.description}</div>);
                 tdList.eq(tdIdx).html(descHtml);

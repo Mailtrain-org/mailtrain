@@ -1,8 +1,6 @@
 exports.up = function(knex, Promise) {
-    const entityTypesAddNamespace = ['list', 'report', 'report_template', 'user'];
-    let schema = knex.schema;
-
-    schema = schema.createTable('namespaces', table => {
+    const entityTypesAddNamespace = ['list', 'custom_form', 'report', 'report_template', 'user'];
+    let promise = knex.schema.createTable('namespaces', table => {
             table.increments('id').primary();
             table.string('name');
             table.text('description');
@@ -10,12 +8,12 @@ exports.up = function(knex, Promise) {
         })
         .then(() => knex('namespaces').insert({
             id: 1, /* Global namespace id */
-            name: 'Global',
-            description: 'Global namespace'
+            name: 'Root',
+            description: 'Root namespace'
         }));
 
     for (const entityType of entityTypesAddNamespace) {
-        schema = schema
+        promise = promise
             .then(() => knex.schema.table(`${entityType}s`, table => {
                 table.integer('namespace').unsigned().notNullable();
             }))
@@ -27,7 +25,7 @@ exports.up = function(knex, Promise) {
             }));
     }
 
-    return schema;
+    return promise;
 };
 
 exports.down = function(knex, Promise) {

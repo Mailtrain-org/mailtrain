@@ -54,12 +54,15 @@ router.all('/*', (req, res, next) => {
     next();
 });
 
+/* REPLACED
 router.get('/', (req, res) => {
     res.render('lists/lists', {
         title: _('Lists')
     });
 });
+*/
 
+/* REPLACED
 router.get('/create', passport.csrfProtection, (req, res) => {
     let data = tools.convertKeys(req.query, {
         skip: ['layout']
@@ -75,7 +78,9 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 
     res.render('lists/create', data);
 });
+*/
 
+/* REPLACED
 router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.create(req.body, (err, id) => {
         if (err || !id) {
@@ -86,7 +91,9 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
         res.redirect('/lists/view/' + id);
     });
 });
+*/
 
+/* REPLACED
 router.get('/edit/:id', passport.csrfProtection, (req, res) => {
     lists.get(req.params.id, (err, list) => {
         if (err || !list) {
@@ -112,7 +119,9 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
         });
     });
 });
+*/
 
+/* REPLACED
 router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.update(req.body.id, req.body, (err, updated) => {
 
@@ -133,7 +142,9 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
         }
     });
 });
+*/
 
+/* REPLACED
 router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) => {
     lists.delete(req.body.id, (err, deleted) => {
         if (err) {
@@ -147,6 +158,7 @@ router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) =
         return res.redirect('/lists');
     });
 });
+*/
 
 router.post('/ajax', (req, res) => {
     lists.filter(req.body, Number(req.query.parent) || false, (err, data, total, filteredTotal) => {

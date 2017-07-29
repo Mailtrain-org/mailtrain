@@ -1,4 +1,4 @@
-const shareableEntityTypes = ['list', 'report', 'report_template', 'namespace'];
+const shareableEntityTypes = ['list', 'custom_form', 'report', 'report_template', 'namespace'];
 
 exports.up = function(knex, Promise) {
     let schema = knex.schema;
@@ -9,6 +9,7 @@ exports.up = function(knex, Promise) {
                 table.integer('entity').unsigned().notNullable().references(`${entityType}s.id`).onDelete('CASCADE');
                 table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
                 table.string('role', 128).notNullable();
+                table.boolean('auto').defaultTo(false);
                 table.primary(['entity', 'user']);
             })
             .createTable(`permissions_${entityType}`, table => {

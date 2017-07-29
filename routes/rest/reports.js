@@ -6,6 +6,7 @@ const reports = require('../../models/reports');
 const reportProcessor = require('../../lib/report-processor');
 const fileHelpers = require('../../lib/file-helpers');
 const shares = require('../../models/shares');
+const contextHelpers = require('../../lib/context-helpers');
 
 const router = require('../../lib/router-async').create();
 
@@ -41,7 +42,7 @@ router.postAsync('/reports-table', passport.loggedIn, async (req, res) => {
 router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'execute');
 
-    const report = await reports.getByIdWithTemplate(null, req.params.id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
     await shares.enforceEntityPermission(req.context, 'reportTemplate', report.report_template, 'execute');
 
     await reportProcessor.start(req.params.id);
@@ -51,7 +52,7 @@ router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection
 router.postAsync('/report-stop/:id', async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'execute');
 
-    const report = await reports.getByIdWithTemplate(null, req.params.id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
     await shares.enforceEntityPermission(req.context, 'reportTemplate', report.report_template, 'execute');
 
     await reportProcessor.stop(req.params.id);
@@ -61,14 +62,14 @@ router.postAsync('/report-stop/:id', async (req, res) => {
 router.getAsync('/report-content/:id', async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
 
-    const report = await reports.getByIdWithTemplate(null, req.params.id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
     res.sendFile(fileHelpers.getReportContentFile(report));
 });
 
 router.getAsync('/report-output/:id', async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewOutput');
 
-    const report = await reports.getByIdWithTemplate(null, req.params.id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
     res.sendFile(fileHelpers.getReportOutputFile(report));
 });
 

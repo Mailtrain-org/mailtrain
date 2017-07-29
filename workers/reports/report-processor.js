@@ -18,15 +18,14 @@ const contextHelpers = require('../../lib/context-helpers');
 
 handlebarsHelpers.registerHelpers(handlebars);
 
-const userFieldGetters = {
-    'campaign': campaigns.getById,
-    'list': lists.getById
-};
-
-
 async function main() {
     try {
-        const context = contextHelpers.getServiceContext();
+        const context = contextHelpers.getAdminContext();
+
+        const userFieldGetters = {
+            'campaign': campaigns.getById,
+            'list': id => lists.getById(context, id)
+        };
 
         const reportId = Number(process.argv[2]);
 

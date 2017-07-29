@@ -3,12 +3,13 @@
 const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const users = require('../../models/users');
+const contextHelpers = require('../../lib/context-helpers');
 
 const router = require('../../lib/router-async').create();
 
 
 router.getAsync('/account', passport.loggedIn, async (req, res) => {
-    const user = await users.getById(null, req.user.id);
+    const user = await users.getById(contextHelpers.getAdminContext(), req.user.id);
     user.hash = users.hash(user);
     return res.json(user);
 });

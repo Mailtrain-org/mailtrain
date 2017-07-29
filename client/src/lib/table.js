@@ -239,6 +239,8 @@ class Table extends Component {
                 type: 'html',
                 createdCell: createdCellFn
             });
+
+            // FIXME, sift all columns through renderToStaticMarkup in order to sanitize the HTML
         }
 
         const dtOptions = {

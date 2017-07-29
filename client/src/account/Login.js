@@ -105,7 +105,7 @@ export default class Login extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="username" label={t('Username')}/>
                     <InputField id="password" label={t('Password')} type="password" />
-                    <CheckBox id="remember" label={t('Remember me')}/>
+                    <CheckBox id="remember" text={t('Remember me')}/>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Sign in')}/>

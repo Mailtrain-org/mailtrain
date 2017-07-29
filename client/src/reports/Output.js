@@ -22,8 +22,9 @@ export default class Output extends Component {
     @withAsyncErrorHandler
     async loadOutput() {
         const id = parseInt(this.props.match.params.id);
-        const outputResp = await axios.get(`/rest/report-output/${id}`);
-        const reportResp = await axios.get(`/rest/reports/${id}`);
+        const outputRespPromise = axios.get(`/rest/report-output/${id}`);
+        const reportRespPromise = axios.get(`/rest/reports/${id}`);
+        const [outputResp, reportResp] = await Promise.all([outputRespPromise, reportRespPromise]);
 
         this.setState({
             output: outputResp.data,

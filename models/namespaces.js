@@ -151,6 +151,9 @@ async function updateWithConsistencyCheck(context, entity) {
             throw new interoperableErrors.ChangedError();
         }
 
+        // namespaceHelpers.validateEntity is not needed here because it is part of the tree traversal check below
+        await namespaceHelpers.validateMove(context, entity, existing, 'namespace', 'createNamespace', 'delete');
+
         let iter = entity;
         while (iter.namespace != null) {
             iter = await tx('namespaces').where('id', iter.namespace).first();

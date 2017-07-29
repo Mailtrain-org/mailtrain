@@ -60,9 +60,18 @@ A namespace role further defines allowed operations for entity types within and 
 
 The following defines the role master for scope "global". This effectively means that in 
 "Create/Edit User" form, the user can be given role "Master". 
-The role gives the permission to rebuild the permission cache. Further, it specifies that the
+The role gives the permission to rebuild the permission cache. 
+
+Further, it specifies that the
 holder of the role will automatically be given access (share) to the root namespace in the
-namespace role "master". This role is also an admin role, which means that user id 1 will always be reset to this role.
+namespace role "master" (specified by ```rootNamespaceRole="master"```). This access to the root namespace is given irrespective of the namespace
+in which the user is created. This highlight the dual purpose of namespaces: a) they group
+entities w.r.t. access management, b) they allow categorizing entities and users in a hierarchy
+to potentially reflect the organisational or process hierarchy. The latter is especially useful for
+more enterprise applications where a single installation of Mailtrain serves a number of rather
+independent groups.
+
+The global role defined below is also an admin role (denoted by the ```admin=true```), which means that user id 1 will always be reset to this role.
 This serves as a kind of bootstrap that makes sure that there is always a user that can be
 used to give access to other users.
 ```
@@ -74,16 +83,36 @@ permissions=["rebuildPermissions"]
 rootNamespaceRole="master"
 ```
 
-This defines the role "master" for "report" entities. It lists the operations that a user
+Another example for a global role is the following. This one is intended for regular users.
+As such, it does not automatically give access to everything. Rather, it gives limited access
+to entities under the namespace in which the user has been created. This is specified by the
+```ownNamespaceRole="editor"```
+```
+[roles.global.editor]
+name="Editor"
+description="Anything under own namespace except operations related to sending and doing reports"
+permissions=[]
+ownNamespaceRole="editor"
+```
+
+The roles for entities are defined in a similar fashion. The example below shows the definition
+of the role "master" for "report" entities. It lists the operations that a user
 that has "master" access to a particular report can do with the report. Note that to get the
 "master" access to a particular report through this role, the report would either have to be shared with the user
-with role "master".
-  
+with role "master".  
 ```
 [roles.report.master]
 name="Master"
 description="All permissions"
 permissions=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
+```
+
+The same for the restricted role "editor" can look as follows.
+```
+[roles.report.editor]
+name="Editor"
+description="Anything under own namespace except operations related to sending and doing reports"
+permissions=["view", "viewContent", "viewOutput"]
 ```
 
 The following defines the role "master" for "namespace" entities. Similarly to the example above,
@@ -101,4 +130,12 @@ permissions=["view", "edit", "delete", "share", "createNamespace", "createReport
 reportTemplate=["view", "edit", "delete", "share", "execute"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 namespace=["view", "edit", "delete", "share", "createNamespace", "createReportTemplate", "createReport", "manageUsers"]
+```
+
+And the same for the more restricted role "editor".
+```
+[roles.namespace.editor.children]
+reportTemplate=[]
+report=["view", "viewContent", "viewOutput"]
+namespace=["view", "edit", "delete"]
 ```
