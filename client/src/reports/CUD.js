@@ -2,17 +2,17 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
+import { translate } from 'react-i18next';
+import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import {
     withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, TableSelectMode, ButtonRow, Button,
     Fieldset
 } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { ModalDialog } from '../lib/bootstrap-components';
 import moment from 'moment';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
+import {DeleteModalDialog} from "../lib/delete";
 
 @translate()
 @withForm
@@ -170,27 +170,6 @@ export default class CUD extends Component {
         }
     }
 
-    async showDeleteModal() {
-        this.navigateTo(`/reports/edit/${this.state.entityId}/delete`);
-    }
-
-    async hideDeleteModal() {
-        this.navigateTo(`/reports/edit/${this.state.entityId}`);
-    }
-
-    async performDelete() {
-        const t = this.props.t;
-
-        await this.hideDeleteModal();
-
-        this.disableForm();
-        this.setFormStatusMessage('info', t('Deleting report...'));
-
-        await axios.delete(`/rest/reports/${this.state.entityId}`);
-
-        this.navigateToWithFlashMessage('/reports', 'success', t('Report deleted'));
-    }
-
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
@@ -248,12 +227,14 @@ export default class CUD extends Component {
         return (
             <div>
                 {edit &&
-                    <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
-                        { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
-                        { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
-                    ]}>
-                        {t('Are you sure you want to delete "{{name}}"?', {name: this.getFormValue('name')})}
-                    </ModalDialog>
+                    <DeleteModalDialog
+                        stateOwner={this}
+                        visible={this.props.match.params.action === 'delete'}
+                        deleteUrl={`/reports/${this.state.entityId}`}
+                        cudUrl={`/reports/edit/${this.state.entityId}`}
+                        listUrl="/reports"
+                        deletingMsg={t('Deleting report ...')}
+                        deletedMsg={t('Report deleted')}/>
                 }
 
                 <Title>{edit ? t('Edit Report') : t('Create Report')}</Title>
@@ -278,7 +259,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <Button className="btn-danger" icon="remove" label={t('Delete Report')} onClickAsync={::this.showDeleteModal}/>}
+                        {edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/edit/${this.state.entityId}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

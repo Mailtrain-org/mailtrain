@@ -3,12 +3,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { translate, Trans } from 'react-i18next';
-import { requiresAuthenticatedUser, withPageHelpers, Title } from '../../lib/page'
+import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page'
 import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEditor, ButtonRow, Button } from '../../lib/form';
-import axios from '../../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { ModalDialog } from '../../lib/bootstrap-components';
 import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
+import {DeleteModalDialog} from "../../lib/delete";
 
 @translate()
 @withForm
@@ -276,27 +275,6 @@ export default class CUD extends Component {
         }
     }
 
-    async showDeleteModal() {
-        this.navigateTo(`/reports/templates/edit/${this.state.entityId}/delete`);
-    }
-
-    async hideDeleteModal() {
-        this.navigateTo(`/reports/templates/edit/${this.state.entityId}`);
-    }
-
-    async performDelete() {
-        const t = this.props.t;
-
-        await this.hideDeleteModal();
-
-        this.disableForm();
-        this.setFormStatusMessage('info', t('Deleting report template...'));
-
-        await axios.delete(`/rest/report-templates/${this.state.entityId}`);
-
-        this.navigateToWithFlashMessage('/reports/templates', 'success', t('Report template deleted'));
-    }
-
     render() {
         const t = this.props.t;
         const edit = this.props.edit;
@@ -304,12 +282,14 @@ export default class CUD extends Component {
         return (
             <div>
                 {edit &&
-                    <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
-                        { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
-                        { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
-                    ]}>
-                        {t('Are you sure you want to delete report template "{{name}}"?', {name: this.getFormValue('name')})}
-                    </ModalDialog>
+                    <DeleteModalDialog
+                        stateOwner={this}
+                        visible={this.props.match.params.action === 'delete'}
+                        deleteUrl={`/reports/templates/${this.state.entityId}`}
+                        cudUrl={`/reports/templates/edit/${this.state.entityId}`}
+                        listUrl="/reports/templates"
+                        deletingMsg={t('Deleting report template ...')}
+                        deletedMsg={t('Report template deleted')}/>
                 }
 
                 <Title>{edit ? t('Edit Report Template') : t('Create Report Template')}</Title>
@@ -327,7 +307,7 @@ export default class CUD extends Component {
                         <ButtonRow>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
-                            <Button className="btn-danger" icon="remove" label={t('Delete Template')} onClickAsync={::this.showDeleteModal}/>
+                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/templates/edit/${this.state.entityId}/delete`}/>
                         </ButtonRow>
                     :
                         <ButtonRow>

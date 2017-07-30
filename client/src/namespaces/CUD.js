@@ -3,12 +3,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { translate } from 'react-i18next';
-import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
+import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button, TreeTableSelect } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
-import { ModalDialog } from '../lib/bootstrap-components';
+import {DeleteModalDialog} from "../lib/delete";
 
 @translate()
 @withForm
@@ -171,41 +171,19 @@ export default class CUD extends Component {
         }
     }
 
-    async showDeleteModal() {
-        this.navigateTo(`/namespaces/edit/${this.state.entityId}/delete`);
-    }
-
-    async hideDeleteModal() {
-        this.navigateTo(`/namespaces/edit/${this.state.entityId}`);
-    }
-
-    async performDelete() {
-        const t = this.props.t;
-
-        await this.hideDeleteModal();
-
-        try {
+    async onDeleteError(error) {
+        if (error instanceof interoperableErrors.ChildDetectedError) {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Deleting namespace...'));
-
-            await axios.delete(`/rest/namespaces/${this.state.entityId}`);
-
-            this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace deleted'));
-
-        } catch (error) {
-            if (error instanceof interoperableErrors.ChildDetectedError) {
-                this.disableForm();
-                this.setFormStatusMessage('danger',
-                    <span>
-                        <strong>{t('The namespace cannot be deleted.')}</strong>{' '}
-                        {t('There has been a child namespace found. This is most likely because someone else has changed the parent of some namespace in the meantime. Refresh your page to start anew with fresh data.')}
-                    </span>
-                );
-                return;
-            }
-
-            throw error;
+            this.setFormStatusMessage('danger',
+                <span>
+                    <strong>{t('The namespace cannot be deleted.')}</strong>{' '}
+                    {t('There has been a child namespace found. This is most likely because someone else has changed the parent of some namespace in the meantime. Refresh your page to start anew with fresh data.')}
+                </span>
+            );
+            return;
         }
+
+        throw error;
     }
 
     render() {
@@ -215,12 +193,15 @@ export default class CUD extends Component {
         return (
             <div>
                 {!this.isEditGlobal() && !this.hasChildren && edit &&
-                    <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
-                        { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
-                        { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
-                    ]}>
-                        {t('Are you sure you want to delete namespace "{{namespace}}"?', {namespace: this.getFormValue('name')})}
-                    </ModalDialog>
+                    <DeleteModalDialog
+                        stateOwner={this}
+                        visible={this.props.match.params.action === 'delete'}
+                        deleteUrl={`/rest/namespaces/${this.state.entityId}`}
+                        cudUrl={`/namespaces/edit/${this.state.entityId}`}
+                        listUrl="/namespaces"
+                        deletingMsg={t('Deleting namespace ...')}
+                        deletedMsg={t('Namespace deleted')}
+                        onErrorAsync={::this.onDeleteError}/>
                 }
 
                 <Title>{edit ? t('Edit Namespace') : t('Create Namespace')}</Title>
@@ -234,8 +215,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {!this.isEditGlobal() && !this.hasChildren && edit && <Button className="btn-danger" icon="remove" label={t('Delete Namespace')}
-                                         onClickAsync={::this.showDeleteModal}/>}
+                        {!this.isEditGlobal() && !this.hasChildren && edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/namespaces/edit/${this.state.entityId}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

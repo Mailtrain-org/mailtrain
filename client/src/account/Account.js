@@ -27,7 +27,7 @@ export default class Account extends Component {
         this.initForm({
             serverValidation: {
                 url: '/rest/account-validate',
-                changed: ['email', 'username', 'currentPassword']
+                changed: ['email', 'currentPassword']
             }
         });
     }
@@ -53,10 +53,12 @@ export default class Account extends Component {
 
         if (!email) {
             state.setIn(['email', 'error'], t('Email must not be empty.'));
-        } else if (!emailServerValidation || emailServerValidation.invalid) {
+        } else if (emailServerValidation && emailServerValidation.invalid) {
             state.setIn(['email', 'error'], t('Invalid email address.'));
-        } else if (!emailServerValidation || emailServerValidation.exists) {
+        } else if (emailServerValidation && emailServerValidation.exists) {
             state.setIn(['email', 'error'], t('The email is already associated with another user in the system.'));
+        } else if (!emailServerValidation) {
+            state.setIn(['email', 'error'], t('Validation is in progress...'));
         } else {
             state.setIn(['email', 'error'], null);
         }
@@ -86,8 +88,10 @@ export default class Account extends Component {
 
             if (!currentPassword) {
                 state.setIn(['currentPassword', 'error'], t('Current password must not be empty.'));
-            } else if (!currentPasswordServerValidation || currentPasswordServerValidation.incorrect) {
+            } else if (currentPasswordServerValidation && currentPasswordServerValidation.incorrect) {
                 state.setIn(['currentPassword', 'error'], t('Incorrect password.'));
+            } else if (!currentPasswordServerValidation) {
+                state.setIn(['email', 'error'], t('Validation is in progress...'));
             } else {
                 state.setIn(['currentPassword', 'error'], null);
             }

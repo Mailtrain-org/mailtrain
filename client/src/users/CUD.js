@@ -3,15 +3,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { translate } from 'react-i18next';
-import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
+import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TableSelect } from '../lib/form';
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
-import { ModalDialog } from '../lib/bootstrap-components';
 import mailtrainConfig from 'mailtrainConfig';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
+import {DeleteModalDialog} from "../lib/delete";
 
 @translate()
 @withForm
@@ -79,8 +79,10 @@ export default class CUD extends Component {
 
         if (!username) {
             state.setIn(['username', 'error'], t('User name must not be empty'));
-        } else if (!usernameServerValidation || usernameServerValidation.exists) {
+        } else if (usernameServerValidation && usernameServerValidation.exists) {
             state.setIn(['username', 'error'], t('The user name already exists in the system.'));
+        } else if (!usernameServerValidation) {
+            state.setIn(['email', 'error'], t('Validation is in progress...'));
         } else {
             state.setIn(['username', 'error'], null);
         }
@@ -92,8 +94,12 @@ export default class CUD extends Component {
 
             if (!email) {
                 state.setIn(['email', 'error'], t('Email must not be empty'));
-            } else if (!emailServerValidation || emailServerValidation.invalid) {
+            } else if (emailServerValidation && emailServerValidation.invalid) {
                 state.setIn(['email', 'error'], t('Invalid email address.'));
+            } else if (emailServerValidation && emailServerValidation.exists) {
+                state.setIn(['email', 'error'], t('The email is already associated with another user in the system.'));
+            } else if (!emailServerValidation) {
+                state.setIn(['email', 'error'], t('Validation is in progress...'));
             } else {
                 state.setIn(['email', 'error'], null);
             }
@@ -222,12 +228,14 @@ export default class CUD extends Component {
         return (
             <div>
                 {edit && canDelete &&
-                    <ModalDialog hidden={!this.isDelete()} title={t('Confirm deletion')} onCloseAsync={::this.hideDeleteModal} buttons={[
-                        { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteModal },
-                        { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDelete }
-                    ]}>
-                        {t('Are you sure you want to delete user "{{username}}"?', {username: this.getFormValue('username')})}
-                    </ModalDialog>
+                    <DeleteModalDialog
+                        stateOwner={this}
+                        visible={this.props.match.params.action === 'delete'}
+                        deleteUrl={`/users/${this.state.entityId}`}
+                        cudUrl={`/users/edit/${this.state.entityId}`}
+                        listUrl="/users"
+                        deletingMsg={t('Deleting user ...')}
+                        deletedMsg={t('User deleted')}/>
                 }
 
                 <Title>{edit ? t('Edit User') : t('Create User')}</Title>
@@ -247,8 +255,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && canDelete && <Button className="btn-danger" icon="remove" label={t('Delete User')}
-                                         onClickAsync={::this.showDeleteModal}/>}
+                        {edit && canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete User')} linkTo={`/users/edit/${this.state.entityId}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

@@ -244,7 +244,8 @@ class Dropdown extends Component {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        options: PropTypes.array.isRequired
+        options: PropTypes.array,
+        optGroups: PropTypes.array
     }
 
     static contextTypes = {
@@ -257,7 +258,18 @@ class Dropdown extends Component {
         const owner = this.context.formStateOwner;
         const id = this.props.id;
         const htmlId = 'form_' + id;
-        const options = props.options.map(option => <option key={option.key} value={option.key}>{option.label}</option>);
+        let options = [];
+
+        if (this.props.options) {
+            options = props.options.map(option => <option key={option.key} value={option.key}>{option.label}</option>);
+        } else if (this.props.optGroups) {
+            options = props.optGroups.map(optGroup =>
+                <optgroup key={optGroup.key} label={optGroup.label}>
+                    {optGroup.options.map(option => <option key={option.key} value={option.key}>{option.label}</option>)}
+                </optgroup>
+            );
+        }
+
 
         return wrapInput(id, htmlId, owner, props.label, props.help,
             <select id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
@@ -270,7 +282,9 @@ class Dropdown extends Component {
 
 class AlignedRow extends Component {
     static propTypes = {
-        className: PropTypes.string
+        className: PropTypes.string,
+        label: PropTypes.string,
+        htmlId: PropTypes.string
     }
 
     static defaultProps = {
@@ -278,13 +292,25 @@ class AlignedRow extends Component {
     }
 
     render() {
-        return (
-            <div className="form-group">
-                <div className={"col-sm-10 col-sm-offset-2 " + this.props.className}>
-                    {this.props.children}
+        if (this.props.label) {
+            return (
+                <div className="form-group">
+                    <label htmlFor={this.props.htmlId} className="col-sm-2 control-label">{this.props.label}</label>
+                    <div className={"col-sm-10 " + this.props.className} id={this.props.htmlId}>
+                        {this.props.children}
+                    </div>
                 </div>
-            </div>
-        );
+            );
+
+        } else {
+            return (
+                <div className="form-group">
+                    <div className={"col-sm-10 col-sm-offset-2 " + this.props.className} id={this.props.htmlId}>
+                        {this.props.children}
+                    </div>
+                </div>
+            );
+        }
     }
 }
 
@@ -499,7 +525,7 @@ TableSelect.prototype.refresh = function() {
 class ACEEditor extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         height: PropTypes.string,
         mode: PropTypes.string
@@ -710,6 +736,355 @@ function withForm(target) {
                     }
                 }));
                 
+                validateFormState(this, mutState);
+            })
+        }));
+    };
+
+    inst.waitForFormServerValidated = async function() {
+        if (!this.isFormServerValidated()) {
+            await new Promise(resolve => { formValidateResolve = resolve; });
+        }
+    };
+
+    inst.scheduleFormRevalidate = function() {
+        scheduleValidateForm(this);
+    };
+
+    inst.updateFormValue = function(key, value) {
+        this.setState(previousState => {
+            const oldValue = previousState.formState.getIn(['data', key, 'value']);
+
+            let newState = {
+                formState: previousState.formState.withMutations(mutState => {
+                    mutState.setIn(['data', key, 'value'], value);
+                    validateFormState(this, mutState);
+                })
+            };
+
+            const onChangeCallbacks = this.state.formSettings.onChange || {};
+
+            if (onChangeCallbacks[key]) {
+                onChangeCallbacks[key](newState, key, oldValue, value);
+            }
+
+            return newState;
+        });
+    };
+
+    inst.getFormValue = function(name) {
+        return this.state.formState.getIn(['data', name, 'value']);
+    };
+
+    inst.getFormValues = function(name) {
+        return this.state.formState.get('data').map(attr => attr.get('value')).toJS();
+    };
+
+    inst.getFormError = function(name) {
+        return this.state.formState.getIn(['data', name, 'error']);
+    };
+
+    inst.isFormWithLoadingNotice = function() {
+        return this.state.formState.get('state') === FormState.LoadingWithNotice;
+    };
+
+    inst.isFormLoading = function() {
+        return this.state.formState.get('state') === FormState.Loading || this.state.formState.get('state') === FormState.LoadingWithNotice;
+    };
+
+    inst.isFormReady = function() {
+        return this.state.formState.get('state') === FormState.Ready;
+    };
+
+    inst.isFormValidationShown = function() {
+        return this.state.formState.get('isValidationShown');
+    };
+
+    inst.addFormValidationClass = function(className, name) {
+        if (this.isFormValidationShown()) {
+            const error = this.getFormError(name);
+            if (error) {
+                return className + ' has-error';
+            } else {
+                return className + ' has-success';
+            }
+        } else {
+            return className;
+        }
+    };
+
+    inst.getFormValidationMessage = function(name) {
+        if (this.isFormValidationShown()) {
+            return this.getFormError(name);
+        } else {
+            return '';
+        }
+    };
+
+    inst.showFormValidation = function() {
+        this.setState(previousState => ({formState: previousState.formState.set('isValidationShown', true)}));
+    };
+
+    inst.hideFormValidation = function() {
+        this.setState(previousState => ({formState: previousState.formState.set('isValidationShown', false)}));
+    };
+
+    inst.isFormWithoutErrors = function() {
+        return !this.state.formState.get('data').find(attr => attr.get('error'));
+    };
+
+    inst.isFormServerValidated = function() {
+        return !this.state.formSettings.serverValidation || this.state.formSettings.serverValidation.changed.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
+    };
+
+    inst.getFormStatusMessageText = function() {
+        return this.state.formState.get('statusMessageText');
+    };
+
+    inst.getFormStatusMessageSeverity = function() {
+        return this.state.formState.get('statusMessageSeverity');
+    };
+
+    inst.setFormStatusMessage = function(severity, text) {
+        this.setState(previousState => ({
+            formState: previousState.formState.withMutations(map => {
+                map.set('statusMessageText', text);
+                map.set('statusMessageSeverity', severity);
+            })
+        }));
+    };
+
+    inst.clearFormStatusMessage = function() {
+        this.setState(previousState => ({
+            formState: previousState.formState.withMutations(map => {
+                map.set('statusMessageText', '');
+            })
+        }));
+    };
+
+    inst.enableForm = function() {
+        this.setState(previousState => ({formState: previousState.formState.set('isDisabled', false)}));
+    };
+
+    inst.disableForm = function() {
+        this.setState(previousState => ({formState: previousState.formState.set('isDisabled', true)}));
+    };
+
+    inst.isFormDisabled = function() {
+        return this.state.formState.get('isDisabled');
+    };
+
+    inst.formHandleChangedError = async function(fn) {
+        const t = this.props.t;
+        try {
+            await fn();
+        } catch (error) {
+            if (error instanceof interoperableErrors.ChangedError) {
+                this.disableForm();
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                    </span>
+                );
+                return;
+            }
+
+            if (error instanceof interoperableErrors.NotFoundError) {
+                this.disableForm();
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('It seems that someone else has deleted the entity in the meantime.')}
+                    </span>
+                );
+                return;
+            }
+
+            throw error;
+        }
+    };
+
+    return target;
+}
+
+function withForm(target) {
+    const inst = target.prototype;
+
+    const cleanFormState = Immutable.Map({
+        state: FormState.Loading,
+        isValidationShown: false,
+        isDisabled: false,
+        statusMessageText: '',
+        data: Immutable.Map(),
+        isServerValidationRunning: false
+    });
+
+    // formValidateResolve is called by "validateForm" once client receives validation response from server that does not
+    // trigger another server validation
+    let formValidateResolve = null;
+
+    function scheduleValidateForm(self) {
+        setTimeout(() => {
+            self.setState(previousState => ({
+                formState: previousState.formState.withMutations(mutState => {
+                    validateFormState(self, mutState);
+                })
+            }));
+        }, 0);
+    }
+
+    function validateFormState(self, mutState) {
+        const settings = self.state.formSettings;
+
+        if (!mutState.get('isServerValidationRunning') && settings.serverValidation) {
+            const payload = {};
+            let payloadNotEmpty = false;
+
+            for (const attr of settings.serverValidation.extra || []) {
+                payload[attr] = mutState.getIn(['data', attr, 'value']);
+            }
+
+            for (const attr of settings.serverValidation.changed) {
+                const currValue = mutState.getIn(['data', attr, 'value']);
+                const serverValue = mutState.getIn(['data', attr, 'serverValue']);
+
+                // This really assumes that all form values are preinitialized (i.e. not undef)
+                if (currValue !== serverValue) {
+                    mutState.setIn(['data', attr, 'serverValidated'], false);
+                    payload[attr] = currValue;
+                    payloadNotEmpty = true;
+                }
+            }
+
+            if (payloadNotEmpty) {
+                mutState.set('isServerValidationRunning', true);
+
+                axios.post(settings.serverValidation.url, payload)
+                    .then(response => {
+
+                        self.setState(previousState => ({
+                            formState: previousState.formState.withMutations(mutState => {
+                                mutState.set('isServerValidationRunning', false);
+
+                                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                                    for (const attr in payload) {
+                                        mutStateData.setIn([attr, 'serverValue'], payload[attr]);
+
+                                        if (payload[attr] === mutState.getIn(['data', attr, 'value'])) {
+                                            mutStateData.setIn([attr, 'serverValidated'], true);
+                                            mutStateData.setIn([attr, 'serverValidation'], response.data[attr] || true);
+                                        }
+                                    }
+                                }));
+                            })
+                        }));
+
+                        scheduleValidateForm(self);
+                    })
+                    .catch(error => {
+                        console.log('Error in "validateFormState": ' + error);
+
+                        self.setState(previousState => ({
+                            formState: previousState.formState.set('isServerValidationRunning', false)
+                        }));
+
+                        // TODO: It might be good not to give up immediatelly, but retry a couple of times
+                        // scheduleValidateForm(self);
+                    });
+            } else {
+                if (formValidateResolve) {
+                    const resolve = formValidateResolve;
+                    formValidateResolve = null;
+                    resolve();
+                }
+            }
+        }
+
+        if (self.localValidateFormValues) {
+            mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                self.localValidateFormValues(mutStateData);
+            }));
+        }
+    }
+
+    inst.initForm = function(settings) {
+        const state = this.state || {};
+        state.formState = cleanFormState;
+        state.formSettings = settings || {};
+        this.state = state;
+    };
+
+    inst.resetFormState = function() {
+        this.setState({
+            formState: cleanFormState
+        });
+    };
+
+    inst.getFormValuesFromURL = async function(url, mutator) {
+        setTimeout(() => {
+            this.setState(previousState => {
+                if (previousState.formState.get('state') === FormState.Loading) {
+                    return {
+                        formState: previousState.formState.set('state', FormState.LoadingWithNotice)
+                    };
+                }
+            });
+        }, 500);
+
+        const response = await axios.get(url);
+
+        const data = response.data;
+
+        data.originalHash = data.hash;
+        delete data.hash;
+
+        if (mutator) {
+            mutator(data);
+        }
+
+        this.populateFormValues(data);
+    };
+
+    inst.validateAndSendFormValuesToURL = async function(method, url, mutator) {
+        await this.waitForFormServerValidated();
+
+        if (this.isFormWithoutErrors()) {
+            const data = this.getFormValues();
+
+            if (mutator) {
+                mutator(data);
+            }
+
+            let response;
+            if (method === FormSendMethod.PUT) {
+                response = await axios.put(url, data);
+            } else if (method === FormSendMethod.POST) {
+                response = await axios.post(url, data);
+            }
+
+            return response.data || true;
+
+        } else {
+            this.showFormValidation();
+            return false;
+        }
+    };
+
+
+    inst.populateFormValues = function(data) {
+        this.setState(previousState => ({
+            formState: previousState.formState.withMutations(mutState => {
+                mutState.set('state', FormState.Ready);
+
+                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                    for (const key in data) {
+                        mutStateData.set(key, Immutable.Map({
+                            value: data[key]
+                        }));
+                    }
+                }));
+
                 validateFormState(this, mutState);
             })
         }));

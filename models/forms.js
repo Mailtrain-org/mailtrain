@@ -2,23 +2,26 @@
 
 const knex = require('../lib/knex');
 const { enforce, filterObject } = require('../lib/helpers');
+const hasher = require('node-object-hash')();
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
+const namespaceHelpers = require('../lib/namespace-helpers');
 const bluebird = require('bluebird');
-const fs = bluebird.promisifyAll(require('fs'));
+const fsReadFile = bluebird.promisify(require('fs').readFile);
 const path = require('path');
 const mjml = require('mjml');
 const _ = require('../lib/translate')._;
 
-const formAllowedKeys = [
+const formAllowedKeys = new Set([
     'name',
     'description',
     'layout',
-    'form_input_style'
-];
+    'form_input_style',
+    'namespace'
+]);
 
-const allowedFormKeys = [
+const allowedFormKeys = new Set([
     'web_subscribe',
     'web_confirm_subscription_notice',
     'mail_confirm_subscription_html',
@@ -41,10 +44,11 @@ const allowedFormKeys = [
     'mail_unsubscription_confirmed_html',
     'mail_unsubscription_confirmed_text',
     'web_manual_unsubscribe_notice'
-];
+]);
 
-const hashKeys = [...formAllowedKeys, ...allowedFormKeys];
+const hashKeys = new Set([...formAllowedKeys, ...allowedFormKeys]);
 
+const allowedKeysServerValidate = new Set(['layout', ...allowedFormKeys]);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
@@ -85,7 +89,7 @@ async function getById(context, id) {
 
     let entity;
     await knex.transaction(async tx => {
-        entity = _getById(tx, id);
+        entity = await _getById(tx, id);
     });
 
     return entity;
@@ -95,14 +99,13 @@ async function getById(context, id) {
 async function serverValidate(context, data) {
     const result = {};
 
-    const form = filterObject(data, allowedFormKeys);
-
+    const form = filterObject(data, allowedKeysServerValidate);
     const errs = checkForMjmlErrors(form);
 
     for (const key in form) {
         result[key] = {};
         if (errs[key]) {
-            result.key.errors = errs[key];
+            result[key].errors = errs[key];
         }
     }
 
@@ -111,14 +114,18 @@ async function serverValidate(context, data) {
 
 
 async function create(context, entity) {
-    await shares.enforceEntityPermission(context, 'namespace', 'createCustomForm');
+    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createCustomForm');
 
     let id;
     await knex.transaction(async tx => {
+        await namespaceHelpers.validateEntity(tx, entity);
+
+        const form = filterObject(entity, allowedFormKeys);
+        enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');
+
         const ids = await tx('custom_forms').insert(filterObject(entity, formAllowedKeys));
         id = ids[0];
 
-        const form = filterObject(entity, allowedFormKeys);
         for (const formKey in form) {
             await tx('custom_forms_data').insert({
                 form: id,
@@ -126,6 +133,8 @@ async function create(context, entity) {
                 data_value: form[formKey]
             })
         }
+
+        await shares.rebuildPermissions(tx, { entityTypeId: 'customForm', entityId: id });
     });
 
     return id;
@@ -135,12 +144,15 @@ async function updateWithConsistencyCheck(context, entity) {
     await shares.enforceEntityPermission(context, 'customForm', entity.id, 'edit');
 
     await knex.transaction(async tx => {
-        const existing = _getById(tx, context, id);
+        const existing = await _getById(tx, entity.id);
 
         const existingHash = hash(existing);
         if (existingHash != entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
+
+        await namespaceHelpers.validateEntity(tx, entity);
+        await namespaceHelpers.validateMove(context, entity, existing, 'customForm', 'createCustomForm', 'delete');
 
         const form = filterObject(entity, allowedFormKeys);
         enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');
@@ -149,15 +161,20 @@ async function updateWithConsistencyCheck(context, entity) {
 
         for (const formKey in form) {
             await tx('custom_forms_data').update({
-                form: entity.id,
-                data_key: formKey,
                 data_value: form[formKey]
+            }).where({
+                form: entity.id,
+                data_key: formKey
             });
         }
+
+        await shares.rebuildPermissions(tx, { entityTypeId: 'customForm', entityId: entity.id });
     });
 }
 
 async function remove(context, id) {
+    shares.enforceEntityPermission(context, 'customForm', id, 'delete');
+
     await knex.transaction(async tx => {
         const entity = await tx('custom_forms').where('id', id).first();
 
@@ -165,20 +182,18 @@ async function remove(context, id) {
             throw shares.throwPermissionDenied();
         }
 
-        shares.enforceEntityPermission(context, 'list', entity.list, 'manageForms');
-
         await tx('custom_forms_data').where('form', id).del();
         await tx('custom_forms').where('id', id).del();
     });
 }
 
 
-async function getDefaultFormValues() {
+async function getDefaultCustomFormValues() {
     const basePath = path.join(__dirname, '..');
 
     async function getContents(fileName) {
         try {
-            const template = await fs.readFile(path.join(basePath, fileName), 'utf8');
+            const template = await fsReadFile(path.join(basePath, fileName), 'utf8');
             return template.replace(/\{\{#translate\}\}(.*?)\{\{\/translate\}\}/g, (m, s) => _(s));
         } catch (err) {
             return false;
@@ -195,7 +210,7 @@ async function getDefaultFormValues() {
     }
 
     form.layout = await getContents('views/subscription/layout.mjml.hbs') || '';
-    form.formInputStyle = await getContents('public/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
+    form.form_input_style = await getContents('public/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
 
     return form;
 }
@@ -224,24 +239,32 @@ function checkForMjmlErrors(form) {
             const template = form[key];
             const errs = hasMjmlError(template);
 
+            const msgs = errs.map(x => x.formattedMessage);
             if (key === 'mail_confirm_html' && !template.includes('{{confirmUrl}}')) {
-                errs.push('Missing {{confirmUrl}}');
+                msgs.push('Missing {{confirmUrl}}');
             }
 
-            if (errs.length) {
-                errors[key] = errs;
+            if (msgs.length) {
+                errors[key] = msgs;
             }
 
         } else if (key === 'layout') {
-            const layout = values[index];
-            const err = hasMjmlError('', layout);
+            const layout = form[key];
+            const errs = hasMjmlError('', layout);
 
-            if (!layout.includes('{{{body}}}')) {
-                errs.push(`{{{body}}} not found`);
+            let msgs;
+            if (Array.isArray(errs)) {
+                msgs = errs.map(x => x.formattedMessage)
+            } else {
+                msgs = [ errs.message ];
             }
 
-            if (errs.length) {
-                errors[key] = errs;
+            if (!layout.includes('{{{body}}}')) {
+                msgs.push(`{{{body}}} not found`);
+            }
+
+            if (msgs.length) {
+                errors[key] = msgs;
             }
         }
     }
@@ -256,6 +279,6 @@ module.exports = {
     create,
     updateWithConsistencyCheck,
     remove,
-    getDefaultFormValues,
+    getDefaultCustomFormValues,
     serverValidate
 };
