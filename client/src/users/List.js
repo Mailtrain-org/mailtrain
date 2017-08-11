@@ -15,21 +15,23 @@ export default class List extends Component {
     }
 
     render() {
+        // There are no permissions checks here because this page makes no sense for anyone who does not have manageUsers permission
+        // Once someone has this permission, then all on this page can be used.
+
         const t = this.props.t;
 
         const actions = data => [
             {
-                label: 'Edit',
-                link: '/users/edit/' + data[0]
+                label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                link: `/users/${data[0]}/edit`
             },
             {
-                label: 'Shares',
-                link: '/users/shares/' + data[0]
+                label: <span className="glyphicon glyphicon-share" aria-hidden="true" title="Share"></span>,
+                link: `/users/${data[0]}/shares`
             }
         ];
 
         const columns = [
-            { data: 0, title: "#" },
             { data: 1, title: "Username" }
         ];
 

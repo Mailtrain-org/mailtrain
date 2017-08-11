@@ -44,3 +44,27 @@ h3.legend {
     font-size: 21px;
     margin-bottom: 20px;
 }
+
+.mt-secondary-nav {
+    margin-top: 5px;
+    margin-right: 5px;
+    text-align: right;
+}
+
+@media (max-width: 767px) {
+    .mt-secondary-nav {
+        margin: 0px;
+        background-color: #f5f5f5;
+        padding: 8px 5px;
+        border-radius: 4px;
+    }
+}
+
+.mt-secondary-nav > li {
+    display: inline-block;
+    float: none;
+}
+
+.mt-secondary-nav > li > a {
+    padding: 3px 10px;
+}

@@ -89,6 +89,7 @@ async function getById(context, id) {
     await knex.transaction(async tx => {
         shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
         entity = await _getById(tx, id);
+        entity.permissions = await shares.getPermissions(tx, context, 'customForm', id);
     });
 
     return entity;
@@ -146,7 +147,7 @@ async function updateWithConsistencyCheck(context, entity) {
         const existing = await _getById(tx, entity.id);
 
         const existingHash = hash(existing);
-        if (texistingHash !== entity.originalHash) {
+        if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 

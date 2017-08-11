@@ -94,12 +94,12 @@ export default class List extends Component {
                 if (mimeType === 'text/html') {
                     viewContent = {
                         label: <span className="glyphicon glyphicon-eye-open" aria-hidden="true" title="View"></span>,
-                        link: `reports/view/${id}`
+                        link: `/reports/${id}/view`
                     };
                 } else if (mimeType === 'text/csv') {
                     viewContent = {
                         label: <span className="glyphicon glyphicon-download-alt" aria-hidden="true" title="Download"></span>,
-                        href: `reports/download/${id}`
+                        href: `/reports/${id}/download`
                     };
                 }
 
@@ -127,7 +127,7 @@ export default class List extends Component {
                 actions.push(
                     {
                         label: <span className="glyphicon glyphicon-modal-window" aria-hidden="true" title="View console output"></span>,
-                        link: `reports/output/${id}`
+                        link: `/reports/${id}/output`
                     }
                 );
             }
@@ -139,14 +139,14 @@ export default class List extends Component {
             if (perms.includes('edit') && permsReportTemplate.includes('execute')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: `/reports/edit/${id}`
+                    link: `/reports/${id}/edit`
                 });
             }
 
             if (perms.includes('share')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: `/reports/share/${id}`
+                    link: `/reports/${id}/share`
                 });
             }
 
@@ -154,7 +154,6 @@ export default class List extends Component {
         };
 
         const columns = [
-            { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('Template') },
             { data: 3, title: t('Description') },

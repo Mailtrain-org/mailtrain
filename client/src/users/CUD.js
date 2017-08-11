@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 import { translate } from 'react-i18next';
 import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TableSelect } from '../lib/form';
-import axios from '../lib/axios';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
+import { withErrorHandling } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
 import mailtrainConfig from 'mailtrainConfig';
@@ -26,10 +25,6 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.id);
-        }
-
         this.initForm({
             serverValidation: {
                 url: '/rest/users-validate',
@@ -40,24 +35,16 @@ export default class CUD extends Component {
     }
 
     static propTypes = {
-        edit: PropTypes.bool
-    }
-
-    isDelete() {
-        return this.props.match.params.action === 'delete';
-    }
-
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/users/${this.state.entityId}`, data => {
-            data.password = '';
-            data.password2 = '';
-        });
+        action: PropTypes.string.isRequired,
+        entity: PropTypes.object
     }
 
     componentDidMount() {
-        if (this.props.edit) {
-            this.loadFormValues();
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity, data => {
+                data.password = '';
+                data.password2 = '';
+            });
         } else {
             this.populateFormValues({
                 username: '',
@@ -72,7 +59,7 @@ export default class CUD extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
         const username = state.getIn(['username', 'value']);
         const usernameServerValidation = state.getIn(['username', 'serverValidation']);
@@ -121,7 +108,7 @@ export default class CUD extends Component {
 
             let passwordMsgs = [];
 
-            if (!edit && !password) {
+            if (!isEdit && !password) {
                 passwordMsgs.push(t('Password must not be empty'));
             }
 
@@ -142,12 +129,11 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/users/${this.state.entityId}`
+            url = `/rest/users/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/rest/users'
@@ -192,30 +178,9 @@ export default class CUD extends Component {
         }
     }
 
-    async showDeleteModal() {
-        this.navigateTo(`/users/edit/${this.state.entityId}/delete`);
-    }
-
-    async hideDeleteModal() {
-        this.navigateTo(`/users/edit/${this.state.entityId}`);
-    }
-
-    async performDelete() {
-        const t = this.props.t;
-
-        await this.hideDeleteModal();
-
-        this.disableForm();
-        this.setFormStatusMessage('info', t('Deleting user...'));
-
-        await axios.delete(`/rest/users/${this.state.entityId}`);
-
-        this.navigateToWithFlashMessage('/users', 'success', t('User deleted'));
-    }
-
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
         const userId = this.getFormValue('id');
         const canDelete = userId !== 1 && mailtrainConfig.userId !== userId;
 
@@ -227,18 +192,18 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {edit && canDelete &&
+                {isEdit && canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/users/${this.state.entityId}`}
-                        cudUrl={`/users/edit/${this.state.entityId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/users/${this.props.entity.id}`}
+                        cudUrl={`/users/${this.props.entity.id}/edit`}
                         listUrl="/users"
                         deletingMsg={t('Deleting user ...')}
                         deletedMsg={t('User deleted')}/>
                 }
 
-                <Title>{edit ? t('Edit User') : t('Create User')}</Title>
+                <Title>{isEdit ? t('Edit User') : t('Create User')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="username" label={t('User Name')}/>
@@ -255,7 +220,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete User')} linkTo={`/users/edit/${this.state.entityId}/delete`}/>}
+                        {isEdit && canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete User')} linkTo={`/users/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

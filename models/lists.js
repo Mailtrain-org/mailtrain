@@ -31,12 +31,19 @@ async function listDTAjax(context, params) {
 }
 
 async function getById(context, id) {
-    shares.enforceEntityPermission(context, 'list', id, 'view');
+    let entity;
 
-    const entity = await knex('lists').where('id', id).first();
-    if (!entity) {
-        throw new interoperableErrors.NotFoundError();
-    }
+    await knex.transaction(async tx => {
+
+        shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
+
+        entity = await tx('lists').where('id', id).first();
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        entity.permissions = await shares.getPermissions(tx, context, 'list', id);
+    });
 
     return entity;
 }
@@ -73,7 +80,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         const existingHash = hash(existing);
-        if (texistingHash !== entity.originalHash) {
+        if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 

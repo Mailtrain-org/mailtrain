@@ -20,32 +20,21 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.id);
-        }
-
         this.initForm();
     }
 
     static propTypes = {
-        edit: PropTypes.bool
-    }
-
-    isDelete() {
-        return this.props.match.params.action === 'delete';
-    }
-
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/report-templates/${this.state.entityId}`);
+        action: PropTypes.string.isRequired,
+        wizard: PropTypes.string,
+        entity: PropTypes.object
     }
 
     componentDidMount() {
-        if (this.props.edit) {
-            this.loadFormValues();
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
-            const wizard = this.props.match.params.wizard;
+            const wizard = this.props.wizard;
 
             if (wizard === 'subscribers-all') {
                 this.populateFormValues({
@@ -209,7 +198,6 @@ export default class CUD extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
@@ -245,12 +233,11 @@ export default class CUD extends Component {
 
     async doSubmit(stay) {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/report-templates/${this.state.entityId}`
+            url = `/rest/report-templates/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/rest/report-templates'
@@ -277,22 +264,22 @@ export default class CUD extends Component {
 
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
         return (
             <div>
-                {edit &&
+                {isEdit &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/reports/templates/${this.state.entityId}`}
-                        cudUrl={`/reports/templates/edit/${this.state.entityId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/reports/templates/${this.props.entity.id}`}
+                        cudUrl={`/reports/templates/${this.props.entity.id}/edit`}
                         listUrl="/reports/templates"
                         deletingMsg={t('Deleting report template ...')}
                         deletedMsg={t('Report template deleted')}/>
                 }
 
-                <Title>{edit ? t('Edit Report Template') : t('Create Report Template')}</Title>
+                <Title>{isEdit ? t('Edit Report Template') : t('Create Report Template')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     <InputField id="name" label={t('Name')}/>
@@ -303,11 +290,11 @@ export default class CUD extends Component {
                     <ACEEditor id="js" height="700px" mode="javascript" label={t('Data processing code')} help={<Trans>Write the body of the JavaScript function with signature <code>function(inputs, callback)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
                     <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('Rendering template')} help={<Trans>Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>
 
-                    {edit ?
+                    {isEdit ?
                         <ButtonRow>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
-                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/templates/edit/${this.state.entityId}/delete`}/>
+                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
                         </ButtonRow>
                     :
                         <ButtonRow>

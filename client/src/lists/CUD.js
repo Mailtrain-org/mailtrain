@@ -8,7 +8,7 @@ import {
     withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, ButtonRow, Button,
     Dropdown, StaticField, CheckBox
 } from '../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
+import { withErrorHandling } from '../lib/error-handling';
 import { DeleteModalDialog } from '../lib/delete';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import { UnsubscriptionMode } from '../../../shared/lists';
@@ -24,27 +24,19 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.id);
-        }
-
         this.initForm();
     }
 
     static propTypes = {
-        edit: PropTypes.bool
+        action: PropTypes.string.isRequired,
+        entity: PropTypes.object
     }
-
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/lists/${this.state.entityId}`, data => {
-            data.form = data.default_form ? 'custom' : 'default';
-        });
-    }
-
+    
     componentDidMount() {
-        if (this.props.edit) {
-            this.loadFormValues();
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity, data => {
+                data.form = data.default_form ? 'custom' : 'default';
+            });
         } else {
             this.populateFormValues({
                 name: '',
@@ -60,7 +52,6 @@ export default class CUD extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
@@ -79,12 +70,11 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/lists/${this.state.entityId}`
+            url = `/rest/lists/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/rest/lists'
@@ -110,7 +100,7 @@ export default class CUD extends Component {
 
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
         const unsubcriptionModeOptions = [
             {
@@ -144,7 +134,7 @@ export default class CUD extends Component {
                 key: 'custom',
                 label: t('Custom Forms (select form below)')
             }
-        ]
+        ];
 
         const customFormsColumns = [
             {data: 0, title: "#"},
@@ -155,23 +145,23 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {edit &&
+                {isEdit &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/rest/lists/${this.state.entityId}`}
-                        cudUrl={`/lists/edit/${this.state.entityId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/rest/lists/${this.props.entity.id}`}
+                        cudUrl={`/lists/${this.props.entity.id}/edit`}
                         listUrl="/lists"
                         deletingMsg={t('Deleting list ...')}
                         deletedMsg={t('List deleted')}/>
                 }
 
-                <Title>{edit ? t('Edit List') : t('Create List')}</Title>
+                <Title>{isEdit ? t('Edit List') : t('Create List')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
 
-                    {edit &&
+                    {isEdit &&
                         <StaticField id="cid" label="List ID" help={t('This is the list ID displayed to the subscribers')}>
                             {this.getFormValue('cid')}
                         </StaticField>
@@ -184,7 +174,7 @@ export default class CUD extends Component {
                     <Dropdown id="form" label={t('Forms')} options={formsOptions} help={t('Web and email forms and templates used in subscription management process.')}/>
 
                     {this.getFormValue('form') === 'custom' &&
-                        <TableSelect id="default_form" label={t('Custom Forms')} withHeader dropdown dataUrl='/rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans>The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.state.entityId}`}>here</a>.</Trans>}/>
+                        <TableSelect id="default_form" label={t('Custom Forms')} withHeader dropdown dataUrl='/rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans>The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.props.entity.id}`}>here</a>.</Trans>}/>
                     }
 
                     <CheckBox id="public_subscribe" label={t('Subscription')} text={t('Allow public users to subscribe themselves')}/>
@@ -194,7 +184,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/edit/${this.state.entityId}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

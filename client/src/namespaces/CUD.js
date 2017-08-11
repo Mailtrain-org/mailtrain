@@ -21,21 +21,17 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.id);
-        }
-
         this.initForm();
         this.hasChildren = false;
-
     }
 
     static propTypes = {
-        edit: PropTypes.bool
+        action: PropTypes.string.isRequired,
+        entity: PropTypes.object
     }
 
     isEditGlobal() {
-        return this.state.entityId === 1; /* Global namespace id */
+        return this.props.entity && this.props.entity.id === 1; /* Global namespace id */
     }
 
     isDelete() {
@@ -46,7 +42,7 @@ export default class CUD extends Component {
         for (let idx = 0; idx < data.length; idx++) {
             const entry = data[idx];
 
-            if (entry.key === this.state.entityId) {
+            if (entry.key === this.props.entity.id) {
                 if (entry.children.length > 0) {
                     this.hasChildren = true;
                 }
@@ -71,7 +67,7 @@ export default class CUD extends Component {
                     root.expanded = true;
                 }
 
-                if (this.props.edit && !this.isEditGlobal()) {
+                if (this.props.entity && !this.isEditGlobal()) {
                     this.removeNsIdSubtree(data);
                 }
 
@@ -81,14 +77,9 @@ export default class CUD extends Component {
             });
     }
 
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/namespaces/${this.state.entityId}`);
-    }
-
     componentDidMount() {
-        if (this.props.edit) {
-            this.loadFormValues();
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity);
         } else {
             this.populateFormValues({
                 name: '',
@@ -122,12 +113,11 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/namespaces/${this.state.entityId}`
+            url = `/rest/namespaces/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/rest/namespaces'
@@ -188,23 +178,23 @@ export default class CUD extends Component {
 
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
         return (
             <div>
-                {!this.isEditGlobal() && !this.hasChildren && edit &&
+                {!this.isEditGlobal() && !this.hasChildren && isEdit &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/rest/namespaces/${this.state.entityId}`}
-                        cudUrl={`/namespaces/edit/${this.state.entityId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/rest/namespaces/${this.props.entity.id}`}
+                        cudUrl={`/namespaces/${this.props.entity.id}/edit`}
                         listUrl="/namespaces"
                         deletingMsg={t('Deleting namespace ...')}
                         deletedMsg={t('Namespace deleted')}
                         onErrorAsync={::this.onDeleteError}/>
                 }
 
-                <Title>{edit ? t('Edit Namespace') : t('Create Namespace')}</Title>
+                <Title>{isEdit ? t('Edit Namespace') : t('Create Namespace')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
@@ -215,7 +205,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {!this.isEditGlobal() && !this.hasChildren && edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/namespaces/edit/${this.state.entityId}/delete`}/>}
+                        {!this.isEditGlobal() && !this.hasChildren && isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/namespaces/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

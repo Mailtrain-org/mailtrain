@@ -31,14 +31,14 @@ const getStructure = t => {
     if (mailtrainConfig.isAuthMethodLocal) {
         subPaths.forgot = {
             title: t('Password reset'),
-                params: [':username?'],
+                extraParams: [':username?'],
                 link: '/account/forgot',
                 component: Reset
         };
 
         subPaths.reset = {
             title: t('Password reset'),
-                params: [':username', ':resetToken'],
+                extraParams: [':username', ':resetToken'],
                 link: '/account/reset',
                 component: ResetLink
         };

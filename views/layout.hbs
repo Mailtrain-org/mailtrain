@@ -53,7 +53,7 @@
 <body class="{{bodyClass}}">
 
     <nav class="navbar navbar-default navbar-static-top">
-        <div class="container">
+        <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -155,7 +155,7 @@
 
     {{#if indexPage}}
         <div class="jumbotron">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="pull-right col-md-4">
                     {{{shoutout}}}
                 </div>
@@ -173,14 +173,14 @@
         </div>
     {{/if}}
 
-    <div class="container">
+    <div class="container-fluid">
 
         {{flash_messages}} {{{body}}}
 
     </div>
 
     <footer class="footer">
-        <div class="container">
+        <div class="container-fluid">
             <p class="text-muted">&copy; 2016 Kreata OÜ <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{{#translate}}Source on GitHub{{/translate}}</a></p>
         </div>
     </footer>

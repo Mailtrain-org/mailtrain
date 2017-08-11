@@ -518,6 +518,17 @@ async function enforceTypePermissionTx(tx, context, entityTypeId, requiredOperat
     }
 }
 
+async function getPermissions(tx, context, entityTypeId, entityId) {
+    const entityType = permissions.getEntityType(entityTypeId);
+
+    const rows = await tx(entityType.permissionsTable)
+        .select('operation')
+        .where('entity', entityId)
+        .where('user', context.user.id);
+
+    return rows.map(x => x.operation);
+}
+
 
 module.exports = {
     listByEntityDTAjax,
@@ -535,5 +546,6 @@ module.exports = {
     checkTypePermission,
     enforceGlobalPermission,
     throwPermissionDenied,
-    regenerateRoleNamesTable
+    regenerateRoleNamesTable,
+    getPermissions
 };

@@ -28,79 +28,86 @@ const getStructure = t => {
                     link: '/lists',
                     component: ListsList,
                     children: {
-/* FIXME
-                        ':listId': {
+                        ':listId([0-9]+)': {
                             title: resolved => t('List "{{name}}"', {name: resolved.list.name}),
                             resolve: {
-                                list: match => `/rest/lists/${match.params.listId}`
+                                list: params => `/rest/lists/${params.listId}`
                             },
-                            actions: {
-                                edit: {
+                            link: params => `/lists/${params.listId}/edit`,
+                            navs: {
+                                ':action(edit|delete)': {
                                     title: t('Edit'),
-                                    params: [':action?'],
-                                    render: props => (<ListsCUD edit entity={resolved.list} {...props} />)
+                                    link: params => `/lists/${params.listId}/edit`,
+                                    visible: resolved => resolved.list.permissions.includes('edit'),
+                                    render: props => <ListsCUD action={props.match.params.action} entity={props.resolved.list} />
                                 },
-                                create: {
-                                    title: t('Create'),
-                                    render: props => (<ListsCUD entity={resolved.list} {...props} />)
+                                fields: {
+                                    title: t('Fields'),
+                                    link: params => `/lists/${params.listId}/fields/`,
+                                    visible: resolved => resolved.list.permissions.includes('manageFields'),
+                                    component: FieldsList,
+                                    children: {
+                                        ':fieldId([0-9]+)': {
+                                            title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
+                                            resolve: {
+                                                field: params => `/rest/fields/${params.listId}/${params.fieldId}`
+                                            },
+                                            link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
+                                            navs: {
+                                                ':action(edit|delete)': {
+                                                    title: t('Edit'),
+                                                    link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
+                                                    render: props => <FieldsCUD action={props.match.params.action} entity={props.resolved.field} list={props.resolved.list} />
+                                                }
+                                            }
+                                        },
+                                        create: {
+                                            title: t('Create Field'),
+                                            render: props => <FieldsCUD action="create" list={props.resolved.list} />
+                                        }
+                                    }
                                 },
                                 share: {
                                     title: t('Share'),
-                                    render: props => (<Share title={t('Share')} entity={resolved.list} entityTypeId="list" {...props} />)
+                                    link: params => `/lists/${params.listId}/share`,
+                                    visible: resolved => resolved.list.permissions.includes('share'),
+                                    render: props => <Share title={t('Share')} entity={props.resolved.list} entityTypeId="list" />
                                 }
                             }
                         },
-*/
-                        edit: {
-                            title: t('Edit List'),
-                            params: [':id', ':action?'],
-                            render: props => (<ListsCUD edit {...props} />)
-                        },
                         create: {
-                            title: t('Create List'),
-                            render: props => (<ListsCUD {...props} />)
-                        },
-                        share: {
-                            title: t('Share List'),
-                            params: [':id'],
-                            render: props => (<Share title={entity => t('Share List "{{name}}"', {name: entity.name})} getUrl={id => `/rest/lists/${id}`} entityTypeId="list" {...props} />)
-                        },
-                        fields: {
-                            title: t('Fields'),
-                            params: [':listId'],
-                            link: match => `/lists/fields/${match.params.listId}`,
-                            component: FieldsList,
-                            children: {
-                                 edit: {
-                                     title: t('Edit Field'),
-                                     params: [':listId', ':fieldId', ':action?'],
-                                     render: props => (<FieldsCUD edit {...props} />)
-                                 },
-                                 create: {
-                                     title: t('Create Field'),
-                                     params: [':listId'],
-                                     render: props => (<FieldsCUD {...props} />)
-                                 },
-                            }
+                            title: t('Create'),
+                            render: props => <ListsCUD action="create" />
                         },
                         forms: {
                             title: t('Custom Forms'),
                             link: '/lists/forms',
                             component: FormsList,
                             children: {
-                                edit: {
-                                    title: t('Edit Custom Forms'),
-                                    params: [':id', ':action?'],
-                                    render: props => (<FormsCUD edit {...props} />)
+                                ':formsId([0-9]+)': {
+                                    title: resolved => t('Custom Forms "{{name}}"', {name: resolved.forms.name}),
+                                    resolve: {
+                                        forms: params => `/rest/forms/${params.formsId}`
+                                    },
+                                    link: params => `/lists/forms/${params.formsId}/edit`,
+                                    navs: {
+                                        ':action(edit|delete)': {
+                                            title: t('Edit'),
+                                            link: params => `/lists/forms/${params.formsId}/edit`,
+                                            visible: resolved => resolved.forms.permissions.includes('edit'),
+                                            render: props => <FormsCUD action={props.match.params.action} entity={props.resolved.forms} />
+                                        },
+                                        share: {
+                                            title: t('Share'),
+                                            link: params => `/lists/forms/${params.formsId}/share`,
+                                            visible: resolved => resolved.forms.permissions.includes('share'),
+                                            render: props => <Share title={t('Share')} entity={props.resolved.forms} entityTypeId="customForm" />
+                                        }
+                                    }
                                 },
                                 create: {
-                                    title: t('Create Custom Forms'),
-                                    render: props => (<FormsCUD {...props} />)
-                                },
-                                share: {
-                                    title: t('Share Custom Forms'),
-                                    params: [':id'],
-                                    render: props => (<Share title={entity => t('Custom Forms "{{name}}"', {name: entity.name})} getUrl={id => `/rest/forms/${id}`} entityTypeId="customForm" {...props} />)
+                                    title: t('Create'),
+                                    render: props => <FormsCUD action="create" />
                                 }
                             }
                         }

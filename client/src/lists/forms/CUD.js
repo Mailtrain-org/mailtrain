@@ -24,10 +24,6 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.id);
-        }
-
         this.serverValidatedFields = [
             'layout',
             'web_subscribe',
@@ -241,11 +237,12 @@ export default class CUD extends Component {
     }
 
     static propTypes = {
-        edit: PropTypes.bool
+        action: PropTypes.string.isRequired,
+        entity: PropTypes.object
     }
 
-    @withAsyncErrorHandler
-    async loadOrPopulateFormValues() {
+
+    componentDidMount() {
         function supplyDefaults(data) {
             for (const key in mailtrainConfig.defaultCustomFormValues) {
                 if (!data[key]) {
@@ -254,11 +251,12 @@ export default class CUD extends Component {
             }
         }
 
-        if (this.props.edit) {
-            await this.getFormValuesFromURL(`/rest/forms/${this.state.entityId}`, data => {
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity, data => {
                 data.selectedTemplate = 'layout';
                 supplyDefaults(data);
             });
+
         } else {
             const data = {
                 name: '',
@@ -272,13 +270,8 @@ export default class CUD extends Component {
         }
     }
 
-    componentDidMount() {
-        this.loadOrPopulateFormValues();
-    }
-
     localValidateFormValues(state) {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
@@ -319,12 +312,11 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/forms/${this.state.entityId}`
+            url = `/rest/forms/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/rest/forms'
@@ -348,7 +340,7 @@ export default class CUD extends Component {
 
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
         const templateOptGroups = [];
 
@@ -377,18 +369,18 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {edit &&
+                {isEdit &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/rest/forms/${this.state.entityId}`}
-                        cudUrl={`/lists/forms/edit/${this.state.entityId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/rest/forms/${this.props.entity.id}`}
+                        cudUrl={`/lists/forms/${this.props.entity.id}/edit`}
                         listUrl="/lists/forms"
                         deletingMsg={t('Deleting form ...')}
                         deletedMsg={t('Form deleted')}/>
                 }
 
-                <Title>{edit ? t('Edit Custom Forms') : t('Create Custom Forms')}</Title>
+                <Title>{isEdit ? t('Edit Custom Forms') : t('Create Custom Forms')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
@@ -441,7 +433,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/forms/edit/${this.state.entityId}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

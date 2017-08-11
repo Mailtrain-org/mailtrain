@@ -4,120 +4,235 @@ import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
+import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
 import './page.css';
-import { withErrorHandling } from './error-handling';
+import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import { DismissibleAlert, Button } from './bootstrap-components';
 import mailtrainConfig from 'mailtrainConfig';
+import axios from '../lib/axios';
 
 
-class PageContent extends Component {
-    static propTypes = {
-        structure: PropTypes.object.isRequired
-    }
-
-    getRoutes(urlPrefix, children) {
-        let routes = [];
-        for (let routeKey in children) {
-            const structure = children[routeKey];
-
-            let path = urlPrefix + routeKey;
-            let pathWithParams = path;
-
-            if (structure.params) {
-                pathWithParams = pathWithParams + '/' + structure.params.join('/');
-            }
-
-            if (structure.component || structure.render) {
-                const route = {
-                    component: structure.component,
-                    render: structure.render,
-                    path: (pathWithParams === '' ? '/' : pathWithParams)
-                };
-
-                routes.push(route);
-            }
-
-            if (structure.children) {
-                routes = routes.concat(this.getRoutes(path + '/', structure.children));
-            }
-        }
-
-        return routes;
-    }
-
-    renderRoute(route) {
-        if (route.component) {
-            return <Route key={route.path} exact path={route.path} component={route.component} />;
-        } else if (route.render) {
-            return <Route key={route.path} exact path={route.path} render={route.render} />;
-        }
-    }
-
-    render() {
-        let routes = this.getRoutes('', this.props.structure);
-        return <Switch>{routes.map(x => this.renderRoute(x))}</Switch>;
-    }
-}
-
-@withRouter
 class Breadcrumb extends Component {
     static propTypes = {
-        structure: PropTypes.object.isRequired
+        route: PropTypes.object.isRequired,
+        params: PropTypes.object.isRequired,
+        resolved: PropTypes.object.isRequired
     }
 
-    renderElement(breadcrumbElem) {
-        if (breadcrumbElem.isActive) {
-            return <li key={breadcrumbElem.idx} className="active">{breadcrumbElem.title}</li>;
+    renderElement(entry, isActive) {
+        const params = this.props.params;
+        let title;
+        if (typeof entry.title === 'function') {
+            title = entry.title(this.props.resolved);
+        } else {
+            title = entry.title;
+        }
 
-        } else if (breadcrumbElem.externalLink) {
-            return <li key={breadcrumbElem.idx}><a href={breadcrumbElem.externalLink}>{breadcrumbElem.title}</a></li>;
+        if (isActive) {
+            return <li key={entry.path} className="active">{title}</li>;
 
-        } else if (breadcrumbElem.link) {
-            let link;
-            if (typeof breadcrumbElem.link === 'function') {
-                link = breadcrumbElem.link(this.props.match);
+        } else if (entry.externalLink) {
+            let externalLink;
+            if (typeof entry.externalLink === 'function') {
+                externalLink = entry.externalLink(params);
             } else {
-                link = breadcrumbElem.link;
+                externalLink = entry.externalLink;
             }
-            return <li key={breadcrumbElem.idx}><Link to={link}>{breadcrumbElem.title}</Link></li>;
+
+            return <li key={entry.path}><a href={externalLink}>{title}</a></li>;
+
+        } else if (entry.link) {
+            let link;
+            if (typeof entry.link === 'function') {
+                link = entry.link(params);
+            } else {
+                link = entry.link;
+            }
+            return <li key={entry.path}><Link to={link}>{title}</Link></li>;
 
         } else {
-            return <li key={breadcrumbElem.idx}>{breadcrumbElem.title}</li>;
+            return <li key={entry.path}>{title}</li>;
         }
     }
 
     render() {
-        const location = this.props.location.pathname;
-        const locationElems = location.split('/');
+        const route = this.props.route;
 
-        let breadcrumbElems = [];
-        let children = this.props.structure;
-
-        for (let idx = 0; idx < locationElems.length; idx++) {
-            const breadcrumbElem = children[locationElems[idx]];
-            if (!breadcrumbElem) {
-                break;
-            }
-
-            breadcrumbElem.isActive = (idx === locationElems.length - 1);
-            breadcrumbElem.idx = idx;
-
-            breadcrumbElems.push(breadcrumbElem);
-            children = breadcrumbElem.children;
-
-            if (!children) {
-                break;
-            }
-        }
-
-        const renderedElems = breadcrumbElems.map(x => this.renderElement(x));
+        const renderedElems = [...route.parents.map(x => this.renderElement(x)), this.renderElement(route, true)];
 
         return <ol className="breadcrumb">{renderedElems}</ol>;
     }
 }
 
+class SecondaryNavBar extends Component {
+    static propTypes = {
+        route: PropTypes.object.isRequired,
+        params: PropTypes.object.isRequired,
+        resolved: PropTypes.object.isRequired,
+        className: PropTypes.string
+    }
+
+    renderElement(key, entry) {
+        const params = this.props.params;
+        let title;
+        if (typeof entry.title === 'function') {
+            title = entry.title(this.props.resolved);
+        } else {
+            title = entry.title;
+        }
+
+        let className = '';
+        if (entry.active) {
+            className += ' active';
+        }
+
+        if (entry.link) {
+            let link;
+
+            if (typeof entry.link === 'function') {
+                link = entry.link(params);
+            } else {
+                link = entry.link;
+            }
+
+            return <li key={key} role="presentation" className={className}><Link to={link}>{title}</Link></li>;
+
+        } else if (entry.externalLink) {
+            let externalLink;
+            if (typeof entry.externalLink === 'function') {
+                externalLink = entry.externalLink(params);
+            } else {
+                externalLink = entry.externalLink;
+            }
+
+            return <li key={key} role="presentation" className={className}><a href={externalLink}>{title}</a></li>;
+
+        } else {
+            return <li key={key} role="presentation" className={className}>{title}</li>;
+        }
+    }
+
+    render() {
+        const route = this.props.route;
+
+        const keys = Object.keys(route.navs);
+        const renderedElems = [];
+
+        for (const key in keys) {
+            const entry = route.navs[key];
+
+            let visible = true;
+            if (typeof entry.visible === 'function') {
+                visible = entry.visible(this.props.resolved);
+            }
+
+            if (visible) {
+                renderedElems.push(this.renderElement(key, entry));
+            }
+        }
+
+        let className = 'mt-secondary-nav nav nav-pills';
+        if (this.props.className) {
+            className += ' ' + this.props.className;
+        }
+
+        return <ul className={className}>{renderedElems}</ul>;
+    }
+}
+
+@translate()
+@withErrorHandling
+class RouteContent extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+
+        if (Object.keys(props.route.resolve).length === 0) {
+            this.state.resolved = {};
+        }
+    }
+
+    static propTypes = {
+        route: PropTypes.object.isRequired,
+        flashMessage: PropTypes.object
+    }
+
+    @withAsyncErrorHandler
+    async resolve() {
+        const route = this.props.route;
+
+        const keys = Object.keys(route.resolve);
+
+        if (keys.length > 0) {
+            const promises = keys.map(key => axios.get(route.resolve[key](this.props.match.params)));
+            const resolvedArr = await Promise.all(promises);
+
+            const resolved = {};
+            for (let idx = 0; idx < keys.length; idx++) {
+                resolved[keys[idx]] = resolvedArr[idx].data;
+            }
+
+            this.setState({
+                resolved
+            });
+        }
+    }
+
+    componentDidMount() {
+        this.resolve();
+    }
+
+    render() {
+        const t = this.props.t;
+        const route = this.props.route;
+        const params = this.props.match.params;
+        const resolved = this.state.resolved;
+
+        if (!route.render && !route.component && route.link) {
+            let link;
+            if (typeof route.link === 'function') {
+                link = route.link(params);
+            } else {
+                link = route.link;
+            }
+
+            return <Redirect to={link}/>;
+
+        } else {
+            if (resolved) {
+                const compProps = {
+                    match: this.props.match,
+                    location: this.props.location,
+                    resolved
+                };
+
+                let component;
+                if (route.render) {
+                    component = route.render(compProps);
+                } else if (route.component) {
+                    component = React.createElement(route.component, compProps, null);
+                }
+
+
+
+                return (
+                    <div>
+                        <div>
+                            <SecondaryNavBar className="hidden-xs pull-right" route={route} params={params} resolved={resolved}/>
+                            <Breadcrumb route={route} params={params} resolved={resolved}/>
+                            <SecondaryNavBar className="visible-xs" route={route} params={params} resolved={resolved}/>
+                        </div>
+                        {this.props.flashMessage}
+                        {component}
+                    </div>
+                );
+            } else {
+                return <div>{t('Loading...')}</div>;
+            }
+        }
+    }
+}
 
 
 @withRouter
@@ -229,13 +344,93 @@ class SectionContent extends Component {
         })
     }
 
+    getRoutes(urlPrefix, resolve, parents, structure, navs) {
+        let routes = [];
+        for (let routeKey in structure) {
+            const entry = structure[routeKey];
+
+            let path = urlPrefix + routeKey;
+            let pathWithParams = path;
+
+            if (entry.extraParams) {
+                pathWithParams = pathWithParams + '/' + entry.extraParams.join('/');
+            }
+
+            let entryResolve;
+            if (entry.resolve) {
+                entryResolve = Object.assign({}, resolve, entry.resolve);
+            } else {
+                entryResolve = resolve;
+            }
+
+            let navKeys;
+            const entryNavs = [];
+            if (entry.navs) {
+                navKeys = Object.keys(entry.navs);
+
+                for (const navKey of navKeys) {
+                    const nav = entry.navs[navKey];
+
+                    entryNavs.push({
+                        title: nav.title,
+                        visible: nav.visible,
+                        link: nav.link,
+                        externalLink: nav.externalLink
+                    });
+                }
+            }
+
+            const route = {
+                path: (pathWithParams === '' ? '/' : pathWithParams),
+                component: entry.component,
+                render: entry.render,
+                title: entry.title,
+                link: entry.link,
+                resolve: entryResolve,
+                parents,
+                navs: [...navs, ...entryNavs]
+            };
+
+            routes.push(route);
+
+            const childrenParents = [...parents, route];
+
+            if (entry.navs) {
+                for (let navKeyIdx = 0; navKeyIdx < navKeys.length; navKeyIdx++) {
+                    const navKey = navKeys[navKeyIdx];
+                    const nav = entry.navs[navKey];
+
+                    const childNavs = [...entryNavs];
+                    childNavs[navKeyIdx] = Object.assign({}, childNavs[navKeyIdx], { active: true });
+
+                    routes = routes.concat(this.getRoutes(path + '/', entryResolve, childrenParents, { [navKey]: nav }, childNavs));
+                }
+            }
+
+            if (entry.children) {
+                routes = routes.concat(this.getRoutes(path + '/', entryResolve, childrenParents, entry.children, entryNavs));
+            }
+        }
+
+        return routes;
+    }
+
+    renderRoute(route) {
+        let flashMessage;
+        if (this.state.flashMessageText) {
+            flashMessage = <DismissibleAlert severity={this.state.flashMessageSeverity} onCloseAsync={::this.closeFlashMessage}>{this.state.flashMessageText}</DismissibleAlert>;
+        }
+
+        const render = props => <RouteContent route={route} flashMessage={flashMessage} {...props}/>;
+
+        return <Route key={route.path} exact path={route.path} render={render} />
+    }
+
     render() {
+        let routes = this.getRoutes('', {}, [], this.props.structure, []);
+
         return (
-            <div>
-                <Breadcrumb structure={this.props.structure} />
-                {(this.state.flashMessageText && <DismissibleAlert severity={this.state.flashMessageSeverity} onCloseAsync={::this.closeFlashMessage}>{this.state.flashMessageText}</DismissibleAlert>)}
-                <PageContent structure={this.props.structure}/>
-            </div>
+            <Switch>{routes.map(x => this.renderRoute(x))}</Switch>
         );
     }
 }
@@ -280,9 +475,18 @@ class Title extends Component {
 }
 
 class Toolbar extends Component {
+    static propTypes = {
+        className: PropTypes.string,
+    };
+
     render() {
+        let className = 'pull-right mt-button-row';
+        if (this.props.className) {
+            className += ' ' + this.props.className;
+        }
+
         return (
-            <div className="pull-right mt-button-row">
+            <div className={className}>
                 {this.props.children}
             </div>
         );

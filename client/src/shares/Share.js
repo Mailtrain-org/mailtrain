@@ -21,32 +21,20 @@ export default class Share extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            entityId: parseInt(props.match.params.id)
-        };
-
         this.initForm();
     }
 
     static propTypes = {
-        title: PropTypes.func,
-        getUrl: PropTypes.func,
+        title: PropTypes.string,
+        entity: PropTypes.object,
         entityTypeId: PropTypes.string
-    }
-
-    @withAsyncErrorHandler
-    async loadEntity() {
-        const response = await axios.get(this.props.getUrl(this.state.entityId));
-        this.setState({
-            entity: response.data
-        });
     }
 
     @withAsyncErrorHandler
     async deleteShare(userId) {
         const data = {
             entityTypeId: this.props.entityTypeId,
-            entityId: this.state.entityId,
+            entityId: this.props.entity.id,
             userId
         };
 
@@ -58,14 +46,13 @@ export default class Share extends Component {
     clearShareFields() {
         this.populateFormValues({
             entityTypeId: this.props.entityTypeId,
-            entityId: this.state.entityId,
+            entityId: this.props.entity.id,
             userId: null,
             role: null
         });
     }
 
     componentDidMount() {
-        this.loadEntity();
         this.clearShareFields();
     }
 
@@ -151,29 +138,25 @@ export default class Share extends Component {
         ];
 
 
-        if (this.state.entity) {
-            return (
-                <div>
-                    <Title>{this.props.title(this.state.entity)}</Title>
+        return (
+            <div>
+                <Title>{this.props.title}</Title>
 
-                    <h3 className="legend">{t('Add User')}</h3>
-                    <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                        <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('User')} withHeader dropdown dataUrl={`/rest/shares-unassigned-users-table/${this.props.entityTypeId}/${this.state.entityId}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
-                        <TableSelect id="role" label={t('Role')} withHeader dropdown dataUrl={`/rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
+                <h3 className="legend">{t('Add User')}</h3>
+                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
+                    <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('User')} withHeader dropdown dataUrl={`/rest/shares-unassigned-users-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
+                    <TableSelect id="role" label={t('Role')} withHeader dropdown dataUrl={`/rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
 
-                        <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Share')}/>
-                        </ButtonRow>
-                    </Form>
+                    <ButtonRow>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('Share')}/>
+                    </ButtonRow>
+                </Form>
 
-                    <hr/>
-                    <h3 className="legend">{t('Existing Users')}</h3>
+                <hr/>
+                <h3 className="legend">{t('Existing Users')}</h3>
 
-                    <Table ref={node => this.sharesTable = node} withHeader dataUrl={`/rest/shares-table-by-entity/${this.props.entityTypeId}/${this.state.entityId}`} columns={sharesColumns} actions={actions}/>
-                </div>
-            );
-        } else {
-            return (<p>{t('Loading ...')}</p>)
-        }
+                <Table ref={node => this.sharesTable = node} withHeader dataUrl={`/rest/shares-table-by-entity/${this.props.entityTypeId}/${this.props.entity.id}`} columns={sharesColumns} actions={actions}/>
+            </div>
+        );
     }
 }

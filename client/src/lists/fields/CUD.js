@@ -26,17 +26,11 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        this.state.listId = parseInt(props.match.params.listId);
-
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.fieldId);
-        }
-
         this.fieldTypes = getFieldTypes(props.t);
 
         this.initForm({
             serverValidation: {
-                url: `/rest/fields-validate/${this.state.listId}`,
+                url: `/rest/fields-validate/${this.props.list.id}`,
                 changed: ['key'],
                 extra: ['id']
             }
@@ -44,28 +38,21 @@ export default class CUD extends Component {
     }
 
     static propTypes = {
-        edit: PropTypes.bool
-    }
-
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/fields/${this.state.listId}/${this.state.entityId}`, data => {
-            if (data.default_value === null) {
-                data.default_value = '';
-            }
-        });
+        action: PropTypes.string.isRequired,
+        list: PropTypes.object,
+        entity: PropTypes.object
     }
 
     @withAsyncErrorHandler
     async loadOrderOptions() {
         const t = this.props.t;
 
-        const flds = await axios.get(`/rest/fields/${this.state.listId}`);
+        const flds = await axios.get(`/rest/fields/${this.props.list.id}`);
 
         const getOrderOptions = fld => {
             return [
                 {key: 'none', label: t('Not visible')},
-                ...flds.data.filter(x => x.id !== this.state.entityId && x[fld] !== null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id, label: `${x.name} (${this.fieldTypes[x.type].label})`})),
+                ...flds.data.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id, label: `${x.name} (${this.fieldTypes[x.type].label})`})),
                 {key: 'end', label: t('End of list')}
             ];
         };
@@ -78,8 +65,13 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
-        if (this.props.edit) {
-            this.loadFormValues();
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity, data => {
+                if (data.default_value === null) {
+                    data.default_value = '';
+                }
+            });
+
         } else {
             this.populateFormValues({
                 name: '',
@@ -101,7 +93,6 @@ export default class CUD extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
@@ -123,15 +114,14 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/fields/${this.state.listId}/${this.state.entityId}`
+            url = `/rest/fields/${this.props.list.id}/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = `/rest/fields/${this.state.listId}`
+            url = `/rest/fields/${this.props.list.id}`
         }
 
         try {
@@ -145,7 +135,7 @@ export default class CUD extends Component {
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/rest/fields/${this.state.listId}`, 'success', t('Field saved'));
+                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field saved'));
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
@@ -167,7 +157,7 @@ export default class CUD extends Component {
 
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
 /*
         const orderColumns = [
@@ -183,18 +173,18 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {edit &&
+                {isEdit &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/rest/fields/${this.state.listId}/${this.state.entityId}`}
-                        cudUrl={`/lists/fields/edit/${this.state.listId}/${this.state.entityId}`}
-                        listUrl={`/lists/fields/${this.state.listId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/rest/fields/${this.props.list.id}/${this.props.entity.id}`}
+                        cudUrl={`/lists/fields/${this.props.list.id}/${this.props.entity.id}/edit`}
+                        listUrl={`/lists/fields/${this.props.list.id}`}
                         deletingMsg={t('Deleting field ...')}
                         deletedMsg={t('Field deleted')}/>
                 }
 
-                <Title>{edit ? t('Edit Field') : t('Create Field')}</Title>
+                <Title>{isEdit ? t('Edit Field') : t('Create Field')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
@@ -215,7 +205,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/fields/edit/${this.state.listId}/${this.state.entityId}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/fields/${this.props.list.id}/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

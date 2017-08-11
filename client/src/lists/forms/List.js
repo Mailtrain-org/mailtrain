@@ -48,13 +48,13 @@ export default class List extends Component {
             if (perms.includes('edit')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: '/lists/forms/edit/' + data[0]
+                    link: `/lists/forms/${data[0]}/edit`
                 });
             }
             if (perms.includes('share')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: '/lists/forms/share/' + data[0]
+                    link: `/lists/forms/${data[0]}/share`
                 });
             }
 
@@ -62,7 +62,6 @@ export default class List extends Component {
         };
 
         const columns = [
-            { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
             { data: 3, title: t('Namespace') }

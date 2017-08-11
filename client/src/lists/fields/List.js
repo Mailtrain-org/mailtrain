@@ -29,7 +29,7 @@ export default class List extends Component {
 
         const actions = data => [{
             label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-            link: `/lists/fields/edit/${this.state.listId}/${data[0]}`
+            link: `/lists/${this.state.listId}/fields/${data[0]}/edit`
         }];
 
         const columns = [
@@ -42,7 +42,7 @@ export default class List extends Component {
         return (
             <div>
                 <Toolbar>
-                    <NavButton linkTo={`/lists/fields/${this.state.listId}/create`} className="btn-primary" icon="plus" label={t('Create Field')}/>
+                    <NavButton linkTo={`/lists/${this.state.listId}/fields/create`} className="btn-primary" icon="plus" label={t('Create Field')}/>
                 </Toolbar>
 
                 <Title>{t('Fields')}</Title>

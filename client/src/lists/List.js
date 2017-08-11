@@ -48,21 +48,21 @@ export default class List extends Component {
             if (perms.includes('edit')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: '/lists/edit/' + data[0]
-                });
-            }
-
-            if (perms.includes('share')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: '/lists/share/' + data[0]
+                    link: `/lists/${data[0]}/edit`
                 });
             }
 
             if (perms.includes('manageFields')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-th-list" aria-hidden="true" title="Manage Fields"></span>,
-                    link: '/lists/fields/' + data[0]
+                    link: `/lists/${data[0]}/fields`
+                });
+            }
+
+            if (perms.includes('share')) {
+                actions.push({
+                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                    link: `/lists/${data[0]}/share`
                 });
             }
 
@@ -70,7 +70,6 @@ export default class List extends Component {
         };
 
         const columns = [
-            { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('ID'), render: data => `<code>${data}</code>` },
             { data: 3, title: t('Subscribers') },

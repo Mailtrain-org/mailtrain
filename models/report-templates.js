@@ -15,12 +15,19 @@ function hash(entity) {
 }
 
 async function getById(context, id) {
-    await shares.enforceEntityPermission(context, 'reportTemplate', id, 'view');
+    let entity;
 
-    const entity = await knex('report_templates').where('id', id).first();
-    if (!entity) {
-        throw new interoperableErrors.NotFoundError();
-    }
+    await knex.transaction(async tx => {
+
+        await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', id, 'view');
+
+        entity = await tx('report_templates').where('id', id).first();
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        entity.permissions = await shares.getPermissions(tx, context, 'reportTemplate', id);
+    });
 
     return entity;
 }
@@ -60,7 +67,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         const existingHash = hash(existing);
-        if (texistingHash !== entity.originalHash) {
+        if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 

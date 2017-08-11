@@ -9,7 +9,7 @@ const contextHelpers = require('../lib/context-helpers');
 
 const router = require('../lib/router-async').create();
 
-router.getAsync('/download/:id', passport.loggedIn, async (req, res) => {
+router.getAsync('/:id/download', passport.loggedIn, async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
 
     const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);

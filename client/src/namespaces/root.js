@@ -20,20 +20,31 @@ const getStructure = t => ({
                 link: '/namespaces',
                 component: List,
                 children: {
-                    edit : {
-                        title: t('Edit Namespace'),
-                        params: [':id', ':action?'],
-                        render: props => (<CUD edit {...props} />)
+                    ':namespaceId([0-9]+)': {
+                        title: resolved => t('Namespace "{{name}}"', {name: resolved.namespace.name}),
+                        resolve: {
+                            namespace: params => `/rest/namespaces/${params.namespaceId}`
+                        },
+                        link: params => `/namespaces/${params.namespaceId}/edit`,
+                        navs: {
+                            ':action(edit|delete)': {
+                                title: t('Edit'),
+                                link: params => `/namespaces/${params.namespaceId}/edit`,
+                                visible: resolved => resolved.namespace.permissions.includes('edit'),
+                                render: props => <CUD action={props.match.params.action} entity={props.resolved.namespace} />
+                            },
+                            share: {
+                                title: t('Share'),
+                                link: params => `/namespaces/${params.namespaceId}/share`,
+                                visible: resolved => resolved.namespace.permissions.includes('share'),
+                                render: props => <Share title={t('Share')} entity={props.resolved.namespace} entityTypeId="namespace" />
+                            }
+                        }
                     },
-                    create : {
-                        title: t('Create Namespace'),
-                        render: props => (<CUD {...props} />)
+                    create: {
+                        title: t('Create'),
+                        render: props => <CUD action="create" />
                     },
-                    share: {
-                        title: t('Share Namespace'),
-                        params: [':id'],
-                        render: props => (<Share title={entity => t('Share Namespace "{{name}}"', {name: entity.name})} getUrl={id => `/rest/namespaces/${id}`} entityTypeId="namespace" {...props} />)
-                    }
                 }
             }
         }

@@ -25,10 +25,6 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        if (props.edit) {
-            this.state.entityId = parseInt(props.match.params.id);
-        }
-
         this.initForm({
             onChange: {
                 report_template: ::this.onReportTemplateChange
@@ -37,11 +33,8 @@ export default class CUD extends Component {
     }
 
     static propTypes = {
-        edit: PropTypes.bool
-    }
-
-    isDelete() {
-        return this.props.match.params.action === 'delete';
+        action: PropTypes.string.isRequired,
+        entity: PropTypes.object
     }
 
     @withAsyncErrorHandler
@@ -60,18 +53,13 @@ export default class CUD extends Component {
         }
     }
 
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/reports/${this.state.entityId}`, data => {
-            for (const key in data.params) {
-                data[`param_${key}`] = data.params[key];
-            }
-        });
-    }
-
     componentDidMount() {
-        if (this.props.edit) {
-            this.loadFormValues();
+        if (this.props.entity) {
+            this.getFormValuesFromEntity(this.props.entity, data => {
+                for (const key in data.params) {
+                    data[`param_${key}`] = data.params[key];
+                }
+            });
         } else {
             this.populateFormValues({
                 name: '',
@@ -85,7 +73,7 @@ export default class CUD extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const edit = this.props.entity;
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
@@ -130,7 +118,6 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-        const edit = this.props.edit;
 
         if (!this.getFormValue('user_fields')) {
             this.setFormStatusMessage('warning', t('Report parameters are not selected. Wait for them to get displayed and then fill them in.'));
@@ -138,9 +125,9 @@ export default class CUD extends Component {
         }
 
         let sendMethod, url;
-        if (edit) {
+        if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/reports/${this.state.entityId}`
+            url = `/rest/reports/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
             url = '/rest/reports'
@@ -172,7 +159,7 @@ export default class CUD extends Component {
 
     render() {
         const t = this.props.t;
-        const edit = this.props.edit;
+        const isEdit = !!this.props.entity;
 
         const reportTemplateColumns = [
             { data: 0, title: "#" },
@@ -226,18 +213,18 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {edit &&
+                {isEdit &&
                     <DeleteModalDialog
                         stateOwner={this}
-                        visible={this.props.match.params.action === 'delete'}
-                        deleteUrl={`/reports/${this.state.entityId}`}
-                        cudUrl={`/reports/edit/${this.state.entityId}`}
+                        visible={this.props.action === 'delete'}
+                        deleteUrl={`/reports/${this.props.entity.id}`}
+                        cudUrl={`/reports/${this.props.entity.id}/edit`}
                         listUrl="/reports"
                         deletingMsg={t('Deleting report ...')}
                         deletedMsg={t('Report deleted')}/>
                 }
 
-                <Title>{edit ? t('Edit Report') : t('Create Report')}</Title>
+                <Title>{isEdit ? t('Edit Report') : t('Create Report')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
@@ -259,7 +246,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {edit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/edit/${this.state.entityId}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

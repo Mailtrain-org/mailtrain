@@ -19,20 +19,27 @@ function hash(entity) {
 }
 
 async function getByIdWithTemplate(context, id) {
-    await shares.enforceEntityPermission(context, 'report', id, 'view');
+    let entity;
 
-    const entity = await knex('reports')
-        .where('reports.id', id)
-        .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
-        .select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'reports.state', 'reports.namespace', 'report_templates.user_fields', 'report_templates.mime_type', 'report_templates.hbs', 'report_templates.js'])
-        .first();
+    await knex.transaction(async tx => {
 
-    if (!entity) {
-        throw new interoperableErrors.NotFoundError();
-    }
+        await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'view');
 
-    entity.user_fields = JSON.parse(entity.user_fields);
-    entity.params = JSON.parse(entity.params);
+        entity = await tx('reports')
+            .where('reports.id', id)
+            .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
+            .select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'reports.state', 'reports.namespace', 'report_templates.user_fields', 'report_templates.mime_type', 'report_templates.hbs', 'report_templates.js'])
+            .first();
+
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        entity.user_fields = JSON.parse(entity.user_fields);
+        entity.params = JSON.parse(entity.params);
+
+        entity.permissions = await shares.getPermissions(tx, context, 'report', id);
+    });
 
     return entity;
 }
@@ -89,7 +96,7 @@ async function updateWithConsistencyCheck(context, entity) {
         existing.params = JSON.parse(existing.params);
 
         const existingHash = hash(existing);
-        if (texistingHash !== entity.originalHash) {
+        if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 

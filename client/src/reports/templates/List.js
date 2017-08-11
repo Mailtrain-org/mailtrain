@@ -50,14 +50,14 @@ export default class List extends Component {
             if (perms.includes('view')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: '/reports/templates/edit/' + data[0]
+                    link: `/reports/templates/${data[0]}/edit`
                 });
             }
 
             if (perms.includes('share')) {
                 actions.push({
                     label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: '/reports/templates/share/' + data[0]
+                    link: `/reports/templates/${data[0]}/share`
                 });
             }
 
@@ -65,7 +65,6 @@ export default class List extends Component {
         };
 
         const columns = [
-            { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
             { data: 3, title: t('Created'), render: data => moment(data).fromNow() },

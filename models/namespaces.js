@@ -6,6 +6,8 @@ const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const permissions = require('../lib/permissions');
+const namespaceHelpers = require('../lib/namespace-helpers');
+
 
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
@@ -106,12 +108,19 @@ function hash(entity) {
 }
 
 async function getById(context, id) {
-    await shares.enforceEntityPermission(context, 'namespace', id, 'view');
+    let entity;
 
-    const entity = await knex('namespaces').where('id', id).first();
-    if (!entity) {
-        throw new interoperableErrors.NotFoundError();
-    }
+    await knex.transaction(async tx => {
+
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
+
+        entity = await tx('namespaces').where('id', id).first();
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        entity.permissions = await shares.getPermissions(tx, context, 'namespace', id);
+    });
 
     return entity;
 }
@@ -145,7 +154,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         const existingHash = hash(existing);
-        if (texistingHash !== entity.originalHash) {
+        if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 

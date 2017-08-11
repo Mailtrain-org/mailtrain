@@ -10,6 +10,7 @@ const shares = require('./shares');
 const fieldsLegacy = require('../lib/models/fields');
 const bluebird = require('bluebird');
 const validators = require('../shared/validators');
+const shortid = require('shortid');
 
 const allowedKeysCreate = new Set(['name', 'key', 'default_value', 'type', 'group', 'settings']);
 const allowedKeysUpdate = new Set(['name', 'key', 'default_value', 'group', 'settings']);
@@ -62,7 +63,7 @@ fieldTypes['radio-enum'] = fieldTypes['dropdown-enum'] = {
 };
 
 fieldTypes.option = {
-    validate: entity => [],
+    validate: entity => {},
     addColumn: (table, name) => table.boolean(name),
     indexed: true,
     grouped: false
@@ -156,13 +157,18 @@ async function serverValidate(context, listId, data) {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
 
         if (data.key) {
-            const existing = await tx('custom_fields').where({
+            const existingKeyQuery = tx('custom_fields').where({
                 list: listId,
                 key: data.key
-            }).whereNot('id', data.id).first();
+            });
 
+            if (data.id) {
+                existingKeyQuery.whereNot('id', data.id);
+            }
+
+            const existingKey = await existingKeyQuery.first();
             result.key = {
-                exists: !!existing
+                exists: !!existingKey
             };
         }
     });
@@ -180,7 +186,6 @@ async function _validateAndPreprocess(tx, listId, entity, isCreate) {
     enforce(fieldType, 'Unknown field type');
 
     const validateErrs = fieldType.validate(entity);
-    enforce(!validateErrs.length, 'Invalid field');
 
     enforce(validators.mergeTagValid(entity.key), 'Merge tag is not valid.');
 
@@ -189,7 +194,7 @@ async function _validateAndPreprocess(tx, listId, entity, isCreate) {
         key: entity.key
     });
     if (!isCreate) {
-        existingWithKeyQuery.whereNot('id', data.id);
+        existingWithKeyQuery.whereNot('id', entity.id);
     }
     const existingWithKey = await existingWithKeyQuery.first();
     if (existingWithKey) {
@@ -255,9 +260,11 @@ async function create(context, listId, entity) {
 
         await _validateAndPreprocess(tx, listId, entity, true);
 
+        const fieldType = fieldTypes[entity.type];
+
         let columnName;
         if (!fieldType.grouped) {
-            columnName = ('custom_' + slugify(name, '_') + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '');
+            columnName = ('custom_' + slugify(entity.name, '_') + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '');
         }
 
         const filteredEntity = filterObject(entity, allowedKeysCreate);
@@ -267,7 +274,7 @@ async function create(context, listId, entity) {
         const ids = await tx('custom_fields').insert(filteredEntity);
         id = ids[0];
 
-        _sortIn(tx, listId, id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
+        await _sortIn(tx, listId, id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
 
         if (columnName) {
             await knex.schema.table('subscription__' + listId, table => {
@@ -297,10 +304,10 @@ async function updateWithConsistencyCheck(context, listId, entity) {
         }
 
         enforce(entity.type === existing.type, 'Field type cannot be changed');
-        await _validateAndPreprocess(tx, listId, entity, true);
+        await _validateAndPreprocess(tx, listId, entity, false);
 
         await tx('custom_fields').where('id', entity.id).update(filterObject(entity, allowedKeysUpdate));
-        _sortIn(tx, listId, entity.id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
+        await _sortIn(tx, listId, entity.id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
     });
 }
 
