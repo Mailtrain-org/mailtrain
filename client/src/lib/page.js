@@ -132,12 +132,14 @@ class SecondaryNavBar extends Component {
             }
         }
 
-        let className = 'mt-secondary-nav nav nav-pills';
-        if (this.props.className) {
-            className += ' ' + this.props.className;
-        }
+        if (renderedElems.length > 1) {
+            let className = 'mt-secondary-nav nav nav-pills';
+            if (this.props.className) {
+                className += ' ' + this.props.className;
+            }
 
-        return <ul className={className}>{renderedElems}</ul>;
+            return <ul className={className}>{renderedElems}</ul>;
+        }
     }
 }
 
@@ -213,8 +215,6 @@ class RouteContent extends Component {
                 } else if (route.component) {
                     component = React.createElement(route.component, compProps, null);
                 }
-
-
 
                 return (
                     <div>
