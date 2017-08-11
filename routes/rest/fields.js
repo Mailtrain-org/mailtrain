@@ -10,6 +10,10 @@ router.postAsync('/fields-table/:listId', passport.loggedIn, async (req, res) =>
     return res.json(await fields.listDTAjax(req.context, req.params.listId, req.body));
 });
 
+router.postAsync('/fields-grouped-table/:listId', passport.loggedIn, async (req, res) => {
+    return res.json(await fields.listGroupedDTAjax(req.context, req.params.listId, req.body));
+});
+
 router.getAsync('/fields/:listId/:fieldId', passport.loggedIn, async (req, res) => {
     const entity = await fields.getById(req.context, req.params.listId, req.params.fieldId);
     entity.hash = fields.hash(entity);

@@ -78,6 +78,7 @@ fieldTypes['date'] = fieldTypes['birthday'] = {
     grouped: false
 };
 
+const groupedTypes = Object.keys(fieldTypes).filter(key => fieldTypes[key].grouped);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
@@ -137,6 +138,29 @@ async function listDTAjax(context, listId, params) {
             .from('custom_fields')
             .innerJoin('lists', 'custom_fields.list', 'lists.id')
             .where('custom_fields.list', listId),
+        [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
+        {
+            orderByBuilder: (builder, orderColumn, orderDir) => {
+                if (orderColumn === 'custom_fields.order_list') {
+                    builder.orderBy(knex.raw('-custom_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc'); // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                } else {
+                    builder.orderBy(orderColumn, orderDir);
+                }
+            }
+        }
+    );
+}
+
+async function listGroupedDTAjax(context, listId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'list', requiredOperations: ['manageFields'] }],
+        params,
+        builder => builder
+            .from('custom_fields')
+            .innerJoin('lists', 'custom_fields.list', 'lists.id')
+            .where('custom_fields.list', listId)
+            .whereIn('custom_fields.type', groupedTypes),
         [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
         {
             orderByBuilder: (builder, orderColumn, orderDir) => {
@@ -342,6 +366,7 @@ module.exports = {
     getById,
     list,
     listDTAjax,
+    listGroupedDTAjax,
     create,
     updateWithConsistencyCheck,
     remove,

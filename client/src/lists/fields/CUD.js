@@ -70,6 +70,7 @@ export default class CUD extends Component {
                 if (data.default_value === null) {
                     data.default_value = '';
                 }
+                // TODO: Construct form fields from settings
             });
 
         } else {
@@ -79,6 +80,7 @@ export default class CUD extends Component {
                 key: '',
                 default_value: '',
                 group: null,
+                renderTemplate: '',
                 orderListBefore: 'end', // possible values are <numeric id> / 'end' / 'none'
                 orderSubscribeBefore: 'end',
                 orderManageBefore: 'end',
@@ -110,6 +112,12 @@ export default class CUD extends Component {
         } else {
             state.setIn(['key', 'error'], null);
         }
+
+        // TODO: Validate field settings:
+        //   TODO: parse and check options for enums
+        //   TODO: make sure group is selected for option
+        //   TODO: check default date/birthday is in the right format
+        //   TODO: check number is a number
     }
 
     async submitHandler() {
@@ -132,6 +140,8 @@ export default class CUD extends Component {
                 if (data.default_value.trim() === '') {
                     data.default_value = null;
                 }
+
+                // TODO: Construct settings field
             });
 
             if (submitSuccessful) {
@@ -159,17 +169,124 @@ export default class CUD extends Component {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
 
-/*
-        const orderColumns = [
-            { data: 1, title: t('Field name'), sortable: false, searchable: false }
-        ];
-*/
-
         const typeOptions = Object.keys(this.fieldTypes).map(key => ({key, label:this.fieldTypes[key].label}));
 
         const type = this.getFormValue('type');
 
-        //                             <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
+        let fieldSettings = null;
+        switch (type) {
+            case 'text':
+            case 'website':
+            case 'longtext':
+            case 'gpg':
+            case 'number':
+                fieldSettings =
+                    <Fieldset label={t('Field settings')}>
+                        <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
+                    </Fieldset>;
+                break;
+
+            case 'checkbox':
+            case 'radio-grouped':
+            case 'dropdown-grouped':
+                fieldSettings =
+                    <Fieldset label={t('Field settings')}>
+                        <ACEEditor
+                            id="renderTemplate"
+                            label={t('Template')}
+                            height="250px"
+                            mode="handlebars"
+                            help={<Trans>You can control the appearance of the merge tag with this template. The template
+                                uses handlebars syntax and you can find all values from <code>{'{{values}}'}</code> array, for
+                                example <code>{'{{#each values}} {{this}} {{/each}}'}</code>. If template is not defined then
+                                multiple values are joined with commas.</Trans>}
+                        />
+                    </Fieldset>;
+                break;
+
+            case 'radio-enum':
+            case 'dropdown-enum':
+                fieldSettings =
+                    <Fieldset label={t('Field settings')}>
+                        <ACEEditor
+                            id="enumOptions"
+                            label={t('Options')}
+                            height="250px"
+                            mode="text"
+                            help={<Trans><div>Specify the options to select from in the following format:<code>key|label</code>. For example:</div>
+                                <div><code>au|Australia</code></div><div><code>at|Austria</code></div></Trans>}
+                        />
+                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default key (e.g. <code>au</code> used when the field is empty.')</Trans>}/>
+                        <ACEEditor
+                            id="renderTemplate"
+                            label={t('Template')}
+                            height="250px"
+                            mode="handlebars"
+                            help={<Trans>You can control the appearance of the merge tag with this template. The template
+                                uses handlebars syntax and you can find all values from <code>{'{{values}}'}</code> array.
+                                Each entry in the array is an object with attributes <code>key</code> and <code>label</code>.
+                                For example <code>{'{{#each values}} {{this.value}} {{/each}}'}</code>. If template is not defined then
+                                multiple values are joined with commas.</Trans>}
+                        />
+                    </Fieldset>;
+                break;
+
+            case 'date':
+                fieldSettings =
+                    <Fieldset label={t('Field settings')}>
+                        <Dropdown id="dateFormat" label={t('Date format')}
+                            options={[
+                                {key: 'us', label: t('MM/DD/YYYY')},
+                                {key: 'eur', label: t('DD/MM/YYYY')}
+                            ]}
+                        />
+                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.')</Trans>}/>
+                    </Fieldset>;
+                break;
+
+            case 'birthday':
+                fieldSettings =
+                    <Fieldset label={t('Field settings')}>
+                        <Dropdown id="dateFormat" label={t('Date format')}
+                            options={[
+                                {key: 'us', label: t('MM/DD')},
+                                {key: 'eur', label: t('DD/MM')}
+                            ]}
+                        />
+                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.')</Trans>}/>
+                    </Fieldset>;
+                break;
+
+            case 'json':
+                fieldSettings = <Fieldset label={t('Field settings')}>
+                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default key (e.g. <code>au</code> used when the field is empty.')</Trans>}/>
+                        <ACEEditor
+                            id="renderTemplate"
+                            label={t('Template')}
+                            height="250px"
+                            mode="json"
+                            help={<Trans>You can use this template to render JSON values (if the JSON is an array then the array is
+                                exposed as <code>values</code>, otherwise you can access the JSON keys directly).</Trans>}
+                        />
+                    </Fieldset>;
+                break;
+
+            case 'option':
+                const fieldsGroupedColumns = [
+                    { data: 4, title: "#" },
+                    { data: 1, title: t('Name') },
+                    { data: 2, title: t('Type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
+                    { data: 3, title: t('Merge Tag') }
+                ];
+
+                fieldSettings =
+                    <Fieldset label={t('Field settings')}>
+                        <TableSelect id="group" label={t('Group')} withHeader dropdown dataUrl={`/rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('Select group to which the options should belong.')}/>
+                        <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
+                    </Fieldset>;
+                break;
+        }
+
 
         return (
             <div>
@@ -193,10 +310,8 @@ export default class CUD extends Component {
 
                     <InputField id="key" label={t('Merge tag')}/>
 
-                    {/* type && this.fieldTypes[type].renderSettings */}
-                    <Fieldset label={t('Field settings')}>
-                        <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
-                    </Fieldset>
+                    {fieldSettings}
+
                     <Fieldset label={t('Field order')}>
                         <Dropdown id="orderListBefore" label={t('Listings (before)')} options={this.state.orderListOptions} help={t('Select the field before which this field should appeara in listings. To exclude the field from listings, select "Not visible".')}/>
                         <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={this.state.orderSubscribeOptions} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>

@@ -8,25 +8,21 @@ export function getFieldTypes(t) {
     const fieldTypes = {
         text: {
             label: t('Text'),
-            renderSettings:
-                <Fieldset label={t('Field settings')}>
-                    <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
-                </Fieldset>
         },
         website: {
-            label: t('Website')
+            label: t('Website'),
         },
         longtext: {
-            label: t('Multi-line text')
+            label: t('Multi-line text'),
         },
         gpg: {
-            label: t('GPG Public Key')
+            label: t('GPG Public Key'),
         },
         number: {
-            label: t('Number')
+            label: t('Number'),
         },
         checkbox: {
-            label: t('Checkboxes (from option fields)')
+            label: t('Checkboxes (from option fields)'),
         },
         'radio-grouped': {
             label: t('Radio Buttons (from option fields)')
