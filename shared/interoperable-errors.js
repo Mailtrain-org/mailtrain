@@ -50,6 +50,12 @@ class DuplicitEmailError extends InteroperableError {
     }
 }
 
+class DuplicitKeyError extends InteroperableError {
+    constructor(msg, data) {
+        super('DuplicitKeyError', msg, data);
+    }
+}
+
 class IncorrectPasswordError extends InteroperableError {
     constructor(msg, data) {
         super('IncorrectPasswordError', msg, data);
@@ -84,6 +90,7 @@ const errorTypes = {
     ChildDetectedError,
     DuplicitNameError,
     DuplicitEmailError,
+    DuplicitKeyError,
     IncorrectPasswordError,
     InvalidTokenError,
     DependencyNotFoundError,

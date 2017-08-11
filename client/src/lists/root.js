@@ -10,6 +10,8 @@ import ListsList from './List';
 import ListsCUD from './CUD';
 import FormsList from './forms/List';
 import FormsCUD from './forms/CUD';
+import FieldsList from './fields/List';
+import FieldsCUD from './fields/CUD';
 import Share from '../shares/Share';
 
 
@@ -26,6 +28,29 @@ const getStructure = t => {
                     link: '/lists',
                     component: ListsList,
                     children: {
+/* FIXME
+                        ':listId': {
+                            title: resolved => t('List "{{name}}"', {name: resolved.list.name}),
+                            resolve: {
+                                list: match => `/rest/lists/${match.params.listId}`
+                            },
+                            actions: {
+                                edit: {
+                                    title: t('Edit'),
+                                    params: [':action?'],
+                                    render: props => (<ListsCUD edit entity={resolved.list} {...props} />)
+                                },
+                                create: {
+                                    title: t('Create'),
+                                    render: props => (<ListsCUD entity={resolved.list} {...props} />)
+                                },
+                                share: {
+                                    title: t('Share'),
+                                    render: props => (<Share title={t('Share')} entity={resolved.list} entityTypeId="list" {...props} />)
+                                }
+                            }
+                        },
+*/
                         edit: {
                             title: t('Edit List'),
                             params: [':id', ':action?'],
@@ -39,6 +64,24 @@ const getStructure = t => {
                             title: t('Share List'),
                             params: [':id'],
                             render: props => (<Share title={entity => t('Share List "{{name}}"', {name: entity.name})} getUrl={id => `/rest/lists/${id}`} entityTypeId="list" {...props} />)
+                        },
+                        fields: {
+                            title: t('Fields'),
+                            params: [':listId'],
+                            link: match => `/lists/fields/${match.params.listId}`,
+                            component: FieldsList,
+                            children: {
+                                 edit: {
+                                     title: t('Edit Field'),
+                                     params: [':listId', ':fieldId', ':action?'],
+                                     render: props => (<FieldsCUD edit {...props} />)
+                                 },
+                                 create: {
+                                     title: t('Create Field'),
+                                     params: [':listId'],
+                                     render: props => (<FieldsCUD {...props} />)
+                                 },
+                            }
                         },
                         forms: {
                             title: t('Custom Forms'),

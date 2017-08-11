@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = (knex, Promise) => (async() => {
 /* This is shows what it would look like when we specify the "users" table with Knex.
    In some sense, this is probably the most complicated table we have in Mailtrain.
 
@@ -36,25 +36,22 @@ exports.up = function(knex, Promise) {
 
     // We should check here if the tables already exist and upgrade them to db_schema_version 28, which is the baseline.
     // For now, we just check whether our DB is up-to-date based on the existing SQL migration infrastructure in Mailtrain.
-    return knex('settings').where({key: 'db_schema_version'}).first('value')
-        .then(row => {
-            if (!row || Number(row.value) !== 29) {
-                throw new Error('Unsupported DB schema version: ' + row.value);
-            }
-        })
+    const row = await knex('settings').where({key: 'db_schema_version'}).first('value');
+    if (!row || Number(row.value) !== 29) {
+        throw new Error('Unsupported DB schema version: ' + row.value);
+    }
 
         // We have to update data types of primary keys and related foreign keys. Mailtrain uses unsigned int(11), while
         // Knex uses unsigned int (which is unsigned int(10) ).
-        .then(() => knex.schema
-            .raw('ALTER TABLE `users` MODIFY `id` int unsigned not null auto_increment')
-            .raw('ALTER TABLE `lists` MODIFY `id` int unsigned not null auto_increment')
-                .raw('ALTER TABLE `confirmations` MODIFY `list` int unsigned not null')
-                .raw('ALTER TABLE `custom_fields` MODIFY `list` int unsigned not null')
-                .raw('ALTER TABLE `importer` MODIFY `list` int unsigned not null')
-                .raw('ALTER TABLE `segments` MODIFY `list` int unsigned not null')
-                .raw('ALTER TABLE `triggers` MODIFY `list` int unsigned not null')
-                .raw('ALTER TABLE `custom_forms` MODIFY `list` int unsigned not null')
-        )
+    await knex.schema
+        .raw('ALTER TABLE `users` MODIFY `id` int unsigned not null auto_increment')
+        .raw('ALTER TABLE `lists` MODIFY `id` int unsigned not null auto_increment')
+            .raw('ALTER TABLE `confirmations` MODIFY `list` int unsigned not null')
+            .raw('ALTER TABLE `custom_fields` MODIFY `list` int unsigned not null')
+            .raw('ALTER TABLE `importer` MODIFY `list` int unsigned not null')
+            .raw('ALTER TABLE `segments` MODIFY `list` int unsigned not null')
+            .raw('ALTER TABLE `triggers` MODIFY `list` int unsigned not null')
+            .raw('ALTER TABLE `custom_forms` MODIFY `list` int unsigned not null');
 
 /*
     Remaining foreign keys:
@@ -68,8 +65,8 @@ exports.up = function(knex, Promise) {
     custom_forms_data form custom_forms id
     report_template report_template report_templates id
 */
-};
+})();
 
-exports.down = function(knex, Promise) {
+exports.down = (knex, Promise) => (async() => {
     // return knex.schema.dropTable('users');
-};
+})();

@@ -59,6 +59,13 @@ export default class List extends Component {
                 });
             }
 
+            if (perms.includes('manageFields')) {
+                actions.push({
+                    label: <span className="glyphicon glyphicon-th-list" aria-hidden="true" title="Manage Fields"></span>,
+                    link: '/lists/fields/' + data[0]
+                });
+            }
+
             return actions;
         };
 

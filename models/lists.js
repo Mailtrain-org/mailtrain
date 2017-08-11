@@ -42,10 +42,10 @@ async function getById(context, id) {
 }
 
 async function create(context, entity) {
-    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createList');
-
     let id;
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createList');
+
         await namespaceHelpers.validateEntity(tx, entity);
         enforce(entity.unsubscription_mode >= 0 && entity.unsubscription_mode < UnsubscriptionMode.MAX, 'Unknown unsubscription mode');
 
@@ -64,16 +64,16 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
-    await shares.enforceEntityPermission(context, 'list', entity.id, 'edit');
-
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'edit');
+
         const existing = await tx('lists').where('id', entity.id).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
         const existingHash = hash(existing);
-        if (existingHash != entity.originalHash) {
+        if (texistingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
@@ -88,9 +88,9 @@ async function updateWithConsistencyCheck(context, entity) {
 }
 
 async function remove(context, id) {
-    await shares.enforceEntityPermission(context, 'list', id, 'delete');
-
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'delete');
+
         await tx('lists').where('id', id).del();
         await knex.schema.dropTableIfExists('subscription__' + id);
     });

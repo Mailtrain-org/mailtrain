@@ -123,14 +123,14 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
-    enforce(await tools.validateEmail(user.email) === 0, 'Invalid email');
+async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
+    enforce(await tools.validateEmail(entity.email) === 0, 'Invalid email');
 
-    await namespaceHelpers.validateEntity(tx, user);
+    await namespaceHelpers.validateEntity(tx, entity);
 
-    const otherUserWithSameEmailQuery = tx('users').where('email', user.email);
-    if (user.id) {
-        otherUserWithSameEmailQuery.andWhereNot('id', user.id);
+    const otherUserWithSameEmailQuery = tx('users').where('email', entity.email);
+    if (entity.id) {
+        otherUserWithSameEmailQuery.andWhereNot('id', entity.id);
     }
 
     if (await otherUserWithSameEmailQuery.first()) {
@@ -139,9 +139,9 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
 
 
     if (!isOwnAccount) {
-        const otherUserWithSameUsernameQuery = tx('users').where('username', user.username);
-        if (user.id) {
-            otherUserWithSameUsernameQuery.andWhereNot('id', user.id);
+        const otherUserWithSameUsernameQuery = tx('users').where('username', entity.username);
+        if (entity.id) {
+            otherUserWithSameUsernameQuery.andWhereNot('id', entity.id);
         }
 
         if (await otherUserWithSameUsernameQuery.first()) {
@@ -149,30 +149,28 @@ async function _validateAndPreprocess(tx, user, isCreate, isOwnAccount) {
         }
     }
 
-    enforce(user.role in config.roles.global, 'Unknown role');
+    enforce(entity.role in config.roles.global, 'Unknown role');
 
-    enforce(!isCreate || user.password.length > 0, 'Password not set');
+    enforce(!isCreate || entity.password.length > 0, 'Password not set');
 
-    if (user.password) {
-        const passwordValidatorResults = passwordValidator.test(user.password);
+    if (entity.password) {
+        const passwordValidatorResults = passwordValidator.test(entity.password);
         if (passwordValidatorResults.errors.length > 0) {
             // This is not an interoperable error because this is not supposed to happen unless the client is tampered with.
             throw new Error('Invalid password');
         }
 
-        user.password = await bcryptHash(user.password, null, null);
+        entity.password = await bcryptHash(entity.password, null, null);
     } else {
-        delete user.password;
+        delete entity.password;
     }
 }
 
 async function create(context, user) {
-    if (context) { // Is also called internally from ldap handling in passport
-        await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
-    }
-
     let id;
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
+
         if (passport.isAuthMethodLocal) {
             await _validateAndPreprocess(tx, user, true);
 
@@ -208,8 +206,8 @@ async function updateWithConsistencyCheck(context, user, isOwnAccount) {
         }
 
         if (!isOwnAccount) {
-            await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
-            await shares.enforceEntityPermission(context, 'namespace', existing.namespace, 'manageUsers');
+            await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
+            await shares.enforceEntityPermissionTx(tx, context, 'namespace', existing.namespace, 'manageUsers');
         }
 
         if (passport.isAuthMethodLocal) {
@@ -251,7 +249,7 @@ async function remove(context, userId) {
             shares.throwPermissionDenied();
         }
 
-        await shares.enforceEntityPermission(context, 'namespace', existing.namespace, 'manageUsers');
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', existing.namespace, 'manageUsers');
 
         await tx('users').where('id', userId).del();
     });

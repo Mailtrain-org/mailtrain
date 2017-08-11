@@ -25,7 +25,7 @@ exports.up = (knex, Promise) => (async() => {
             key: 'FIRST_NAME',
             type: 'text',
             column: 'first_name',
-            visible: 1 // FIXME - Revise the need for this field
+            visible: 1
         });
 
         const [lastNameFieldId] = await knex('custom_fields').insert({
@@ -34,7 +34,7 @@ exports.up = (knex, Promise) => (async() => {
             key: 'LAST_NAME',
             type: 'text',
             column: 'last_name',
-            visible: 1 // FIXME - Revise the need for this field
+            visible: 1
         });
 
         let orderSubscribe;
@@ -66,6 +66,11 @@ exports.up = (knex, Promise) => (async() => {
         }
 
         const orderList = [firstNameFieldId, lastNameFieldId];
+        for (const fld of fields) {
+            if (fld.visible && fld.type === 'text') {
+                orderList.push(fld.id);
+            }
+        }
 
         let idx = 0;
         for (const fldId of orderSubscribe) {
@@ -90,8 +95,12 @@ exports.up = (knex, Promise) => (async() => {
         table.dropColumn('fields_shown_on_subscribe');
         table.dropColumn('fields_shown_on_manage');
     });
+
+    await knex.schema.table('custom_fields', table => {
+        table.dropColumn('visible');
+    });
 })();
 
 
-exports.down = function(knex, Promise) {
-};
+exports.down = (knex, Promise) => (async() => {
+})();

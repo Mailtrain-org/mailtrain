@@ -23,16 +23,17 @@ class PageContent extends Component {
             const structure = children[routeKey];
 
             let path = urlPrefix + routeKey;
+            let pathWithParams = path;
 
             if (structure.params) {
-                path = path + '/' + structure.params.join('/');
+                pathWithParams = pathWithParams + '/' + structure.params.join('/');
             }
 
             if (structure.component || structure.render) {
                 const route = {
                     component: structure.component,
                     render: structure.render,
-                    path: (path === '' ? '/' : path)
+                    path: (pathWithParams === '' ? '/' : pathWithParams)
                 };
 
                 routes.push(route);

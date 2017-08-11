@@ -56,16 +56,12 @@ async function listDTAjax(context, params) {
 }
 
 async function create(context, entity) {
-    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReport');
-    await shares.enforceEntityPermission(context, 'reportTemplate', entity.report_template, 'execute');
-
     let id;
     await knex.transaction(async tx => {
-        await namespaceHelpers.validateEntity(tx, entity);
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createReport');
+        await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', entity.report_template, 'execute');
 
-        if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
-            throw new interoperableErrors.DependencyNotFoundError();
-        }
+        await namespaceHelpers.validateEntity(tx, entity);
 
         entity.params = JSON.stringify(entity.params);
 
@@ -81,10 +77,10 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
-    await shares.enforceEntityPermission(context, 'report', entity.id, 'edit');
-    await shares.enforceEntityPermission(context, 'reportTemplate', entity.report_template, 'execute');
-
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'report', entity.id, 'edit');
+        await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', entity.report_template, 'execute');
+
         const existing = await tx('reports').where('id', entity.id).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
@@ -93,12 +89,8 @@ async function updateWithConsistencyCheck(context, entity) {
         existing.params = JSON.parse(existing.params);
 
         const existingHash = hash(existing);
-        if (existingHash != entity.originalHash) {
+        if (texistingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
-        }
-
-        if (!await tx('report_templates').select(['id']).where('id', entity.report_template).first()) {
-            throw new interoperableErrors.DependencyNotFoundError();
         }
 
         await namespaceHelpers.validateEntity(tx, entity);

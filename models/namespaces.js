@@ -118,13 +118,10 @@ async function getById(context, id) {
 
 async function create(context, entity) {
     enforce(entity.namespace, 'Parent namespace must be set');
-    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createNamespace');
 
     let id;
     await knex.transaction(async tx => {
-        if (!await tx('namespaces').select(['id']).where('id', entity.namespace).first()) {
-            throw new interoperableErrors.DependencyNotFoundError();
-        }
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createNamespace');
 
         const ids = await tx('namespaces').insert(filterObject(entity, allowedKeys));
         id = ids[0];
@@ -138,16 +135,17 @@ async function create(context, entity) {
 
 async function updateWithConsistencyCheck(context, entity) {
     enforce(entity.id !== 1 || entity.namespace === null, 'Cannot assign a parent to the root namespace.');
-    await shares.enforceEntityPermission(context, 'namespace', entity.id, 'edit');
 
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.id, 'edit');
+
         const existing = await tx('namespaces').where('id', entity.id).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
         const existingHash = hash(existing);
-        if (existingHash != entity.originalHash) {
+        if (texistingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
@@ -175,9 +173,10 @@ async function updateWithConsistencyCheck(context, entity) {
 
 async function remove(context, id) {
     enforce(id !== 1, 'Cannot delete the root namespace.');
-    await shares.enforceEntityPermission(context, 'namespace', id, 'delete');
 
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'delete');
+
         const childNs = await tx('namespaces').where('namespace', id).first();
         if (childNs) {
             throw new interoperableErrors.ChildDetectedError();

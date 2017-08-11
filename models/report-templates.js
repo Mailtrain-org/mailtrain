@@ -36,10 +36,9 @@ async function listDTAjax(context, params) {
 }
 
 async function create(context, entity) {
-    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createReportTemplate');
-
     let id;
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createReportTemplate');
         await namespaceHelpers.validateEntity(tx, entity);
 
         const ids = await tx('report_templates').insert(filterObject(entity, allowedKeys));
@@ -52,16 +51,16 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
-    await shares.enforceEntityPermission(context, 'reportTemplate', entity.id, 'edit');
-
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', entity.id, 'edit');
+
         const existing = await tx('report_templates').where('id', entity.id).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
         const existingHash = hash(existing);
-        if (existingHash != entity.originalHash) {
+        if (texistingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 

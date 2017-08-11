@@ -206,8 +206,8 @@ description="All permissions"
 permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
 
 [roles.namespace.master.children]
-list=["view", "edit", "delete"]
-customForm=["view", "edit", "delete"]
+list=["view", "edit", "delete", "share", "manageFields"]
+customForm=["view", "edit", "delete", "share"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
 namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
@@ -215,12 +215,12 @@ namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "
 [roles.list.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete"]
+permissions=["view", "edit", "delete", "share", "manageFields"]
 
 [roles.customForm.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete"]
+permissions=["view", "edit", "delete", "share"]
 
 [roles.report.master]
 name="Master"

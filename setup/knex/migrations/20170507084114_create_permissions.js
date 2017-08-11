@@ -1,10 +1,9 @@
 const shareableEntityTypes = ['list', 'custom_form', 'report', 'report_template', 'namespace'];
 
-exports.up = function(knex, Promise) {
-    let schema = knex.schema;
+exports.up = (knex, Promise) => (async() => {
 
     for (const entityType of shareableEntityTypes) {
-        schema = schema
+        await knex.schema
             .createTable(`shares_${entityType}`, table => {
                 table.integer('entity').unsigned().notNullable().references(`${entityType}s.id`).onDelete('CASCADE');
                 table.integer('user').unsigned().notNullable().references('users.id').onDelete('CASCADE');
@@ -21,7 +20,7 @@ exports.up = function(knex, Promise) {
     }
     /* The global share for admin is set automatically in rebuildPermissions, which is called upon every start */
 
-    schema = schema
+    await knex.schema
         .createTable('generated_role_names', table => {
             table.string('entity_type', 32).notNullable();
             table.string('role', 128).notNullable();
@@ -30,18 +29,12 @@ exports.up = function(knex, Promise) {
             table.primary(['entity_type', 'role']);
         });
     /* The generate_role_names table is repopulated in regenerateRoleNamesTable, which is called upon every start */
+})();
 
-    return schema;
-};
-
-exports.down = function(knex, Promise) {
-    let schema = knex.schema;
-
+exports.down = (knex, Promise) => (async() => {
     for (const entityType of shareableEntityTypes) {
-        schema = schema
+        await knex.schema
             .dropTable(`shares_${entityType}`)
             .dropTable(`permissions_${entityType}`);
     }
-
-    return schema;
-};
+})();

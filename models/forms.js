@@ -85,10 +85,9 @@ async function _getById(tx, id) {
 
 
 async function getById(context, id) {
-    shares.enforceEntityPermission(context, 'customForm', id, 'view');
-
     let entity;
     await knex.transaction(async tx => {
+        shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
         entity = await _getById(tx, id);
     });
 
@@ -114,10 +113,10 @@ async function serverValidate(context, data) {
 
 
 async function create(context, entity) {
-    await shares.enforceEntityPermission(context, 'namespace', entity.namespace, 'createCustomForm');
-
     let id;
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCustomForm');
+
         await namespaceHelpers.validateEntity(tx, entity);
 
         const form = filterObject(entity, allowedFormKeys);
@@ -141,13 +140,13 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
-    await shares.enforceEntityPermission(context, 'customForm', entity.id, 'edit');
-
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'customForm', entity.id, 'edit');
+
         const existing = await _getById(tx, entity.id);
 
         const existingHash = hash(existing);
-        if (existingHash != entity.originalHash) {
+        if (texistingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
@@ -173,9 +172,9 @@ async function updateWithConsistencyCheck(context, entity) {
 }
 
 async function remove(context, id) {
-    shares.enforceEntityPermission(context, 'customForm', id, 'delete');
-
     await knex.transaction(async tx => {
+        shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'delete');
+
         const entity = await tx('custom_forms').where('id', id).first();
 
         if (!entity) {

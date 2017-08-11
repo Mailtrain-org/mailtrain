@@ -83,9 +83,9 @@ async function listRolesDTAjax(context, entityTypeId, params) {
 async function assign(context, entityTypeId, entityId, userId, role) {
     const entityType = permissions.getEntityType(entityTypeId);
 
-    await enforceEntityPermission(context, entityTypeId, entityId, 'share');
-
     await knex.transaction(async tx => {
+        await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
+
         enforce(await tx('users').where('id', userId).select('id').first(), 'Invalid user id');
         enforce(await tx(entityType.entitiesTable).where('id', entityId).select('id').first(), 'Invalid entity id');
 
@@ -427,28 +427,37 @@ function enforceGlobalPermission(context, requiredOperations) {
     throwPermissionDenied();
 }
 
-async function _checkPermission(context, entityTypeId, entityId, requiredOperations) {
-    if (context.user.admin) { // This handles the getAdminContext() case
-        return true;
-    }
-
+async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations) {
     const entityType = permissions.getEntityType(entityTypeId);
 
-    if (typeof requiredOperations === 'string') {
-        requiredOperations = [ requiredOperations ];
+    if (context.user.admin) { // This handles the getAdminContext() case. In this case we don't check the permission, but just the existence.
+        const existsQuery = tx(entityType.entitiesTable);
+
+        if (entityId) {
+            existsQuery.where('id', entityId);
+        }
+
+        const exists = await existsQuery.first();
+
+        return !!exists;
+
+    } else {
+        if (typeof requiredOperations === 'string') {
+            requiredOperations = [ requiredOperations ];
+        }
+
+        const permsQuery = tx(entityType.permissionsTable)
+            .where('user', context.user.id)
+            .whereIn('operation', requiredOperations);
+
+        if (entityId) {
+            permsQuery.andWhere('entity', entityId);
+        }
+
+        const perms = await permsQuery.first();
+
+        return !!perms;
     }
-
-    const permsQuery = knex(entityType.permissionsTable)
-        .where('user', context.user.id)
-        .whereIn('operation', requiredOperations);
-
-    if (entityId) {
-        permsQuery.andWhere('entity', entityId);
-    }
-
-    const perms = await permsQuery.first();
-
-    return !!perms;
 }
 
 async function checkEntityPermission(context, entityTypeId, entityId, requiredOperations) {
@@ -456,23 +465,55 @@ async function checkEntityPermission(context, entityTypeId, entityId, requiredOp
         return false;
     }
 
-    return await _checkPermission(context, entityTypeId, entityId, requiredOperations);
+    let result;
+    await knex.transaction(async tx => {
+        result = await _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations);
+    });
+    return result;
 }
 
 async function checkTypePermission(context, entityTypeId, requiredOperations) {
-    return await _checkPermission(context, entityTypeId, null, requiredOperations);
+    let result;
+    await knex.transaction(async tx => {
+        result = await _checkPermissionTx(tx, context, entityTypeId, null, requiredOperations);
+    });
+    return result;
 }
 
 async function enforceEntityPermission(context, entityTypeId, entityId, requiredOperations) {
-    const perms = await checkEntityPermission(context, entityTypeId, entityId, requiredOperations);
-    if (!perms) {
+    if (!entityId) {
+        throwPermissionDenied();
+    }
+    await knex.transaction(async tx => {
+        const result = await _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations);
+        if (!result) {
+            throwPermissionDenied();
+        }
+    });
+}
+
+async function enforceEntityPermissionTx(tx, context, entityTypeId, entityId, requiredOperations) {
+    if (!entityId) {
+        throwPermissionDenied();
+    }
+    const result = await _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations);
+    if (!result) {
         throwPermissionDenied();
     }
 }
 
 async function enforceTypePermission(context, entityTypeId, requiredOperations) {
-    const perms = await checkTypePermission(context, entityTypeId, requiredOperations);
-    if (!perms) {
+    await knex.transaction(async tx => {
+        const result = await _checkPermissionTx(tx, context, entityTypeId, null, requiredOperations);
+        if (!result) {
+            throwPermissionDenied();
+        }
+    });
+}
+
+async function enforceTypePermissionTx(tx, context, entityTypeId, requiredOperations) {
+    const result = await _checkPermissionTx(tx, context, entityTypeId, null, requiredOperations);
+    if (!result) {
         throwPermissionDenied();
     }
 }
@@ -487,7 +528,9 @@ module.exports = {
     rebuildPermissions,
     removeDefaultShares,
     enforceEntityPermission,
+    enforceEntityPermissionTx,
     enforceTypePermission,
+    enforceTypePermissionTx,
     checkEntityPermission,
     checkTypePermission,
     enforceGlobalPermission,
