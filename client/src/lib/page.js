@@ -139,6 +139,8 @@ class SecondaryNavBar extends Component {
             }
 
             return <ul className={className}>{renderedElems}</ul>;
+        } else {
+            return null;
         }
     }
 }
