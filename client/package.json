@@ -30,6 +30,7 @@
     "react-dom": "^15.6.1",
     "react-i18next": "^4.6.1",
     "react-router-dom": "^4.1.1",
+    "slugify": "^1.1.0",
     "url-parse": "^1.1.9"
   },
   "devDependencies": {

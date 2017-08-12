@@ -6,7 +6,7 @@ import { translate, Trans } from 'react-i18next';
 import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page';
 import {
     withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, ButtonRow, Button,
-    Fieldset, Dropdown, AlignedRow, ACEEditor
+    Fieldset, Dropdown, AlignedRow, ACEEditor, StaticField
 } from '../../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/delete";
@@ -14,6 +14,8 @@ import { getFieldTypes } from './field-types';
 import axios from '../../lib/axios';
 import interoperableErrors from '../../../../shared/interoperable-errors';
 import validators from '../../../../shared/validators';
+import slugify from 'slugify';
+import { parseDate, parseBirthday } from '../../../../shared/fields';
 
 @translate()
 @withForm
@@ -33,6 +35,9 @@ export default class CUD extends Component {
                 url: `/rest/fields-validate/${this.props.list.id}`,
                 changed: ['key'],
                 extra: ['id']
+            },
+            onChange: {
+                name: ::this.onChangeName
             }
         });
     }
@@ -41,6 +46,16 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         list: PropTypes.object,
         entity: PropTypes.object
+    }
+
+    onChangeName(state, attr, oldValue, newValue) {
+        const oldComputedKey = ('MERGE_' + slugify(oldValue, '_')).toUpperCase().replace(/[^A-Z0-9_]/g, '');
+        const oldKey = state.formState.getIn(['data', 'key', 'value']);
+
+        if (oldKey === '' || oldKey === oldComputedKey) {
+            const newKey = ('MERGE_' + slugify(newValue, '_')).toUpperCase().replace(/[^A-Z0-9_]/g, '');
+            state.formState = state.formState.setIn(['data', 'key', 'value'], newKey);
+        }
     }
 
     @withAsyncErrorHandler
@@ -70,7 +85,34 @@ export default class CUD extends Component {
                 if (data.default_value === null) {
                     data.default_value = '';
                 }
-                // TODO: Construct form fields from settings
+
+                if (data.type !== 'option') {
+                    data.group = null;
+                }
+
+                data.enumOptions = '';
+                data.dateFormat = 'eur';
+                data.renderTemplate = '';
+
+                switch (data.type) {
+                    case 'checkbox':
+                    case 'radio-grouped':
+                    case 'dropdown-grouped':
+                    case 'json':
+                        data.renderTemplate = data.settings.renderTemplate;
+                        break;
+
+                    case 'radio-enum':
+                    case 'dropdown-enum':
+                        data.enumOptions = this.renderEnumOptions(data.settings.enumOptions);
+                        data.renderTemplate = data.settings.renderTemplate;
+                        break;
+
+                    case 'date':
+                    case 'birthday':
+                        data.dateFormat = data.settings.dateFormat;
+                        break;
+                }
             });
 
         } else {
@@ -81,6 +123,8 @@ export default class CUD extends Component {
                 default_value: '',
                 group: null,
                 renderTemplate: '',
+                enumOptions: '',
+                dateFormat: 'eur',
                 orderListBefore: 'end', // possible values are <numeric id> / 'end' / 'none'
                 orderSubscribeBefore: 'end',
                 orderManageBefore: 'end',
@@ -113,12 +157,70 @@ export default class CUD extends Component {
             state.setIn(['key', 'error'], null);
         }
 
-        // TODO: Validate field settings:
-        //   TODO: parse and check options for enums
-        //   TODO: make sure group is selected for option
-        //   TODO: check default date/birthday is in the right format
-        //   TODO: check number is a number
+        const type = state.getIn(['type', 'value']);
+
+        const group = state.getIn(['group', 'value']);
+        if (type === 'option' && !group) {
+            state.setIn(['group', 'error'], t('Group has to be selected'));
+        } else {
+            state.setIn(['group', 'error'], null);
+        }
+
+        const defaultValue = state.getIn(['default_value', 'value']);
+        if (type === 'number' && !/^[0-9]*$/.test(defaultValue.trim())) {
+            state.setIn(['default_value', 'error'], t('Default value is not integer number'));
+        } else if (type === 'date' && !parseDate(state.getIn(['dateFormat', 'value']), defaultValue)) {
+            state.setIn(['default_value', 'error'], t('Default value is not a properly formatted date'));
+        } else if (type === 'birthday' && !parseBirthday(state.getIn(['dateFormat', 'value']), defaultValue)) {
+            state.setIn(['default_value', 'error'], t('Default value is not a properly formatted birthday date'));
+        } else {
+            state.setIn(['default_value', 'error'], null);
+        }
+
+        let enumOptionErrors;
+        if ((type === 'radio-enum' || type === 'dropdown-enum') && (enumOptionErrors = this.parseEnumOptions(state.getIn(['enumOptions', 'value'])).errors)) {
+            state.setIn(['enumOptions', 'error'], <div>{enumOptionErrors.map((err, idx) => <div key={idx}>{err}</div>)}</div>);
+        } else {
+            state.setIn(['enumOptions', 'error'], null);
+        }
     }
+
+    parseEnumOptions(text) {
+        const t = this.props.t;
+        const errors = [];
+        const options = {};
+
+        const lines = text.split('\n');
+        for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+            const line = lines[lineIdx].trim();
+
+            if (line != '') {
+                const matches = line.match(/^([^|]*)[|](.*)$/);
+                if (matches) {
+                    const key = matches[1].trim();
+                    const label = matches[2].trim();
+                    options[key] = label;
+                } else {
+                    errors.push(t('Errror on line {{ line }}', { line: lineIdx + 1}));
+                }
+            }
+        }
+
+        if (errors.length) {
+            return {
+                errors
+            };
+        } else {
+            return {
+                options
+            };
+        }
+    }
+
+    renderEnumOptions(options) {
+        return Object.keys(options).map(key => `${key}|${options[key]}`).join('\n');
+    }
+
 
     async submitHandler() {
         const t = this.props.t;
@@ -141,7 +243,34 @@ export default class CUD extends Component {
                     data.default_value = null;
                 }
 
-                // TODO: Construct settings field
+                if (data.type !== 'option') {
+                    data.group = null;
+                }
+
+                data.settings = {};
+                switch (data.type) {
+                    case 'checkbox':
+                    case 'radio-grouped':
+                    case 'dropdown-grouped':
+                    case 'json':
+                        data.settings.renderTemplate = data.renderTemplate;
+                        break;
+
+                    case 'radio-enum':
+                    case 'dropdown-enum':
+                        data.settings.enumOptions = this.parseEnumOptions(data.enumOptions).options;
+                        data.settings.renderTemplate = data.renderTemplate;
+                        break;
+
+                    case 'date':
+                    case 'birthday':
+                        data.settings.dateFormat = data.dateFormat;
+                        break;
+                }
+
+                delete data.renderTemplate;
+                delete data.enumOptions;
+                delete data.dateFormat;
             });
 
             if (submitSuccessful) {
@@ -169,7 +298,7 @@ export default class CUD extends Component {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
 
-        const typeOptions = Object.keys(this.fieldTypes).map(key => ({key, label:this.fieldTypes[key].label}));
+        const typeOptions = Object.keys(this.fieldTypes).map(key => ({key, label: this.fieldTypes[key].label}));
 
         const type = this.getFormValue('type');
 
@@ -240,7 +369,7 @@ export default class CUD extends Component {
                                 {key: 'eur', label: t('DD/MM/YYYY')}
                             ]}
                         />
-                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.')</Trans>}/>
+                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.</Trans>}/>
                     </Fieldset>;
                 break;
 
@@ -253,7 +382,7 @@ export default class CUD extends Component {
                                 {key: 'eur', label: t('DD/MM')}
                             ]}
                         />
-                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.')</Trans>}/>
+                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.</Trans>}/>
                     </Fieldset>;
                 break;
 
@@ -306,7 +435,11 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
 
-                    <Dropdown id="type" label={t('Type')} options={typeOptions}/>
+                    {isEdit ?
+                        <StaticField id="type" className="mt-form-disabled" label={t('Type')}>{(this.fieldTypes[this.getFormValue('type')] || {}).label}</StaticField>
+                    :
+                        <Dropdown id="type" label={t('Type')} options={typeOptions}/>
+                    }
 
                     <InputField id="key" label={t('Merge tag')}/>
 

@@ -23,6 +23,11 @@
     display: block;
 }
 
+.mt-form-disabled {
+    background-color: #eeeeee;
+    opacity: 1;
+}
+
 .ace_editor {
     border: 1px solid #ccc;
 }

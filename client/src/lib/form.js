@@ -143,7 +143,8 @@ class StaticField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        className: PropTypes.string
     }
 
     render() {
@@ -152,8 +153,13 @@ class StaticField extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
+        let className = 'form-control';
+        if (props.className) {
+            className += ' ' + props.className;
+        }
+
         return wrapInput(null, htmlId, owner, props.label, props.help,
-            <div id={htmlId} className="form-control" aria-describedby={htmlId + '_help'}>{props.children}</div>
+            <div id={htmlId} className={className} aria-describedby={htmlId + '_help'}>{props.children}</div>
         );
     }
 }
