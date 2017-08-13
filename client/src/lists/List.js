@@ -71,7 +71,7 @@ export default class List extends Component {
 
         const columns = [
             { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => `<code>${data}</code>` },
+            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
             { data: 3, title: t('Subscribers') },
             { data: 4, title: t('Description') },
             { data: 5, title: t('Namespace') }

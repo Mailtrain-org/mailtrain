@@ -239,8 +239,21 @@ class Table extends Component {
                 type: 'html',
                 createdCell: createdCellFn
             });
+        }
 
-            // FIXME, sift all columns through renderToStaticMarkup in order to sanitize the HTML
+        // XSS protection
+        for (const column of columns) {
+            const originalRender = column.render;
+            column.render = (data, ...rest) => {
+                if (originalRender) {
+                    const markup = originalRender(data, ...rest);
+                    return ReactDOMServer.renderToStaticMarkup(<div>{markup}</div>);
+                } else {
+                    return ReactDOMServer.renderToStaticMarkup(<div>{data}</div>)
+                }
+            };
+
+            column.title = ReactDOMServer.renderToStaticMarkup(<div>{column.title}</div>);
         }
 
         const dtOptions = {

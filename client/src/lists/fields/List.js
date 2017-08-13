@@ -34,7 +34,9 @@ export default class List extends Component {
 
         const columns = [
             { data: 4, title: "#" },
-            { data: 1, title: t('Name') },
+            { data: 1, title: t('Name'),
+                render: (data, cmd, rowData) => rowData[2] === 'option' ? <span><span className="glyphicon glyphicon-record" aria-hidden="true"></span> {data}</span> : data
+            },
             { data: 2, title: t('Type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
             { data: 3, title: t('Merge Tag') }
         ];

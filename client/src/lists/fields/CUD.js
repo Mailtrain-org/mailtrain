@@ -67,7 +67,7 @@ export default class CUD extends Component {
         const getOrderOptions = fld => {
             return [
                 {key: 'none', label: t('Not visible')},
-                ...flds.data.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id, label: `${x.name} (${this.fieldTypes[x.type].label})`})),
+                ...flds.data.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.type !== 'option').sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
                 {key: 'end', label: t('End of list')}
             ];
         };
@@ -82,6 +82,8 @@ export default class CUD extends Component {
     componentDidMount() {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity, data => {
+                data.settings = data.settings || {};
+
                 if (data.default_value === null) {
                     data.default_value = '';
                 }
@@ -113,6 +115,10 @@ export default class CUD extends Component {
                         data.dateFormat = data.settings.dateFormat;
                         break;
                 }
+
+                data.orderListBefore = data.orderListBefore.toString();
+                data.orderSubscribeBefore = data.orderSubscribeBefore.toString();
+                data.orderManageBefore = data.orderManageBefore.toString();
             });
 
         } else {
@@ -177,9 +183,17 @@ export default class CUD extends Component {
             state.setIn(['default_value', 'error'], null);
         }
 
-        let enumOptionErrors;
-        if ((type === 'radio-enum' || type === 'dropdown-enum') && (enumOptionErrors = this.parseEnumOptions(state.getIn(['enumOptions', 'value'])).errors)) {
-            state.setIn(['enumOptions', 'error'], <div>{enumOptionErrors.map((err, idx) => <div key={idx}>{err}</div>)}</div>);
+        if (type === 'radio-enum' || type === 'dropdown-enum') {
+            const enumOptions = this.parseEnumOptions(state.getIn(['enumOptions', 'value']));
+            if (enumOptions.errors) {
+                state.setIn(['enumOptions', 'error'], <div>{enumOptions.errors.map((err, idx) => <div key={idx}>{err}</div>)}</div>);
+            } else {
+                state.setIn(['enumOptions', 'error'], null);
+
+                if (defaultValue !== '' && !(defaultValue in enumOptions.options)) {
+                    state.setIn(['default_value', 'error'], t('Default value is not one of the allowed options'));
+                }
+            }
         } else {
             state.setIn(['enumOptions', 'error'], null);
         }
@@ -271,6 +285,14 @@ export default class CUD extends Component {
                 delete data.renderTemplate;
                 delete data.enumOptions;
                 delete data.dateFormat;
+
+                if (data.type === 'option') {
+                    data.orderListBefore = data.orderSubscribeBefore = data.orderManageBefore = 'none';
+                } else {
+                    data.orderListBefore = Number.parseInt(data.orderListBefore) || data.orderListBefore;
+                    data.orderSubscribeBefore = Number.parseInt(data.orderSubscribeBefore) || data.orderSubscribeBefore;
+                    data.orderManageBefore = Number.parseInt(data.orderManageBefore) || data.orderManageBefore;
+                }
             });
 
             if (submitSuccessful) {
@@ -445,11 +467,13 @@ export default class CUD extends Component {
 
                     {fieldSettings}
 
-                    <Fieldset label={t('Field order')}>
-                        <Dropdown id="orderListBefore" label={t('Listings (before)')} options={this.state.orderListOptions} help={t('Select the field before which this field should appeara in listings. To exclude the field from listings, select "Not visible".')}/>
-                        <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={this.state.orderSubscribeOptions} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>
-                        <Dropdown id="orderManageBefore" label={t('Management form (before)')} options={this.state.orderManageOptions} help={t('Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select "Not visible".')}/>
-                    </Fieldset>
+                    {type !== 'option' &&
+                        <Fieldset label={t('Field order')}>
+                            <Dropdown id="orderListBefore" label={t('Listings (before)')} options={this.state.orderListOptions} help={t('Select the field before which this field should appeara in listings. To exclude the field from listings, select "Not visible".')}/>
+                            <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={this.state.orderSubscribeOptions} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>
+                            <Dropdown id="orderManageBefore" label={t('Management form (before)')} options={this.state.orderManageOptions} help={t('Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select "Not visible".')}/>
+                        </Fieldset>
+                    }
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>

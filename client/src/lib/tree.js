@@ -86,6 +86,17 @@ class TreeTable extends Component {
         return this.props.selection !== nextProps.selection || this.state.treeData != nextState.treeData;
     }
 
+    // XSS protection
+    sanitizeTreeData(unsafeData) {
+        const data = unsafeData.slice();
+        for (const entry of data) {
+            entry.title = ReactDOMServer.renderToStaticMarkup(<div>{entry.title}</div>)
+            entry.description = ReactDOMServer.renderToStaticMarkup(<div>{entry.description}</div>)
+            entry.children = this.sanitizeTreeData(entry.children);
+        }
+        return data;
+    }
+
     componentDidMount() {
         if (!this.props.data && this.props.dataUrl) {
             this.loadData(this.props.dataUrl);
@@ -109,10 +120,8 @@ class TreeTable extends Component {
 
             let tdIdx = 1;
 
-            // FIXME, sift title through renderToStaticMarkup in order to sanitize the HTML
-
             if (this.props.withDescription) {
-                const descHtml = ReactDOMServer.renderToStaticMarkup(<div>{node.data.description}</div>);
+                const descHtml = node.data.description; // This was already sanitized in sanitizeTreeData when the data was loaded
                 tdList.eq(tdIdx).html(descHtml);
                 tdIdx += 1;
             }
@@ -142,7 +151,7 @@ class TreeTable extends Component {
             icon: false,
             autoScroll: true,
             scrollParent: jQuery(this.domTableContainer),
-            source: this.state.treeData,
+            source: this.sanitizeTreeData(this.state.treeData),
             table: {
                 nodeColumnIdx: 0
             },
@@ -156,7 +165,7 @@ class TreeTable extends Component {
     }
 
     componentDidUpdate() {
-        this.tree.reload(this.state.treeData);
+        this.tree.reload(this.sanitizeTreeData(this.state.treeData));
         this.updateSelection();
     }
 

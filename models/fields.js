@@ -137,14 +137,34 @@ async function listDTAjax(context, listId, params) {
         builder => builder
             .from('custom_fields')
             .innerJoin('lists', 'custom_fields.list', 'lists.id')
+
+            // This self join is to provide 'option' fields a reference to their parent grouped field. If the field is not an option, it refers to itself
+            // All this is to show options always below their group parent
+            .innerJoin('custom_fields AS parent_fields', function() {
+                this.on(function() {
+                    this.on('custom_fields.type', '=', knex.raw('?', ['option']))
+                        .on('custom_fields.group', '=', 'parent_fields.id');
+                }).orOn(function() {
+                    this.on('custom_fields.type', '<>', knex.raw('?', ['option']))
+                        .on('custom_fields.id', '=', 'parent_fields.id');
+                });
+            })
             .where('custom_fields.list', listId),
         [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
         {
             orderByBuilder: (builder, orderColumn, orderDir) => {
+                // We use here parent_fields to keep options always below their parent group
                 if (orderColumn === 'custom_fields.order_list') {
-                    builder.orderBy(knex.raw('-custom_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc'); // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                    builder
+                        .orderBy(knex.raw('-parent_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                        .orderBy('parent_fields.name', orderDir)
+                        .orderBy(knex.raw('custom_fields.type = "option"'), 'asc')
                 } else {
-                    builder.orderBy(orderColumn, orderDir);
+                    const parentColumn = orderColumn.replace(/^custom_fields/, 'parent_fields');
+                    builder
+                        .orderBy(parentColumn, orderDir)
+                        .orderBy('parent_fields.name', orderDir)
+                        .orderBy(knex.raw('custom_fields.type = "option"'), 'asc');
                 }
             }
         }
@@ -165,9 +185,13 @@ async function listGroupedDTAjax(context, listId, params) {
         {
             orderByBuilder: (builder, orderColumn, orderDir) => {
                 if (orderColumn === 'custom_fields.order_list') {
-                    builder.orderBy(knex.raw('-custom_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc'); // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                    builder
+                        .orderBy(knex.raw('-custom_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                        .orderBy('custom_fields.name', orderDir);
                 } else {
-                    builder.orderBy(orderColumn, orderDir);
+                    builder
+                        .orderBy(orderColumn, orderDir)
+                        .orderBy('custom_fields.name', orderDir);
                 }
             }
         }
@@ -203,6 +227,8 @@ async function serverValidate(context, listId, data) {
 async function _validateAndPreprocess(tx, listId, entity, isCreate) {
     enforce(entity.type === 'option' || !entity.group, 'Only option may have a group assigned');
     enforce(entity.type !== 'option' || entity.group, 'Option must have a group assigned.');
+    enforce(entity.type !== 'option' || (entity.orderListBefore === 'none' && entity.orderSubscribeBefore === 'none' && entity.orderManageBefore === 'none'), 'Option cannot be made visible');
+
     enforce(!entity.group || await tx('custom_fields').where({list: listId, id: entity.group}).first(), 'Group field does not exist');
     enforce(entity.name, 'Name must be present');
 
@@ -297,6 +323,7 @@ async function create(context, listId, entity) {
 
         const ids = await tx('custom_fields').insert(filteredEntity);
         id = ids[0];
+
 
         await _sortIn(tx, listId, id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
 
