@@ -36,7 +36,8 @@ const FormSendMethod = {
 class Form extends Component {
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
-        onSubmitAsync: PropTypes.func
+        onSubmitAsync: PropTypes.func,
+        inline: PropTypes.bool
     }
 
     static childContextTypes = {
@@ -77,7 +78,7 @@ class Form extends Component {
             }
         } else {
             return (
-                <form className="form-horizontal" onSubmit={::this.onSubmit}>
+                <form className={props.inline ? 'form-inline' : 'form-horizontal'} onSubmit={::this.onSubmit}>
                     <fieldset disabled={owner.isFormDisabled()}>
                         {props.children}
                     </fieldset>
@@ -105,25 +106,53 @@ class Fieldset extends Component {
     }
 }
 
-function wrapInput(id, htmlId, owner, label, help, input) {
-    const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
+function wrapInput(id, htmlId, owner, label, help, input, inline) {
+    const className = id ? owner.addFormValidationClass('form-group', id) : 'form-group';
 
-    return (
-        <div className={id ? owner.addFormValidationClass('form-group', id) : 'form-group'} >
-            <div className="col-sm-2">
-                <label htmlFor={htmlId} className="control-label">{label}</label>
+    let helpBlock = null;
+    if (help) {
+        helpBlock = <div className={'help-block' + (!inline ? ' col-sm-offset-2 col-sm-10' : '')}
+                         id={htmlId + '_help'}>{help}</div>;
+    }
+
+    let validationBlock = null;
+    if (id) {
+        const validationMsg = id && owner.getFormValidationMessage(id);
+        if (validationMsg) {
+            validationBlock = <div className={'help-block' + (!inline ? ' col-sm-offset-2 col-sm-10' : '')}
+                                   id={htmlId + '_help_validation'}>{validationMsg}</div>;
+        }
+    }
+
+    const labelBlock = <label htmlFor={htmlId} className="control-label">{label}</label>;
+
+    if (inline) {
+        return (
+            <div className={className} >
+                {labelBlock} &nbsp; {input}
+                {helpBlock}
+                {validationBlock}
             </div>
-            <div className="col-sm-10">
-                {input}
+        );
+    } else {
+        return (
+            <div className={className} >
+                <div className="col-sm-2">
+                    {labelBlock}
+                </div>
+                <div className="col-sm-10">
+                    {input}
+                </div>
+                {helpBlock}
+                {validationBlock}
             </div>
-            {helpBlock}
-            {id && <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>}
-        </div>
-    );
+        );
+    }
 }
 
-function wrapInputInline(id, htmlId, owner, containerClass, label, text, help, input) {
+function wrapInputWithText(id, htmlId, owner, containerClass, label, text, help, input) {
     const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
+    const validationMsg = id && owner.getFormValidationMessage(id);
 
     return (
         <div className={id ? owner.addFormValidationClass('form-group', id) : 'form-group'} >
@@ -134,7 +163,7 @@ function wrapInputInline(id, htmlId, owner, containerClass, label, text, help, i
                 <label>{input} {text}</label>
             </div>
             {helpBlock}
-            {id && <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{owner.getFormValidationMessage(id)}</div>}
+            {id && validationMsg && <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{validationMsg}</div>}
         </div>
     );
 }
@@ -216,7 +245,7 @@ class CheckBox extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInputInline(id, htmlId, owner, 'checkbox', props.label, props.text, props.help,
+        return wrapInputWithText(id, htmlId, owner, 'checkbox', props.label, props.text, props.help,
             <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
         );
     }
@@ -251,7 +280,9 @@ class Dropdown extends Component {
         label: PropTypes.string.isRequired,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         options: PropTypes.array,
-        optGroups: PropTypes.array
+        optGroups: PropTypes.array,
+        className: PropTypes.string,
+        inline: PropTypes.bool
     }
 
     static contextTypes = {
@@ -276,11 +307,16 @@ class Dropdown extends Component {
             );
         }
 
+        let className = 'form-control';
+        if (props.className) {
+            className += ' ' + props.className;
+        }
 
         return wrapInput(id, htmlId, owner, props.label, props.help,
-            <select id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
+            <select id={htmlId} className={className} aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
                 {options}
-            </select>
+            </select>,
+            props.inline
         );
     }
 }

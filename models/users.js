@@ -37,12 +37,8 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
 }
 
-async function _getBy(context, key, value, extraColumns) {
-    const columns = ['id', 'username', 'name', 'email', 'namespace', 'role'];
-
-    if (extraColumns) {
-        columns.push(...extraColumns);
-    }
+async function _getBy(context, key, value, extraColumns = []) {
+    const columns = ['id', 'username', 'name', 'email', 'namespace', 'role', ...extraColumns];
 
     const user = await knex('users').select(columns).where(key, value).first();
 

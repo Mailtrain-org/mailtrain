@@ -20,19 +20,8 @@ export default class List extends Component {
 
         const t = this.props.t;
 
-        const actions = data => [
-            {
-                label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                link: `/users/${data[0]}/edit`
-            },
-            {
-                label: <span className="glyphicon glyphicon-share" aria-hidden="true" title="Share"></span>,
-                link: `/users/${data[0]}/shares`
-            }
-        ];
-
         const columns = [
-            { data: 1, title: "Username" }
+            { data: 1, title: "Username" },
         ];
 
         if (mailtrainConfig.isAuthMethodLocal) {
@@ -42,6 +31,19 @@ export default class List extends Component {
         columns.push({ data: 3, title: "Namespace" });
         columns.push({ data: 4, title: "Role" });
 
+        columns.push({
+            actions: data => [
+                {
+                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    link: `/users/${data[0]}/edit`
+                },
+                {
+                    label: <span className="glyphicon glyphicon-share" aria-hidden="true" title="Share"></span>,
+                    link: `/users/${data[0]}/shares`
+                }
+            ]
+        });
+
         return (
             <div>
                 <Toolbar>
@@ -50,7 +52,7 @@ export default class List extends Component {
 
                 <Title>{t('Users')}</Title>
 
-                <Table withHeader dataUrl="/rest/users-table" columns={columns} actions={actions} />
+                <Table withHeader dataUrl="/rest/users-table" columns={columns} />
             </div>
         );
     }

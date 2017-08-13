@@ -7,7 +7,6 @@ const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
-const fieldsLegacy = require('../lib/models/fields');
 const bluebird = require('bluebird');
 const validators = require('../shared/validators');
 const shortid = require('shortid');
@@ -85,15 +84,10 @@ function hash(entity) {
 }
 
 async function getById(context, listId, id) {
-    let entity;
-
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
 
-        entity = await tx('custom_fields').where({list: listId, id}).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
+        const entity = await tx('custom_fields').where({list: listId, id}).first();
 
         const orderFields = {
             order_list: 'orderListBefore',
@@ -113,20 +107,20 @@ async function getById(context, listId, id) {
                 entity[orderFields[key]] = 'none';
             }
         }
-    });
 
-    return entity;
+        return entity;
+    });
 }
 
 async function list(context, listId) {
-    let rows;
-
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
-        rows = await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'order_list', 'order_subscribe', 'order_manage']);
+        return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'order_list', 'order_subscribe', 'order_manage']).orderBy('id', 'asc');
     });
+}
 
-    return rows;
+async function listByOrderListTx(tx, listId, extraColumns = []) {
+    return await tx('custom_fields').where({list: listId}).whereNotNull('order_list').select(['name', ...extraColumns]).orderBy('order_list', 'asc');
 }
 
 async function listDTAjax(context, listId, params) {
@@ -199,9 +193,8 @@ async function listGroupedDTAjax(context, listId, params) {
 }
 
 async function serverValidate(context, listId, data) {
-    const result = {};
-
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
+        const result = {};
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
 
         if (data.key) {
@@ -219,9 +212,9 @@ async function serverValidate(context, listId, data) {
                 exists: !!existingKey
             };
         }
-    });
 
-    return result;
+        return result;
+    });
 }
 
 async function _validateAndPreprocess(tx, listId, entity, isCreate) {
@@ -304,8 +297,7 @@ async function _sortIn(tx, listId, entityId, orderListBefore, orderSubscribeBefo
 }
 
 async function create(context, listId, entity) {
-    let id;
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
 
         await _validateAndPreprocess(tx, listId, entity, true);
@@ -322,8 +314,7 @@ async function create(context, listId, entity) {
         filteredEntity.column = columnName;
 
         const ids = await tx('custom_fields').insert(filteredEntity);
-        id = ids[0];
-
+        const id = ids[0];
 
         await _sortIn(tx, listId, id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
 
@@ -335,9 +326,9 @@ async function create(context, listId, entity) {
                 }
             });
         }
-    });
 
-    return id;
+        return id;
+    });
 }
 
 async function updateWithConsistencyCheck(context, listId, entity) {
@@ -392,6 +383,7 @@ module.exports = {
     hash,
     getById,
     list,
+    listByOrderListTx,
     listDTAjax,
     listGroupedDTAjax,
     create,

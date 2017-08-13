@@ -103,10 +103,10 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'const results = await campaigns.getResults(inputs.campaign, ["custom_country"], query =>\n' +
+                        'const results = await campaigns.getResults(inputs.campaign, ["merge_country"], query =>\n' +
                         '  query.count("* AS count_all")\n' +
                         '    .select(knex.raw("SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"))\n' +
-                        '    .groupBy("custom_country")\n' +
+                        '    .groupBy("merge_country")\n' +
                         ');\n' +
                         '\n' +
                         'for (const row of results) {\n' +
@@ -138,7 +138,7 @@ export default class CUD extends Component {
                         '    {{#each results}}\n' +
                         '      <tr>\n' +
                         '        <th scope="row">\n' +
-                        '          {{custom_country}}\n' +
+                        '          {{merge_country}}\n' +
                         '        </th>\n' +
                         '        <td style="width: 20%;">\n' +
                         '          {{count_opened}}\n' +

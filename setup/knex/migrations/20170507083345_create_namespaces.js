@@ -1,10 +1,10 @@
 exports.up = (knex, Promise) => (async() => {
-    const entityTypesAddNamespace = ['list', 'custom_form', 'report', 'report_template', 'user'];
+    const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
     await knex.schema.createTable('namespaces', table => {
         table.increments('id').primary();
         table.string('name');
         table.text('description');
-        table.integer('namespace').unsigned().references('namespaces.id').onDelete('CASCADE');
+        table.integer('namespace').unsigned().references('namespaces.id');
     });
 
     await knex('namespaces').insert({
@@ -23,7 +23,7 @@ exports.up = (knex, Promise) => (async() => {
         });
 
         await knex.schema.table(`${entityType}s`, table => {
-            table.foreign('namespace').references('namespaces.id').onDelete('CASCADE');
+            table.foreign('namespace').references('namespaces.id');
         });
     }
 })();

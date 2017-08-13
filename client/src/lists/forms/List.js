@@ -41,30 +41,31 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        const actions = data => {
-            const actions = [];
-            const perms = data[4];
-
-            if (perms.includes('edit')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: `/lists/forms/${data[0]}/edit`
-                });
-            }
-            if (perms.includes('share')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: `/lists/forms/${data[0]}/share`
-                });
-            }
-
-            return actions;
-        };
-
         const columns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('Namespace') }
+            { data: 3, title: t('Namespace') },
+            {
+                actions: data => {
+                    const actions = [];
+                    const perms = data[4];
+
+                    if (perms.includes('edit')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            link: `/lists/forms/${data[0]}/edit`
+                        });
+                    }
+                    if (perms.includes('share')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            link: `/lists/forms/${data[0]}/share`
+                        });
+                    }
+
+                    return actions;
+                }
+            }
         ];
 
         return (
@@ -77,7 +78,7 @@ export default class List extends Component {
 
                 <Title>{t('Forms')}</Title>
 
-                <Table withHeader dataUrl="/rest/forms-table" columns={columns} actions={actions} />
+                <Table withHeader dataUrl="/rest/forms-table" columns={columns} />
             </div>
         );
     }

@@ -8,6 +8,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handli
 import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
 import moment from 'moment';
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withPageHelpers
@@ -32,7 +33,7 @@ export default class List extends Component {
         const result = await axios.post('/rest/permissions-check', request);
 
         this.setState({
-            createPermitted: result.data.createReportTemplate
+            createPermitted: result.data.createReportTemplate && mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess')
         });
     }
 
@@ -43,32 +44,33 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        const actions = data => {
-            const actions = [];
-            const perms = data[5];
-
-            if (perms.includes('view')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: `/reports/templates/${data[0]}/edit`
-                });
-            }
-
-            if (perms.includes('share')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: `/reports/templates/${data[0]}/share`
-                });
-            }
-
-            return actions;
-        };
-
         const columns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
             { data: 3, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 4, title: t('Namespace') }
+            { data: 4, title: t('Namespace') },
+            {
+                actions: data => {
+                    const actions = [];
+                    const perms = data[5];
+
+                    if (mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess') && perms.includes('edit')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            link: `/reports/templates/${data[0]}/edit`
+                        });
+                    }
+
+                    if (perms.includes('share')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            link: `/reports/templates/${data[0]}/share`
+                        });
+                    }
+
+                    return actions;
+                }
+            }
         ];
 
         return (
@@ -86,7 +88,7 @@ export default class List extends Component {
 
                 <Title>{t('Report Templates')}</Title>
 
-                <Table withHeader dataUrl="/rest/report-templates-table" columns={columns} actions={actions} />
+                <Table withHeader dataUrl="/rest/report-templates-table" columns={columns} />
             </div>
         );
     }

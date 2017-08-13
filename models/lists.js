@@ -8,6 +8,7 @@ const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
+const fields = require('./fields');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
@@ -31,26 +32,17 @@ async function listDTAjax(context, params) {
 }
 
 async function getById(context, id) {
-    let entity;
-
-    await knex.transaction(async tx => {
-
+    return await knex.transaction(async tx => {
         shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
-
-        entity = await tx('lists').where('id', id).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
-        entity.permissions = await shares.getPermissions(tx, context, 'list', id);
+        const entity = await tx('lists').where('id', id).first();
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'list', id);
+        entity.listFields = await fields.listByOrderListTx(tx, id);
+        return entity;
     });
-
-    return entity;
 }
 
 async function create(context, entity) {
-    let id;
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createList');
 
         await namespaceHelpers.validateEntity(tx, entity);
@@ -60,14 +52,14 @@ async function create(context, entity) {
         filteredEntity.cid = shortid.generate();
 
         const ids = await tx('lists').insert(filteredEntity);
-        id = ids[0];
+        const id = ids[0];
 
         await knex.schema.raw('CREATE TABLE `subscription__' + id + '` LIKE subscription');
 
         await shares.rebuildPermissions(tx, { entityTypeId: 'list', entityId: id });
-    });
 
-    return id;
+        return id;
+    });
 }
 
 async function updateWithConsistencyCheck(context, entity) {

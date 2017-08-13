@@ -47,7 +47,6 @@ class Table extends Component {
         selectionAsArray: PropTypes.bool,
         onSelectionChangedAsync: PropTypes.func,
         onSelectionDataAsync: PropTypes.func,
-        actions: PropTypes.func,
         withHeader: PropTypes.bool,
         refreshInterval: PropTypes.number
     }
@@ -177,81 +176,82 @@ class Table extends Component {
     componentDidMount() {
         const columns = this.props.columns.slice();
 
-        if (this.props.actions) {
-            const createdCellFn = (td, data) => {
-                const linksContainer = jQuery('<span class="mt-action-links"/>');
-
-                let actions = this.props.actions(data);
-                let options = {};
-
-                if (!Array.isArray(actions)) {
-                    options = actions;
-                    actions = actions.actions;
-                }
-
-                for (const action of actions) {
-                    if (action.action) {
-                        const html = ReactDOMServer.renderToStaticMarkup(<a href="">{action.label}</a>);
-                        const elem = jQuery(html);
-                        elem.click((evt) => { evt.preventDefault(); action.action(this) });
-                        linksContainer.append(elem);
-
-                    } else if (action.link) {
-                        const html = ReactDOMServer.renderToStaticMarkup(<a href={action.link}>{action.label}</a>);
-                        const elem = jQuery(html);
-                        elem.click((evt) => { evt.preventDefault(); this.navigateTo(action.link) });
-                        linksContainer.append(elem);
-
-                    } else if (action.href) {
-                        const html = ReactDOMServer.renderToStaticMarkup(<a href={action.href}>{action.label}</a>);
-                        const elem = jQuery(html);
-                        linksContainer.append(elem);
-
-                    } else {
-                        const html = ReactDOMServer.renderToStaticMarkup(action.label);
-                        const elem = jQuery(html);
-                        linksContainer.append(elem);
-                    }
-                }
-
-                if (options.refreshTimeout) {
-                    const currentMS = Date.now();
-
-                    if (!this.refreshTimeoutAt || this.refreshTimeoutAt > currentMS + options.refreshTimeout) {
-                        clearTimeout(this.refreshTimeoutId);
-
-                        this.refreshTimeoutAt = currentMS + options.refreshTimeout;
-
-                        this.refreshTimeoutId = setTimeout(() => {
-                            this.refreshTimeoutAt = 0;
-                            this.refresh();
-                        }, options.refreshTimeout);
-                    }
-                }
-
-                jQuery(td).html(linksContainer);
-            };
-
-            columns.push({
-                data: null,
-                orderable: false,
-                searchable: false,
-                type: 'html',
-                createdCell: createdCellFn
-            });
-        }
-
-        // XSS protection
+        // XSS protection and actions rendering
         for (const column of columns) {
-            const originalRender = column.render;
-            column.render = (data, ...rest) => {
-                if (originalRender) {
-                    const markup = originalRender(data, ...rest);
-                    return ReactDOMServer.renderToStaticMarkup(<div>{markup}</div>);
-                } else {
-                    return ReactDOMServer.renderToStaticMarkup(<div>{data}</div>)
+            if (column.actions) {
+                const createdCellFn = (td, data, rowData) => {
+                    const linksContainer = jQuery('<span class="mt-action-links"/>');
+
+                    let actions = column.actions(rowData);
+                    let options = {};
+
+                    if (!Array.isArray(actions)) {
+                        options = actions;
+                        actions = actions.actions;
+                    }
+
+                    for (const action of actions) {
+                        if (action.action) {
+                            const html = ReactDOMServer.renderToStaticMarkup(<a href="">{action.label}</a>);
+                            const elem = jQuery(html);
+                            elem.click((evt) => { evt.preventDefault(); action.action(this) });
+                            linksContainer.append(elem);
+
+                        } else if (action.link) {
+                            const html = ReactDOMServer.renderToStaticMarkup(<a href={action.link}>{action.label}</a>);
+                            const elem = jQuery(html);
+                            elem.click((evt) => { evt.preventDefault(); this.navigateTo(action.link) });
+                            linksContainer.append(elem);
+
+                        } else if (action.href) {
+                            const html = ReactDOMServer.renderToStaticMarkup(<a href={action.href}>{action.label}</a>);
+                            const elem = jQuery(html);
+                            linksContainer.append(elem);
+
+                        } else {
+                            const html = ReactDOMServer.renderToStaticMarkup(<span>{action.label}</span>);
+                            const elem = jQuery(html);
+                            linksContainer.append(elem);
+                        }
+                    }
+
+                    if (options.refreshTimeout) {
+                        const currentMS = Date.now();
+
+                        if (!this.refreshTimeoutAt || this.refreshTimeoutAt > currentMS + options.refreshTimeout) {
+                            clearTimeout(this.refreshTimeoutId);
+
+                            this.refreshTimeoutAt = currentMS + options.refreshTimeout;
+
+                            this.refreshTimeoutId = setTimeout(() => {
+                                this.refreshTimeoutAt = 0;
+                                this.refresh();
+                            }, options.refreshTimeout);
+                        }
+                    }
+
+                    jQuery(td).html(linksContainer);
+                };
+
+                column.type = 'html';
+                column.createdCell = createdCellFn;
+
+                if (!('data' in column)) {
+                    column.data = null;
+                    column.orderable = false;
+                    column.searchable = false;
                 }
-            };
+            } else {
+                const originalRender = column.render;
+                column.render = (data, ...rest) => {
+                    if (originalRender) {
+                        const markup = originalRender(data, ...rest);
+                        return ReactDOMServer.renderToStaticMarkup(<div>{markup}</div>);
+                    } else {
+                        return ReactDOMServer.renderToStaticMarkup(<div>{data}</div>)
+                    }
+                };
+            }
 
             column.title = ReactDOMServer.renderToStaticMarkup(<div>{column.title}</div>);
         }

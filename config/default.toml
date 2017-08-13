@@ -196,9 +196,8 @@ browser="phantomjs"
 name="Master"
 admin=true
 description="All permissions"
-permissions=["rebuildPermissions"]
+permissions=["rebuildPermissions", "createJavascriptWithROAccess"]
 rootNamespaceRole="master"
-
 
 [roles.namespace.master]
 name="Master"
@@ -206,8 +205,10 @@ description="All permissions"
 permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
 
 [roles.namespace.master.children]
-list=["view", "edit", "delete", "share", "manageFields"]
+list=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
 customForm=["view", "edit", "delete", "share"]
+campaign=["view", "edit", "delete", "share"]
+template=["view", "edit", "delete", "share"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
 namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
@@ -215,9 +216,19 @@ namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "
 [roles.list.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "manageFields"]
+permissions=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
 
 [roles.customForm.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete", "share"]
+
+[roles.campaign.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete", "share"]
+
+[roles.template.master]
 name="Master"
 description="All permissions"
 permissions=["view", "edit", "delete", "share"]
@@ -236,33 +247,51 @@ permissions=["view", "edit", "delete", "share", "execute"]
 
 [roles.global.editor]
 name="Editor"
-description="Anything under own namespace except operations related to sending and doing reports"
+description="XXX"
 permissions=[]
 ownNamespaceRole="editor"
 
-
-[roles.reportTemplate.editor]
+[roles.namespace.editor]
 name="Editor"
-description="Anything under own namespace except operations related to sending and doing reports"
+description="XXX"
+permissions=["view", "edit", "delete"]
+
+[roles.namespace.editor.children]
+list=[]
+customForm=[]
+campaign=[]
+template=[]
+report=[]
+reportTemplate=[]
+namespace=["view", "edit", "delete"]
+
+[roles.list.editor]
+name="Editor"
+description="XXX"
+permissions=[]
+
+[roles.customForm.editor]
+name="Editor"
+description="All permissions"
+permissions=[]
+
+[roles.campaign.editor]
+name="Editor"
+description="XXX"
+permissions=[]
+
+[roles.template.editor]
+name="Editor"
+description="XXX"
 permissions=[]
 
 [roles.report.editor]
 name="Editor"
-description="Anything under own namespace except operations related to sending and doing reports"
-permissions=["view", "viewContent", "viewOutput"]
-
-[roles.list.editor]
-name="Editor"
-description="Anything under own namespace except operations related to sending and doing reports"
+description="XXX"
 permissions=[]
 
-[roles.namespace.editor]
+[roles.reportTemplate.editor]
 name="Editor"
-description="Anything under own namespace except operations related to sending and doing reports"
-permissions=["view", "edit", "delete"]
+description="XXX"
+permissions=[]
 
-[roles.namespace.editor.children]
-reportTemplate=[]
-report=["view", "viewContent", "viewOutput"]
-list=[]
-namespace=["view", "edit", "delete"]

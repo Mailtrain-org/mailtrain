@@ -19,29 +19,22 @@ function hash(entity) {
 }
 
 async function getByIdWithTemplate(context, id) {
-    let entity;
-
-    await knex.transaction(async tx => {
-
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'view');
 
-        entity = await tx('reports')
+        const entity = await tx('reports')
             .where('reports.id', id)
             .innerJoin('report_templates', 'reports.report_template', 'report_templates.id')
             .select(['reports.id', 'reports.name', 'reports.description', 'reports.report_template', 'reports.params', 'reports.state', 'reports.namespace', 'report_templates.user_fields', 'report_templates.mime_type', 'report_templates.hbs', 'report_templates.js'])
             .first();
 
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
         entity.user_fields = JSON.parse(entity.user_fields);
         entity.params = JSON.parse(entity.params);
 
-        entity.permissions = await shares.getPermissions(tx, context, 'report', id);
-    });
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'report', id);
 
-    return entity;
+        return entity;
+    });
 }
 
 async function listDTAjax(context, params) {
@@ -147,21 +140,17 @@ const campaignFieldsMapping = {
     email: 'subscribers.email'
 };
 
-function customFieldName(id) {
-    return id.replace(/MERGE_/, 'CUSTOM_').toLowerCase();
-}
-
 async function getCampaignResults(context, campaign, select, extra) {
-    const fieldList = await fields.list(campaign.list);
+    const fieldList = await fields.list(context, campaign.list);
 
-    const fieldsMapping = fieldList.reduce((map, field) => {
-        /* Dropdowns and checkboxes are aggregated. As such, they have field.column == null and the options are in field.options.
+    const fieldsMapping = Object.assign({}, campaignFieldsMapping);
+    for (const field of fieldList) {
+        /* Dropdowns and checkboxes are aggregated. As such, they have field.column == null
            TODO - For the time being, we ignore groupped fields. */
         if (field.column) {
-            map[customFieldName(field.key)] = 'subscribers.' + field.column;
+            fieldsMapping[field.key.toLowerCase()] = 'subscribers.' + field.column;
         }
-        return map;
-    }, Object.assign({}, campaignFieldsMapping));
+    }
 
     let selFields = [];
     for (let idx = 0; idx < select.length; idx++) {

@@ -14,6 +14,7 @@ import ReportTemplatesCUD from './templates/CUD';
 import ReportTemplatesList from './templates/List';
 import Share from '../shares/Share';
 import { ReportState } from '../../../shared/reports';
+import mailtrainConfig from 'mailtrainConfig';
 
 
 const getStructure = t => {
@@ -86,7 +87,7 @@ const getStructure = t => {
                                         ':action(edit|delete)': {
                                             title: t('Edit'),
                                             link: params => `/reports/templates/${params.templateId}/edit`,
-                                            visible: resolved => resolved.template.permissions.includes('edit'),
+                                            visible: resolved => mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess') && resolved.template.permissions.includes('edit'),
                                             render: props => <ReportTemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
                                         },
                                         share: {

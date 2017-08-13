@@ -53,11 +53,11 @@ async function main() {
 
         const campaignsProxy = {
             getResults: (campaign, select, extra) => reports.getCampaignResults(context, campaign, select, extra),
-            getById: campaigns.getById
+            getById: campaignId => campaigns.getById(context, campaignId)
         };
 
         const subscriptionsProxy = {
-            list: subscriptions.list
+            list: listId => subscriptions.list(context, listId)
         };
 
         const sandbox = {

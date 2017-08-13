@@ -85,14 +85,12 @@ async function _getById(tx, id) {
 
 
 async function getById(context, id) {
-    let entity;
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
-        entity = await _getById(tx, id);
-        entity.permissions = await shares.getPermissions(tx, context, 'customForm', id);
+        const entity = await _getById(tx, id);
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'customForm', id);
+        return entity;
     });
-
-    return entity;
 }
 
 
@@ -114,8 +112,7 @@ async function serverValidate(context, data) {
 
 
 async function create(context, entity) {
-    let id;
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCustomForm');
 
         await namespaceHelpers.validateEntity(tx, entity);
@@ -124,7 +121,7 @@ async function create(context, entity) {
         enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');
 
         const ids = await tx('custom_forms').insert(filterObject(entity, formAllowedKeys));
-        id = ids[0];
+        const id = ids[0];
 
         for (const formKey in form) {
             await tx('custom_forms_data').insert({
@@ -135,9 +132,8 @@ async function create(context, entity) {
         }
 
         await shares.rebuildPermissions(tx, { entityTypeId: 'customForm', entityId: id });
+        return id;
     });
-
-    return id;
 }
 
 async function updateWithConsistencyCheck(context, entity) {

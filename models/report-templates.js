@@ -15,21 +15,12 @@ function hash(entity) {
 }
 
 async function getById(context, id) {
-    let entity;
-
-    await knex.transaction(async tx => {
-
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', id, 'view');
-
-        entity = await tx('report_templates').where('id', id).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
-        entity.permissions = await shares.getPermissions(tx, context, 'reportTemplate', id);
+        const entity = await tx('report_templates').where('id', id).first();
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'reportTemplate', id);
+        return entity;
     });
-
-    return entity;
 }
 
 async function listDTAjax(context, params) {
@@ -43,22 +34,23 @@ async function listDTAjax(context, params) {
 }
 
 async function create(context, entity) {
-    let id;
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
+        await shares.enforceGlobalPermission(context, 'createJavascriptWithROAccess');
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createReportTemplate');
         await namespaceHelpers.validateEntity(tx, entity);
 
         const ids = await tx('report_templates').insert(filterObject(entity, allowedKeys));
-        id = ids[0];
+        const id = ids[0];
 
         await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: id });
-    });
 
-    return id;
+        return id;
+    });
 }
 
 async function updateWithConsistencyCheck(context, entity) {
     await knex.transaction(async tx => {
+        await shares.enforceGlobalPermission(context, 'createJavascriptWithROAccess');
         await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', entity.id, 'edit');
 
         const existing = await tx('report_templates').where('id', entity.id).first();
@@ -87,14 +79,11 @@ async function remove(context, id) {
 }
 
 async function getUserFieldsById(context, id) {
-    await shares.enforceEntityPermission(context, 'reportTemplate', id, 'view');
-
-    const entity = await knex('report_templates').select(['user_fields']).where('id', id).first();
-    if (!entity) {
-        throw new interoperableErrors.NotFoundError();
-    }
-
-    return JSON.parse(entity.user_fields);
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', id, 'view');
+        const entity = await tx('report_templates').select(['user_fields']).where('id', id).first();
+        return JSON.parse(entity.user_fields);
+    });
 }
 
 module.exports = {

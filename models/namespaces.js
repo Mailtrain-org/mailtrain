@@ -108,38 +108,28 @@ function hash(entity) {
 }
 
 async function getById(context, id) {
-    let entity;
-
-    await knex.transaction(async tx => {
-
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
-
-        entity = await tx('namespaces').where('id', id).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
-        entity.permissions = await shares.getPermissions(tx, context, 'namespace', id);
+        const entity = await tx('namespaces').where('id', id).first();
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'namespace', id);
+        return entity;
     });
-
-    return entity;
 }
 
 async function create(context, entity) {
     enforce(entity.namespace, 'Parent namespace must be set');
 
-    let id;
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createNamespace');
 
         const ids = await tx('namespaces').insert(filterObject(entity, allowedKeys));
-        id = ids[0];
+        const id = ids[0];
 
         // We don't have to rebuild all entity types, because no entity can be a child of the namespace at this moment.
         await shares.rebuildPermissions(tx, { entityTypeId: 'namespace', entityId: id });
-    });
 
-    return id;
+        return id;
+    });
 }
 
 async function updateWithConsistencyCheck(context, entity) {
@@ -190,6 +180,8 @@ async function remove(context, id) {
         if (childNs) {
             throw new interoperableErrors.ChildDetectedError();
         }
+
+        // FIXME - Remove all contained entities first
 
         await tx('namespaces').where('id', id).del();
     });

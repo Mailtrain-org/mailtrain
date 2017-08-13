@@ -20,7 +20,7 @@ router.postAsync('/shares-unassigned-users-table/:entityTypeId/:entityId', passp
 });
 
 router.postAsync('/shares-roles-table/:entityTypeId', passport.loggedIn, async (req, res) => {
-    return res.json(await shares.listRolesDTAjax(req.context, req.params.entityTypeId, req.body));
+    return res.json(await shares.listRolesDTAjax(req.params.entityTypeId, req.body));
 });
 
 router.putAsync('/shares', passport.loggedIn, async (req, res) => {

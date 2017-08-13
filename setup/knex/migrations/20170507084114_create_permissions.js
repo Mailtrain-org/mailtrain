@@ -1,4 +1,4 @@
-const shareableEntityTypes = ['list', 'custom_form', 'report', 'report_template', 'namespace'];
+const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace'];
 
 exports.up = (knex, Promise) => (async() => {
 

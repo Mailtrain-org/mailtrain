@@ -6,6 +6,7 @@ import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} f
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import { Table } from '../lib/table';
 import axios from '../lib/axios';
+import {Link} from "react-router-dom";
 
 @translate()
 @withPageHelpers
@@ -41,40 +42,59 @@ export default class List extends Component {
     render() {
         const t = this.props.t;
 
-        const actions = data => {
-            const actions = [];
-            const perms = data[6];
-
-            if (perms.includes('edit')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: `/lists/${data[0]}/edit`
-                });
-            }
-
-            if (perms.includes('manageFields')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-th-list" aria-hidden="true" title="Manage Fields"></span>,
-                    link: `/lists/${data[0]}/fields`
-                });
-            }
-
-            if (perms.includes('share')) {
-                actions.push({
-                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
-                    link: `/lists/${data[0]}/share`
-                });
-            }
-
-            return actions;
-        };
-
         const columns = [
-            { data: 1, title: t('Name') },
+            {
+                data: 1,
+                title: t('Name'),
+                actions: data => {
+                    const perms = data[6];
+                    if (perms.includes('viewSubscriptions')) {
+                        return [{label: data[1], link: `/lists/${data[0]}/subscriptions`}];
+                    } else {
+                        return [{label: data[1]}];
+                    }
+                }
+            },
             { data: 2, title: t('ID'), render: data => <code>{data}</code> },
             { data: 3, title: t('Subscribers') },
             { data: 4, title: t('Description') },
-            { data: 5, title: t('Namespace') }
+            { data: 5, title: t('Namespace') },
+            {
+                actions: data => {
+                    const actions = [];
+                    const perms = data[6];
+
+                    if (perms.includes('viewSubscriptions')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-user" aria-hidden="true" title="Subscribers"></span>,
+                            link: `/lists/${data[0]}/subscriptions`
+                        });
+                    }
+
+                    if (perms.includes('edit')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            link: `/lists/${data[0]}/edit`
+                        });
+                    }
+
+                    if (perms.includes('manageFields')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-th-list" aria-hidden="true" title="Manage Fields"></span>,
+                            link: `/lists/${data[0]}/fields`
+                        });
+                    }
+
+                    if (perms.includes('share')) {
+                        actions.push({
+                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            link: `/lists/${data[0]}/share`
+                        });
+                    }
+
+                    return actions;
+                }
+            }
         ];
 
         return (
@@ -88,7 +108,7 @@ export default class List extends Component {
 
                 <Title>{t('Lists')}</Title>
 
-                <Table withHeader dataUrl="/rest/lists-table" columns={columns} actions={actions} />
+                <Table withHeader dataUrl="/rest/lists-table" columns={columns} />
             </div>
         );
     }

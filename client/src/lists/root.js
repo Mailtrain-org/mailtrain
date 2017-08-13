@@ -12,6 +12,7 @@ import FormsList from './forms/List';
 import FormsCUD from './forms/CUD';
 import FieldsList from './fields/List';
 import FieldsCUD from './fields/CUD';
+import SubscriptionsList from './subscriptions/List';
 import Share from '../shares/Share';
 
 
@@ -33,8 +34,14 @@ const getStructure = t => {
                             resolve: {
                                 list: params => `/rest/lists/${params.listId}`
                             },
-                            link: params => `/lists/${params.listId}/edit`,
+                            link: params => `/lists/${params.listId}/subscriptions`,
                             navs: {
+                                subscriptions: {
+                                    title: t('Subscribers'),
+                                    link: params => `/lists/${params.listId}/subscriptions`,
+                                    visible: resolved => resolved.list.permissions.includes('viewSubscriptions'),
+                                    render: props => <SubscriptionsList list={props.resolved.list} />
+                                },
                                 ':action(edit|delete)': {
                                     title: t('Edit'),
                                     link: params => `/lists/${params.listId}/edit`,
@@ -45,7 +52,7 @@ const getStructure = t => {
                                     title: t('Fields'),
                                     link: params => `/lists/${params.listId}/fields/`,
                                     visible: resolved => resolved.list.permissions.includes('manageFields'),
-                                    component: FieldsList,
+                                    render: props => <FieldsList list={props.resolved.list} />,
                                     children: {
                                         ':fieldId([0-9]+)': {
                                             title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
@@ -66,6 +73,11 @@ const getStructure = t => {
                                             render: props => <FieldsCUD action="create" list={props.resolved.list} />
                                         }
                                     }
+                                },
+                                segments: {
+                                    title: t('Segments'),
+                                    link: params => `/lists/${params.listId}/segments`,
+                                    visible: resolved => resolved.list.permissions.includes('manageSegments')
                                 },
                                 share: {
                                     title: t('Share'),
