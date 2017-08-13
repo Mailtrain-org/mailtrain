@@ -13,6 +13,7 @@ import FormsCUD from './forms/CUD';
 import FieldsList from './fields/List';
 import FieldsCUD from './fields/CUD';
 import SubscriptionsList from './subscriptions/List';
+import SegmentsList from './segments/List';
 import Share from '../shares/Share';
 
 
@@ -77,7 +78,8 @@ const getStructure = t => {
                                 segments: {
                                     title: t('Segments'),
                                     link: params => `/lists/${params.listId}/segments`,
-                                    visible: resolved => resolved.list.permissions.includes('manageSegments')
+                                    visible: resolved => resolved.list.permissions.includes('manageSegments'),
+                                    render: props => <SegmentsList list={props.resolved.list} />
                                 },
                                 share: {
                                     title: t('Share'),

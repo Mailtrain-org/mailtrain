@@ -21,8 +21,6 @@ async function listDTAjax(context, listId, params) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const flds = await fields.listByOrderListTx(tx, listId, ['column']);
-
         return await dtHelpers.ajaxListTx(
             tx,
             params,
