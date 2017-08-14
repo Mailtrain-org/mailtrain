@@ -14,6 +14,7 @@ import FieldsList from './fields/List';
 import FieldsCUD from './fields/CUD';
 import SubscriptionsList from './subscriptions/List';
 import SegmentsList from './segments/List';
+import SegmentsCUD from './segments/CUD';
 import Share from '../shares/Share';
 
 
@@ -58,20 +59,24 @@ const getStructure = t => {
                                         ':fieldId([0-9]+)': {
                                             title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
                                             resolve: {
-                                                field: params => `/rest/fields/${params.listId}/${params.fieldId}`
+                                                field: params => `/rest/fields/${params.listId}/${params.fieldId}`,
+                                                fields: params => `/rest/fields/${params.listId}`
                                             },
                                             link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
                                             navs: {
                                                 ':action(edit|delete)': {
                                                     title: t('Edit'),
                                                     link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
-                                                    render: props => <FieldsCUD action={props.match.params.action} entity={props.resolved.field} list={props.resolved.list} />
+                                                    render: props => <FieldsCUD action={props.match.params.action} entity={props.resolved.field} list={props.resolved.list} fields={props.resolved.fields} />
                                                 }
                                             }
                                         },
                                         create: {
-                                            title: t('Create Field'),
-                                            render: props => <FieldsCUD action="create" list={props.resolved.list} />
+                                            title: t('Create'),
+                                            resolve: {
+                                                fields: params => `/rest/fields/${params.listId}`
+                                            },
+                                            render: props => <FieldsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
                                         }
                                     }
                                 },
@@ -79,7 +84,31 @@ const getStructure = t => {
                                     title: t('Segments'),
                                     link: params => `/lists/${params.listId}/segments`,
                                     visible: resolved => resolved.list.permissions.includes('manageSegments'),
-                                    render: props => <SegmentsList list={props.resolved.list} />
+                                    render: props => <SegmentsList list={props.resolved.list} />,
+                                    children: {
+                                        ':segmentId([0-9]+)': {
+                                            title: resolved => t('Segment "{{name}}"', {name: resolved.segment.name}),
+                                            resolve: {
+                                                segment: params => `/rest/segments/${params.listId}/${params.segmentId}`,
+                                                fields: params => `/rest/fields/${params.listId}`
+                                            },
+                                            link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
+                                            navs: {
+                                                ':action(edit|delete)': {
+                                                    title: t('Edit'),
+                                                    link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
+                                                    render: props => <SegmentsCUD action={props.match.params.action} entity={props.resolved.segment} list={props.resolved.list} fields={props.resolved.fields} />
+                                                }
+                                            }
+                                        },
+                                        create: {
+                                            title: t('Create'),
+                                            resolve: {
+                                                fields: params => `/rest/fields/${params.listId}`
+                                            },
+                                            render: props => <SegmentsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
+                                        }
+                                    }
                                 },
                                 share: {
                                     title: t('Share'),

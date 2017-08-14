@@ -9,6 +9,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const fields = require('./fields');
+const segments = require('./segments');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
@@ -56,7 +57,7 @@ async function create(context, entity) {
 
         await knex.schema.raw('CREATE TABLE `subscription__' + id + '` LIKE subscription');
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'list', entityId: id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: id });
 
         return id;
     });
@@ -82,7 +83,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await tx('lists').where('id', entity.id).update(filterObject(entity, allowedKeys));
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'list', entityId: entity.id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: entity.id });
     });
 }
 
@@ -90,8 +91,22 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'delete');
 
+        await fields.removeAllByListIdTx(tx, context, id);
+        await segments.removeAllByListIdTx(tx, context, id);
+
         await tx('lists').where('id', id).del();
         await knex.schema.dropTableIfExists('subscription__' + id);
+    });
+}
+
+async function removeFormFromAllTx(tx, context, formId) {
+    await knex.transaction(async tx => {
+        const entities = tx('lists').where('default_form', formId).select(['id']);
+
+        for (const entity of entities) {
+            await shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'edit');
+            await tx('lists').where('id', entity.id).update({default_form: null});
+        }
     });
 }
 
@@ -103,5 +118,6 @@ module.exports = {
     getById,
     create,
     updateWithConsistencyCheck,
-    remove
+    remove,
+    removeFormFromAllTx
 };

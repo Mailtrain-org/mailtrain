@@ -5,6 +5,11 @@ exports.up = (knex, Promise) => (async() => {
         table.json('settings');
     });
 
+    await knex.schema.table('custom_fields', table => {
+        table.dropForeign('list', 'custom_fields_ibfk_1');
+        table.foreign('list').references('lists.id');
+    });
+
     const fields = await knex('custom_fields');
 
     for (const field of fields) {

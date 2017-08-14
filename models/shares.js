@@ -115,14 +115,16 @@ async function assign(context, entityTypeId, entityId, userId, role) {
 
         await tx(entityType.permissionsTable).where({user: userId, entity: entityId}).del();
         if (entityTypeId === 'namespace') {
-            await rebuildPermissions(tx, {userId});
+            await rebuildPermissionsTx(tx, {userId});
         } else if (role) {
-            await rebuildPermissions(tx, { entityTypeId, entityId, userId });
+            await rebuildPermissionsTx(tx, { entityTypeId, entityId, userId });
         }
     });
 }
 
-async function _rebuildPermissions(tx, restriction) {
+async function rebuildPermissionsTx(tx, restriction) {
+    restriction = restriction || {};
+
     const namespaceEntityType = permissions.getEntityType('namespace');
 
     // Collect entity types we care about
@@ -358,16 +360,10 @@ async function _rebuildPermissions(tx, restriction) {
     }
 }
 
-async function rebuildPermissions(tx, restriction) {
-    restriction = restriction || {};
-
-    if (tx) {
-        await _rebuildPermissions(tx, restriction);
-    } else {
-        await knex.transaction(async tx => {
-            await _rebuildPermissions(tx, restriction);
-        });
-    }
+async function rebuildPermissions(restriction) {
+    await knex.transaction(async tx => {
+        await rebuildPermissionsTx(tx, restriction);
+    });
 }
 
 async function regenerateRoleNamesTable() {
@@ -556,6 +552,7 @@ module.exports = {
     listUnassignedUsersDTAjax,
     listRolesDTAjax,
     assign,
+    rebuildPermissionsTx,
     rebuildPermissions,
     removeDefaultShares,
     enforceEntityPermission,

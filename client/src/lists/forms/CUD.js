@@ -323,7 +323,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving forms ...'));
+        this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             delete data.selectedTemplate;

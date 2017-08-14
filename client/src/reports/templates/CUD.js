@@ -244,7 +244,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving report template ...'));
+        this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
 

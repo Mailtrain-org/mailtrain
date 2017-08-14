@@ -10,6 +10,7 @@ const shares = require('./shares');
 const bluebird = require('bluebird');
 const validators = require('../shared/validators');
 const shortid = require('shortid');
+const segments = require('./segments');
 
 const allowedKeysCreate = new Set(['name', 'key', 'default_value', 'type', 'group', 'settings']);
 const allowedKeysUpdate = new Set(['name', 'key', 'default_value', 'group', 'settings']);
@@ -353,31 +354,43 @@ async function updateWithConsistencyCheck(context, listId, entity) {
     });
 }
 
+async function removeTx(tx, context, listId, id) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+
+    const existing = await tx('custom_fields').where({list: listId, id: id}).first();
+    if (!existing) {
+        throw new interoperableErrors.NotFoundError();
+    }
+
+    const fieldType = fieldTypes[existing.type];
+
+    await tx('custom_fields').where({list: listId, id}).del();
+
+    if (fieldType.grouped) {
+        await tx('custom_fields').where({list: listId, group: id}).del();
+
+    } else {
+        await knex.schema.table('subscription__' + listId, table => {
+            table.dropColumn(existing.column);
+        });
+
+        await segments.removeRulesByFieldIdTx(tx, context, listId, id);
+    }
+}
+
 async function remove(context, listId, id) {
     await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
-
-        const existing = await tx('custom_fields').where({list: listId, id: id}).first();
-        if (!existing) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
-        const fieldType = fieldTypes[existing.type];
-
-        await tx('custom_fields').where({list: listId, id}).del();
-
-        if (fieldType.grouped) {
-            await tx('custom_fields').where({list: listId, group: id}).del();
-
-        } else {
-            await knex.schema.table('subscription__' + listId, table => {
-                table.dropColumn(existing.column);
-            });
-
-            await tx('segemnt_rules').where({column: existing.column}).del();
-        }
+        await removeTx(tx, context, listId, id);
     });
 }
+
+async function removeAllByListIdTx(tx, context, listId) {
+    const entities = await tx('custom_fields').where('list', listId).select(['id']);
+    for (const entity of entities) {
+        await removeTx(tx, context, listId, entity.id);
+    }
+}
+
 
 module.exports = {
     hash,
@@ -389,5 +402,6 @@ module.exports = {
     create,
     updateWithConsistencyCheck,
     remove,
+    removeAllByListIdTx,
     serverValidate
 };

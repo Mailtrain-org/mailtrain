@@ -12,6 +12,7 @@ const fsReadFile = bluebird.promisify(require('fs').readFile);
 const path = require('path');
 const mjml = require('mjml');
 const _ = require('../lib/translate')._;
+const lists = require('./lists');
 
 const formAllowedKeys = new Set([
     'name',
@@ -131,7 +132,7 @@ async function create(context, entity) {
             })
         }
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'customForm', entityId: id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: id });
         return id;
     });
 }
@@ -164,7 +165,7 @@ async function updateWithConsistencyCheck(context, entity) {
             });
         }
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'customForm', entityId: entity.id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: entity.id });
     });
 }
 
@@ -172,11 +173,7 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'delete');
 
-        const entity = await tx('custom_forms').where('id', id).first();
-
-        if (!entity) {
-            throw shares.throwPermissionDenied();
-        }
+        lists.removeFormFromAllTx(tx, context, id);
 
         await tx('custom_forms_data').where('form', id).del();
         await tx('custom_forms').where('id', id).del();

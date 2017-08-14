@@ -126,7 +126,7 @@ async function create(context, entity) {
         const id = ids[0];
 
         // We don't have to rebuild all entity types, because no entity can be a child of the namespace at this moment.
-        await shares.rebuildPermissions(tx, { entityTypeId: 'namespace', entityId: id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'namespace', entityId: id });
 
         return id;
     });
@@ -166,7 +166,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await tx('namespaces').where('id', entity.id).update(filterObject(entity, allowedKeys));
 
-        await shares.rebuildPermissions(tx);
+        await shares.rebuildPermissionsTx(tx);
     });
 }
 

@@ -11,7 +11,6 @@ import {
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/delete";
 import { getFieldTypes } from './field-types';
-import axios from '../../lib/axios';
 import interoperableErrors from '../../../../shared/interoperable-errors';
 import validators from '../../../../shared/validators';
 import slugify from 'slugify';
@@ -45,6 +44,7 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         list: PropTypes.object,
+        fields: PropTypes.array,
         entity: PropTypes.object
     }
 
@@ -56,27 +56,6 @@ export default class CUD extends Component {
             const newKey = ('MERGE_' + slugify(newValue, '_')).toUpperCase().replace(/[^A-Z0-9_]/g, '');
             state.formState = state.formState.setIn(['data', 'key', 'value'], newKey);
         }
-    }
-
-    @withAsyncErrorHandler
-    async loadOrderOptions() {
-        const t = this.props.t;
-
-        const flds = await axios.get(`/rest/fields/${this.props.list.id}`);
-
-        const getOrderOptions = fld => {
-            return [
-                {key: 'none', label: t('Not visible')},
-                ...flds.data.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.type !== 'option').sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
-                {key: 'end', label: t('End of list')}
-            ];
-        };
-
-        this.setState({
-            orderListOptions: getOrderOptions('order_list'),
-            orderSubscribeOptions: getOrderOptions('order_subscribe'),
-            orderManageOptions: getOrderOptions('order_manage')
-        });
     }
 
     componentDidMount() {
@@ -139,8 +118,6 @@ export default class CUD extends Component {
                 orderManageOptions: []
             });
         }
-
-        this.loadOrderOptions();
     }
 
     localValidateFormValues(state) {
@@ -250,7 +227,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving field ...'));
+            this.setFormStatusMessage('info', t('Saving ...'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 if (data.default_value.trim() === '') {
@@ -319,6 +296,16 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+
+
+        const getOrderOptions = fld => {
+            return [
+                {key: 'none', label: t('Not visible')},
+                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.type !== 'option').sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
+                {key: 'end', label: t('End of list')}
+            ];
+        };
+
 
         const typeOptions = Object.keys(this.fieldTypes).map(key => ({key, label: this.fieldTypes[key].label}));
 
@@ -469,9 +456,9 @@ export default class CUD extends Component {
 
                     {type !== 'option' &&
                         <Fieldset label={t('Field order')}>
-                            <Dropdown id="orderListBefore" label={t('Listings (before)')} options={this.state.orderListOptions} help={t('Select the field before which this field should appeara in listings. To exclude the field from listings, select "Not visible".')}/>
-                            <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={this.state.orderSubscribeOptions} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>
-                            <Dropdown id="orderManageBefore" label={t('Management form (before)')} options={this.state.orderManageOptions} help={t('Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select "Not visible".')}/>
+                            <Dropdown id="orderListBefore" label={t('Listings (before)')} options={getOrderOptions('order_list')} help={t('Select the field before which this field should appeara in listings. To exclude the field from listings, select "Not visible".')}/>
+                            <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={getOrderOptions('order_subscribe')} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>
+                            <Dropdown id="orderManageBefore" label={t('Management form (before)')} options={getOrderOptions('order_manage')} help={t('Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select "Not visible".')}/>
                         </Fieldset>
                     }
 

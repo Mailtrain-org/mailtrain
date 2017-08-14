@@ -141,7 +141,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving user ...'));
+            this.setFormStatusMessage('info', t('Saving ...'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 delete data.password2;

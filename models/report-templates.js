@@ -7,6 +7,7 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
+const reports = require('./reports');
 
 const allowedKeys = new Set(['name', 'description', 'mime_type', 'user_fields', 'js', 'hbs', 'namespace']);
 
@@ -42,7 +43,7 @@ async function create(context, entity) {
         const ids = await tx('report_templates').insert(filterObject(entity, allowedKeys));
         const id = ids[0];
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'reportTemplate', entityId: id });
 
         return id;
     });
@@ -68,14 +69,18 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await tx('report_templates').where('id', entity.id).update(filterObject(entity, allowedKeys));
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'reportTemplate', entityId: entity.id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'reportTemplate', entityId: entity.id });
     });
 }
 
 async function remove(context, id) {
-    await shares.enforceEntityPermission(context, 'reportTemplate', id, 'delete');
+    await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', id, 'delete');
 
-    await knex('report_templates').where('id', id).del();
+        await reports.removeAllByReportTemplateIdTx(tx, context, id);
+
+        await tx('report_templates').where('id', id).del();
+    });
 }
 
 async function getUserFieldsById(context, id) {

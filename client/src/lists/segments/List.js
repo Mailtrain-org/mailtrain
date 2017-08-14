@@ -30,7 +30,6 @@ export default class List extends Component {
 
         const columns = [
             { data: 1, title: t('Name') },
-            { data: 2, title: t('Match') },
             {
                 actions: data => [{
                     label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,

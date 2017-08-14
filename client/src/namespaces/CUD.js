@@ -125,7 +125,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving namespace ...'));
+            this.setFormStatusMessage('info', t('Saving ...'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
 

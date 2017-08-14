@@ -68,7 +68,7 @@ async function create(context, entity) {
         const ids = await tx('reports').insert(filterObject(entity, allowedKeys));
         id = ids[0];
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'report', entityId: id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'report', entityId: id });
     });
 
     const reportProcessor = require('../lib/report-processor');
@@ -103,7 +103,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await tx('reports').where('id', entity.id).update(filteredUpdates);
 
-        await shares.rebuildPermissions(tx, { entityTypeId: 'report', entityId: entity.id });
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'report', entityId: entity.id });
     });
 
     // This require is here to avoid cyclic dependency
@@ -111,11 +111,27 @@ async function updateWithConsistencyCheck(context, entity) {
     await reportProcessor.start(entity.id);
 }
 
-async function remove(context, id) {
-    await shares.enforceEntityPermission(context, 'report', id, 'delete');
+async function removeTx(tx, context, id) {
+    await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'delete');
 
-    await knex('reports').where('id', id).del();
+    await tx('reports').where('id', id).del();
+
+    // FIXME: Remove generated files
 }
+
+async function remove(context, id) {
+    await knex.transaction(async tx => {
+        await removeTx(tx, context, id);
+    });
+}
+
+async function removeAllByReportTemplateIdTx(tx, context, templateId) {
+    const entities = await tx('reports').where('report_template', templateId).select(['id']);
+    for (const entity of entities) {
+        await removeTx(tx, context, entity.id);
+    }
+}
+
 
 async function updateFields(id, fields) {
     return await knex('reports').where('id', id).update(fields);
@@ -186,8 +202,9 @@ module.exports = {
     create,
     updateWithConsistencyCheck,
     remove,
+    removeAllByReportTemplateIdTx,
     updateFields,
     listByState,
     bulkChangeState,
-    getCampaignResults
+    getCampaignResults,
 };

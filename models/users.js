@@ -183,7 +183,7 @@ async function create(context, user) {
             id = ids[0];
         }
 
-        await shares.rebuildPermissions(tx, { userId: id });
+        await shares.rebuildPermissionsTx(tx, { userId: id });
     });
 
     return id;
@@ -231,7 +231,7 @@ async function updateWithConsistencyCheck(context, user, isOwnAccount) {
             await shares.removeDefaultShares(tx, existing);
         }
 
-        await shares.rebuildPermissions(tx, { userId: user.id });
+        await shares.rebuildPermissionsTx(tx, { userId: user.id });
     });
 }
 

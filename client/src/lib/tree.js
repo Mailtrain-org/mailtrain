@@ -91,9 +91,11 @@ class TreeTable extends Component {
         const data = [];
         for (const unsafeEntry of unsafeData) {
             const entry = Object.assign({}, unsafeEntry);
-            entry.title = ReactDOMServer.renderToStaticMarkup(<div>{entry.title}</div>)
-            entry.description = ReactDOMServer.renderToStaticMarkup(<div>{entry.description}</div>)
-            entry.children = this.sanitizeTreeData(entry.children);
+            entry.title = ReactDOMServer.renderToStaticMarkup(<div>{entry.title}</div>);
+            entry.description = ReactDOMServer.renderToStaticMarkup(<div>{entry.description}</div>);
+            if (entry.children) {
+                entry.children = this.sanitizeTreeData(entry.children);
+            }
             data.push(entry);
         }
         return data;

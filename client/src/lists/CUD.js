@@ -81,7 +81,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving list ...'));
+        this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             if (data.form === 'default') {
