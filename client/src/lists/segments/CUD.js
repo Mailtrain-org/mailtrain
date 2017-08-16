@@ -11,8 +11,11 @@ import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handli
 import {DeleteModalDialog} from "../../lib/delete";
 import interoperableErrors from '../../../../shared/interoperable-errors';
 
+import styles from './CUD.scss';
 import SortableTree from 'react-sortable-tree';
-import { getRuleTreeNodeRenderer } from './RuleTreeNodeRenderer';
+import {ActionLink, Icon} from "../../lib/bootstrap-components";
+
+console.log(styles);
 
 @translate()
 @withForm
@@ -23,7 +26,7 @@ export default class CUD extends Component {
     constructor(props) {
         super(props);
 
-        this.compoundRuleTypes = [ 'all', 'some', 'none' ];
+        this.compoundRuleTypes = [ 'all', 'some', 'one', 'none' ];
 
         const allRule = {
             type: 'all'
@@ -33,99 +36,44 @@ export default class CUD extends Component {
             type: 'eq'
         };
 
+        const sampleRules = [
+            {
+                type: 'all',
+                rules: [
+                    {
+                        type: 'some',
+                        rules: [
+                            {
+                                type: 'eq',
+                                value: 11
+                            },
+                            {
+                                type: 'eq',
+                                value: 9
+                            }
+                        ]
+                    },
+                    {
+                        type: 'some',
+                        rules: [
+                            {
+                                type: 'eq',
+                                value: 3
+                            },
+                            {
+                                type: 'eq',
+                                value: 7
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+
         this.state = {
-            rules: [
-                {
-                    key: 'a',
-                    title: 'A',
-                    expanded: true,
-                    rule: allRule,
-                    children: [
-                        {
-                            key: 'aa',
-                            title: 'AA',
-                            expanded: true,
-                            rule: allRule,
-                            children: [
-                                {
-                                    key: 'aaa',
-                                    title:
-                                        <div><h4>sdfsdf</h4><div>xxx</div><div>yyy<NavButton label="ZZZ" linkTo="/lists"/></div></div>,
-                                    rule: otherRule
-                                },
-                                {
-                                    key: 'aab',
-                                    title: 'AAB',
-                                    subtitle: 'sdfwere',
-                                    rule: otherRule
-                                }
-                            ]
-                        },
-                        {
-                            key: 'ab',
-                            title: 'AB',
-                            expanded: true,
-                            rule: allRule,
-                            children: [
-                                {
-                                    key: 'aba',
-                                    title: 'ABA',
-                                    rule: otherRule
-                                },
-                                {
-                                    key: 'abb',
-                                    title: 'ABB',
-                                    rule: otherRule
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    key: 'b',
-                    title: 'B',
-                    expanded: true,
-                    rule: allRule,
-                    children: [
-                        {
-                            key: 'ba',
-                            title: 'BA',
-                            expanded: true,
-                            rule: allRule,
-                            children: [
-                                {
-                                    key: 'baa',
-                                    title: 'BAA',
-                                    rule: otherRule
-                                },
-                                {
-                                    key: 'bab',
-                                    title: 'BAB',
-                                    rule: otherRule
-                                }
-                            ]
-                        },
-                        {
-                            key: 'bb',
-                            title: 'BB',
-                            expanded: true,
-                            rule: allRule,
-                            children: [
-                                {
-                                    key: 'bba',
-                                    title: 'BBA',
-                                    rule: otherRule
-                                },
-                                {
-                                    key: 'bbb',
-                                    title: 'BBB',
-                                    rule: otherRule
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
+            rules: sampleRules,
+            rulesTree: this.getTreeFromRules(sampleRules)
         };
 
         this.initForm();
@@ -136,6 +84,37 @@ export default class CUD extends Component {
         list: PropTypes.object,
         fields: PropTypes.array,
         entity: PropTypes.object
+    }
+
+    getRulesFromTree(tree) {
+        const rules = [];
+        for (const node of tree) {
+            const rule = Object.assign({}, node.rule);
+            rule.rules = this.getRulesFromTree(node.children);
+            rules.push(rule);
+        }
+
+        return rules;
+    }
+
+    getTreeFromRules(rules) {
+        const tree = [];
+        for (const rule of rules) {
+            let title, subtitle;
+
+            title = rule.type; // FIXME
+            subtitle = null;
+
+            tree.push({
+                rule,
+                title,
+                subtitle,
+                expanded: true,
+                children: this.getTreeFromRules(rule.rules || [])
+            });
+        }
+
+        return tree;
     }
 
     componentDidMount() {
@@ -205,15 +184,41 @@ export default class CUD extends Component {
         }
     }
 
-    onRuleSelectionClick(data) {
+    async onRuleDelete(data) {
+        console.log(data);
+    }
+
+    async onRuleOptions(data) {
         this.setState({
-            selectedRule: data.node.key
+            ruleOptionsVisible: true
         });
+    }
+
+    async onRuleTree() {
+        this.setState({
+            ruleOptionsVisible: false
+        });
+    }
+
+    async onRulesChanged(rulesTree) {
+        this.setState({
+            rulesTree,
+            rules: this.getRulesFromTree(rulesTree)
+        })
     }
 
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+
+        let ruleOptionsVisibilityClass = '';
+        if ('ruleOptionsVisible' in this.state) {
+            if (this.state.ruleOptionsVisible) {
+                ruleOptionsVisibilityClass = ' ' + styles.ruleOptionsVisible;
+            } else {
+                ruleOptionsVisibilityClass = ' ' + styles.ruleOptionsHidden;
+            }
+        }
 
         return (
 
@@ -231,35 +236,52 @@ export default class CUD extends Component {
 
                 <Title>{isEdit ? t('Edit Segment') : t('Create Segment')}</Title>
 
-                <Form stateOwner={this} onSubmitAsync={::this.submitHandler} format="wide">
-                    <ButtonRow format="wide" className="pull-right">
+                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
+                    <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
                         {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/fields/${this.props.list.id}/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
 
                     <h3>{t('Segment Options')}</h3>
 
-                    <InputField id="name" label={t('Name')} format="wide"/>
+                    <InputField id="name" label={t('Name')}/>
 
 
                     <hr />
 
-                    <div className="row">
-                        <div className="col-md-6" >
+                    <div className={styles.rulePane + ruleOptionsVisibilityClass}>
+                        <div className={styles.leftPane}>
                             <SortableTree
-                                treeData={this.state.rules}
-                                onChange={ rules => this.setState({rules}) }
+                                treeData={this.state.rulesTree}
+                                onChange={rulesTree => this.onRulesChanged(rulesTree)}
                                 isVirtualized={false}
-                                nodeContentRenderer={getRuleTreeNodeRenderer({
-                                    onClick: ::this.onRuleSelectionClick,
-                                    isSelected: data => data.node.key === this.state.selectedRule
+                                canDrop={ data => !data.nextParent || this.compoundRuleTypes.includes(data.nextParent.rule.type) }
+                                generateNodeProps={data => ({
+                                    buttons: [
+                                        <ActionLink onClickAsync={async () => await this.onRuleOptions(data)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
+                                        <ActionLink onClickAsync={async () => await this.onRuleDelete(data)} className={styles.ruleActionLink}><Icon name="remove"/></ActionLink>
+                                    ]
                                 })}
-                                canDrop={data => data.nextParent && this.compoundRuleTypes.includes(data.nextParent.rule.type)}
                             />
+
+                            <div className={styles.leftPaneOverlay} />
+
+                            <div className={styles.paneDivider}>
+                                <div className={styles.paneDividerSolidBackground}/>
+                            </div>
                         </div>
-                        <div className="col-md-6">
-                            <h3>{t('Selected Rule Options')}</h3>
-                            <InputField id="name" label={t('Name')} format="wide" />
+
+                        <div className={styles.rightPane}>
+                            <div className={styles.rulePaneRightInner}>
+                                <div className={styles.ruleOptions}>
+                                    <h3>{t('Rule Options')}</h3>
+                                    <InputField id="name" label={t('Name')}/>
+
+                                    <ButtonRow>
+                                        <Button className="btn-primary" icon="chevron-left" label={t('Back')} onClickAsync={::this.onRuleTree}/>
+                                    </ButtonRow>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </Form>

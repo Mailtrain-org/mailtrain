@@ -32,6 +32,19 @@ class DismissibleAlert extends Component {
     }
 }
 
+class Icon extends Component {
+    static propTypes = {
+        name: PropTypes.string,
+        className: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        return <span className={'glyphicon glyphicon-' + props.name + (props.className ? ' ' + props.className : '')}></span>;
+    }
+}
+
 @withErrorHandling
 class Button extends Component {
     static propTypes = {
@@ -59,7 +72,7 @@ class Button extends Component {
 
         let icon;
         if (props.icon) {
-            icon = <span className={'glyphicon glyphicon-' + props.icon}></span>
+            icon = <Icon name={props.icon}/>
         }
 
         let iconSpacer;
@@ -240,5 +253,6 @@ export {
     DropdownMenu,
     ActionLink,
     DismissibleAlert,
-    ModalDialog
+    ModalDialog,
+    Icon
 };

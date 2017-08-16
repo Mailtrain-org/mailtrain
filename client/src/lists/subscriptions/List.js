@@ -109,7 +109,7 @@ export default class List extends Component {
                 }
 
                 <div className="well well-sm">
-                    <Form inline stateOwner={this}>
+                    <Form format="inline" stateOwner={this}>
                         <Dropdown format="inline" className="input-sm" id="segment" label={t('Segment')} options={this.state.segmentOptions}/>
                     </Form>
                 </div>

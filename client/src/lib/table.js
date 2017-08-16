@@ -11,7 +11,6 @@ import 'datatables.net';
 import 'datatables.net-bs';
 import 'datatables.net-bs/css/dataTables.bootstrap.css';
 
-import './table.css';
 import axios from './axios';
 
 import { withPageHelpers } from '../lib/page'
