@@ -1,9 +1,50 @@
+.mt-treetable-container .fancytree-container span.fancytree-node.mt-tree-end-drop {
+    height: 10px;
+    margin-top: 0px;
+    margin-bottom: -10px;
+    overflow: hidden;
+    min-height: 0px;
+}
+
+.mt-treetable-container .fancytree-container span.fancytree-node.mt-tree-end-drop span.fancytree-title {
+    width: 15px;
+    margin-left: 28px;
+}
+
+.mt-treetable-container .fancytree-container span.fancytree-node.mt-tree-end-drop.mt-tree-end-drop-wide span.fancytree-title {
+    width: 100%;
+}
+
+.mt-treetable-container .fancytree-container {
+    border: none;
+}
+
+.mt-treetable-container span.fancytree-expander {
+    color: #333333;
+}
+
 .mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td,
-.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active:hover>td {
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active:hover>td,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title:hover,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active:hover span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node span.fancytree-title:hover {
     background-color: transparent;
 }
 
-.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-title {
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node span.fancytree-title {
+    cursor: default;
+}
+
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title:hover {
+    border-color: transparent;
+}
+
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-expander,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title {
+    outline: 0px none;
     color: #333333;
 }
 
@@ -28,6 +69,33 @@
     min-width: 150px;
 }
 
+
+
+.mt-treetable-container span.fancytree-node.fancytree-drag-source {
+    background-color: transparent !important;
+}
+
+.mt-treetable-container #fancytree-drop-marker {
+    background-image: url("../../public/fancytree/skin-bootstrap/icons.gif");
+    height: 12px;
+}
+
+.mt-treetable-container #fancytree-drop-marker.fancytree-drop-over {
+    background-position: 0px -130px;
+    width: 22px;
+}
+
+.mt-treetable-container #fancytree-drop-marker.fancytree-drop-after, .mt-treetable-container #fancytree-drop-marker.fancytree-drop-before {
+    background-position: 0px -145px;
+    width: 64px;
+}
+
+.mt-treetable-container span.fancytree-node.fancytree-drop-accept fancytree-expander {
+    visibility: hidden;
+}
+
+
+
 .form-group .mt-treetable-container {
     border: 1px solid #cccccc;
     border-radius: 4px;
@@ -49,3 +117,4 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
 }
+

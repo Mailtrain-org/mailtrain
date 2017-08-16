@@ -37,7 +37,7 @@ class Form extends Component {
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
         onSubmitAsync: PropTypes.func,
-        inline: PropTypes.bool
+        format: PropTypes.string
     }
 
     static childContextTypes = {
@@ -70,6 +70,13 @@ class Form extends Component {
         const statusMessageText = owner.getFormStatusMessageText();
         const statusMessageSeverity = owner.getFormStatusMessageSeverity();
 
+        let formClass = 'form-horizontal';
+        if (props.format === 'wide') {
+            formClass = '';
+        } else if (props.format === 'inline') {
+            formClass = 'form-inline';
+        }
+
         if (!owner.isFormReady()) {
             if (owner.isFormWithLoadingNotice()) {
                 return <p className={`alert alert-info mt-form-status`} role="alert">{t('Loading ...')}</p>
@@ -78,11 +85,15 @@ class Form extends Component {
             }
         } else {
             return (
-                <form className={props.inline ? 'form-inline' : 'form-horizontal'} onSubmit={::this.onSubmit}>
+                <form className={formClass} onSubmit={::this.onSubmit}>
                     <fieldset disabled={owner.isFormDisabled()}>
                         {props.children}
                     </fieldset>
-                    {statusMessageText && <p className={`col-sm-10 col-sm-offset-2 alert alert-${statusMessageSeverity} mt-form-status`} role="alert">{statusMessageText}</p>}
+                    {statusMessageText &&
+                        <AlignedRow htmlId="form-status-message">
+                            <p className={`alert alert-${statusMessageSeverity} mt-form-status`} role="alert">{statusMessageText}</p>
+                        </AlignedRow>
+                    }
                 </form>
             );
         }
@@ -106,27 +117,48 @@ class Fieldset extends Component {
     }
 }
 
-function wrapInput(id, htmlId, owner, label, help, input, inline) {
+function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, input) {
     const className = id ? owner.addFormValidationClass('form-group', id) : 'form-group';
+
+    let colLeft = '';
+    let colRight = '';
+    let offsetRight = '';
+
+    switch (format) {
+        case 'wide':
+            colLeft = '';
+            colRight = '';
+            offsetRight = '';
+            break;
+        default:
+            colLeft = 'col-sm-2';
+            colRight = 'col-sm-10';
+            offsetRight = 'col-sm-offset-2';
+            break;
+    }
+
+    if (format === 'inline') {
+    }
 
     let helpBlock = null;
     if (help) {
-        helpBlock = <div className={'help-block' + (!inline ? ' col-sm-offset-2 col-sm-10' : '')}
-                         id={htmlId + '_help'}>{help}</div>;
+        helpBlock = <div className={`help-block ${colRight} ${offsetRight}`} id={htmlId + '_help'}>{help}</div>;
     }
 
     let validationBlock = null;
     if (id) {
         const validationMsg = id && owner.getFormValidationMessage(id);
         if (validationMsg) {
-            validationBlock = <div className={'help-block' + (!inline ? ' col-sm-offset-2 col-sm-10' : '')}
-                                   id={htmlId + '_help_validation'}>{validationMsg}</div>;
+            validationBlock = <div className={`help-block ${colRight} ${offsetRight}`} id={htmlId + '_help_validation'}>{validationMsg}</div>;
         }
     }
 
-    const labelBlock = <label htmlFor={htmlId} className="control-label">{label}</label>;
+    let labelBlock = null;
+    if (label) {
+        labelBlock = <label htmlFor={htmlId} className="control-label">{label}</label>;
+    }
 
-    if (inline) {
+    if (format === 'inline') {
         return (
             <div className={className} >
                 {labelBlock} &nbsp; {input}
@@ -137,10 +169,10 @@ function wrapInput(id, htmlId, owner, label, help, input, inline) {
     } else {
         return (
             <div className={className} >
-                <div className="col-sm-2">
+                <div className={colLeft}>
                     {labelBlock}
                 </div>
-                <div className="col-sm-10">
+                <div className={`${colRight} ${rightContainerClass}`}>
                     {input}
                 </div>
                 {helpBlock}
@@ -150,30 +182,13 @@ function wrapInput(id, htmlId, owner, label, help, input, inline) {
     }
 }
 
-function wrapInputWithText(id, htmlId, owner, containerClass, label, text, help, input) {
-    const helpBlock = help ? <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help'}>{help}</div> : '';
-    const validationMsg = id && owner.getFormValidationMessage(id);
-
-    return (
-        <div className={id ? owner.addFormValidationClass('form-group', id) : 'form-group'} >
-            <div className="col-sm-2">
-                <label className="control-label">{label}</label>
-            </div>
-            <div className={"col-sm-10 " + containerClass }>
-                <label>{input} {text}</label>
-            </div>
-            {helpBlock}
-            {id && validationMsg && <div className="help-block col-sm-offset-2 col-sm-10" id={htmlId + '_help_validation'}>{validationMsg}</div>}
-        </div>
-    );
-}
-
 class StaticField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        className: PropTypes.string
+        className: PropTypes.string,
+        format: PropTypes.string
     }
 
     render() {
@@ -187,7 +202,7 @@ class StaticField extends Component {
             className += ' ' + props.className;
         }
 
-        return wrapInput(null, htmlId, owner, props.label, props.help,
+        return wrapInput(null, htmlId, owner, props.format, '', props.label, props.help,
             <div id={htmlId} className={className} aria-describedby={htmlId + '_help'}>{props.children}</div>
         );
     }
@@ -199,7 +214,8 @@ class InputField extends Component {
         label: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         type: PropTypes.string,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        format: PropTypes.string
     }
 
     static defaultProps = {
@@ -221,7 +237,7 @@ class InputField extends Component {
             type = 'password';
         }
 
-        return wrapInput(id, htmlId, owner, props.label, props.help,
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );
     }
@@ -232,7 +248,8 @@ class CheckBox extends Component {
         id: PropTypes.string.isRequired,
         text: PropTypes.string.isRequired,
         label: PropTypes.string,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        format: PropTypes.string
     }
 
     static contextTypes = {
@@ -245,8 +262,11 @@ class CheckBox extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInputWithText(id, htmlId, owner, 'checkbox', props.label, props.text, props.help,
-            <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+        return wrapInput(id, htmlId, owner, props.format, 'checkbox', props.label, props.help,
+            <label>
+                <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+                {props.text}
+            </label>
         );
     }
 }
@@ -255,7 +275,8 @@ class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        format: PropTypes.string
     }
 
     static contextTypes = {
@@ -268,7 +289,7 @@ class TextArea extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInput(id, htmlId, owner, props.label, props.help,
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
@@ -282,7 +303,7 @@ class Dropdown extends Component {
         options: PropTypes.array,
         optGroups: PropTypes.array,
         className: PropTypes.string,
-        inline: PropTypes.bool
+        format: PropTypes.string
     }
 
     static contextTypes = {
@@ -312,11 +333,10 @@ class Dropdown extends Component {
             className += ' ' + props.className;
         }
 
-        return wrapInput(id, htmlId, owner, props.label, props.help,
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <select id={htmlId} className={className} aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
                 {options}
-            </select>,
-            props.inline
+            </select>
         );
     }
 }
@@ -326,7 +346,12 @@ class AlignedRow extends Component {
     static propTypes = {
         className: PropTypes.string,
         label: PropTypes.string,
-        htmlId: PropTypes.string
+        htmlId: PropTypes.string,
+        format: PropTypes.string
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
     }
 
     static defaultProps = {
@@ -334,33 +359,28 @@ class AlignedRow extends Component {
     }
 
     render() {
-        if (this.props.label) {
-            return (
-                <div className="form-group">
-                    <label htmlFor={this.props.htmlId} className="col-sm-2 control-label">{this.props.label}</label>
-                    <div className={"col-sm-10 " + this.props.className} id={this.props.htmlId}>
-                        {this.props.children}
-                    </div>
-                </div>
-            );
+        const props = this.props;
+        const owner = this.context.formStateOwner;
 
-        } else {
-            return (
-                <div className="form-group">
-                    <div className={"col-sm-10 col-sm-offset-2 " + this.props.className} id={this.props.htmlId}>
-                        {this.props.children}
-                    </div>
-                </div>
-            );
-        }
+        return wrapInput(null, props.htmlId, owner, props.format, props.className, props.label, null, this.props.children);
     }
 }
 
 
 class ButtonRow extends Component {
+    static propTypes = {
+        className: PropTypes.string,
+        format: PropTypes.string
+    }
+
     render() {
+        let className = 'mt-button-row';
+        if (this.props.className) {
+            className += ' ' + this.props.className;
+        }
+
         return (
-            <AlignedRow className="mt-button-row">{this.props.children}</AlignedRow>
+            <AlignedRow className={className} format={this.props.format}>{this.props.children}</AlignedRow>
         );
     }
 }
@@ -423,7 +443,8 @@ class TreeTableSelect extends Component {
         label: PropTypes.string.isRequired,
         dataUrl: PropTypes.string,
         data: PropTypes.array,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        format: PropTypes.string
     }
 
     static contextTypes = {
@@ -441,7 +462,7 @@ class TreeTableSelect extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInput(id, htmlId, owner, props.label, props.help,
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <TreeTable data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
         );
     }
@@ -471,7 +492,8 @@ class TableSelect extends Component {
 
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        format: PropTypes.string
     }
 
     static defaultProps = {
@@ -530,7 +552,7 @@ class TableSelect extends Component {
         const t = props.t;
 
         if (props.dropdown) {
-            return wrapInput(id, htmlId, owner, props.label, props.help,
+            return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div className="input-group mt-tableselect-dropdown">
                         <input type="text" className="form-control" value={this.state.selectedLabel} readOnly onClick={::this.toggleOpen}/>
@@ -544,7 +566,7 @@ class TableSelect extends Component {
                 </div>
             );
         } else {
-            return wrapInput(id, htmlId, owner, props.label, props.help,
+            return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div>
                         <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
@@ -570,7 +592,8 @@ class ACEEditor extends Component {
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         height: PropTypes.string,
-        mode: PropTypes.string
+        mode: PropTypes.string,
+        format: PropTypes.string
     }
 
     static contextTypes = {
@@ -583,7 +606,7 @@ class ACEEditor extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInput(id, htmlId, owner, props.label, props.help,
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <AceEditor
                 id={htmlId}
                 mode={props.mode}

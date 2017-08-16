@@ -69,7 +69,10 @@ class TreeTable extends Component {
         onSelectionChangedAsync: PropTypes.func,
         actions: PropTypes.func,
         withHeader: PropTypes.bool,
-        withDescription: PropTypes.bool
+        withDescription: PropTypes.bool,
+        noTable: PropTypes.bool,
+        withDnd: PropTypes.bool,
+        withIcons: PropTypes.bool
     }
 
     componentWillReceiveProps(nextProps) {
@@ -106,17 +109,6 @@ class TreeTable extends Component {
             this.loadData(this.props.dataUrl);
         }
 
-        const glyphOpts = {
-            map: {
-                expanderClosed: 'glyphicon glyphicon-menu-right',
-                expanderLazy: 'glyphicon glyphicon-menu-right',  // glyphicon-plus-sign
-                expanderOpen: 'glyphicon glyphicon-menu-down',  // glyphicon-collapse-down
-                checkbox: 'glyphicon glyphicon-unchecked',
-                checkboxSelected: 'glyphicon glyphicon-check',
-                checkboxUnknown: 'glyphicon glyphicon-share',                
-            }
-        };
-
         let createNodeFn;
         createNodeFn = (event, data) => {
             const node = data.node;
@@ -148,22 +140,70 @@ class TreeTable extends Component {
             }
         };
 
-        this.tree = jQuery(this.domTable).fancytree({
-            extensions: ['glyph', 'table'],
-            glyph: glyphOpts,
+        const treeOpts = {
+            extensions: ['glyph'],
+            glyph: {
+                map: {
+                    expanderClosed: 'glyphicon glyphicon-menu-right',
+                    expanderLazy: 'glyphicon glyphicon-menu-right',  // glyphicon-plus-sign
+                    expanderOpen: 'glyphicon glyphicon-menu-down',  // glyphicon-collapse-down
+                    checkbox: 'glyphicon glyphicon-unchecked',
+                    checkboxSelected: 'glyphicon glyphicon-check',
+                    checkboxUnknown: 'glyphicon glyphicon-share',
+
+                    folder: 'glyphicon glyphicon-folder-close',
+                    folderOpen: 'glyphicon glyphicon-folder-open',
+                    doc: 'glyphicon glyphicon-file',
+                    docOpen: 'glyphicon glyphicon-file'
+                }
+            },
             selectMode: (this.selectMode === TreeSelectMode.MULTI ? 2 : 1),
-            icon: false,
+            icon: !!this.props.withIcons,
             autoScroll: true,
             scrollParent: jQuery(this.domTableContainer),
             source: this.sanitizeTreeData(this.state.treeData),
-            table: {
-                nodeColumnIdx: 0
-            },
+            toggleEffect: false,
             createNode: createNodeFn,
             checkbox: this.selectMode === TreeSelectMode.MULTI,
             activate: (this.selectMode === TreeSelectMode.SINGLE ? ::this.onActivate : null),
-            select: (this.selectMode === TreeSelectMode.MULTI ? ::this.onSelect : null)
-        }).fancytree("getTree");
+            select: (this.selectMode === TreeSelectMode.MULTI ? ::this.onSelect : null),
+        };
+
+        if (!this.props.noTable) {
+            treeOpts.extensions.push('table');
+            treeOpts.table = {
+                nodeColumnIdx: 0
+            };
+        }
+
+        if (this.props.withDnd) {
+            treeOpts.extensions.push('dnd');
+            treeOpts.dnd = {
+                autoExpandMS: 400,
+                focusOnClick: true,
+                preventVoidMoves: true,
+                preventRecursiveMoves: true,
+                dropMarkerOffsetX: -46, // -22
+                dropMarkerInsertOffsetX: 0,
+                dragStart: (node, data) => {
+                    return node.key !== '__mt-tree-end-drop__';
+                },
+                dragEnter: (node, data) => {
+                    if (node.folder) {
+                        return ['before', 'over'];
+                    } else {
+                        return ['before'];
+                    }
+                },
+                dragDrop: (node, data) => {
+                    console.log(node);
+                    console.log(data);
+                    data.otherNode.moveTo(node, data.hitMode);
+                }
+            };
+        }
+
+        this.tree = jQuery(this.domTable).fancytree(treeOpts).fancytree("getTree");
 
         this.updateSelection();
     }
@@ -252,6 +292,10 @@ class TreeTable extends Component {
         let containerClass = 'mt-treetable-container';
         if (this.selectMode === TreeSelectMode.NONE) {
             containerClass += ' mt-treetable-inactivable';
+        } else {
+            if (!props.noTable) {
+                containerClass += ' table-hover';
+            }
         }
 
         if (!this.withHeader) {
@@ -260,31 +304,44 @@ class TreeTable extends Component {
 
         // FIXME: style={{ height: '100px', overflow: 'auto'}}
 
-        const container =
-            <div className={containerClass} ref={(domElem) => { this.domTableContainer = domElem; }} >
-                <table ref={(domElem) => { this.domTable = domElem; }} className="table table-hover table-striped table-condensed">
-                    {props.withHeader &&
-                        <thead>
-                            <tr>
-                                <th className="mt-treetable-title">{t('Name')}</th>
-                                {withDescription && <th>{t('Description')}</th>}
-                                {actions && <th></th>}
-                            </tr>
-                        </thead>
-                    }
-                    <tbody>
-                    <tr>
-                        <td></td>
-                        {withDescription && <td></td>}
-                        {actions && <td></td>}
-                    </tr>
-                    </tbody>
-                </table>
-            </div>;
+        if (props.noTable) {
+            return (
+                <div className={containerClass} ref={(domElem) => { this.domTableContainer = domElem; }} >
+                    <div ref={(domElem) => { this.domTable = domElem; }}>
+                    </div>
+                </div>
+            );
 
-        return (
-            container
-        );
+        } else {
+            let tableClass = 'table table-striped table-condensed';
+            if (this.selectMode !== TreeSelectMode.NONE) {
+                tableClass += ' table-hover';
+            }
+
+            return (
+                <div className={containerClass} ref={(domElem) => { this.domTableContainer = domElem; }} >
+                    <table ref={(domElem) => { this.domTable = domElem; }} className={tableClass}>
+                        {props.withHeader &&
+                        <thead>
+                        <tr>
+                            <th className="mt-treetable-title">{t('Name')}</th>
+                            {withDescription && <th>{t('Description')}</th>}
+                            {actions && <th></th>}
+                        </tr>
+                        </thead>
+                        }
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            {withDescription && <td></td>}
+                            {actions && <td></td>}
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
     }
 }
 
