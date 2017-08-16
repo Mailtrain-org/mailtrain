@@ -10,7 +10,9 @@ import {
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/delete";
 import interoperableErrors from '../../../../shared/interoperable-errors';
-import {TreeSelectMode, TreeTable} from "../../lib/tree";
+
+import SortableTree from 'react-sortable-tree';
+import { getRuleTreeNodeRenderer } from './RuleTreeNodeRenderer';
 
 @translate()
 @withForm
@@ -21,7 +23,110 @@ export default class CUD extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {};
+        this.compoundRuleTypes = [ 'all', 'some', 'none' ];
+
+        const allRule = {
+            type: 'all'
+        };
+
+        const otherRule = {
+            type: 'eq'
+        };
+
+        this.state = {
+            rules: [
+                {
+                    key: 'a',
+                    title: 'A',
+                    expanded: true,
+                    rule: allRule,
+                    children: [
+                        {
+                            key: 'aa',
+                            title: 'AA',
+                            expanded: true,
+                            rule: allRule,
+                            children: [
+                                {
+                                    key: 'aaa',
+                                    title:
+                                        <div><h4>sdfsdf</h4><div>xxx</div><div>yyy<NavButton label="ZZZ" linkTo="/lists"/></div></div>,
+                                    rule: otherRule
+                                },
+                                {
+                                    key: 'aab',
+                                    title: 'AAB',
+                                    subtitle: 'sdfwere',
+                                    rule: otherRule
+                                }
+                            ]
+                        },
+                        {
+                            key: 'ab',
+                            title: 'AB',
+                            expanded: true,
+                            rule: allRule,
+                            children: [
+                                {
+                                    key: 'aba',
+                                    title: 'ABA',
+                                    rule: otherRule
+                                },
+                                {
+                                    key: 'abb',
+                                    title: 'ABB',
+                                    rule: otherRule
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    key: 'b',
+                    title: 'B',
+                    expanded: true,
+                    rule: allRule,
+                    children: [
+                        {
+                            key: 'ba',
+                            title: 'BA',
+                            expanded: true,
+                            rule: allRule,
+                            children: [
+                                {
+                                    key: 'baa',
+                                    title: 'BAA',
+                                    rule: otherRule
+                                },
+                                {
+                                    key: 'bab',
+                                    title: 'BAB',
+                                    rule: otherRule
+                                }
+                            ]
+                        },
+                        {
+                            key: 'bb',
+                            title: 'BB',
+                            expanded: true,
+                            rule: allRule,
+                            children: [
+                                {
+                                    key: 'bba',
+                                    title: 'BBA',
+                                    rule: otherRule
+                                },
+                                {
+                                    key: 'bbb',
+                                    title: 'BBB',
+                                    rule: otherRule
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
 
         this.initForm();
     }
@@ -100,128 +205,15 @@ export default class CUD extends Component {
         }
     }
 
-    async onRuleSelectionChangedAsync(sel) {
+    onRuleSelectionClick(data) {
         this.setState({
-            selectedRule: sel
+            selectedRule: data.node.key
         });
     }
 
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
-
-        const treeEnd = {
-            key: '__mt-tree-end-drop__',
-            icon: false,
-            unselectable: true,
-            extraClasses: 'mt-tree-end-drop',
-            beforeActivate: () => false
-        };
-
-        const treeEndWide = { // This one is used after a non-folder sibling that has no children
-            key: '__mt-tree-end-drop__',
-            icon: false,
-            unselectable: true,
-            extraClasses: 'mt-tree-end-drop mt-tree-end-drop-wide',
-            beforeActivate: () => false
-        }
-
-        const sampleTreeData = [
-            {
-                key: 'a',
-                title: 'A',
-                expanded: true,
-                folder: true,
-                children: [
-                    {
-                        key: 'aa',
-                        title: 'AA',
-                        expanded: true,
-                        folder: true,
-                        children: [
-                            {
-                                key: 'aaa',
-                                title: 'AAA',
-                            },
-                            {
-                                key: 'aab',
-                                title: 'AAB',
-                            },
-                            {
-                                key: 'aab',
-                                title: 'AAB',
-                                folder: true
-                            },
-                            treeEnd
-                        ]
-                    },
-                    {
-                        key: 'ab',
-                        title: 'AB',
-                        expanded: true,
-                        folder: true,
-                        children: [
-                            {
-                                key: 'aba',
-                                title: 'ABA'
-                            },
-                            {
-                                key: 'abb',
-                                title: 'ABB'
-                            },
-                            treeEndWide
-                        ]
-                    },
-                    treeEnd
-                ]
-            },
-            {
-                key: 'b',
-                title: 'B',
-                expanded: true,
-                folder: true,
-                children: [
-                    {
-                        key: 'ba',
-                        title: 'BA',
-                        expanded: true,
-                        folder: true,
-                        children: [
-                            {
-                                key: 'baa',
-                                title: 'BAA'
-                            },
-                            {
-                                key: 'bab',
-                                title: 'BAB'
-                            },
-                            treeEndWide
-                        ]
-                    },
-                    {
-                        key: 'bb',
-                        title: 'BB',
-                        expanded: true,
-                        folder: true,
-                        children: [
-                            {
-                                key: 'bba',
-                                title: 'BBA'
-                            },
-                            {
-                                key: 'bbb',
-                                title: 'BBB'
-                            },
-                            treeEndWide
-                        ]
-                    },
-                    treeEnd
-                ]
-            },
-            treeEnd
-        ];
-
-
 
         return (
 
@@ -253,10 +245,19 @@ export default class CUD extends Component {
                     <hr />
 
                     <div className="row">
-                        <div className="col-sm-6">
-                            <TreeTable data={sampleTreeData} noTable withIcons withDnd format="wide" selectMode={TreeSelectMode.SINGLE} selection={this.state.selectedRule} onSelectionChangedAsync={::this.onRuleSelectionChangedAsync} />
+                        <div className="col-md-6" >
+                            <SortableTree
+                                treeData={this.state.rules}
+                                onChange={ rules => this.setState({rules}) }
+                                isVirtualized={false}
+                                nodeContentRenderer={getRuleTreeNodeRenderer({
+                                    onClick: ::this.onRuleSelectionClick,
+                                    isSelected: data => data.node.key === this.state.selectedRule
+                                })}
+                                canDrop={data => data.nextParent && this.compoundRuleTypes.includes(data.nextParent.rule.type)}
+                            />
                         </div>
-                        <div className="col-sm-6">
+                        <div className="col-md-6">
                             <h3>{t('Selected Rule Options')}</h3>
                             <InputField id="name" label={t('Name')} format="wide" />
                         </div>

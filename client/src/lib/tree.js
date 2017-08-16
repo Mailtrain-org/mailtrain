@@ -71,7 +71,6 @@ class TreeTable extends Component {
         withHeader: PropTypes.bool,
         withDescription: PropTypes.bool,
         noTable: PropTypes.bool,
-        withDnd: PropTypes.bool,
         withIcons: PropTypes.bool
     }
 
@@ -173,33 +172,6 @@ class TreeTable extends Component {
             treeOpts.extensions.push('table');
             treeOpts.table = {
                 nodeColumnIdx: 0
-            };
-        }
-
-        if (this.props.withDnd) {
-            treeOpts.extensions.push('dnd');
-            treeOpts.dnd = {
-                autoExpandMS: 400,
-                focusOnClick: true,
-                preventVoidMoves: true,
-                preventRecursiveMoves: true,
-                dropMarkerOffsetX: -46, // -22
-                dropMarkerInsertOffsetX: 0,
-                dragStart: (node, data) => {
-                    return node.key !== '__mt-tree-end-drop__';
-                },
-                dragEnter: (node, data) => {
-                    if (node.folder) {
-                        return ['before', 'over'];
-                    } else {
-                        return ['before'];
-                    }
-                },
-                dragDrop: (node, data) => {
-                    console.log(node);
-                    console.log(data);
-                    data.otherNode.moveTo(node, data.hitMode);
-                }
             };
         }
 

@@ -16,9 +16,40 @@ module.exports = {
     },
     module: {
         rules: [
-            {test: /\.(js|jsx)$/, use: 'babel-loader'},
-            {test: /\.css$/, loader: 'style-loader!css-loader'},
-            {test: /\.(png|jpg|gif)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /(disposables)/ /* https://github.com/react-dnd/react-dnd/issues/407 */,
+                use: [ 'babel-loader' ]
+            },
+            {
+                test: /\.css$/,
+                use: [ 'style-loader', 'css-loader' ]
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                use: [ 
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            limit: 8192 // inline base64 URLs for <=8k images, direct URLs for the rest
+                        }
+                    }
+                ] 
+            }, 
+            {
+                test: /\.scss$/,
+                exclude: path.join(__dirname, 'node_modules'),
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            localIdentName: '[path][name]__[local]--[hash:base64:5]'
+                        }
+                    },
+                    'sass-loader' ]
+            },
         ]
     },
     externals: {
