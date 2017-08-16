@@ -45,6 +45,8 @@
     "css-loader": "^0.28.4",
     "i18next-conv": "^3.0.3",
     "node-sass": "^4.5.3",
+    "react-dnd-html5-backend": "^2.4.1",
+    "react-dnd-touch-backend": "^0.3.13",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",

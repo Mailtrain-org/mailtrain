@@ -21,7 +21,23 @@ $desktopAnimationStartPosition: 300px;
 
   .leftPane {
     display: inline-block;
-    width: 0px;
+    width: 100%;
+    margin-right: -100%;
+
+    .leftPaneInner {
+      .ruleTree {
+        background: #fbfbfb;
+        border: #cfcfcf 1px solid;
+        border-radius: 3px;
+        padding: 10px 0px;
+        margin-top: 15px;
+        margin-bottom: 30px;
+
+        // Without this, the placeholders when rearranging the tree are not shown
+        position: relative;
+        z-index: 0;
+      }
+    }
 
     .leftPaneOverlay {
       display: none;
@@ -81,7 +97,7 @@ $desktopAnimationStartPosition: 300px;
     opacity: 0;
     visibility: hidden;
 
-    .rulePaneRightInner {
+    .rightPaneInner {
       margin-right: $mobileLeftPaneResidualWidth;
       @media (min-width: $desktopMinWidth) {
         margin-right: $desktopLeftPaneResidualWidth;

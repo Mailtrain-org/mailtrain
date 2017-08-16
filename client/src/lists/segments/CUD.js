@@ -12,11 +12,16 @@ import {DeleteModalDialog} from "../../lib/delete";
 import interoperableErrors from '../../../../shared/interoperable-errors';
 
 import styles from './CUD.scss';
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
+import TouchBackend from 'react-dnd-touch-backend';
 import SortableTree from 'react-sortable-tree';
 import {ActionLink, Icon} from "../../lib/bootstrap-components";
 
-console.log(styles);
+// https://stackoverflow.com/a/4819886/1601953
+const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
 
+@DragDropContext(isTouchDevice ? TouchBackend : HTML5Backend)
 @translate()
 @withForm
 @withPageHelpers
@@ -28,6 +33,7 @@ export default class CUD extends Component {
 
         this.compoundRuleTypes = [ 'all', 'some', 'one', 'none' ];
 
+/*
         const allRule = {
             type: 'all'
         };
@@ -69,11 +75,11 @@ export default class CUD extends Component {
                 ]
             }
         ];
-
+*/
 
         this.state = {
-            rules: sampleRules,
-            rulesTree: this.getTreeFromRules(sampleRules)
+            rules: [],
+            rulesTree: this.getTreeFromRules([])
         };
 
         this.initForm();
@@ -89,7 +95,7 @@ export default class CUD extends Component {
     getRulesFromTree(tree) {
         const rules = [];
         for (const node of tree) {
-            const rule = Object.assign({}, node.rule);
+            const rule = node.rule;
             rule.rules = this.getRulesFromTree(node.children);
             rules.push(rule);
         }
@@ -185,16 +191,49 @@ export default class CUD extends Component {
     }
 
     async onRuleDelete(data) {
-        console.log(data);
+        let finishedSearching = false;
+
+        function childrenWithoutRule(rules) {
+            console.log(rules);
+            const newRules = [];
+
+            for (const rule of rules) {
+                if (finishedSearching) {
+                    newRules.push(rule);
+
+                } else if (rule !== data.node.rule) {
+                    const newRule = Object.assign({}, rule);
+
+                    if (rule.rules) {
+                        newRule.rules = childrenWithoutRule(rule.rules);
+                    }
+
+                    newRules.push(newRule);
+
+                } else {
+                    finishedSearching = true;
+                }
+            }
+
+            return newRules;
+        }
+
+        const rules = childrenWithoutRule(this.state.rules);
+        console.log(rules);
+
+        this.setState({
+            rules,
+            rulesTree: this.getTreeFromRules(rules)
+        });
     }
 
-    async onRuleOptions(data) {
+    async showRuleOptions(data) {
         this.setState({
             ruleOptionsVisible: true
         });
     }
 
-    async onRuleTree() {
+    async hideRuleOptions() {
         this.setState({
             ruleOptionsVisible: false
         });
@@ -205,6 +244,28 @@ export default class CUD extends Component {
             rulesTree,
             rules: this.getRulesFromTree(rulesTree)
         })
+    }
+
+    _addRule(type) {
+        const rules = this.state.rules;
+
+        rules.push({
+            type,
+            rules: []
+        });
+
+        this.setState({
+            rules,
+            rulesTree: this.getTreeFromRules(rules)
+        });
+    }
+
+    async addCompositeRule() {
+        this._addRule('all');
+    }
+
+    async addRule() {
+        this._addRule('eq');
     }
 
     render() {
@@ -251,18 +312,31 @@ export default class CUD extends Component {
 
                     <div className={styles.rulePane + ruleOptionsVisibilityClass}>
                         <div className={styles.leftPane}>
-                            <SortableTree
-                                treeData={this.state.rulesTree}
-                                onChange={rulesTree => this.onRulesChanged(rulesTree)}
-                                isVirtualized={false}
-                                canDrop={ data => !data.nextParent || this.compoundRuleTypes.includes(data.nextParent.rule.type) }
-                                generateNodeProps={data => ({
-                                    buttons: [
-                                        <ActionLink onClickAsync={async () => await this.onRuleOptions(data)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
-                                        <ActionLink onClickAsync={async () => await this.onRuleDelete(data)} className={styles.ruleActionLink}><Icon name="remove"/></ActionLink>
-                                    ]
-                                })}
-                            />
+                            <div className={styles.leftPaneInner}>
+                                <Toolbar>
+                                    <Button className="btn-primary" label={t('Add Composite Rule')} onClickAsync={::this.addCompositeRule}/>
+                                    <Button className="btn-primary" label={t('Add Rule')} onClickAsync={::this.addRule}/>
+                                </Toolbar>
+
+                                <h3>{t('Rules')}</h3>
+
+                                <div className="clearfix"/>
+
+                                <div className={styles.ruleTree}>
+                                    <SortableTree
+                                        treeData={this.state.rulesTree}
+                                        onChange={rulesTree => this.onRulesChanged(rulesTree)}
+                                        isVirtualized={false}
+                                        canDrop={ data => !data.nextParent || this.compoundRuleTypes.includes(data.nextParent.rule.type) }
+                                        generateNodeProps={data => ({
+                                            buttons: [
+                                                <ActionLink onClickAsync={async () => await this.showRuleOptions(data)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
+                                                <ActionLink onClickAsync={async () => await this.onRuleDelete(data)} className={styles.ruleActionLink}><Icon name="remove"/></ActionLink>
+                                            ]
+                                        })}
+                                    />
+                                </div>
+                            </div>
 
                             <div className={styles.leftPaneOverlay} />
 
@@ -272,13 +346,13 @@ export default class CUD extends Component {
                         </div>
 
                         <div className={styles.rightPane}>
-                            <div className={styles.rulePaneRightInner}>
+                            <div className={styles.rightPaneInner}>
                                 <div className={styles.ruleOptions}>
                                     <h3>{t('Rule Options')}</h3>
                                     <InputField id="name" label={t('Name')}/>
 
                                     <ButtonRow>
-                                        <Button className="btn-primary" icon="chevron-left" label={t('Back')} onClickAsync={::this.onRuleTree}/>
+                                        <Button className="btn-primary" icon="chevron-left" label={t('Back')} onClickAsync={::this.hideRuleOptions}/>
                                     </ButtonRow>
                                 </div>
                             </div>

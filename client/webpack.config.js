@@ -18,7 +18,7 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude: /(disposables)/ /* https://github.com/react-dnd/react-dnd/issues/407 */,
+                exclude: /(disposables|react-dnd-touch-backend)/ /* https://github.com/react-dnd/react-dnd/issues/407 */,
                 use: [ 'babel-loader' ]
             },
             {
