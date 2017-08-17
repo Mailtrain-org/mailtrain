@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { translate, Trans } from 'react-i18next';
 import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton, Toolbar} from '../../lib/page';
 import {
-    withForm, Form, FormSendMethod, InputField, ButtonRow, Button, Fieldset
+    withForm, Form, FormSendMethod, InputField, ButtonRow, Button, Fieldset, Dropdown, TreeTableSelect
 } from '../../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/delete";
@@ -17,6 +17,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import TouchBackend from 'react-dnd-touch-backend';
 import SortableTree from 'react-sortable-tree';
 import {ActionLink, Icon} from "../../lib/bootstrap-components";
+import { getFieldTypes } from '../fields/field-types';
 
 // https://stackoverflow.com/a/4819886/1601953
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
@@ -31,55 +32,238 @@ export default class CUD extends Component {
     constructor(props) {
         super(props);
 
-        this.compoundRuleTypes = [ 'all', 'some', 'one', 'none' ];
+        const t = props.t;
 
-/*
-        const allRule = {
-            type: 'all'
-        };
+        this.fieldTypes = getFieldTypes(t);
 
-        const otherRule = {
-            type: 'eq'
-        };
-
-        const sampleRules = [
+        this.predefColumns = [
             {
-                type: 'all',
-                rules: [
-                    {
-                        type: 'some',
-                        rules: [
-                            {
-                                type: 'eq',
-                                value: 11
-                            },
-                            {
-                                type: 'eq',
-                                value: 9
-                            }
-                        ]
-                    },
-                    {
-                        type: 'some',
-                        rules: [
-                            {
-                                type: 'eq',
-                                value: 3
-                            },
-                            {
-                                type: 'eq',
-                                value: 7
-                            }
-                        ]
-                    }
-                ]
+                column: 'email',
+                name: t('Email address'),
+                type: 'text',
+                tag: 'EMAIL'
+            },
+            {
+                column: 'opt_in_country',
+                name: t('Signup country'),
+                type: 'text'
+            },
+            {
+                column: 'created',
+                name: t('Sign up date'),
+                type: 'date'
+            },
+            {
+                column: 'latest_open',
+                name: t('Latest open'),
+                type: 'date'
+            },
+            {
+                column: 'latest_click',
+                name: t('Latest click'),
+                type: 'date'
             }
         ];
-*/
+
+        this.compositeRuleTypeOptions = [
+            { key: 'all', label: t('All rules must match')},
+            { key: 'some', label: t('At least one rule must match')},
+            { key: 'none', label: t('No rule may match')}
+        ];
+
+        this.compositeRuleTypes = {
+            all: true,
+            some: true,
+            none: true
+        };
+
+        this.primitiveRuleTypeOptions = {
+            text: [
+                { key: 'eq', label: t('Equal to')},
+                { key: 'like', label: t('Match (with SQL LIKE)')},
+                { key: 're', label: t('Match (with regular expressions)')},
+                { key: 'lt', label: t('Alphabetically before')},
+                { key: 'le', label: t('Alphabetically before or equal to')},
+                { key: 'gt', label: t('Alphabetically after')},
+                { key: 'ge', label: t('Alphabetically after or equal to')}
+            ],
+            website: [
+                { key: 'eq', label: t('Equal to')},
+                { key: 'like', label: t('Match (with SQL LIKE)')},
+                { key: 're', label: t('Match (with regular expressions)')}
+            ],
+            number: [
+                { key: 'eq', label: t('Equal to')},
+                { key: 'lt', label: t('Less than')},
+                { key: 'le', label: t('Less than or equal to')},
+                { key: 'gt', label: t('Greater than')},
+                { key: 'ge', label: t('Greater than or equal to')}
+            ],
+            birthday: [
+                { key: 'eq', label: t('On')},
+                { key: 'lt', label: t('Before')},
+                { key: 'le', label: t('Before or on')},
+                { key: 'gt', label: t('After')},
+                { key: 'ge', label: t('After or on')},
+                { key: 'eqNowPlusDays', label: t('On x-th day before/after now')},
+                { key: 'ltNowPlusDays', label: t('Before x-th day before/after now')},
+                { key: 'leNowPlusDays', label: t('Before or on x-th day before/after now')},
+                { key: 'gtNowPlusDays', label: t('After x-th day before/after now')},
+                { key: 'geNowPlusDays', label: t('After or on x-th day before/after now')},
+            ],
+            date: [
+                { key: 'eq', label: t('On')},
+                { key: 'lt', label: t('Before')},
+                { key: 'le', label: t('Before or on')},
+                { key: 'gt', label: t('After')},
+                { key: 'ge', label: t('After or on')},
+                { key: 'eqNowPlusDays', label: t('On x-th day before/after now')},
+                { key: 'ltNowPlusDays', label: t('Before x-th day before/after now')},
+                { key: 'leNowPlusDays', label: t('Before or on x-th day before/after now')},
+                { key: 'gtNowPlusDays', label: t('After x-th day before/after now')},
+                { key: 'geNowPlusDays', label: t('After or on x-th day before/after now')},
+            ],
+            option: [
+                { key: 'isTrue', label: t('Is selected')},
+                { key: 'isFalse', label: t('Is not selected')}
+            ],
+            'radio-enum': [
+                { key: 'eq', label: t('Key equal to')},
+                { key: 'like', label: t('Key match (with SQL LIKE)')},
+                { key: 're', label: t('Key match (with regular expressions)')},
+                { key: 'lt', label: t('Key alphabetically before')},
+                { key: 'le', label: t('Key alphabetically before or equal to')},
+                { key: 'gt', label: t('Key alphabetically after')},
+                { key: 'ge', label: t('Key alphabetically after or equal to')}
+            ],
+            'dropdown-enum': [
+                { key: 'eq', label: t('Key equal to')},
+                { key: 'like', label: t('Key match (with SQL LIKE)')},
+                { key: 're', label: t('Key match (with regular expressions)')},
+                { key: 'lt', label: t('Key alphabetically before')},
+                { key: 'le', label: t('Key alphabetically before or equal to')},
+                { key: 'gt', label: t('Key alphabetically after')},
+                { key: 'ge', label: t('Key alphabetically after or equal to')}
+            ]
+        };
+        
+        const stringValueSettings = {
+            form: <InputField id="ruleValue" label={t('Value')} />,
+            getFormData: rule => ({
+                ruleValue: rule.value
+            }),
+            assignRuleSettings: rule => {
+                rule.value = this.getFormValue('ruleValue');
+            },
+            localValidateForm: state => {
+                if (!state.getIn(['ruleValue', 'value'])) {
+                    state.setIn(['ruleValue', 'error'], t('Value must not be empty'));
+                } else {
+                    state.setIn(['ruleValue', 'error'], null);
+                }
+            }
+        };
+
+        const numberValueSettings = {
+            form: <InputField id="value" label={t('Value')} />
+        };
+
+        const birthdayValueSettings = {
+            form: <InputField id="value" label={t('Value')} /> // FIXME
+        };
+
+        const birthdayRelativeValueSettings = {
+            form: <InputField id="value" label={t('Value')} /> // FIXME
+        };
+
+        const dateValueSettings = {
+            form: <InputField id="value" label={t('Value')} /> // FIXME
+        };
+
+        const dateRelativeValueSettings = {
+            form: <InputField id="value" label={t('Value')} /> // FIXME
+        };
+
+        const optionValueSettings = {
+            form: null
+        };
+
+
+        this.primitiveRuleTypes = {
+            text: {
+                eq: stringValueSettings,
+                like: stringValueSettings,
+                re: stringValueSettings,
+                lt: stringValueSettings,
+                le: stringValueSettings,
+                gt: stringValueSettings,
+                ge: stringValueSettings
+            },
+            website: {
+                eq: stringValueSettings,
+                like: stringValueSettings,
+                re: stringValueSettings,
+            },
+            number: {
+                eq: numberValueSettings,
+                lt: numberValueSettings,
+                le: numberValueSettings,
+                gt: numberValueSettings,
+                ge: numberValueSettings
+            },
+            birthday: {
+                eq: birthdayValueSettings,
+                lt: birthdayValueSettings,
+                le: birthdayValueSettings,
+                gt: birthdayValueSettings,
+                ge: birthdayValueSettings,
+                eqNowPlusDays: birthdayRelativeValueSettings,
+                ltNowPlusDays: birthdayRelativeValueSettings,
+                leNowPlusDays: birthdayRelativeValueSettings,
+                gtNowPlusDays: birthdayRelativeValueSettings,
+                geNowPlusDays: birthdayRelativeValueSettings
+            },
+            date: {
+                eq: dateValueSettings,
+                lt: dateValueSettings,
+                le: dateValueSettings,
+                gt: dateValueSettings,
+                ge: dateValueSettings,
+                eqNowPlusDays: dateRelativeValueSettings,
+                ltNowPlusDays: dateRelativeValueSettings,
+                leNowPlusDays: dateRelativeValueSettings,
+                gtNowPlusDays: dateRelativeValueSettings,
+                geNowPlusDays: dateRelativeValueSettings
+            },
+            option: {
+                isTrue: optionValueSettings,
+                isFale: optionValueSettings
+            },
+            'radio-enum': {
+                eq: stringValueSettings,
+                like: stringValueSettings,
+                re: stringValueSettings,
+                lt: stringValueSettings,
+                le: stringValueSettings,
+                gt: stringValueSettings,
+                ge: stringValueSettings
+            },
+            'dropdown-enum': {
+                eq: stringValueSettings,
+                like: stringValueSettings,
+                re: stringValueSettings,
+                lt: stringValueSettings,
+                le: stringValueSettings,
+                gt: stringValueSettings,
+                ge: stringValueSettings
+            }
+        };
+
 
         this.state = {
-            rules: [],
             rulesTree: this.getTreeFromRules([])
+            // There is no ruleOptionsVisible here. We have 3 state logic for the visibility:
+            //   Undef - not shown, True - shown with entry animation, False - hidden with exit animation
         };
 
         this.initForm();
@@ -90,6 +274,13 @@ export default class CUD extends Component {
         list: PropTypes.object,
         fields: PropTypes.array,
         entity: PropTypes.object
+    }
+
+    getColumnType(column) {
+        const field = this.props.fields.find(fld => x.column === column);
+        if (field) {
+            return field.type;
+        }
     }
 
     getRulesFromTree(tree) {
@@ -123,16 +314,61 @@ export default class CUD extends Component {
         return tree;
     }
 
+    assignRuleSettings(rule) {
+        // This assumes that the rule form has successfully passed validation
+
+        rule.type = this.getFormValue('ruleType');
+
+        if (rule.type in !this.compositeRuleTypes) {
+            rule.column = this.getFormValue('ruleColumn');
+
+            const colType = this.getColumnType(rule.column);
+            if (colType) {
+                this.primitiveRuleTypes[colType][rule.type].assignRuleSettings(rule);
+            }
+        }
+    }
+
+    getFormData(rule) {
+        if (rule.type in !this.compositeRuleTypes) {
+            let data;
+            const colType = this.getColumnType(rule.column);
+            if (colType) { // getFormData is called also from addRule, which means the rule may not have a column selected
+                data = this.primitiveRuleTypes[colType][rule.type].getFormData(rule);
+            } else {
+                data = {};
+            }
+
+            data.ruleType = rule.type;
+            data.ruleColumn = rule.column;
+
+        } else {
+            return {
+                ruleType: rule.type
+            };
+        }
+    }
+
     componentDidMount() {
         if (this.props.entity) {
+            this.setState({
+                rulesTree: this.getTreeFromRules(this.props.entity.settings.rootRule.rules)
+            });
+
             this.getFormValuesFromEntity(this.props.entity, data => {
-                // FIXME populate all others from settings
+                data.rootRuleType = data.settings.rootRule.type;
             });
 
         } else {
             this.populateFormValues({
                 name: '',
-                settingsJSON: ''
+                settings: {
+                    rootRule: {
+                        type: 'all',
+                        rules: []
+                    }
+                },
+                rootRuleType: 'all'
             });
         }
     }
@@ -146,10 +382,19 @@ export default class CUD extends Component {
             state.setIn(['name', 'error'], null);
         }
 
+        // FIXME - validate rule
     }
 
-    async submitHandler() {
+    localValidateSelectedRule() {
+
+    }
+
+    async doSubmit(stay) {
         const t = this.props.t;
+
+        if (!this.localValidateSelectedRule()) {
+            // FIXME
+        }
 
         let sendMethod, url;
         if (this.props.entity) {
@@ -165,12 +410,29 @@ export default class CUD extends Component {
             this.setFormStatusMessage('info', t('Saving ...'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                // FIXME - make sure settings is correct and delete all others
+                const keep = ['name', 'settings', 'originalHash'];
+
+                if (this.state.selectedRule) {
+                    this.assignRuleSettings(this.state.selectedRule);
+                }
+
+                data.settings.rootRule.type = data.rootRuleType;
+
+                for (const key in data) {
+                    if (!keep.includes(key)) {
+                        delete data[key];
+                    }
+                }
             });
 
             if (submitSuccessful) {
-                this.enableForm();
-                this.setFormStatusMessage('success', t('Segment saved'));
+                if (stay) {
+                    await this.loadFormValues();
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Segment saved'));
+                } else {
+                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment saved'));
+                }
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
@@ -190,11 +452,18 @@ export default class CUD extends Component {
         }
     }
 
+    async submitAndStay() {
+        await this.formHandleChangedError(async () => await this.doSubmit(true));
+    }
+
+    async submitAndLeave() {
+        await this.formHandleChangedError(async () => await this.doSubmit(false));
+    }
+
     async onRuleDelete(data) {
         let finishedSearching = false;
 
         function childrenWithoutRule(rules) {
-            console.log(rules);
             const newRules = [];
 
             for (const rule of rules) {
@@ -218,59 +487,89 @@ export default class CUD extends Component {
             return newRules;
         }
 
-        const rules = childrenWithoutRule(this.state.rules);
-        console.log(rules);
+        if (!this.state.ruleOptionsVisible) {
+            const rules = childrenWithoutRule(this.state.rules);
 
-        this.setState({
-            rules,
-            rulesTree: this.getTreeFromRules(rules)
-        });
+            this.setState({
+                rules,
+                rulesTree: this.getTreeFromRules(rules)
+            });
+        }
     }
 
     async showRuleOptions(data) {
+        const rule = data.node.rule;
+
+        this.populateFormValues(this.getFormData(rule));
+
         this.setState({
-            ruleOptionsVisible: true
+            ruleOptionsVisible: true,
+            selectedRule: rule
         });
     }
 
     async hideRuleOptions() {
+        const rule = this.state.selectedRule;
+
+        // FIXME validate rule settings and if it is valid, do the rest
+
+        this.assignRuleSettings(rule); // This changes the rule in the state without notifying. Although this is an anti-pattern for React, this behavior is OK here because we don't want to notify anyone.
+
         this.setState({
-            ruleOptionsVisible: false
+            ruleOptionsVisible: false,
+            selectedRule: null,
+            rulesTree: this.getTreeFromRules(this.state.rules)
         });
     }
 
     async onRulesChanged(rulesTree) {
+        // This assumes that !this.state.ruleOptionsVisible
+        this.getFormValue('settings').rootRule.rules = this.getRulesFromTree(rulesTree);
+
         this.setState({
-            rulesTree,
-            rules: this.getRulesFromTree(rulesTree)
+            rulesTree
         })
     }
 
-    _addRule(type) {
-        const rules = this.state.rules;
-
-        rules.push({
-            type,
-            rules: []
-        });
-
-        this.setState({
-            rules,
-            rulesTree: this.getTreeFromRules(rules)
-        });
-    }
-
     async addCompositeRule() {
-        this._addRule('all');
+        if (!this.state.ruleOptionsVisible) {
+            const rule = {
+                type: 'all',
+                rules: []
+            };
+
+            const rules = this.getFormValue('settings').rootRule.rules;
+            rules.push(rule);
+
+            this.setState({
+                rulesTree: this.getTreeFromRules(rules)
+            });
+        }
     }
 
     async addRule() {
-        this._addRule('eq');
+        if (!this.state.ruleOptionsVisible) {
+            const rule = {
+                type: null  // Null type means a primitive rule where the type has to be chosen based on the chosen column
+            };
+
+            const rules = this.getFormValue('settings').rootRule.rules;
+            rules.push(rule);
+
+            this.populateFormValues(this.getFormData(rule));
+
+            this.setState({
+                ruleOptionsVisible: true,
+                selectedRule: rule,
+                rulesTree: this.getTreeFromRules(rules)
+            });
+        }
     }
 
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const selectedRule = this.state.selectedRule;
 
         let ruleOptionsVisibilityClass = '';
         if ('ruleOptionsVisible' in this.state) {
@@ -278,6 +577,54 @@ export default class CUD extends Component {
                 ruleOptionsVisibilityClass = ' ' + styles.ruleOptionsVisible;
             } else {
                 ruleOptionsVisibilityClass = ' ' + styles.ruleOptionsHidden;
+            }
+        }
+
+        let ruleOptions = null;
+        if (selectedRule) {
+            if (selectedRule.type in this.compositeRuleTypes) {
+                ruleOptions = <Dropdown id="ruleType" label={t('Type')} options={this.compositeRuleTypeOptions} />
+            }
+            else {
+
+                const ruleColumnOptionsColumns = [
+                    { data: 1, title: t('Name') },
+                    { data: 2, title: t('Type') },
+                    { data: 3, title: t('Merge Tag') }
+                ];
+
+                const ruleColumnOptions = [
+                    ...this.predefColumns.map(fld => [ fld.column, fld.name, this.fieldTypes[fld.type], fld.tag || '' ]),
+                    ...this.props.fields.filter(fld => fld.type in this.primitiveRuleTypes).map(fld => [ fld.column, fld.name, this.fieldTypes[fld.type], fld.tag || '' ])
+                ];
+
+                const ruleColumnSelect = <TableSelect id="ruleColumn" label={t('Field')} data={ruleColumnOptions} columns={ruleColumnOptionsColumns} dropdown withHeader />;
+                let ruleTypeSelect = null;
+                let ruleSettings = null;
+
+                const ruleColumn = this.getFormValue('ruleColumn');
+                if (ruleColumn) {
+                    const colType = this.getColumnType(ruleColumn);
+                    if (colType) {
+                        const ruleTypeOptions = this.primitiveRuleTypeOptions[colType];
+
+                        if (ruleTypeOptions) {
+                            ruleTypeSelect = <Dropdown id="ruleType" label={t('Type')} options={ruleTypeOptions} />
+
+                            const ruleType = this.getFormValue('ruleType');
+                            if (ruleType) {
+                                ruleSettings = this.state.primitiveRuleTypes[colType][ruleType].form;
+                            }
+                        }
+                    }
+                }
+
+                ruleOptions =
+                    <div>
+                        {ruleColumnSelect}
+                        {ruleTypeSelect}
+                        {ruleSettings}
+                    </div>;
             }
         }
 
@@ -297,16 +644,18 @@ export default class CUD extends Component {
 
                 <Title>{isEdit ? t('Edit Segment') : t('Create Segment')}</Title>
 
-                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
+                <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
+
                         {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/fields/${this.props.list.id}/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
 
                     <h3>{t('Segment Options')}</h3>
 
-                    <InputField id="name" label={t('Name')}/>
-
+                    <InputField id="name" label={t('Name')} />
+                    <Dropdown id="rootRuleType" label={t('Toplevel match type')} options={this.compositeRuleTypeOptions} />
 
                     <hr />
 
@@ -327,7 +676,7 @@ export default class CUD extends Component {
                                         treeData={this.state.rulesTree}
                                         onChange={rulesTree => this.onRulesChanged(rulesTree)}
                                         isVirtualized={false}
-                                        canDrop={ data => !data.nextParent || this.compoundRuleTypes.includes(data.nextParent.rule.type) }
+                                        canDrop={ data => !data.nextParent || (data.nextParent.rule.type in this.compositeRuleTypes) }
                                         generateNodeProps={data => ({
                                             buttons: [
                                                 <ActionLink onClickAsync={async () => await this.showRuleOptions(data)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
@@ -349,7 +698,8 @@ export default class CUD extends Component {
                             <div className={styles.rightPaneInner}>
                                 <div className={styles.ruleOptions}>
                                     <h3>{t('Rule Options')}</h3>
-                                    <InputField id="name" label={t('Name')}/>
+
+                                    {ruleOptions}
 
                                     <ButtonRow>
                                         <Button className="btn-primary" icon="chevron-left" label={t('Back')} onClickAsync={::this.hideRuleOptions}/>

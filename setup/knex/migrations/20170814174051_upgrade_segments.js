@@ -40,18 +40,16 @@ exports.up = (knex, Promise) => (async() => {
             if (oldRule.column in predefColumns) {
                 fieldType = predefColumns[oldRule.column];
             } else {
-                const field = await knex('custom_fields').where({list: segment.list, type: 'like', column: oldRule.column}).select(['type']).first();
+                const field = await knex('custom_fields').where({list: segment.list, column: oldRule.column}).select(['type']).first();
                 if (field) {
                     fieldType = field.type;
                 }
             }
 
             switch (fieldType) {
-                case 'string':
+                case 'text':
+                case 'website':
                     rules.push({ column: oldRule.column, value: oldSettings.value });
-                    break;
-                case 'boolean':
-                    rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
                     break;
                 case 'number':
                     if (oldSettings.range) {
@@ -79,74 +77,53 @@ exports.up = (knex, Promise) => (async() => {
                     }
                     break;
                 case 'birthday':
-                    if (oldSettings.range) {
-                        if (oldSettings.start && oldSettings.end) {
-                            if (type === 'all') {
-                                rules.push({ type: 'birthdayGe', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'birthdayLe', column: oldRule.column, value: oldSettings.end});
-                            } else {
-                                rules.push({
-                                    type: 'all',
-                                    rules: [
-                                        { type: 'birthdayGe', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'birthdayLe', column: oldRule.column, value: oldSettings.end}
-                                    ]
-                                });
-                            }
-                        } else if (oldSettings.start) {
-                            rules.push({ type: 'birthdayGe', column: oldRule.column, value: oldSettings.start  });
-                        }
-                        if (oldSettings.end) {
-                            rules.push({ type: 'birthdayLe', column: oldRule.column, value: oldSettings.end  });
-                        }
-                    } else {
-                        rules.push({ type: 'birthdayEq', column: oldRule.column, value: oldSettings.value  });
-                    }
-                    break;
                 case 'date':
                     if (oldSettings.relativeRange) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'dateGeNowPlusDays', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'dateLeNowPlusDays', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'geNowPlusDays', column: oldRule.column, value: oldSettings.start});
+                                rules.push({ type: 'leNowPlusDays', column: oldRule.column, value: oldSettings.end});
                             } else {
                                 rules.push({
                                     type: 'all',
                                     rules: [
-                                        { type: 'dateGeNowPlusDays', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'dateLeNowPlusDays', column: oldRule.column, value: oldSettings.end}
+                                        { type: 'geNowPlusDays', column: oldRule.column, value: oldSettings.start},
+                                        { type: 'leNowPlusDays', column: oldRule.column, value: oldSettings.end}
                                     ]
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'dateGeNowPlusDays', column: oldRule.column, value: oldSettings.startDirection ? oldSettings.start : -oldSettings.start  });
+                            rules.push({ type: 'geNowPlusDays', column: oldRule.column, value: oldSettings.startDirection ? oldSettings.start : -oldSettings.start  });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'dateLeNowPlusDays', column: oldRule.column, value: oldSettings.endDirection ? oldSettings.end : -oldSettings.end  });
+                            rules.push({ type: 'leNowPlusDays', column: oldRule.column, value: oldSettings.endDirection ? oldSettings.end : -oldSettings.end  });
                         }
                     } else if (oldSettings.range) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'dateGe', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'dateLe', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start});
+                                rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end});
                             } else {
                                 rules.push({
                                     type: 'all',
                                     rules: [
-                                        { type: 'dateGe', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'dateLe', column: oldRule.column, value: oldSettings.end}
+                                        { type: 'ge', column: oldRule.column, value: oldSettings.start},
+                                        { type: 'le', column: oldRule.column, value: oldSettings.end}
                                     ]
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'dateGe', column: oldRule.column, value: oldSettings.start  });
+                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start  });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'dateLe', column: oldRule.column, value: oldSettings.end  });
+                            rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end  });
                         }
                     } else {
-                        rules.push({ type: 'dateEq', column: oldRule.column, value: oldSettings.value  });
+                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
                     }
+                    break;
+                case 'option':
+                    rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
                     break;
                 default:
                     throw new Error(`Unknown rule for column ${oldRule.column} with field type ${fieldType}`);

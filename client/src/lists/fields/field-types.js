@@ -21,7 +21,7 @@ export function getFieldTypes(t) {
         number: {
             label: t('Number'),
         },
-        checkbox: {
+        'checkbox-grouped': {
             label: t('Checkboxes (from option fields)'),
         },
         'radio-grouped': {

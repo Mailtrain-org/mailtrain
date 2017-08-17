@@ -20,11 +20,7 @@ exports.up = (knex, Promise) => (async() => {
             settings.groupTemplate = field.group_template;
         }
 
-        if (type === 'checkbox') {
-            settings.groupTemplate = field.group_template;
-        }
-
-        if (['dropdown', 'radio'].includes(type)) {
+        if (['checkbox', 'dropdown', 'radio'].includes(type)) {
             settings.groupTemplate = field.group_template;
             type = type + '-grouped';
         }

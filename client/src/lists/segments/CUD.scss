@@ -6,6 +6,20 @@ $mobileAnimationStartPosition: 100px;
 $desktopLeftPaneResidualWidth: 200px;
 $desktopAnimationStartPosition: 300px;
 
+@mixin optionsHidden {
+  transform: translateX($mobileAnimationStartPosition);
+  @media (min-width: $desktopMinWidth) {
+    transform: translateX($desktopAnimationStartPosition);
+  }
+}
+
+@mixin optionsVisible {
+  transform: translateX($mobileLeftPaneResidualWidth);
+  @media (min-width: $desktopMinWidth) {
+    transform: translateX($desktopLeftPaneResidualWidth);
+  }
+}
+
 .toolbar {
   text-align: right;
 }
@@ -28,7 +42,7 @@ $desktopAnimationStartPosition: 300px;
       .ruleTree {
         background: #fbfbfb;
         border: #cfcfcf 1px solid;
-        border-radius: 3px;
+        border-radius: 4px;
         padding: 10px 0px;
         margin-top: 15px;
         margin-bottom: 30px;
@@ -62,10 +76,7 @@ $desktopAnimationStartPosition: 300px;
       height: 100%;
       background: url('./divider.png') repeat-y;
 
-      transform: translateX($mobileAnimationStartPosition);
-      @media (min-width: $desktopMinWidth) {
-        transform: translateX($desktopAnimationStartPosition);
-      }
+      @include optionsHidden;
 
       padding-left: 50px;
       z-index: 1;
@@ -89,10 +100,7 @@ $desktopAnimationStartPosition: 300px;
     z-index: 2;
     position: relative;
 
-    transform: translateX($mobileAnimationStartPosition);
-    @media (min-width: $desktopMinWidth) {
-      transform: translateX($desktopAnimationStartPosition);
-    }
+    @include optionsHidden;
 
     opacity: 0;
     visibility: hidden;
@@ -119,10 +127,7 @@ $desktopAnimationStartPosition: 300px;
       opacity: 1;
       visibility: visible;
 
-      transform: translateX($mobileLeftPaneResidualWidth);
-      @media (min-width: $desktopMinWidth) {
-        transform: translateX($desktopLeftPaneResidualWidth);
-      }
+      @include optionsVisible;
     }
 
     .rightPane {
@@ -130,10 +135,7 @@ $desktopAnimationStartPosition: 300px;
       opacity: 1;
       visibility: visible;
 
-      transform: translateX($mobileLeftPaneResidualWidth);
-      @media (min-width: $desktopMinWidth) {
-        transform: translateX($desktopLeftPaneResidualWidth);
-      }
+      @include optionsVisible;
     }
   }
 

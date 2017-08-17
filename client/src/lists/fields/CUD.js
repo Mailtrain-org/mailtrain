@@ -76,7 +76,7 @@ export default class CUD extends Component {
                 data.renderTemplate = '';
 
                 switch (data.type) {
-                    case 'checkbox':
+                    case 'checkbox-grouped':
                     case 'radio-grouped':
                     case 'dropdown-grouped':
                     case 'json':
@@ -240,7 +240,7 @@ export default class CUD extends Component {
 
                 data.settings = {};
                 switch (data.type) {
-                    case 'checkbox':
+                    case 'checkbox-grouped':
                     case 'radio-grouped':
                     case 'dropdown-grouped':
                     case 'json':
@@ -324,7 +324,7 @@ export default class CUD extends Component {
                     </Fieldset>;
                 break;
 
-            case 'checkbox':
+            case 'checkbox-grouped':
             case 'radio-grouped':
             case 'dropdown-grouped':
                 fieldSettings =
