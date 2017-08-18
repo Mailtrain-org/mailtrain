@@ -433,8 +433,8 @@ export default class CUD extends Component {
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
                         deleteUrl={`/rest/fields/${this.props.list.id}/${this.props.entity.id}`}
-                        cudUrl={`/lists/fields/${this.props.list.id}/${this.props.entity.id}/edit`}
-                        listUrl={`/lists/fields/${this.props.list.id}`}
+                        cudUrl={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/edit`}
+                        listUrl={`/lists/${this.props.list.id}/fields`}
                         deletingMsg={t('Deleting field ...')}
                         deletedMsg={t('Field deleted')}/>
                 }
@@ -464,7 +464,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/fields/${this.props.list.id}/${this.props.entity.id}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

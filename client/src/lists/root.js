@@ -163,7 +163,7 @@ const getStructure = t => {
 
 export default function() {
     ReactDOM.render(
-        <I18nextProvider i18n={ i18n }><Section root='/lists' structure={getStructure}/></I18nextProvider>,
+        <I18nextProvider i18n={ i18n }><Section root='/lists/1/segments/create' /* FIXME */ structure={getStructure}/></I18nextProvider>,
         document.getElementById('root')
     );
 };

@@ -238,7 +238,7 @@ class InputField extends Component {
         }
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+            <input type={type} value={owner.getFormValue(id) || ''} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );
     }
 }
@@ -290,7 +290,7 @@ class TextArea extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <textarea id={htmlId} value={owner.getFormValue(id)} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
+            <textarea id={htmlId} value={owner.getFormValue(id) || ''} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
 }
@@ -841,10 +841,14 @@ function withForm(target) {
                 })
             };
 
-            const onChangeCallbacks = this.state.formSettings.onChange || {};
+            const onChangeCallback = this.state.formSettings.onChange || {};
 
-            if (onChangeCallbacks[key]) {
-                onChangeCallbacks[key](newState, key, oldValue, value);
+            if (typeof onChangeCallback === 'object') {
+                if (onChangeCallback[key]) {
+                    onChangeCallback[key](newState, key, oldValue, value);
+                }
+            } else {
+                onChangeCallback(newState, key, oldValue, value);
             }
 
             return newState;

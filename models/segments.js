@@ -4,6 +4,8 @@ const knex = require('../lib/knex');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
+const { enforce, filterObject } = require('../lib/helpers');
+const hasher = require('node-object-hash')();
 
 const allowedKeys = new Set(['name', 'settings']);
 
@@ -47,7 +49,7 @@ async function create(context, listId, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
 
-        entity.settings = JSON.stringify(entity.params);
+        entity.settings = JSON.stringify(entity.settings);
 
         const filteredEntity = filterObject(entity, allowedKeys);
         filteredEntity.list = listId;
@@ -68,12 +70,14 @@ async function updateWithConsistencyCheck(context, listId, entity) {
             throw new interoperableErrors.NotFoundError();
         }
 
+        existing.settings = JSON.parse(existing.settings);
+
         const existingHash = hash(existing);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
-        entity.settings = JSON.stringify(entity.params);
+        entity.settings = JSON.stringify(entity.settings);
 
         await tx('segments').where('id', entity.id).update(filterObject(entity, allowedKeys));
     });
@@ -105,8 +109,10 @@ async function removeRulesByFieldIdTx(tx, context, listId, fieldId) {
 }
 
 module.exports = {
+    hash,
     listDTAjax,
     list,
+    getById,
     create,
     updateWithConsistencyCheck,
     remove,
