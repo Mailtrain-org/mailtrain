@@ -200,7 +200,7 @@ export default class CUD extends Component {
         await this.formHandleChangedError(async () => await this.doSubmit(false));
     }
 
-    async onRulesChanged(rulesTree) {
+    onRulesChanged(rulesTree) {
         // This assumes that !this.state.ruleOptionsVisible
         this.getFormValue('settings').rootRule.rules = this.getRulesFromTree(rulesTree);
 
@@ -209,9 +209,7 @@ export default class CUD extends Component {
         })
     }
 
-    async showRuleOptions(data) {
-        const rule = data.node.rule;
-
+    showRuleOptions(rule) {
         this.updateFormValue('selectedRule', rule);
 
         this.setState({
@@ -226,6 +224,17 @@ export default class CUD extends Component {
             ruleOptionsVisible: false,
             rulesTree: this.getTreeFromRules(this.getFormValue('settings').rootRule.rules)
         });
+    }
+
+    onRuleSettingsPaneDelete() {
+        const selectedRule = this.getFormValue('selectedRule');
+        this.updateFormValue('selectedRule', null);
+
+        this.setState({
+            ruleOptionsVisible: false,
+        });
+
+        this.deleteRule(selectedRule);
     }
 
     onRuleSettingsPaneUpdated(hasErrors) {
@@ -261,7 +270,7 @@ export default class CUD extends Component {
         });
     }
 
-    async deleteRule(data) {
+    deleteRule(ruleToDelete) {
         let finishedSearching = false;
 
         function childrenWithoutRule(rules) {
@@ -271,7 +280,7 @@ export default class CUD extends Component {
                 if (finishedSearching) {
                     newRules.push(rule);
 
-                } else if (rule !== data.node.rule) {
+                } else if (rule !== ruleToDelete) {
                     const newRule = Object.assign({}, rule);
 
                     if (rule.rules) {
@@ -288,15 +297,13 @@ export default class CUD extends Component {
             return newRules;
         }
 
-        if (!this.state.ruleOptionsVisible) {
-            const rules = childrenWithoutRule(this.getFormValue('settings').rootRule.rules);
+        const rules = childrenWithoutRule(this.getFormValue('settings').rootRule.rules);
 
-            this.getFormValue('settings').rootRule.rules = rules;
+        this.getFormValue('settings').rootRule.rules = rules;
 
-            this.setState({
-                rulesTree: this.getTreeFromRules(rules)
-            });
-        }
+        this.setState({
+            rulesTree: this.getTreeFromRules(rules)
+        });
     }
 
 
@@ -374,8 +381,8 @@ export default class CUD extends Component {
                                     canDrop={ data => !data.nextParent || (ruleHelpers.isCompositeRuleType(data.nextParent.rule.type)) }
                                     generateNodeProps={data => ({
                                         buttons: [
-                                            <ActionLink onClickAsync={async () => await this.showRuleOptions(data)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
-                                            <ActionLink onClickAsync={async () => await this.deleteRule(data)} className={styles.ruleActionLink}><Icon name="remove"/></ActionLink>
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon name="remove"/></ActionLink>
                                         ]
                                     })}
                                 />
@@ -392,7 +399,7 @@ export default class CUD extends Component {
                     <div className={styles.rightPane}>
                         <div className={styles.rightPaneInner}>
                             {selectedRule &&
-                                <RuleSettingsPane rule={selectedRule} fields={this.props.fields} onChange={::this.onRuleSettingsPaneUpdated} onClose={::this.onRuleSettingsPaneClose} forceShowValidation={this.isFormValidationShown()}/>}
+                                <RuleSettingsPane rule={selectedRule} fields={this.props.fields} onChange={::this.onRuleSettingsPaneUpdated} onClose={::this.onRuleSettingsPaneClose} onDelete={::this.onRuleSettingsPaneDelete} forceShowValidation={this.isFormValidationShown()}/>}
                         </div>
                     </div>
                 </div>

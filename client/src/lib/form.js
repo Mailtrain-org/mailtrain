@@ -10,7 +10,7 @@ import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import { TreeTable, TreeSelectMode } from './tree';
 import { Table, TableSelectMode } from './table';
-import { Button as ActionButton } from "./bootstrap-components";
+import { Button } from "./bootstrap-components";
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -498,57 +498,6 @@ class ButtonRow extends Component {
     }
 }
 
-@withErrorHandling
-class Button extends Component {
-    static propTypes = {
-        onClickAsync: PropTypes.func,
-        label: PropTypes.string,
-        icon: PropTypes.string,
-        className: PropTypes.string,
-        type: PropTypes.string
-    }
-
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
-    @withAsyncErrorHandler
-    async onClick(evt) {
-        if (this.props.onClickAsync) {
-            evt.preventDefault();
-
-            this.context.formStateOwner.disableForm();
-            await this.props.onClickAsync(evt);
-            this.context.formStateOwner.enableForm();
-        }
-    }
-
-    render() {
-        const props = this.props;
-
-        let className = 'btn';
-        if (props.className) {
-            className = className + ' ' + props.className;
-        }
-
-        let type = props.type || 'button';
-
-        let icon;
-        if (props.icon) {
-            icon = <span className={'glyphicon glyphicon-' + props.icon}></span>
-        }
-
-        let iconSpacer;
-        if (props.icon && props.label) {
-            iconSpacer = ' ';
-        }
-
-        return (
-            <button type={type} className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
-        );
-    }
-}
-
 
 class TreeTableSelect extends Component {
     static propTypes = {
@@ -670,7 +619,7 @@ class TableSelect extends Component {
                     <div className={`input-group ${styles.tableSelectDropdown}`}>
                         <input type="text" className="form-control" value={this.state.selectedLabel} readOnly onClick={::this.toggleOpen}/>
                         <span className="input-group-btn">
-                            <ActionButton label={t('Select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
+                            <Button label={t('Select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
                         </span>
                     </div>
                     <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>

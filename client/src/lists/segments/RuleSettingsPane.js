@@ -37,6 +37,7 @@ export default class CUD extends Component {
         fields: PropTypes.array.isRequired,
         onChange: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
+        onDelete: PropTypes.func.isRequired,
         forceShowValidation: PropTypes.bool.isRequired
     }
 
@@ -158,6 +159,10 @@ export default class CUD extends Component {
         }
     }
 
+    async deleteRule() {
+        this.props.onDelete();
+    }
+
     render() {
         const t = this.props.t;
         const rule = this.props.rule;
@@ -218,6 +223,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="chevron-left" label={t('OK')}/>
+                        <Button className="btn-primary" icon="remove" label={t('Delete')} onClickAsync={::this.deleteRule}/>
                     </ButtonRow>
                 </Form>
 

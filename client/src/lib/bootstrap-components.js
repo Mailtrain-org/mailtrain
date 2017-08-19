@@ -51,7 +51,8 @@ class Button extends Component {
         onClickAsync: PropTypes.func,
         label: PropTypes.string,
         icon: PropTypes.string,
-        className: PropTypes.string
+        className: PropTypes.string,
+        type: PropTypes.string
     }
 
     @withAsyncErrorHandler
@@ -70,6 +71,8 @@ class Button extends Component {
             className = className + ' ' + props.className;
         }
 
+        let type = props.type || 'button';
+
         let icon;
         if (props.icon) {
             icon = <Icon name={props.icon}/>
@@ -81,7 +84,7 @@ class Button extends Component {
         }
 
         return (
-            <button type="button" className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
+            <button type={type} className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
         );
     }
 }
