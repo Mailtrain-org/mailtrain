@@ -951,6 +951,8 @@ function withForm(target) {
 
             const formState = previousState.formState.withMutations(mutState => {
                 mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                    mutStateData.setIn([key, 'value'], value);
+
                     if (typeof onChangeBeforeValidationCallback === 'object') {
                         if (onChangeBeforeValidationCallback[key]) {
                             onChangeBeforeValidationCallback[key](mutStateData, key, oldValue, value);
@@ -958,8 +960,6 @@ function withForm(target) {
                     } else {
                         onChangeBeforeValidationCallback(mutStateData, key, oldValue, value);
                     }
-
-                    mutStateData.setIn([key, 'value'], value);
                 }));
 
                 validateFormState(this, mutState);

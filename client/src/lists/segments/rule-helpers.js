@@ -253,43 +253,43 @@ export function getRuleHelpers(t, fields) {
     };
 
     const birthdayValueSettings = {
-        form: <DatePicker id="value" label={t('Date')} birthday />,
+        form: <DatePicker id="birthday" label={t('Date')} birthday />,
         getFormData: rule => ({
-            value: formatBirthday(DateFormat.INTL, rule.value)
+            birthday: formatBirthday(DateFormat.INTL, rule.value)
         }),
         assignRuleSettings: (rule, getter) => {
-            rule.value = parseBirthday(DateFormat.INTL, getter('value')).toISOString();
+            rule.value = parseBirthday(DateFormat.INTL, getter('birthday')).toISOString();
         },
         validate: state => {
-            const value = state.getIn(['value', 'value']);
+            const value = state.getIn(['birthday', 'value']);
             const date = parseBirthday(DateFormat.INTL, value);
             if (!value) {
-                state.setIn(['value', 'error'], t('Date must not be empty'));
+                state.setIn(['birthday', 'error'], t('Date must not be empty'));
             } else if (!date) {
-                state.setIn(['value', 'error'], t('Date is invalid'));
+                state.setIn(['birthday', 'error'], t('Date is invalid'));
             } else {
-                state.setIn(['value', 'error'], null);
+                state.setIn(['birthday', 'error'], null);
             }
         }
     };
 
     const dateValueSettings = {
-        form: <DatePicker id="value" label={t('Date')} />,
+        form: <DatePicker id="date" label={t('Date')} />,
         getFormData: rule => ({
-            value: formatDate(DateFormat.INTL, rule.value)
+            date: formatDate(DateFormat.INTL, rule.value)
         }),
         assignRuleSettings: (rule, getter) => {
-            rule.value = parseDate(DateFormat.INTL, getter('value')).toISOString();
+            rule.value = parseDate(DateFormat.INTL, getter('date')).toISOString();
         },
         validate: state => {
-            const value = state.getIn(['value', 'value']);
+            const value = state.getIn(['date', 'value']);
             const date = parseDate(DateFormat.INTL, value);
             if (!value) {
-                state.setIn(['value', 'error'], t('Date must not be empty'));
+                state.setIn(['date', 'error'], t('Date must not be empty'));
             } else if (!date) {
-                state.setIn(['value', 'error'], t('Date is invalid'));
+                state.setIn(['date', 'error'], t('Date is invalid'));
             } else {
-                state.setIn(['value', 'error'], null);
+                state.setIn(['date', 'error'], null);
             }
         }
     };
@@ -297,35 +297,34 @@ export function getRuleHelpers(t, fields) {
     const dateRelativeValueSettings = {
         form:
             <div>
-                <InputField id="value" label={t('Number of days')}/>
+                <InputField id="daysValue" label={t('Number of days')}/>
                 <Dropdown id="direction" label={t('Before/After')} options={[
                     { key: 'before', label: t('Before current date') },
                     { key: 'after', label: t('After current date') }
                 ]}/>
             </div>,
         getFormData: rule => ({
-            value: Math.abs(rule.value).toString(),
+            daysValue: Math.abs(rule.value).toString(),
             direction: rule.value >= 0 ? 'after' : 'before'
         }),
         assignRuleSettings: (rule, getter) => {
             const direction = getter('direction');
-            rule.value = parseInt(getter('value')) * (direction === 'before' ? -1 : 1);
+            rule.value = parseInt(getter('daysValue')) * (direction === 'before' ? -1 : 1);
         },
         validate: state => {
-            const value = state.getIn(['value', 'value']);
+            const value = state.getIn(['daysValue', 'value']);
             if (!value) {
-                state.setIn(['value', 'error'], t('Value must not be empty'));
+                state.setIn(['daysValue', 'error'], t('Number of days must not be empty'));
             } else if (isNaN(value)) {
-                state.setIn(['value', 'error'], t('Value must be a number'));
+                state.setIn(['daysValue', 'error'], t('Number of days must be a number'));
             } else {
-                state.setIn(['value', 'error'], null);
+                state.setIn(['daysValue', 'error'], null);
             }
         }
     };
 
     const optionValueSettings = {
         form: null,
-        formDataDefaults: {},
         getFormData: rule => ({}),
         assignRuleSettings: (rule, getter) => {},
         validate: state => {}
@@ -353,6 +352,9 @@ export function getRuleHelpers(t, fields) {
 
     ruleHelpers.primitiveRuleTypesFormDataDefaults = {
         value: '',
+        date: '',
+        daysValue: '',
+        birthday: '',
         direction: 'before'
     };
 

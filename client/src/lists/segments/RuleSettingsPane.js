@@ -109,10 +109,10 @@ export default class CUD extends Component {
 
     populateRuleDefaults(mutState) {
         const ruleHelpers = this.ruleHelpers;
-        const type = mutState.getIn(['data','type','value']);
+        const type = mutState.getIn(['type','value']);
 
         if (!ruleHelpers.isCompositeRuleType(type)) {
-            const column = mutState.getIn(['data', 'column', 'value']);
+            const column = mutState.getIn(['column', 'value']);
 
             if (column) {
                 const colType = ruleHelpers.getColumnType(column);
@@ -121,7 +121,7 @@ export default class CUD extends Component {
                     const settings = ruleHelpers.primitiveRuleTypes[colType][type];
                     if (!settings) {
                         // The existing rule type does not fit the newly changed column. This resets the rule type chooser to "-- Select ---"
-                        mutState.setIn(['data', 'type', 'value'], '');
+                        mutState.setIn(['type', 'value'], '');
                     }
                 }
             }
