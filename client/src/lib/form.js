@@ -19,6 +19,14 @@ import 'brace/mode/json';
 import 'brace/mode/handlebars';
 import 'brace/theme/github';
 
+import DayPicker from 'react-day-picker';
+import 'react-day-picker/lib/style.css';
+import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birthdayYear, getDateFormatString, getBirthdayFormatString } from '../../../shared/date';
+
+import styles from "./styles.scss";
+import moment from "moment";
+
+
 const FormState = {
     Loading: 0,
     LoadingWithNotice: 1,
@@ -79,7 +87,7 @@ class Form extends Component {
 
         if (!owner.isFormReady()) {
             if (owner.isFormWithLoadingNotice()) {
-                return <p className={`alert alert-info mt-form-status`} role="alert">{t('Loading ...')}</p>
+                return <p className={`alert alert-info ${styles.formStatus}`} role="alert">{t('Loading ...')}</p>
             } else {
                 return <div></div>;
             }
@@ -91,7 +99,7 @@ class Form extends Component {
                     </fieldset>
                     {statusMessageText &&
                         <AlignedRow htmlId="form-status-message">
-                            <p className={`alert alert-${statusMessageSeverity} mt-form-status`} role="alert">{statusMessageText}</p>
+                            <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
                         </AlignedRow>
                     }
                 </form>
@@ -295,6 +303,111 @@ class TextArea extends Component {
     }
 }
 
+
+class DatePicker extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            opened: false
+        };
+    }
+
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        format: PropTypes.string,
+        birthday: PropTypes.bool,
+        dateFormat: PropTypes.string
+    }
+
+    static defaultProps = {
+        dateFormat: DateFormat.INTL
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    toggleDayPicker() {
+        this.setState({
+            opened: !this.state.opened
+        });
+    }
+
+    daySelected(date) {
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const props = this.props;
+        owner.updateFormValue(id, props.birthday ? formatBirthday(props.dateFormat, date) : formatDate(props.dateFormat, date));
+
+        this.setState({
+            opened: false
+        });
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        function BirthdayPickerCaption({ date, localeUtils, onChange }) {
+            const months = localeUtils.getMonths();
+            return (
+                <div className="DayPicker-Caption">
+                    {months[date.getMonth()]}
+                </div>
+            );
+        }
+
+        let selectedDate, captionElement, fromMonth, toMonth, placeholder;
+        const selectedDateStr = owner.getFormValue(id) || '';
+        if (props.birthday) {
+            selectedDate = parseBirthday(props.dateFormat, selectedDateStr);
+            if (!selectedDate) {
+                selectedDate = moment().set('year', birthdayYear).toDate();
+            }
+
+            captionElement = <BirthdayPickerCaption/>;
+            fromMonth = new Date(birthdayYear, 0, 1);
+            toMonth = new Date(birthdayYear, 11, 31);
+            placeholder = getBirthdayFormatString(props.dateFormat);
+
+        } else {
+            selectedDate = parseDate(props.dateFormat, selectedDateStr);
+            if (!selectedDate) {
+                selectedDate = moment().toDate();
+            }
+
+            placeholder = getDateFormatString(props.dateFormat);
+        }
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div>
+                <div className="input-group">
+                    <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><span className="glyphicon glyphicon-th"></span></span>
+                </div>
+                {this.state.opened &&
+                    <div className={styles.dayPickerWrapper}>
+                        <DayPicker
+                            onDayClick={date => this.daySelected(date)}
+                            selectedDays={selectedDate}
+                            initialMonth={selectedDate}
+                            fromMonth={fromMonth}
+                            toMonth={toMonth}
+                            captionElement={captionElement}
+                        />
+                    </div>
+                }
+            </div>
+        );
+    }
+}
+
+
 class Dropdown extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -374,7 +487,7 @@ class ButtonRow extends Component {
     }
 
     render() {
-        let className = 'mt-button-row';
+        let className = styles.buttonRow;
         if (this.props.className) {
             className += ' ' + this.props.className;
         }
@@ -554,13 +667,13 @@ class TableSelect extends Component {
         if (props.dropdown) {
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
-                    <div className="input-group mt-tableselect-dropdown">
+                    <div className={`input-group ${styles.tableSelectDropdown}`}>
                         <input type="text" className="form-control" value={this.state.selectedLabel} readOnly onClick={::this.toggleOpen}/>
                         <span className="input-group-btn">
                             <ActionButton label={t('Select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
                         </span>
                     </div>
-                    <div className={'mt-tableselect-table' + (this.state.open ? '' : ' mt-tableselect-table-hidden')}>
+                    <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
                         <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
@@ -834,12 +947,28 @@ function withForm(target) {
         this.setState(previousState => {
             const oldValue = previousState.formState.getIn(['data', key, 'value']);
 
+            const onChangeBeforeValidationCallback = this.state.formSettings.onChangeBeforeValidation || {};
+
+            const formState = previousState.formState.withMutations(mutState => {
+                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                    if (typeof onChangeBeforeValidationCallback === 'object') {
+                        if (onChangeBeforeValidationCallback[key]) {
+                            onChangeBeforeValidationCallback[key](mutStateData, key, oldValue, value);
+                        }
+                    } else {
+                        onChangeBeforeValidationCallback(mutStateData, key, oldValue, value);
+                    }
+
+                    mutStateData.setIn([key, 'value'], value);
+                }));
+
+                validateFormState(this, mutState);
+            });
+
             let newState = {
-                formState: previousState.formState.withMutations(mutState => {
-                    mutState.setIn(['data', key, 'value'], value);
-                    validateFormState(this, mutState);
-                })
+                formState
             };
+
 
             const onChangeCallback = this.state.formSettings.onChange || {};
 
@@ -1000,6 +1129,7 @@ export {
     InputField,
     CheckBox,
     TextArea,
+    DatePicker,
     Dropdown,
     AlignedRow,
     ButtonRow,

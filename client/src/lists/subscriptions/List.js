@@ -12,7 +12,6 @@ import {
     Dropdown, Form,
     withForm
 } from '../../lib/form';
-import axios from '../../lib/axios';
 
 @translate()
 @withForm
@@ -24,62 +23,48 @@ export default class List extends Component {
         super(props);
 
         const t = props.t;
-        this.state = {
-            segmentOptions: [
-                {key: 'none', label: t('All subscriptions')}
-            ]
-        };
+        this.state = {};
 
         this.subscriptionStatusLabels = {
             [SubscriptionStatus.SUBSCRIBED]: t('Subscribed'),
             [SubscriptionStatus.UNSUBSCRIBED]: t('Unubscribed'),
             [SubscriptionStatus.BOUNCED]: t('Bounced'),
             [SubscriptionStatus.COMPLAINED]: t('Complained'),
-        }
+        };
 
         this.initForm({
             onChange: {
-                segment: ::this.onSegmentChange
+                segment: (newState, key, oldValue, value) => {
+                    this.navigateTo(`/lists/${this.props.list.id}/subscriptions` + (value ? '/' + value : ''));
+                }
             }
         });
     }
 
     static propTypes = {
-        list: PropTypes.object
+        list: PropTypes.object,
+        segments: PropTypes.array,
+        segmentId: PropTypes.string
     }
 
-    onSegmentChange(state, attr, oldValue, newValue) {
-        // TODO
-
-        this.subscriptionsTable.refresh();
-    }
-
-    @withAsyncErrorHandler
-    async loadSegmentOptions() {
-        const t = this.props.t;
-
-        const result = await axios.get(`/rest/segments/${this.props.list.id}`);
-
-        this.setState({
-            segmentOptions: [
-                {key: 'none', label: t('All subscriptions')},
-                ...result.data.map(x => ({ key: x.id.toString(), label: x.name})),
-            ]
+    updateSegmentSelection(props) {
+        this.populateFormValues({
+            segment: props.segmentId || ''
         });
     }
 
     componentDidMount() {
-        this.populateFormValues({
-            segment: 'none'
-        });
-
-        this.loadSegmentOptions();
+        this.updateSegmentSelection(this.props);
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.updateSegmentSelection(nextProps);
+    }
 
     render() {
         const t = this.props.t;
         const list = this.props.list;
+        const segments = this.props.segments;
 
         const columns = [
             { data: 2, title: t('Email') },
@@ -96,6 +81,17 @@ export default class List extends Component {
             });
         }
 
+        const segmentOptions = [
+            {key: '', label: t('All subscriptions')},
+            ...segments.map(x => ({ key: x.id.toString(), label: x.name}))
+        ]
+
+
+        let dataUrl = '/rest/subscriptions-table/' + list.id;
+        if (this.props.segmentId) {
+            dataUrl += '/' + this.props.segmentId;
+        }
+
         return (
             <div>
                 <Toolbar>
@@ -110,12 +106,12 @@ export default class List extends Component {
 
                 <div className="well well-sm">
                     <Form format="inline" stateOwner={this}>
-                        <Dropdown format="inline" className="input-sm" id="segment" label={t('Segment')} options={this.state.segmentOptions}/>
+                        <Dropdown format="inline" className="input-sm" id="segment" label={t('Segment')} options={segmentOptions}/>
                     </Form>
                 </div>
 
 
-                <Table ref={node => this.subscriptionsTable = node} withHeader dataUrl={`/rest/subscriptions-table/${list.id}`} columns={columns} />
+                <Table ref={node => this.subscriptionsTable = node} withHeader dataUrl={dataUrl} columns={columns} />
             </div>
         );
     }

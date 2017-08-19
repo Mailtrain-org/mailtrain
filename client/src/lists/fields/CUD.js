@@ -14,7 +14,8 @@ import { getFieldTypes } from './field-types';
 import interoperableErrors from '../../../../shared/interoperable-errors';
 import validators from '../../../../shared/validators';
 import slugify from 'slugify';
-import { parseDate, parseBirthday } from '../../../../shared/fields';
+import { parseDate, parseBirthday, DateFormat } from '../../../../shared/date';
+import styles from "../../lib/styles.scss";
 
 @translate()
 @withForm
@@ -72,7 +73,7 @@ export default class CUD extends Component {
                 }
 
                 data.enumOptions = '';
-                data.dateFormat = 'eur';
+                data.dateFormat = DateFormat.EUR;
                 data.renderTemplate = '';
 
                 switch (data.type) {
@@ -374,8 +375,8 @@ export default class CUD extends Component {
                     <Fieldset label={t('Field settings')}>
                         <Dropdown id="dateFormat" label={t('Date format')}
                             options={[
-                                {key: 'us', label: t('MM/DD/YYYY')},
-                                {key: 'eur', label: t('DD/MM/YYYY')}
+                                {key: DateFormat.US, label: t('MM/DD/YYYY')},
+                                {key: DateFormat.EU, label: t('DD/MM/YYYY')}
                             ]}
                         />
                         <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.</Trans>}/>
@@ -387,8 +388,8 @@ export default class CUD extends Component {
                     <Fieldset label={t('Field settings')}>
                         <Dropdown id="dateFormat" label={t('Date format')}
                             options={[
-                                {key: 'us', label: t('MM/DD')},
-                                {key: 'eur', label: t('DD/MM')}
+                                {key: DateFormat.US, label: t('MM/DD')},
+                                {key: DateFormat.EU, label: t('DD/MM')}
                             ]}
                         />
                         <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.</Trans>}/>
@@ -445,7 +446,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
 
                     {isEdit ?
-                        <StaticField id="type" className="mt-form-disabled" label={t('Type')}>{(this.fieldTypes[this.getFormValue('type')] || {}).label}</StaticField>
+                        <StaticField id="type" className={styles.formDisabled} label={t('Type')}>{(this.fieldTypes[this.getFormValue('type')] || {}).label}</StaticField>
                     :
                         <Dropdown id="type" label={t('Type')} options={typeOptions}/>
                     }

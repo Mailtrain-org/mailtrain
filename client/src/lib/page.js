@@ -5,12 +5,12 @@ import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
-import './page.css';
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import { DismissibleAlert, Button } from './bootstrap-components';
 import mailtrainConfig from 'mailtrainConfig';
 import axios from '../lib/axios';
+import styles from "./styles.scss";
 
 
 class Breadcrumb extends Component {
@@ -133,7 +133,7 @@ class SecondaryNavBar extends Component {
         }
 
         if (renderedElems.length > 1) {
-            let className = 'mt-secondary-nav nav nav-pills';
+            let className = styles.secondaryNav + ' nav nav-pills';
             if (this.props.className) {
                 className += ' ' + this.props.className;
             }
@@ -482,7 +482,7 @@ class Toolbar extends Component {
     };
 
     render() {
-        let className = 'pull-right mt-button-row';
+        let className = 'pull-right ' + styles.buttonRow;
         if (this.props.className) {
             className += ' ' + this.props.className;
         }

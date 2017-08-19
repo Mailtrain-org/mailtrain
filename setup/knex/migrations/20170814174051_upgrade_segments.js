@@ -77,26 +77,50 @@ exports.up = (knex, Promise) => (async() => {
                     }
                     break;
                 case 'birthday':
-                case 'date':
-                    if (oldSettings.relativeRange) {
+                    if (oldSettings.range) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'geNowPlusDays', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'leNowPlusDays', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start});
+                                rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end});
                             } else {
                                 rules.push({
                                     type: 'all',
                                     rules: [
-                                        { type: 'geNowPlusDays', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'leNowPlusDays', column: oldRule.column, value: oldSettings.end}
+                                        { type: 'ge', column: oldRule.column, value: oldSettings.start},
+                                        { type: 'le', column: oldRule.column, value: oldSettings.end}
                                     ]
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'geNowPlusDays', column: oldRule.column, value: oldSettings.startDirection ? oldSettings.start : -oldSettings.start  });
+                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start  });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'leNowPlusDays', column: oldRule.column, value: oldSettings.endDirection ? oldSettings.end : -oldSettings.end  });
+                            rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end  });
+                        }
+                    } else {
+                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
+                    }
+                    break;
+                case 'date':
+                    if (oldSettings.relativeRange) {
+                        if (oldSettings.start && oldSettings.end) {
+                            if (type === 'all') {
+                                rules.push({ type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.start});
+                                rules.push({ type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.end});
+                            } else {
+                                rules.push({
+                                    type: 'all',
+                                    rules: [
+                                        { type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.start},
+                                        { type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.end}
+                                    ]
+                                });
+                            }
+                        } else if (oldSettings.start) {
+                            rules.push({ type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.startDirection ? oldSettings.start : -oldSettings.start  });
+                        }
+                        if (oldSettings.end) {
+                            rules.push({ type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.endDirection ? oldSettings.end : -oldSettings.end  });
                         }
                     } else if (oldSettings.range) {
                         if (oldSettings.start && oldSettings.end) {

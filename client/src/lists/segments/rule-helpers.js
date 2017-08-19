@@ -1,14 +1,12 @@
 'use strict';
 
 import React from 'react';
-import {InputField} from "../../lib/form";
+import {DatePicker, Dropdown, InputField} from "../../lib/form";
+import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birthdayYear, getDateFormatString, getBirthdayFormatString } from '../../../../shared/date';
+
 
 export function getRuleHelpers(t, fields) {
 
-    function formatDate(date) {
-        return date; // FIXME
-    }
-    
     const ruleHelpers = {};
 
     ruleHelpers.compositeRuleTypes = {
@@ -108,46 +106,69 @@ export function getRuleHelpers(t, fields) {
         }
     }
 
-    ruleHelpers.primitiveRuleTypes.date = ruleHelpers.primitiveRuleTypes.birthday = {
+    ruleHelpers.primitiveRuleTypes.date = {
         eq: {
             dropdownLabel: t('On'),
-            treeLabel: rule => t('Date in column "{{colName}}" is {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(rule.value)}),
+            treeLabel: rule => t('Date in column "{{colName}}" is {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         lt: {
             dropdownLabel: t('Before'),
-            treeLabel: rule => t('Date in column "{{colName}}" is before {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(rule.value)}),
+            treeLabel: rule => t('Date in column "{{colName}}" is before {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         le: {
             dropdownLabel: t('Before or on'),
-            treeLabel: rule => t('Date in column "{{colName}}" is before or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(rule.value)}),
+            treeLabel: rule => t('Date in column "{{colName}}" is before or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         gt: {
             dropdownLabel: t('After'),
-            treeLabel: rule => t('Date in column "{{colName}}" is after {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(rule.value)}),
+            treeLabel: rule => t('Date in column "{{colName}}" is after {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         ge: {
             dropdownLabel: t('After or on'),
-            treeLabel: rule => t('Date in column "{{colName}}" is after or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(rule.value)}),
+            treeLabel: rule => t('Date in column "{{colName}}" is after or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
-        eqNowPlusDays: {
-            dropdownLabel: t('On x-th day before/after now'),
+        eqTodayPlusDays: {
+            dropdownLabel: t('On x-th day before/after current date'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is'),
         },
-        ltNowPlusDays: {
-            dropdownLabel: t('Before x-th day before/after now'),
+        ltTodayPlusDays: {
+            dropdownLabel: t('Before x-th day before/after current date'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is before'),
         },
-        leNowPlusDays: {
-            dropdownLabel: t('Before or on x-th day before/after now'),
+        leTodayPlusDays: {
+            dropdownLabel: t('Before or on x-th day before/after current date'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is before or on'),
         },
-        gtNowPlusDays: {
-            dropdownLabel: t('After x-th day before/after now'),
+        gtTodayPlusDays: {
+            dropdownLabel: t('After x-th day before/after current date'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is after'),
         },
-        geNowPlusDays: {
-            dropdownLabel: t('After or on x-th day before/after now'),
+        geTodayPlusDays: {
+            dropdownLabel: t('After or on x-th day before/after current date'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is after or on'),
+        }
+    };
+
+    ruleHelpers.primitiveRuleTypes.birthday = {
+        eq: {
+            dropdownLabel: t('On'),
+            treeLabel: rule => t('Date in column "{{colName}}" is {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+        },
+        lt: {
+            dropdownLabel: t('Before'),
+            treeLabel: rule => t('Date in column "{{colName}}" is before {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+        },
+        le: {
+            dropdownLabel: t('Before or on'),
+            treeLabel: rule => t('Date in column "{{colName}}" is before or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+        },
+        gt: {
+            dropdownLabel: t('After'),
+            treeLabel: rule => t('Date in column "{{colName}}" is after {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+        },
+        ge: {
+            dropdownLabel: t('After or on'),
+            treeLabel: rule => t('Date in column "{{colName}}" is after or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
         }
     };
 
@@ -194,7 +215,7 @@ export function getRuleHelpers(t, fields) {
     };
 
 
-    const stringValueSettings = {
+    const stringValueSettings = allowEmpty => ({
         form: <InputField id="value" label={t('Value')} />,
         getFormData: rule => ({
             value: rule.value
@@ -203,13 +224,13 @@ export function getRuleHelpers(t, fields) {
             rule.value = getter('value');
         },
         validate: state => {
-            if (!state.getIn(['value', 'value'])) {
+            if (!allowEmpty && !state.getIn(['value', 'value'])) {
                 state.setIn(['value', 'error'], t('Value must not be empty'));
             } else {
                 state.setIn(['value', 'error'], null);
             }
         }
-    };
+    });
 
     const numberValueSettings = {
         form: <InputField id="value" label={t('Value')} />,
@@ -232,23 +253,79 @@ export function getRuleHelpers(t, fields) {
     };
 
     const birthdayValueSettings = {
-        form: <InputField id="value" label={t('Value')} /> // FIXME
-    };
-
-    const birthdayRelativeValueSettings = {
-        form: <InputField id="value" label={t('Value')} /> // FIXME
+        form: <DatePicker id="value" label={t('Date')} birthday />,
+        getFormData: rule => ({
+            value: formatBirthday(DateFormat.INTL, rule.value)
+        }),
+        assignRuleSettings: (rule, getter) => {
+            rule.value = parseBirthday(DateFormat.INTL, getter('value')).toISOString();
+        },
+        validate: state => {
+            const value = state.getIn(['value', 'value']);
+            const date = parseBirthday(DateFormat.INTL, value);
+            if (!value) {
+                state.setIn(['value', 'error'], t('Date must not be empty'));
+            } else if (!date) {
+                state.setIn(['value', 'error'], t('Date is invalid'));
+            } else {
+                state.setIn(['value', 'error'], null);
+            }
+        }
     };
 
     const dateValueSettings = {
-        form: <InputField id="value" label={t('Value')} /> // FIXME
+        form: <DatePicker id="value" label={t('Date')} />,
+        getFormData: rule => ({
+            value: formatDate(DateFormat.INTL, rule.value)
+        }),
+        assignRuleSettings: (rule, getter) => {
+            rule.value = parseDate(DateFormat.INTL, getter('value')).toISOString();
+        },
+        validate: state => {
+            const value = state.getIn(['value', 'value']);
+            const date = parseDate(DateFormat.INTL, value);
+            if (!value) {
+                state.setIn(['value', 'error'], t('Date must not be empty'));
+            } else if (!date) {
+                state.setIn(['value', 'error'], t('Date is invalid'));
+            } else {
+                state.setIn(['value', 'error'], null);
+            }
+        }
     };
 
     const dateRelativeValueSettings = {
-        form: <InputField id="value" label={t('Value')} /> // FIXME
+        form:
+            <div>
+                <InputField id="value" label={t('Number of days')}/>
+                <Dropdown id="direction" label={t('Before/After')} options={[
+                    { key: 'before', label: t('Before current date') },
+                    { key: 'after', label: t('After current date') }
+                ]}/>
+            </div>,
+        getFormData: rule => ({
+            value: Math.abs(rule.value).toString(),
+            direction: rule.value >= 0 ? 'after' : 'before'
+        }),
+        assignRuleSettings: (rule, getter) => {
+            const direction = getter('direction');
+            rule.value = parseInt(getter('value')) * (direction === 'before' ? -1 : 1);
+        },
+        validate: state => {
+            const value = state.getIn(['value', 'value']);
+            if (!value) {
+                state.setIn(['value', 'error'], t('Value must not be empty'));
+            } else if (isNaN(value)) {
+                state.setIn(['value', 'error'], t('Value must be a number'));
+            } else {
+                state.setIn(['value', 'error'], null);
+            }
+        }
     };
 
     const optionValueSettings = {
         form: null,
+        formDataDefaults: {},
         getFormData: rule => ({}),
         assignRuleSettings: (rule, getter) => {},
         validate: state => {}
@@ -261,16 +338,24 @@ export function getRuleHelpers(t, fields) {
         }
     }
 
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.text, Object.keys(ruleHelpers.primitiveRuleTypes.text), stringValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.website, Object.keys(ruleHelpers.primitiveRuleTypes.website), stringValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.number, Object.keys(ruleHelpers.primitiveRuleTypes.number), numberValueSettings);
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.text, ['eq', 'like', 're'], stringValueSettings(true));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.text, ['lt', 'le', 'gt', 'ge'], stringValueSettings(false));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.website, ['eq', 'like', 're'], stringValueSettings(true));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.number, ['eq', 'lt', 'le', 'gt', 'ge'], numberValueSettings);
     assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.birthday, ['eq', 'lt', 'le', 'gt', 'ge'], birthdayValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.birthday, ['eqNowPlusDays', 'ltNowPlusDays', 'leNowPlusDays', 'gtNowPlusDays', 'geNowPlusDays'], birthdayRelativeValueSettings);
     assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.date, ['eq', 'lt', 'le', 'gt', 'ge'], dateValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.date, ['eqNowPlusDays', 'ltNowPlusDays', 'leNowPlusDays', 'gtNowPlusDays', 'geNowPlusDays'], dateRelativeValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.option, Object.keys(ruleHelpers.primitiveRuleTypes.option), optionValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['dropdown-enum'], Object.keys(ruleHelpers.primitiveRuleTypes['dropdown-enum']), stringValueSettings);
-    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['radio-enum'], Object.keys(ruleHelpers.primitiveRuleTypes['radio-enum']), stringValueSettings);
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.date, ['eqTodayPlusDays', 'ltTodayPlusDays', 'leTodayPlusDays', 'gtTodayPlusDays', 'geTodayPlusDays'], dateRelativeValueSettings);
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes.option, ['isTrue', 'isFalse'], optionValueSettings);
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['dropdown-enum'], ['eq', 'like', 're'], stringValueSettings(true));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['dropdown-enum'], ['lt', 'le', 'gt', 'ge'], stringValueSettings(false));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['radio-enum'], ['eq', 'like', 're'], stringValueSettings(true));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['radio-enum'], ['lt', 'le', 'gt', 'ge'], stringValueSettings(false));
+
+    ruleHelpers.primitiveRuleTypesFormDataDefaults = {
+        value: '',
+        direction: 'before'
+    };
+
 
 
     ruleHelpers.getCompositeRuleTypeOptions = () => {
@@ -283,24 +368,22 @@ export function getRuleHelpers(t, fields) {
             text: ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge'],
             website: ['eq', 'like', 're'],
             number: ['eq', 'lt', 'le', 'gt', 'ge'],
-            birthday: ['eq', 'lt', 'le', 'gt', 'ge', 'eqNowPlusDays', 'ltNowPlusDays', 'leNowPlusDays', 'gtNowPlusDays', 'geNowPlusDays'],
-            date: ['eq', 'lt', 'le', 'gt', 'ge', 'eqNowPlusDays', 'ltNowPlusDays', 'leNowPlusDays', 'gtNowPlusDays', 'geNowPlusDays'],
+            birthday: ['eq', 'lt', 'le', 'gt', 'ge'],
+            date: ['eq', 'lt', 'le', 'gt', 'ge', 'eqTodayPlusDays', 'ltTodayPlusDays', 'leTodayPlusDays', 'gtTodayPlusDays', 'geTodayPlusDays'],
             option: ['isTrue', 'isFalse'],
-            'radio-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge'],
-            'dropdown-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge']
+            'dropdown-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge'],
+            'radio-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge']
         };
 
         return order[columnType].map(key => ({ key, label: ruleHelpers.primitiveRuleTypes[columnType][key].dropdownLabel }));
     };
-
-
 
     const predefColumns = [
         {
             column: 'email',
             name: t('Email address'),
             type: 'text',
-            tag: 'EMAIL'
+            key: 'EMAIL'
         },
         {
             column: 'opt_in_country',
@@ -329,7 +412,7 @@ export function getRuleHelpers(t, fields) {
         ...fields.filter(fld => fld.type in ruleHelpers.primitiveRuleTypes)
     ];
 
-    ruleHelpers.fieldsByColumn = [];
+    ruleHelpers.fieldsByColumn = {};
     for (const fld of ruleHelpers.fields) {
         ruleHelpers.fieldsByColumn[fld.column] = fld;
     }

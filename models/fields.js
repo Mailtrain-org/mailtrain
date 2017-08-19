@@ -113,10 +113,14 @@ async function getById(context, listId, id) {
     });
 }
 
+async function listTx(tx, listId) {
+    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'order_list', 'order_subscribe', 'order_manage']).orderBy('id', 'asc');
+}
+
 async function list(context, listId) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
-        return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'order_list', 'order_subscribe', 'order_manage']).orderBy('id', 'asc');
+        return await listTx(tx, listId);
     });
 }
 
@@ -125,72 +129,76 @@ async function listByOrderListTx(tx, listId, extraColumns = []) {
 }
 
 async function listDTAjax(context, listId, params) {
-    return await dtHelpers.ajaxListWithPermissions(
-        context,
-        [{ entityTypeId: 'list', requiredOperations: ['manageFields'] }],
-        params,
-        builder => builder
-            .from('custom_fields')
-            .innerJoin('lists', 'custom_fields.list', 'lists.id')
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
 
-            // This self join is to provide 'option' fields a reference to their parent grouped field. If the field is not an option, it refers to itself
-            // All this is to show options always below their group parent
-            .innerJoin('custom_fields AS parent_fields', function() {
-                this.on(function() {
-                    this.on('custom_fields.type', '=', knex.raw('?', ['option']))
-                        .on('custom_fields.group', '=', 'parent_fields.id');
-                }).orOn(function() {
-                    this.on('custom_fields.type', '<>', knex.raw('?', ['option']))
-                        .on('custom_fields.id', '=', 'parent_fields.id');
-                });
-            })
-            .where('custom_fields.list', listId),
-        [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
-        {
-            orderByBuilder: (builder, orderColumn, orderDir) => {
-                // We use here parent_fields to keep options always below their parent group
-                if (orderColumn === 'custom_fields.order_list') {
-                    builder
-                        .orderBy(knex.raw('-parent_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
-                        .orderBy('parent_fields.name', orderDir)
-                        .orderBy(knex.raw('custom_fields.type = "option"'), 'asc')
-                } else {
-                    const parentColumn = orderColumn.replace(/^custom_fields/, 'parent_fields');
-                    builder
-                        .orderBy(parentColumn, orderDir)
-                        .orderBy('parent_fields.name', orderDir)
-                        .orderBy(knex.raw('custom_fields.type = "option"'), 'asc');
+        return await dtHelpers.ajaxListTx(
+            tx,
+            params,
+            builder => builder
+                .from('custom_fields')
+
+                // This self join is to provide 'option' fields a reference to their parent grouped field. If the field is not an option, it refers to itself
+                // All this is to show options always below their group parent
+                .innerJoin('custom_fields AS parent_fields', function() {
+                    this.on(function() {
+                        this.on('custom_fields.type', '=', knex.raw('?', ['option']))
+                            .on('custom_fields.group', '=', 'parent_fields.id');
+                    }).orOn(function() {
+                        this.on('custom_fields.type', '<>', knex.raw('?', ['option']))
+                            .on('custom_fields.id', '=', 'parent_fields.id');
+                    });
+                })
+                .where('custom_fields.list', listId),
+            [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
+            {
+                orderByBuilder: (builder, orderColumn, orderDir) => {
+                    // We use here parent_fields to keep options always below their parent group
+                    if (orderColumn === 'custom_fields.order_list') {
+                        builder
+                            .orderBy(knex.raw('-parent_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                            .orderBy('parent_fields.name', orderDir)
+                            .orderBy(knex.raw('custom_fields.type = "option"'), 'asc')
+                    } else {
+                        const parentColumn = orderColumn.replace(/^custom_fields/, 'parent_fields');
+                        builder
+                            .orderBy(parentColumn, orderDir)
+                            .orderBy('parent_fields.name', orderDir)
+                            .orderBy(knex.raw('custom_fields.type = "option"'), 'asc');
+                    }
                 }
             }
-        }
-    );
+        );
+    });
 }
 
 async function listGroupedDTAjax(context, listId, params) {
-    return await dtHelpers.ajaxListWithPermissions(
-        context,
-        [{ entityTypeId: 'list', requiredOperations: ['manageFields'] }],
-        params,
-        builder => builder
-            .from('custom_fields')
-            .innerJoin('lists', 'custom_fields.list', 'lists.id')
-            .where('custom_fields.list', listId)
-            .whereIn('custom_fields.type', groupedTypes),
-        [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
-        {
-            orderByBuilder: (builder, orderColumn, orderDir) => {
-                if (orderColumn === 'custom_fields.order_list') {
-                    builder
-                        .orderBy(knex.raw('-custom_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
-                        .orderBy('custom_fields.name', orderDir);
-                } else {
-                    builder
-                        .orderBy(orderColumn, orderDir)
-                        .orderBy('custom_fields.name', orderDir);
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+
+        return await dtHelpers.ajaxListTx(
+            tx,
+            params,
+            builder => builder
+                .from('custom_fields')
+                .where('custom_fields.list', listId)
+                .whereIn('custom_fields.type', groupedTypes),
+            ['custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list'],
+            {
+                orderByBuilder: (builder, orderColumn, orderDir) => {
+                    if (orderColumn === 'custom_fields.order_list') {
+                        builder
+                            .orderBy(knex.raw('-custom_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
+                            .orderBy('custom_fields.name', orderDir);
+                    } else {
+                        builder
+                            .orderBy(orderColumn, orderDir)
+                            .orderBy('custom_fields.name', orderDir);
+                    }
                 }
             }
-        }
-    );
+        );
+    });
 }
 
 async function serverValidate(context, listId, data) {
@@ -374,7 +382,7 @@ async function removeTx(tx, context, listId, id) {
             table.dropColumn(existing.column);
         });
 
-        await segments.removeRulesByFieldIdTx(tx, context, listId, id);
+        await segments.removeRulesByColumnTx(tx, context, listId, existing.column);
     }
 }
 
@@ -391,11 +399,12 @@ async function removeAllByListIdTx(tx, context, listId) {
     }
 }
 
-
-module.exports = {
+// This is to handle circular dependency with segments.js
+Object.assign(module.exports, {
     hash,
     getById,
     list,
+    listTx,
     listByOrderListTx,
     listDTAjax,
     listGroupedDTAjax,
@@ -404,4 +413,4 @@ module.exports = {
     remove,
     removeAllByListIdTx,
     serverValidate
-};
+});

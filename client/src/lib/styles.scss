@@ -1,0 +1,89 @@
+:global .DayPicker {
+  border-left: 1px solid lightgray;
+  border-right: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.dayPickerWrapper {
+  text-align: right;
+}
+
+
+
+.buttonRow > * {
+  margin-right: 15px;
+}
+
+.buttonRow > *:last-child {
+  margin-right: 0px;
+}
+
+.formStatus {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.actionLinks > * {
+  margin-right: 8px;
+}
+
+.actionLinks > *:last-child {
+  margin-right: 0px;
+}
+
+:global .form-horizontal .control-label {
+  display: block;
+}
+
+.formDisabled {
+  background-color: #eeeeee;
+  opacity: 1;
+}
+
+:global .ace_editor {
+  border: 1px solid #ccc;
+}
+
+.tableSelectDropdown {
+  margin-bottom: 15px;
+}
+
+.tableSelectTable.tableSelectTableHidden {
+  visibility: hidden;
+  height: 0px;
+}
+
+.tableSelectDropdown input[readonly] {
+  background-color: white;
+}
+
+:global h3.legend {
+  font-size: 21px;
+  margin-bottom: 20px;
+}
+
+.secondaryNav {
+  margin-top: 5px;
+  margin-right: 5px;
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .secondaryNav {
+    margin: 0px;
+    background-color: #f5f5f5;
+    padding: 5px 5px;
+    border-radius: 4px;
+  }
+}
+
+.secondaryNav > li {
+  display: inline-block;
+  float: none;
+}
+
+.secondaryNav > li > a {
+  padding: 3px 10px;
+}

@@ -14,6 +14,7 @@ import axios from './axios';
 
 import { withPageHelpers } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
+import styles from "./styles.scss";
 
 const TreeSelectMode = {
     NONE: 0,
@@ -122,7 +123,7 @@ class TreeTable extends Component {
             }
 
             if (this.props.actions) {
-                const linksContainer = jQuery('<span class="mt-action-links"/>');
+                const linksContainer = jQuery(`<span class="${styles.actionLinks}"/>`);
 
                 const actions = this.props.actions(node);
                 for (const {label, link} of actions) {

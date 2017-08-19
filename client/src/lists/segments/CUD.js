@@ -93,6 +93,10 @@ export default class CUD extends Component {
         await this.getFormValuesFromURL(`/rest/segments/${this.props.list.id}/${this.props.entity.id}`, data => {
             data.rootRuleType = data.settings.rootRule.type;
             data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
+
+            this.setState({
+                rulesTree: this.getTreeFromRules(data.settings.rootRule.rules)
+            });
         });
     }
 

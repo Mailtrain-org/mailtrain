@@ -15,6 +15,7 @@ import axios from './axios';
 
 import { withPageHelpers } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
+import styles from "./styles.scss";
 
 //dtFactory();
 //dtSelectFactory();
@@ -169,7 +170,7 @@ class Table extends Component {
 
         this.selectionMap = nextSelectionMap;
 
-        return updateDueToSelectionChange || this.props.data != nextProps.data || this.props.dataUrl != nextProps.dataUrl;
+        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl;
     }
 
     componentDidMount() {
@@ -179,7 +180,7 @@ class Table extends Component {
         for (const column of columns) {
             if (column.actions) {
                 const createdCellFn = (td, data, rowData) => {
-                    const linksContainer = jQuery('<span class="mt-action-links"/>');
+                    const linksContainer = jQuery(`<span class="${styles.actionLinks}"/>`);
 
                     let actions = column.actions(rowData);
                     let options = {};
@@ -322,18 +323,19 @@ class Table extends Component {
         if (this.props.data) {
             this.table.clear();
             this.table.rows.add(this.props.data);
-
         } else {
-            const self = this;
-            this.table.rows().every(function() {
-                const key = this.data()[self.props.selectionKeyIndex];
-                if (self.selectionMap.has(key)) {
-                    jQuery(this.node()).addClass('selected');
-                } else {
-                    jQuery(this.node()).removeClass('selected');
-                }
-            });
+            this.refresh();
         }
+
+        const self = this;
+        this.table.rows().every(function() {
+            const key = this.data()[self.props.selectionKeyIndex];
+            if (self.selectionMap.has(key)) {
+                jQuery(this.node()).addClass('selected');
+            } else {
+                jQuery(this.node()).removeClass('selected');
+            }
+        });
 
         this.updateSelectInfo();
         this.fetchAndNotifySelectionData();

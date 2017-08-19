@@ -27,6 +27,7 @@
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-ace": "^5.1.0",
+    "react-day-picker": "^6.1.0",
     "react-dom": "^15.6.1",
     "react-i18next": "^4.6.1",
     "react-router-dom": "^4.1.1",

@@ -40,9 +40,13 @@ const getStructure = t => {
                             navs: {
                                 subscriptions: {
                                     title: t('Subscribers'),
+                                    resolve: {
+                                        segments: params => `/rest/segments/${params.listId}`
+                                    },
+                                    extraParams: [':segmentId?'],
                                     link: params => `/lists/${params.listId}/subscriptions`,
                                     visible: resolved => resolved.list.permissions.includes('viewSubscriptions'),
-                                    render: props => <SubscriptionsList list={props.resolved.list} />
+                                    render: props => <SubscriptionsList list={props.resolved.list} segments={props.resolved.segments} segmentId={props.match.params.segmentId} />
                                 },
                                 ':action(edit|delete)': {
                                     title: t('Edit'),
@@ -163,7 +167,7 @@ const getStructure = t => {
 
 export default function() {
     ReactDOM.render(
-        <I18nextProvider i18n={ i18n }><Section root='/lists/1/segments/create' /* FIXME */ structure={getStructure}/></I18nextProvider>,
+        <I18nextProvider i18n={ i18n }><Section root='/lists' structure={getStructure}/></I18nextProvider>,
         document.getElementById('root')
     );
 };

@@ -27,6 +27,7 @@ export default class CUD extends Component {
         this.state = {};
 
         this.initForm({
+            onChangeBeforeValidation: ::this.populateRuleDefaults,
             onChange: ::this.onFormChange
         });
     }
@@ -45,12 +46,12 @@ export default class CUD extends Component {
             const ruleHelpers = this.ruleHelpers;
 
             let data;
-            if (!ruleHelpers.isCompositeRuleType(rule.type)) {
+            if (!ruleHelpers.isCompositeRuleType(rule.type)) { // rule.type === null signifies primitive rule where the type has not been determined yet
+                data = ruleHelpers.primitiveRuleTypesFormDataDefaults;
+
                 const settings = ruleHelpers.getRuleTypeSettings(rule);
                 if (settings) {
-                    data = settings.getFormData(rule);
-                } else {
-                    data = {}; // This handles the case of a new rule, which does not have a type and column yet
+                    Object.assign(data, settings.getFormData(rule));
                 }
 
                 data.type = rule.type || ''; // On '', we display label "--SELECT--" in the type dropdown. Null would not be accepted by React.
@@ -89,10 +90,10 @@ export default class CUD extends Component {
 
         const ruleType = state.getIn(['type', 'value']);
         if (!ruleHelpers.isCompositeRuleType(ruleType)) {
-            const columnType = state.getIn(['column', 'value']);
+            const column = state.getIn(['column', 'value']);
 
-            if (columnType) {
-                const colType = ruleHelpers.getColumnType(columnType);
+            if (column) {
+                const colType = ruleHelpers.getColumnType(column);
 
                 if (ruleType) {
                     const settings = ruleHelpers.primitiveRuleTypes[colType][ruleType];
@@ -102,6 +103,27 @@ export default class CUD extends Component {
                 }
             } else {
                 state.setIn(['column', 'error'], t('Field must be selected'));
+            }
+        }
+    }
+
+    populateRuleDefaults(mutState) {
+        const ruleHelpers = this.ruleHelpers;
+        const type = mutState.getIn(['data','type','value']);
+
+        if (!ruleHelpers.isCompositeRuleType(type)) {
+            const column = mutState.getIn(['data', 'column', 'value']);
+
+            if (column) {
+                const colType = ruleHelpers.getColumnType(column);
+
+                if (type) {
+                    const settings = ruleHelpers.primitiveRuleTypes[colType][type];
+                    if (!settings) {
+                        // The existing rule type does not fit the newly changed column. This resets the rule type chooser to "-- Select ---"
+                        mutState.setIn(['data', 'type', 'value'], '');
+                    }
+                }
             }
         }
     }
@@ -136,7 +158,6 @@ export default class CUD extends Component {
         }
     }
 
-
     render() {
         const t = this.props.t;
         const rule = this.props.rule;
@@ -153,7 +174,7 @@ export default class CUD extends Component {
                 { data: 3, title: t('Merge Tag') }
             ];
 
-            const ruleColumnOptions = ruleHelpers.fields.map(fld => [ fld.column, fld.name, this.fieldTypes[fld.type].label, fld.tag || '' ]);
+            const ruleColumnOptions = ruleHelpers.fields.map(fld => [ fld.column, fld.name, this.fieldTypes[fld.type].label, fld.key || '' ]);
 
             const ruleColumnSelect = <TableSelect id="column" label={t('Field')} data={ruleColumnOptions} columns={ruleColumnOptionsColumns} dropdown withHeader selectionLabelIndex={1} />;
             let ruleTypeSelect = null;
@@ -186,6 +207,7 @@ export default class CUD extends Component {
         }
 
 
+
         return (
             <div className={styles.ruleOptions}>
                 <h3>{t('Rule Options')}</h3>
@@ -198,6 +220,7 @@ export default class CUD extends Component {
                         <Button type="submit" className="btn-primary" icon="chevron-left" label={t('OK')}/>
                     </ButtonRow>
                 </Form>
+
             </div>
         );
     }
