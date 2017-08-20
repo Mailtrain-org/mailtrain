@@ -8,7 +8,7 @@ import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button
 import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
-import {DeleteModalDialog} from "../lib/delete";
+import {DeleteModalDialog} from "../lib/modals";
 
 @translate()
 @withForm

@@ -25,6 +25,11 @@ router.getAsync('/fields/:listId', passport.loggedIn, async (req, res) => {
     return res.json(rows);
 });
 
+router.getAsync('/fields-grouped/:listId', passport.loggedIn, async (req, res) => {
+    const rows = await fields.listGrouped(req.context, req.params.listId);
+    return res.json(rows);
+});
+
 router.postAsync('/fields/:listId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     await fields.create(req.context, req.params.listId, req.body);
     return res.json();

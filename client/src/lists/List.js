@@ -7,6 +7,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import { Table } from '../lib/table';
 import axios from '../lib/axios';
 import {Link} from "react-router-dom";
+import {Icon} from "../lib/bootstrap-components";
 
 @translate()
 @withPageHelpers
@@ -66,28 +67,28 @@ export default class List extends Component {
 
                     if (perms.includes('viewSubscriptions')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-user" aria-hidden="true" title="Subscribers"></span>,
+                            label: <Icon icon="user" title="Subscribers"/>,
                             link: `/lists/${data[0]}/subscriptions`
                         });
                     }
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/lists/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('manageFields')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-th-list" aria-hidden="true" title="Manage Fields"></span>,
+                            label: <Icon icon="th-list" title={t('Manage Fields')}/>,
                             link: `/lists/${data[0]}/fields`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            label: <Icon icon="share-alt" title={t('Share')}/>,
                             link: `/lists/${data[0]}/share`
                         });
                     }

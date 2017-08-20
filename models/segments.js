@@ -214,7 +214,7 @@ function hash(entity) {
 
 async function listDTAjax(context, listId, params) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageSegments']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
 
         return await dtHelpers.ajaxListTx(
             tx,
@@ -227,7 +227,7 @@ async function listDTAjax(context, listId, params) {
     });
 }
 
-async function list(context, listId) {
+async function listIdName(context, listId) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageSegments']);
 
@@ -237,7 +237,7 @@ async function list(context, listId) {
 
 async function getById(context, listId, id) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageSegments']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
         const entity = await tx('segments').where({id, list: listId}).first();
         entity.settings = JSON.parse(entity.settings);
         return entity;
@@ -400,7 +400,7 @@ async function getQueryGeneratorTx(tx, listId, id) {
 Object.assign(module.exports, {
     hash,
     listDTAjax,
-    list,
+    listIdName,
     getById,
     create,
     updateWithConsistencyCheck,

@@ -241,8 +241,8 @@ export function getRuleHelpers(t, fields) {
             rule.value = parseInt(getter('value'));
         },
         validate: state => {
-            const value = state.getIn(['value', 'value']);
-            if (!value) {
+            const value = state.getIn(['value', 'value']).trim();
+            if (value === '') {
                 state.setIn(['value', 'error'], t('Value must not be empty'));
             } else if (isNaN(value)) {
                 state.setIn(['value', 'error'], t('Value must be a number'));

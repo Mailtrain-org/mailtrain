@@ -15,4 +15,16 @@ const axiosWrapper = {
     delete: (...args) => axiosInst.delete(...args).catch(error => { throw interoperableErrors.deserialize(error.response.data) || error })
 };
 
+const HTTPMethod = {
+    GET: axiosWrapper.get,
+    PUT: axiosWrapper.put,
+    POST: axiosWrapper.post,
+    DELETE: axiosWrapper.delete
+};
+
+axiosWrapper.method = (method, ...args) => method(...args);
+
 export default axiosWrapper;
+export {
+    HTTPMethod
+}

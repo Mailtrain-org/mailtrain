@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../lib/i18n';
+import qs from 'querystringify';
 
 import { Section } from '../lib/page';
 import ListsList from './List';
@@ -13,6 +14,7 @@ import FormsCUD from './forms/CUD';
 import FieldsList from './fields/List';
 import FieldsCUD from './fields/CUD';
 import SubscriptionsList from './subscriptions/List';
+import SubscriptionsCUD from './subscriptions/CUD';
 import SegmentsList from './segments/List';
 import SegmentsCUD from './segments/CUD';
 import Share from '../shares/Share';
@@ -41,13 +43,35 @@ const getStructure = t => {
                                 subscriptions: {
                                     title: t('Subscribers'),
                                     resolve: {
-                                        segments: params => `/rest/segments/${params.listId}`
+                                        segments: params => `/rest/segments/${params.listId}`,
                                     },
-                                    extraParams: [':segmentId?'],
                                     link: params => `/lists/${params.listId}/subscriptions`,
                                     visible: resolved => resolved.list.permissions.includes('viewSubscriptions'),
-                                    render: props => <SubscriptionsList list={props.resolved.list} segments={props.resolved.segments} segmentId={props.match.params.segmentId} />
-                                },
+                                    render: props => <SubscriptionsList list={props.resolved.list} segments={props.resolved.segments} segmentId={qs.parse(props.location.search).segment} />,
+                                    children: {
+                                        ':subscriptionId([0-9]+)': {
+                                            title: resolved => resolved.subscription.email,
+                                            resolve: {
+                                                subscription: params => `/rest/subscriptions/${params.listId}/${params.subscriptionId}`,
+                                                fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
+                                            },
+                                            link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
+                                            navs: {
+                                                ':action(edit|delete)': {
+                                                    title: t('Edit'),
+                                                    link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
+                                                    render: props => <SubscriptionsCUD action={props.match.params.action} entity={props.resolved.subscription} list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
+                                                }
+                                            }
+                                        },
+                                        create: {
+                                            title: t('Create'),
+                                            resolve: {
+                                                fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
+                                            },
+                                            render: props => <SubscriptionsCUD action="create" list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
+                                        }
+                                    }                                },
                                 ':action(edit|delete)': {
                                     title: t('Edit'),
                                     link: params => `/lists/${params.listId}/edit`,

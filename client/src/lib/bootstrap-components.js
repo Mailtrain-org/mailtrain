@@ -34,14 +34,15 @@ class DismissibleAlert extends Component {
 
 class Icon extends Component {
     static propTypes = {
-        name: PropTypes.string,
+        icon: PropTypes.string.isRequired,
+        title: PropTypes.string,
         className: PropTypes.string
     }
 
     render() {
         const props = this.props;
 
-        return <span className={'glyphicon glyphicon-' + props.name + (props.className ? ' ' + props.className : '')}></span>;
+        return <span className={'glyphicon glyphicon-' + props.icon + (props.className ? ' ' + props.className : '')} title={props.title}></span>;
     }
 }
 
@@ -75,7 +76,7 @@ class Button extends Component {
 
         let icon;
         if (props.icon) {
-            icon = <Icon name={props.icon}/>
+            icon = <Icon icon={props.icon}/>
         }
 
         let iconSpacer;

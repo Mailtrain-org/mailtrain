@@ -8,6 +8,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import moment from 'moment';
 import axios from '../lib/axios';
 import { ReportState } from '../../../shared/reports';
+import {Icon} from "../lib/bootstrap-components";
 
 @translate()
 @withErrorHandling
@@ -88,11 +89,11 @@ export default class List extends Component {
 
                     if (state === ReportState.PROCESSING || state === ReportState.SCHEDULED) {
                         viewContent = {
-                            label: <span className="glyphicon glyphicon-hourglass" aria-hidden="true" title="Processing"></span>,
+                            label: <Icon icon="hourglass" title={t('Processing')}/>,
                         };
 
                         startStop = {
-                            label: <span className="glyphicon glyphicon-stop" aria-hidden="true" title="Stop"></span>,
+                            label: <Icon icon="stop" title={t('Stop')}/>,
                             action: (table) => this.stop(table, id)
                         };
 
@@ -100,28 +101,28 @@ export default class List extends Component {
                     } else if (state === ReportState.FINISHED) {
                         if (mimeType === 'text/html') {
                             viewContent = {
-                                label: <span className="glyphicon glyphicon-eye-open" aria-hidden="true" title="View"></span>,
+                                label: <Icon icon="eye-open" title={t('View')}/>,
                                 link: `/reports/${id}/view`
                             };
                         } else if (mimeType === 'text/csv') {
                             viewContent = {
-                                label: <span className="glyphicon glyphicon-download-alt" aria-hidden="true" title="Download"></span>,
+                                label: <Icon icon="download-alt" title={t('Download')}/>,
                                 href: `/reports/${id}/download`
                             };
                         }
 
                         startStop = {
-                            label: <span className="glyphicon glyphicon-repeat" aria-hidden="true" title="Refresh report"></span>,
+                            label: <Icon icon="repeat" title={t('Refresh report')}/>,
                             action: (table) => this.start(table, id)
                         };
 
                     } else if (state === ReportState.FAILED) {
                         viewContent = {
-                            label: <span className="glyphicon glyphicon-thumbs-down" aria-hidden="true" title="Report generation failed"></span>,
+                            label: <Icon icon="thumbs-down" title={t('Report generation failed')}/>,
                         };
 
                         startStop = {
-                            label: <span className="glyphicon glyphicon-repeat" aria-hidden="true" title="Regenerate report"></span>,
+                            label: <Icon icon="repeat" title={t('Regenerate report')}/>,
                             action: (table) => this.start(table, id)
                         };
                     }
@@ -133,7 +134,7 @@ export default class List extends Component {
                     if (perms.includes('viewOutput')) {
                         actions.push(
                             {
-                                label: <span className="glyphicon glyphicon-modal-window" aria-hidden="true" title="View console output"></span>,
+                                label: <Icon icon="modal-window" title={t('View console output')}/>,
                                 link: `/reports/${id}/output`
                             }
                         );
@@ -145,14 +146,14 @@ export default class List extends Component {
 
                     if (perms.includes('edit') && permsReportTemplate.includes('execute')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/reports/${id}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            label: <Icon icon="share-alt" title={t('Share')}/>,
                             link: `/reports/${id}/share`
                         });
                     }

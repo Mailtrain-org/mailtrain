@@ -10,7 +10,7 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
 import mailtrainConfig from 'mailtrainConfig';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
-import {DeleteModalDialog} from "../lib/delete";
+import {DeleteModalDialog} from "../lib/modals";
 
 @translate()
 @withForm

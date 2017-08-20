@@ -15,9 +15,14 @@ const SubscriptionStatus = {
     BOUNCED: 3,
     COMPLAINED: 4,
     MAX: 5
+};
+
+function getFieldKey(field) {
+    return field.column || 'grouped_' + field.id;
 }
 
 module.exports = {
     UnsubscriptionMode,
-    SubscriptionStatus
+    SubscriptionStatus,
+    getFieldKey
 };

@@ -12,7 +12,7 @@ import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import moment from 'moment';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
-import {DeleteModalDialog} from "../lib/delete";
+import {DeleteModalDialog} from "../lib/modals";
 
 @translate()
 @withForm

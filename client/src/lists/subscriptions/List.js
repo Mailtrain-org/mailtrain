@@ -12,6 +12,9 @@ import {
     Dropdown, Form,
     withForm
 } from '../../lib/form';
+import {Icon} from "../../lib/bootstrap-components";
+import axios from '../../lib/axios';
+import {getSubscriptionStatusLabels} from './helpers';
 
 @translate()
 @withForm
@@ -23,19 +26,15 @@ export default class List extends Component {
         super(props);
 
         const t = props.t;
+
         this.state = {};
 
-        this.subscriptionStatusLabels = {
-            [SubscriptionStatus.SUBSCRIBED]: t('Subscribed'),
-            [SubscriptionStatus.UNSUBSCRIBED]: t('Unubscribed'),
-            [SubscriptionStatus.BOUNCED]: t('Bounced'),
-            [SubscriptionStatus.COMPLAINED]: t('Complained'),
-        };
+        this.subscriptionStatusLabels = getSubscriptionStatusLabels(t);
 
         this.initForm({
             onChange: {
                 segment: (newState, key, oldValue, value) => {
-                    this.navigateTo(`/lists/${this.props.list.id}/subscriptions` + (value ? '/' + value : ''));
+                    this.navigateTo(`/lists/${this.props.list.id}/subscriptions` + (value ? '?segment=' + value : ''));
                 }
             }
         });
@@ -61,6 +60,24 @@ export default class List extends Component {
         this.updateSegmentSelection(nextProps);
     }
 
+    @withAsyncErrorHandler
+    async deleteSubscription(id) {
+        await axios.delete(`/rest/subscriptions/${this.props.list.id}/${id}`);
+        this.subscriptionsTable.refresh();
+    }
+
+    @withAsyncErrorHandler
+    async unsubscribeSubscription(id) {
+        await axios.post(`/rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`);
+        this.subscriptionsTable.refresh();
+    }
+
+    @withAsyncErrorHandler
+    async blacklistSubscription(id) {
+        await axios.post(`/rest/XXX/${this.props.list.id}/${id}`); // FIXME - add url one the blacklist functionality is in
+        this.subscriptionsTable.refresh();
+    }
+
     render() {
         const t = this.props.t;
         const list = this.props.list;
@@ -72,19 +89,53 @@ export default class List extends Component {
             { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' }
         ];
 
+        let colIdx = 5;
+        for (const fld of list.listFields) {
+            columns.push({
+                data: colIdx,
+                title: fld.name
+            });
+
+            colIdx += 1;
+        }
+
         if (list.permissions.includes('manageSubscriptions')) {
             columns.push({
-                actions: data => [{
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
-                    link: `/lists/${this.props.list.id}/subscriptions/${data[0]}/edit`
-                }]
+                actions: data => {
+                    const actions = [];
+
+                    actions.push({
+                        label: <Icon icon="edit" title={t('Edit')}/>,
+                        link: `/lists/${this.props.list.id}/subscriptions/${data[0]}/edit`
+                    });
+
+                    if (data[3] === SubscriptionStatus.SUBSCRIBED) {
+                        actions.push({
+                            label: <Icon icon="off" title={t('Unsubscribe')}/>,
+                            action: () => this.unsubscribeSubscription(data[0])
+                        });
+                    }
+
+                    // FIXME - add condition here to show it only if not blacklisted already
+                    actions.push({
+                        label: <Icon icon="ban-circle" title={t('Blacklist')}/>,
+                        action: () => this.blacklistSubscription(data[0])
+                    });
+
+                    actions.push({
+                        label: <Icon icon="remove" title={t('Remove')}/>,
+                        action: () => this.deleteSubscription(data[0])
+                    });
+
+                    return actions;
+                }
             });
         }
 
         const segmentOptions = [
             {key: '', label: t('All subscriptions')},
             ...segments.map(x => ({ key: x.id.toString(), label: x.name}))
-        ]
+        ];
 
 
         let dataUrl = '/rest/subscriptions-table/' + list.id;

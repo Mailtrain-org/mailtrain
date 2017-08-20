@@ -6,7 +6,8 @@ import { translate } from 'react-i18next';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
 import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
-import { getFieldTypes } from './field-types';
+import { getFieldTypes } from './helpers';
+import {Icon} from "../../lib/bootstrap-components";
 
 @translate()
 @withPageHelpers
@@ -40,7 +41,7 @@ export default class List extends Component {
             { data: 3, title: t('Merge Tag') },
             {
                 actions: data => [{
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    label: <Icon icon="edit" title={t('Edit')}/>,
                     link: `/lists/${this.props.list.id}/fields/${data[0]}/edit`
                 }]
             }

@@ -10,7 +10,7 @@ import {
 } from '../../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
-import {DeleteModalDialog} from "../../lib/delete";
+import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 
 @translate()

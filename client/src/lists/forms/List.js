@@ -6,6 +6,7 @@ import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} f
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
+import {Icon} from "../../lib/bootstrap-components";
 
 @translate()
 @withPageHelpers
@@ -52,13 +53,13 @@ export default class List extends Component {
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/lists/forms/${data[0]}/edit`
                         });
                     }
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            label: <Icon icon="share-alt" title={t('Share')}/>,
                             link: `/lists/forms/${data[0]}/share`
                         });
                     }

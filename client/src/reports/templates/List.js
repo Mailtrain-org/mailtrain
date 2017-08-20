@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { DropdownMenu } from '../../lib/bootstrap-components';
+import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
 import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, DropdownLink } from '../../lib/page';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
@@ -56,14 +56,14 @@ export default class List extends Component {
 
                     if (mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess') && perms.includes('edit')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                            label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/reports/templates/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                            label: <Icon icon="share-alt" title={t('Share')}/>,
                             link: `/reports/templates/${data[0]}/share`
                         });
                     }

@@ -6,7 +6,7 @@ import {translate} from "react-i18next";
 import {NavButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../../lib/page";
 import {Button as FormButton, ButtonRow, Dropdown, Form, FormSendMethod, InputField, withForm} from "../../lib/form";
 import {withAsyncErrorHandler, withErrorHandling} from "../../lib/error-handling";
-import {DeleteModalDialog} from "../../lib/delete";
+import {DeleteModalDialog} from "../../lib/modals";
 import interoperableErrors from "../../../../shared/interoperable-errors";
 
 import styles from "./CUD.scss";
@@ -15,7 +15,7 @@ import HTML5Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
 import SortableTree from "react-sortable-tree";
 import {ActionLink, Button, Icon} from "../../lib/bootstrap-components";
-import {getRuleHelpers} from "./rule-helpers";
+import {getRuleHelpers} from "./helpers";
 import RuleSettingsPane from "./RuleSettingsPane";
 
 // https://stackoverflow.com/a/4819886/1601953
@@ -381,8 +381,8 @@ export default class CUD extends Component {
                                     canDrop={ data => !data.nextParent || (ruleHelpers.isCompositeRuleType(data.nextParent.rule.type)) }
                                     generateNodeProps={data => ({
                                         buttons: [
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon name="edit"/></ActionLink>,
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon name="remove"/></ActionLink>
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon icon="edit" title={t('Edit')}/></ActionLink>,
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="remove" title={t('Delete')}/></ActionLink>
                                         ]
                                     })}
                                 />

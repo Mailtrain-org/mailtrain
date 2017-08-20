@@ -5,6 +5,7 @@ import { translate } from 'react-i18next';
 import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
 import { Table } from '../lib/table';
 import mailtrainConfig from 'mailtrainConfig';
+import {Icon} from "../lib/bootstrap-components";
 
 @translate()
 @withPageHelpers
@@ -34,11 +35,11 @@ export default class List extends Component {
         columns.push({
             actions: data => [
                 {
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    label: <Icon icon="edit" title={t('Edit')}/>,
                     link: `/users/${data[0]}/edit`
                 },
                 {
-                    label: <span className="glyphicon glyphicon-share" aria-hidden="true" title="Share"></span>,
+                    label: <Icon icon="share" title={t('Share')}/>,
                     link: `/users/${data[0]}/shares`
                 }
             ]

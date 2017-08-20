@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import axios from './axios';
+import axios, {HTTPMethod} from './axios';
 import Immutable from 'immutable';
 import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
@@ -33,10 +33,7 @@ const FormState = {
     Ready: 2
 };
 
-const FormSendMethod = {
-    PUT: 0,
-    POST: 1
-};
+const FormSendMethod = HTTPMethod;
 
 @translate()
 @withPageHelpers
@@ -279,6 +276,116 @@ class CheckBox extends Component {
     }
 }
 
+class CheckBoxGroup extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        options: PropTypes.array,
+        className: PropTypes.string,
+        format: PropTypes.string
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    onChange(key) {
+        const id = this.props.id;
+        const owner = this.context.formStateOwner;
+        const existingSelection = owner.getFormValue(id);
+
+        let newSelection;
+        if (existingSelection.includes(key)) {
+            newSelection = existingSelection.filter(x => x !== key);
+        } else {
+            newSelection = [key, ...existingSelection];
+        }
+        owner.updateFormValue(id, newSelection.sort());
+    }
+
+    render() {
+        const props = this.props;
+
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        const selection = owner.getFormValue(id);
+
+        const options = [];
+        for (const option of props.options) {
+            options.push(
+                <div key={option.key} className="checkbox">
+                    <label>
+                        <input type="checkbox" checked={selection.includes(option.key)} onChange={evt => this.onChange(option.key)}/>
+                        {option.label}
+                    </label>
+                </div>
+            );
+        }
+
+        let className = 'form-control';
+        if (props.className) {
+            className += ' ' + props.className;
+        }
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div>
+                {options}
+            </div>
+        );
+    }
+}
+
+class RadioGroup extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        options: PropTypes.array,
+        className: PropTypes.string,
+        format: PropTypes.string
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    render() {
+        const props = this.props;
+
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        const value = owner.getFormValue(id);
+
+        const options = [];
+        for (const option of props.options) {
+            options.push(
+                <div key={option.key} className="radio">
+                    <label>
+                        <input type="radio" name={htmlId} checked={value === option.key} onChange={evt => owner.updateFormValue(id, option.key)}/>
+                        {option.label}
+                    </label>
+                </div>
+            );
+        }
+
+        let className = 'form-control';
+        if (props.className) {
+            className += ' ' + props.className;
+        }
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div>
+                {options}
+            </div>
+        );
+    }
+}
+
 class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -453,7 +560,6 @@ class Dropdown extends Component {
         );
     }
 }
-
 
 class AlignedRow extends Component {
     static propTypes = {
@@ -848,12 +954,7 @@ function withForm(target) {
                 mutator(data);
             }
 
-            let response;
-            if (method === FormSendMethod.PUT) {
-                response = await axios.put(url, data);
-            } else if (method === FormSendMethod.POST) {
-                response = await axios.post(url, data);
-            }
+            const response = await axios.method(method, url, data);
 
             return response.data || true;
 
@@ -1077,6 +1178,8 @@ export {
     StaticField,
     InputField,
     CheckBox,
+    CheckBoxGroup,
+    RadioGroup,
     TextArea,
     DatePicker,
     Dropdown,

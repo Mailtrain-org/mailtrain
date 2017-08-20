@@ -6,6 +6,7 @@ import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton }
 import { TreeTable } from '../lib/tree';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
+import {Icon} from "../lib/bootstrap-components";
 
 @translate()
 @withErrorHandling
@@ -46,14 +47,14 @@ export default class List extends Component {
 
             if (node.data.permissions.includes('edit')) {
                 actions.push({
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    label: <Icon icon="edit" title={t('Edit')}/>,
                     link: `/namespaces/${node.key}/edit`
                 });
             }
 
             if (node.data.permissions.includes('share')) {
                 actions.push({
-                    label: <span className="glyphicon glyphicon-share-alt" aria-hidden="true" title="Share"></span>,
+                    label: <Icon icon="share-alt" title={t('Share')}/>,
                     link: `/namespaces/${node.key}/share`
                 });
             }

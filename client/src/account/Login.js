@@ -8,7 +8,7 @@ import {
     withForm, Form, FormSendMethod, InputField, CheckBox, ButtonRow, Button, AlignedRow
 } from '../lib/form';
 import { withErrorHandling } from '../lib/error-handling';
-import URL from 'url-parse';
+import qs from 'querystringify';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 
@@ -63,8 +63,7 @@ export default class Login extends Component {
                as part of login response. Then we should integrate it in the mailtrainConfig global variable. */
 
             if (submitSuccessful) {
-                const query = new URL(this.props.location.search, true).query;
-                const nextUrl = query.next || '/';
+                const nextUrl = qs.parse(this.props.location.search).next || '/';
 
                 /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
                 window.location = nextUrl;

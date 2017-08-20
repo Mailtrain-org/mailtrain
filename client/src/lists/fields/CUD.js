@@ -9,8 +9,8 @@ import {
     Fieldset, Dropdown, AlignedRow, ACEEditor, StaticField
 } from '../../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import {DeleteModalDialog} from "../../lib/delete";
-import { getFieldTypes } from './field-types';
+import {DeleteModalDialog} from "../../lib/modals";
+import { getFieldTypes } from './helpers';
 import interoperableErrors from '../../../../shared/interoperable-errors';
 import validators from '../../../../shared/validators';
 import slugify from 'slugify';
@@ -86,7 +86,7 @@ export default class CUD extends Component {
 
                     case 'radio-enum':
                     case 'dropdown-enum':
-                        data.enumOptions = this.renderEnumOptions(data.settings.enumOptions);
+                        data.enumOptions = this.renderEnumOptions(data.settings.options);
                         data.renderTemplate = data.settings.renderTemplate;
                         break;
 
@@ -151,7 +151,9 @@ export default class CUD extends Component {
         }
 
         const defaultValue = state.getIn(['default_value', 'value']);
-        if (type === 'number' && !/^[0-9]*$/.test(defaultValue.trim())) {
+        if (defaultValue === '') {
+            state.setIn(['default_value', 'error'], null);
+        } else if (type === 'number' && !/^[0-9]*$/.test(defaultValue.trim())) {
             state.setIn(['default_value', 'error'], t('Default value is not integer number'));
         } else if (type === 'date' && !parseDate(state.getIn(['dateFormat', 'value']), defaultValue)) {
             state.setIn(['default_value', 'error'], t('Default value is not a properly formatted date'));
@@ -168,7 +170,7 @@ export default class CUD extends Component {
             } else {
                 state.setIn(['enumOptions', 'error'], null);
 
-                if (defaultValue !== '' && !(defaultValue in enumOptions.options)) {
+                if (defaultValue !== '' && !(enumOptions.options.find(x => x.key === defaultValue))) {
                     state.setIn(['default_value', 'error'], t('Default value is not one of the allowed options'));
                 }
             }
@@ -180,7 +182,7 @@ export default class CUD extends Component {
     parseEnumOptions(text) {
         const t = this.props.t;
         const errors = [];
-        const options = {};
+        const options = [];
 
         const lines = text.split('\n');
         for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
@@ -191,7 +193,7 @@ export default class CUD extends Component {
                 if (matches) {
                     const key = matches[1].trim();
                     const label = matches[2].trim();
-                    options[key] = label;
+                    options.push({ key, label });
                 } else {
                     errors.push(t('Errror on line {{ line }}', { line: lineIdx + 1}));
                 }
@@ -210,7 +212,7 @@ export default class CUD extends Component {
     }
 
     renderEnumOptions(options) {
-        return Object.keys(options).map(key => `${key}|${options[key]}`).join('\n');
+        return options.map(opt => `${opt.key}|${opt.label}`).join('\n');
     }
 
 
@@ -250,7 +252,7 @@ export default class CUD extends Component {
 
                     case 'radio-enum':
                     case 'dropdown-enum':
-                        data.settings.enumOptions = this.parseEnumOptions(data.enumOptions).options;
+                        data.settings.options = this.parseEnumOptions(data.enumOptions).options;
                         data.settings.renderTemplate = data.renderTemplate;
                         break;
 

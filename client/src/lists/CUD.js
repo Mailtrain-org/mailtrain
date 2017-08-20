@@ -9,7 +9,7 @@ import {
     Dropdown, StaticField, CheckBox
 } from '../lib/form';
 import { withErrorHandling } from '../lib/error-handling';
-import { DeleteModalDialog } from '../lib/delete';
+import { DeleteModalDialog } from '../lib/modals';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import { UnsubscriptionMode } from '../../../shared/lists';
 

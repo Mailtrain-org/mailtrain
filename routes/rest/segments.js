@@ -11,7 +11,7 @@ router.postAsync('/segments-table/:listId', passport.loggedIn, async (req, res) 
 });
 
 router.getAsync('/segments/:listId', passport.loggedIn, async (req, res) => {
-    return res.json(await segments.list(req.context, req.params.listId));
+    return res.json(await segments.listIdName(req.context, req.params.listId));
 });
 
 router.getAsync('/segments/:listId/:segmentId', passport.loggedIn, async (req, res) => {

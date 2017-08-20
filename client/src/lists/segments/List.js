@@ -6,6 +6,7 @@ import { translate } from 'react-i18next';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
 import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
+import {Icon} from "../../lib/bootstrap-components";
 
 @translate()
 @withPageHelpers
@@ -32,7 +33,7 @@ export default class List extends Component {
             { data: 1, title: t('Name') },
             {
                 actions: data => [{
-                    label: <span className="glyphicon glyphicon-edit" aria-hidden="true" title="Edit"></span>,
+                    label: <Icon icon="edit" title={t('Edit')}/>,
                     link: `/lists/${this.props.list.id}/segments/${data[0]}/edit`
                 }]
             }

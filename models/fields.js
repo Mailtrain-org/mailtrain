@@ -18,55 +18,82 @@ const hashKeys = allowedKeysCreate;
 
 const fieldTypes = {};
 
+const Cardinality = {
+    SINGLE: 0,
+    MULTIPLE: 1
+};
+
 fieldTypes.text = fieldTypes.website = {
     validate: entity => {},
     addColumn: (table, name) => table.string(name),
     indexed: true,
-    grouped: false
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
 fieldTypes.longtext = fieldTypes.gpg = {
     validate: entity => {},
     addColumn: (table, name) => table.text(name),
     indexed: false,
-    grouped: false
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
 fieldTypes.json = {
     validate: entity => {},
     addColumn: (table, name) => table.json(name),
     indexed: false,
-    grouped: false
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
 fieldTypes.number = {
     validate: entity => {},
     addColumn: (table, name) => table.integer(name),
     indexed: true,
-    grouped: false
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
-fieldTypes.checkbox = fieldTypes['radio-grouped'] = fieldTypes['dropdown-grouped'] = {
+fieldTypes['checkbox-grouped'] = {
     validate: entity => {},
     indexed: true,
-    grouped: true
+    grouped: true,
+    enumerated: false,
+    cardinality: Cardinality.MULTIPLE
+};
+
+fieldTypes['radio-grouped'] = fieldTypes['dropdown-grouped'] = {
+    validate: entity => {},
+    indexed: true,
+    grouped: true,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
 fieldTypes['radio-enum'] = fieldTypes['dropdown-enum'] = {
     validate: entity => {
         enforce(entity.settings.options, 'Options missing in settings');
-        enforce(Object.keys(entity.settings.options).includes(entity.default_value), 'Default value not present in options');
+        enforce(entity.default_value === null || entity.settings.options.find(x => x.key === entity.default_value), 'Default value not present in options');
     },
     addColumn: (table, name) => table.string(name),
     indexed: true,
-    grouped: false
+    grouped: false,
+    enumerated: true,
+    cardinality: Cardinality.SINGLE
 };
 
 fieldTypes.option = {
     validate: entity => {},
     addColumn: (table, name) => table.boolean(name),
     indexed: true,
-    grouped: false
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
 fieldTypes['date'] = fieldTypes['birthday'] = {
@@ -75,10 +102,16 @@ fieldTypes['date'] = fieldTypes['birthday'] = {
     },
     addColumn: (table, name) => table.dateTime(name),
     indexed: true,
-    grouped: false
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE
 };
 
 const groupedTypes = Object.keys(fieldTypes).filter(key => fieldTypes[key].grouped);
+
+function getFieldType(type) {
+    return fieldTypes[type];
+}
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
@@ -89,6 +122,8 @@ async function getById(context, listId, id) {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
 
         const entity = await tx('custom_fields').where({list: listId, id}).first();
+
+        entity.settings = JSON.parse(entity.settings);
 
         const orderFields = {
             order_list: 'orderListBefore',
@@ -114,13 +149,52 @@ async function getById(context, listId, id) {
 }
 
 async function listTx(tx, listId) {
-    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'order_list', 'order_subscribe', 'order_manage']).orderBy('id', 'asc');
+    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'order_list', 'settings', 'group', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
 }
 
 async function list(context, listId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['manageFields', 'manageSegments']);
         return await listTx(tx, listId);
+    });
+}
+
+async function listGroupedTx(tx, listId) {
+    const flds = await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'column', 'settings', 'group', 'default_value']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
+
+    const fldsById = {};
+    for (const fld of flds) {
+        fld.settings = JSON.parse(fld.settings);
+
+        fldsById[fld.id] = fld;
+
+        if (fieldTypes[fld.type].grouped) {
+            fld.settings.options = [];
+            fld.groupedOptions = {};
+        }
+    }
+
+    for (const fld of flds) {
+        if (fld.group) {
+            const group = fldsById[fld.group];
+            group.settings.options.push({ key: fld.column, label: fld.name });
+            group.groupedOptions[fld.column] = fld;
+        }
+    }
+
+    const groupedFlds = flds.filter(fld => !fld.group);
+
+    for (const fld of flds) {
+        delete fld.group;
+    }
+
+    return groupedFlds;
+}
+
+async function listGrouped(context, listId) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['manageSubscriptions']);
+        return await listGroupedTx(tx, listId);
     });
 }
 
@@ -241,7 +315,7 @@ async function _validateAndPreprocess(tx, listId, entity, isCreate) {
 
     enforce(validators.mergeTagValid(entity.key), 'Merge tag is not valid.');
 
-    const existingWithKeyQuery = knex('custom_fields').where({
+    const existingWithKeyQuery = tx('custom_fields').where({
         list: listId,
         key: entity.key
     });
@@ -349,6 +423,7 @@ async function updateWithConsistencyCheck(context, listId, entity) {
             throw new interoperableErrors.NotFoundError();
         }
 
+        existing.settings = JSON.parse(existing.settings);
         const existingHash = hash(existing);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
@@ -357,7 +432,7 @@ async function updateWithConsistencyCheck(context, listId, entity) {
         enforce(entity.type === existing.type, 'Field type cannot be changed');
         await _validateAndPreprocess(tx, listId, entity, false);
 
-        await tx('custom_fields').where('id', entity.id).update(filterObject(entity, allowedKeysUpdate));
+        await tx('custom_fields').where({list: listId, id: entity.id}).update(filterObject(entity, allowedKeysUpdate));
         await _sortIn(tx, listId, entity.id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
     });
 }
@@ -401,10 +476,14 @@ async function removeAllByListIdTx(tx, context, listId) {
 
 // This is to handle circular dependency with segments.js
 Object.assign(module.exports, {
+    Cardinality,
+    getFieldType,
     hash,
     getById,
     list,
     listTx,
+    listGrouped,
+    listGroupedTx,
     listByOrderListTx,
     listDTAjax,
     listGroupedDTAjax,
