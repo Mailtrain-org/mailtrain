@@ -14,7 +14,7 @@ import {
 } from '../../lib/form';
 import {Icon} from "../../lib/bootstrap-components";
 import axios from '../../lib/axios';
-import {getSubscriptionStatusLabels} from './helpers';
+import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
 
 @translate()
 @withForm
@@ -30,6 +30,7 @@ export default class List extends Component {
         this.state = {};
 
         this.subscriptionStatusLabels = getSubscriptionStatusLabels(t);
+        this.fieldTypes = getFieldTypes(t);
 
         this.initForm({
             onChange: {
@@ -90,10 +91,16 @@ export default class List extends Component {
         ];
 
         let colIdx = 5;
+
         for (const fld of list.listFields) {
+
+            const indexable = this.fieldTypes[fld.type].indexable;
+
             columns.push({
                 data: colIdx,
-                title: fld.name
+                title: fld.name,
+                sortable: indexable,
+                searchable: indexable
             });
 
             colIdx += 1;

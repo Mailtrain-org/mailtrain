@@ -12,6 +12,7 @@ import { withErrorHandling } from '../lib/error-handling';
 import { DeleteModalDialog } from '../lib/modals';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import { UnsubscriptionMode } from '../../../shared/lists';
+import styles from "../lib/styles.scss";
 
 @translate()
 @withForm
@@ -162,7 +163,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
 
                     {isEdit &&
-                        <StaticField id="cid" label="List ID" help={t('This is the list ID displayed to the subscribers')}>
+                        <StaticField id="cid" className={styles.formDisabled} label="List ID" help={t('This is the list ID displayed to the subscribers')}>
                             {this.getFormValue('cid')}
                         </StaticField>
                     }

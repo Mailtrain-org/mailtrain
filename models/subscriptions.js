@@ -11,8 +11,67 @@ const { SubscriptionStatus, getFieldKey } = require('../shared/lists');
 const segments = require('./segments');
 const { enforce, filterObject } = require('../lib/helpers');
 const moment = require('moment');
+const { formatDate, formatBirthday } = require('../shared/date');
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
+
+const fieldTypes = {};
+
+const Cardinality = {
+    SINGLE: 0,
+    MULTIPLE: 1
+};
+
+function getOptionsMap(groupedField) {
+    const result = {};
+    for (const opt of groupedField.settings.options) {
+        result[opt.key] = opt.label;
+    }
+
+    return result;
+}
+
+fieldTypes.text = fieldTypes.website = fieldTypes.longtext = fieldTypes.gpg = fieldTypes.number = {
+    afterJSON: (groupedField, entity) => {},
+    listRender: (groupedField, value) => value
+};
+
+fieldTypes.json = {
+    afterJSON: (groupedField, entity) => {},
+    listRender: (groupedField, value) => value
+};
+
+fieldTypes['checkbox-grouped'] = {
+    afterJSON: (groupedField, entity) => {},
+    listRender: (groupedField, value) => {
+        const optMap = getOptionsMap(groupedField);
+        return value.map(x => optMap[x]).join(', ');
+    }
+};
+
+fieldTypes['radio-enum'] = fieldTypes['dropdown-enum'] = fieldTypes['radio-grouped'] = fieldTypes['dropdown-grouped'] = {
+    afterJSON: (groupedField, entity) => {},
+    listRender: (groupedField, value) => {
+        const optMap = getOptionsMap(groupedField);
+        return optMap[value];
+    }
+};
+
+fieldTypes.date = {
+    afterJSON: (groupedField, entity) => {
+        entity[getFieldKey(groupedField)] = moment(entity[getFieldKey(groupedField)]).toDate();
+    },
+    listRender: (groupedField, value) => formatDate(groupedField.settings.dateFormat, value)
+};
+
+fieldTypes.birthday = {
+    afterJSON: (groupedField, entity) => {
+        entity[getFieldKey(groupedField)] = moment(entity[getFieldKey(groupedField)]).toDate();
+    },
+    listRender: (groupedField, value) => formatBirthday(groupedField.settings.dateFormat, value)
+};
+
+
 
 function getTableName(listId) {
     return `subscription__${listId}`;
@@ -149,7 +208,57 @@ async function listDTAjax(context, listId, segmentId, params) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const flds = await fields.listByOrderListTx(tx, listId, ['column']);
+        // All the data transformation below is to reuse ajaxListTx and groupSubscription methods so as to keep the code DRY
+        // We first construct the columns to contain all which is supposed to be show and extraColumns which contain
+        // everything else that constitutes the subscription.
+        // Then in ajaxList's mapFunc, we construct the entity from the fields ajaxList retrieved and pass it to groupSubscription
+        // to group the fields. Then we copy relevant values form grouped subscription to ajaxList's data which then get
+        // returned to the client. During the copy, we also render the values.
+
+        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const listFlds = await fields.listByOrderListTx(tx, listId, ['column', 'id']);
+
+        const columns = ['id', 'cid', 'email', 'status', 'created'];
+        const extraColumns = [];
+        let listFldIdx = columns.length;
+        const idxMap = {};
+
+        for (const listFld of listFlds) {
+            const fldKey = getFieldKey(listFld);
+            const fld = groupedFieldsMap[fldKey];
+
+            if (fld.column) {
+                columns.push(fld.column);
+            } else {
+                columns.push({
+                    name: fldKey,
+                    raw: 0
+                })
+            }
+
+            idxMap[fldKey] = listFldIdx;
+            listFldIdx += 1;
+        }
+
+        for (const fldKey in groupedFieldsMap) {
+            const fld = groupedFieldsMap[fldKey];
+
+            if (fld.column) {
+                if (!(fldKey in idxMap)) {
+                    extraColumns.push(fld.column);
+                    idxMap[fldKey] = listFldIdx;
+                    listFldIdx += 1;
+                }
+
+            } else {
+                for (const optionColumn in fld.groupedOptions) {
+                    extraColumns.push(optionColumn);
+                    idxMap[optionColumn] = listFldIdx;
+                    listFldIdx += 1;
+                }
+            }
+        }
+
         const addSegmentQuery = segmentId ? await segments.getQueryGeneratorTx(tx, listId, segmentId) : () => {};
 
         return await dtHelpers.ajaxListTx(
@@ -162,8 +271,28 @@ async function listDTAjax(context, listId, segmentId, params) {
                 });
                 return query;
             },
-            ['id', 'cid', 'email', 'status', 'created', ...flds.map(fld => fld.column)]
-            // FIXME - adapt data in custom columns to render them properly
+            columns,
+            {
+                mapFun: data => {
+                    const entity = {};
+                    for (const fldKey in idxMap) {
+                        // This is a bit of hacking. We rely on the fact that if a field has a column, then the column is the field key.
+                        // Then it has the group id with value 0. groupSubscription will be able to process the fields that have a column
+                        // and it will assign values to the fields that don't have a value (i.e. those that currently have the group id and value 0).
+                        entity[fldKey] = data[idxMap[fldKey]];
+                    }
+
+                    groupSubscription(groupedFieldsMap, entity);
+
+                    for (const listFld of listFlds) {
+                        const fldKey = getFieldKey(listFld);
+                        const fld = groupedFieldsMap[fldKey];
+                        data[idxMap[fldKey]] = fieldTypes[fld.type].listRender(fld, entity[fldKey]);
+                    }
+                },
+
+                extraColumns
+            }
         );
     });
 }
@@ -223,9 +352,8 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, isCr
 
     for (const key in groupedFieldsMap) {
         const fld = groupedFieldsMap[key];
-        if (fld.type === 'date' || fld.type === 'birthday') {
-            entity[getFieldKey(fld)] = moment(entity[getFieldKey(fld)]).toDate();
-        }
+
+        fieldTypes[fld.type].afterJSON(fld, entity);
     }
 }
 

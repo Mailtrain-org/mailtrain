@@ -149,7 +149,7 @@ async function getById(context, listId, id) {
 }
 
 async function listTx(tx, listId) {
-    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'order_list', 'settings', 'group', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
+    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'settings', 'group', 'default_value', 'order_list', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
 }
 
 async function list(context, listId) {
@@ -160,7 +160,7 @@ async function list(context, listId) {
 }
 
 async function listGroupedTx(tx, listId) {
-    const flds = await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'column', 'settings', 'group', 'default_value']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
+    const flds = await listTx(tx, listId);
 
     const fldsById = {};
     for (const fld of flds) {
@@ -199,7 +199,7 @@ async function listGrouped(context, listId) {
 }
 
 async function listByOrderListTx(tx, listId, extraColumns = []) {
-    return await tx('custom_fields').where({list: listId}).whereNotNull('order_list').select(['name', ...extraColumns]).orderBy('order_list', 'asc');
+    return await tx('custom_fields').where({list: listId}).whereNotNull('order_list').select(['name', 'type', ...extraColumns]).orderBy('order_list', 'asc');
 }
 
 async function listDTAjax(context, listId, params) {
