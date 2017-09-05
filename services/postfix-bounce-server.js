@@ -60,7 +60,7 @@ let server = net.createServer(socket => {
                     if (err || !message) {
                         return checkNextLine();
                     }
-                    if ( queued_as ) {
+                    if ( queued_as || status === 'sent' ) {
                         log.verbose('POSTFIXBOUNCE', 'Message %s locally requeued as %s', queueId, queued_as);
                         // Update message's previous queueId (thanks @mfechner )
                         campaigns.updateMessageResponse(message, queued, queued_as, (err, updated) => {
