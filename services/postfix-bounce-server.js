@@ -50,6 +50,8 @@ let server = net.createServer(socket => {
                         queued_as = queued.match(/ queued as (\w+)/);
                         if (queued_as) {
                             queued_as = queued_as[1];
+                        } else {
+                            queued_as = ''
                         }
                     }
                 }
