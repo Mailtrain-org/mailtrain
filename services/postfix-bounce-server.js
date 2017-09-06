@@ -51,7 +51,7 @@ let server = net.createServer(socket => {
                         if (queued_as) {
                             queued_as = queued_as[1];
                         } else {
-                            queued_as = ''
+                            queued_as = '';
                         }
                     }
                 }
