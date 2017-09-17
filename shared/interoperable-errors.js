@@ -70,7 +70,13 @@ class InvalidTokenError extends InteroperableError {
 
 class DependencyNotFoundError extends InteroperableError {
     constructor(msg, data) {
-        super('DependencyNotFound', msg, data);
+        super('DependencyNotFoundError', msg, data);
+    }
+}
+
+class NamespaceNotFoundError extends InteroperableError {
+    constructor(msg, data) {
+        super('NamespaceNotFoundError', msg, data);
     }
 }
 
@@ -94,6 +100,7 @@ const errorTypes = {
     IncorrectPasswordError,
     InvalidTokenError,
     DependencyNotFoundError,
+    NamespaceNotFoundError,
     PermissionDeniedError
 };
 

@@ -64,19 +64,19 @@ export default class List extends Component {
     @withAsyncErrorHandler
     async deleteSubscription(id) {
         await axios.delete(`/rest/subscriptions/${this.props.list.id}/${id}`);
-        this.subscriptionsTable.refresh();
+        this.blacklistTable.refresh();
     }
 
     @withAsyncErrorHandler
     async unsubscribeSubscription(id) {
         await axios.post(`/rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`);
-        this.subscriptionsTable.refresh();
+        this.blacklistTable.refresh();
     }
 
     @withAsyncErrorHandler
-    async blacklistSubscription(id) {
-        await axios.post(`/rest/XXX/${this.props.list.id}/${id}`); // FIXME - add url one the blacklist functionality is in
-        this.subscriptionsTable.refresh();
+    async blacklistSubscription(email) {
+        await axios.post("/rest/blacklist", { email });
+        this.blacklistTable.refresh();
     }
 
     render() {
@@ -86,11 +86,11 @@ export default class List extends Component {
 
         const columns = [
             { data: 2, title: t('Email') },
-            { data: 3, title: t('Status'), render: data => this.subscriptionStatusLabels[data] },
+            { data: 3, title: t('Status'), render: (data, display, rowData) => this.subscriptionStatusLabels[data] + (rowData[5] ? ', ' + t('Blacklisted') : '') },
             { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' }
         ];
 
-        let colIdx = 5;
+        let colIdx = 6;
 
         for (const fld of list.listFields) {
 
@@ -123,11 +123,12 @@ export default class List extends Component {
                         });
                     }
 
-                    // FIXME - add condition here to show it only if not blacklisted already
-                    actions.push({
-                        label: <Icon icon="ban-circle" title={t('Blacklist')}/>,
-                        action: () => this.blacklistSubscription(data[0])
-                    });
+                    if (!data[5]) {
+                        actions.push({
+                            label: <Icon icon="ban-circle" title={t('Blacklist')}/>,
+                            action: () => this.blacklistSubscription(data[2])
+                        });
+                    }
 
                     actions.push({
                         label: <Icon icon="remove" title={t('Remove')}/>,
@@ -169,7 +170,7 @@ export default class List extends Component {
                 </div>
 
 
-                <Table ref={node => this.subscriptionsTable = node} withHeader dataUrl={dataUrl} columns={columns} />
+                <Table ref={node => this.blacklistTable = node} withHeader dataUrl={dataUrl} columns={columns} />
             </div>
         );
     }

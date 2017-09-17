@@ -19,7 +19,7 @@ const getStructure = t => {
                 users: {
                     title: t('Users'),
                     link: '/users',
-                    component: List,
+                    panelComponent: List,
                     children: {
                         ':userId([0-9]+)': {
                             title: resolved => t('User "{{name}}"', {name: resolved.user.name}),
@@ -31,18 +31,18 @@ const getStructure = t => {
                                 ':action(edit|delete)': {
                                     title: t('Edit'),
                                     link: params => `/users/${params.userId}/edit`,
-                                    render: props => <CUD action={props.match.params.action} entity={props.resolved.user} />
+                                    panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.user} />
                                 },
                                 shares: {
                                     title: t('Shares'),
                                     link: params => `/users/${params.userId}/shares`,
-                                    render: props => <UserShares user={props.resolved.user} />
+                                    panelRender: props => <UserShares user={props.resolved.user} />
                                 }
                             }
                         },
                         create: {
                             title: t('Create'),
-                            render: props => <CUD action="create" />
+                            panelRender: props => <CUD action="create" />
                         },
                     }
                 }
@@ -56,6 +56,6 @@ export default function() {
         <I18nextProvider i18n={ i18n }><Section root='/users' structure={getStructure}/></I18nextProvider>,
         document.getElementById('root')
     );
-};
+}
 
 

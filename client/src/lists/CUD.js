@@ -13,6 +13,7 @@ import { DeleteModalDialog } from '../lib/modals';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import { UnsubscriptionMode } from '../../../shared/lists';
 import styles from "../lib/styles.scss";
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withForm
@@ -46,7 +47,7 @@ export default class CUD extends Component {
                 default_form: null,
                 public_subscribe: true,
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
-                namespace: null
+                namespace: mailtrainConfig.user.namespace
             });
         }
     }
@@ -102,6 +103,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const unsubcriptionModeOptions = [
             {
@@ -146,7 +148,7 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {isEdit &&
+                {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
@@ -185,7 +187,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.entity.id}/delete`}/>}
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

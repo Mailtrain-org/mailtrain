@@ -1,17 +1,16 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { translate } from 'react-i18next';
-import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
-import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
-import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
-import interoperableErrors from '../../../shared/interoperable-errors';
-import { DismissibleAlert, Button } from './bootstrap-components';
-import mailtrainConfig from 'mailtrainConfig';
-import axios from '../lib/axios';
+import React, {Component} from "react";
+import {translate} from "react-i18next";
+import PropTypes from "prop-types";
+import {withRouter} from "react-router";
+import {BrowserRouter as Router, Link, Redirect, Route, Switch} from "react-router-dom";
+import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
+import interoperableErrors from "../../../shared/interoperable-errors";
+import {Button, DismissibleAlert} from "./bootstrap-components";
+import mailtrainConfig from "mailtrainConfig";
 import styles from "./styles.scss";
-
+import {getRoutes, needsResolve, resolve, withPageHelpers} from "./page-common";
 
 class Breadcrumb extends Component {
     static propTypes = {
@@ -163,28 +162,42 @@ class RouteContent extends Component {
     }
 
     @withAsyncErrorHandler
-    async resolve() {
-        const route = this.props.route;
-
-        const keys = Object.keys(route.resolve);
-
-        if (keys.length > 0) {
-            const promises = keys.map(key => axios.get(route.resolve[key](this.props.match.params)));
-            const resolvedArr = await Promise.all(promises);
-
-            const resolved = {};
-            for (let idx = 0; idx < keys.length; idx++) {
-                resolved[keys[idx]] = resolvedArr[idx].data;
-            }
-
+    async resolve(props) {
+        if (Object.keys(props.route.resolve).length === 0) {
             this.setState({
-                resolved
+                resolved: {}
             });
+
+        } else {
+            this.setState({
+                resolved: null
+            });
+
+            const resolved = await resolve(props.route, props.match);
+
+            if (!this.disregardResolve) { // This is to prevent the warning about setState on discarded component when we immediatelly redirect.
+                this.setState({
+                    resolved
+                });
+            }
         }
     }
 
     componentDidMount() {
-        this.resolve();
+        this.resolve(this.props);
+    }
+
+    componentDidUpdate() {
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.match.params !== nextProps.match.params && needsResolve(this.props.route, nextProps.route, this.props.match, nextProps.match)) {
+            this.resolve(nextProps);
+        }
+    }
+
+    componentWillUnmount() {
+        this.disregardResolve = true; // This is to prevent the warning about setState on discarded component when we immediatelly redirect.
     }
 
     render() {
@@ -193,7 +206,7 @@ class RouteContent extends Component {
         const params = this.props.match.params;
         const resolved = this.state.resolved;
 
-        if (!route.render && !route.component && route.link) {
+        if (!route.panelRender && !route.panelComponent && route.link) {
             let link;
             if (typeof route.link === 'function') {
                 link = route.link(params);
@@ -211,11 +224,11 @@ class RouteContent extends Component {
                     resolved
                 };
 
-                let component;
-                if (route.render) {
-                    component = route.render(compProps);
-                } else if (route.component) {
-                    component = React.createElement(route.component, compProps, null);
+                let panel;
+                if (route.panelComponent) {
+                    panel = React.createElement(route.panelComponent, compProps);
+                } else if (route.panelRender) {
+                    panel = route.panelRender(compProps);
                 }
 
                 return (
@@ -226,7 +239,7 @@ class RouteContent extends Component {
                             <SecondaryNavBar className="visible-xs" route={route} params={params} resolved={resolved}/>
                         </div>
                         {this.props.flashMessage}
-                        {component}
+                        {panel}
                     </div>
                 );
             } else {
@@ -291,14 +304,6 @@ class SectionContent extends Component {
         };
     }
 
-    getFlashMessageText() {
-        return this.state.flashMessageText;
-    }
-
-    getFlashMessageSeverity() {
-        return this.state.flashMessageSeverity;
-    }
-
     setFlashMessage(severity, text) {
         this.setState({
             flashMessageText: text,
@@ -346,77 +351,6 @@ class SectionContent extends Component {
         })
     }
 
-    getRoutes(urlPrefix, resolve, parents, structure, navs) {
-        let routes = [];
-        for (let routeKey in structure) {
-            const entry = structure[routeKey];
-
-            let path = urlPrefix + routeKey;
-            let pathWithParams = path;
-
-            if (entry.extraParams) {
-                pathWithParams = pathWithParams + '/' + entry.extraParams.join('/');
-            }
-
-            let entryResolve;
-            if (entry.resolve) {
-                entryResolve = Object.assign({}, resolve, entry.resolve);
-            } else {
-                entryResolve = resolve;
-            }
-
-            let navKeys;
-            const entryNavs = [];
-            if (entry.navs) {
-                navKeys = Object.keys(entry.navs);
-
-                for (const navKey of navKeys) {
-                    const nav = entry.navs[navKey];
-
-                    entryNavs.push({
-                        title: nav.title,
-                        visible: nav.visible,
-                        link: nav.link,
-                        externalLink: nav.externalLink
-                    });
-                }
-            }
-
-            const route = {
-                path: (pathWithParams === '' ? '/' : pathWithParams),
-                component: entry.component,
-                render: entry.render,
-                title: entry.title,
-                link: entry.link,
-                resolve: entryResolve,
-                parents,
-                navs: [...navs, ...entryNavs]
-            };
-
-            routes.push(route);
-
-            const childrenParents = [...parents, route];
-
-            if (entry.navs) {
-                for (let navKeyIdx = 0; navKeyIdx < navKeys.length; navKeyIdx++) {
-                    const navKey = navKeys[navKeyIdx];
-                    const nav = entry.navs[navKey];
-
-                    const childNavs = [...entryNavs];
-                    childNavs[navKeyIdx] = Object.assign({}, childNavs[navKeyIdx], { active: true });
-
-                    routes = routes.concat(this.getRoutes(path + '/', entryResolve, childrenParents, { [navKey]: nav }, childNavs));
-                }
-            }
-
-            if (entry.children) {
-                routes = routes.concat(this.getRoutes(path + '/', entryResolve, childrenParents, entry.children, entryNavs));
-            }
-        }
-
-        return routes;
-    }
-
     renderRoute(route) {
         let flashMessage;
         if (this.state.flashMessageText) {
@@ -429,7 +363,7 @@ class SectionContent extends Component {
     }
 
     render() {
-        let routes = this.getRoutes('', {}, [], this.props.structure, []);
+        let routes = getRoutes('', {}, [], this.props.structure, [], null, null);
 
         return (
             <Switch>{routes.map(x => this.renderRoute(x))}</Switch>
@@ -524,44 +458,6 @@ class DropdownLink extends Component {
             <li><Link to={props.to}>{props.children}</Link></li>
         );
     }
-}
-
-function withPageHelpers(target) {
-    target = withErrorHandling(target);
-
-    const inst = target.prototype;
-
-    const contextTypes = target.contextTypes || {};
-
-    contextTypes.sectionContent = PropTypes.object.isRequired;
-
-    target.contextTypes = contextTypes;
-
-    inst.getFlashMessageText = function() {
-        return this.context.sectionContent.getFlashMessageText();
-    };
-
-    inst.getFlashMessageSeverity = function() {
-        return this.context.sectionContent.getFlashMessageSeverity();
-    };
-
-    inst.setFlashMessage = function(severity, text) {
-        return this.context.sectionContent.setFlashMessage(severity, text);
-    };
-
-    inst.navigateTo = function(path) {
-        return this.context.sectionContent.navigateTo(path);
-    }
-
-    inst.navigateBack = function() {
-        return this.context.sectionContent.navigateBack();
-    }
-
-    inst.navigateToWithFlashMessage = function(path, severity, text) {
-        return this.context.sectionContent.navigateToWithFlashMessage(path, severity, text);
-    }
-
-    return target;
 }
 
 function requiresAuthenticatedUser(target) {

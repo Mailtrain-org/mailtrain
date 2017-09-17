@@ -10,13 +10,10 @@ import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import { TreeTable, TreeSelectMode } from './tree';
 import { Table, TableSelectMode } from './table';
-import { Button } from "./bootstrap-components";
+import {Button, Icon} from "./bootstrap-components";
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
-import 'brace/mode/javascript';
-import 'brace/mode/json';
-import 'brace/mode/handlebars';
 import 'brace/theme/github';
 
 import DayPicker from 'react-day-picker';
@@ -42,7 +39,8 @@ class Form extends Component {
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
         onSubmitAsync: PropTypes.func,
-        format: PropTypes.string
+        format: PropTypes.string,
+        noStatus: PropTypes.bool
     }
 
     static childContextTypes = {
@@ -60,7 +58,7 @@ class Form extends Component {
         const t = this.props.t;
 
         const owner = this.props.stateOwner;
-        
+
         evt.preventDefault();
 
         if (this.props.onSubmitAsync) {
@@ -94,10 +92,10 @@ class Form extends Component {
                     <fieldset disabled={owner.isFormDisabled()}>
                         {props.children}
                     </fieldset>
-                    {statusMessageText &&
-                        <AlignedRow htmlId="form-status-message">
-                            <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
-                        </AlignedRow>
+                    {!props.noStatus && statusMessageText &&
+                    <AlignedRow htmlId="form-status-message">
+                        <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
+                    </AlignedRow>
                     }
                 </form>
             );
@@ -107,18 +105,46 @@ class Form extends Component {
 
 class Fieldset extends Component {
     static propTypes = {
-        label: PropTypes.string
+        id: PropTypes.string,
+        label: PropTypes.string,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
     }
 
     render() {
         const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        const className = id ? owner.addFormValidationClass('', id) : '';
+
+        let helpBlock = null;
+        if (this.props.help) {
+            helpBlock = <div className="help-block" id={htmlId + '_help'}>{this.props.help}</div>;
+        }
+
+        let validationBlock = null;
+        if (id) {
+            const validationMsg = id && owner.getFormValidationMessage(id);
+            if (validationMsg) {
+                validationBlock = <div className="help-block" id={htmlId + '_help_validation'}>{validationMsg}</div>;
+            }
+        }
 
         return (
-            <fieldset>
+            <fieldset className={className}>
                 {props.label ? <legend>{props.label}</legend> : null}
-                {props.children}
+                <div className="fieldset-content">
+                    {props.children}
+                    {helpBlock}
+                    {validationBlock}
+                </div>
             </fieldset>
-            );
+        );
     }
 }
 
@@ -411,6 +437,7 @@ class TextArea extends Component {
 }
 
 
+@translate()
 class DatePicker extends Component {
     constructor(props) {
         super(props);
@@ -426,7 +453,9 @@ class DatePicker extends Component {
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         format: PropTypes.string,
         birthday: PropTypes.bool,
-        dateFormat: PropTypes.string
+        dateFormat: PropTypes.string,
+        formatDate: PropTypes.func,
+        parseDate: PropTypes.func
     }
 
     static defaultProps = {
@@ -447,7 +476,12 @@ class DatePicker extends Component {
         const owner = this.context.formStateOwner;
         const id = this.props.id;
         const props = this.props;
-        owner.updateFormValue(id, props.birthday ? formatBirthday(props.dateFormat, date) : formatDate(props.dateFormat, date));
+
+        if (props.formatDate) {
+            owner.updateFormValue(id, props.formatDate(date));
+        } else {
+            owner.updateFormValue(id, props.birthday ? formatBirthday(props.dateFormat, date) : formatDate(props.dateFormat, date));
+        }
 
         this.setState({
             opened: false
@@ -459,6 +493,7 @@ class DatePicker extends Component {
         const owner = this.context.formStateOwner;
         const id = this.props.id;
         const htmlId = 'form_' + id;
+        const t = props.t;
 
         function BirthdayPickerCaption({ date, localeUtils, onChange }) {
             const months = localeUtils.getMonths();
@@ -472,7 +507,15 @@ class DatePicker extends Component {
         let selectedDate, captionElement, fromMonth, toMonth, placeholder;
         const selectedDateStr = owner.getFormValue(id) || '';
         if (props.birthday) {
-            selectedDate = parseBirthday(props.dateFormat, selectedDateStr);
+            if (props.parseDate) {
+                selectedDate = props.parseDate(selectedDateStr);
+                if (selectedDate) {
+                    selectedDate = moment(selectedDate).set('year', birthdayYear).toDate();
+                }
+            } else {
+                selectedDate = parseBirthday(props.dateFormat, selectedDateStr);
+            }
+
             if (!selectedDate) {
                 selectedDate = moment().set('year', birthdayYear).toDate();
             }
@@ -483,7 +526,12 @@ class DatePicker extends Component {
             placeholder = getBirthdayFormatString(props.dateFormat);
 
         } else {
-            selectedDate = parseDate(props.dateFormat, selectedDateStr);
+            if (props.parseDate) {
+                selectedDate = props.parseDate(selectedDateStr);
+            } else {
+                selectedDate = parseDate(props.dateFormat, selectedDateStr);
+            }
+
             if (!selectedDate) {
                 selectedDate = moment().toDate();
             }
@@ -495,19 +543,19 @@ class DatePicker extends Component {
             <div>
                 <div className="input-group">
                     <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
-                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><span className="glyphicon glyphicon-th"></span></span>
+                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><Icon icon="calendar" title={t('Open calendar')}/></span>
                 </div>
                 {this.state.opened &&
-                    <div className={styles.dayPickerWrapper}>
-                        <DayPicker
-                            onDayClick={date => this.daySelected(date)}
-                            selectedDays={selectedDate}
-                            initialMonth={selectedDate}
-                            fromMonth={fromMonth}
-                            toMonth={toMonth}
-                            captionElement={captionElement}
-                        />
-                    </div>
+                <div className={styles.dayPickerWrapper}>
+                    <DayPicker
+                        onDayClick={date => this.daySelected(date)}
+                        selectedDays={selectedDate}
+                        initialMonth={selectedDate}
+                        fromMonth={fromMonth}
+                        toMonth={toMonth}
+                        captionElement={captionElement}
+                    />
+                </div>
                 }
             </div>
         );
@@ -729,7 +777,7 @@ class TableSelect extends Component {
                         </span>
                     </div>
                     <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
-                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
@@ -737,7 +785,7 @@ class TableSelect extends Component {
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div>
-                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
@@ -938,6 +986,7 @@ function withForm(target) {
         delete data.hash;
 
         if (mutator) {
+            // FIXME - change the interface such that if the mutator is provided, it is supposed to return which fields to keep in the form
             mutator(data);
         }
 
@@ -951,6 +1000,7 @@ function withForm(target) {
             const data = this.getFormValues();
 
             if (mutator) {
+                // FIXME - change the interface such that the mutator is supposed to create the object to be submitted
                 mutator(data);
             }
 
@@ -1147,6 +1197,17 @@ function withForm(target) {
                     <span>
                         <strong>{t('Your updates cannot be saved.')}</strong>{' '}
                         {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                    </span>
+                );
+                return;
+            }
+
+            if (error instanceof interoperableErrors.NamespaceNotFoundError) {
+                this.disableForm();
+                this.setFormStatusMessage('danger',
+                    <span>
+                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
+                        {t('It seems that someone else has deleted the target namespace in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
                     </span>
                 );
                 return;

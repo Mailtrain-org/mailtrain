@@ -18,7 +18,7 @@ router.postAsync('/account', passport.loggedIn, passport.csrfProtection, async (
     const data = req.body;
     data.id = req.user.id;
 
-    await users.updateWithConsistencyCheck(req.body, true);
+    await users.updateWithConsistencyCheck(contextHelpers.getAdminContext(), req.body, true);
     return res.json();
 });
 
@@ -26,7 +26,7 @@ router.postAsync('/account-validate', passport.loggedIn, passport.csrfProtection
     const data = req.body;
     data.id = req.user.id;
 
-    return res.json(await users.serverValidate(req.context, data, true));
+    return res.json(await users.serverValidate(contextHelpers.getAdminContext(), data, true));
 });
 
 router.getAsync('/access-token', passport.loggedIn, async (req, res) => {

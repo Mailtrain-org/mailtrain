@@ -7,7 +7,8 @@ module.exports = {
         users: ['babel-polyfill', './src/users/root.js'],
         account: ['babel-polyfill', './src/account/root.js'],
         reports: ['babel-polyfill', './src/reports/root.js'],
-        lists: ['babel-polyfill', './src/lists/root.js']
+        lists: ['babel-polyfill', './src/lists/root.js'],
+        blacklist: ['babel-polyfill', './src/blacklist/root.js']
     },
     output: {
         library: 'MailtrainReactBody',

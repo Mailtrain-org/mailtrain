@@ -1,10 +1,10 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { translate } from 'react-i18next';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
-import { Table } from '../lib/table';
-import mailtrainConfig from 'mailtrainConfig';
+import React, {Component} from "react";
+import {translate} from "react-i18next";
+import {NavButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../lib/page";
+import {Table} from "../lib/table";
+import mailtrainConfig from "mailtrainConfig";
 import {Icon} from "../lib/bootstrap-components";
 
 @translate()

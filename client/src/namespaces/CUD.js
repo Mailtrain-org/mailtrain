@@ -9,6 +9,7 @@ import axios from '../lib/axios';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {DeleteModalDialog} from "../lib/modals";
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withForm
@@ -32,10 +33,6 @@ export default class CUD extends Component {
 
     isEditGlobal() {
         return this.props.entity && this.props.entity.id === 1; /* Global namespace id */
-    }
-
-    isDelete() {
-        return this.props.match.params.action === 'delete';
     }
 
     removeNsIdSubtree(data) {
@@ -84,7 +81,7 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                namespace: null
+                namespace: mailtrainConfig.user.namespace
             });
         }
 
@@ -179,10 +176,11 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canDelete = isEdit && !this.isEditGlobal() && !this.hasChildren && this.props.entity.permissions.includes('delete');
 
         return (
             <div>
-                {!this.isEditGlobal() && !this.hasChildren && isEdit &&
+                {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
@@ -205,7 +203,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {!this.isEditGlobal() && !this.hasChildren && isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/namespaces/${this.props.entity.id}/delete`}/>}
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/namespaces/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

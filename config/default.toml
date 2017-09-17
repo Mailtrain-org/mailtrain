@@ -196,7 +196,7 @@ browser="phantomjs"
 name="Master"
 admin=true
 description="All permissions"
-permissions=["rebuildPermissions", "createJavascriptWithROAccess"]
+permissions=["rebuildPermissions", "createJavascriptWithROAccess", "manageBlacklist"]
 rootNamespaceRole="master"
 
 [roles.namespace.master]

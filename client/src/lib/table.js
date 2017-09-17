@@ -102,6 +102,10 @@ class Table extends Component {
     }
 
     updateSelectInfo() {
+        if (!this.jqSelectInfo) {
+            return; // If the table is updated very quickly after mounting, the datatable may not be initialized yet.
+        }
+
         const t = this.props.t;
 
         const count = this.selectionMap.size;

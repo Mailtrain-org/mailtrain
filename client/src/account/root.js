@@ -19,28 +19,28 @@ const getStructure = t => {
         login: {
             title: t('Sign in'),
             link: '/account/login',
-            component: Login,
+            panelComponent: Login,
         },
         api: {
             title: t('API'),
             link: '/account/api',
-            component: API
+            panelComponent: API
         }
     };
 
     if (mailtrainConfig.isAuthMethodLocal) {
         subPaths.forgot = {
             title: t('Password reset'),
-                extraParams: [':username?'],
-                link: '/account/forgot',
-                component: Reset
+            extraParams: [':username?'],
+            link: '/account/forgot',
+            panelComponent: Reset
         };
 
         subPaths.reset = {
             title: t('Password reset'),
-                extraParams: [':username', ':resetToken'],
-                link: '/account/reset',
-                component: ResetLink
+            extraParams: [':username', ':resetToken'],
+            link: '/account/reset',
+            panelComponent: ResetLink
         };
     }
 
@@ -52,10 +52,9 @@ const getStructure = t => {
                 account: {
                     title: t('Account'),
                     link: '/account',
-                    component: Account,
+                    panelComponent: Account,
 
                     children: subPaths
-
                 }
             }
         }
@@ -67,6 +66,6 @@ export default function() {
         <I18nextProvider i18n={ i18n }><Section root='/account/login' structure={getStructure}/></I18nextProvider>,
         document.getElementById('root')
     );
-};
+}
 
 

@@ -178,16 +178,6 @@ export default class CUD extends Component {
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
             }
         } catch (error) {
-            if (error instanceof interoperableErrors.DependencyNotFoundError) {
-                this.setFormStatusMessage('danger',
-                    <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that another field upon which sort field order was established has been deleted in the meantime. Refresh your page to start anew. Please note that your changes will be lost.')}
-                    </span>
-                );
-                return;
-            }
-
             throw error;
         }
     }

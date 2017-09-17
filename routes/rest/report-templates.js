@@ -40,9 +40,4 @@ router.getAsync('/report-template-user-fields/:reportTemplateId', passport.logge
     return res.json(userFields);
 });
 
-router.getAsync('/report-templates-create-permitted', passport.loggedIn, async (req, res) => {
-    return res.json(await shares.checkTypePermission(req.context, 'namespace', 'createReportTemplate'));
-});
-
-
 module.exports = router;

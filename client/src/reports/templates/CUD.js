@@ -8,6 +8,10 @@ import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEdit
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
+import mailtrainConfig from 'mailtrainConfig';
+import 'brace/mode/javascript';
+import 'brace/mode/json';
+import 'brace/mode/handlebars';
 
 @translate()
 @withForm
@@ -45,7 +49,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report listing all subscribers along with their statistics.',
-                    namespace: null,
+                    namespace: mailtrainConfig.user.namespace,
                     mime_type: 'text/html',
                     user_fields:
                         '[\n' +
@@ -95,7 +99,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report with results are aggregated by some "Country" custom field.',
-                    namespace: null,
+                    namespace: mailtrainConfig.user.namespace,
                     mime_type: 'text/html',
                     user_fields:
                         '[\n' +
@@ -166,7 +170,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Exports a list as a CSV file.',
-                    namespace: null,
+                    namespace: mailtrainConfig.user.namespace,
                     mime_type: 'text/csv',
                     user_fields:
                         '[\n' +
@@ -191,7 +195,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: '',
-                    namespace: null,
+                    namespace: mailtrainConfig.user.namespace,
                     mime_type: 'text/html',
                     user_fields: '',
                     js: '',
@@ -270,10 +274,11 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         return (
             <div>
-                {isEdit &&
+                {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
@@ -299,7 +304,9 @@ export default class CUD extends Component {
                         <ButtonRow>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
                             <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
-                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
+                            {canDelete &&
+                                <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
+                            }
                         </ButtonRow>
                     :
                         <ButtonRow>

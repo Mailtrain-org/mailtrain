@@ -16,6 +16,8 @@ import validators from '../../../../shared/validators';
 import slugify from 'slugify';
 import { parseDate, parseBirthday, DateFormat } from '../../../../shared/date';
 import styles from "../../lib/styles.scss";
+import 'brace/mode/json';
+import 'brace/mode/handlebars';
 
 @translate()
 @withForm
@@ -113,10 +115,7 @@ export default class CUD extends Component {
                 dateFormat: 'eur',
                 orderListBefore: 'end', // possible values are <numeric id> / 'end' / 'none'
                 orderSubscribeBefore: 'end',
-                orderManageBefore: 'end',
-                orderListOptions: [],
-                orderSubscribeOptions: [],
-                orderManageOptions: []
+                orderManageBefore: 'end'
             });
         }
     }
@@ -282,16 +281,6 @@ export default class CUD extends Component {
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
             }
         } catch (error) {
-            if (error instanceof interoperableErrors.DependencyNotFoundError) {
-                this.setFormStatusMessage('danger',
-                    <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that another field upon which sort field order was established has been deleted in the meantime. Refresh your page to start anew. Please note that your changes will be lost.')}
-                    </span>
-                );
-                return;
-            }
-
             throw error;
         }
     }
@@ -459,7 +448,7 @@ export default class CUD extends Component {
 
                     {type !== 'option' &&
                         <Fieldset label={t('Field order')}>
-                            <Dropdown id="orderListBefore" label={t('Listings (before)')} options={getOrderOptions('order_list')} help={t('Select the field before which this field should appeara in listings. To exclude the field from listings, select "Not visible".')}/>
+                            <Dropdown id="orderListBefore" label={t('Listings (before)')} options={getOrderOptions('order_list')} help={t('Select the field before which this field should appear in listings. To exclude the field from listings, select "Not visible".')}/>
                             <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={getOrderOptions('order_subscribe')} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>
                             <Dropdown id="orderManageBefore" label={t('Management form (before)')} options={getOrderOptions('order_manage')} help={t('Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select "Not visible".')}/>
                         </Fieldset>

@@ -28,7 +28,7 @@ const getStructure = t => {
                 'reports': {
                     title: t('Reports'),
                     link: '/reports',
-                    component: ReportsList,
+                    panelComponent: ReportsList,
                     children: {
                         ':reportId([0-9]+)': {
                             title: resolved => t('Report "{{name}}"', {name: resolved.report.name}),
@@ -41,13 +41,13 @@ const getStructure = t => {
                                     title: t('Edit'),
                                     link: params => `/reports/${params.reportId}/edit`,
                                     visible: resolved => resolved.report.permissions.includes('edit'),
-                                    render: props => <ReportsCUD action={props.match.params.action} entity={props.resolved.report} />
+                                    panelRender: props => <ReportsCUD action={props.match.params.action} entity={props.resolved.report} />
                                 },
                                 view: {
                                     title: t('View'),
                                     link: params => `/reports/${params.reportId}/view`,
                                     visible: resolved => resolved.report.permissions.includes('viewContent') && resolved.report.state === ReportState.FINISHED && resolved.report.mime_type === 'text/html',
-                                    render: props => (<ReportsView {...props} />),
+                                    panelRender: props => (<ReportsView {...props} />),
                                 },
                                 download: {
                                     title: t('Download'),
@@ -58,24 +58,24 @@ const getStructure = t => {
                                     title: t('Output'),
                                     link: params => `/reports/${params.reportId}/output`,
                                     visible: resolved => resolved.report.permissions.includes('viewOutput'),
-                                    render: props => (<ReportsOutput {...props} />)
+                                    panelRender: props => (<ReportsOutput {...props} />)
                                 },
                                 share: {
                                     title: t('Share'),
                                     link: params => `/reports/${params.reportId}/share`,
                                     visible: resolved => resolved.report.permissions.includes('share'),
-                                    render: props => <Share title={t('Share')} entity={props.resolved.report} entityTypeId="report" />
+                                    panelRender: props => <Share title={t('Share')} entity={props.resolved.report} entityTypeId="report" />
                                 }
                             }
                         },
                         create: {
                             title: t('Create'),
-                            render: props => <ReportsCUD action="create" />
+                            panelRender: props => <ReportsCUD action="create" />
                         },
                         'templates': {
                             title: t('Templates'),
                             link: '/reports/templates',
-                            component: ReportTemplatesList,
+                            panelComponent: ReportTemplatesList,
                             children: {
                                 ':templateId([0-9]+)': {
                                     title: resolved => t('Template "{{name}}"', {name: resolved.template.name}),
@@ -88,20 +88,20 @@ const getStructure = t => {
                                             title: t('Edit'),
                                             link: params => `/reports/templates/${params.templateId}/edit`,
                                             visible: resolved => mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess') && resolved.template.permissions.includes('edit'),
-                                            render: props => <ReportTemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
+                                            panelRender: props => <ReportTemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
                                         },
                                         share: {
                                             title: t('Share'),
                                             link: params => `/reports/templates/${params.templateId}/share`,
                                             visible: resolved => resolved.template.permissions.includes('share'),
-                                            render: props => <Share title={t('Share')} entity={props.resolved.template} entityTypeId="reportTemplate" />
+                                            panelRender: props => <Share title={t('Share')} entity={props.resolved.template} entityTypeId="reportTemplate" />
                                         }
                                     }
                                 },
                                 create: {
                                     title: t('Create'),
                                     extraParams: [':wizard?'],
-                                    render: props => <ReportTemplatesCUD action="create" wizard={props.match.params.wizard} />
+                                    panelRender: props => <ReportTemplatesCUD action="create" wizard={props.match.params.wizard} />
                                 }
                             }
                         }

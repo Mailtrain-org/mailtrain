@@ -36,7 +36,6 @@ const webhooks = require('./routes/webhooks');
 const subscription = require('./routes/subscription');
 const archive = require('./routes/archive');
 const api = require('./routes/api');
-const blacklist = require('./routes/blacklist');
 const editorapi = require('./routes/editorapi');
 const grapejs = require('./routes/grapejs');
 const mosaico = require('./routes/mosaico');
@@ -56,12 +55,14 @@ const fieldsRest = require('./routes/rest/fields');
 const sharesRest = require('./routes/rest/shares');
 const segmentsRest = require('./routes/rest/segments');
 const subscriptionsRest = require('./routes/rest/subscriptions');
+const blacklistRest = require('./routes/rest/blacklist');
 
 const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
 const usersLegacyIntegration = require('./routes/users-legacy-integration');
 const accountLegacyIntegration = require('./routes/account-legacy-integration');
 const reportsLegacyIntegration = require('./routes/reports-legacy-integration');
 const listsLegacyIntegration = require('./routes/lists-legacy-integration');
+const blacklistLegacyIntegration = require('./routes/blacklist-legacy-integration');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -235,7 +236,6 @@ app.use('/lists', lists);
 app.use('/templates', templates);
 app.use('/campaigns', campaigns);
 app.use('/settings', settings);
-app.use('/blacklist', blacklist);
 app.use('/links', links);
 app.use('/fields', fields);
 app.use('/forms', forms);
@@ -259,6 +259,7 @@ app.use('/users', usersLegacyIntegration);
 app.use('/namespaces', namespacesLegacyIntegration);
 app.use('/account', accountLegacyIntegration);
 app.use('/lists', listsLegacyIntegration);
+app.use('/blacklist', blacklistLegacyIntegration);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/reports', reports);
@@ -281,6 +282,7 @@ app.use('/rest', fieldsRest);
 app.use('/rest', sharesRest);
 app.use('/rest', segmentsRest);
 app.use('/rest', subscriptionsRest);
+app.use('/rest', blacklistRest);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportTemplatesRest);

@@ -5,6 +5,7 @@ import {SubscriptionStatus} from "../../../../shared/lists";
 import {ACEEditor, CheckBoxGroup, DatePicker, Dropdown, InputField, RadioGroup, TextArea} from "../../lib/form";
 import {formatBirthday, formatDate, parseBirthday, parseDate} from "../../../../shared/date";
 import {getFieldKey} from '../../../../shared/lists';
+import 'brace/mode/json';
 
 export function getSubscriptionStatusLabels(t) {
 

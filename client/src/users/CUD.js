@@ -52,7 +52,7 @@ export default class CUD extends Component {
                 email: '',
                 password: '',
                 password2: '',
-                namespace: null
+                namespace: mailtrainConfig.user.namespace
             });
         }
     }
@@ -182,7 +182,7 @@ export default class CUD extends Component {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
         const userId = this.getFormValue('id');
-        const canDelete = userId !== 1 && mailtrainConfig.userId !== userId;
+        const canDelete = isEdit && userId !== 1 && mailtrainConfig.user.id !== userId;
 
         const rolesColumns = [
             { data: 1, title: "Name" },
@@ -192,7 +192,7 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {isEdit && canDelete &&
+                {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
@@ -220,7 +220,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete User')} linkTo={`/users/${this.props.entity.id}/delete`}/>}
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete User')} linkTo={`/users/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

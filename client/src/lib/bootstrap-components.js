@@ -35,14 +35,19 @@ class DismissibleAlert extends Component {
 class Icon extends Component {
     static propTypes = {
         icon: PropTypes.string.isRequired,
+        family: PropTypes.string,
         title: PropTypes.string,
         className: PropTypes.string
+    }
+
+    static defaultProps = {
+        family: 'glyphicon'
     }
 
     render() {
         const props = this.props;
 
-        return <span className={'glyphicon glyphicon-' + props.icon + (props.className ? ' ' + props.className : '')} title={props.title}></span>;
+        return <span className={`${props.family} ${props.family}-${props.icon}` + (props.className ? ' ' + props.className : '')} title={props.title}></span>;
     }
 }
 
@@ -129,6 +134,7 @@ class ActionLink extends Component {
     async onClick(evt) {
         if (this.props.onClickAsync) {
             evt.preventDefault();
+            evt.stopPropagation();
 
             await this.props.onClickAsync(evt);
         }

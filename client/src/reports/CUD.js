@@ -13,6 +13,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import moment from 'moment';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withForm
@@ -65,7 +66,7 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 report_template: null,
-                namespace: null,
+                namespace: mailtrainConfig.user.namespace,
                 user_fields: null
             });
         }
@@ -100,7 +101,7 @@ export default class CUD extends Component {
                 const selection = state.getIn([fldId, 'value']) || [];
 
                 if (spec.maxOccurences === 1) {
-                    if (spec.minOccurences === 1 && (selection === null || selection === undefined)) {
+                    if (spec.minOccurences === 1 && (selection === null || selection === undefined)) { // FIXME - this does not seem to correspond with selectionAsArray
                         state.setIn([fldId, 'error'], t('Exactly one item has to be selected'));
                     }
                 } else {
@@ -119,7 +120,7 @@ export default class CUD extends Component {
     async submitHandler() {
         const t = this.props.t;
 
-        if (!this.getFormValue('user_fields')) {
+        if (this.getFormValue('report_template') && !this.getFormValue('user_fields')) {
             this.setFormStatusMessage('warning', t('Report parameters are not selected. Wait for them to get displayed and then fill them in.'));
             return;
         }
@@ -160,9 +161,9 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const reportTemplateColumns = [
-            { data: 0, title: "#" },
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
             { data: 3, title: t('Created'), render: data => moment(data).fromNow() }
@@ -213,7 +214,7 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {isEdit &&
+                {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
@@ -246,7 +247,9 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>}
+                        {canDelete &&
+                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>
+                        }
                     </ButtonRow>
                 </Form>
             </div>

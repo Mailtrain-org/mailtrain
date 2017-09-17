@@ -208,6 +208,8 @@ async function listDTAjax(context, listId, segmentId, params) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
+        const listTable = getTableName(listId);
+
         // All the data transformation below is to reuse ajaxListTx and groupSubscription methods so as to keep the code DRY
         // We first construct the columns to contain all which is supposed to be show and extraColumns which contain
         // everything else that constitutes the subscription.
@@ -218,7 +220,14 @@ async function listDTAjax(context, listId, segmentId, params) {
         const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
         const listFlds = await fields.listByOrderListTx(tx, listId, ['column', 'id']);
 
-        const columns = ['id', 'cid', 'email', 'status', 'created'];
+        const columns = [
+            listTable + '.id',
+            listTable + '.cid',
+            listTable + '.email',
+            listTable + '.status',
+            listTable + '.created',
+            { name: 'blacklisted', raw: 'not isnull(blacklist.email)' }
+        ];
         const extraColumns = [];
         let listFldIdx = columns.length;
         const idxMap = {};
@@ -228,10 +237,10 @@ async function listDTAjax(context, listId, segmentId, params) {
             const fld = groupedFieldsMap[fldKey];
 
             if (fld.column) {
-                columns.push(fld.column);
+                columns.push(listTable + '.' + fld.column);
             } else {
                 columns.push({
-                    name: fldKey,
+                    name: listTable + '.' + fldKey,
                     raw: 0
                 })
             }
@@ -245,14 +254,14 @@ async function listDTAjax(context, listId, segmentId, params) {
 
             if (fld.column) {
                 if (!(fldKey in idxMap)) {
-                    extraColumns.push(fld.column);
+                    extraColumns.push(listTable + '.' + fld.column);
                     idxMap[fldKey] = listFldIdx;
                     listFldIdx += 1;
                 }
 
             } else {
                 for (const optionColumn in fld.groupedOptions) {
-                    extraColumns.push(optionColumn);
+                    extraColumns.push(listTable + '.' + optionColumn);
                     idxMap[optionColumn] = listFldIdx;
                     listFldIdx += 1;
                 }
@@ -265,7 +274,10 @@ async function listDTAjax(context, listId, segmentId, params) {
             tx,
             params,
             builder => {
-                const query = builder.from(getTableName(listId));
+                const query = builder
+                    .from(listTable)
+                    .leftOuterJoin('blacklist', listTable + '.email', 'blacklist.email')
+                ;
                 query.where(function() {
                     addSegmentQuery(this);
                 });

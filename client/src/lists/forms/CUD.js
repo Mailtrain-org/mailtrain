@@ -262,7 +262,7 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 selectedTemplate: 'layout',
-                namespace: null
+                namespace: mailtrainConfig.user.namespace
             };
             supplyDefaults(data);
 
@@ -341,6 +341,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const templateOptGroups = [];
 
@@ -369,7 +370,7 @@ export default class CUD extends Component {
 
         return (
             <div>
-                {isEdit &&
+                {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
@@ -433,7 +434,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/forms/${this.props.entity.id}/delete`}/>}
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

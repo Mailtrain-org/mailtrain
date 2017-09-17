@@ -267,6 +267,8 @@ async function getByUsernameIfPasswordMatch(username, password) {
             throw new interoperableErrors.IncorrectPasswordError();
         }
 
+        delete user.password;
+
         return user;
 
     } catch (err) {
