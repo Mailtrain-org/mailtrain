@@ -319,11 +319,11 @@ router.post('/zone-mta/sender-config', (req, res) => {
 
         res.json({
             dkim: {
-                keys: {
+                keys: [{
                     domainName: configItems.dkimDomain || domain,
                     keySelector: configItems.dkimSelector,
                     privateKey: configItems.dkimPrivateKey
-                }
+                }]
             }
         });
     });
