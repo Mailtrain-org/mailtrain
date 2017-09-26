@@ -119,6 +119,50 @@ If you are using the bundled ZoneMTA then you should make sure you are using a p
 
 With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect 10/10 score out from [MailTester](https://www.mail-tester.com/) when sending a campaign message to a MailTester test address. I did not have VERP turned on, so the sender address matched return path address.
 
+#### Getting your head around DKIM, DMARK, SPF and PTR
+
+DKIM, DMARK, SPF and PTR are DNS records which spam filters use to figure out if e-mails were really sent by you (and not by a spammer who tries to conceal his identity to be able to continue send bulks of e-mails people never subscribed for). Assuming that you use zone-mta and your e-mails are to originate from a Mailtrain installation at `mailtrain.example.com` and optionally from `mail.example.net`, to practically set all these records up you will need to:
+
+1. generate genrate a private and public DKIM key
+
+```sh
+mkdir /opt/dkim-keys
+chmod 700 /opt/dkim-keys
+pushd /opt/dkim-keys
+openssl genrsa -out mailtrain.example.com.key 2048 # private key mailtrain.example.com.key
+openssl rsa -in mailtrain.example.com.key -out mailtrain.example.com.pub -pubout -outform PEM # public key mailtrain.example.com.pub
+```
+
+2. add 3 new txt records for the mailtrain.example.com that will most likely similar to the example below:
+
+```
+default._domainkey.mailtrain.example.com     TXT    "k=rsa; p=[public key in one line];"
+mailtrain.example.com                        TXT    "v=spf1 mx a a:mail.example.net -all"
+_dmarc.mailtrain.example.com                 TXT    "v=DMARC1; p=reject"
+```
+
+(refer to a google search for a DKIM generator, SPF generator and DMARC genreator to get you up to speed). Configure your Mailtrain settings accoring to this:
+
+**DKIM domain:** mailtrain.example.com
+**DKIM selector:** default
+**DKIM Private Key:** [copy and paste the private key in /opt/dkim-keys/mailtrain.example.com.key]
+
+The above steps will have the following effect:
+
+- all messages sent by Mailtrain / Zone-mta will be signed by the DKIM Private Key (the signature becomes a part of the e-mail)
+- when a spamfilter encounters this signature, it will look for the **<DKIM selector>**._domainkey.**<DKIM domain>** TXT record, and use the public key stored there to verify that the signature is valid
+- additionally, the spamfilter will look for a TXT SPF record and will look a if the e-mail was sent from the IP address of mailtrain.example.com or mail.example.net.  If the sender IP or domain is different, it will discard the e-mail as spam.
+- furthermore, the spamfilter looks for the DMARC record, which tells it what to do with mails that aren't signed with DKIM or which don't have a valid signature. The example above will tell the spamfilter to reject such a mail as well.
+
+3. You are now almost set. To further confirm that you have full control over your network, the last step is to set up a PTR record, which will give the right answer for a reverse DNS lookup (answer to "what domain name is bound to IP address xxx.xxx.xxx.xxx). If you run your own DNS, you probably know it will look similar to this:
+
+```
+10.27/1.110.220.in-addr.arpa. 	1800 	PTR 	mailtrain.example.com.
+```
+
+If you run Mailtrain on a VPS, you will have to find the PTR configuration somewhere in your administration interface or ask your provider to help you.
+
+
 ### Simple Install (Docker)
 #### Requirements:
 
