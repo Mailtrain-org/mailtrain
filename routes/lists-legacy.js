@@ -563,7 +563,7 @@ router.get('/subscription/:id/import/:importId', passport.csrfProtection, (req, 
                 data.list = list;
                 data.csrfToken = req.csrfToken();
 
-                data.customFields = fields.getRow(fieldList, data);
+                data.customFields = fields.getRow(fieldList, data, false, true);
 
                 res.render('lists/subscription/import-preview', data);
             });
