@@ -646,7 +646,7 @@ router.post('/subscription/import-confirm', passport.parseForm, passport.csrfPro
         }
 
         subscriptions.getImport(list.id, req.body.import, (err, data) => {
-            if (err || !list) {
+            if (err || !data) {
                 req.flash('danger', err && err.message || err || _('Could not find import data with specified ID'));
                 return res.redirect('/lists');
             }
