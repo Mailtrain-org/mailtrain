@@ -1,6 +1,8 @@
-![](http://mailtrain.org/mailtrain.png)
+# Mailtrain
 
 [Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v7+) and MySQL (v5.5+ or MariaDB).
+
+![](http://mailtrain.org/mailtrain.png)
 
 ## Features
 
@@ -34,6 +36,9 @@ Depending on how you have configured your system and Docker you may need to prep
 * Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password.
 
 ## Quick Start - Manual Install (any OS that supports Node.js)
+
+### Requirements: 
+ * Mailtrain requires at least **Node.js v7**. If you want to use an older version of Node.js then you should use version v1.24 of Mailtrain. You can either download it [here](https://github.com/Mailtrain-org/mailtrain/archive/v1.24.0.zip) or if using git then run `git checkout v1.24.0` before starting it
 
   1. Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `npm install --production` in the Mailtrain folder to install required dependencies
