@@ -636,8 +636,14 @@ function getPreview(path, size, delimiter, callback) {
                 fs.close(fd, () => {
                     // just ignore
                 });
+                if (err) {
+                    return callback(err);
+                }
                 if (!data || !data.length) {
-                    return callback(null, new Error(_('Empty file')));
+                    return callback(new Error(_('Empty file')));
+                }
+                if (data.length < 2) {
+                    return callback(new Error(_('Too few rows')));
                 }
                 callback(err, data);
             });
