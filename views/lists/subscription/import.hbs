@@ -29,10 +29,15 @@
 
     <div class="form-group">
         <label class="col-sm-2 control-label">{{#translate}}Categorize the imported subscribers as{{/translate}}:</label>
-        <div class="col-sm-6">
+        <div class="col-sm-10">
             <div class="radio">
                 <label>
                     <input type="radio" name="type" id="type" value="subscribed" checked> {{#translate}}Subscribed{{/translate}} – <span class="text-muted">{{#translate}}Regular subscriber addresses{{/translate}}</span>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="type" id="type" value="force_subscribed"> {{#translate}}Subscribed (Force){{/translate}} – <span class="text-muted">{{#translate}}Regular subscriber addresses, resubscribe users that have unsubscribed{{/translate}}</span>
                 </label>
             </div>
             <div class="radio">
