@@ -285,7 +285,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
                 list.imports = imports.map((entry, i) => {
                     entry.index = i + 1;
-                    entry.importType = entry.type === 0 ? _('Force Subscribe') : (entry.type === 1 ? _('Subscribe') : _('Unsubscribe'));
+                    entry.importType = entry.type === 0 ? _('Subscribe') : (entry.type === 1 ? _('Force Subscribe') : _('Unsubscribe'));
                     switch (entry.status) {
                         case 0:
                             entry.importStatus = _('Initializing');
