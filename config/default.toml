@@ -121,6 +121,9 @@ filter="(|(username={{username}})(mail={{username}}))"
 #Username field in LDAP (uid/cn/username)
 uidTag="username"
 passwordresetlink=""
+# Use a different user to bind LDAP (final bind DN will be: {{uidTag}}={{bindUser}},{{baseDN}})
+bindUser=""
+bindPassword=""
 
 [postfixbounce]
 # Enable to allow writing Postfix bounce log to Mailtrain listener
