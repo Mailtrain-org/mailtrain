@@ -13,6 +13,11 @@
     <input type="hidden" name="id" value="{{id}}" />
 </form>
 
+<form method="post" class="duplicate-form" id="templates-duplicate" action="/templates/duplicate">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{id}}" />
+</form>
+
 <form class="form-horizontal" method="post" action="/templates/edit">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" name="id" value="{{id}}" />
@@ -45,6 +50,7 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <div class="pull-right">
+                <button type="submit" form="templates-duplicate" class="btn btn-default"> {{#translate}}Duplicate{{/translate}}</button>
                 <button type="submit" form="templates-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> {{#translate}}Delete Template{{/translate}}</button>
             </div>
             <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update{{/translate}}</button>
