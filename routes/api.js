@@ -315,6 +315,39 @@ router.post('/delete/:listId', (req, res) => {
     });
 });
 
+router.get('/subscriptions/:listId', (req, res) => {
+    let start = parseInt(req.query.start || 0, 10);
+    let limit = parseInt(req.query.limit || 10000, 10);
+
+    lists.getByCid(req.params.listId, (err, list) => {
+	if (err) {
+            res.status(500);
+            return res.json({
+		error: err.message || err,
+		data: []
+            });
+	}
+	subscriptions.list(list.id, start, limit, (err, rows, total) => {
+	    if (err) {
+		res.status(500);
+		return res.json({
+		    error: err.message || err,
+		    data: []
+		});
+	    }
+	    res.status(200);
+	    res.json({
+		data: {
+		    total: total,
+		    start: start,
+		    limit: limit,
+		    subscriptions: rows
+		}
+	    });
+	});
+    });
+});
+
 router.post('/field/:listId', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
