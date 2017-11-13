@@ -43,6 +43,27 @@
     </ul>
 </div>
 
+<h3>GET /api/subscriptions/:listId – {{#translate}}Get list of subscriptions{{/translate}}</h3>
+
+<p>
+    {{#translate}}Retrieve a list of subscriptions to the list referenced by :listId. All fields of the subscribers will be returned. Note that custom fields will have generated names.{{/translate}}
+</p>
+
+<p>
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+    <li><strong>start</strong> – {{#translate}}Start position{{/translate}} (<em>{{#translate}}optional, default 0{{/translate}}</em>)</li>
+    <li><strong>limit</strong> – {{#translate}}limit subscription count in response{{/translate}} (<em>{{#translate}}optional, default 10000{{/translate}}</em>)</li>
+</ul>
+
+<p>
+    <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XGET '{{serviceUrl}}api/subscriptions/B16uVTdW?access_token={{accessToken}}&limit=10&start=0' </pre>
+
 <h3>POST /api/subscribe/:listId – {{#translate}}Add subscription{{/translate}}</h3>
 
 <p>
