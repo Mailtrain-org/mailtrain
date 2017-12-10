@@ -157,14 +157,14 @@ const campaignFieldsMapping = {
 };
 
 async function getCampaignResults(context, campaign, select, extra) {
-    const fieldList = await fields.list(context, campaign.list);
+    const flds = await fields.list(context, campaign.list);
 
     const fieldsMapping = Object.assign({}, campaignFieldsMapping);
-    for (const field of fieldList) {
-        /* Dropdowns and checkboxes are aggregated. As such, they have field.column == null
-           TODO - For the time being, we ignore groupped fields. */
-        if (field.column) {
-            fieldsMapping[field.key.toLowerCase()] = 'subscribers.' + field.column;
+    for (const fld of flds) {
+        /* Dropdown and checkbox groups have field.column == null
+           TODO - For the time being, we don't group options and we don't expand enums. We just provide it as it is in the DB. */
+        if (fld.column) {
+            fieldsMapping[fld.key.toLowerCase()] = 'subscribers.' + fld.column;
         }
     }
 

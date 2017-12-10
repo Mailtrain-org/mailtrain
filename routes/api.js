@@ -1,9 +1,8 @@
 'use strict';
 
-let users = require('../models/users');
 let lists = require('../lib/models/lists');
 let fields = require('../lib/models/fields');
-let blacklist = require('../lib/models/blacklist');
+let blacklist = require('../models/blacklist');
 let subscriptions = require('../lib/models/subscriptions');
 let confirmations = require('../lib/models/confirmations');
 let tools = require('../lib/tools');
@@ -11,35 +10,6 @@ let log = require('npmlog');
 const router = require('../lib/router-async').create();
 let mailHelpers = require('../lib/subscription-mail-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
-
-router.allAsync('/*', async (req, res, next) => {
-    if (!req.query.access_token) {
-        res.status(403);
-        return res.json({
-            error: 'Missing access_token',
-            data: []
-        });
-    }
-
-    try {
-        await users.getByAccessToken(req.query.access_token);
-        next();
-    } catch (err) {
-        if (err instanceof interoperableErrors.NotFoundError) {
-            res.status(403);
-            return res.json({
-                error: 'Invalid or expired access_token',
-                data: []
-            });
-        } else {
-            res.status(500);
-            return res.json({
-                error: err.message || err,
-                data: []
-            });
-        }
-    }
-});
 
 router.post('/subscribe/:listId', (req, res) => {
     let input = {};
@@ -365,82 +335,52 @@ router.post('/field/:listId', (req, res) => {
     });
 });
 
-router.post('/blacklist/add', (req, res) => {
+router.postAsync('/blacklist/add', async (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
     if (!(input.EMAIL) || (input.EMAIL === ''))  {
-      res.status(500);
-      return res.json({
-          error: 'EMAIL argument are required',
-          data: []
-      });
+        throw new Error('EMAIL argument is required');
     }
-    blacklist.add(input.EMAIL, (err) =>{
-      if (err) {
-          res.status(500);
-          return res.json({
-              error: err.message || err,
-              data: []
-          });
-      }
-      res.status(200);
-      res.json({
-          data: []
-      });
+
+    await blacklist.add(req.context, input.EMAIL);
+
+    res.json({
+        data: []
     });
 });
 
-router.post('/blacklist/delete', (req, res) => {
+router.postAsync('/blacklist/delete', async (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
-    if (!(input.EMAIL) || (input.EMAIL === ''))  {
-      res.status(500);
-      return res.json({
-          error: 'EMAIL argument are required',
-          data: []
-      });
+    if (!(input.EMAIL) || (input.EMAIL === '')) {
+        throw new Error('EMAIL argument is required');
     }
-    blacklist.delete(input.EMAIL, (err) =>{
-      if (err) {
-          res.status(500);
-          return res.json({
-              error: err.message || err,
-              data: []
-          });
-      }
-      res.status(200);
-      res.json({
-          data: []
-      });
+
+    await blacklist.remove(req.oontext, input.EMAIL);
+
+    res.json({
+        data: []
     });
 });
 
-router.get('/blacklist/get', (req, res) => {
+router.getAsync('/blacklist/get', async (req, res) => {
     let start = parseInt(req.query.start || 0, 10);
     let limit = parseInt(req.query.limit || 10000, 10);
     let search = req.query.search || '';
 
-    blacklist.get(start, limit, search, (err, data, total) => {
-      if (err) {
-          res.status(500);
-          return res.json({
-              error: err.message || err,
-              data: []
-          });
-      }
-      res.status(200);
-      res.json({
-          data: {
-            total: total,
+    const { emails, total } = await blacklist.search(req.context, start, limit, search);
+
+    return res.json({
+        data: {
+            total,
             start: start,
             limit: limit,
-            emails: data
-          }
-      });
+            emails
+        }
     });
 });
 

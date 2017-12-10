@@ -39,7 +39,7 @@ router.postAsync('/subscriptions-validate/:listId', passport.loggedIn, async (re
 });
 
 router.postAsync('/subscriptions-unsubscribe/:listId/:subscriptionId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await subscriptions.unsubscribe(req.context, req.params.listId, req.params.subscriptionId);
+    await subscriptions.unsubscribeAndGet(req.context, req.params.listId, req.params.subscriptionId);
     return res.json();
 });
 

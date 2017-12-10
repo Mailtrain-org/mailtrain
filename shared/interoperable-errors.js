@@ -87,6 +87,31 @@ class PermissionDeniedError extends InteroperableError {
     }
 }
 
+class InvalidConfirmationForSubscriptionError extends InteroperableError {
+    constructor(msg, data) {
+        super('InvalidConfirmationForSubscriptionError', msg, data);
+    }
+}
+
+class InvalidConfirmationForAddressChangeError extends InteroperableError {
+    constructor(msg, data) {
+        super('InvalidConfirmationForAddressChangeError', msg, data);
+    }
+}
+
+class InvalidConfirmationForUnsubscriptionError extends InteroperableError {
+    constructor(msg, data) {
+        super('InvalidConfirmationForUnsubscriptionError', msg, data);
+    }
+}
+
+class SubscriptionNotAllowedError extends InteroperableError {
+    constructor(msg, data) {
+        super('SubscriptionNotAllowedError', msg, data);
+        this.status = 403;
+    }
+}
+
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
@@ -101,7 +126,11 @@ const errorTypes = {
     InvalidTokenError,
     DependencyNotFoundError,
     NamespaceNotFoundError,
-    PermissionDeniedError
+    PermissionDeniedError,
+    InvalidConfirmationForSubscriptionError,
+    InvalidConfirmationForAddressChangeError,
+    InvalidConfirmationForUnsubscriptionError,
+    SubscriptionNotAllowedError
 };
 
 function deserialize(errorObj) {

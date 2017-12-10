@@ -226,11 +226,30 @@ app.use((req, res, next) => {
     });
 });
 
+// Endpoint under /api are authenticated by access token
+app.all('/api/*', passport.authByPanelToken);
+
+
+// Marks the following endpoint to return JSON object when error occurs
+app.all('/api/*', (req, res, next) => {
+    req.needsAPIJSONResponse = true;
+    next();
+});
+
+app.all('/rest/*', (req, res, next) => {
+    req.needsRESTJSONResponse = true;
+    next();
+});
+
+
+// Initializes the request context to be used for authorization
 app.use((req, res, next) => {
     req.context = contextHelpers.getRequestContext(req);
     next();
 });
 
+
+// Regular endpoints
 app.use('/', routes);
 app.use('/lists', lists);
 app.use('/templates', templates);
@@ -244,10 +263,13 @@ app.use('/triggers', triggers);
 app.use('/webhooks', webhooks);
 app.use('/subscription', subscription);
 app.use('/archive', archive);
-app.use('/api', api);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
+
+
+// API endpoints
+app.use('/api', api);
 
 
 if (config.reports && config.reports.enabled === true) {
@@ -267,11 +289,7 @@ if (config.reports && config.reports.enabled === true) {
 }
 /* ------------------------------------------------------------------- */
 
-app.all('/rest/*', (req, res, next) => {
-    req.needsJSONResponse = true;
-    next();
-});
-
+// REST endpoints
 app.use('/rest', namespacesRest);
 app.use('/rest', usersRest);
 app.use('/rest', accountRest);
@@ -289,6 +307,7 @@ if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportsRest);
 }
 
+
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
     let err = new Error(_('Not Found'));
@@ -296,8 +315,8 @@ app.use((req, res, next) => {
     next(err);
 });
 
-// error handlers
 
+// Error handlers
 if (app.get('env') === 'development') {
     // development error handler
     // will print stacktrace
@@ -306,7 +325,7 @@ if (app.get('env') === 'development') {
             return next();
         }
 
-        if (req.needsJSONResponse) {
+        if (req.needsRESTJSONResponse) {
             const resp = {
                 message: err.message,
                 error: err
@@ -318,6 +337,14 @@ if (app.get('env') === 'development') {
             }
 
             res.status(err.status || 500).json(resp);
+
+        } else if (req.needsAPIJSONResponse) {
+            const resp = {
+                error: err.message || err,
+                data: []
+            };
+
+            return status(err.status || 500).json(resp);
 
         } else {
             if (err instanceof interoperableErrors.NotLoggedInError) {
@@ -342,7 +369,7 @@ if (app.get('env') === 'development') {
         }
 
         console.log(err);
-        if (req.needsJSONResponse) {
+        if (req.needsRESTJSONResponse) {
             const resp = {
                 message: err.message,
                 error: {}
@@ -355,7 +382,17 @@ if (app.get('env') === 'development') {
 
             res.status(err.status || 500).json(resp);
 
+        } else if (req.needsAPIJSONResponse) {
+            const resp = {
+                error: err.message || err,
+                data: []
+            };
+
+            return status(err.status || 500).json(resp);
+
         } else {
+            // TODO: Render interoperable errors using a special client that does internationalization of the error message
+
             if (err instanceof interoperableErrors.NotLoggedInError) {
                 req.flash('danger', _('Need to be logged in to access restricted content'));
                 return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));

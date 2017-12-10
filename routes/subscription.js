@@ -1,28 +1,43 @@
 'use strict';
 
-let log = require('npmlog');
-let config = require('config');
-let tools = require('../lib/tools');
-let helpers = require('../lib/helpers');
-let passport = require('../lib/passport');
-let express = require('express');
-let router = new express.Router();
-let lists = require('../lib/models/lists');
-let fields = require('../lib/models/fields');
-let subscriptions = require('../lib/models/subscriptions');
-let settings = require('../lib/models/settings');
-let openpgp = require('openpgp');
-let _ = require('../lib/translate')._;
-let util = require('util');
-let cors = require('cors');
-let cache = require('memory-cache');
-let geoip = require('geoip-ultralight');
-let confirmations = require('../lib/models/confirmations');
-let mailHelpers = require('../lib/subscription-mail-helpers');
+const log = require('npmlog');
+const config = require('config');
+const router = require('../lib/router-async').create();
+const confirmations = require('../models/confirmations');
+const subscriptions = require('../models/subscriptions');
+const lists = require('../models/lists');
+const fields = require('../models/fields');
+const settings = require('../models/settings');
+const _ = require('../lib/translate')._;
+const contextHelpers = require('../lib/context-helpers');
+const forms = require('../models/forms');
 
-let originWhitelist = config.cors && config.cors.origins || [];
+const openpgp = require('openpgp');
+const util = require('util');
+const cors = require('cors');
+const cache = require('memory-cache');
+const geoip = require('geoip-ultralight');
+const passport = require('../lib/passport');
 
-let corsOptions = {
+const tools = require('../lib/tools-async');
+const helpers = require('../lib/helpers');
+const mailHelpers = require('../lib/subscription-mail-helpers');
+
+const interoperableErrors = require('../shared/interoperable-errors');
+
+const mjml = require('mjml');
+const hbs = require('hbs');
+
+const mjmlTemplates = new Map();
+const objectHash = require('object-hash');
+
+const bluebird = require('bluebird');
+const fsReadFile = bluebird.promisify(require('fs').readFile);
+
+
+const originWhitelist = config.cors && config.cors.origins || [];
+
+const corsOptions = {
     allowedHeaders: ['Content-Type', 'Origin', 'Accept', 'X-Requested-With'],
     methods: ['GET', 'POST'],
     optionsSuccessStatus: 200, // IE11 chokes on 204
@@ -30,14 +45,14 @@ let corsOptions = {
         if (originWhitelist.includes(origin)) {
             callback(null, true);
         } else {
-            let err = new Error(_('Not allowed by CORS'));
+            const err = new Error(_('Not allowed by CORS'));
             err.status = 403;
             callback(err);
         }
     }
 };
 
-let corsOrCsrfProtection = (req, res, next) => {
+const corsOrCsrfProtection = (req, res, next) => {
     if (req.get('X-Requested-With') === 'XMLHttpRequest') {
         cors(corsOptions)(req, res, next);
     } else {
@@ -45,518 +60,356 @@ let corsOrCsrfProtection = (req, res, next) => {
     }
 };
 
-function checkAndExecuteConfirmation(req, action, errorMsg, next, exec) {
-    confirmations.takeConfirmation(req.params.cid, (err, confirmation) => {
-        if (!err && (!confirmation || confirmation.action !== action)) {
-            err = new Error(_(errorMsg));
-            err.status = 404;
-        }
+async function takeConfirmationAndValidate(req, action, errorFactory) {
+    const confirmation = await confirmations.takeConfirmation(req.params.cid);
 
-        if (err) {
-            return next(err);
-        }
+    if (!confirmation || confirmation.action !== action) {
+        throw errorFactory();
+    }
 
-        lists.get(confirmation.listId, (err, list) => {
-            if (!err && !list) {
-                err = new Error(_('Selected list not found'));
-                err.status = 404;
-            }
-
-            if (err) {
-                return next(err);
-            }
-
-            exec(confirmation, list);
-        });
-    });
+    return confirmation;
 }
 
-router.get('/confirm/subscribe/:cid', (req, res, next) => {
-    checkAndExecuteConfirmation(req, 'subscribe', 'Request invalid or already completed. If your subscription request is still pending, please subscribe again.', next, (confirmation, list) => {
-        const data = confirmation.data;
-        let optInCountry = geoip.lookupCountry(confirmation.ip) || null;
+async function injectCustomFormData(customFormId, viewKey, data) {
+    function sortAndFilterCustomFieldsBy(key) {
+        data.customFields = data.customFields.filter(fld => fld[key] !== null);
+        data.customFields.sort((a, b) => a[key] - b[key]);
+    }
 
-        const meta = {
-            cid: req.params.cid,
-            email: data.email,
-            optInIp: confirmation.ip,
-            optInCountry,
-            status: subscriptions.Status.SUBSCRIBED
-        };
+    if (viewKey === 'web_subscribe') {
+        sortAndFilterCustomFieldsBy('order_subscribe');
+    } else if (viewKey === 'web_manage') {
+        sortAndFilterCustomFieldsBy('order_manage');
+    }
 
-        subscriptions.insert(list.id, meta, data.subscriptionData, (err, result) => {
-            if (err) {
-                return next(err);
-            }
+    if (!customFormId) {
+        data.formInputStyle = '@import url(/subscription/form-input-style.css);';
+        return;
+    }
 
-            if (!result.entryId) {
-                return next(new Error(_('Could not save subscription')));
-            }
+    const form = await forms.getById(contextHelpers.getAdminContext(), customFormId);
 
-            subscriptions.getById(list.id, result.entryId, (err, subscription) => {
-                if (err) {
-                    return next(err);
-                }
+    data.template.template = form[viewKey] || data.template.template;
+    data.template.layout = form.layout || data.template.layout;
+    data.formInputStyle = form.formInputStyle || '@import url(/subscription/form-input-style.css);';
 
-                mailHelpers.sendSubscriptionConfirmed(list, data.email, subscription, err => {
-                    if (err) {
-                        return next(err);
-                    }
+    const configItems = await settings.get(['ua_code']);
 
-                    res.redirect('/subscription/' + list.cid + '/subscribed-notice');
-                });
-            });
+    data.uaCode = configItems.uaCode;
+    data.customSubscriptionScripts = config.customsubscriptionscripts || [];
+}
+
+async function getMjmlTemplate(template) {
+    let key = (typeof template === 'object') ? objectHash(template) : template;
+
+    if (mjmlTemplates.has(key)) {
+        return mjmlTemplates.get(key);
+    }
+
+    let source;
+    if (typeof template === 'object') {
+        source = await tools.mergeTemplateIntoLayout(template.template, template.layout);
+    } else {
+        source = await fsReadFile(path.join(__dirname, '..', 'views', template), 'utf-8');
+    }
+
+    const compiled = mjml.mjml2html(source);
+
+    if (compiled.errors.length) {
+        throw new Error(compiled.errors[0].message || compiled.errors[0]);
+    }
+
+    const renderer = hbs.handlebars.compile(compiled.html);
+    mjmlTemplates.set(key, renderer);
+
+    return renderer;
+}
+
+function captureFlashMessages(req, res) {
+    return new Promise((resolve, reject) => {
+        res.render('subscription/capture-flash-messages', { layout: null }, (err, flash) => {
+            reject(err);
+            resolve(flash);
         });
-    });
+    })
+}
+
+
+
+router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
+    const confirmation = await takeConfirmationAndValidate(req, 'subscribe', () => new interoperableErrors.InvalidConfirmationForSubscriptionError('Request invalid or already completed. If your subscription request is still pending, please subscribe again.'));
+    const subscription = confirmation.data;
+
+    const meta = {
+        cid: req.params.cid,
+        ip: confirmation.ip,
+        country: geoip.lookupCountry(confirmation.ip) || null
+    };
+
+    subscription.status = SubscriptionStatus.SUBSCRIBED;
+
+    await subscriptions.create(contextHelpers.getAdminContext(), confirmation.list, subscription, meta);
+
+    const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
+    await mailHelpers.sendSubscriptionConfirmed(list, subscription.email, subscription);
+
+    res.redirect('/subscription/' + list.cid + '/subscribed-notice');
 });
 
-router.get('/confirm/change-address/:cid', (req, res, next) => {
-    checkAndExecuteConfirmation(req, 'change-address', 'Request invalid or already completed. If your address change request is still pending, please change the address again.', next, (confirmation, list) => {
-        const data = confirmation.data;
 
-        if (!data.subscriptionId) { // Something went terribly wrong and we don't have data that we have originally provided
-            return next(new Error(_('Subscriber info corrupted or missing')));
-        }
+router.getAsync('/confirm/change-address/:cid', async (req, res) => {
+    const confirmation = await takeConfirmationAndValidate(req, 'change-address', () => new interoperableErrors.InvalidConfirmationForAddressChangeError('Request invalid or already completed. If your address change request is still pending, please change the address again.'));
+    const data = confirmation.data;
 
-        subscriptions.updateAddress(list.id, data.subscriptionId, data.emailNew, err => {
-            if (err) {
-                return next(err);
-            }
+    const subscription = await subscriptions.updateAddressAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionId, data.emailNew);
 
-            subscriptions.getById(list.id, data.subscriptionId, (err, subscription) => {
-                if (err) {
-                    return next(err);
-                }
+    await mailHelpers.sendSubscriptionConfirmed(list, data.emailNew, subscription);
 
-                mailHelpers.sendSubscriptionConfirmed(list, data.emailNew, subscription, err => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    req.flash('info', _('Email address changed'));
-                    res.redirect('/subscription/' + list.cid + '/manage/' + subscription.cid);
-                });
-            });
-        });
-    });
+    req.flash('info', _('Email address changed'));
+    res.redirect('/subscription/' + list.cid + '/manage/' + subscription.cid);
 });
 
-router.get('/confirm/unsubscribe/:cid', (req, res, next) => {
-    checkAndExecuteConfirmation(req, 'unsubscribe', 'Request invalid or already completed. If your unsubscription request is still pending, please unsubscribe again.', next, (confirmation, list) => {
-        const data = confirmation.data;
 
-        subscriptions.changeStatus(list.id, confirmation.data.subscriptionId, confirmation.data.campaignId, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
-            if (err) {
-                return next(err);
-            }
+router.getAsync('/confirm/unsubscribe/:cid', async (req, res) => {
+    const confirmation = await takeConfirmationAndValidate(req, 'unsubscribe', () => new interoperableErrors.InvalidConfirmationForUnsubscriptionError('Request invalid or already completed. If your unsubscription request is still pending, please unsubscribe again.'));
+    const data = confirmation.data;
 
-            // TODO: Shall we do anything with "found"?
+    const subscription = await subscriptions.unsubscribeAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionId);
 
-            subscriptions.getById(list.id, confirmation.data.subscriptionId, (err, subscription) => {
-                if (err) {
-                    return next(err);
-                }
+    await mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription);
 
-                mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
-                });
-            });
-        });
-    });
+    res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
 });
 
-router.get('/:cid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err) {
-            if (!list) {
-                err = new Error(_('Selected list not found'));
-                err.status = 404;
-            } else if (!list.publicSubscribe) {
-                err = new Error(_('The list does not allow public subscriptions.'));
-                err.status = 403;
-            }
-        }
 
-        if (err) {
-            return next(err);
-        }
+router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.cid);
 
-        // TODO: process subscriber cid param for resubscription requests
+    if (!list.publicSubscribe) {
+        throw new interoperableErrors.SubscriptionNotAllowedError('The list does not allow public subscriptions.');
+    }
 
-        let data = tools.convertKeys(req.query, {
-            skip: ['layout']
-        });
-        data.layout = 'subscription/layout';
-        data.title = list.name;
-        data.cid = list.cid;
-        data.csrfToken = req.csrfToken();
+    const ucid = req.query.cid;
 
+    const data = {};
+    data.layout = 'subscription/layout';
+    data.title = list.name;
+    data.cid = list.cid;
+    data.csrfToken = req.csrfToken();
 
-        function nextStep() {
-            fields.list(list.id, (err, fieldList) => {
-                if (err && !fieldList) {
-                    fieldList = [];
-                }
+    let subscription;
+    if (ucid) {
+        subscription = await subscriptions.getById(contextHelpers.getAdminContext(), list.id, ucid);
+    }
 
-                data.customFields = fields.getRow(fieldList, data);
-                data.useEditor = true;
+    data.customFields = fields.getRow(contextHelpers.getAdminContext(), list.id, subscription);
+    data.useEditor = true;
 
-                settings.list(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-                    if (err) {
-                        return next(err);
-                    }
-                    data.hasPubkey = !!configItems.pgpPrivateKey;
-                    data.defaultAddress = configItems.defaultAddress;
-                    data.defaultPostaddress = configItems.defaultPostaddress;
+    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress']);
+    data.hasPubkey = !!configItems.pgpPrivateKey;
+    data.defaultAddress = configItems.defaultAddress;
+    data.defaultPostaddress = configItems.defaultPostaddress;
 
-                    data.template = {
-                        template: 'subscription/web-subscribe.mjml.hbs',
-                        layout: 'subscription/layout.mjml.hbs'
-                    };
+    data.template = {
+        template: 'subscription/web-subscribe.mjml.hbs',
+        layout: 'subscription/layout.mjml.hbs'
+    };
 
-                    helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data, (err, data) => {
-                        if (err) {
-                            return next(err);
-                        }
+    await injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data);
 
-                        helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                            if (err) {
-                                return next(err);
-                            }
+    const htmlRenderer = await getMjmlTemplate(data.template);
 
-                            helpers.captureFlashMessages(req, res, (err, flash) => {
-                                if (err) {
-                                    return next(err);
-                                }
+    data.isWeb = true;
+    data.needsJsWarning = true;
+    data.flashMessages = await captureFlashMessages(res);
 
-                                data.isWeb = true;
-                                data.needsJsWarning = true;
-                                data.flashMessages = flash;
-                                res.send(htmlRenderer(data));
-                            });
-                        });
-                    });
-                });
-            });
-        }
-
-
-        const ucid = req.query.cid;
-        if (ucid) {
-            subscriptions.get(list.id, ucid, (err, subscription) => {
-                if (err) {
-                    return next(err);
-                }
-
-                for (let key in subscription) {
-                    if (!(key in data)) {
-                        data[key] = subscription[key];
-                    }
-                }
-
-                nextStep();
-            });
-        } else {
-            nextStep();
-        }
-    });
+    res.send(htmlRenderer(data));
 });
+
 
 router.options('/:cid/widget', cors(corsOptions));
 
-router.get('/:cid/widget', cors(corsOptions), (req, res, next) => {
-    let cached = cache.get(req.path);
+router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
+    req.needsAPIJSONResponse = true;
+
+    const cached = cache.get(req.path);
     if (cached) {
         return res.status(200).json(cached);
     }
 
-    let sendError = err => {
-        res.status(err.status || 500);
-        res.json({
-            error: err.message || err
-        });
+    const list = await lists.getByCid(req.params.cid);
+
+    const configItems = settings.get(['serviceUrl', 'pgpPrivateKey']);
+
+    const data = {
+        title: list.name,
+        cid: list.cid,
+        serviceUrl: configItems.serviceUrl,
+        hasPubkey: !!configItems.pgpPrivateKey,
+        customFields: fields.getRow(contextHelpers.getAdminContext(), list.id),
+        template: {},
+        layout: null,
     };
 
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
+    await injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data);
+
+    const renderAsync = bluebird.promisify(res.render);
+    const html = await renderAsync('subscription/widget-subscribe', data);
+
+    const response = {
+        data: {
+            title: data.title,
+            cid: data.cid,
+            html
         }
+    };
 
-        if (err) {
-            return sendError(err);
-        }
-
-        fields.list(list.id, (err, fieldList) => {
-            if (err && !fieldList) {
-                fieldList = [];
-            }
-
-            settings.list(['serviceUrl', 'pgpPrivateKey'], (err, configItems) => {
-                if (err) {
-                    return sendError(err);
-                }
-
-                let data = {
-                    title: list.name,
-                    cid: list.cid,
-                    serviceUrl: configItems.serviceUrl,
-                    hasPubkey: !!configItems.pgpPrivateKey,
-                    customFields: fields.getRow(fieldList),
-                    template: {},
-                    layout: null,
-                };
-
-                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data, (err, data) => {
-                    if (err) {
-                        return sendError(err);
-                    }
-
-                    res.render('subscription/widget-subscribe', data, (err, html) => {
-                        if (err) {
-                            return sendError(err);
-                        }
-
-                        let response = {
-                            data: {
-                                title: data.title,
-                                cid: data.cid,
-                                html
-                            }
-                        };
-
-                        cache.put(req.path, response, 30000); // ms
-                        res.status(200).json(response);
-                    });
-                });
-            });
-        });
-    });
+    cache.put(req.path, response, 30000); // ms
+    res.status(200).json(response);
 });
+
 
 router.options('/:cid/subscribe', cors(corsOptions));
 
-router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, res, next) => {
-    let sendJsonError = (err, status) => {
-        res.status(status || err.status || 500);
-        res.json({
-            error: err.message || err
-        });
-    };
+router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, async (req, res) => {
+    const email = (req.body.email || '').toString().trim();
 
-    let email = (req.body.email || '').toString().trim();
+    if (req.xhr) {
+        req.needsAPIJSONResponse = true;
+    }
+
 
     if (!email) {
         if (req.xhr) {
-            return sendJsonError(_('Email address not set'), 400);
+            throw new Error('Email address not set');
         }
+
         req.flash('danger', _('Email address not set'));
         return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
     }
 
-    tools.validateEmail(email, false, err => {
-        if (err) {
-            if (req.xhr) {
-                return sendJsonError(err.message, 400);
-            }
-            req.flash('danger', err.message);
-            return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+    const emailErr = await tools.validateEmail(email);
+    if (emailErr) {
+        if (req.xhr) {
+            throw new Error(emailErr.message);
         }
 
-        // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
-        // the subscriber has JavaScript turned on and thats it. If Mailtrain gets more targeted then this
-        // simple check should be replaced with an actual captcha
-        let subTime = Number(req.body.sub) || 0;
-        // allow clock skew 24h in the past and 24h to the future
-        let subTimeTest = !!(subTime > Date.now() - 24 * 3600 * 1000 && subTime < Date.now() + 24 * 3600 * 1000);
-        let addressTest = !req.body.address;
-        let testsPass = subTimeTest && addressTest;
+        req.flash('danger', emailErr.message);
+        return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+    }
 
-        lists.getByCid(req.params.cid, (err, list) => {
-            if (!err) {
-                if (!list) {
-                    err = new Error(_('Selected list not found'));
-                    err.status = 404;
-                } else if (!list.publicSubscribe) {
-                    err = new Error(_('The list does not allow public subscriptions.'));
-                    err.status = 403;
-                }
-            }
+    // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
+    // the subscriber has JavaScript turned on and thats it. If Mailtrain gets more targeted then this
+    // simple check should be replaced with an actual captcha
+    let subTime = Number(req.body.sub) || 0;
+    // allow clock skew 24h in the past and 24h to the future
+    let subTimeTest = !!(subTime > Date.now() - 24 * 3600 * 1000 && subTime < Date.now() + 24 * 3600 * 1000);
+    let addressTest = !req.body.address;
+    let testsPass = subTimeTest && addressTest;
 
-            if (err) {
-                return req.xhr ? sendJsonError(err) : next(err);
-            }
+    const list = await lists.getByCid(req.params.cid);
 
-            let subscriptionData = {};
-            Object.keys(req.body).forEach(key => {
-                if (key !== 'email' && key.charAt(0) !== '_') {
-                    subscriptionData[key] = (req.body[key] || '').toString().trim();
-                }
-            });
-            subscriptionData = tools.convertKeys(subscriptionData);
+    if (!list.publicSubscribe) {
+        throw new interoperableErrors.SubscriptionNotAllowedError('The list does not allow public subscriptions.');
+    }
 
-            subscriptions.getByEmail(list.id, email, (err, subscription) => {
-                if (err) {
-                    return req.xhr ? sendJsonError(err) : next(err);
-                }
 
-                if (subscription && subscription.status === subscriptions.Status.SUBSCRIBED) {
-                    mailHelpers.sendAlreadySubscribed(list, email, subscription, (err) => {
-                        if (err) {
-                            return req.xhr ? sendJsonError(err) : next(err);
-                        }
-                        res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
-                    });
-                } else {
-                    const data = {
-                        email,
-                        subscriptionData
-                    };
-
-                    confirmations.addConfirmation(list.id, 'subscribe', req.ip, data, (err, confirmCid) => {
-                        if (err) {
-                            if (req.xhr) {
-                                return sendJsonError(err);
-                            }
-                            req.flash('danger', err.message || err);
-                            return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
-                        }
-
-                        function sendWebResponse() {
-                            if (req.xhr) {
-                                return res.status(200).json({
-                                    msg: _('Please Confirm Subscription')
-                                });
-                            }
-                            res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
-                        }
-
-                        if (!testsPass) {
-                            log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
-                            sendWebResponse();
-                        } else {
-                            mailHelpers.sendConfirmSubscription(list, email, confirmCid, subscriptionData, (err) => {
-                                if (err) {
-                                    return req.xhr ? sendJsonError(err) : sendWebResponse(err);
-                                }
-                                sendWebResponse();
-                            })
-                        }
-                    });
-                }
-            });
-        });
+    let subscriptionData = {};
+    Object.keys(req.body).forEach(key => {
+        if (key !== 'email' && key.charAt(0) !== '_') {
+            subscriptionData[key] = (req.body[key] || '').toString().trim();
+        }
     });
+
+    const subscription = subscriptions.getByEmail(list.id, email)
+
+    if (subscription && subscription.status === subscriptions.Status.SUBSCRIBED) {
+        await mailHelpers.sendAlreadySubscribed(list, email, subscription);
+        res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
+
+    } else {
+        const data = {
+            email,
+            subscriptionData
+        };
+
+        const confirmCid = await confirmations.addConfirmation(list.id, 'subscribe', req.ip, data);
+
+        if (!testsPass) {
+            log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
+        } else {
+            await mailHelpers.sendConfirmSubscription(list, email, confirmCid, subscriptionData);
+        }
+
+        if (req.xhr) {
+            return res.status(200).json({
+                msg: _('Please Confirm Subscription')
+            });
+        }
+        res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
+    }
 });
 
-router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
+router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.lcid);
+    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid);
 
+    if (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED) {
+        throw new Error(_('Subscription not found in this list'));
+    }
+
+    subscription.lcid = req.params.lcid;
+    subscription.title = list.name;
+    subscription.csrfToken = req.csrfToken();
+    subscription.layout = 'subscription/layout';
+
+    subscription.customFields = await fields.getRow(contextHelpers.getAdminContext(), list.id, subscription);
+
+    subscription.useEditor = true;
+
+    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress']);
+    subscription.hasPubkey = !!configItems.pgpPrivateKey;
+    subscription.defaultAddress = configItems.defaultAddress;
+    subscription.defaultPostaddress = configItems.defaultPostaddress;
+
+    subscription.template = {
+        template: 'subscription/web-manage.mjml.hbs',
+        layout: 'subscription/layout.mjml.hbs'
+    };
+
+    await injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-manage', subscription);
+
+    const htmlRenderer = await getMjmlTemplate(data.template);
+
+    data.isWeb = true;
+    data.needsJsWarning = true;
+    data.isManagePreferences = true;
+    data.flashMessages = await captureFlashMessages(res);
+
+    res.send(htmlRenderer(data));
+});
+
+router.postAsync('/:lcid/manage', passport.parseForm, passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.lcid);
+    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.body.cid);
+
+    if (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED) {
+        throw new Error(_('Subscription not found in this list'));
+    }
+
+
+    delete req.body.email; // email change is not allowed
+    delete req.body.status; // status change is not allowed
+
+    // FIXME - az sem
+    // FIXME, allow update of only fields that have order_manage
+
+    await subscriptions.updateWithConsistencyCheck(contextHelpers.getAdminContext(), list.id, subscription)
+    subscriptions.update(list.id, subscription.cid, req.body, false, err => {
         if (err) {
             return next(err);
         }
-
-        fields.list(list.id, (err, fieldList) => {
-            if (err) {
-                return next(err);
-            }
-            subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-                if (!err && (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED)) {
-                    err = new Error(_('Subscription not found in this list'));
-                    err.status = 404;
-                }
-
-                if (err) {
-                    return next(err);
-                }
-
-                subscription.lcid = req.params.lcid;
-                subscription.title = list.name;
-                subscription.csrfToken = req.csrfToken();
-                subscription.layout = 'subscription/layout';
-
-                subscription.customFields = fields.getRow(fieldList, subscription);
-
-                subscription.useEditor = true;
-
-                settings.list(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-                    if (err) {
-                        return next(err);
-                    }
-                    subscription.hasPubkey = !!configItems.pgpPrivateKey;
-                    subscription.defaultAddress = configItems.defaultAddress;
-                    subscription.defaultPostaddress = configItems.defaultPostaddress;
-
-                    subscription.template = {
-                        template: 'subscription/web-manage.mjml.hbs',
-                        layout: 'subscription/layout.mjml.hbs'
-                    };
-
-                    helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-manage', subscription, (err, data) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            helpers.captureFlashMessages(req, res, (err, flash) => {
-                                if (err) {
-                                    return next(err);
-                                }
-
-                                data.isWeb = true;
-                                data.needsJsWarning = true;
-                                data.isManagePreferences = true;
-                                data.flashMessages = flash;
-                                res.send(htmlRenderer(data));
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-});
-
-router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
-
-        if (err) {
-            return next(err);
-        }
-
-        subscriptions.get(list.id, req.body.cid, (err, subscription) => {
-            if (!err && (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED)) {
-                err = new Error(_('Subscription not found in this list'));
-                err.status = 404;
-            }
-
-            if (err) {
-                return next(err);
-            }
-
-            subscriptions.update(list.id, subscription.cid, req.body, false, err => {
-                if (err) {
-                    return next(err);
-                }
-                res.redirect('/subscription/' + req.params.lcid + '/updated-notice');
-            });
-        });
+        res.redirect('/subscription/' + req.params.lcid + '/updated-notice');
     });
 });
 

@@ -11,7 +11,7 @@ router.postAsync('/lists-table', passport.loggedIn, async (req, res) => {
 });
 
 router.getAsync('/lists/:listId', passport.loggedIn, async (req, res) => {
-    const list = await lists.getById(req.context, req.params.listId);
+    const list = await lists.getByIdWithListFields(req.context, req.params.listId);
     list.hash = lists.hash(list);
     return res.json(list);
 });

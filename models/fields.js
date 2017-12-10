@@ -7,7 +7,6 @@ const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
-const bluebird = require('bluebird');
 const validators = require('../shared/validators');
 const shortid = require('shortid');
 const segments = require('./segments');
@@ -154,7 +153,7 @@ async function listTx(tx, listId) {
 
 async function list(context, listId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['manageFields', 'manageSegments']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageFields', 'manageSegments']);
         return await listTx(tx, listId);
     });
 }
@@ -193,6 +192,7 @@ async function listGroupedTx(tx, listId) {
 
 async function listGrouped(context, listId) {
     return await knex.transaction(async tx => {
+        // It may seem odd why there is not 'manageFields' here. But it's just a result of strictly apply the "need-to-know" principle. Simply, at this point this function is needed only in managing subscriptions.
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['manageSubscriptions']);
         return await listGroupedTx(tx, listId);
     });
@@ -474,6 +474,32 @@ async function removeAllByListIdTx(tx, context, listId) {
     }
 }
 
+async function getRow(context, listId, subscription) {
+    const customFields = [{
+        name: 'Email Address',
+        column: 'email',
+        typeSubscriptionEmail: true,
+        value: subscription ? subscription.email : '',
+        order_subscribe: -1,
+        order_manage: -1
+    }];
+
+    const flds = await list(context, listId);
+
+    for (const fld of flds) {
+        if (fld.column) {
+            customFields.push({
+                name: fld.name,
+                column: fld.column,
+                ['type' + fld.type.replace(/(?:^|-)([a-z])/g, (m, c) => c.toUpperCase())]: true,
+                value: subscription ? subscription[fld.column] : ''
+            });
+        }
+    }
+
+    return customFields;
+}
+
 // This is to handle circular dependency with segments.js
 Object.assign(module.exports, {
     Cardinality,
@@ -491,5 +517,6 @@ Object.assign(module.exports, {
     updateWithConsistencyCheck,
     remove,
     removeAllByListIdTx,
-    serverValidate
+    serverValidate,
+    getRow
 });

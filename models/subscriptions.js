@@ -191,17 +191,30 @@ async function hashByList(listId, entity) {
     });
 }
 
-async function getById(context, listId, id) {
+async function _getBy(context, listId, key, value) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const entity = await tx(getTableName(listId)).where('id', id).first();
+        const entity = await tx(getTableName(listId)).where(key, value).first();
 
         const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
         groupSubscription(groupedFieldsMap, entity);
 
         return entity;
     });
+}
+
+
+async function getById(context, listId, id) {
+    return await _getBy(context, listId, 'id', id);
+}
+
+async function getByEmail(context, listId, email) {
+    return await _getBy(context, listId, 'email', email);
+}
+
+async function getByCid(context, listId, cid) {
+    return await _getBy(context, listId, 'cid', cid);
 }
 
 async function listDTAjax(context, listId, segmentId, params) {
@@ -369,7 +382,7 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, isCr
     }
 }
 
-async function create(context, listId, entity) {
+async function create(context, listId, entity, meta = {}) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
@@ -384,10 +397,9 @@ async function create(context, listId, entity) {
 
         ungroupSubscription(groupedFieldsMap, filteredEntity);
 
-        // FIXME - process:
-        // filteredEntity.opt_in_ip =
-        // filteredEntity.opt_in_country =
-        // filteredEntity.imported =
+        filteredEntity.opt_in_ip = meta.ip;
+        filteredEntity.opt_in_country = meta.country;
+        filteredEntity.imported = meta.imported || false;
 
         const ids = await tx(getTableName(listId)).insert(filteredEntity);
         const id = ids[0];
@@ -466,35 +478,58 @@ async function remove(context, listId, id) {
     });
 }
 
-async function unsubscribe(context, listId, id) {
-    await knex.transaction(async tx => {
+async function unsubscribeAndGet(context, listId, subscriptionId) {
+    return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const existing = await tx(getTableName(listId)).where('id', id).first();
+        const existing = await tx(getTableName(listId)).where('id', subscriptionId).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
         if (existing.status === SubscriptionStatus.SUBSCRIBED) {
-            await tx(getTableName(listId)).where('id', id).update({
+            existing.status = SubscriptionStatus.UNSUBSCRIBED;
+
+            await tx(getTableName(listId)).where('id', subscriptionId).update({
                 status: SubscriptionStatus.UNSUBSCRIBED
             });
 
             await tx('lists').where('id', listId).decrement('subscribers', 1);
         }
+
+        return existing;
     });
 }
 
+async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
+        const existing = await tx(getTableName(listId)).where('id', subscriptionId).first();
+        if (!existing) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        await tx(getTableName(listId)).where('id', subscriptionId).update({
+            email: emailNew
+        });
+
+        existing.email = emailNew;
+        return existing;
+    });
+}
 
 module.exports = {
     hashByList,
     getById,
+    getByCid,
+    getByEmail,
     list,
     listDTAjax,
     serverValidate,
     create,
     updateWithConsistencyCheck,
     remove,
-    unsubscribe
+    unsubscribeAndGet,
+    updateAddressAndGet
 };

@@ -32,12 +32,36 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function _getByIdTx(tx, context, id) {
+    shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
+    const entity = await tx('lists').where('id', id).first();
+    entity.permissions = await shares.getPermissionsTx(tx, context, 'list', id);
+    return entity;
+}
+
 async function getById(context, id) {
     return await knex.transaction(async tx => {
-        shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
-        const entity = await tx('lists').where('id', id).first();
-        entity.permissions = await shares.getPermissionsTx(tx, context, 'list', id);
+        return _getByIdTx(tx, context, id);
+    });
+}
+
+async function getByIdWithListFields(context, id) {
+    return await knex.transaction(async tx => {
+        const entity = _getByIdTx(tx, context, id);
         entity.listFields = await fields.listByOrderListTx(tx, id);
+        return entity;
+    });
+}
+
+async function getByCid(context, cid) {
+    return await knex.transaction(async tx => {
+        const entity = await tx('lists').where('cid', cid).first();
+        if (!entity) {
+            shares.throwPermissionDenied();
+        }
+
+        shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'view');
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'list', entity.id);
         return entity;
     });
 }
@@ -116,6 +140,8 @@ module.exports = {
     hash,
     listDTAjax,
     getById,
+    getByIdWithListFields,
+    getByCid,
     create,
     updateWithConsistencyCheck,
     remove,
