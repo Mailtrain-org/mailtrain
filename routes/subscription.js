@@ -95,7 +95,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
     data.template.layout = form.layout || data.template.layout;
     data.formInputStyle = form.formInputStyle || '@import url(/subscription/form-input-style.css);';
 
-    const configItems = await settings.get(['ua_code']);
+    const configItems = await settings.get(['uaCode']);
 
     data.uaCode = configItems.uaCode;
     data.customSubscriptionScripts = config.customsubscriptionscripts || [];
@@ -243,7 +243,7 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
 
     const list = await lists.getByCid(req.params.cid);
 
-    const configItems = settings.get(['serviceUrl', 'pgpPrivateKey']);
+    const configItems = await settings.get(['serviceUrl', 'pgpPrivateKey']);
 
     const data = {
         title: list.name,

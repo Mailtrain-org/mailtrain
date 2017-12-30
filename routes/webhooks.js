@@ -1,10 +1,12 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 let express = require('express');
 let router = new express.Router();
 let request = require('request');
 let campaigns = require('../lib/models/campaigns');
-let settings = require('../lib/models/settings');
 let log = require('npmlog');
 let multer = require('multer');
 let uploads = multer();
@@ -293,7 +295,7 @@ router.post('/zone-mta/sender-config', (req, res) => {
             error: 'api_token value not set'
         });
     }
-    settings.list(['dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain'], (err, configItems) => {
+    getSettings(['dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain'], (err, configItems) => {
         if (err) {
             return res.json({
                 error: err.message

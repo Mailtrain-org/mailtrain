@@ -1,8 +1,10 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 let log = require('npmlog');
 let config = require('config');
-let settings = require('../lib/models/settings');
 let campaigns = require('../lib/models/campaigns');
 let BounceHandler = require('bounce-handler').BounceHandler;
 let SMTPServer = require('smtp-server').SMTPServer;
@@ -19,7 +21,7 @@ let server = new SMTPServer({
 
     onRcptTo: (address, session, callback) => {
 
-        settings.list(['verpHostname'], (err, configItems) => {
+        getSettings(['verpHostname'], (err, configItems) => {
             if (err) {
                 err = new Error('Failed to load configuration');
                 err.responseCode = 421;

@@ -1,7 +1,9 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 let links = require('../lib/models/links');
-let settings = require('../lib/models/settings');
 let lists = require('../lib/models/lists');
 let subscriptions = require('../lib/models/subscriptions');
 let tools = require('../lib/tools');
@@ -78,7 +80,7 @@ router.get('/:campaign/:list/:subscription/:link', (req, res) => {
                 return notFound();
             }
 
-            settings.get('serviceUrl', (err, serviceUrl) => {
+            getSettings('serviceUrl', (err, serviceUrl) => {
                 if (err) {
                     // ignore
                 }

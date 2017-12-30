@@ -5,6 +5,8 @@ const log = require('npmlog');
 
 const _ = require('./lib/translate')._;
 
+const { nodeifyFunction } = require('./lib/nodeify');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -23,8 +25,8 @@ const contextHelpers = require('./lib/context-helpers');
 
 const routes = require('./routes/index');
 const lists = require('./routes/lists-legacy');
-const settings = require('./routes/settings');
-const settingsModel = require('./lib/models/settings');
+//const settings = require('./routes/settings');
+const getSettings = nodeifyFunction(require('./models/settings').get);
 const templates = require('./routes/templates');
 const campaigns = require('./routes/campaigns');
 const links = require('./routes/links');
@@ -215,7 +217,7 @@ app.use((req, res, next) => {
     }
     res.locals.bodyClass = bodyClasses.join(' ');
 
-    settingsModel.list(['ua_code', 'shoutout'], (err, configItems) => {
+    getSettings(['uaCode', 'shoutout'], (err, configItems) => {
         if (err) {
             return next(err);
         }
@@ -227,7 +229,7 @@ app.use((req, res, next) => {
 });
 
 // Endpoint under /api are authenticated by access token
-app.all('/api/*', passport.authByPanelToken);
+app.all('/api/*', passport.authByAccessToken);
 
 
 // Marks the following endpoint to return JSON object when error occurs
@@ -254,7 +256,7 @@ app.use('/', routes);
 app.use('/lists', lists);
 app.use('/templates', templates);
 app.use('/campaigns', campaigns);
-app.use('/settings', settings);
+//app.use('/settings', settings);
 app.use('/links', links);
 app.use('/fields', fields);
 app.use('/forms', forms);

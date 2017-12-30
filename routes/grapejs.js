@@ -1,5 +1,8 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 const config = require('config');
 const express = require('express');
 const router = new express.Router();
@@ -7,8 +10,8 @@ const passport = require('../lib/passport');
 const _ = require('../lib/translate')._;
 const fs = require('fs');
 const path = require('path');
-const settings = require('../lib/models/settings');
 const editorHelpers = require('../lib/editor-helpers')
+
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
@@ -19,7 +22,7 @@ router.all('/*', (req, res, next) => {
 });
 
 router.get('/editor', passport.csrfProtection, (req, res) => {
-    settings.get('serviceUrl', (err, serviceUrl) => {
+    getSettings('serviceUrl', (err, serviceUrl) => {
         if (err) {
             req.flash('danger', err.message || err);
             return res.redirect('/');

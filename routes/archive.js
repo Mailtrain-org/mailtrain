@@ -1,6 +1,8 @@
 'use strict';
 
-let settings = require('../lib/models/settings');
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 let campaigns = require('../lib/models/campaigns');
 let links = require('../lib/models/links');
 let lists = require('../lib/models/lists');
@@ -15,7 +17,7 @@ let _ = require('../lib/translate')._;
 let util = require('util');
 
 router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res, next) => {
-    settings.get('serviceUrl', (err, serviceUrl) => {
+    getSettings('serviceUrl', (err, serviceUrl) => {
         if (err) {
             req.flash('danger', err.message || err);
             return res.redirect('/');

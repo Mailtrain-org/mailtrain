@@ -1,5 +1,8 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 const log = require('npmlog');
 const config = require('config');
 const express = require('express');
@@ -23,7 +26,6 @@ const htmlToText = require('html-to-text');
 const premailerApi = require('premailer-api');
 const _ = require('../lib/translate')._;
 const mailer = require('../lib/mailer');
-const settings = require('../lib/models/settings');
 const templates = require('../lib/models/templates');
 const campaigns = require('../lib/models/campaigns');
 
@@ -224,7 +226,7 @@ const getStaticImageUrl = (dynamicUrl, staticDir, staticDirUrl, callback) => {
 };
 
 const prepareHtml = (html, editorName, callback) => {
-    settings.get('serviceUrl', (err, serviceUrl) => {
+    getSettings('serviceUrl', (err, serviceUrl) => {
         if (err) {
             return callback(err.message || err);
         }
@@ -326,7 +328,7 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
 // https://github.com/aguidrevitch/jquery-file-upload-middleware
 
 router.get('/upload', passport.csrfProtection, (req, res) => {
-    settings.get('serviceUrl', (err, serviceUrl) => {
+    getSettings('serviceUrl', (err, serviceUrl) => {
         if (err) {
             return res.status(500).send(err.message || err);
         }
@@ -358,7 +360,7 @@ router.get('/upload', passport.csrfProtection, (req, res) => {
 });
 
 router.post('/upload', passport.csrfProtection, (req, res) => {
-    settings.get('serviceUrl', (err, serviceUrl) => {
+    getSettings('serviceUrl', (err, serviceUrl) => {
         if (err) {
             return res.status(500).send(err.message || err);
         }
@@ -474,7 +476,7 @@ router.post('/test', parseGrapejsMultipartTestForm, passport.csrfProtection, (re
             return sendError(err);
         }
 
-        settings.list(['defaultAddress', 'defaultFrom'], (err, configItems) => {
+        getSettings(['defaultAddress', 'defaultFrom'], (err, configItems) => {
             if (err) {
                 return sendError(err);
             }

@@ -11,13 +11,11 @@ async function get(keyOrKeys) {
         keys = keyOrKeys;
     }
 
-    keys = keys.map(key => tools.toDbKey(key));
-
     const rows = await knex('settings').select(['key', 'value']).whereIn('key', keys);
 
     const settings = {};
     for (const row of rows) {
-        settings[tools.fromDbKey(row.key)] = row.value;
+        settings[row.key] = row.value;
     }
 
     if (!Array.isArray(keyOrKeys)) {

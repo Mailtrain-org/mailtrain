@@ -1,5 +1,8 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 let log = require('npmlog');
 let config = require('config');
 let db = require('../lib/db');
@@ -10,7 +13,6 @@ let segments = require('../lib/models/segments');
 let lists = require('../lib/models/lists');
 let blacklist = require('../lib/models/blacklist');
 let fields = require('../lib/models/fields');
-let settings = require('../lib/models/settings');
 let links = require('../lib/models/links');
 let shortid = require('shortid');
 let url = require('url');
@@ -312,7 +314,7 @@ function formatMessage(message, callback) {
                 return callback(new Error(_('List not found')));
             }
 
-            settings.list(['serviceUrl', 'verpUse', 'verpHostname'], (err, configItems) => {
+            getSettings(['serviceUrl', 'verpUse', 'verpHostname'], (err, configItems) => {
                 if (err) {
                     return callback(err);
                 }

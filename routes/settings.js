@@ -1,5 +1,7 @@
 'use strict';
 
+// FIXME: This does not work now because of missing lib/models/settings
+
 let config = require('config');
 let passport = require('../lib/passport');
 let express = require('express');

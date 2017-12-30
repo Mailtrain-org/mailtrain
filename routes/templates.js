@@ -1,10 +1,12 @@
 'use strict';
 
+const { nodeifyFunction } = require('../lib/nodeify');
+const getSettings = nodeifyFunction(require('../models/settings').get);
+
 let config = require('config');
 let express = require('express');
 let router = new express.Router();
 let templates = require('../lib/models/templates');
-let settings = require('../lib/models/settings');
 let tools = require('../lib/tools');
 let helpers = require('../lib/helpers');
 let striptags = require('striptags');
@@ -36,7 +38,7 @@ router.get('/create', passport.csrfProtection, (req, res, next) => {
     data.csrfToken = req.csrfToken();
     data.useEditor = true;
 
-    settings.list(['defaultPostaddress', 'defaultSender', 'disableWysiwyg'], (err, configItems) => {
+    getSettings(['defaultPostaddress', 'defaultSender', 'disableWysiwyg'], (err, configItems) => {
         if (err) {
             return next(err);
         }
@@ -95,7 +97,7 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
             req.flash('danger', err && err.message || err || _('Could not find template with specified ID'));
             return res.redirect('/templates');
         }
-        settings.list(['disableWysiwyg'], (err, configItems) => {
+        getSettings(['disableWysiwyg'], (err, configItems) => {
             if (err) {
                 return next(err);
             }
