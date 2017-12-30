@@ -12,6 +12,8 @@ const _ = require('../lib/translate')._;
 const contextHelpers = require('../lib/context-helpers');
 const forms = require('../models/forms');
 
+const { SubscriptionStatus } = require('../shared/lists');
+
 const openpgp = require('openpgp');
 const util = require('util');
 const cors = require('cors');
@@ -153,12 +155,13 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
     const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
     await mailHelpers.sendSubscriptionConfirmed(list, subscription.email, subscription);
 
-    res.redirect('/subscription/' + list.cid + '/subscribed-notice');
+    res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/subscribed-notice');
 });
 
 
 router.getAsync('/confirm/change-address/:cid', async (req, res) => {
     const confirmation = await takeConfirmationAndValidate(req, 'change-address', () => new interoperableErrors.InvalidConfirmationForAddressChangeError('Request invalid or already completed. If your address change request is still pending, please change the address again.'));
+    const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
     const data = confirmation.data;
 
     const subscription = await subscriptions.updateAddressAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionId, data.emailNew);
@@ -166,19 +169,20 @@ router.getAsync('/confirm/change-address/:cid', async (req, res) => {
     await mailHelpers.sendSubscriptionConfirmed(list, data.emailNew, subscription);
 
     req.flash('info', _('Email address changed'));
-    res.redirect('/subscription/' + list.cid + '/manage/' + subscription.cid);
+    res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/manage/' + subscription.cid);
 });
 
 
 router.getAsync('/confirm/unsubscribe/:cid', async (req, res) => {
     const confirmation = await takeConfirmationAndValidate(req, 'unsubscribe', () => new interoperableErrors.InvalidConfirmationForUnsubscriptionError('Request invalid or already completed. If your unsubscription request is still pending, please unsubscribe again.'));
+    const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
     const data = confirmation.data;
 
-    const subscription = await subscriptions.unsubscribeAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionId);
+    const subscription = await subscriptions.unsubscribeByCidAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionCid, data.campaignCid);
 
     await mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription);
 
-    res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
+    res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribed-notice');
 });
 
 
@@ -199,7 +203,7 @@ router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
 
     let subscription;
     if (ucid) {
-        subscription = await subscriptions.getById(contextHelpers.getAdminContext(), list.id, ucid);
+        subscription = await subscriptions.getById(contextHelpers.getAdminContext(), list.id, ucid, false);
     }
 
     data.customFields = fields.getRow(contextHelpers.getAdminContext(), list.id, subscription);
@@ -215,7 +219,7 @@ router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
         layout: 'subscription/layout.mjml.hbs'
     };
 
-    await injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
 
     const htmlRenderer = await getMjmlTemplate(data.template);
 
@@ -251,7 +255,7 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
         layout: null,
     };
 
-    await injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-subscribe', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
 
     const renderAsync = bluebird.promisify(res.render);
     const html = await renderAsync('subscription/widget-subscribe', data);
@@ -277,7 +281,6 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     if (req.xhr) {
         req.needsAPIJSONResponse = true;
     }
-
 
     if (!email) {
         if (req.xhr) {
@@ -313,7 +316,6 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         throw new interoperableErrors.SubscriptionNotAllowedError('The list does not allow public subscriptions.');
     }
 
-
     let subscriptionData = {};
     Object.keys(req.body).forEach(key => {
         if (key !== 'email' && key.charAt(0) !== '_') {
@@ -321,11 +323,11 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         }
     });
 
-    const subscription = subscriptions.getByEmail(list.id, email)
+    const subscription = subscriptions.getByEmail(list.id, email, false)
 
-    if (subscription && subscription.status === subscriptions.Status.SUBSCRIBED) {
+    if (subscription && subscription.status === SubscriptionStatus.SUBSCRIBED) {
         await mailHelpers.sendAlreadySubscribed(list, email, subscription);
-        res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
+        res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
     } else {
         const data = {
@@ -346,16 +348,16 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
                 msg: _('Please Confirm Subscription')
             });
         }
-        res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
+        res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
     }
 });
 
 router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(req.params.lcid);
-    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid);
+    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid, false);
 
-    if (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED) {
-        throw new Error(_('Subscription not found in this list'));
+    if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
     subscription.lcid = req.params.lcid;
@@ -377,7 +379,7 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
         layout: 'subscription/layout.mjml.hbs'
     };
 
-    await injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-manage', subscription);
+    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-manage', subscription);
 
     const htmlRenderer = await getMjmlTemplate(data.template);
 
@@ -391,411 +393,278 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
 
 router.postAsync('/:lcid/manage', passport.parseForm, passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(req.params.lcid);
-    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.body.cid);
+    const status = await subscriptions.getStatusByCid(contextHelpers.getAdminContext(), list.id, req.body.cid);
 
-    if (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED) {
-        throw new Error(_('Subscription not found in this list'));
+    if (status !== SubscriptionStatus.SUBSCRIBED) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
+    await subscriptions.updateManagedUngrouped(contextHelpers.getAdminContext(), list.id, req.body)
 
-    delete req.body.email; // email change is not allowed
-    delete req.body.status; // status change is not allowed
-
-    // FIXME - az sem
-    // FIXME, allow update of only fields that have order_manage
-
-    await subscriptions.updateWithConsistencyCheck(contextHelpers.getAdminContext(), list.id, subscription)
-    subscriptions.update(list.id, subscription.cid, req.body, false, err => {
-        if (err) {
-            return next(err);
-        }
-        res.redirect('/subscription/' + req.params.lcid + '/updated-notice');
-    });
+    res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/updated-notice');
 });
 
-router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
+router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.lcid);
+    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid, false);
 
-        if (err) {
-            return next(err);
-        }
+    if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+    }
 
-        settings.list(['defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-            if (err) {
-                return next(err);
-            }
+    const configItems = await settings.get(['defaultAddress', 'defaultPostaddress']);
 
-            subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-                if (!err && (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED)) {
-                    err = new Error(_('Subscription not found in this list'));
-                    err.status = 404;
-                }
+    subscription.lcid = req.params.lcid;
+    subscription.title = list.name;
+    subscription.csrfToken = req.csrfToken();
+    subscription.defaultAddress = configItems.defaultAddress;
+    subscription.defaultPostaddress = configItems.defaultPostaddress;
 
-                subscription.lcid = req.params.lcid;
-                subscription.title = list.name;
-                subscription.csrfToken = req.csrfToken();
-                subscription.defaultAddress = configItems.defaultAddress;
-                subscription.defaultPostaddress = configItems.defaultPostaddress;
+    subscription.template = {
+        template: 'subscription/web-manage-address.mjml.hbs',
+        layout: 'subscription/layout.mjml.hbs'
+    };
 
-                subscription.template = {
-                    template: 'subscription/web-manage-address.mjml.hbs',
-                    layout: 'subscription/layout.mjml.hbs'
-                };
+    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-manage-address', subscription);
 
-                helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-manage-address', subscription, (err, data) => {
-                    if (err) {
-                        return next(err);
-                    }
+    const htmlRenderer = await getMjmlTemplate(data.template);
 
-                    helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                        if (err) {
-                            return next(err);
-                        }
+    data.isWeb = true;
+    data.needsJsWarning = true;
+    data.isManagePreferences = true;
+    data.flashMessages = await captureFlashMessages(res);
 
-                        helpers.captureFlashMessages(req, res, (err, flash) => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            data.isWeb = true;
-                            data.needsJsWarning = true;
-                            data.flashMessages = flash;
-                            res.send(htmlRenderer(data));
-                        });
-                    });
-                });
-            });
-        });
-    });
+    res.send(htmlRenderer(data));
 });
 
-router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
 
-        if (err) {
-            return next(err);
-        }
+router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.lcid);
 
-        let bodyData = tools.convertKeys(req.body); // This is here to convert "email-new" to "emailNew"
-        const emailOld = (bodyData.email || '').toString().trim();
-        const emailNew = (bodyData.emailNew || '').toString().trim();
+    const emailNew = (req.body['email-new'] || '').toString().trim();
 
-        if (emailOld === emailNew) {
-            req.flash('info', _('Nothing seems to be changed'));
-            res.redirect('/subscription/' + req.params.lcid + '/manage/' + req.body.cid);
+    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.body.cid, false);
+
+    if (status !== SubscriptionStatus.SUBSCRIBED) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+    }
+
+    if (subscription.email === emailNew) {
+        req.flash('info', _('Nothing seems to be changed'));
+
+    } else {
+        const emailErr = await tools.validateEmail(emailNew);
+        if (emailErr) {
+            req.flash('danger', emailErr.message);
 
         } else {
-            subscriptions.updateAddressCheck(list, req.body.cid, emailNew, req.ip, (err, subscription, newEmailAvailable) => {
-                if (err) {
-                    return next(err);
-                }
+            const newSubscription = await subscriptions.getByEmail(contextHelpers.getAdminContext(), list.id, emailNew, false);
 
-                function sendWebResponse(err) {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    req.flash('info', _('An email with further instructions has been sent to the provided address'));
-                    res.redirect('/subscription/' + req.params.lcid + '/manage/' + req.body.cid);
-                }
-
-                if (newEmailAvailable) {
-                    const data = {
-                        subscriptionId: subscription.id,
-                        emailNew
-                    };
-
-                    confirmations.addConfirmation(list.id, 'change-address', req.ip, data, (err, confirmCid) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        mailHelpers.sendConfirmAddressChange(list, emailNew, confirmCid, subscription, sendWebResponse);
-                    });
-
-                } else {
-                    mailHelpers.sendAlreadySubscribed(list, emailNew, subscription, sendWebResponse);
-                }
-            });
-        }
-    });
-});
-
-router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
-        }
-
-        if (err) {
-            return next(err);
-        }
-
-        settings.list(['defaultAddress', 'defaultPostaddress'], (err, configItems) => {
-            if (err) {
-                return next(err);
+            if (newSubscription && newSubscription.status === SubscriptionStatus.SUBSCRIBED) {
+                await mailHelpers.sendAlreadySubscribed(list, emailNew, subscription);
+            } else {
+                const confirmCid = await confirmations.addConfirmation(list.id, 'change-address', req.ip, data);
+                await mailHelpers.sendConfirmAddressChange(list, emailNew, confirmCid, subscription, sendWebResponse);
             }
 
-            subscriptions.get(list.id, req.params.ucid, (err, subscription) => {
-                if (!err && (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED)) {
-                    err = new Error(_('Subscription not found in this list'));
-                    err.status = 404;
-                }
+            req.flash('info', _('An email with further instructions has been sent to the provided address'));
+        }
+    }
 
-                if (err) {
-                    return next(err);
-                }
-
-
-                const autoUnsubscribe = req.query.auto === 'yes';
-
-                if (autoUnsubscribe) {
-                    handleUnsubscribe(list, subscription, autoUnsubscribe, req.query.c, req.ip, res, next);
-
-                } else if (req.query.formTest ||
-                    list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM ||
-                    list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
-
-                    subscription.lcid = req.params.lcid;
-                    subscription.ucid = req.params.ucid;
-                    subscription.title = list.name;
-                    subscription.csrfToken = req.csrfToken();
-                    subscription.campaign = req.query.c;
-                    subscription.defaultAddress = configItems.defaultAddress;
-                    subscription.defaultPostaddress = configItems.defaultPostaddress;
-
-                    subscription.template = {
-                        template: 'subscription/web-unsubscribe.mjml.hbs',
-                        layout: 'subscription/layout.mjml.hbs'
-                    };
-
-                    helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-unsubscribe', subscription, (err, data) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                            if (err) {
-                                return next(err);
-                            }
-
-                            helpers.captureFlashMessages(req, res, (err, flash) => {
-                                if (err) {
-                                    return next(err);
-                                }
-
-                                data.isWeb = true;
-                                data.flashMessages = flash;
-                                res.send(htmlRenderer(data));
-                            });
-                        });
-                    });
-                } else { // UnsubscriptionMode.ONE_STEP || UnsubscriptionMode.TWO_STEP || UnsubscriptionMode.MANUAL
-                    handleUnsubscribe(list, subscription, autoUnsubscribe, req.query.c, req.ip, res, next);
-                }
-            });
-        });
-    });
+    res.redirect('/subscription/' + encodeURIComponent(req.params.lcid) + '/manage/' + encodeURIComponent(req.body.cid));
 });
 
-router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
+
+router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.lcid);
+
+    const configItems = await settings.get(['defaultAddress', 'defaultPostaddress']);
+
+    const autoUnsubscribe = req.query.auto === 'yes';
+
+    if (autoUnsubscribe) {
+        handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, res, next);
+
+    } else if (req.query.formTest ||
+        list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM ||
+        list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
+
+        const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid, false);
+
+        if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+            throw new interoperableErrors.NotFoundError('Subscription not found in this list');
         }
 
-        if (err) {
-            return next(err);
-        }
+        subscription.lcid = req.params.lcid;
+        subscription.ucid = req.params.ucid;
+        subscription.title = list.name;
+        subscription.csrfToken = req.csrfToken();
+        subscription.campaign = req.query.c;
+        subscription.defaultAddress = configItems.defaultAddress;
+        subscription.defaultPostaddress = configItems.defaultPostaddress;
 
-        const campaignId = (req.body.campaign || '').toString().trim() || false;
+        subscription.template = {
+            template: 'subscription/web-unsubscribe.mjml.hbs',
+            layout: 'subscription/layout.mjml.hbs'
+        };
 
-        subscriptions.get(list.id, req.body.ucid, (err, subscription) => {
-            if (!err && (!subscription || subscription.status !== subscriptions.Status.SUBSCRIBED)) {
-                err = new Error(_('Subscription not found in this list'));
-                err.status = 404;
-            }
+        await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-unsubscribe', subscription);
 
-            if (err) {
-                return next(err);
-            }
+        const htmlRenderer = await getMjmlTemplate(data.template);
 
-            handleUnsubscribe(list, subscription, false, campaignId, req.ip, res, next);
-        });
-    });
+        data.isWeb = true;
+        data.needsJsWarning = true;
+        data.isManagePreferences = true;
+        data.flashMessages = await captureFlashMessages(res);
+
+        res.send(htmlRenderer(data));
+
+    } else { // UnsubscriptionMode.ONE_STEP || UnsubscriptionMode.TWO_STEP || UnsubscriptionMode.MANUAL
+        await handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, res);
+    }
 });
 
-function handleUnsubscribe(list, subscription, autoUnsubscribe, campaignId, ip, res, next) {
+
+router.postAsync('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, async (req, res) => {
+    const list = await lists.getByCid(req.params.lcid);
+
+    const campaignCid = (req.body.campaign || '').toString().trim() || false;
+
+    await handleUnsubscribe(list, req.body.ucid, false, campaignCid, req.ip, res);
+});
+
+
+async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaignCid, ip, res) {
     if ((list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM) ||
         (autoUnsubscribe && (list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM)) ) {
 
-        subscriptions.changeStatus(list.id, subscription.id, campaignId, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
-            if (err) {
-                return next(err);
+        try {
+            const subscription = await subscriptions.unsubscribeByCidAndGet(contextHelpers.getAdminContext(), list.id, subscriptionCid, campaignCid);
+
+            await mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription);
+
+            res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribed-notice');
+
+        } catch (err) {
+            if (err instanceof interoperableErrors.NotFoundError) {
+                throw new interoperableErrors.NotFoundError('Subscription not found in this list'); // This is here to provide some meaningful error message.
             }
+        }
 
-            // TODO: Shall we do anything with "found"?
+    } else {
+        const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid, false);
 
-            mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription, err => {
-                if (err) {
-                    return next(err);
-                }
+        if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+            throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+        }
 
-                res.redirect('/subscription/' + list.cid + '/unsubscribed-notice');
-            });
-        });
+        if (list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
 
-    } else if (list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP || list.unsubscriptionMode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM) {
+            const data = {
+                subscriptionCid,
+                campaignCid
+            };
 
-        const data = {
-            subscriptionId: subscription.id,
-            campaignId
-        };
+            const confirmCid = await confirmations.addConfirmation(list.id, 'unsubscribe', ip, data);
+            await mailHelpers.sendConfirmUnsubscription(list, subscription.email, confirmCid, subscription);
 
-        confirmations.addConfirmation(list.id, 'unsubscribe', ip, data, (err, confirmCid) => {
-            if (err) {
-                return next(err);
-            }
+            res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/confirm-unsubscription-notice');
 
-            mailHelpers.sendConfirmUnsubscription(list, subscription.email, confirmCid, subscription, err => {
-                if (err) {
-                    return next(err);
-                }
-
-                res.redirect('/subscription/' + list.cid + '/confirm-unsubscription-notice');
-            });
-        });
-
-    } else { // UnsubscriptionMode.MANUAL
-        res.redirect('/subscription/' + list.cid + '/manual-unsubscribe-notice');
+        } else { // UnsubscriptionMode.MANUAL
+            res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/manual-unsubscribe-notice');
+        }
     }
 }
 
-router.get('/:cid/confirm-subscription-notice', (req, res, next) => {
-    webNotice('confirm-subscription', req, res, next);
+
+router.getAsync('/:cid/confirm-subscription-notice', async (req, res) => {
+    await webNotice('confirm-subscription', req, res);
 });
 
-router.get('/:cid/confirm-unsubscription-notice', (req, res, next) => {
-    webNotice('confirm-unsubscription', req, res, next);
+router.getAsync('/:cid/confirm-unsubscription-notice', async (req, res) => {
+    await webNotice('confirm-unsubscription', req, res);
 });
 
-router.get('/:cid/subscribed-notice', (req, res, next) => {
-    webNotice('subscribed', req, res, next);
+router.getAsync('/:cid/subscribed-notice', async (req, res) => {
+    await webNotice('subscribed', req, res);
 });
 
-router.get('/:cid/updated-notice', (req, res, next) => {
-    webNotice('updated', req, res, next);
+router.getAsync('/:cid/updated-notice', async (req, res) => {
+    await webNotice('updated', req, res);
 });
 
-router.get('/:cid/unsubscribed-notice', (req, res, next) => {
-    webNotice('unsubscribed', req, res, next);
+router.getAsync('/:cid/unsubscribed-notice', async (req, res) => {
+    await webNotice('unsubscribed', req, res);
 });
 
-router.get('/:cid/manual-unsubscribe-notice', (req, res, next) => {
-    webNotice('manual-unsubscribe', req, res, next);
+router.getAsync('/:cid/manual-unsubscribe-notice', async (req, res) => {
+    await webNotice('manual-unsubscribe', req, res);
 });
 
-router.post('/publickey', passport.parseForm, (req, res, next) => {
-    settings.list(['pgpPassphrase', 'pgpPrivateKey'], (err, configItems) => {
-        if (err) {
-            return next(err);
+router.postAsync('/publickey', passport.parseForm, async (req, res) => {
+    const configItems = await settings.get(['pgpPassphrase', 'pgpPrivateKey']);
+
+    if (!configItems.pgpPrivateKey) {
+        const err = new Error(_('Public key is not set'));
+        err.status = 404;
+        throw err;
+    }
+
+    let privKey;
+    try {
+        privKey = openpgp.key.readArmored(configItems.pgpPrivateKey).keys[0];
+        if (configItems.pgpPassphrase && !privKey.decrypt(configItems.pgpPassphrase)) {
+            privKey = false;
         }
-        if (!configItems.pgpPrivateKey) {
-            err = new Error(_('Public key is not set'));
-            err.status = 404;
-            return next(err);
-        }
+    } catch (E) {
+        // just ignore if failed
+    }
 
-        let privKey;
-        try {
-            privKey = openpgp.key.readArmored(configItems.pgpPrivateKey).keys[0];
-            if (configItems.pgpPassphrase && !privKey.decrypt(configItems.pgpPassphrase)) {
-                privKey = false;
-            }
-        } catch (E) {
-            // just ignore if failed
-        }
+    if (!privKey) {
+        const err = new Error(_('Public key is not set'));
+        err.status = 404;
+        throw err;
+    }
 
-        if (!privKey) {
-            err = new Error(_('Public key is not set'));
-            err.status = 404;
-            return next(err);
-        }
+    const pubkey = privKey.toPublic().armor();
 
-        let pubkey = privKey.toPublic().armor();
-
-        res.writeHead(200, {
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename=public.asc'
-        });
-
-        res.end(pubkey);
+    res.writeHead(200, {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': 'attachment; filename=public.asc'
     });
+
+    res.end(pubkey);
 });
 
 
-function webNotice(type, req, res, next) {
-    lists.getByCid(req.params.cid, (err, list) => {
-        if (!err && !list) {
-            err = new Error(_('Selected list not found'));
-            err.status = 404;
+async function webNotice(type, req, res) {
+    const list = await lists.getByCid(req.params.cid);
+
+    const configItems = await settings.get(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress', 'adminEmail']);
+
+
+    const data = {
+        title: list.name,
+        homepage: configItems.defaultHomepage || configItems.serviceUrl,
+        defaultAddress: configItems.defaultAddress,
+        defaultPostaddress: configItems.defaultPostaddress,
+        contactAddress: configItems.defaultAddress,
+        template: {
+            template: 'subscription/web-' + type + '-notice.mjml.hbs',
+            layout: 'subscription/layout.mjml.hbs'
         }
+    };
 
-        if (err) {
-            return next(err);
-        }
+    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-' + type + '-notice', data);
 
-        settings.list(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress', 'adminEmail'], (err, configItems) => {
-            if (err) {
-                return next(err);
-            }
+    const htmlRenderer = await getMjmlTemplate(data.template);
 
-            let data = {
-                title: list.name,
-                homepage: configItems.defaultHomepage || configItems.serviceUrl,
-                defaultAddress: configItems.defaultAddress,
-                defaultPostaddress: configItems.defaultPostaddress,
-                contactAddress: configItems.defaultAddress,
-                template: {
-                    template: 'subscription/web-' + type + '-notice.mjml.hbs',
-                    layout: 'subscription/layout.mjml.hbs'
-                }
-            };
+    data.isWeb = true;
+    data.isConfirmNotice = true; // FIXME: Not sure what this does. Check it in a browser with disabled JS
+    data.isManagePreferences = true;
+    data.flashMessages = await captureFlashMessages(res);
 
-            helpers.injectCustomFormData(req.query.fid || list.defaultForm, 'subscription/web-' + type + '-notice', data, (err, data) => {
-                if (err) {
-                    return next(err);
-                }
-
-                helpers.getMjmlTemplate(data.template, (err, htmlRenderer) => {
-                    if (err) {
-                        return next(err);
-                    }
-
-                    helpers.captureFlashMessages(req, res, (err, flash) => {
-                        if (err) {
-                            return next(err);
-                        }
-
-                        data.isWeb = true;
-                        data.isConfirmNotice = true;
-                        data.flashMessages = flash;
-                        res.send(htmlRenderer(data));
-                    });
-                });
-            });
-        });
-    });
+    res.send(htmlRenderer(data));
 }
 
 module.exports = router;

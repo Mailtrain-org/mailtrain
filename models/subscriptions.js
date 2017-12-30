@@ -73,8 +73,12 @@ fieldTypes.birthday = {
 
 
 
-function getTableName(listId) {
+function getSubscriptionTableName(listId) {
     return `subscription__${listId}`;
+}
+
+function getCampaignTableName(campaignId) {
+    return `campaign__${campaignId}`;
 }
 
 async function getGroupedFieldsMap(tx, listId) {
@@ -191,37 +195,60 @@ async function hashByList(listId, entity) {
     });
 }
 
-async function _getBy(context, listId, key, value) {
+
+async function _getStatusBy(context, listId, key, value) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const entity = await tx(getTableName(listId)).where(key, value).first();
+        const entity = await tx(getSubscriptionTableName(listId)).where(key, value).select(['status']).first();
+
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        return entity.status;
+    });
+}
+
+async function getStatusByCid(context, listId, cid) {
+    return await _getStatusBy(context, listId, 'cid', cid);
+}
+
+
+async function _getBy(context, listId, key, value, grouped) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+
+        const entity = await tx(getSubscriptionTableName(listId)).where(key, value).first();
 
         const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
-        groupSubscription(groupedFieldsMap, entity);
+
+        if (grouped) {
+            groupSubscription(groupedFieldsMap, entity);
+        }
 
         return entity;
     });
 }
 
 
-async function getById(context, listId, id) {
-    return await _getBy(context, listId, 'id', id);
+async function getById(context, listId, id, grouped = true) {
+    return await _getBy(context, listId, 'id', id, grouped);
 }
 
-async function getByEmail(context, listId, email) {
-    return await _getBy(context, listId, 'email', email);
+async function getByEmail(context, listId, email, grouped = true) {
+    return await _getBy(context, listId, 'email', email, grouped);
 }
 
-async function getByCid(context, listId, cid) {
-    return await _getBy(context, listId, 'cid', cid);
+async function getByCid(context, listId, cid, grouped = true) {
+    return await _getBy(context, listId, 'cid', cid, grouped);
 }
 
 async function listDTAjax(context, listId, segmentId, params) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const listTable = getTableName(listId);
+        const listTable = getSubscriptionTableName(listId);
 
         // All the data transformation below is to reuse ajaxListTx and groupSubscription methods so as to keep the code DRY
         // We first construct the columns to contain all which is supposed to be show and extraColumns which contain
@@ -326,7 +353,7 @@ async function list(context, listId) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const entities = await tx(getTableName(listId));
+        const entities = await tx(getSubscriptionTableName(listId));
 
         const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
 
@@ -344,7 +371,7 @@ async function serverValidate(context, listId, data) {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
         if (data.email) {
-            const existingKeyQuery = tx(getTableName(listId)).where('email', data.email);
+            const existingKeyQuery = tx(getSubscriptionTableName(listId)).where('email', data.email);
 
             if (data.id) {
                 existingKeyQuery.whereNot('id', data.id);
@@ -363,7 +390,7 @@ async function serverValidate(context, listId, data) {
 async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, isCreate) {
     enforce(entity.email, 'Email must be set');
 
-    const existingWithKeyQuery = tx(getTableName(listId)).where('email', entity.email);
+    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('email', entity.email);
 
     if (!isCreate) {
         existingWithKeyQuery.whereNot('id', entity.id);
@@ -401,7 +428,7 @@ async function create(context, listId, entity, meta = {}) {
         filteredEntity.opt_in_country = meta.country;
         filteredEntity.imported = meta.imported || false;
 
-        const ids = await tx(getTableName(listId)).insert(filteredEntity);
+        const ids = await tx(getSubscriptionTableName(listId)).insert(filteredEntity);
         const id = ids[0];
 
         if (entity.status === SubscriptionStatus.SUBSCRIBED) {
@@ -416,7 +443,7 @@ async function updateWithConsistencyCheck(context, listId, entity) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const existing = await tx(getTableName(listId)).where('id', entity.id).first();
+        const existing = await tx(getSubscriptionTableName(listId)).where('id', entity.id).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
@@ -441,7 +468,7 @@ async function updateWithConsistencyCheck(context, listId, entity) {
             filteredEntity.status_change = new Date();
         }
 
-        await tx(getTableName(listId)).where('id', entity.id).update(filteredEntity);
+        await tx(getSubscriptionTableName(listId)).where('id', entity.id).update(filteredEntity);
 
 
         let countIncrement = 0;
@@ -460,12 +487,12 @@ async function updateWithConsistencyCheck(context, listId, entity) {
 async function removeTx(tx, context, listId, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-    const existing = await tx(getTableName(listId)).where('id', id).first();
+    const existing = await tx(getSubscriptionTableName(listId)).where('id', id).first();
     if (!existing) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    await tx(getTableName(listId)).where('id', id).del();
+    await tx(getSubscriptionTableName(listId)).where('id', id).del();
 
     if (existing.status === SubscriptionStatus.SUBSCRIBED) {
         await tx('lists').where('id', listId).decrement('subscribers', 1);
@@ -478,23 +505,37 @@ async function remove(context, listId, id) {
     });
 }
 
-async function unsubscribeAndGet(context, listId, subscriptionId) {
+async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaignCid) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const existing = await tx(getTableName(listId)).where('id', subscriptionId).first();
-        if (!existing) {
+        const existing = await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).first();
+        if (!(existing && existing.status === SubscriptionStatus.SUBSCRIBED)) {
             throw new interoperableErrors.NotFoundError();
         }
 
-        if (existing.status === SubscriptionStatus.SUBSCRIBED) {
-            existing.status = SubscriptionStatus.UNSUBSCRIBED;
+        existing.status = SubscriptionStatus.UNSUBSCRIBED;
 
-            await tx(getTableName(listId)).where('id', subscriptionId).update({
-                status: SubscriptionStatus.UNSUBSCRIBED
-            });
+        await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).update({
+            status: SubscriptionStatus.UNSUBSCRIBED
+        });
 
-            await tx('lists').where('id', listId).decrement('subscribers', 1);
+        await tx('lists').where('id', listId).decrement('subscribers', 1);
+
+        if (campaignCid) {
+            const campaign = await tx('campaigns').where('cid', campaignCid);
+            const subscriptionInCampaign = await tx(getCampaignTableName(campaign.id)).where({subscription: existing.id, list: listId});
+
+            if (!subscriptionInCampaign) {
+                throw new Error('Invalid campaign.')
+            }
+
+            if (subscriptionInCampaign.status === SubscriptionStatus.SUBSCRIBED) {
+                await tx('campaigns').where('id', campaign.id).increment('unsubscribed', 1);
+                await tx(getCampaignTableName(campaign.id)).where({subscription: existing.id, list: listId}).update({
+                    status: SubscriptionStatus.UNSUBSCRIBED
+                });
+            }
         }
 
         return existing;
@@ -505,12 +546,12 @@ async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const existing = await tx(getTableName(listId)).where('id', subscriptionId).first();
+        const existing = await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
 
-        await tx(getTableName(listId)).where('id', subscriptionId).update({
+        await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).update({
             email: emailNew
         });
 
@@ -519,17 +560,46 @@ async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
     });
 }
 
+async function updateManagedUngrouped(context, listId, entity) {
+    await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
+
+        const existing = await tx(getSubscriptionTableName(listId)).where('id', entity.id).first();
+        if (!existing) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        const flds = await fields.listTx(tx, listId);
+
+        const update = {};
+
+        for (const fld of flds) {
+            if (fld.order_manage) {
+                if (!fld.group) { // fieldTypes is primarily meant only for groupedFields, so we don't try it for fields that would be grouped (i.e. option), because there is nothing to be done for them anyway
+                    fieldTypes[fld.type].afterJSON(fld, entity);
+                }
+
+                update[fld.column] = entity[fld.column];
+            }
+        }
+
+        await tx(getSubscriptionTableName(listId)).where('id', entity.id).update(update);
+    });
+}
+
 module.exports = {
     hashByList,
     getById,
     getByCid,
     getByEmail,
+    getStatusByCid,
     list,
     listDTAjax,
     serverValidate,
     create,
     updateWithConsistencyCheck,
     remove,
-    unsubscribeAndGet,
-    updateAddressAndGet
+    unsubscribeByCidAndGet,
+    updateAddressAndGet,
+    updateManagedUngrouped
 };
