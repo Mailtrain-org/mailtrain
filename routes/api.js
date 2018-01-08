@@ -348,6 +348,22 @@ router.get('/subscriptions/:listId', (req, res) => {
     });
 });
 
+router.get('/subscriptions/email/:email', (req, res) => {
+    lists.getListsWithEmail(req.params.email, (err, lists) => {
+        if (err) {
+            res.status(500);
+		    return res.json({
+		        error: err.message || err,
+		        data: []
+		    });
+        }
+        res.status(200);
+        res.json({
+            data: lists
+        });
+    });
+});
+
 router.post('/field/:listId', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
