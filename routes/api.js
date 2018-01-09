@@ -348,7 +348,7 @@ router.get('/subscriptions/:listId', (req, res) => {
     });
 });
 
-router.get('/subscriptions/email/:email', (req, res) => {
+router.get('/lists/:email', (req, res) => {
     lists.getListsWithEmail(req.params.email, (err, lists) => {
         if (err) {
             res.status(500);
