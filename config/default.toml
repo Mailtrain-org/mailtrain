@@ -125,6 +125,22 @@ passwordresetlink=""
 bindUser=""
 bindPassword=""
 
+[ldapauth]
+# Alternative LDAP implementation using the more popular passport-ldapauth library.
+enabled=false
+host="localhost"
+port=389
+# Subtree in which the searchrequest for the user is done
+baseDN="ou=users,dc=company"
+# What whe are searching for. This should return a single user.
+filter="(|(sAMAccountName={{username}})(mail={{username}}))"
+# Username field in LDAP, used to identify the user in Mailtrain (uid/cn/username/sAMAccountName)
+uidTag="sAMAccountName"
+passwordresetlink=""
+# Credentials for the initial search operation (final bind DN will be exactly as specified)
+bindUser="name@company.net"
+bindPassword="mySecretPassword"
+
 [postfixbounce]
 # Enable to allow writing Postfix bounce log to Mailtrain listener
 # If enabled, tail mail.log to Mailtrain with the following command:
