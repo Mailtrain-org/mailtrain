@@ -235,4 +235,6 @@ fi
 service zone-mta start
 service mailtrain start
 
+echo $MYSQL_ROOT_PASSWORD > ~/mysql_root_password
+echo "MySQL root password: $MYSQL_ROOT_PASSWORD"
 echo "Success! Open http://$HOSTNAME/ and log in as admin:test";
