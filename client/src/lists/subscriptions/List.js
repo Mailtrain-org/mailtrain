@@ -12,7 +12,7 @@ import {
     Dropdown, Form,
     withForm
 } from '../../lib/form';
-import {Icon} from "../../lib/bootstrap-components";
+import {Icon, Button} from "../../lib/bootstrap-components";
 import axios from '../../lib/axios';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
 
@@ -154,6 +154,7 @@ export default class List extends Component {
         return (
             <div>
                 <Toolbar>
+                    <a href={`/subscription/${this.props.list.cid}`} className="btn-default"><Button label={t('Subscription Form')} className="btn-default"/></a>
                     <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('Add Subscriber')}/>
                 </Toolbar>
 

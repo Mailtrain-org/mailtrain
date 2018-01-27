@@ -87,7 +87,7 @@ async function _getById(tx, id) {
 
 async function getById(context, id) {
     return await knex.transaction(async tx => {
-        shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
+        await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
         const entity = await _getById(tx, id);
         entity.permissions = await shares.getPermissionsTx(tx, context, 'customForm', id);
         return entity;
@@ -171,9 +171,9 @@ async function updateWithConsistencyCheck(context, entity) {
 
 async function remove(context, id) {
     await knex.transaction(async tx => {
-        shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'delete');
+        await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'delete');
 
-        lists.removeFormFromAllTx(tx, context, id);
+        await lists.removeFormFromAllTx(tx, context, id);
 
         await tx('custom_forms_data').where('form', id).del();
         await tx('custom_forms').where('id', id).del();

@@ -1,0 +1,20 @@
+{
+  "name": "mailtrain-shared",
+  "version": "1.0.0",
+  "description": "Self hosted email newsletter app - shared lib",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Mailtrain-org/mailtrain.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "homepage": "https://mailtrain.org/",
+  "engines": {
+    "node": ">=5.0.0"
+  },
+  "dependencies": {
+    "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13",
+    "owasp-password-strength-test": "github:bures/owasp-password-strength-test"
+  }
+}

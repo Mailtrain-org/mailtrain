@@ -56,7 +56,7 @@ export default class API extends Component {
 
         return (
             <div>
-                <Title>{t('Sign in')}</Title>
+                <Title>{t('API')}</Title>
 
 
                 <div className="panel panel-default">

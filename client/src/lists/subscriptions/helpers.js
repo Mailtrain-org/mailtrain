@@ -25,7 +25,10 @@ export function getFieldTypes(t) {
 
     const stringFieldType = long => ({
         form: groupedField => long ? <TextArea key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name}/> : <InputField key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name}/>,
-        assignFormData: (groupedField, data) => {},
+        assignFormData: (groupedField, data) => {
+            const value = data[getFieldKey(groupedField)];
+            data[getFieldKey(groupedField)] = value || '';
+        },
         initFormData: (groupedField, data) => {
             data[getFieldKey(groupedField)] = '';
         },
@@ -109,7 +112,10 @@ export function getFieldTypes(t) {
 
     const jsonFieldType = {
         form: groupedField => <ACEEditor key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name} mode="json" height="300px"/>,
-        assignFormData: (groupedField, data) => {},
+        assignFormData: (groupedField, data) => {
+            const value = data[getFieldKey(groupedField)];
+            data[getFieldKey(groupedField)] = value || '';
+        },
         initFormData: (groupedField, data) => {
             data[getFieldKey(groupedField)] = '';
         },

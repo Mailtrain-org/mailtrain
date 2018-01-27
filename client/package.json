@@ -24,7 +24,6 @@
     "immutable": "^3.8.1",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
-    "owasp-password-strength-test": "github:bures/owasp-password-strength-test",
     "prop-types": "^15.5.10",
     "querystringify": "^1.0.0",
     "react": "^15.6.1",

@@ -105,13 +105,6 @@ class InvalidConfirmationForUnsubscriptionError extends InteroperableError {
     }
 }
 
-class SubscriptionNotAllowedError extends InteroperableError {
-    constructor(msg, data) {
-        super('SubscriptionNotAllowedError', msg, data);
-        this.status = 403;
-    }
-}
-
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
@@ -129,8 +122,7 @@ const errorTypes = {
     PermissionDeniedError,
     InvalidConfirmationForSubscriptionError,
     InvalidConfirmationForAddressChangeError,
-    InvalidConfirmationForUnsubscriptionError,
-    SubscriptionNotAllowedError
+    InvalidConfirmationForUnsubscriptionError
 };
 
 function deserialize(errorObj) {
