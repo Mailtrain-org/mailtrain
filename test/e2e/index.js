@@ -8,7 +8,7 @@ const only = 'only';
 const skip = 'skip';
 
 let tests = [
-    'login',
+    //'login',
     'subscription'
 ];
 

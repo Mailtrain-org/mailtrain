@@ -1,339 +1,237 @@
 'use strict';
 
-let lists = require('../lib/models/lists');
-let fields = require('../lib/models/fields');
-let blacklist = require('../models/blacklist');
-let subscriptions = require('../lib/models/subscriptions');
-let confirmations = require('../lib/models/confirmations');
-let tools = require('../lib/tools');
-let log = require('npmlog');
+const lists = require('../models/lists');
+const tools = require('../lib/tools-async');
+const blacklist = require('../models/blacklist');
+const fields = require('../models/fields');
+const { SubscriptionStatus } = require('../shared/lists');
+const subscriptions = require('../models/subscriptions');
+const confirmations = require('../models/confirmations');
+const log = require('npmlog');
 const router = require('../lib/router-async').create();
-let mailHelpers = require('../lib/subscription-mail-helpers');
+const mailHelpers = require('../lib/subscription-mail-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
+const contextHelpers = require('../lib/context-helpers');
+const shares = require('../models/shares');
+const slugify = require('slugify');
 
-router.post('/subscribe/:listId', (req, res) => {
-    let input = {};
+class APIError extends Error {
+    constructor(msg, status) {
+        super(msg);
+        this.status = status;
+    }
+}
+
+
+router.postAsync('/subscribe/:listId', async (req, res) => {
+    const listId = req.params.listId;
+    
+    const input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
-    lists.getByCid(req.params.listId, (err, list) => {
-        if (err) {
-            log.error('API', err);
-            res.status(500);
-            return res.json({
-                error: err.message || err,
-                data: []
-            });
-        }
-        if (!list) {
-            res.status(404);
-            return res.json({
-                error: 'Selected listId not found',
-                data: []
-            });
-        }
-        if (!input.EMAIL) {
-            res.status(400);
-            return res.json({
-                error: 'Missing EMAIL',
-                data: []
-            });
-        }
-        tools.validateEmail(input.EMAIL, false, err => {
-            if (err) {
-                log.error('API', err);
-                res.status(400);
-                return res.json({
-                    error: err.message || err,
-                    data: []
-                });
+
+    if (!input.EMAIL) {
+        throw new APIError('Missing EMAIL', 400);
+    }
+
+    const emailErr = await tools.validateEmail(input.EMAIL, false);
+    if (emailErr) {
+        const errMsg = tools.validateEmailGetMessage(emailErr, email);
+        log.error('API', errMsg);
+        throw new APIError(errMsg, 400);
+    }
+
+    const subscription = {
+        email: input.EMAIL
+    };
+
+    if (input.TIMEZONE) {
+        subscription.tz = (input.TIMEZONE || '').toString().trim();
+    }
+
+    const fieldList = await fields.fromPost(req.context, listId);
+
+    for (const field of fieldList) {
+        if (field.key in input && field.column) {
+            if (field.type === 'option') {
+                subscription[field.column] = ['false', 'no', '0', ''].indexOf((input[field.key] || '').toString().trim().toLowerCase()) >= 0 ? '' : '1';
+            } else {
+                subscription[field.column] = input[field.key];
             }
-
-            let subscription = {
-                email: input.EMAIL
-            };
-
-            if (input.FIRST_NAME) {
-                subscription.first_name = (input.FIRST_NAME || '').toString().trim();
-            }
-
-            if (input.LAST_NAME) {
-                subscription.last_name = (input.LAST_NAME || '').toString().trim();
-            }
-
-            if (input.TIMEZONE) {
-                subscription.tz = (input.TIMEZONE || '').toString().trim();
-            }
-
-            fields.list(list.id, (err, fieldList) => {
-                if (err && !fieldList) {
-                    fieldList = [];
-                }
-
-                fieldList.forEach(field => {
-                    if (input.hasOwnProperty(field.key) && field.column) {
-                        subscription[field.column] = input[field.key];
-                    } else if (field.options) {
-                        for (let i = 0, len = field.options.length; i < len; i++) {
-                            if (input.hasOwnProperty(field.options[i].key) && field.options[i].column) {
-                                let value = input[field.options[i].key];
-                                if (field.options[i].type === 'option') {
-                                    value = ['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0 ? '' : '1';
-                                }
-                                subscription[field.options[i].column] = value;
-                            }
-                        }
-                    }
-                });
-
-                let meta = {
-                    partial: true
-                };
-
-                if (/^(yes|true|1)$/i.test(input.FORCE_SUBSCRIBE)) {
-                    meta.status = 1;
-                }
-
-                if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
-                    const data = {
-                        email: subscription.email,
-                        subscriptionData: subscription
-                    };
-
-                    confirmations.addConfirmation(list.id, 'subscribe', req.ip, data, (err, confirmCid) => {
-                        if (err) {
-                            log.error('API', err);
-                            res.status(500);
-                            return res.json({
-                                error: err.message || err,
-                                data: []
-                            });
-                        }
-
-                        mailHelpers.sendConfirmSubscription(list, input.EMAIL, confirmCid, subscription, (err) => {
-                            if (err) {
-                                log.error('API', err);
-                                res.status(500);
-                                return res.json({
-                                    error: err.message || err,
-                                    data: []
-                                });
-                            }
-
-                            res.status(200);
-                            res.json({
-                                data: {
-                                    id: confirmCid
-                                }
-                            });
-                        });
-                    });
-                } else {
-                    subscriptions.insert(list.id, meta, subscription, (err, response) => {
-                        if (err) {
-                            log.error('API', err);
-                            res.status(500);
-                            return res.json({
-                                error: err.message || err,
-                                data: []
-                            });
-                        }
-                        res.status(200);
-                        res.json({
-                            data: {
-                                id: response.cid
-                            }
-                        });
-                    });
-                }
-            });
-        });
-    });
-});
-
-router.post('/unsubscribe/:listId', (req, res) => {
-    let input = {};
-    Object.keys(req.body).forEach(key => {
-        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
-    });
-    lists.getByCid(req.params.listId, (err, list) => {
-        if (err) {
-            res.status(500);
-            return res.json({
-                error: err.message || err,
-                data: []
-            });
         }
-        if (!list) {
-            res.status(404);
-            return res.json({
-                error: 'Selected listId not found',
-                data: []
-            });
-        }
-        if (!input.EMAIL) {
-            res.status(400);
-            return res.json({
-                error: 'Missing EMAIL',
-                data: []
-            });
-        }
+    }
 
-        subscriptions.getByEmail(list.id, input.EMAIL, (err, subscription) => {
-            if (err) {
-                res.status(500);
-                return res.json({
-                    error: err.message || err,
-                    data: []
-                });
-            }
+    if (/^(yes|true|1)$/i.test(input.FORCE_SUBSCRIBE)) {
+        subscription.status = SubscriptionStatus.SUBSCRIBED;
+    }
 
-            if (!subscription) {
-                res.status(404);
-                return res.json({
-                    error: 'Subscription with given email not found',
-                    data: []
-                });
-            }
+    if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
+        const list = await lists.getByCid(contextHelpers.getAdminContext(), listId);
+        await shares.enforceEntityPermission(req.context, 'list', listId, 'manageSubscriptions');
 
-            subscriptions.changeStatus(list.id, subscription.id, false, subscriptions.Status.UNSUBSCRIBED, (err, found) => {
-                if (err) {
-                    res.status(500);
-                    return res.json({
-                        error: err.message || err,
-                        data: []
-                    });
-                }
-                res.status(200);
-                res.json({
-                    data: {
-                        id: subscription.id,
-                        unsubscribed: true
-                    }
-                });
-            });
-        });
-    });
-});
-
-router.post('/delete/:listId', (req, res) => {
-    let input = {};
-    Object.keys(req.body).forEach(key => {
-        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
-    });
-    lists.getByCid(req.params.listId, (err, list) => {
-        if (err) {
-            res.status(500);
-            return res.json({
-                error: err.message || err,
-                data: []
-            });
-        }
-        if (!list) {
-            res.status(404);
-            return res.json({
-                error: 'Selected listId not found',
-                data: []
-            });
-        }
-        if (!input.EMAIL) {
-            res.status(400);
-            return res.json({
-                error: 'Missing EMAIL',
-                data: []
-            });
-        }
-        subscriptions.getByEmail(list.id, input.EMAIL, (err, subscription) => {
-            if (err) {
-                res.status(500);
-                return res.json({
-                    error: err.message || err,
-                    data: []
-                });
-            }
-            if (!subscription) {
-                res.status(404);
-                return res.json({
-                    error: 'Subscription not found',
-                    data: []
-                });
-            }
-            subscriptions.delete(list.id, subscription.cid, (err, subscription) => {
-                if (err) {
-                    res.status(500);
-                    return res.json({
-                        error: err.message || err,
-                        data: []
-                    });
-                }
-                if (!subscription) {
-                    res.status(404);
-                    return res.json({
-                        error: 'Subscription not found',
-                        data: []
-                    });
-                }
-                res.status(200);
-                res.json({
-                    data: {
-                        id: subscription.id,
-                        deleted: true
-                    }
-                });
-            });
-        });
-    });
-});
-
-router.post('/field/:listId', (req, res) => {
-    let input = {};
-    Object.keys(req.body).forEach(key => {
-        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
-    });
-    lists.getByCid(req.params.listId, (err, list) => {
-        if (err) {
-            log.error('API', err);
-            res.status(500);
-            return res.json({
-                error: err.message || err,
-                data: []
-            });
-        }
-        if (!list) {
-            res.status(404);
-            return res.json({
-                error: 'Selected listId not found',
-                data: []
-            });
-        }
-
-        let field = {
-            name: (input.NAME || '').toString().trim(),
-            defaultValue: (input.DEFAULT || '').toString().trim() || null,
-            type: (input.TYPE || '').toString().toLowerCase().trim(),
-            group: Number(input.GROUP) || null,
-            groupTemplate: (input.GROUP_TEMPLATE || '').toString().toLowerCase().trim(),
-            visible: ['false', 'no', '0', ''].indexOf((input.VISIBLE || '').toString().toLowerCase().trim()) < 0
+        const data = {
+            email,
+            subscriptionData: subscription
         };
 
-        fields.create(list.id, field, (err, id, tag) => {
-            if (err) {
-                res.status(500);
-                return res.json({
-                    error: err.message || err,
-                    data: []
-                });
+        const confirmCid = await confirmations.addConfirmation(listId, 'subscribe', req.ip, data);
+        await mailHelpers.sendConfirmSubscription(list, input.EMAIL, confirmCid, subscription);
+
+        res.status(200);
+        res.json({
+            data: {
+                id: confirmCid
             }
-            res.status(200);
-            res.json({
-                data: {
-                    id,
-                    tag
-                }
-            });
         });
+    } else {
+        const meta = {};
+        await subscriptions.create(req.context, listId, subscription, meta);
+
+        res.status(200);
+        res.json({
+            data: {
+                id: meta.cid
+            }
+        });
+    }
+});
+
+
+router.postAsync('/unsubscribe/:listId', async (req, res) => {
+    const input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+
+    if (!input.EMAIL) {
+        throw new APIError('Missing EMAIL', 400);
+    }
+
+    const subscription = await subscriptions.unsubscribeByEmailAndGet(req.context, req.params.listId, input.EMAIL);
+
+    res.status(200);
+    res.json({
+        data: {
+            id: subscription.id,
+            unsubscribed: true
+        }
     });
 });
+
+
+router.postAsync('/delete/:listId', async (req, res) => {
+    const input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+
+    if (!input.EMAIL) {
+        throw new APIError('Missing EMAIL', 400);
+    }
+
+    const subscription = await subscriptions.removeByEmailAndGet(req.context, req.params.listId, input.EMAIL);
+
+    res.status(200);
+    res.json({
+        data: {
+            id: subscription.id,
+            deleted: true
+        }
+    });
+});
+
+
+router.getAsync('/subscriptions/:listId', async (req, res) => {
+    const start = parseInt(req.query.start || 0, 10);
+    const limit = parseInt(req.query.limit || 10000, 10);
+
+    const { subscriptions, total } = await subscriptions.list(req.params.listId, false, start, limit);
+
+    res.status(200);
+    res.json({
+        data: {
+            total: total,
+            start: start,
+            limit: limit,
+            subscriptions
+        }
+    });
+});
+
+
+router.getAsync('/lists/:email', async (req, res) => {
+    const lists = await subscriptions.getListsWithEmail(req.context, req.params.email);
+
+    res.status(200);
+    res.json({
+        data: lists
+    });
+});
+
+
+router.postAsync('/field/:listId', async (req, res) => {
+    const input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+
+    const key = (input.NAME || '').toString().trim() || slugify('merge ' + name, '_').toUpperCase();
+    const visible = ['false', 'no', '0', ''].indexOf((input.VISIBLE || '').toString().toLowerCase().trim()) < 0;
+
+    const groupTemplate = (input.GROUP_TEMPLATE || '').toString().toLowerCase().trim();
+
+    let type = (input.TYPE || '').toString().toLowerCase().trim();
+    const settings = {};
+
+    if (type === 'checkbox') {
+        type = 'checkbox-grouped';
+        settings.groupTemplate = groupTemplate;
+    } else if (type === 'dropdown') {
+        type = 'dropdown-grouped';
+        settings.groupTemplate = groupTemplate;
+    } else if (type === 'radio') {
+        type = 'radio-grouped';
+        settings.groupTemplate = groupTemplate;
+    } else if (type === 'json') {
+        settings.groupTemplate = groupTemplate;
+    } else if (type === 'date-us') {
+        type = 'date';
+        settings.dateFormat = 'us';
+    } else if (type === 'date-eur') {
+        type = 'date';
+        settings.dateFormat = 'eur';
+    } else if (type === 'birthday-us') {
+        type = 'birthday';
+        settings.birthdayFormat = 'us';
+    } else if (type === 'birthday-eur') {
+        type = 'birthday';
+        settings.birthdayFormat = 'eur';
+    }
+
+    const field = {
+        name: (input.NAME || '').toString().trim(),
+        key,
+        default_value: (input.DEFAULT || '').toString().trim() || null,
+        type,
+        settings,
+        group: Number(input.GROUP) || null,
+        orderListBefore: visible ? 'end' : 'none',
+        orderSubscribeBefore: visible ? 'end' : 'none',
+        orderManageBefore: visible ? 'end' : 'none'
+    };
+
+    const id = await fields.create(req.context, req.params.listId, field);
+
+    res.status(200);
+    res.json({
+        data: {
+            id,
+            tag: key
+        }
+    });
+});
+
 
 router.postAsync('/blacklist/add', async (req, res) => {
     let input = {};
@@ -351,6 +249,7 @@ router.postAsync('/blacklist/add', async (req, res) => {
     });
 });
 
+
 router.postAsync('/blacklist/delete', async (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
@@ -366,6 +265,7 @@ router.postAsync('/blacklist/delete', async (req, res) => {
         data: []
     });
 });
+
 
 router.getAsync('/blacklist/get', async (req, res) => {
     let start = parseInt(req.query.start || 0, 10);
@@ -383,5 +283,6 @@ router.getAsync('/blacklist/get', async (req, res) => {
         }
     });
 });
+
 
 module.exports = router;

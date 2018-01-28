@@ -15,7 +15,7 @@ function getPage(listConf) {
 }
 
 function generateEmail() {
-    return 'keep.' + shortid.generate() + '@mailtrain.org';
+    return 'keep.' + shortid.generate() + '@gmail.com';
 }
 
 function generateCustomFieldValue(field) {
@@ -142,8 +142,8 @@ suite('Subscription use-cases', () => {
         });
 
         await step('System shows a flash notice that email is invalid.', async () => {
-            await page.webSubscribe.waitForFlash();
-            expect(await page.webSubscribe.getFlash()).to.contain('Invalid email address');
+            await page.webSubscribeAfterPost.waitForFlash();
+            expect(await page.webSubscribeAfterPost.getFlash()).to.contain('Invalid email address');
         });
     });
 

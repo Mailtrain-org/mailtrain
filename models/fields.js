@@ -10,6 +10,10 @@ const shares = require('./shares');
 const validators = require('../shared/validators');
 const shortid = require('shortid');
 const segments = require('./segments');
+const { formatDate, formatBirthday, parseDate, parseBirthday } = require('../shared/date');
+const { getFieldKey } = require('../shared/lists');
+const { cleanupFromPost } = require('../lib/helpers');
+
 
 const allowedKeysCreate = new Set(['name', 'key', 'default_value', 'type', 'group', 'settings']);
 const allowedKeysUpdate = new Set(['name', 'key', 'default_value', 'group', 'settings']);
@@ -22,72 +26,133 @@ const Cardinality = {
     MULTIPLE: 1
 };
 
-fieldTypes.text = fieldTypes.website = {
-    validate: entity => {},
+fieldTypes.text = {
+    validate: field => {},
     addColumn: (table, name) => table.string(name),
     indexed: true,
     grouped: false,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeText',
+    forHbs: (field, value) => value,
+    parsePostValue: (field, value) => value
 };
 
-fieldTypes.longtext = fieldTypes.gpg = {
-    validate: entity => {},
+fieldTypes.website = {
+    validate: field => {},
+    addColumn: (table, name) => table.string(name),
+    indexed: true,
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeWebsite',
+    forHbs: (field, value) => value,
+    parsePostValue: (field, value) => value
+};
+
+fieldTypes.longtext = {
+    validate: field => {},
     addColumn: (table, name) => table.text(name),
     indexed: false,
     grouped: false,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeLongtext',
+    forHbs: (field, value) => value,
+    parsePostValue: (field, value) => value
+};
+
+fieldTypes.gpg = {
+    validate: field => {},
+    addColumn: (table, name) => table.text(name),
+    indexed: false,
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeGpg',
+    forHbs: (field, value) => value,
+    parsePostValue: (field, value) => value
 };
 
 fieldTypes.json = {
-    validate: entity => {},
+    validate: field => {},
     addColumn: (table, name) => table.json(name),
     indexed: false,
     grouped: false,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeJson',
+    forHbs: (field, value) => value,
+    parsePostValue: (field, value) => value
 };
 
 fieldTypes.number = {
-    validate: entity => {},
+    validate: field => {},
     addColumn: (table, name) => table.integer(name),
     indexed: true,
     grouped: false,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeNumber',
+    forHbs: (field, value) => value,
+    parsePostValue: (field, value) => Number(value)
 };
 
 fieldTypes['checkbox-grouped'] = {
-    validate: entity => {},
+    validate: field => {},
     indexed: true,
     grouped: true,
     enumerated: false,
-    cardinality: Cardinality.MULTIPLE
+    cardinality: Cardinality.MULTIPLE,
+    getHbsType: field => 'typeCheckboxGrouped'
 };
 
-fieldTypes['radio-grouped'] = fieldTypes['dropdown-grouped'] = {
-    validate: entity => {},
+fieldTypes['radio-grouped'] = {
+    validate: field => {},
     indexed: true,
     grouped: true,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeRadioGrouped'
 };
 
-fieldTypes['radio-enum'] = fieldTypes['dropdown-enum'] = {
-    validate: entity => {
-        enforce(entity.settings.options, 'Options missing in settings');
-        enforce(entity.default_value === null || entity.settings.options.find(x => x.key === entity.default_value), 'Default value not present in options');
+fieldTypes['dropdown-grouped'] = {
+    validate: field => {},
+    indexed: true,
+    grouped: true,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeDropdownGrouped'
+};
+
+fieldTypes['radio-enum'] = {
+    validate: field => {
+        enforce(field.settings.options, 'Options missing in settings');
+        enforce(field.default_value === null || field.settings.options.find(x => x.key === field.default_value), 'Default value not present in options');
     },
     addColumn: (table, name) => table.string(name),
     indexed: true,
     grouped: false,
     enumerated: true,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeRadioEnum'
+};
+
+fieldTypes['dropdown-enum'] = {
+    validate: field => {
+        enforce(field.settings.options, 'Options missing in settings');
+        enforce(field.default_value === null || field.settings.options.find(x => x.key === field.default_value), 'Default value not present in options');
+    },
+    addColumn: (table, name) => table.string(name),
+    indexed: true,
+    grouped: false,
+    enumerated: true,
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeDropdownEnum'
 };
 
 fieldTypes.option = {
-    validate: entity => {},
+    validate: field => {},
     addColumn: (table, name) => table.boolean(name),
     indexed: true,
     grouped: false,
@@ -95,15 +160,32 @@ fieldTypes.option = {
     cardinality: Cardinality.SINGLE
 };
 
-fieldTypes['date'] = fieldTypes['birthday'] = {
-    validate: entity => {
-        enforce(['eur', 'us'].includes(entity.settings.dateFormat), 'Date format incorrect');
+fieldTypes['date'] = {
+    validate: field => {
+        enforce(['eur', 'us'].includes(field.settings.dateFormat), 'Date format incorrect');
     },
     addColumn: (table, name) => table.dateTime(name),
     indexed: true,
     grouped: false,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeDate' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
+    forHbs: (field, value) => formatDate(field.settings.dateFormat, value),
+    parsePostValue: (field, value) => parseDate(field.settings.dateFormat, value)
+};
+
+fieldTypes['birthday'] = {
+    validate: field => {
+        enforce(['eur', 'us'].includes(field.settings.dateFormat), 'Date format incorrect');
+    },
+    addColumn: (table, name) => table.dateTime(name),
+    indexed: true,
+    grouped: false,
+    enumerated: false,
+    cardinality: Cardinality.SINGLE,
+    getHbsType: field => 'typeBirthday' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
+    forHbs: (field, value) => formatBirthday(field.settings.dateFormat, value),
+    parsePostValue: (field, value) => parseBirthday(field.settings.dateFormat, value)
 };
 
 const groupedTypes = Object.keys(fieldTypes).filter(key => fieldTypes[key].grouped);
@@ -153,7 +235,7 @@ async function listTx(tx, listId) {
 
 async function list(context, listId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageFields', 'manageSegments']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageFields', 'manageSegments', 'manageSubscriptions']);
         return await listTx(tx, listId);
     });
 }
@@ -474,31 +556,126 @@ async function removeAllByListIdTx(tx, context, listId) {
     }
 }
 
-async function getRow(context, listId, subscription) {
+// Returns an array that can be used for rendering by Handlebars
+async function forHbs(context, listId, subscription) { // assumes grouped subscription
     const customFields = [{
         name: 'Email Address',
         column: 'email',
+        key: 'EMAIL',
         typeSubscriptionEmail: true,
         value: subscription ? subscription.email : '',
         order_subscribe: -1,
         order_manage: -1
     }];
 
-    const flds = await list(context, listId);
+    const flds = await listGrouped(context, listId);
 
     for (const fld of flds) {
-        if (fld.column) {
-            customFields.push({
-                name: fld.name,
-                column: fld.column,
-                ['type' + fld.type.replace(/(?:^|-)([a-z])/g, (m, c) => c.toUpperCase())]: true,
-                value: subscription ? subscription[fld.column] : ''
-            });
+        const type = fieldTypes[fld.type];
+        const fldKey = getFieldKey(fld);
+
+        const entry = {
+            name: fld.name,
+            key: fld.key,
+            [type.getHbsType(fld)]: true,
+            order_subscribe: fld.order_subscribe,
+            order_manage: fld.order_manage,
+        };
+
+        if (!type.grouped && !type.enumerated) {
+            entry.value = subscription ? type.forHbs(fld, subscription[fldKey]) : '';
+
+        } else if (type.grouped) {
+            const options = [];
+            const value = subscription ? subscription[fldKey] : (type.cardinality === Cardinality.SINGLE ? null : []);
+
+            for (const optCol in fld.groupedOptions) {
+                const opt = fld.groupedOptions[optCol];
+
+                let isEnabled;
+                if (type.cardinality === Cardinality.SINGLE) {
+                    isEnabled = value === opt.column;
+                } else {
+                    isEnabled = value.includes(opt.column);
+                }
+
+                options.push({
+                    key: opt.key,
+                    name: opt.name,
+                    value: isEnabled
+                });
+            }
+
+            entry.options = options;
+
+        } else if (type.enumerated) {
+            const options = [];
+            const value = subscription ? subscription[fldKey] : null;
+
+            for (const opt of fld.settings.options) {
+                options.push({
+                    key: opt.key,
+                    name: opt.label,
+                    value: value === opt.key
+                });
+            }
+
+            entry.options = options;
+
         }
+
+        customFields.push(entry);
     }
 
     return customFields;
 }
+
+async function fromPost(context, listId, data) { // assumes grouped subscription
+
+    const flds = await listGrouped(context, listId);
+
+    const subscription = {};
+
+    for (const fld of flds) {
+        const type = fieldTypes[fld.type];
+        const fldKey = getFieldKey(fld);
+
+        let value = null;
+
+        if (!type.grouped && !type.enumerated) {
+            value = type.parsePostValue(fld, cleanupFromPost(data[fld.key]));
+
+        } else if (type.grouped) {
+            if (type.cardinality === Cardinality.SINGLE) {
+                for (const optCol in fld.groupedOptions) {
+                    const opt = fld.groupedOptions[optCol];
+
+                    if (data[fld.key] === opt.key) {
+                        value = opt.column
+                    }
+                }
+            } else {
+                value = [];
+
+                for (const optCol in fld.groupedOptions) {
+                    const opt = fld.groupedOptions[optCol];
+
+                    if (data[opt.key]) {
+                        value.push(opt.column);
+                    }
+                }
+            }
+
+        } else if (type.enumerated) {
+            value = data[fld.key];
+        }
+
+        subscription[fldKey] = value;
+    }
+
+    return subscription;
+}
+
 
 // This is to handle circular dependency with segments.js
 Object.assign(module.exports, {
@@ -518,5 +695,6 @@ Object.assign(module.exports, {
     remove,
     removeAllByListIdTx,
     serverValidate,
-    getRow
+    forHbs,
+    fromPost
 });

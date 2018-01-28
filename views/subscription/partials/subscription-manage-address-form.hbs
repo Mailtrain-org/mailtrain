@@ -3,14 +3,14 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="hidden" name="cid" value="{{cid}}">
 
-    <div class="form-group">
-        <label for="email">{{#translate}}Existing Email Address{{/translate}}</label>
-        <input type="email" name="email" id="email" placeholder="" value="{{email}}" readonly>
+    <div class="form-group email">
+        <label for="EMAIL">{{#translate}}Existing Email Address{{/translate}}</label>
+        <input type="email" name="EMAIL" id="email" placeholder="" value="{{email}}" readonly>
     </div>
 
-    <div class="form-group">
-        <label for="email-new">{{#translate}}New Email Address{{/translate}}</label>
-        <input type="email" name="email-new" id="email-new" placeholder="{{#translate}}Your new email address{{/translate}}" value="{{email}}">
+    <div class="form-group email">
+        <label for="EMAIL_NEW">{{#translate}}New Email Address{{/translate}}</label>
+        <input type="email" name="EMAIL_NEW" id="email-new" placeholder="{{#translate}}Your new email address{{/translate}}" value="{{email}}">
     </div>
 
     <p>

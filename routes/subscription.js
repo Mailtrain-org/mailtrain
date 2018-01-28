@@ -37,6 +37,7 @@ const objectHash = require('object-hash');
 const bluebird = require('bluebird');
 const fsReadFile = bluebird.promisify(require('fs').readFile);
 
+const { cleanupFromPost } = require('../lib/helpers');
 
 const originWhitelist = config.cors && config.cors.origins || [];
 
@@ -158,8 +159,6 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
         }
     }
 
-    console.log(subscription);
-
     const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
     subscription.cid = meta.cid;
     await mailHelpers.sendSubscriptionConfirmed(list, subscription.email, subscription);
@@ -195,31 +194,15 @@ router.getAsync('/confirm/unsubscribe/:cid', async (req, res) => {
 });
 
 
-router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
-    const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
-
-    if (!list.public_subscribe) {
-        shares.throwPermissionDenied();
-    }
-
-    const ucid = req.query.cid;
-
-    const data = req.query;
+async function _renderSubscribe(req, res, list, subscription) {
+    const data = {};
+    data.email = subscription && subscription.email;
     data.layout = 'subscription/layout';
     data.title = list.name;
     data.cid = list.cid;
     data.csrfToken = req.csrfToken();
 
-    let subscription;
-    if (ucid) {
-        subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, ucid, false);
-
-        if (subscription) {
-            data.email = subscription.email;
-        }
-    }
-
-    data.customFields = await fields.getRow(contextHelpers.getAdminContext(), list.id, subscription);
+    data.customFields = await fields.forHbs(contextHelpers.getAdminContext(), list.id, subscription);
     data.useEditor = true;
 
     const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress']);
@@ -241,60 +224,55 @@ router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
     data.flashMessages = await captureFlashMessages(res);
 
     const result = htmlRenderer(data);
+
     res.send(result);
-});
+}
 
-
-router.options('/:cid/widget', cors(corsOptions));
-
-router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
-    req.needsAPIJSONResponse = true;
-
-    const cached = cache.get(req.path);
-    if (cached) {
-        return res.status(200).json(cached);
-    }
-
+router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
 
-    const configItems = await settings.get(['serviceUrl', 'pgpPrivateKey']);
+    if (!list.public_subscribe) {
+        shares.throwPermissionDenied();
+    }
 
-    const data = {
-        title: list.name,
-        cid: list.cid,
-        serviceUrl: configItems.serviceUrl,
-        hasPubkey: !!configItems.pgpPrivateKey,
-        customFields: await fields.getRow(contextHelpers.getAdminContext(), list.id),
-        template: {},
-        layout: null,
-    };
+    const ucid = req.query.cid;
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
+    let subscription;
+    if (ucid) {
+        try {
+            subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, ucid);
 
-    const renderAsync = bluebird.promisify(res.render);
-    const html = await renderAsync('subscription/widget-subscribe', data);
-
-    const response = {
-        data: {
-            title: data.title,
-            cid: data.cid,
-            html
+            if (subscription.status === SubscriptionStatus.SUBSCRIBED) {
+                subscription = null;
+            }
+        } catch (err) {
+            if (err instanceof interoperableErrors.NotFoundError) {
+            } else {
+                throw err;
+            }
         }
-    };
+    }
 
-    cache.put(req.path, response, 30000); // ms
-    res.status(200).json(response);
+    await _renderSubscribe(req, res, list, subscription);
 });
 
 
 router.options('/:cid/subscribe', cors(corsOptions));
 
 router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, async (req, res) => {
-    const email = (req.body.email || '').toString().trim();
-
     if (req.xhr) {
         req.needsAPIJSONResponse = true;
     }
+
+    const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
+
+    if (!list.public_subscribe) {
+        shares.throwPermissionDenied();
+    }
+
+    const subscriptionData = await fields.fromPost(contextHelpers.getAdminContext(), list.id, req.body);
+
+    const email = cleanupFromPost(req.body.EMAIL);
 
     if (!email) {
         if (req.xhr) {
@@ -302,7 +280,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         }
 
         req.flash('danger', _('Email address not set'));
-        return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+        return await _renderSubscribe(req, res, list, subscriptionData);
     }
 
     const emailErr = await tools.validateEmail(email);
@@ -314,7 +292,8 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         }
 
         req.flash('danger', errMsg);
-        return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+        subscriptionData.email = email;
+        return await _renderSubscribe(req, res, list, subscriptionData);
     }
 
     // Check if the subscriber seems legit. This is a really simple check, the only requirement is that
@@ -326,23 +305,18 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     let addressTest = !req.body.address;
     let testsPass = subTimeTest && addressTest;
 
-    const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
-
-    if (!list.public_subscribe) {
-        shares.throwPermissionDenied();
+    let existingSubscription;
+    try {
+        existingSubscription = await subscriptions.getByEmail(contextHelpers.getAdminContext(), list.id, email);
+    } catch (err) {
+        if (err instanceof interoperableErrors.NotFoundError) {
+        } else {
+            throw err;
+        }
     }
 
-    const subscriptionData = {};
-    Object.keys(req.body).forEach(key => {
-        if (key !== 'email' && key.charAt(0) !== '_') {
-            subscriptionData[key] = (req.body[key] || '').toString().trim();
-        }
-    });
-
-    const subscription = await subscriptions.getByEmail(contextHelpers.getAdminContext(), list.id, email, false);
-
-    if (subscription && subscription.status === SubscriptionStatus.SUBSCRIBED) {
-        await mailHelpers.sendAlreadySubscribed(list, email, subscription);
+    if (existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED) {
+        await mailHelpers.sendAlreadySubscribed(list, email, existingSubscription);
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
     } else {
@@ -368,11 +342,56 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     }
 });
 
+
+router.options('/:cid/widget', cors(corsOptions));
+
+router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
+    req.needsAPIJSONResponse = true;
+
+    const cached = cache.get(req.path);
+    if (cached) {
+        return res.status(200).json(cached);
+    }
+
+    const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
+
+    const configItems = await settings.get(['serviceUrl', 'pgpPrivateKey']);
+
+    const data = {
+        title: list.name,
+        cid: list.cid,
+        serviceUrl: configItems.serviceUrl,
+        hasPubkey: !!configItems.pgpPrivateKey,
+        customFields: await fields.forHbs(contextHelpers.getAdminContext(), list.id),
+        template: {},
+        layout: null,
+    };
+
+    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
+
+    const renderAsync = bluebird.promisify(res.render);
+    const html = await renderAsync('subscription/widget-subscribe', data);
+
+    const response = {
+        data: {
+            title: data.title,
+            cid: data.cid,
+            html
+        }
+    };
+
+    cache.put(req.path, response, 30000); // ms
+    res.status(200).json(response);
+});
+
+
+
 router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
-    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid, false);
 
-    if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+    const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid);
+
+    if (subscription.status !== SubscriptionStatus.SUBSCRIBED) {
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
@@ -384,7 +403,7 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
     data.csrfToken = req.csrfToken();
     data.layout = 'data/layout';
 
-    data.customFields = await fields.getRow(contextHelpers.getAdminContext(), list.id, subscription);
+    data.customFields = await fields.forHbs(contextHelpers.getAdminContext(), list.id, subscription);
 
     data.useEditor = true;
 
@@ -414,7 +433,8 @@ router.postAsync('/:lcid/manage', passport.parseForm, passport.csrfProtection, a
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
 
     try {
-        await subscriptions.updateManagedUngrouped(contextHelpers.getAdminContext(), list.id, req.body);
+        const subscriptionData = await fields.fromPost(contextHelpers.getAdminContext(), list.id, req.body);
+        await subscriptions.updateManaged(contextHelpers.getAdminContext(), list.id, req.body.cid, subscriptionData);
     } catch (err) {
         if (err instanceof interoperableErrors.NotFoundError) {
             throw new interoperableErrors.NotFoundError('Subscription not found in this list');
@@ -430,7 +450,7 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
     const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid, false);
 
-    if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+    if (subscription.status !== SubscriptionStatus.SUBSCRIBED) {
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
@@ -450,7 +470,7 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
         layout: 'subscription/layout.mjml.hbs'
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage-address', subscription);
+    await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage-address', data);
 
     const htmlRenderer = await getMjmlTemplate(data.template);
 
@@ -466,7 +486,7 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
 router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
 
-    const emailNew = (req.body['email-new'] || '').toString().trim();
+    const emailNew = cleanupFromPost(req.body['EMAIL_NEW']);
 
     const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.body.cid, false);
 
@@ -485,7 +505,15 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
             req.flash('danger', errMsg);
 
         } else {
-            const newSubscription = await subscriptions.getByEmail(contextHelpers.getAdminContext(), list.id, emailNew, false);
+            let newSubscription;
+            try {
+                newSubscription = await subscriptions.getByEmail(contextHelpers.getAdminContext(), list.id, emailNew, false);
+            } catch (err) {
+                if (err instanceof interoperableErrors.NotFoundError) {
+                } else {
+                    throw err;
+                }
+            }
 
             if (newSubscription && newSubscription.status === SubscriptionStatus.SUBSCRIBED) {
                 await mailHelpers.sendAlreadySubscribed(list, emailNew, subscription);
@@ -523,7 +551,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
 
         const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, req.params.ucid, false);
 
-        if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+        if (subscription.status !== SubscriptionStatus.SUBSCRIBED) {
             throw new interoperableErrors.NotFoundError('Subscription not found in this list');
         }
 
@@ -562,7 +590,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
 router.postAsync('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
 
-    const campaignCid = (req.body.campaign || '').toString().trim() || false;
+    const campaignCid = cleanupFromPost(req.body.campaign);
 
     await handleUnsubscribe(list, req.body.ucid, false, campaignCid, req.ip, res);
 });
@@ -588,7 +616,7 @@ async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaig
     } else {
         const subscription = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid, false);
 
-        if (!subscription || subscription.status !== SubscriptionStatus.SUBSCRIBED) {
+        if (subscription.status !== SubscriptionStatus.SUBSCRIBED) {
             throw new interoperableErrors.NotFoundError('Subscription not found in this list');
         }
 

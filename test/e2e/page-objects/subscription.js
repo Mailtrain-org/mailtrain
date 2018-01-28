@@ -21,7 +21,7 @@ const fieldHelpers = list => ({
 
         for (const field of list.customFields) {
             if (field.key in subscription) {
-                await this.setValue(`[name="${field.column}"]`, subscription[field.key]);
+                await this.setValue(`[name="${field.key}"]`, subscription[field.key]);
             }
         }
     },
@@ -41,7 +41,7 @@ const fieldHelpers = list => ({
 
         for (const field of list.customFields) {
             if (field.key in subscription) {
-                expect(await this.getValue(`[name="${field.column}"]`)).to.equal(subscription[field.key]);
+                expect(await this.getValue(`[name="${field.key}"]`)).to.equal(subscription[field.key]);
             }
         }
     }
@@ -55,16 +55,29 @@ module.exports = list => ({
         textsToWaitFor: ['Subscribe to list'],
         elements: {
             form: `form[action="/subscription/${list.cid}/subscribe"]`,
-            emailInput: '#main-form input[name="email"]',
-            firstNameInput: '#main-form input[name="first-name"]',
-            lastNameInput: '#main-form input[name="last-name"]',
+            emailInput: '#main-form input[name="EMAIL"]',
+            firstNameInput: '#main-form input[name="FIRST_NAME"]',
+            lastNameInput: '#main-form input[name="LAST_NAME"]',
+            submitButton: 'a[href="#submit"]'
+        }
+    }, fieldHelpers(list)),
+
+    webSubscribeAfterPost: web({
+        url: `/subscription/${list.cid}/subscribe`,
+        elementsToWaitFor: ['form'],
+        textsToWaitFor: ['Subscribe to list'],
+        elements: {
+            form: `form[action="/subscription/${list.cid}/subscribe"]`,
+            emailInput: '#main-form input[name="EMAIL"]',
+            firstNameInput: '#main-form input[name="FIRST_NAME"]',
+            lastNameInput: '#main-form input[name="LAST_NAME"]',
             submitButton: 'a[href="#submit"]'
         }
     }, fieldHelpers(list)),
 
     webSubscribeNonPublic: web({
         url: `/subscription/${list.cid}`,
-        textsToWaitFor: ['The list does not allow public subscriptions'],
+        textsToWaitFor: ['Permission denied'],
     }),
 
     webConfirmSubscriptionNotice: web({
@@ -117,9 +130,9 @@ module.exports = list => ({
         textsToWaitFor: ['Update Your Preferences'],
         elements: {
             form: `form[action="/subscription/${list.cid}/manage"]`,
-            emailInput: '#main-form input[name="email"]',
-            firstNameInput: '#main-form input[name="first-name"]',
-            lastNameInput: '#main-form input[name="last-name"]',
+            emailInput: '#main-form input[name="EMAIL"]',
+            firstNameInput: '#main-form input[name="FIRST_NAME"]',
+            lastNameInput: '#main-form input[name="LAST_NAME"]',
             submitButton: 'a[href="#submit"]',
             manageAddressLink: `a[href^="/subscription/${list.cid}/manage-address/"]`
         },
@@ -134,8 +147,8 @@ module.exports = list => ({
         textsToWaitFor: ['Update Your Email Address'],
         elements: {
             form: `form[action="/subscription/${list.cid}/manage-address"]`,
-            emailInput: '#main-form input[name="email"]',
-            emailNewInput: '#main-form input[name="email-new"]',
+            emailInput: '#main-form input[name="EMAIL"]',
+            emailNewInput: '#main-form input[name="EMAIL_NEW"]',
             submitButton: 'a[href="#submit"]'
         }
     }),

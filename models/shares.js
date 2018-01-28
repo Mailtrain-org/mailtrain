@@ -8,6 +8,9 @@ const dtHelpers = require('../lib/dt-helpers');
 const permissions = require('../lib/permissions');
 const interoperableErrors = require('../shared/interoperable-errors');
 
+// TODO: This would really benefit from some permission cache connected to rebuildPermissions
+// A bit of the problem is that the cache would have to expunged as the result of other processes modifying entites/permissions
+
 
 async function listByEntityDTAjax(context, entityTypeId, entityId, params) {
     return await knex.transaction(async (tx) => {

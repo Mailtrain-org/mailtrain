@@ -31,17 +31,7 @@ function getOptionsMap(groupedField) {
     return result;
 }
 
-fieldTypes.text = fieldTypes.website = fieldTypes.longtext = fieldTypes.gpg = {
-    afterJSON: (groupedField, entity) => {},
-    listRender: (groupedField, value) => value
-};
-
-fieldTypes.number = {
-    afterJSON: (groupedField, entity) => {},
-    listRender: (groupedField, value) => Number(value)
-};
-
-fieldTypes.json = {
+fieldTypes.text = fieldTypes.website = fieldTypes.longtext = fieldTypes.gpg = fieldTypes.number = fieldTypes.json = {
     afterJSON: (groupedField, entity) => {},
     listRender: (groupedField, value) => value
 };
@@ -207,25 +197,15 @@ async function hashByList(listId, entity) {
 }
 
 
-async function _getStatusBy(context, listId, key, value) {
-    return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
-
-        const entity = await tx(getSubscriptionTableName(listId)).where(key, value).select(['status']).first();
-
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
-        return entity.status;
-    });
-}
-
 async function _getBy(context, listId, key, value, grouped) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
         const entity = await tx(getSubscriptionTableName(listId)).where(key, value).first();
+
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+        }
 
         const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
 
@@ -355,19 +335,36 @@ async function listDTAjax(context, listId, segmentId, params) {
     });
 }
 
-async function list(context, listId) {
+async function list(context, listId, grouped = true, offset, limit) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
-        const entities = await tx(getSubscriptionTableName(listId));
+        const count = await tx(getSubscriptionTableName(listId)).count('* as count').first().count;
 
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const entitiesQry = tx(getSubscriptionTableName(listId)).orderBy('id', 'asc');
 
-        for (const entity of entities) {
-            groupSubscription(groupedFieldsMap, entity);
+        if (Number.isInteger(offset)) {
+            entitiesQry.offset(offset);
         }
 
-        return entities;
+        if (Number.isInteger(limit)) {
+            entitiesQry.limit(limit);
+        }
+
+        const entities = await entitiesQry;
+
+        if (grouped) {
+            const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+
+            for (const entity of entities) {
+                groupSubscription(groupedFieldsMap, entity);
+            }
+        }
+
+        return {
+            subscriptions: entities,
+            total: count
+        };
     });
 }
 
@@ -395,7 +392,6 @@ async function serverValidate(context, listId, data) {
 
 async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, isCreate) {
     enforce(entity.email, 'Email must be set');
-    enforce(entity.status > 0 && entity.status < SubscriptionStatus.MAX, 'Subscription status is invalid');
 
     const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('email', entity.email);
 
@@ -405,14 +401,16 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     const existingWithKey = await existingWithKeyQuery.first();
     if (existingWithKey) {
         if (meta && meta.replaceOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED) {
-            meta.updateNeeded = true;
+            meta.update = true;
             meta.existing = existingWithKey;
         } else {
             throw new interoperableErrors.DuplicitEmailError();
         }
     }
 
-    enforce(entity.status >= 0 && entity.status < SubscriptionStatus.MAX, 'Invalid status');
+    if ((isCreate && !(meta && meta.update)) || 'status' in entity) {
+        enforce(entity.status >= 0 && entity.status < SubscriptionStatus.MAX, 'Invalid status');
+    }
 
     for (const key in groupedFieldsMap) {
         const fld = groupedFieldsMap[key];
@@ -422,22 +420,25 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
 }
 
 async function _update(tx, listId, existing, filteredEntity) {
-    if (existing.status !== filteredEntity.status) {
-        filteredEntity.status_change = new Date();
+    if ('status' in filteredEntity) {
+        if (existing.status !== filteredEntity.status) {
+            filteredEntity.status_change = new Date();
+        }
     }
 
     await tx(getSubscriptionTableName(listId)).where('id', existing.id).update(filteredEntity);
 
+    if ('status' in filteredEntity) {
+        let countIncrement = 0;
+        if (existing.status === SubscriptionStatus.SUBSCRIBED && filteredEntity.status !== SubscriptionStatus.SUBSCRIBED) {
+            countIncrement = -1;
+        } else if (existing.status !== SubscriptionStatus.SUBSCRIBED && filteredEntity.status === SubscriptionStatus.SUBSCRIBED) {
+            countIncrement = 1;
+        }
 
-    let countIncrement = 0;
-    if (existing.status === SubscriptionStatus.SUBSCRIBED && filteredEntity.status !== SubscriptionStatus.SUBSCRIBED) {
-        countIncrement = -1;
-    } else if (existing.status !== SubscriptionStatus.SUBSCRIBED && filteredEntity.status === SubscriptionStatus.SUBSCRIBED) {
-        countIncrement = 1;
-    }
-
-    if (countIncrement) {
-        await tx('lists').where('id', listId).increment('subscribers', countIncrement);
+        if (countIncrement) {
+            await tx('lists').where('id', listId).increment('subscribers', countIncrement);
+        }
     }
 }
 
@@ -452,6 +453,11 @@ async function _create(tx, listId, filteredEntity) {
     return id;
 }
 
+/*
+    Adds a new subscription. Returns error if a subscription with the same email address is already present and is not unsubscribed.
+    If it is unsubscribed, the existing subscription is changed based on the provided data.
+    If meta.partial is true, it updates even an active subscription.
+ */
 async function create(context, listId, entity, meta /* meta is provided when called from /confirm/subscribe/:cid */) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
@@ -470,7 +476,7 @@ async function create(context, listId, entity, meta /* meta is provided when cal
         filteredEntity.opt_in_country = meta && meta.country;
         filteredEntity.imported = meta && !!meta.imported;
 
-        if (meta && meta.updateNeeded) {
+        if (meta && meta.update) {
             await _update(tx, listId, meta.existing, filteredEntity);
             meta.cid = meta.existing.cid; // The cid is needed by /confirm/subscribe/:cid
             return meta.existing.id;
@@ -515,10 +521,9 @@ async function updateWithConsistencyCheck(context, listId, entity) {
     });
 }
 
-async function removeTx(tx, context, listId, id) {
+async function _removeAndGetTx(tx, context, listId, existing) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-    const existing = await tx(getSubscriptionTableName(listId)).where('id', id).first();
     if (!existing) {
         throw new interoperableErrors.NotFoundError();
     }
@@ -532,9 +537,18 @@ async function removeTx(tx, context, listId, id) {
 
 async function remove(context, listId, id) {
     await knex.transaction(async tx => {
-        await removeTx(tx, context, listId, id);
+        const existing = await tx(getSubscriptionTableName(listId)).where('id', id).first();
+        await _removeAndGetTx(tx, context, listId, existing);
     });
 }
+
+async function removeByEmailAndGet(context, listId, email) {
+    return await knex.transaction(async tx => {
+        const existing = await tx(getSubscriptionTableName(listId)).where('email', email).first();
+        return await _removeAndGetTx(tx, context, listId, existing);
+    });
+}
+
 
 async function _unsubscribeAndGetTx(tx, context, listId, existingSubscription, campaignCid) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
@@ -585,6 +599,13 @@ async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaign
     });
 }
 
+async function unsubscribeByEmailAndGet(context, listId, email) {
+    return await knex.transaction(async tx => {
+        const existing = await tx(getSubscriptionTableName(listId)).where('email', email).first();
+        return _unsubscribeAndGetTx(tx, context, listId, existing);
+    });
+}
+
 async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
@@ -594,39 +615,60 @@ async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
             throw new interoperableErrors.NotFoundError();
         }
 
-        await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).update({
-            email: emailNew
-        });
+        if (existing.email !== emailNew) {
+            await tx(getSubscriptionTableName(listId)).where('email', emailNew).del();
 
-        existing.email = emailNew;
+            await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).update({
+                email: emailNew
+            });
+
+            existing.email = emailNew;
+        }
+
         return existing;
     });
 }
 
-async function updateManagedUngrouped(context, listId, entity) {
+async function updateManaged(context, listId, cid, entity) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const existing = await tx(getSubscriptionTableName(listId)).where('cid', entity.cid).first();
-        if (!existing || existing.status !== SubscriptionStatus.SUBSCRIBED) {
-            throw new interoperableErrors.NotFoundError();
-        }
-
-        const flds = await fields.listTx(tx, listId);
+        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
 
         const update = {};
+        for (const key in groupedFieldsMap) {
+            const fld = groupedFieldsMap[key];
 
-        for (const fld of flds) {
             if (fld.order_manage) {
-                if (!fld.group) { // fieldTypes is primarily meant only for groupedFields, so we don't try it for fields that would be grouped (i.e. option), because there is nothing to be done for them anyway
-                    fieldTypes[fld.type].afterJSON(fld, entity);
-                }
+                update[key] = entity[key];
+            }
 
-                update[fld.column] = entity[fld.column];
+            fieldTypes[fld.type].afterJSON(fld, update);
+        }
+
+        ungroupSubscription(groupedFieldsMap, update);
+
+        await tx(getSubscriptionTableName(listId)).where('cid', cid).update(update);
+    });
+}
+
+
+async function getListsWithEmail(context, email) {
+    // FIXME - this methods is rather suboptimal if there are many lists. It quite needs permission caching in shares.js
+
+    return await knex.transaction(async tx => {
+        const lists = await tx('lists').select(['id', 'name']);
+        const result = [];
+
+        for (const list of lists) {
+            await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
+            const entity = await tx(getSubscriptionTableName(list.id)).where('email', email).first();
+            if (entity) {
+                result.push(list);
             }
         }
 
-        await tx(getSubscriptionTableName(listId)).where('cid', entity.cid).update(update);
+        return result;
     });
 }
 
@@ -641,8 +683,11 @@ module.exports = {
     create,
     updateWithConsistencyCheck,
     remove,
+    removeByEmailAndGet,
     unsubscribeByCidAndGet,
     unsubscribeByIdAndGet,
+    unsubscribeByEmailAndGet,
     updateAddressAndGet,
-    updateManagedUngrouped
+    updateManaged,
+    getListsWithEmail
 };
