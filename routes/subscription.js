@@ -19,7 +19,7 @@ let cache = require('memory-cache');
 let geoip = require('geoip-ultralight');
 let confirmations = require('../lib/models/confirmations');
 let mailHelpers = require('../lib/subscription-mail-helpers');
-let corsOptions = tools.corsOptions;
+let corsOptions = tools.getCorsOptions();
 
 let corsOrCsrfProtection = (req, res, next) => {
     if (req.get('X-Requested-With') === 'XMLHttpRequest') {

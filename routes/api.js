@@ -13,9 +13,7 @@ let cors = require('cors');
 let router = new express.Router();
 let mailHelpers = require('../lib/subscription-mail-helpers');
 
-router.use(cors(tools.getCorsOptions));
-
-router.all('/*', (req, res, next) => {
+router.all('/*', cors(tools.getCorsOptions()), (req, res, next) => {
     if (!req.query.access_token) {
         res.status(403);
         return res.json({
