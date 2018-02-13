@@ -18,8 +18,7 @@ router.getAsync('/reports/:reportId', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/reports', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await reports.create(req.context, req.body);
-    return res.json();
+    return res.json(await reports.create(req.context, req.body));
 });
 
 router.putAsync('/reports/:reportId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

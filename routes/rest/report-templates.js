@@ -14,8 +14,7 @@ router.getAsync('/report-templates/:reportTemplateId', passport.loggedIn, async 
 });
 
 router.postAsync('/report-templates', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await reportTemplates.create(req.context, req.body);
-    return res.json();
+    return res.json(await reportTemplates.create(req.context, req.body));
 });
 
 router.putAsync('/report-templates/:reportTemplateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

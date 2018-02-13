@@ -16,8 +16,7 @@ router.getAsync('/namespaces/:nsId', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/namespaces', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await namespaces.create(req.context, req.body);
-    return res.json();
+    return res.json(await namespaces.create(req.context, req.body));
 });
 
 router.putAsync('/namespaces/:nsId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

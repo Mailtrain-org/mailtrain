@@ -17,8 +17,7 @@ router.getAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, asy
 });
 
 router.postAsync('/subscriptions/:listId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await subscriptions.create(req.context, req.params.listId, req.body);
-    return res.json();
+    return res.json(await subscriptions.create(req.context, req.params.listId, req.body));
 });
 
 router.putAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

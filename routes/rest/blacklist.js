@@ -11,8 +11,7 @@ router.postAsync('/blacklist-table', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/blacklist', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await blacklist.add(req.context, req.body.email);
-    return res.json();
+    return res.json(await blacklist.add(req.context, req.body.email));
 });
 
 router.deleteAsync('/blacklist/:email', passport.loggedIn, passport.csrfProtection, async (req, res) => {

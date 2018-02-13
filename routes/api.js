@@ -42,31 +42,17 @@ router.postAsync('/subscribe/:listId', async (req, res) => {
         throw new APIError(errMsg, 400);
     }
 
-    const subscription = {
-        email: input.EMAIL
-    };
-
     if (input.TIMEZONE) {
         subscription.tz = (input.TIMEZONE || '').toString().trim();
     }
 
-    const fieldList = await fields.fromPost(req.context, listId);
-
-    for (const field of fieldList) {
-        if (field.key in input && field.column) {
-            if (field.type === 'option') {
-                subscription[field.column] = ['false', 'no', '0', ''].indexOf((input[field.key] || '').toString().trim().toLowerCase()) >= 0 ? '' : '1';
-            } else {
-                subscription[field.column] = input[field.key];
-            }
-        }
-    }
+    const subscription = await fields.fromPost(req.context, listId);
 
     if (/^(yes|true|1)$/i.test(input.FORCE_SUBSCRIBE)) {
         subscription.status = SubscriptionStatus.SUBSCRIBED;
     }
 
-    if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) {
+    if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) { // if REQUIRE_CONFIRMATION is set, we assume that the user is not subscribed and will be subscribed
         const list = await lists.getByCid(contextHelpers.getAdminContext(), listId);
         await shares.enforceEntityPermission(req.context, 'list', listId, 'manageSubscriptions');
 
@@ -85,7 +71,12 @@ router.postAsync('/subscribe/:listId', async (req, res) => {
             }
         });
     } else {
-        const meta = {};
+        subscription.email = input.EMAIL;
+
+        const meta = {
+            updateAllowed: true
+        };
+
         await subscriptions.create(req.context, listId, subscription, meta);
 
         res.status(200);

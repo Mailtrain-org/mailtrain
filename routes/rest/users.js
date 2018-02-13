@@ -16,8 +16,7 @@ router.getAsync('/users/:userId', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/users', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await users.create(req.context, req.body);
-    return res.json();
+    return res.json(await users.create(req.context, req.body));
 });
 
 router.putAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

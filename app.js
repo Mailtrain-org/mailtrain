@@ -27,15 +27,10 @@ const routes = require('./routes/index');
 const lists = require('./routes/lists-legacy');
 //const settings = require('./routes/settings');
 const getSettings = nodeifyFunction(require('./models/settings').get);
-const templates = require('./routes/templates');
 const campaigns = require('./routes/campaigns');
 const links = require('./routes/links');
-const fields = require('./routes/fields');
-const forms = require('./routes/forms-legacy');
-const segments = require('./routes/segments');
 const triggers = require('./routes/triggers');
 const webhooks = require('./routes/webhooks');
-const subscription = require('./routes/subscription');
 const archive = require('./routes/archive');
 const api = require('./routes/api');
 const editorapi = require('./routes/editorapi');
@@ -44,6 +39,7 @@ const mosaico = require('./routes/mosaico');
 
 // These are routes for the new React-based client
 const reports = require('./routes/reports');
+const subscription = require('./routes/subscription');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const usersRest = require('./routes/rest/users');
@@ -57,13 +53,16 @@ const fieldsRest = require('./routes/rest/fields');
 const sharesRest = require('./routes/rest/shares');
 const segmentsRest = require('./routes/rest/segments');
 const subscriptionsRest = require('./routes/rest/subscriptions');
+const templatesRest = require('./routes/rest/templates');
 const blacklistRest = require('./routes/rest/blacklist');
+const editorsRest = require('./routes/rest/editors');
 
 const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
 const usersLegacyIntegration = require('./routes/users-legacy-integration');
 const accountLegacyIntegration = require('./routes/account-legacy-integration');
 const reportsLegacyIntegration = require('./routes/reports-legacy-integration');
 const listsLegacyIntegration = require('./routes/lists-legacy-integration');
+const templatesLegacyIntegration = require('./routes/templates-legacy-integration');
 const blacklistLegacyIntegration = require('./routes/blacklist-legacy-integration');
 
 const interoperableErrors = require('./shared/interoperable-errors');
@@ -254,20 +253,18 @@ app.use((req, res, next) => {
 // Regular endpoints
 app.use('/', routes);
 app.use('/lists', lists);
-app.use('/templates', templates);
 app.use('/campaigns', campaigns);
 //app.use('/settings', settings);
 app.use('/links', links);
-app.use('/fields', fields);
-app.use('/forms', forms);
-app.use('/segments', segments);
 app.use('/triggers', triggers);
 app.use('/webhooks', webhooks);
-app.use('/subscription', subscription);
 app.use('/archive', archive);
 app.use('/editorapi', editorapi);
 app.use('/grapejs', grapejs);
 app.use('/mosaico', mosaico);
+
+
+app.use('/subscription', subscription);
 
 
 // API endpoints
@@ -283,6 +280,7 @@ app.use('/users', usersLegacyIntegration);
 app.use('/namespaces', namespacesLegacyIntegration);
 app.use('/account', accountLegacyIntegration);
 app.use('/lists', listsLegacyIntegration);
+app.use('/templates', templatesLegacyIntegration);
 app.use('/blacklist', blacklistLegacyIntegration);
 
 if (config.reports && config.reports.enabled === true) {
@@ -302,7 +300,9 @@ app.use('/rest', fieldsRest);
 app.use('/rest', sharesRest);
 app.use('/rest', segmentsRest);
 app.use('/rest', subscriptionsRest);
+app.use('/rest', templatesRest);
 app.use('/rest', blacklistRest);
+app.use('/rest', editorsRest);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportTemplatesRest);

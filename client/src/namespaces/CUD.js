@@ -56,22 +56,19 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadTreeData() {
-        axios.get('/rest/namespaces-tree')
-            .then(response => {
+        const response = await axios.get('/rest/namespaces-tree');
+        const data = response.data;
+        for (const root of data) {
+            root.expanded = true;
+        }
 
-                const data = response.data;
-                for (const root of data) {
-                    root.expanded = true;
-                }
+        if (this.props.entity && !this.isEditGlobal()) {
+            this.removeNsIdSubtree(data);
+        }
 
-                if (this.props.entity && !this.isEditGlobal()) {
-                    this.removeNsIdSubtree(data);
-                }
-
-                this.setState({
-                    treeData: data
-                });
-            });
+        this.setState({
+            treeData: data
+        });
     }
 
     componentDidMount() {

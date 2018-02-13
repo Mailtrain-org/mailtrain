@@ -630,7 +630,13 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
     return customFields;
 }
 
+// Converts subscription data received via POST request from subscription form or via subscribe request to API v1 to subscription structure supported by subscriptions model.
 async function fromPost(context, listId, data) { // assumes grouped subscription
+
+    // This is to handle option values from API v1
+    function isSelected(value) {
+        return ['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0 ? false : true;
+    }
 
     const flds = await listGrouped(context, listId);
 
@@ -650,7 +656,10 @@ async function fromPost(context, listId, data) { // assumes grouped subscription
                 for (const optCol in fld.groupedOptions) {
                     const opt = fld.groupedOptions[optCol];
 
-                    if (data[fld.key] === opt.key) {
+                    // This handles two different formats for grouped dropdowns and radios.
+                    // The first part of the condition handles the POST requests from the subscription form, while the
+                    // second part handles the subscribe request to API v1
+                    if (data[fld.key] === opt.key || isSelected(data[opt.key])) {
                         value = opt.column
                     }
                 }
@@ -660,7 +669,7 @@ async function fromPost(context, listId, data) { // assumes grouped subscription
                 for (const optCol in fld.groupedOptions) {
                     const opt = fld.groupedOptions[optCol];
 
-                    if (data[opt.key]) {
+                    if (isSelected(data[opt.key])) {
                         value.push(opt.column);
                     }
                 }

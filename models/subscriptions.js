@@ -400,7 +400,7 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     }
     const existingWithKey = await existingWithKeyQuery.first();
     if (existingWithKey) {
-        if (meta && meta.replaceOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED) {
+        if (meta && (meta.updateAllowed || meta.updateOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED)) {
             meta.update = true;
             meta.existing = existingWithKey;
         } else {
@@ -476,7 +476,7 @@ async function create(context, listId, entity, meta /* meta is provided when cal
         filteredEntity.opt_in_country = meta && meta.country;
         filteredEntity.imported = meta && !!meta.imported;
 
-        if (meta && meta.update) {
+        if (meta && meta.update) { // meta.update is set by _validateAndPreprocess
             await _update(tx, listId, meta.existing, filteredEntity);
             meta.cid = meta.existing.cid; // The cid is needed by /confirm/subscribe/:cid
             return meta.existing.id;

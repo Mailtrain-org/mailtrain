@@ -13,8 +13,10 @@ import { Table, TableSelectMode } from './table';
 import {Button, Icon} from "./bootstrap-components";
 
 import brace from 'brace';
-import AceEditor from 'react-ace';
+import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
+
+import CKEditorRaw from "react-ckeditor-component";
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
@@ -823,7 +825,7 @@ class ACEEditor extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <AceEditor
+            <ACEEditorRaw
                 id={htmlId}
                 mode={props.mode}
                 theme="github"
@@ -835,6 +837,35 @@ class ACEEditor extends Component {
                 value={owner.getFormValue(id)}
                 tabSize={2}
                 setOptions={{useWorker: false}} // This disables syntax check because it does not always work well (e.g. in case of JS code in report templates)
+            />
+        );
+    }
+}
+
+
+class CKEditor extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        height: PropTypes.string
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.context.formStateOwner;
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <CKEditorRaw
+                onChange={evt => owner.updateFormValue(id, evt.editor.getData())}
+                content={owner.getFormValue(id)}
+                config={{width: '100%', height: props.height}}
             />
         );
     }
@@ -1251,5 +1282,6 @@ export {
     TableSelect,
     TableSelectMode,
     ACEEditor,
+    CKEditor,
     FormSendMethod
 }

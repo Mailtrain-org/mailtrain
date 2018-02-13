@@ -31,8 +31,7 @@ router.getAsync('/fields-grouped/:listId', passport.loggedIn, async (req, res) =
 });
 
 router.postAsync('/fields/:listId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await fields.create(req.context, req.params.listId, req.body);
-    return res.json();
+    return res.json(await fields.create(req.context, req.params.listId, req.body));
 });
 
 router.putAsync('/fields/:listId/:fieldId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

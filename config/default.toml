@@ -22,12 +22,7 @@
 title="mailtrain"
 
 # Enabled HTML editors
-editors=[
-  ["summernote", "Summernote"],
-  ["grapejs", "GrapeJS"],
-  ["mosaico", "Mosaico"],
-  ["codeeditor", "Code Editor"]
-]
+editors=["ckeditor", "codeeditor"]
 
 # Default language to use
 language="en"
@@ -203,7 +198,7 @@ rootNamespaceRole="master"
 [roles.namespace.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
+permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "manageUsers"]
 
 [roles.namespace.master.children]
 list=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
@@ -212,7 +207,7 @@ campaign=["view", "edit", "delete", "share"]
 template=["view", "edit", "delete", "share"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
-namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "manageUsers"]
+namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "manageUsers"]
 
 [roles.list.master]
 name="Master"

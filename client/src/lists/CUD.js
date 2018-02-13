@@ -165,7 +165,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
 
                     {isEdit &&
-                        <StaticField id="cid" className={styles.formDisabled} label="List ID" help={t('This is the list ID displayed to the subscribers')}>
+                        <StaticField id="cid" className={styles.formDisabled} label={t('List ID')} help={t('This is the list ID displayed to the subscribers')}>
                             {this.getFormValue('cid')}
                         </StaticField>
                     }

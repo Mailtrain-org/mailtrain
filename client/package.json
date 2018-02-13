@@ -29,13 +29,14 @@
     "react": "^15.6.1",
     "react-ace": "^5.1.0",
     "react-day-picker": "^6.1.0",
+    "react-dnd-html5-backend": "^2.4.1",
+    "react-dnd-touch-backend": "^0.3.13",
     "react-dom": "^15.6.1",
+    "react-dropzone": "^4.2.1",
     "react-i18next": "^4.6.1",
     "react-router-dom": "^4.1.1",
     "react-sortable-tree": "^1.2.0",
     "slugify": "^1.1.0",
-    "react-dnd-html5-backend": "^2.4.1",
-    "react-dnd-touch-backend": "^0.3.13",
     "url-parse": "^1.1.9"
   },
   "devDependencies": {

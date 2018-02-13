@@ -218,7 +218,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/reports/${this.props.entity.id}`}
+                        deleteUrl={`/rest/reports/${this.props.entity.id}`}
                         cudUrl={`/reports/${this.props.entity.id}/edit`}
                         listUrl="/reports"
                         deletingMsg={t('Deleting report ...')}

@@ -142,7 +142,7 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
     const meta = {
         ip: confirmation.ip,
         country: geoip.lookupCountry(confirmation.ip) || null,
-        replaceOfUnsubscribedAllowed: true
+        updateOfUnsubscribedAllowed: true
     };
 
     const subscription = data.subscriptionData;

@@ -17,8 +17,7 @@ router.getAsync('/forms/:formId', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/forms', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await forms.create(req.context, req.body);
-    return res.json();
+    return res.json(await forms.create(req.context, req.body));
 });
 
 router.putAsync('/forms/:formId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

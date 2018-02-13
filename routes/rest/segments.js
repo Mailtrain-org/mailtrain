@@ -21,8 +21,7 @@ router.getAsync('/segments/:listId/:segmentId', passport.loggedIn, async (req, r
 });
 
 router.postAsync('/segments/:listId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await segments.create(req.context, req.params.listId, req.body);
-    return res.json();
+    return res.json(await segments.create(req.context, req.params.listId, req.body));
 });
 
 router.putAsync('/segments/:listId/:segmentId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
