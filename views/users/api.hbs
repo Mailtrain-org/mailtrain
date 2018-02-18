@@ -277,3 +277,22 @@
 
 <pre>curl -XPOST '{{serviceUrl}}api/blacklist/delete?access_token={{accessToken}}' \
 --data 'EMAIL=test@example.com&amp;'</pre>
+
+<h3>GET /api/lists/:email – {{#translate}}Get the lists a user has subscribed to{{/translate}}</h3>
+
+<p>
+  {{#translate}}Retrieve the lists that the user with :email has subscribed to. {{/translate}}
+</p>
+
+<p>
+  <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+  <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+</ul>
+
+<p>
+  <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XGET '{{serviceUrl}}api/lists/test@example.com?access_token={{accessToken}} </pre>
