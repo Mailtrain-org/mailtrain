@@ -328,14 +328,17 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
 
             campaign.isScheduled = campaign.scheduled && campaign.scheduled > new Date();
 
+            // save total delivered count
+            campaing.orgdelivered = campaign.delivered
+
             // show only messages that weren't bounced as delivered
             campaign.delivered = campaign.delivered - campaign.bounced;
 
-            campaign.openRate = campaign.delivered ? Math.round((campaign.opened / campaign.delivered) * 10000) / 100 : 0;
-            campaign.clicksRate = campaign.delivered ? Math.round((campaign.clicks / campaign.delivered) * 10000) / 100 : 0;
-            campaign.bounceRate = campaign.delivered ? Math.round((campaign.bounced / campaign.delivered) * 10000) / 100 : 0;
-            campaign.complaintRate = campaign.delivered ? Math.round((campaign.complained / campaign.delivered) * 10000) / 100 : 0;
-            campaign.unsubscribeRate = campaign.delivered ? Math.round((campaign.unsubscribed / campaign.delivered) * 10000) / 100 : 0;
+            campaign.openRate = campaign.orgdelivered ? Math.round((campaign.opened / campaign.orgdelivered) * 10000) / 100 : 0;
+            campaign.clicksRate = campaign.orgdelivered ? Math.round((campaign.clicks / campaign.orgdelivered) * 10000) / 100 : 0;
+            campaign.bounceRate = campaign.orgdelivered ? Math.round((campaign.bounced / campaign.orgdelivered) * 10000) / 100 : 0;
+            campaign.complaintRate = campaign.orgdelivered ? Math.round((campaign.complained / campaign.orgdelivered) * 10000) / 100 : 0;
+            campaign.unsubscribeRate = campaign.orgdelivered ? Math.round((campaign.unsubscribed / campaign.orgdelivered) * 10000) / 100 : 0;
 
             campaigns.getLinks(campaign.id, (err, links) => {
                 if (err) {
