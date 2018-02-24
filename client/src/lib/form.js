@@ -863,7 +863,9 @@ class CKEditor extends Component {
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <CKEditorRaw
-                onChange={evt => owner.updateFormValue(id, evt.editor.getData())}
+                events={{
+                    "change": evt => owner.updateFormValue(id, evt.editor.getData())
+                }}
                 content={owner.getFormValue(id)}
                 config={{width: '100%', height: props.height}}
             />

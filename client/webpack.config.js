@@ -52,9 +52,14 @@ module.exports = {
                     },
                     'sass-loader' ]
             },
+            {
+                test: /\.(woff|ttf|eot)$/,
+                use: [ 'url-loader' ]
+            }
         ]
     },
     externals: {
+        $: "jQuery",
         jquery: 'jQuery',
         csfrToken: 'csfrToken',
         mailtrainConfig: 'mailtrainConfig'

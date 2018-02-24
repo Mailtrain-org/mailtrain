@@ -159,6 +159,120 @@ export default class CUD extends Component {
 
         const typeKey = this.getFormValue('type');
 
+        let editForm = null;
+        if (isEdit && typeKey) {
+            editForm = <div>
+                <AlignedRow>
+                    <Button className="btn-default" onClickAsync={::this.toggleMergeTagReference} label={t('Merge tag reference')}/>
+                    {this.state.showMergeTagReference &&
+                    <div style={{marginTop: '15px'}}>
+                        <Trans><p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p></Trans>
+                        <table className="table table-bordered table-condensed table-striped">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <Trans>Merge tag</Trans>
+                                </th>
+                                <th>
+                                    <Trans>Description</Trans>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">
+                                    [LINK_UNSUBSCRIBE]
+                                </th>
+                                <td>
+                                    <Trans>URL that points to the unsubscribe page</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [LINK_PREFERENCES]
+                                </th>
+                                <td>
+                                    <Trans>URL that points to the preferences page of the subscriber</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [LINK_BROWSER]
+                                </th>
+                                <td>
+                                    <Trans>URL to preview the message in a browser</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [EMAIL]
+                                </th>
+                                <td>
+                                    <Trans>Email address</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [FIRST_NAME]
+                                </th>
+                                <td>
+                                    <Trans>First name</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [LAST_NAME]
+                                </th>
+                                <td>
+                                    <Trans>Last name</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [FULL_NAME]
+                                </th>
+                                <td>
+                                    <Trans>Full name (first and last name combined)</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [SUBSCRIPTION_ID]
+                                </th>
+                                <td>
+                                    <Trans>Unique ID that identifies the recipient</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [LIST_ID]
+                                </th>
+                                <td>
+                                    <Trans>Unique ID that identifies the list used for this campaign</Trans>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    [CAMPAIGN_ID]
+                                </th>
+                                <td>
+                                    <Trans>Unique ID that identifies current campaign</Trans>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <Trans><p>In addition to that any custom field can have its own merge tag.</p></Trans>
+                    </div>}
+                </AlignedRow>
+
+                {this.templateTypes[typeKey].form}
+
+                <ACEEditor id="text" height="400px" mode="text" label={t('Template content (plain text)')} help={<Trans>To extract the text from HTML click <ActionLink onClickAsync={::this.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}/>
+            </div>
+        }
+
+
         return (
             <div>
                 {canDelete &&
@@ -190,113 +304,7 @@ export default class CUD extends Component {
 
                     <NamespaceSelect/>
 
-                    <AlignedRow>
-                        <Button className="btn-default" onClickAsync={::this.toggleMergeTagReference} label={t('Merge tag reference')}/>
-                        {this.state.showMergeTagReference &&
-                        <div style={{marginTop: '15px'}}>
-                            <Trans><p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p></Trans>
-                            <table className="table table-bordered table-condensed table-striped">
-                                <thead>
-                                <tr>
-                                    <th>
-                                        <Trans>Merge tag</Trans>
-                                    </th>
-                                    <th>
-                                        <Trans>Description</Trans>
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <th scope="row">
-                                        [LINK_UNSUBSCRIBE]
-                                    </th>
-                                    <td>
-                                        <Trans>URL that points to the unsubscribe page</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [LINK_PREFERENCES]
-                                    </th>
-                                    <td>
-                                        <Trans>URL that points to the preferences page of the subscriber</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [LINK_BROWSER]
-                                    </th>
-                                    <td>
-                                        <Trans>URL to preview the message in a browser</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [EMAIL]
-                                    </th>
-                                    <td>
-                                        <Trans>Email address</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [FIRST_NAME]
-                                    </th>
-                                    <td>
-                                        <Trans>First name</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [LAST_NAME]
-                                    </th>
-                                    <td>
-                                        <Trans>Last name</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [FULL_NAME]
-                                    </th>
-                                    <td>
-                                        <Trans>Full name (first and last name combined)</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [SUBSCRIPTION_ID]
-                                    </th>
-                                    <td>
-                                        <Trans>Unique ID that identifies the recipient</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [LIST_ID]
-                                    </th>
-                                    <td>
-                                        <Trans>Unique ID that identifies the list used for this campaign</Trans>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        [CAMPAIGN_ID]
-                                    </th>
-                                    <td>
-                                        <Trans>Unique ID that identifies current campaign</Trans>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-
-                            <Trans><p>In addition to that any custom field can have its own merge tag.</p></Trans>
-                        </div>}
-                    </AlignedRow>
-
-                    <ACEEditor id="text" height="400px" mode="text" label={t('Template content (plain text)')} help={<Trans>To extract the text from HTML click <ActionLink onClickAsync={::this.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}/>
-
-                    {isEdit && typeKey && this.templateTypes[typeKey].form}
+                    {editForm}
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={isEdit ? t('Save') : t('Save and edit template')}/>

@@ -28,6 +28,7 @@
     "querystringify": "^1.0.0",
     "react": "^15.6.1",
     "react-ace": "^5.1.0",
+    "react-ckeditor-component": "^1.0.7",
     "react-day-picker": "^6.1.0",
     "react-dnd-html5-backend": "^2.4.1",
     "react-dnd-touch-backend": "^0.3.13",

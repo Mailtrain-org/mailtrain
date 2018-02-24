@@ -1,7 +1,10 @@
 'use strict';
 
 import React from "react";
-import {ACEEditor, SummernoteEditor} from "../lib/form";
+import {
+    ACEEditor,
+    CKEditor
+} from "../lib/form";
 import 'brace/mode/text';
 import 'brace/mode/html'
 
@@ -19,7 +22,7 @@ export function getTemplateTypes(t) {
 
     templateTypes.ckeditor = {
         typeName: t('CKEditor'),
-        form: <SummernoteEditor id="html" height="600px" label={t('Template content (HTML)')}/>
+        form: <CKEditor id="html" height="600px" label={t('Template content (HTML)')}/>
     };
 
     templateTypes.codeeditor = {
