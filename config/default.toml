@@ -109,11 +109,13 @@ host="0.0.0.0"
 [ldap]
 # enable to use ldap user backend
 enabled=false
+# method is ldapjs or ldapauth - it chooses the library to be used
+method="ldapjs"
 host="localhost"
 port=3002
 baseDN="ou=users,dc=company"
 filter="(|(username={{username}})(mail={{username}}))"
-#Username field in LDAP (uid/cn/username)
+# Username field in LDAP (uid/cn/username)
 uidTag="username"
 # nameTag identifies the attribute to be used for user's full name
 nameTag="username"
@@ -121,6 +123,9 @@ passwordresetlink=""
 newUserRole="master"
 # Global namespace id
 newUserNamespaceId=1
+# Use a different user to bind LDAP (final bind DN will be: {{uidTag}}={{bindUser}},{{baseDN}})
+bindUser="name@company.net"
+bindPassword="mySecretPassword"
 
 [postfixbounce]
 # Enable to allow writing Postfix bounce log to Mailtrain listener

@@ -135,7 +135,7 @@ function checkEntries(parent, entries, callback) {
                 if (/\[RSS_ENTRY[\w]*\]/i.test(html)) {
                     html = html.replace(/\[RSS_ENTRY\]/, entry.content); //for backward compatibility
                     Object.keys(entry).forEach(key => {
-                        html = html.replace('[RSS_ENTRY_' + key.toUpperCase() + ']', entry[key]);
+                        html = html.replace(new RegExp('\\[RSS_ENTRY_' + key.toUpperCase() + '\\]', 'g'), entry[key]);
                     });
                 } else {
                     html = entry.content + html;

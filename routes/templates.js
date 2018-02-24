@@ -138,6 +138,19 @@ router.post('/edit', passport.parseForm, passport.csrfProtection, (req, res) => 
     });
 });
 
+router.post('/duplicate', passport.parseForm, passport.csrfProtection, (req, res) => {
+    templates.duplicate(req.body.id, (err, duplicated) => {
+        if (err) {
+            req.flash('danger', err && err.message || err);
+        } else if (duplicated) {
+            req.flash('success', _('Template duplicated'));
+        } else {
+            req.flash('info', _('Could not duplicate specified template'));
+        }
+        return res.redirect('/templates/edit/' + duplicated);
+    });
+});
+
 router.post('/delete', passport.parseForm, passport.csrfProtection, (req, res) => {
     templates.delete(req.body.id, (err, deleted) => {
         if (err) {

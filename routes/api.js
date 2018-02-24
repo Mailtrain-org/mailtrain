@@ -150,7 +150,6 @@ router.getAsync('/subscriptions/:listId', async (req, res) => {
     });
 });
 
-
 router.getAsync('/lists/:email', async (req, res) => {
     const lists = await subscriptions.getListsWithEmail(req.context, req.params.email);
 

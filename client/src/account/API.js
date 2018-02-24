@@ -306,6 +306,25 @@ export default class API extends Component {
 
                 <pre>curl -XPOST '{serviceUrl}api/blacklist/delete?access_token={accessToken}' \
 --data 'EMAIL=test@example.com&amp;'</pre>
+
+                <h3>GET /api/lists/:email – {t('Get the lists a user has subscribed to')}</h3>
+
+                <p>
+                    {t('Retrieve the lists that the user with :email has subscribed to.')}
+                </p>
+
+                <p>
+                    <strong>GET</strong> {t('arguments')}
+                </p>
+                <ul>
+                    <li><strong>access_token</strong> – {t('your personal access token')}</li>
+                </ul>
+
+                <p>
+                    <strong>{t('Example')}</strong>
+                </p>
+
+                <pre>curl -XGET '{{serviceUrl}}api/lists/test@example.com?access_token={{accessToken}} </pre>
             </div>
         );
     }

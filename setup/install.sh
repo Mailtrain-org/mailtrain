@@ -12,10 +12,16 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
+MYSQL_ROOT_PASSWORD=`pwgen 12 -1`
+
+debconf-set-selections <<< 'mariadb-server-5.5 mysql-server/root_password password $MYSQL_ROOT_PASSWORD'
+debconf-set-selections <<< 'mariadb-server-5.5 mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD'
+
 curl -sL https://deb.nodesource.com/setup_7.x | bash -
 apt-get -q -y install mariadb-server pwgen nodejs imagemagick git ufw build-essential dnsutils python software-properties-common
 
 apt-add-repository -y ppa:chris-lea/redis-server
+apt-get update
 apt-get -q -y install redis-server
 
 apt-get clean
@@ -33,10 +39,10 @@ DKIM_API_KEY=`pwgen 12 -1`
 SMTP_PASS=`pwgen 12 -1`
 
 # Setup MySQL user for Mailtrain
-mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
-mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';"
-mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$MYSQL_RO_PASSWORD';"
-mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';"
+mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';" -p$MYSQL_ROOT_PASSWORD
+mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';" -p$MYSQL_ROOT_PASSWORD
+mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$MYSQL_RO_PASSWORD';" -p$MYSQL_ROOT_PASSWORD
+mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';" -p$MYSQL_ROOT_PASSWORD
 mysql -u mailtrain --password="$MYSQL_PASSWORD" -e "CREATE database mailtrain;"
 
 # Enable firewall, allow connections to SSH, HTTP, HTTPS and SMTP
@@ -229,4 +235,6 @@ fi
 service zone-mta start
 service mailtrain start
 
+echo $MYSQL_ROOT_PASSWORD > ~/mysql_root_password
+echo "MySQL root password: $MYSQL_ROOT_PASSWORD"
 echo "Success! Open http://$HOSTNAME/ and log in as admin:test";
