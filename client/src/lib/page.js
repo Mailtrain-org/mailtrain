@@ -217,6 +217,12 @@ class RouteContent extends Component {
             return <Redirect to={link}/>;
 
         } else {
+            const primaryMenuProps = {
+                location: this.props.location
+            };
+
+            const primaryMenuComponent = React.createElement(route.primaryMenuComponent, primaryMenuProps);
+
             if (resolved) {
                 const compProps = {
                     match: this.props.match,
@@ -233,17 +239,29 @@ class RouteContent extends Component {
 
                 return (
                     <div>
+                        {primaryMenuComponent}
+
                         <div>
                             <SecondaryNavBar className="hidden-xs pull-right" route={route} params={params} resolved={resolved}/>
                             <Breadcrumb route={route} params={params} resolved={resolved}/>
                             <SecondaryNavBar className="visible-xs" route={route} params={params} resolved={resolved}/>
                         </div>
-                        {this.props.flashMessage}
-                        {panel}
+
+                        <div className="container-fluid">
+                            {this.props.flashMessage}
+                            {panel}
+                        </div>
                     </div>
                 );
             } else {
-                return <div>{t('Loading...')}</div>;
+                return (
+                    <div>
+                        {primaryMenuComponent}
+                        <div className="container-fluid">
+                            {t('Loading...')}
+                        </div>
+                    </div>
+                );
             }
         }
     }
@@ -257,36 +275,11 @@ class SectionContent extends Component {
         super(props);
 
         this.state = {
-            flashMessageText: ''
         }
 
         this.historyUnlisten = props.history.listen((location, action) => {
             this.closeFlashMessage();
         })
-
-
-        // -------------------------------------------------------------------------------------------------------
-        /* FIXME - remove this once we migrate fully to React
-           This part transforms the flash notice rendered by the server to flash notice managed by React client.
-           It is used primarily for the login info, but there may be some other cases.
-         */
-        const alrt = jQuery('.container>.alert');
-        alrt.find('button').remove();
-
-        const alrtText = alrt.text();
-        if (alrtText) {
-            this.state.flashMessageText = alrtText;
-
-            const severityRegex = /alert-([^ ]*)/;
-            const match = alrt.attr('class').match(severityRegex);
-
-            if (match) {
-                this.state.flashMessageSeverity = match[1];
-            }
-        }
-
-        alrt.remove();
-        // -------------------------------------------------------------------------------------------------------
     }
 
     static propTypes = {
@@ -327,14 +320,13 @@ class SectionContent extends Component {
     ensureAuthenticated() {
         if (!mailtrainConfig.isAuthenticated) {
             /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
-            window.location = '/account/login?next=' + encodeURIComponent(this.props.root);
+            this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
         }
     }
 
     errorHandler(error) {
         if (error instanceof interoperableErrors.NotLoggedInError) {
-            /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
-            window.location = '/account/login?next=' + encodeURIComponent(this.props.root);
+            this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
         } else if (error.response && error.response.data && error.response.data.message) {
             console.error(error);
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);

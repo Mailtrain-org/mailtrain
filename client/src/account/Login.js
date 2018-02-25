@@ -59,13 +59,11 @@ export default class Login extends Component {
             this.setFormStatusMessage('info', t('Verifying credentials ...'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, '/rest/login');
-            /* FIXME, once we turn Mailtrain to single-page application, we should receive authenticated config (from client-helpers.js:getAuthenticatedConfig)
-               as part of login response. Then we should integrate it in the mailtrainConfig global variable. */
 
             if (submitSuccessful) {
                 const nextUrl = qs.parse(this.props.location.search).next || '/';
 
-                /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
+                /* This ensures we get config for the authenticated user */
                 window.location = nextUrl;
             } else {
                 this.setFormStatusMessage('warning', t('Please enter your credentials and try again.'));

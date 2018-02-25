@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=1024, initial-scale=1">
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+
+    <title>Mailtrain</title>
+
+    <script src="/public/mosaico/vendor/jquery.min.js"></script>
+    <script src="/public/mosaico/vendor/jquery-migrate.min.js"></script>
+    <script src="/public/mosaico/vendor/knockout.js"></script>
+    <script src="/public/mosaico/vendor/jquery-ui.min.js"></script>
+    <script src="/public/mosaico/vendor/jquery.ui.touch-punch.min.js"></script>
+    <script src="/public/mosaico/vendor/load-image.all.min.js"></script>
+    <script src="/public/mosaico/vendor/canvas-to-blob.min.js"></script>
+    <script src="/public/mosaico/vendor/jquery.iframe-transport.js"></script>
+    <script src="/public/mosaico/vendor/jquery.fileupload.js"></script>
+    <script src="/public/mosaico/vendor/jquery.fileupload-process.js"></script>
+    <script src="/public/mosaico/vendor/jquery.fileupload-image.js"></script>
+    <script src="/public/mosaico/vendor/jquery.fileupload-validate.js"></script>
+    <script src="/public/mosaico/vendor/knockout-jqueryui.min.js"></script>
+    <script src="/public/mosaico/vendor/tinymce.min.js"></script>
+
+    <script src="/public/mosaico/mosaico.min.js?v=0.16"></script>
+
+    {{#if languageStrings}}<script> window.mosaicoLanguageStrings = {{{languageStrings}}}; </script>{{/if}}
+    <script> window.mosaicoPlugins = []; </script>
+    <script> window.mosaicoHTMLPostRenderers = []; </script>
+
+    {{#if editorConfig.customscripts}}
+        {{#each editorConfig.customscripts}}
+            <script src="{{this}}"></script>
+        {{/each}}
+    {{/if}}
+
+    <script>
+        window.csfrToken = '{{reactCsrfToken}}';
+        window.mailtrainConfig = {{{mailtrainConfig}}};
+    </script>
+
+    <script src="/mailtrain/common.js"></script>
+    <script src="/mailtrain/mosaico.js"></script>
+
+    <link rel="stylesheet" href="/public/mosaico/mosaico-material.min.css?v=0.10" />
+    <link rel="stylesheet" href="/public/mosaico/vendor/notoregular/stylesheet.css" />
+</head>
+<body class="mo-standalone">
+{{{body}}}
+
+{{> tracking_scripts}}
+</body>
+</html>
+

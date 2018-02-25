@@ -14,7 +14,7 @@ import API from './API';
 import mailtrainConfig from 'mailtrainConfig';
 
 
-const getStructure = t => {
+function getMenus(t) {
     const subPaths = {
         login: {
             title: t('Sign in'),
@@ -45,27 +45,16 @@ const getStructure = t => {
     }
 
     return {
-        '': {
-            title: t('Home'),
-            externalLink: '/',
-            children: {
-                account: {
-                    title: t('Account'),
-                    link: '/account',
-                    panelComponent: Account,
+        'account': {
+            title: t('Account'),
+            link: '/account',
+            panelComponent: Account,
 
-                    children: subPaths
-                }
-            }
+            children: subPaths
         }
     };
 }
 
-export default function() {
-    ReactDOM.render(
-        <I18nextProvider i18n={ i18n }><Section root='/account/login' structure={getStructure}/></I18nextProvider>,
-        document.getElementById('root')
-    );
+export default {
+    getMenus
 }
-
-

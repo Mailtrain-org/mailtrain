@@ -1,57 +1,49 @@
 'use strict';
 
-let config = require('config');
-let express = require('express');
-let router = new express.Router();
-let passport = require('../lib/passport');
-let fs = require('fs');
-let path = require('path');
-let _ = require('../lib/translate')._;
-let editorHelpers = require('../lib/editor-helpers');
+const config = require('config');
+const router = require('../lib/router-async').create();
+const passport = require('../lib/passport');
+const clientHelpers = require('../lib/client-helpers');
 
-router.all('/*', (req, res, next) => {
-    if (!req.user) {
-        req.flash('danger', _('Need to be logged in to access restricted content'));
-        return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
+const bluebird = require('bluebird');
+const fsReadFile = bluebird.promisify(require('fs').readFile);
+
+const path = require('path');
+
+// FIXME - add authentication by sandboxToken
+
+
+router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
+    const resourceType = req.query.type;
+    const resourceId = req.query.id;
+
+    const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context);
+
+    let languageStrings = null;
+    if (config.language && config.language !== 'en') {
+        const lang = config.language.split('_')[0];
+        try {
+            const file = path.join(__dirname, '..', 'client', 'public', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
+            languageStrings = await fsReadFile(file, 'utf8');
+        } catch (err) {
+        }
     }
-    next();
-});
 
-router.get('/editor', passport.csrfProtection, (req, res) => {
-    editorHelpers.getResource(req.query.type, req.query.id, (err, resource) => {
-        if (err) {
-            req.flash('danger', err.message || err);
-            return res.redirect('/');
-        }
-
-        let getLanguageStrings = language => {
-            if (!language ||  language === 'en') {
-                return null;
-            }
-            language = language.split('_')[0];
-            try {
-                let file = path.join(__dirname, '..', 'public', 'mosaico', 'dist', 'lang', 'mosaico-' + language + '.json');
-                return fs.readFileSync(file, 'utf8');
-            } catch (err) {
-                return null;
-            }
-        }
-
+    /* ????
         resource.editorName = resource.editorName ||  'mosaico';
         resource.editorData = !resource.editorData ?
             {
                 template: req.query.template || 'versafix-1'
             } :
             JSON.parse(resource.editorData);
+    */
 
-        res.render('mosaico/editor', {
-            layout: 'mosaico/layout-editor',
-            type: req.query.type,
-            resource,
-            editorConfig: config.mosaico,
-            languageStrings: getLanguageStrings(config.language),
-            csrfToken: req.csrfToken(),
-        });
+    res.render('mosaico/root', {
+        layout: 'mosaico/layout',
+        editorConfig: config.mosaico,
+        languageStrings: languageStrings,
+        reactCsrfToken: req.csrfToken(),
+        mailtrainConfig: JSON.stringify(mailtrainConfig)
     });
 });
 

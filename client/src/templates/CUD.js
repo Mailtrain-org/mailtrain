@@ -167,6 +167,7 @@ export default class CUD extends Component {
                     {this.state.showMergeTagReference &&
                     <div style={{marginTop: '15px'}}>
                         <Trans><p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p></Trans>
+                        <Trans><p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p></Trans>
                         <table className="table table-bordered table-condensed table-striped">
                             <thead>
                             <tr>
@@ -213,30 +214,6 @@ export default class CUD extends Component {
                             </tr>
                             <tr>
                                 <th scope="row">
-                                    [FIRST_NAME]
-                                </th>
-                                <td>
-                                    <Trans>First name</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [LAST_NAME]
-                                </th>
-                                <td>
-                                    <Trans>Last name</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [FULL_NAME]
-                                </th>
-                                <td>
-                                    <Trans>Full name (first and last name combined)</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
                                     [SUBSCRIPTION_ID]
                                 </th>
                                 <td>
@@ -261,8 +238,6 @@ export default class CUD extends Component {
                             </tr>
                             </tbody>
                         </table>
-
-                        <Trans><p>In addition to that any custom field can have its own merge tag.</p></Trans>
                     </div>}
                 </AlignedRow>
 

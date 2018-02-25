@@ -23,23 +23,13 @@ const passport = require('./lib/passport');
 const tools = require('./lib/tools');
 const contextHelpers = require('./lib/context-helpers');
 
-const routes = require('./routes/index');
-const lists = require('./routes/lists-legacy');
-//const settings = require('./routes/settings');
 const getSettings = nodeifyFunction(require('./models/settings').get);
-const campaigns = require('./routes/campaigns');
-const links = require('./routes/links');
-const triggers = require('./routes/triggers');
-const webhooks = require('./routes/webhooks');
-const archive = require('./routes/archive');
 const api = require('./routes/api');
-const editorapi = require('./routes/editorapi');
-const grapejs = require('./routes/grapejs');
-const mosaico = require('./routes/mosaico');
 
 // These are routes for the new React-based client
 const reports = require('./routes/reports');
 const subscription = require('./routes/subscription');
+const mosaico = require('./routes/mosaico');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const usersRest = require('./routes/rest/users');
@@ -57,17 +47,31 @@ const templatesRest = require('./routes/rest/templates');
 const blacklistRest = require('./routes/rest/blacklist');
 const editorsRest = require('./routes/rest/editors');
 
-const namespacesLegacyIntegration = require('./routes/namespaces-legacy-integration');
-const usersLegacyIntegration = require('./routes/users-legacy-integration');
-const accountLegacyIntegration = require('./routes/account-legacy-integration');
-const reportsLegacyIntegration = require('./routes/reports-legacy-integration');
-const listsLegacyIntegration = require('./routes/lists-legacy-integration');
-const templatesLegacyIntegration = require('./routes/templates-legacy-integration');
-const blacklistLegacyIntegration = require('./routes/blacklist-legacy-integration');
+const root = require('./routes/root');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
 const app = express();
+
+function install404Fallback(url) {
+    app.use(url, (req, res, next) => {
+        let err = new Error(_('Not Found'));
+        err.status = 404;
+        next(err);
+    });
+
+    app.use(url + '/*', (req, res, next) => {
+        let err = new Error(_('Not Found'));
+        err.status = 404;
+        next(err);
+    });
+}
+
+function useWith404Fallback(url, route) {
+    app.use(url, route);
+    install404Fallback(url);
+}
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -83,8 +87,6 @@ app.disable('x-powered-by');
 
 hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerPartials(__dirname + '/views/subscription/partials/');
-hbs.registerPartials(__dirname + '/views/report-templates/partials/');
-hbs.registerPartials(__dirname + '/views/reports/partials/');
 
 /**
  * We need this helper to make sure that we consume flash messages only
@@ -136,7 +138,7 @@ handlebarsHelpers.registerHelpers(hbs.handlebars);
 
 
 app.use(compression());
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'client', 'public', 'favicon.ico')));
 
 app.use(logger(config.www.log, {
     stream: {
@@ -150,9 +152,9 @@ app.use(logger(config.www.log, {
 }));
 
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
-app.use('/locales', express.static(path.join(__dirname, 'client', 'locales')));
+useWith404Fallback('/public', express.static(path.join(__dirname, 'client', 'public')));
+useWith404Fallback('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
+useWith404Fallback('/locales', express.static(path.join(__dirname, 'client', 'locales')));
 
 app.use(session({
     store: config.redis.enabled ? new RedisStore(config.redis) : false,
@@ -251,42 +253,17 @@ app.use((req, res, next) => {
 
 
 // Regular endpoints
-app.use('/', routes);
-app.use('/lists', lists);
-app.use('/campaigns', campaigns);
-//app.use('/settings', settings);
-app.use('/links', links);
-app.use('/triggers', triggers);
-app.use('/webhooks', webhooks);
-app.use('/archive', archive);
-app.use('/editorapi', editorapi);
-app.use('/grapejs', grapejs);
-app.use('/mosaico', mosaico);
+useWith404Fallback('/subscription', subscription);
 
+if (config.reports && config.reports.enabled === true) {
+    useWith404Fallback('/reports', reports);
+}
 
-app.use('/subscription', subscription);
-
+useWith404Fallback('/mosaico', mosaico);
 
 // API endpoints
-app.use('/api', api);
+useWith404Fallback('/api', api);
 
-
-if (config.reports && config.reports.enabled === true) {
-    app.use('/reports', reports);
-}
-
-/* FIXME - this should be removed once we bind the ReactJS client to / */
-app.use('/users', usersLegacyIntegration);
-app.use('/namespaces', namespacesLegacyIntegration);
-app.use('/account', accountLegacyIntegration);
-app.use('/lists', listsLegacyIntegration);
-app.use('/templates', templatesLegacyIntegration);
-app.use('/blacklist', blacklistLegacyIntegration);
-
-if (config.reports && config.reports.enabled === true) {
-    app.use('/reports', reports);
-    app.use('/reports', reportsLegacyIntegration);
-}
 /* ------------------------------------------------------------------- */
 
 // REST endpoints
@@ -308,14 +285,9 @@ if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportTemplatesRest);
     app.use('/rest', reportsRest);
 }
+install404Fallback('/rest');
 
-
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-    let err = new Error(_('Not Found'));
-    err.status = 404;
-    next(err);
-});
+app.use('/', root);
 
 
 // Error handlers

@@ -109,8 +109,8 @@ host="0.0.0.0"
 [ldap]
 # enable to use ldap user backend
 enabled=false
-# method is ldapjs or ldapauth - it chooses the library to be used
-method="ldapjs"
+# method is ldapjs or ldapauth - it chooses the library to be used. If not given, it chooses the one present.
+# method="ldapjs"
 host="localhost"
 port=3002
 baseDN="ou=users,dc=company"

@@ -42,7 +42,7 @@ router.postAsync('/access-token-reset', passport.loggedIn, passport.csrfProtecti
 
 
 router.post('/login', passport.csrfProtection, passport.restLogin);
-router.post('/logout', passport.csrfProtection, passport.restLogout); // TODO - this endpoint is currently not in use. It will become relevant once we switch to SPA
+router.post('/logout', passport.csrfProtection, passport.restLogout);
 
 router.postAsync('/password-reset-send', passport.csrfProtection, async (req, res) => {
     await users.sendPasswordReset(req.body.usernameOrEmail);

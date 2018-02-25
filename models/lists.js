@@ -134,6 +134,24 @@ async function removeFormFromAllTx(tx, context, formId) {
     });
 }
 
+async function getMergeTags(context, id) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', id, ['view']);
+        const groupedFields = await fields.listGroupedTx(tx, id);
+
+        const mergeTags = [];
+        for (const field of groupedFields) {
+            mergeTags.push({
+                key: field.key,
+                value: field.name
+            });
+
+        }
+
+        return mergeTags;
+    });
+}
+
 
 module.exports = {
     UnsubscriptionMode,
@@ -145,5 +163,6 @@ module.exports = {
     create,
     updateWithConsistencyCheck,
     remove,
-    removeFormFromAllTx
+    removeFormFromAllTx,
+    getMergeTags
 };

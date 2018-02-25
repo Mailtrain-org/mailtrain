@@ -20,178 +20,168 @@ import SegmentsCUD from './segments/CUD';
 import Share from '../shares/Share';
 
 
-const getStructure = t => {
+function getMenus(t) {
     return {
-        '': {
-            title: t('Home'),
-            externalLink: '/',
+        'lists': {
+            title: t('Lists'),
+            link: '/lists',
+            panelComponent: ListsList,
             children: {
-                'lists': {
-                    title: t('Lists'),
-                    link: '/lists',
-                    panelComponent: ListsList,
-                    children: {
-                        ':listId([0-9]+)': {
-                            title: resolved => t('List "{{name}}"', {name: resolved.list.name}),
+                ':listId([0-9]+)': {
+                    title: resolved => t('List "{{name}}"', {name: resolved.list.name}),
+                    resolve: {
+                        list: params => `/rest/lists/${params.listId}`
+                    },
+                    link: params => `/lists/${params.listId}/subscriptions`,
+                    navs: {
+                        subscriptions: {
+                            title: t('Subscribers'),
                             resolve: {
-                                list: params => `/rest/lists/${params.listId}`
+                                segments: params => `/rest/segments/${params.listId}`,
                             },
                             link: params => `/lists/${params.listId}/subscriptions`,
-                            navs: {
-                                subscriptions: {
-                                    title: t('Subscribers'),
-                                    resolve: {
-                                        segments: params => `/rest/segments/${params.listId}`,
-                                    },
-                                    link: params => `/lists/${params.listId}/subscriptions`,
-                                    visible: resolved => resolved.list.permissions.includes('viewSubscriptions'),
-                                    panelRender: props => <SubscriptionsList list={props.resolved.list} segments={props.resolved.segments} segmentId={qs.parse(props.location.search).segment} />,
-                                    children: {
-                                        ':subscriptionId([0-9]+)': {
-                                            title: resolved => resolved.subscription.email,
-                                            resolve: {
-                                                subscription: params => `/rest/subscriptions/${params.listId}/${params.subscriptionId}`,
-                                                fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
-                                            },
-                                            link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
-                                            navs: {
-                                                ':action(edit|delete)': {
-                                                    title: t('Edit'),
-                                                    link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
-                                                    panelRender: props => <SubscriptionsCUD action={props.match.params.action} entity={props.resolved.subscription} list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
-                                                }
-                                            }
-                                        },
-                                        create: {
-                                            title: t('Create'),
-                                            resolve: {
-                                                fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
-                                            },
-                                            panelRender: props => <SubscriptionsCUD action="create" list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
-                                        }
-                                    }                                },
-                                ':action(edit|delete)': {
-                                    title: t('Edit'),
-                                    link: params => `/lists/${params.listId}/edit`,
-                                    visible: resolved => resolved.list.permissions.includes('edit'),
-                                    panelRender: props => <ListsCUD action={props.match.params.action} entity={props.resolved.list} />
-                                },
-                                fields: {
-                                    title: t('Fields'),
-                                    link: params => `/lists/${params.listId}/fields/`,
-                                    visible: resolved => resolved.list.permissions.includes('manageFields'),
-                                    panelRender: props => <FieldsList list={props.resolved.list} />,
-                                    children: {
-                                        ':fieldId([0-9]+)': {
-                                            title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
-                                            resolve: {
-                                                field: params => `/rest/fields/${params.listId}/${params.fieldId}`,
-                                                fields: params => `/rest/fields/${params.listId}`
-                                            },
-                                            link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
-                                            navs: {
-                                                ':action(edit|delete)': {
-                                                    title: t('Edit'),
-                                                    link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
-                                                    panelRender: props => <FieldsCUD action={props.match.params.action} entity={props.resolved.field} list={props.resolved.list} fields={props.resolved.fields} />
-                                                }
-                                            }
-                                        },
-                                        create: {
-                                            title: t('Create'),
-                                            resolve: {
-                                                fields: params => `/rest/fields/${params.listId}`
-                                            },
-                                            panelRender: props => <FieldsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
-                                        }
-                                    }
-                                },
-                                segments: {
-                                    title: t('Segments'),
-                                    link: params => `/lists/${params.listId}/segments`,
-                                    visible: resolved => resolved.list.permissions.includes('manageSegments'),
-                                    panelRender: props => <SegmentsList list={props.resolved.list} />,
-                                    children: {
-                                        ':segmentId([0-9]+)': {
-                                            title: resolved => t('Segment "{{name}}"', {name: resolved.segment.name}),
-                                            resolve: {
-                                                segment: params => `/rest/segments/${params.listId}/${params.segmentId}`,
-                                                fields: params => `/rest/fields/${params.listId}`
-                                            },
-                                            link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
-                                            navs: {
-                                                ':action(edit|delete)': {
-                                                    title: t('Edit'),
-                                                    link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
-                                                    panelRender: props => <SegmentsCUD action={props.match.params.action} entity={props.resolved.segment} list={props.resolved.list} fields={props.resolved.fields} />
-                                                }
-                                            }
-                                        },
-                                        create: {
-                                            title: t('Create'),
-                                            resolve: {
-                                                fields: params => `/rest/fields/${params.listId}`
-                                            },
-                                            panelRender: props => <SegmentsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
-                                        }
-                                    }
-                                },
-                                share: {
-                                    title: t('Share'),
-                                    link: params => `/lists/${params.listId}/share`,
-                                    visible: resolved => resolved.list.permissions.includes('share'),
-                                    panelRender: props => <Share title={t('Share')} entity={props.resolved.list} entityTypeId="list" />
-                                }
-                            }
-                        },
-                        create: {
-                            title: t('Create'),
-                            panelRender: props => <ListsCUD action="create" />
-                        },
-                        forms: {
-                            title: t('Custom Forms'),
-                            link: '/lists/forms',
-                            panelComponent: FormsList,
+                            visible: resolved => resolved.list.permissions.includes('viewSubscriptions'),
+                            panelRender: props => <SubscriptionsList list={props.resolved.list} segments={props.resolved.segments} segmentId={qs.parse(props.location.search).segment} />,
                             children: {
-                                ':formsId([0-9]+)': {
-                                    title: resolved => t('Custom Forms "{{name}}"', {name: resolved.forms.name}),
+                                ':subscriptionId([0-9]+)': {
+                                    title: resolved => resolved.subscription.email,
                                     resolve: {
-                                        forms: params => `/rest/forms/${params.formsId}`
+                                        subscription: params => `/rest/subscriptions/${params.listId}/${params.subscriptionId}`,
+                                        fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
                                     },
-                                    link: params => `/lists/forms/${params.formsId}/edit`,
+                                    link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
                                     navs: {
                                         ':action(edit|delete)': {
                                             title: t('Edit'),
-                                            link: params => `/lists/forms/${params.formsId}/edit`,
-                                            visible: resolved => resolved.forms.permissions.includes('edit'),
-                                            panelRender: props => <FormsCUD action={props.match.params.action} entity={props.resolved.forms} />
-                                        },
-                                        share: {
-                                            title: t('Share'),
-                                            link: params => `/lists/forms/${params.formsId}/share`,
-                                            visible: resolved => resolved.forms.permissions.includes('share'),
-                                            panelRender: props => <Share title={t('Share')} entity={props.resolved.forms} entityTypeId="customForm" />
+                                            link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
+                                            panelRender: props => <SubscriptionsCUD action={props.match.params.action} entity={props.resolved.subscription} list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
                                         }
                                     }
                                 },
                                 create: {
                                     title: t('Create'),
-                                    panelRender: props => <FormsCUD action="create" />
+                                    resolve: {
+                                        fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
+                                    },
+                                    panelRender: props => <SubscriptionsCUD action="create" list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
+                                }
+                            }                                },
+                        ':action(edit|delete)': {
+                            title: t('Edit'),
+                            link: params => `/lists/${params.listId}/edit`,
+                            visible: resolved => resolved.list.permissions.includes('edit'),
+                            panelRender: props => <ListsCUD action={props.match.params.action} entity={props.resolved.list} />
+                        },
+                        fields: {
+                            title: t('Fields'),
+                            link: params => `/lists/${params.listId}/fields/`,
+                            visible: resolved => resolved.list.permissions.includes('manageFields'),
+                            panelRender: props => <FieldsList list={props.resolved.list} />,
+                            children: {
+                                ':fieldId([0-9]+)': {
+                                    title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
+                                    resolve: {
+                                        field: params => `/rest/fields/${params.listId}/${params.fieldId}`,
+                                        fields: params => `/rest/fields/${params.listId}`
+                                    },
+                                    link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
+                                    navs: {
+                                        ':action(edit|delete)': {
+                                            title: t('Edit'),
+                                            link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
+                                            panelRender: props => <FieldsCUD action={props.match.params.action} entity={props.resolved.field} list={props.resolved.list} fields={props.resolved.fields} />
+                                        }
+                                    }
+                                },
+                                create: {
+                                    title: t('Create'),
+                                    resolve: {
+                                        fields: params => `/rest/fields/${params.listId}`
+                                    },
+                                    panelRender: props => <FieldsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
                                 }
                             }
+                        },
+                        segments: {
+                            title: t('Segments'),
+                            link: params => `/lists/${params.listId}/segments`,
+                            visible: resolved => resolved.list.permissions.includes('manageSegments'),
+                            panelRender: props => <SegmentsList list={props.resolved.list} />,
+                            children: {
+                                ':segmentId([0-9]+)': {
+                                    title: resolved => t('Segment "{{name}}"', {name: resolved.segment.name}),
+                                    resolve: {
+                                        segment: params => `/rest/segments/${params.listId}/${params.segmentId}`,
+                                        fields: params => `/rest/fields/${params.listId}`
+                                    },
+                                    link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
+                                    navs: {
+                                        ':action(edit|delete)': {
+                                            title: t('Edit'),
+                                            link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
+                                            panelRender: props => <SegmentsCUD action={props.match.params.action} entity={props.resolved.segment} list={props.resolved.list} fields={props.resolved.fields} />
+                                        }
+                                    }
+                                },
+                                create: {
+                                    title: t('Create'),
+                                    resolve: {
+                                        fields: params => `/rest/fields/${params.listId}`
+                                    },
+                                    panelRender: props => <SegmentsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
+                                }
+                            }
+                        },
+                        share: {
+                            title: t('Share'),
+                            link: params => `/lists/${params.listId}/share`,
+                            visible: resolved => resolved.list.permissions.includes('share'),
+                            panelRender: props => <Share title={t('Share')} entity={props.resolved.list} entityTypeId="list" />
+                        }
+                    }
+                },
+                create: {
+                    title: t('Create'),
+                    panelRender: props => <ListsCUD action="create" />
+                },
+                forms: {
+                    title: t('Custom Forms'),
+                    link: '/lists/forms',
+                    panelComponent: FormsList,
+                    children: {
+                        ':formsId([0-9]+)': {
+                            title: resolved => t('Custom Forms "{{name}}"', {name: resolved.forms.name}),
+                            resolve: {
+                                forms: params => `/rest/forms/${params.formsId}`
+                            },
+                            link: params => `/lists/forms/${params.formsId}/edit`,
+                            navs: {
+                                ':action(edit|delete)': {
+                                    title: t('Edit'),
+                                    link: params => `/lists/forms/${params.formsId}/edit`,
+                                    visible: resolved => resolved.forms.permissions.includes('edit'),
+                                    panelRender: props => <FormsCUD action={props.match.params.action} entity={props.resolved.forms} />
+                                },
+                                share: {
+                                    title: t('Share'),
+                                    link: params => `/lists/forms/${params.formsId}/share`,
+                                    visible: resolved => resolved.forms.permissions.includes('share'),
+                                    panelRender: props => <Share title={t('Share')} entity={props.resolved.forms} entityTypeId="customForm" />
+                                }
+                            }
+                        },
+                        create: {
+                            title: t('Create'),
+                            panelRender: props => <FormsCUD action="create" />
                         }
                     }
                 }
             }
         }
-    }
-};
-
-export default function() {
-    ReactDOM.render(
-        <I18nextProvider i18n={ i18n }><Section root='/lists' structure={getStructure}/></I18nextProvider>,
-        document.getElementById('root')
-    );
+    };
 }
 
 
+export default {
+    getMenus
+}

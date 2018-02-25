@@ -6,9 +6,9 @@ import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 
 import jQuery from 'jquery';
-import '../../public/jquery/jquery-ui-1.12.1.min.js';
-import '../../public/fancytree/jquery.fancytree-all.min.js';
-import '../../public/fancytree/skin-bootstrap/ui.fancytree.min.css';
+import '../../vendor/jquery/jquery-ui-1.12.1.min.js';
+import '../../vendor/fancytree/jquery.fancytree-all.min.js';
+import '../../vendor/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.css';
 import axios from './axios';
 
