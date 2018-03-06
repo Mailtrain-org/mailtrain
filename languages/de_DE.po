@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-04 00:45+0200\n"
-"PO-Revision-Date: 2018-03-06 14:51+0100\n"
+"PO-Revision-Date: 2018-03-06 16:33+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -2462,7 +2462,7 @@ msgstr ""
 
 #: views/settings.hbs:84
 msgid "DKIM Signing by ZoneMTA"
-msgstr "DKIM Signing by ZoneMTA"
+msgstr "DKIM Signing durch ZoneMTA"
 
 #: views/settings.hbs:85
 msgid ""
@@ -2507,7 +2507,7 @@ msgstr "DKIM Domain"
 
 #: views/settings.hbs:91
 msgid "Domain name for the DKIM key"
-msgstr "Domain-Name für den DKIM Key"
+msgstr "Domain-Name für den DKIM-Key"
 
 #: views/settings.hbs:92
 msgid "Leave blank to use the sender email address domain"
@@ -2731,7 +2731,7 @@ msgstr "Einstellungen aktualisieren"
 
 #: views/subscription/web-subscribe.mjml.hbs:1
 msgid "Subscribe to List"
-msgstr "Diese Liste Abonnieren"
+msgstr "Diese Liste abonnieren"
 
 #: views/subscription/web-subscribed.mjml.hbs:3
 msgid "Thank you for subscribing!"
