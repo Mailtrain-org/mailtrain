@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-04 00:45+0200\n"
-"PO-Revision-Date: 2017-05-04 00:46+0200\n"
+"PO-Revision-Date: 2018-03-06 14:51+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 2.0.6\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: views/archive/layout.hbs:1 views/layout.hbs:1
@@ -872,7 +872,7 @@ msgstr "Hallo [FIRST_NAME/Customer],"
 
 #: views/emails/stationery-html.hbs:2 views/emails/stationery-text.hbs:2
 msgid "Cheers,"
-msgstr "Viele Grüsse,"
+msgstr "Viele Grüße,"
 
 #: views/index.hbs:1
 msgid "List Management"
@@ -954,7 +954,7 @@ msgid ""
 msgstr ""
 "Wenn für eine Liste ein benutzerdefiniertes Feld für den GPG-Public-Key "
 "vorhanden ist, können Abonnenten ihren GPG-Public-Key hochladen, um "
-"verschlüsselte E-Mails dieser der Liste zu empfangen."
+"verschlüsselte E-Mails der Liste zu empfangen."
 
 #: views/index.hbs:17
 msgid "Click Stats"
@@ -984,7 +984,7 @@ msgstr ""
 
 #: views/index.hbs:23
 msgid "Send via Any Provider"
-msgstr "Sende mit "
+msgstr "Sende mit"
 
 #: views/index.hbs:24
 msgid ""
@@ -1121,7 +1121,7 @@ msgstr "Liste erstellen"
 
 #: views/lists/create.hbs:6 views/lists/edit.hbs:7
 msgid "List Name"
-msgstr "Linstennamen"
+msgstr "Name der Liste"
 
 #: views/lists/create.hbs:9 views/lists/edit.hbs:15
 msgid "Allow public users to subscribe themselves"
@@ -1472,7 +1472,7 @@ msgstr "ID"
 
 #: views/lists/lists.hbs:7 views/reports/partials/report-fields.hbs:10
 msgid "Subscribers"
-msgstr "Abonnenten "
+msgstr "Abonnenten"
 
 #: views/lists/segments/create.hbs:3 views/lists/segments/edit.hbs:3
 #: views/lists/segments/rule-configure.hbs:3
@@ -1966,7 +1966,7 @@ msgstr "Mosaico öffnen"
 
 #: views/partials/plaintext.hbs:1
 msgid "Template content (plaintext)"
-msgstr "Vorlagen-Inhalt (Klartext) "
+msgstr "Vorlagen-Inhalt (Klartext)"
 
 #: views/report-templates/create.hbs:2 views/report-templates/edit.hbs:2
 #: views/report-templates/report-templates.hbs:2
@@ -2582,7 +2582,7 @@ msgstr "Ihr Abonnement für unsere Liste wurde bestätigt"
 
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:3
 msgid "If you want to modify your subscription then you can "
-msgstr "Wenn Sie Ihr Abonnement ändern möchten, dann können Sie"
+msgstr "Wenn Sie Ihr Abonnement ändern möchten, dann können Sie "
 
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:4
 #: views/subscription/mail-subscription-confirmed-text.hbs:4
@@ -3185,7 +3185,7 @@ msgstr "Wähle Sie Ihr neues Passwort"
 
 #: views/users/reset.hbs:5
 msgid "Please enter a new password."
-msgstr "Bitte geben Sie ein neues Passwort ein"
+msgstr "Bitte geben Sie ein neues Passwort ein."
 
 #: lib/editor-helpers.js:17 routes/templates.js:95
 msgid "Could not find template with specified ID"
