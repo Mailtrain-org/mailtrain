@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-04 00:45+0200\n"
-"PO-Revision-Date: 2018-03-06 16:33+0100\n"
+"PO-Revision-Date: 2018-03-07 14:09+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -918,16 +918,17 @@ msgstr "Mailtrain bietet auch benutzerdefinierte Formulare."
 
 #: views/index.hbs:8
 msgid "List Segmentation"
-msgstr "Listen Segementierung"
+msgstr "Segmentierung"
 
 #: views/index.hbs:9
+#, fuzzy
 msgid ""
 "Send messages only to list subscribers that match predefined segmentation "
 "rules. No need to create separate lists with small differences."
 msgstr ""
-"Senden Sie nur Nachrichten an Abonnenten welche die vordefinierten "
-"Segmentierungsregeln erfüllen. Keine Notwendigkeit, separate Listen mit "
-"kleinen Unterschieden zu erstellen."
+"Senden Sie nur Nachrichten an Abonnenten, welche die vordefinierten "
+"Segmentierungsregeln erfüllen. Es besteht keine Notwendigkeit, separate "
+"Listen mit kleinen Unterschieden zu erstellen."
 
 #: views/index.hbs:11
 msgid "RSS Campaigns"
@@ -2386,7 +2387,7 @@ msgstr "VERP verwenden um bounces zu erfassen"
 
 #: views/settings.hbs:71
 msgid "Server hostname"
-msgstr "Server Hostname"
+msgstr "Hostname"
 
 #: views/settings.hbs:72
 msgid "The VERP server hostname, eg. bounces.example.com"
