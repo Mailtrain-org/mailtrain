@@ -3488,11 +3488,11 @@ msgid "Could not save subscription"
 msgstr "Abonnement konnte nicht gespeichert werden"
 
 #: lib/models/subscriptions.js:441 lib/models/subscriptions.js:471
-msgid "Missing Subbscription ID"
+msgid "Missing Subscription ID"
 msgstr "Abonnement-ID fehlt"
 
 #: lib/models/subscriptions.js:499
-msgid "Missing Subbscription email address"
+msgid "Missing Subscription email address"
 msgstr "Abonnement-E-Mail-Adresse fehlt"
 
 #: lib/models/subscriptions.js:578 lib/models/subscriptions.js:827
