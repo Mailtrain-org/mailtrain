@@ -414,6 +414,10 @@ async function removeDefaultShares(tx, user) {
 }
 
 function checkGlobalPermission(context, requiredOperations) {
+    if (!context.user) {
+        return false;
+    }
+
     if (context.user.admin) { // This handles the getAdminContext() case
         return true;
     }
@@ -443,6 +447,10 @@ function enforceGlobalPermission(context, requiredOperations) {
 }
 
 async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations) {
+    if (!context.user) {
+        return false;
+    }
+
     const entityType = permissions.getEntityType(entityTypeId);
 
     if (context.user.admin) { // This handles the getAdminContext() case. In this case we don't check the permission, but just the existence.
@@ -530,12 +538,20 @@ async function enforceTypePermissionTx(tx, context, entityTypeId, requiredOperat
 }
 
 function getGlobalPermissions(context) {
+    if (!context.user) {
+        return [];
+    }
+
     enforce(!context.user.admin, 'getPermissions is not supposed to be called by assumed admin');
 
     return (config.roles.global[context.user.role] || {}).permissions || [];
 }
 
 async function getPermissionsTx(tx, context, entityTypeId, entityId) {
+    if (!context.user) {
+        return [];
+    }
+
     enforce(!context.user.admin, 'getPermissions is not supposed to be called by assumed admin');
 
     const entityType = permissions.getEntityType(entityTypeId);

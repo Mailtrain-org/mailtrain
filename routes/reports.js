@@ -3,7 +3,7 @@
 const passport = require('../lib/passport');
 const _ = require('../lib/translate')._;
 const reports = require('../models/reports');
-const fileHelpers = require('../lib/file-helpers');
+const reportHelpers = require('../lib/report-helpers');
 const shares = require('../models/shares');
 const contextHelpers = require('../lib/context-helpers');
 
@@ -16,11 +16,11 @@ router.getAsync('/:id/download', passport.loggedIn, async (req, res) => {
 
     if (report.state == reports.ReportState.FINISHED) {
         const headers = {
-            'Content-Disposition': 'attachment;filename=' + fileHelpers.nameToFileName(report.name) + '.csv',
+            'Content-Disposition': 'attachment;filename=' + reportHelpers.nameToFileName(report.name) + '.csv',
             'Content-Type': report.mime_type
         };
 
-        res.sendFile(fileHelpers.getReportContentFile(report), {headers: headers});
+        res.sendFile(reportHelpers.getReportContentFile(report), {headers: headers});
 
     } else {
         return res.status(404).send(_('Report not found'));

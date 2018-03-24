@@ -22,7 +22,8 @@ class ChangedError extends InteroperableError {
 
 class NotFoundError extends InteroperableError {
     constructor(msg, data) {
-        super('NotFoundError', msg, data);
+        super('NotFoundError', msg || 'Not Found', data);
+        this.status = 404;
     }
 }
 
@@ -82,7 +83,7 @@ class NamespaceNotFoundError extends InteroperableError {
 
 class PermissionDeniedError extends InteroperableError {
     constructor(msg, data) {
-        super('PermissionDeniedError', msg, data);
+        super('PermissionDeniedError', msg || 'Permission Denied', data);
         this.status = 403;
     }
 }

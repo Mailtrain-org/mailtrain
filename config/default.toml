@@ -208,8 +208,8 @@ permissions=["view", "edit", "delete", "share", "createNamespace", "createList",
 [roles.namespace.master.children]
 list=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
 customForm=["view", "edit", "delete", "share"]
-campaign=["view", "edit", "delete", "share"]
-template=["view", "edit", "delete", "share"]
+campaign=["view", "edit", "delete", "share", "manageFiles"]
+template=["view", "edit", "delete", "share", "manageFiles"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
 namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "manageUsers"]
@@ -227,12 +227,12 @@ permissions=["view", "edit", "delete", "share"]
 [roles.campaign.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share"]
+permissions=["view", "edit", "delete", "share", "manageFiles"]
 
 [roles.template.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share"]
+permissions=["view", "edit", "delete", "share", "manageFiles"]
 
 [roles.report.master]
 name="Master"

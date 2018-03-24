@@ -64,6 +64,13 @@ export default class List extends Component {
                         });
                     }
 
+                    if (perms.includes('manageFiles')) {
+                        actions.push({
+                            label: <Icon icon="hdd" title={t('Files')}/>,
+                            link: `/templates/${data[0]}/files`
+                        });
+                    }
+
                     if (perms.includes('share')) {
                         actions.push({
                             label: <Icon icon="share-alt" title={t('Share')}/>,

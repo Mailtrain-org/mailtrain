@@ -30,6 +30,7 @@ const api = require('./routes/api');
 const reports = require('./routes/reports');
 const subscription = require('./routes/subscription');
 const mosaico = require('./routes/mosaico');
+const files = require('./routes/files');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const usersRest = require('./routes/rest/users');
@@ -46,6 +47,7 @@ const subscriptionsRest = require('./routes/rest/subscriptions');
 const templatesRest = require('./routes/rest/templates');
 const blacklistRest = require('./routes/rest/blacklist');
 const editorsRest = require('./routes/rest/editors');
+const filesRest = require('./routes/rest/files');
 
 const root = require('./routes/root');
 
@@ -55,15 +57,11 @@ const app = express();
 
 function install404Fallback(url) {
     app.use(url, (req, res, next) => {
-        let err = new Error(_('Not Found'));
-        err.status = 404;
-        next(err);
+        next(new interoperableErrors.NotFoundError());
     });
 
     app.use(url + '/*', (req, res, next) => {
-        let err = new Error(_('Not Found'));
-        err.status = 404;
-        next(err);
+        next(new interoperableErrors.NotFoundError());
     });
 }
 
@@ -254,17 +252,17 @@ app.use((req, res, next) => {
 
 // Regular endpoints
 useWith404Fallback('/subscription', subscription);
+useWith404Fallback('/files', files);
+useWith404Fallback('/mosaico', mosaico);
 
 if (config.reports && config.reports.enabled === true) {
     useWith404Fallback('/reports', reports);
 }
 
-useWith404Fallback('/mosaico', mosaico);
 
 // API endpoints
 useWith404Fallback('/api', api);
 
-/* ------------------------------------------------------------------- */
 
 // REST endpoints
 app.use('/rest', namespacesRest);
@@ -280,6 +278,7 @@ app.use('/rest', subscriptionsRest);
 app.use('/rest', templatesRest);
 app.use('/rest', blacklistRest);
 app.use('/rest', editorsRest);
+app.use('/rest', filesRest);
 
 if (config.reports && config.reports.enabled === true) {
     app.use('/rest', reportTemplatesRest);

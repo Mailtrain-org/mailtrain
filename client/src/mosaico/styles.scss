@@ -1,0 +1,35 @@
+:global .mo-standalone {
+  top: 34px;
+  bottom: 0px;
+  width: 100%;
+  position: absolute;
+}
+
+.navbar {
+  background: #DE4320;
+  overflow: hidden;
+  height: 34px;
+  top: -34px;
+  position: absolute;
+  width: 100%;
+}
+
+.logo {
+  height: 24px;
+  padding: 5px 0 5px 10px;
+  filter: brightness(0) invert(1);
+}
+
+.btn {
+  display: block;
+  float: right;
+  width: 150px;
+  line-height: 34px;
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: sans-serif;
+  cursor: pointer;
+  border-left: 1px solid #972E15;
+}

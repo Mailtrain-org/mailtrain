@@ -9,6 +9,7 @@ import { Section } from '../lib/page';
 import TemplatesCUD from './CUD';
 import TemplatesList from './List';
 import Share from '../shares/Share';
+import Files from "../lib/files";
 
 
 function getMenus(t) {
@@ -30,6 +31,12 @@ function getMenus(t) {
                             link: params => `/templates/${params.templateId}/edit`,
                             visible: resolved => resolved.template.permissions.includes('edit'),
                             panelRender: props => <TemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
+                        },
+                        files: {
+                            title: t('Files'),
+                            link: params => `/templates/${params.templateId}/files`,
+                            visible: resolved => resolved.template.permissions.includes('edit'),
+                            panelRender: props => <Files title={t('Files')} entity={props.resolved.template} entityTypeId="template" />
                         },
                         share: {
                             title: t('Share'),

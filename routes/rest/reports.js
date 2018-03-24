@@ -4,7 +4,7 @@ const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const reports = require('../../models/reports');
 const reportProcessor = require('../../lib/report-processor');
-const fileHelpers = require('../../lib/file-helpers');
+const reportHelpers = require('../../lib/report-helpers');
 const shares = require('../../models/shares');
 const contextHelpers = require('../../lib/context-helpers');
 
@@ -62,14 +62,14 @@ router.getAsync('/report-content/:id', async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
 
     const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
-    res.sendFile(fileHelpers.getReportContentFile(report));
+    res.sendFile(reportHelpers.getReportContentFile(report));
 });
 
 router.getAsync('/report-output/:id', async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewOutput');
 
     const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
-    res.sendFile(fileHelpers.getReportOutputFile(report));
+    res.sendFile(reportHelpers.getReportOutputFile(report));
 });
 
 

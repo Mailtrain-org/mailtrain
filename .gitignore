@@ -31,3 +31,5 @@ public/grapejs/templates/*
 config/production.toml
 workers/reports/config/production.toml
 docker-compose.override.yml
+
+/files
