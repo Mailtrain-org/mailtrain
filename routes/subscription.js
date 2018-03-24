@@ -19,23 +19,7 @@ let cache = require('memory-cache');
 let geoip = require('geoip-ultralight');
 let confirmations = require('../lib/models/confirmations');
 let mailHelpers = require('../lib/subscription-mail-helpers');
-
-let originWhitelist = config.cors && config.cors.origins || [];
-
-let corsOptions = {
-    allowedHeaders: ['Content-Type', 'Origin', 'Accept', 'X-Requested-With'],
-    methods: ['GET', 'POST'],
-    optionsSuccessStatus: 200, // IE11 chokes on 204
-    origin: (origin, callback) => {
-        if (originWhitelist.includes(origin)) {
-            callback(null, true);
-        } else {
-            let err = new Error(_('Not allowed by CORS'));
-            err.status = 403;
-            callback(err);
-        }
-    }
-};
+let corsOptions = tools.getCorsOptions();
 
 let corsOrCsrfProtection = (req, res, next) => {
     if (req.get('X-Requested-With') === 'XMLHttpRequest') {

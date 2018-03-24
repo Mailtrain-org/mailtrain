@@ -9,10 +9,11 @@ let confirmations = require('../lib/models/confirmations');
 let tools = require('../lib/tools');
 let express = require('express');
 let log = require('npmlog');
+let cors = require('cors');
 let router = new express.Router();
 let mailHelpers = require('../lib/subscription-mail-helpers');
 
-router.all('/*', (req, res, next) => {
+router.all('/*', cors(tools.getCorsOptions()), (req, res, next) => {
     if (!req.query.access_token) {
         res.status(403);
         return res.json({
