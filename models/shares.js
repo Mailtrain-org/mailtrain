@@ -7,6 +7,7 @@ const { enforce } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const permissions = require('../lib/permissions');
 const interoperableErrors = require('../shared/interoperable-errors');
+const log = require('npmlog');
 
 // TODO: This would really benefit from some permission cache connected to rebuildPermissions
 // A bit of the problem is that the cache would have to expunged as the result of other processes modifying entites/permissions
@@ -418,12 +419,24 @@ function checkGlobalPermission(context, requiredOperations) {
         return false;
     }
 
-    if (context.user.admin) { // This handles the getAdminContext() case
-        return true;
-    }
-
     if (typeof requiredOperations === 'string') {
         requiredOperations = [ requiredOperations ];
+    }
+
+    if (context.user.restrictedAccessHandler) {
+        log.verbose('check global permissions with restrictedAccessHandler --  requiredOperations: ' + requiredOperations);
+        const allowedPerms = context.user.restrictedAccessHandler.globalPermissions;
+        if (allowedPerms) {
+            requiredOperations = requiredOperations.filter(perm => allowedPerms.has(perm));
+        }
+    }
+
+    if (requiredOperations.length === 0) {
+        return false;
+    }
+
+    if (context.user.admin) { // This handles the getAdminContext() case
+        return true;
     }
 
     const roleSpec = config.roles.global[context.user.role];
@@ -453,6 +466,24 @@ async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredO
 
     const entityType = permissions.getEntityType(entityTypeId);
 
+    if (typeof requiredOperations === 'string') {
+        requiredOperations = [ requiredOperations ];
+    }
+
+    if (context.user.restrictedAccessHandler) {
+        log.verbose('check permissions with restrictedAccessHandler --  entityTypeId: ' + entityTypeId + '  entityId: ' + entityId + '  requiredOperations: ' + requiredOperations);
+        if (context.user.restrictedAccessHandler.permissions && context.user.restrictedAccessHandler.permissions[entityTypeId]) {
+            const allowedPerms = context.user.restrictedAccessHandler.permissions[entityTypeId][entityId];
+            if (allowedPerms) {
+                requiredOperations = requiredOperations.filter(perm => allowedPerms.has(perm));
+            }
+        }
+    }
+
+    if (requiredOperations.length === 0) {
+        return false;
+    }
+
     if (context.user.admin) { // This handles the getAdminContext() case. In this case we don't check the permission, but just the existence.
         const existsQuery = tx(entityType.entitiesTable);
 
@@ -465,10 +496,6 @@ async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredO
         return !!exists;
 
     } else {
-        if (typeof requiredOperations === 'string') {
-            requiredOperations = [ requiredOperations ];
-        }
-
         const permsQuery = tx(entityType.permissionsTable)
             .where('user', context.user.id)
             .whereIn('operation', requiredOperations);
@@ -563,7 +590,6 @@ async function getPermissionsTx(tx, context, entityTypeId, entityId) {
 
     return rows.map(x => x.operation);
 }
-
 
 module.exports = {
     listByEntityDTAjax,

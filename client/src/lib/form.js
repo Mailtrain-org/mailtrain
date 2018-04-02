@@ -25,7 +25,6 @@ import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birth
 import styles from "./styles.scss";
 import moment from "moment";
 
-
 const FormState = {
     Loading: 0,
     LoadingWithNotice: 1,

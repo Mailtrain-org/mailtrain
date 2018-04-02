@@ -100,7 +100,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
     const configItems = await settings.get(['uaCode']);
 
     data.uaCode = configItems.uaCode;
-    data.customSubscriptionScripts = config.customsubscriptionscripts || [];
+    data.customSubscriptionScripts = config.customSubscriptionScripts || [];
 }
 
 async function getMjmlTemplate(template) {

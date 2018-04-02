@@ -13,7 +13,7 @@ import 'datatables.net-bs/css/dataTables.bootstrap.css';
 
 import axios from './axios';
 
-import { withPageHelpers } from '../lib/page'
+import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import styles from "./styles.scss";
 
@@ -394,7 +394,7 @@ class Table extends Component {
   The reference to the table can be obtained by ref.
  */
 Table.prototype.refresh = function() {
-    this.getWrappedInstance().refresh()
+    this.getWrappedInstance().refresh();
 };
 
 export {

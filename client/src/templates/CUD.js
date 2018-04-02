@@ -39,7 +39,8 @@ export default class CUD extends Component {
         this.templateTypes = getTemplateTypes(props.t);
 
         this.state = {
-            showMergeTagReference: false
+            showMergeTagReference: false,
+            elementInFullscreen: false
         };
 
         this.initForm();
@@ -66,7 +67,8 @@ export default class CUD extends Component {
                 namespace: mailtrainConfig.user.namespace,
                 type: mailtrainConfig.editors[0],
                 text: '',
-                html: ''
+                html: '',
+                data: {}
             });
         }
     }
@@ -91,6 +93,11 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
+
+        if (this.props.entity) {
+            const typeKey = this.getFormValue('type');
+            await this.templateTypes[typeKey].htmlEditorBeforeSave(this);
+        }
 
         let sendMethod, url;
         if (this.props.entity) {
@@ -120,6 +127,9 @@ export default class CUD extends Component {
     }
 
     async extractPlainText() {
+        const typeKey = this.getFormValue('type');
+        await this.templateTypes[typeKey].htmlEditorBeforeSave(this);
+
         const html = this.getFormValue('html');
         if (!html) {
             alert('Missing HTML content');
@@ -142,6 +152,12 @@ export default class CUD extends Component {
     async toggleMergeTagReference() {
         this.setState({
             showMergeTagReference: !this.state.showMergeTagReference
+        });
+    }
+
+    async setElementInFullscreen(elementInFullscreen) {
+        this.setState({
+            elementInFullscreen
         });
     }
 
@@ -241,7 +257,7 @@ export default class CUD extends Component {
                     </div>}
                 </AlignedRow>
 
-                {this.templateTypes[typeKey].form}
+                {this.templateTypes[typeKey].getHTMLEditor(this)}
 
                 <ACEEditor id="text" height="400px" mode="text" label={t('Template content (plain text)')} help={<Trans>To extract the text from HTML click <ActionLink onClickAsync={::this.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}/>
             </div>
@@ -249,7 +265,7 @@ export default class CUD extends Component {
 
 
         return (
-            <div>
+            <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
                 {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}

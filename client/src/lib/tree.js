@@ -12,7 +12,7 @@ import '../../vendor/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.css';
 import axios from './axios';
 
-import { withPageHelpers } from '../lib/page'
+import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import styles from "./styles.scss";
 

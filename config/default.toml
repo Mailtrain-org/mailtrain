@@ -22,19 +22,13 @@
 title="mailtrain"
 
 # Enabled HTML editors
-editors=["ckeditor", "codeeditor"]
+editors=["ckeditor", "codeeditor", "mosaico"]
 
 # Default language to use
 language="en"
 
-# Inject custom styles in layout.hbs
-# customstyles=["/custom/hello-world.css"]
-
-# Inject custom scripts in layout.hbs
-# customscripts=["/custom/hello-world.js"]
-
 # Inject custom scripts in subscription/layout.mjml.hbs
-# customsubscriptionscripts=["/custom/hello-world.js"]
+# customSubscriptionScripts=["/custom/hello-world.js"]
 
 # If you start out as a root user (eg. if you want to use ports lower than 1000)
 # then you can downgrade the user once all services are up and running
@@ -43,9 +37,9 @@ language="en"
 
 # If Mailtrain is started as root, "Reports" feature drops the privileges of script generating the report to disallow
 # any modifications of Mailtrain code and even prohibits reading the production configuration (which contains the MySQL
-# password for read/write operations). The rouser/rogroup determines the user to be used
-#rouser="nobody"
-#rogroup="nogroup"
+# password for read/write operations). The roUser/roGroup determines the user to be used
+#roUser="nobody"
+#roGroup="nogroup"
 
 [log]
 # silly|verbose|info|http|warn|error|silent
@@ -54,8 +48,18 @@ level="verbose"
 [www]
 # HTTP port to listen on
 port=3000
+# HTTP port to listen on for sandboxed requests
+sandboxPort=8081
 # HTTP interface to listen on
 host="0.0.0.0"
+# URL Base (must end with slash). It can be either relative (starting with slash) or absolute (starting with http:// or https://).
+# If it is relative, an absolute URL will be constructed automatically based on the domain where it is served and the "port" config parameter
+urlBase="/"
+# URL Base for sandbox urls (must end with slash). It can be either relative (starting with slash) or absolute (starting with http:// or https://)
+# If it is relative, an absolute URL will be constructed automatically based on the domain where it is served and the "port" config parameter
+# If not given at all, it is automatically constructed based on urlBase and sandboxPort.
+# sandboxUrlBase="/"
+
 # Secret for signing the session ID cookie
 secret="a cat"
 # Session length in seconds when "remember me" is checked
@@ -66,10 +70,7 @@ log="dev"
 # Set this to true if you are serving Mailtrain as a virtual domain through Nginx or Apache
 proxy=false
 # maximum POST body size
-postsize="2MB"
-# Uncomment to set uploads folder location for temporary data. Defaults to os.tmpdir()
-# If the service is started by `npm start` then os.tmpdir() points to CWD
-#tmpdir="/tmp"
+postSize="2MB"
 
 [mysql]
 host="localhost"

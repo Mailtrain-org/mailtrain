@@ -319,7 +319,6 @@ class SectionContent extends Component {
 
     ensureAuthenticated() {
         if (!mailtrainConfig.isAuthenticated) {
-            /* FIXME, once we turn Mailtrain to single-page application, this should become navigateTo */
             this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
         }
     }
@@ -383,7 +382,7 @@ class Section extends Component {
 
     render() {
         return (
-            <Router>
+            <Router basename={mailtrainConfig.urlBase}>
                 <SectionContent root={this.props.root} structure={this.structure} />
             </Router>
         );

@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
     entry: {
         root: ['babel-polyfill', './src/root.js'],
-        mosaico: ['babel-polyfill', './src/mosaico/root.js'],
+        mosaico: ['babel-polyfill', './src/lib/mosaico-sandbox-root.js'],
     },
     output: {
         library: 'MailtrainReactBody',

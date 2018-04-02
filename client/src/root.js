@@ -139,7 +139,7 @@ class Root extends Component {
 
     async logout() {
         await axios.post('/rest/logout');
-        window.location = '/';
+        window.location = mailtrainConfig.urlBase;
     }
 
     render() {

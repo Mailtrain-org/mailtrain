@@ -133,7 +133,8 @@ async function createFiles(context, type, entityId, files, dontReplace = false) 
                     originalName: originalName,
                     size: file.size,
                     type: file.mimetype,
-                    url: `/files/${type}/${entityId}/${file.filename}`
+                    url: `/files/${type}/${entityId}/${file.filename}`,
+                    thumbnailUrl: `/files/${type}/${entityId}/${file.filename}` // TODO - use smaller thumbnails
                 });
 
                 if (existingNameMap.has(originalName)) {
@@ -145,10 +146,10 @@ async function createFiles(context, type, entityId, files, dontReplace = false) 
         }
 
         const originalNameArray = Array.from(originalNameSet);
-        await knex(getFilesTable(type)).where('entity', entityId).whereIn('originalname', originalNameArray).del();
+        await tx(getFilesTable(type)).where('entity', entityId).whereIn('originalname', originalNameArray).del();
 
         if (fileEntities) {
-            await knex(getFilesTable(type)).insert(fileEntities);
+            await tx(getFilesTable(type)).insert(fileEntities);
         }
     });
 

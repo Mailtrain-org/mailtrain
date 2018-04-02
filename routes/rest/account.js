@@ -52,12 +52,17 @@ router.postAsync('/password-reset-send', passport.csrfProtection, async (req, re
 router.postAsync('/password-reset-validate', passport.csrfProtection, async (req, res) => {
     const isValid = await users.isPasswordResetTokenValid(req.body.username, req.body.resetToken);
     return res.json(isValid);
-})
+});
 
 router.postAsync('/password-reset', passport.csrfProtection, async (req, res) => {
     await users.resetPassword(req.body.username, req.body.resetToken, req.body.password);
     return res.json();
-})
+});
 
+router.postAsync('/restricted-access-token', passport.loggedIn, async (req, res) => {
+    const restrictedAccessToken = await users.getRestrictedAccessToken(req.context, req.body.method, req.body.params);
+    return res.json(restrictedAccessToken);
+
+});
 
 module.exports = router;

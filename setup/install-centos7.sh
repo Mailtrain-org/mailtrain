@@ -76,8 +76,8 @@ useradd zone-mta || true
 cat >> config/production.toml <<EOT
 user="mailtrain"
 group="mailtrain"
-rouser="nobody"
-rogroup="nobody"
+roUser="nobody"
+roGroup="nobody"
 [log]
 level="error"
 [www]

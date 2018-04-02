@@ -1,11 +1,6 @@
 'use strict';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { I18nextProvider } from 'react-i18next';
-import i18n from '../lib/i18n';
-
-import { Section } from '../lib/page';
 import ReportsCUD from './CUD';
 import ReportsList from './List';
 import ReportsView from './View';
@@ -13,7 +8,7 @@ import ReportsOutput from './Output';
 import ReportTemplatesCUD from './templates/CUD';
 import ReportTemplatesList from './templates/List';
 import Share from '../shares/Share';
-import { ReportState } from '../../../shared/reports';
+import {ReportState} from '../../../shared/reports';
 import mailtrainConfig from 'mailtrainConfig';
 
 

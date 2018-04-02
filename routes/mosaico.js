@@ -7,6 +7,7 @@ const clientHelpers = require('../lib/client-helpers');
 const gm = require('gm').subClass({
     imageMagick: true
 });
+const users = require('../models/users');
 
 const bluebird = require('bluebird');
 const fsReadFile = bluebird.promisify(require('fs').readFile);
@@ -15,6 +16,21 @@ const path = require('path');
 
 const files = require('../models/files');
 const fileHelpers = require('../lib/file-helpers');
+
+
+users.registerRestrictedAccessTokenMethod('mosaico', ({entityTypeId, entityId}) => {
+    if (entityTypeId === 'template' || entityTypeId === 'campaign') {
+        return {
+            permissions: {
+                [entityTypeId]: {
+                    [entityId]: new Set(['manageFiles', 'view'])
+                }
+            }
+        };
+    }
+});
+
+
 
 // FIXME - add authentication by sandboxToken
 
@@ -136,7 +152,7 @@ router.getAsync('/upload/:type/:fileId', passport.loggedIn, async (req, res) => 
 });
 
 
-router.getAsync('/editor', passport.csrfProtection, passport.loggedIn, async (req, res) => {
+router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
     const resourceType = req.query.type;
     const resourceId = req.query.id;
 

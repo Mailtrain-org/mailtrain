@@ -19,6 +19,8 @@ async function getById(context, id) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'view');
         const entity = await tx('templates').where('id', id).first();
+        entity.data = JSON.parse(entity.data);
+
         entity.permissions = await shares.getPermissionsTx(tx, context, 'template', id);
         return entity;
     });
@@ -34,9 +36,16 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function _validateAndPreprocess(tx, entity, isCreate) {
+    entity.data = JSON.stringify(entity.data);
+}
+
 async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
+
+        await _validateAndPreprocess(tx, entity, true);
+
         await namespaceHelpers.validateEntity(tx, entity);
 
         const ids = await tx('templates').insert(filterObject(entity, allowedKeys));
@@ -57,10 +66,14 @@ async function updateWithConsistencyCheck(context, entity) {
             throw new interoperableErrors.NotFoundError();
         }
 
+        existing.data = JSON.parse(existing.data);
+
         const existingHash = hash(existing);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
+
+        await _validateAndPreprocess(tx, entity, false);
 
         await namespaceHelpers.validateEntity(tx, entity);
         await namespaceHelpers.validateMove(context, entity, existing, 'template', 'createTemplate', 'delete');
