@@ -123,6 +123,7 @@ router.getAsync('/img/:type/:fileId', passport.loggedIn, async (req, res) => {
     } else {
         width = sanitizeSize(width, 1, 2048, 600, false);
         height = sanitizeSize(height, 1, 2048, 300, true);
+        // TODO - validate that one has the rights to read this ???
         image = await resizedImage(req.query.src, method, width, height);
     }
 

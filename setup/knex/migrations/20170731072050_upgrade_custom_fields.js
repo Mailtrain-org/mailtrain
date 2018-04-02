@@ -2,7 +2,7 @@
 
 exports.up = (knex, Promise) => (async() => {
     await knex.schema.table('custom_fields', table => {
-        table.json('settings');
+        table.text('settings');
     });
 
     await knex.schema.table('custom_fields', table => {

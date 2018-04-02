@@ -61,7 +61,7 @@ function getMenus(t) {
                     title: t('Create'),
                     panelRender: props => <ReportsCUD action="create" />
                 },
-                'templates': {
+                templates: {
                     title: t('Templates'),
                     link: '/reports/templates',
                     panelComponent: ReportTemplatesList,

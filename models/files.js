@@ -7,21 +7,26 @@ const shares = require('./shares');
 const fs = require('fs-extra-promise');
 const path = require('path');
 const interoperableErrors = require('../shared/interoperable-errors');
+const permissions = require('../lib/permissions');
+
+const entityTypes = permissions.getEntityTypes();
 
 const filesDir = path.join(__dirname, '..', 'files');
 
-const permittedTypes = new Set(['template']);
+function enforceTypePermitted(type) {
+    enforce(type in entityTypes && entityTypes[type].filesTable);
+}
 
 function getFilePath(type, entityId, filename) {
     return path.join(path.join(filesDir, type, entityId.toString()), filename);
 }
 
 function getFilesTable(type) {
-    return 'files_' + type;
+    return entityTypes[type].filesTable;
 }
 
 async function listDTAjax(context, type, entityId, params) {
-    enforce(permittedTypes.has(type));
+    enforceTypePermitted(type);
     await shares.enforceEntityPermission(context, type, entityId, 'manageFiles');
     return await dtHelpers.ajaxList(
         params,
@@ -38,7 +43,7 @@ async function list(context, type, entityId) {
 }
 
 async function getFileById(context, type, id) {
-    enforce(permittedTypes.has(type));
+    enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
         const file = await tx(getFilesTable(type)).where('id', id).first();
         await shares.enforceEntityPermissionTx(tx, context, type, file.entity, 'manageFiles');
@@ -57,7 +62,7 @@ async function getFileById(context, type, id) {
 }
 
 async function getFileByFilename(context, type, entityId, name) {
-    enforce(permittedTypes.has(type));
+    enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, type, entityId, 'view');
         const file = await tx(getFilesTable(type)).where({entity: entityId, filename: name}).first();
@@ -76,7 +81,7 @@ async function getFileByFilename(context, type, entityId, name) {
 }
 
 async function createFiles(context, type, entityId, files, dontReplace = false) {
-    enforce(permittedTypes.has(type));
+    enforceTypePermitted(type);
     if (files.length == 0) {
         // No files uploaded
         return {uploaded: 0};

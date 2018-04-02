@@ -1,6 +1,6 @@
 exports.up = (knex, Promise) => (async() =>  {
     await knex.schema.table('templates', table => {
-        table.json('data');
+        table.text('data', 'longtext');
         table.string('type');
     });
 

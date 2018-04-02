@@ -45,6 +45,7 @@ const sharesRest = require('./routes/rest/shares');
 const segmentsRest = require('./routes/rest/segments');
 const subscriptionsRest = require('./routes/rest/subscriptions');
 const templatesRest = require('./routes/rest/templates');
+const mosaicoTemplatesRest = require('./routes/rest/mosaico-templates');
 const blacklistRest = require('./routes/rest/blacklist');
 const editorsRest = require('./routes/rest/editors');
 const filesRest = require('./routes/rest/files');
@@ -279,6 +280,7 @@ function createApp(trusted) {
     app.use('/rest', segmentsRest);
     app.use('/rest', subscriptionsRest);
     app.use('/rest', templatesRest);
+    app.use('/rest', mosaicoTemplatesRest);
     app.use('/rest', blacklistRest);
     app.use('/rest', editorsRest);
     app.use('/rest', filesRest);

@@ -36,7 +36,7 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function _validateAndPreprocess(tx, entity, isCreate) {
+async function _validateAndPreprocess(tx, entity) {
     entity.data = JSON.stringify(entity.data);
 }
 
@@ -44,7 +44,7 @@ async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
 
-        await _validateAndPreprocess(tx, entity, true);
+        await _validateAndPreprocess(tx, entity);
 
         await namespaceHelpers.validateEntity(tx, entity);
 
@@ -73,7 +73,7 @@ async function updateWithConsistencyCheck(context, entity) {
             throw new interoperableErrors.ChangedError();
         }
 
-        await _validateAndPreprocess(tx, entity, false);
+        await _validateAndPreprocess(tx, entity);
 
         await namespaceHelpers.validateEntity(tx, entity);
         await namespaceHelpers.validateMove(context, entity, existing, 'template', 'createTemplate', 'delete');

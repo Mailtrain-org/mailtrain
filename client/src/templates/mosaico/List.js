@@ -2,13 +2,14 @@
 
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
-import { Icon } from '../lib/bootstrap-components';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { Table } from '../lib/table';
-import axios from '../lib/axios';
+import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
+import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, DropdownLink } from '../../lib/page';
+import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
+import { Table } from '../../lib/table';
+import axios from '../../lib/axios';
 import moment from 'moment';
 import { getTemplateTypes } from './helpers';
+
 
 @translate()
 @withPageHelpers
@@ -26,25 +27,16 @@ export default class List extends Component {
     @withAsyncErrorHandler
     async fetchPermissions() {
         const request = {
-            createTemplate: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createTemplate']
-            },
             createMosaicoTemplate: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createMosaicoTemplate']
-            },
-            viewMosaicoTemplate: {
-                entityTypeId: 'mosaicoTemplate',
-                requiredOperations: ['view']
             }
         };
 
         const result = await axios.post('/rest/permissions-check', request);
 
         this.setState({
-            createPermitted: result.data.createTemplate,
-            mosaicoTemplatesPermitted: result.data.createMosaicoTemplate || result.data.viewMosaicoTemplate
+            createPermitted: result.data.createMosaicoTemplate
         });
     }
 
@@ -69,21 +61,14 @@ export default class List extends Component {
                     if (perms.includes('edit')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('Edit')}/>,
-                            link: `/templates/${data[0]}/edit`
-                        });
-                    }
-
-                    if (perms.includes('manageFiles')) {
-                        actions.push({
-                            label: <Icon icon="hdd" title={t('Files')}/>,
-                            link: `/templates/${data[0]}/files`
+                            link: `/templates/mosaico/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
                             label: <Icon icon="share-alt" title={t('Share')}/>,
-                            link: `/templates/${data[0]}/share`
+                            link: `/templates/mosaico/${data[0]}/share`
                         });
                     }
 
@@ -94,18 +79,18 @@ export default class List extends Component {
 
         return (
             <div>
-                <Toolbar>
-                    {this.state.createPermitted &&
-                       <NavButton linkTo="/templates/create" className="btn-primary" icon="plus" label={t('Create Template')}/>
-                    }
-                    {this.state.mosaicoTemplatesPermitted &&
-                        <NavButton linkTo="/templates/mosaico" className="btn-primary" label={t('Mosaico Templates')}/>
-                    }
-                </Toolbar>
+                {this.state.createPermitted &&
+                    <Toolbar>
+                        <DropdownMenu className="btn-primary" label={t('Create Mosaico Template')}>
+                            <DropdownLink to="/templates/mosaico/create">{t('Blank')}</DropdownLink>
+                            <DropdownLink to="/templates/mosaico/create/versafix">{t('Versafix One')}</DropdownLink>
+                        </DropdownMenu>
+                    </Toolbar>
+                }
 
-                <Title>{t('Templates')}</Title>
+                <Title>{t('Mosaico Templates')}</Title>
 
-                <Table withHeader dataUrl="/rest/templates-table" columns={columns} />
+                <Table withHeader dataUrl="/rest/mosaico-templates-table" columns={columns} />
             </div>
         );
     }

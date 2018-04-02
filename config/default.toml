@@ -204,7 +204,7 @@ rootNamespaceRole="master"
 [roles.namespace.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "manageUsers"]
+permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "manageUsers"]
 
 [roles.namespace.master.children]
 list=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
@@ -213,7 +213,8 @@ campaign=["view", "edit", "delete", "share", "manageFiles"]
 template=["view", "edit", "delete", "share", "manageFiles"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
-namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "manageUsers"]
+mosaicoTemplate=["view", "edit", "delete", "share", "manageFiles"]
+namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "manageUsers"]
 
 [roles.list.master]
 name="Master"
@@ -245,6 +246,10 @@ name="Master"
 description="All permissions"
 permissions=["view", "edit", "delete", "share", "execute"]
 
+[roles.mosaicoTemplate.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete", "share", "manageFiles"]
 
 
 [roles.global.editor]
@@ -297,3 +302,7 @@ name="Editor"
 description="XXX"
 permissions=[]
 
+[roles.mosaicoTemplate.editor]
+name="Editor"
+description="All permissions"
+permissions=[]

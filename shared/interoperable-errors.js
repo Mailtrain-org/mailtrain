@@ -106,6 +106,13 @@ class InvalidConfirmationForUnsubscriptionError extends InteroperableError {
     }
 }
 
+class DependencyPresentError extends InteroperableError {
+    constructor(msg, data) {
+        super('DependencyPresentError', msg, data);
+    }
+}
+
+
 const errorTypes = {
     InteroperableError,
     NotLoggedInError,
@@ -123,7 +130,8 @@ const errorTypes = {
     PermissionDeniedError,
     InvalidConfirmationForSubscriptionError,
     InvalidConfirmationForAddressChangeError,
-    InvalidConfirmationForUnsubscriptionError
+    InvalidConfirmationForUnsubscriptionError,
+    DependencyPresentError
 };
 
 function deserialize(errorObj) {
