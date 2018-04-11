@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Language-Team: \n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2018-04-10 16:32+0200\n"
+"PO-Revision-Date: 2018-04-11 12:42+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2151,10 +2151,7 @@ msgstr "Nome mittente, per esempio : Super Compagnia S.r.l."
 
 #: views/settings.hbs:20
 msgid "Default address"
-msgstr ""
-"Indirizzo predefinitio\n"
-"\n"
-"o"
+msgstr "Indirizzo predefinito"
 
 #: views/settings.hbs:21
 msgid ""
