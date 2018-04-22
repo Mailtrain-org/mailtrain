@@ -3,18 +3,35 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {translate} from "react-i18next";
-import {NavButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../../lib/page";
-import {Button as FormButton, ButtonRow, Dropdown, Form, FormSendMethod, InputField, withForm} from "../../lib/form";
-import {withAsyncErrorHandler, withErrorHandling} from "../../lib/error-handling";
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from "../../lib/page";
+import {
+    Button as FormButton,
+    ButtonRow,
+    Dropdown,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm
+} from "../../lib/form";
+import {withErrorHandling} from "../../lib/error-handling";
 import {DeleteModalDialog} from "../../lib/modals";
-import interoperableErrors from "../../../../shared/interoperable-errors";
 
 import styles from "./CUD.scss";
 import {DragDropContext} from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
 import SortableTree from "react-sortable-tree";
-import {ActionLink, Button, Icon} from "../../lib/bootstrap-components";
+import {
+    ActionLink,
+    Button,
+    Icon
+} from "../../lib/bootstrap-components";
 import {getRuleHelpers} from "./helpers";
 import RuleSettingsPane from "./RuleSettingsPane";
 
@@ -88,18 +105,6 @@ export default class CUD extends Component {
         return tree;
     }
 
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/segments/${this.props.list.id}/${this.props.entity.id}`, data => {
-            data.rootRuleType = data.settings.rootRule.type;
-            data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
-
-            this.setState({
-                rulesTree: this.getTreeFromRules(data.settings.rootRule.rules)
-            });
-        });
-    }
-
     componentDidMount() {
         if (this.props.entity) {
             this.setState({
@@ -167,7 +172,14 @@ export default class CUD extends Component {
 
             if (submitSuccessful) {
                 if (stay) {
-                    await this.loadFormValues();
+                    await this.getFormValuesFromURL(`/rest/segments/${this.props.list.id}/${this.props.entity.id}`, data => {
+                        data.rootRuleType = data.settings.rootRule.type;
+                        data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
+
+                        this.setState({
+                            rulesTree: this.getTreeFromRules(data.settings.rootRule.rules)
+                        });
+                    });
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Segment saved'));
                 } else {

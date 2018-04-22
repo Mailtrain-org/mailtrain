@@ -52,11 +52,6 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/templates/${this.props.entity.id}`);
-    }
-
     componentDidMount() {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);

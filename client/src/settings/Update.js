@@ -1,29 +1,27 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import {
-    withForm,
+    Trans,
+    translate
+} from 'react-i18next';
+import {
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page';
+import {
+    Button,
+    ButtonRow,
+    Fieldset,
     Form,
     FormSendMethod,
     InputField,
     TextArea,
-    TableSelect,
-    ButtonRow,
-    Button,
-    Dropdown,
-    StaticField,
-    CheckBox,
-    Fieldset
+    withForm
 } from '../lib/form';
-import { withErrorHandling } from '../lib/error-handling';
-import { DeleteModalDialog } from '../lib/modals';
-import { validateNamespace, NamespaceSelect } from '../lib/namespace';
-import { UnsubscriptionMode } from '../../../shared/lists';
-import styles from "../lib/styles.scss";
-import mailtrainConfig from 'mailtrainConfig';
+import {withErrorHandling} from '../lib/error-handling';
 
 @translate()
 @withForm
@@ -42,7 +40,7 @@ export default class Update extends Component {
     static propTypes = {
         entity: PropTypes.object
     }
-    
+
     componentDidMount() {
         this.getFormValuesFromEntity(this.props.entity);
     }
@@ -60,7 +58,9 @@ export default class Update extends Component {
         const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.PUT, '/rest/settings');
 
         if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/settings', 'success', t('Global settings saved'));
+            await this.getFormValuesFromURL('/rest/settings');
+            this.enableForm();
+            this.setFormStatusMessage('success', t('Global settings saved'));
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));

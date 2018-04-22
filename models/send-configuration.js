@@ -11,11 +11,11 @@ const {MailerType, getSystemSendConfigurationId} = require('../shared/send-confi
 
 const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'subject', 'subject_overridable', 'verp_hostname', 'mailer_type', 'mailer_settings', 'namespace']);
 
+const allowedMailerTypes = new Set(Object.values(MailerType));
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
-
 
 async function listDTAjax(context, params) {
     return await dtHelpers.ajaxListWithPermissions(
@@ -47,7 +47,7 @@ async function getById(context, id, withPermissions = true) {
 async function _validateAndPreprocess(tx, entity, isCreate) {
     await namespaceHelpers.validateEntity(tx, entity);
 
-    enforce(entity.mailer_type >= 0 && entity.mailer_type < MailerType.MAX, 'Unknown mailer type');
+    enforce(allowedMailerTypes.has(entity.mailer_type), 'Unknown mailer type');
     entity.mailer_settings = JSON.stringify(entity.mailer_settings);
 }
 

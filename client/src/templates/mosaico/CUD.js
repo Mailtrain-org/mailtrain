@@ -1,16 +1,36 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page'
-import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ButtonRow, Button } from '../../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
+import {translate} from 'react-i18next';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../../lib/page'
+import {
+    Button,
+    ButtonRow,
+    Dropdown,
+    Form,
+    FormSendMethod,
+    InputField,
+    TextArea,
+    withForm
+} from '../../lib/form';
+import {withErrorHandling} from '../../lib/error-handling';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 
-import { versafix } from "../../../../shared/mosaico-templates";
-import { getTemplateTypes, getTemplateTypesOrder } from "./helpers";
+import {versafix} from "../../../../shared/mosaico-templates";
+import {
+    getTemplateTypes,
+    getTemplateTypesOrder
+} from "./helpers";
 
 @translate()
 @withForm
@@ -40,13 +60,6 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
         entity: PropTypes.object
-    }
-
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/mosaico-templates/${this.props.entity.id}`, data => {
-            this.templateTypes[data.type].afterLoad(data);
-        });
     }
 
     componentDidMount() {
@@ -126,7 +139,9 @@ export default class CUD extends Component {
 
         if (submitSuccessful) {
             if (stay) {
-                await this.loadFormValues();
+                await this.getFormValuesFromURL(`/rest/mosaico-templates/${this.props.entity.id}`, data => {
+                    this.templateTypes[data.type].afterLoad(data);
+                });
                 this.enableForm();
                 this.setFormStatusMessage('success', t('Mosaico template saved'));
             } else {

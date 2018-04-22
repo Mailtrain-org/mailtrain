@@ -99,13 +99,15 @@ export default class CUD extends Component {
     localValidateFormValues(state) {
         const t = this.props.t;
 
+        const typeKey = state.getIn(['mailer_type', 'value']);
+
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
-        if (!state.getIn(['mailer_type', 'value'])) {
+        if (!typeKey) {
             state.setIn(['mailer_type', 'error'], t('Mailer type must be selected'));
         } else {
             state.setIn(['mailer_type', 'error'], null);
@@ -117,8 +119,11 @@ export default class CUD extends Component {
             state.setIn(['verp_hostname', 'error'], null);
         }
 
-
         validateNamespace(t, state);
+
+        if (typeKey) {
+            this.mailerTypes[typeKey].validate(state);
+        }
     }
 
     async submitHandler() {
@@ -157,7 +162,6 @@ export default class CUD extends Component {
         const canDelete = isEdit && this.props.entity.permissions.includes('delete') && this.props.entity.id !== getSystemSendConfigurationId();
 
         const typeKey = this.getFormValue('mailer_type');
-        console.log(typeKey);
         let mailerForm = null;
         if (typeKey) {
             mailerForm = this.mailerTypes[typeKey].getForm(this);
@@ -210,12 +214,6 @@ export default class CUD extends Component {
                             :
                             <Trans><p>VERP bounce handling server is not enabled. Modify your server configuration file and restart server to enable it.</p></Trans>
                         }
-                        <InputField id="from_email" label={t('Default "from" email')}/>
-                        <CheckBox id="from_email_overridable" text={t('Overridable')}/>
-                        <InputField id="from_name" label={t('Default "from" name')}/>
-                        <CheckBox id="from_name_overridable" text={t('Overridable')}/>
-                        <InputField id="subject" label={t('Subject')}/>
-                        <CheckBox id="subject_overridable" text={t('Overridable')}/>
                     </Fieldset>
 
                     <ButtonRow>

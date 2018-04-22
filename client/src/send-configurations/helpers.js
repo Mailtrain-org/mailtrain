@@ -18,65 +18,6 @@ export const mailerTypesOrder = [
     MailerType.AWS_SES
 ];
 
-function getInitCommon() {
-    return {
-        maxConnections: '5',
-        throttling: '',
-        logTransactions: false
-    };
-}
-
-function getInitGenericSMTP() {
-    return {
-        ...getInitCommon(),
-        smtpHostname: '',
-        smtpPort: '',
-        smtpEncryption: 'NONE',
-        smtpUseAuth: false,
-        smtpUser: '',
-        smtpPassword: '',
-        smtpAllowSelfSigned: false,
-        smtpMaxMessages: '100'
-    };
-}
-
-function afterLoadCommon(data) {
-    data.maxConnections = data.mailer_settings.maxConnections;
-    data.throttling = data.mailer_settings.throttling || '';
-    data.logTransaction = data.mailer_settings.logTransactions;
-}
-
-function afterLoadGenericSMTP(data) {
-    afterLoadCommon(data);
-    data.smtpHostname = data.mailer_settings.hostname;
-    data.smtpPort = data.mailer_settings.port || '';
-    data.smtpEncryption = data.mailer_settings.encryption;
-    data.smtpUseAuth = data.mailer_settings.useAuth;
-    data.smtpUser = data.mailer_settings.user;
-    data.smtpPassword = data.mailer_settings.password;
-    data.smtpAllowSelfSigned = data.mailer_settings.allowSelfSigned;
-    data.smtpMaxMessages = data.mailer_settings.maxMessages;
-}
-
-function beforeSaveCommon(data) {
-    data.mailer_settings = {};
-    data.mailer_settings.maxConnections = Number(data.maxConnections);
-    data.mailer_settings.throttling = Number(data.throttling);
-    data.mailer_settings.logTransactions = data.logTransaction;
-}
-
-function beforeSaveGenericSMTP(data) {
-    beforeSaveCommon(data);
-    data.mailer_settings.hostname = data.smtpHostname;
-    data.mailer_settings.port = Number(data.smtpPort);
-    data.mailer_settings.encryption = data.smtpEncryption;
-    data.mailer_settings.useAuth = data.smtpUseAuth;
-    data.mailer_settings.user = data.smtpUser;
-    data.mailer_settings.password = data.smtpPassword;
-    data.mailer_settings.allowSelfSigned = data.smtpAllowSelfSigned;
-    data.mailer_settings.maxMessages = Number(data.smtpMaxMessages);
-}
-
 export function getMailerTypes(t) {
     const mailerTypes = {};
 
@@ -97,6 +38,88 @@ export function getMailerTypes(t) {
                 delete data[fieldKey];
             }
         }
+    }
+
+    function validateNumber(state, field, label, emptyAllowed = false) {
+        const value = state.getIn([field, 'value']);
+        if (typeof value === 'string' && value.trim() === '' && !emptyAllowed) { // After load, the numerical values can be still numbers
+            state.setIn([field, 'error'], t(`${label} must not be empty`));
+        } else if (isNaN(value)) {
+            state.setIn([field, 'error'], t(`${label} must be a number`));
+        } else {
+            state.setIn([field, 'error'], null);
+        }
+
+    }
+
+    function getInitCommon() {
+        return {
+            maxConnections: '5',
+            throttling: '',
+            logTransactions: false
+        };
+    }
+
+    function getInitGenericSMTP() {
+        return {
+            ...getInitCommon(),
+            smtpHostname: '',
+            smtpPort: '',
+            smtpEncryption: 'NONE',
+            smtpUseAuth: false,
+            smtpUser: '',
+            smtpPassword: '',
+            smtpAllowSelfSigned: false,
+            smtpMaxMessages: '100'
+        };
+    }
+
+    function afterLoadCommon(data) {
+        data.maxConnections = data.mailer_settings.maxConnections;
+        data.throttling = data.mailer_settings.throttling || '';
+        data.logTransactions = data.mailer_settings.logTransactions;
+    }
+
+    function afterLoadGenericSMTP(data) {
+        afterLoadCommon(data);
+        data.smtpHostname = data.mailer_settings.hostname;
+        data.smtpPort = data.mailer_settings.port || '';
+        data.smtpEncryption = data.mailer_settings.encryption;
+        data.smtpUseAuth = data.mailer_settings.useAuth;
+        data.smtpUser = data.mailer_settings.user;
+        data.smtpPassword = data.mailer_settings.password;
+        data.smtpAllowSelfSigned = data.mailer_settings.allowSelfSigned;
+        data.smtpMaxMessages = data.mailer_settings.maxMessages;
+    }
+
+    function beforeSaveCommon(data) {
+        data.mailer_settings = {};
+        data.mailer_settings.maxConnections = Number(data.maxConnections);
+        data.mailer_settings.throttling = Number(data.throttling);
+        data.mailer_settings.logTransactions = data.logTransactions;
+    }
+
+    function beforeSaveGenericSMTP(data) {
+        beforeSaveCommon(data);
+        data.mailer_settings.hostname = data.smtpHostname;
+        data.mailer_settings.port = Number(data.smtpPort);
+        data.mailer_settings.encryption = data.smtpEncryption;
+        data.mailer_settings.useAuth = data.smtpUseAuth;
+        data.mailer_settings.user = data.smtpUser;
+        data.mailer_settings.password = data.smtpPassword;
+        data.mailer_settings.allowSelfSigned = data.smtpAllowSelfSigned;
+        data.mailer_settings.maxMessages = Number(data.smtpMaxMessages);
+    }
+
+    function validateCommon(state) {
+        validateNumber(state, 'maxConnections', 'Max connections');
+        validateNumber(state, 'throttling', 'Throttling', true);
+    }
+
+    function validateGenericSMTP(state) {
+        validateCommon(state);
+        validateNumber(state, 'smtpPort', 'Port', true);
+        validateNumber(state, 'smtpMaxMessages', 'Max messages');
     }
 
     const typeOptions = [
@@ -153,6 +176,9 @@ export function getMailerTypes(t) {
         },
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, MailerType.GENERIC_SMTP);
+        },
+        validate: state => {
+            validateGenericSMTP(state);
         }
     };
 
@@ -212,6 +238,9 @@ export function getMailerTypes(t) {
         },
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, MailerType.ZONE_MTA);
+        },
+        validate: state => {
+            validateGenericSMTP(state);
         }
     };
 
@@ -251,6 +280,9 @@ export function getMailerTypes(t) {
         },
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, MailerType.AWS_SES);
+        },
+        validate: state => {
+            validateCommon(state);
         }
     };
 

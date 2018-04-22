@@ -3,8 +3,7 @@
 const MailerType = {
     GENERIC_SMTP: 'generic_smtp',
     ZONE_MTA: 'zone_mta',
-    AWS_SES: 'aws_ses',
-    MAX: 3
+    AWS_SES: 'aws_ses'
 };
 
 function getSystemSendConfigurationId() {

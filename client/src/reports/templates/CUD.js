@@ -1,12 +1,33 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page'
-import { withForm, Form, FormSendMethod, InputField, TextArea, Dropdown, ACEEditor, ButtonRow, Button } from '../../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
+import {
+    Trans,
+    translate
+} from 'react-i18next';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../../lib/page'
+import {
+    ACEEditor,
+    Button,
+    ButtonRow,
+    Dropdown,
+    Form,
+    FormSendMethod,
+    InputField,
+    TextArea,
+    withForm
+} from '../../lib/form';
+import {withErrorHandling} from '../../lib/error-handling';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import 'brace/mode/javascript';
@@ -31,11 +52,6 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
         entity: PropTypes.object
-    }
-
-    @withAsyncErrorHandler
-    async loadFormValues() {
-        await this.getFormValuesFromURL(`/rest/report-templates/${this.props.entity.id}`);
     }
 
     componentDidMount() {
@@ -259,7 +275,7 @@ export default class CUD extends Component {
 
         if (submitSuccessful) {
             if (stay) {
-                await this.loadFormValues();
+                await this.getFormValuesFromURL(`/rest/report-templates/${this.props.entity.id}`);
                 this.enableForm();
                 this.setFormStatusMessage('success', t('Report template saved'));
             } else {
