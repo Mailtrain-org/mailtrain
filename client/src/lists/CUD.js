@@ -46,6 +46,8 @@ export default class CUD extends Component {
                 form: 'default',
                 default_form: null,
                 public_subscribe: true,
+                contact_email: '',
+                homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
                 namespace: mailtrainConfig.user.namespace
             });
@@ -170,7 +172,10 @@ export default class CUD extends Component {
                         </StaticField>
                     }
 
-                    <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
+                    <TextArea id="description" label={t('Description')}/>
+
+                    <InputField id="contact_email" label={t('Contact email')} help={t('Contact email used in subscription forms and emails that are sent out. If not filled in, the admin email from the global settings will be used.')}/>
+                    <InputField id="homepage" label={t('Homepage')} help={t('Homepage URL used in subscription forms and emails that are sent out. If not filled in, the default homepage from global settings will be used.')}/>
 
                     <NamespaceSelect/>
 

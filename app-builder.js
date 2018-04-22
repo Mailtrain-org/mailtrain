@@ -50,8 +50,9 @@ const mosaicoTemplatesRest = require('./routes/rest/mosaico-templates');
 const blacklistRest = require('./routes/rest/blacklist');
 const editorsRest = require('./routes/rest/editors');
 const filesRest = require('./routes/rest/files');
+const settingsRest = require('./routes/rest/settings');
 
-const root = require('./routes/root');
+const index = require('./routes/index');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
@@ -259,7 +260,7 @@ function createApp(trusted) {
     // Regular endpoints
     useWith404Fallback('/subscription', subscription);
     useWith404Fallback('/files', files);
-    useWith404Fallback('/mosaico', mosaico);
+    useWith404Fallback('/mosaico', mosaico.getRouter(trusted));
 
     if (config.reports && config.reports.enabled === true) {
         useWith404Fallback('/reports', reports);
@@ -286,6 +287,7 @@ function createApp(trusted) {
     app.use('/rest', blacklistRest);
     app.use('/rest', editorsRest);
     app.use('/rest', filesRest);
+    app.use('/rest', settingsRest);
 
     if (config.reports && config.reports.enabled === true) {
         app.use('/rest', reportTemplatesRest);
@@ -293,7 +295,7 @@ function createApp(trusted) {
     }
     install404Fallback('/rest');
 
-    app.use('/', root);
+    app.use('/', index.getRouter(trusted));
 
     // Error handlers
     if (app.get('env') === 'development') {

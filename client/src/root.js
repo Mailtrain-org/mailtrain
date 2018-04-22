@@ -16,6 +16,7 @@ import reports from './reports/root';
 import templates from './templates/root';
 import users from './users/root';
 import sendConfigurations from './send-configurations/root';
+import settings from './settings/root';
 
 import {
     MenuLink,
@@ -31,6 +32,7 @@ import {
 } from "./lib/bootstrap-components";
 import {Link} from "react-router-dom";
 import axios from './lib/axios';
+import {getUrl} from "./lib/urls";
 
 
 @translate()
@@ -79,7 +81,7 @@ class Root extends Component {
                                     <DropdownMenuItem label={t('Administration')}>
                                         <MenuLink to="/users"><Icon icon='cog'/> {t('Users')}</MenuLink>
                                         <MenuLink to="/namespaces"><Icon icon='cog'/> {t('Namespaces')}</MenuLink>
-                                        <MenuLink to="/settings"><Icon icon='cog'/> {t('Settings')}</MenuLink>
+                                        <MenuLink to="/settings"><Icon icon='cog'/> {t('Global Settings')}</MenuLink>
                                         <MenuLink to="/send-configurations"><Icon icon='cog'/> {t('Send Configurations')}</MenuLink>
                                         <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('Blacklist')}</MenuLink>
                                         <MenuLink to="/account/api"><Icon icon='retweet'/> {t('API')}</MenuLink>
@@ -118,6 +120,7 @@ class Root extends Component {
                     ...users.getMenus(t),
                     ...blacklist.getMenus(t),
                     ...account.getMenus(t),
+                    ...settings.getMenus(t),
                     ...sendConfigurations.getMenus(t)
                 }
             }
@@ -126,7 +129,7 @@ class Root extends Component {
 
     async logout() {
         await axios.post('/rest/logout');
-        window.location = mailtrainConfig.urlBase;
+        window.location = getUrl();
     }
 
     render() {

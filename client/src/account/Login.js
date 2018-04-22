@@ -11,6 +11,7 @@ import { withErrorHandling } from '../lib/error-handling';
 import qs from 'querystringify';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withForm
@@ -61,7 +62,7 @@ export default class Login extends Component {
             const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, '/rest/login');
 
             if (submitSuccessful) {
-                const nextUrl = qs.parse(this.props.location.search).next || mailtrainConfig.urlBase;
+                const nextUrl = qs.parse(this.props.location.search).next || getUrl();
 
                 /* This ensures we get config for the authenticated user */
                 window.location = nextUrl;

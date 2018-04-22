@@ -166,7 +166,7 @@ export default class CUD extends Component {
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
+                    <TextArea id="description" label={t('Description')}/>
                     <Dropdown id="type" label={t('Type')} options={this.typeOptions}/>
                     <NamespaceSelect/>
 

@@ -1,17 +1,23 @@
 'use strict';
 
 const knex = require('../lib/knex');
+const { filterObject } = require('../lib/helpers');
+const hasher = require('node-object-hash')();
 const shares = require('./shares');
 
-const allowedKeys = new Set(['adminEmail', 'uaCode', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);
+const allowedKeys = new Set(['adminEmail', 'uaCode', 'shoutout', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);
 // defaultHomepage is used as a default to list.homepage - if the list.homepage is not filled in
+
+function hash(entity) {
+    return hasher.hash(filterObject(entity, allowedKeys));
+}
 
 async function get(context, keyOrKeys) {
     shares.enforceGlobalPermission(context, 'manageSettings');
 
     let keys;
     if (!keyOrKeys) {
-        keys = allowedKeys.values();
+        keys = [...allowedKeys.values()];
     } else if (!Array.isArray(keyOrKeys)) {
         keys = [ keys ];
     } else {
@@ -25,7 +31,7 @@ async function get(context, keyOrKeys) {
         settings[row.key] = row.value;
     }
 
-    if (!Array.isArray(keyOrKeys)) {
+    if (!Array.isArray(keyOrKeys) && keyOrKeys) {
         return settings[keyOrKeys];
     } else {
         return settings;
@@ -48,6 +54,7 @@ async function set(context, data) {
 }
 
 module.exports = {
+    hash,
     get,
     set
 };

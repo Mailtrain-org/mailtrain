@@ -10,6 +10,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
+import {getGlobalNamespaceId} from "../../../shared/namespaces";
 
 @translate()
 @withForm
@@ -32,7 +33,7 @@ export default class CUD extends Component {
     }
 
     isEditGlobal() {
-        return this.props.entity && this.props.entity.id === 1; /* Global namespace id */
+        return this.props.entity && this.props.entity.id === getGlobalNamespaceId();
     }
 
     removeNsIdSubtree(data) {

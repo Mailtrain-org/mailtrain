@@ -13,7 +13,7 @@ const segments = require('./segments');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
-const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));

@@ -1,28 +1,44 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page'
 import {
-    withForm,
+    Trans,
+    translate
+} from 'react-i18next';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page'
+import {
+    Button,
+    ButtonRow,
+    CheckBox,
+    Fieldset,
     Form,
     FormSendMethod,
     InputField,
     TextArea,
-    Dropdown,
-    ButtonRow,
-    Button,
-    CheckBox,
-    Fieldset
+    withForm
 } from '../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { validateNamespace, NamespaceSelect } from '../lib/namespace';
+import {withErrorHandling} from '../lib/error-handling';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 
-import { getMailerTypes, mailerTypesOrder } from "./helpers";
+import {getMailerTypes} from "./helpers";
 
-import {MailerType} from "../../../shared/send-configurations";
+import {
+    getSystemSendConfigurationId,
+    MailerType
+} from "../../../shared/send-configurations";
+
+import mailtrainConfig from 'mailtrainConfig';
+
 
 @translate()
 @withForm
@@ -34,14 +50,6 @@ export default class CUD extends Component {
         super(props);
 
         this.mailerTypes = getMailerTypes(props.t);
-
-        this.typeOptions = [];
-        for (const type of mailerTypesOrder) {
-            this.typeOptions.push({
-                key: type,
-                label: this.mailerTypes[type].typeName
-            });
-        }
 
         this.state = {};
 
@@ -68,7 +76,8 @@ export default class CUD extends Component {
     componentDidMount() {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity, data => {
-                this.mailerTypes[data.type].afterLoad(data);
+                this.mailerTypes[data.mailer_type].afterLoad(data);
+                data.verpEnabled = !!data.verp_hostname;
             });
 
         } else {
@@ -79,6 +88,8 @@ export default class CUD extends Component {
                 from_email_overridable: false,
                 from_name_overridable: false,
                 subject_overridable: false,
+                verpEnabled: false,
+                verp_hostname: '',
                 mailer_type: MailerType.ZONE_MTA,
                 ...this.mailerTypes[MailerType.ZONE_MTA].initData()
             });
@@ -100,6 +111,13 @@ export default class CUD extends Component {
             state.setIn(['mailer_type', 'error'], null);
         }
 
+        if (state.getIn(['verpEnabled', 'value']) && !state.getIn(['verp_hostname', 'value'])) {
+            state.setIn(['verp_hostname', 'error'], t('VERP hostname must not be empty'));
+        } else {
+            state.setIn(['verp_hostname', 'error'], null);
+        }
+
+
         validateNamespace(t, state);
     }
 
@@ -119,7 +137,10 @@ export default class CUD extends Component {
         this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            this.mailerTypes[data.type].beforeSave(data);
+            this.mailerTypes[data.mailer_type].beforeSave(data);
+            if (!data.verpEnabled) {
+                data.verp_hostname = null;
+            }
         });
 
         if (submitSuccessful) {
@@ -133,13 +154,16 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
-        const canDelete = isEdit && this.props.entity.permissions.includes('delete');
+        const canDelete = isEdit && this.props.entity.permissions.includes('delete') && this.props.entity.id !== getSystemSendConfigurationId();
 
         const typeKey = this.getFormValue('mailer_type');
+        console.log(typeKey);
         let mailerForm = null;
         if (typeKey) {
             mailerForm = this.mailerTypes[typeKey].getForm(this);
         }
+
+        const verpEnabled = this.getFormValue('verpEnabled');
 
         return (
             <div>
@@ -159,7 +183,7 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
 
                     <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
+                    <TextArea id="description" label={t('Description')}/>
                     <NamespaceSelect/>
 
                     <Fieldset label={t('Email Header')}>
@@ -171,9 +195,27 @@ export default class CUD extends Component {
                         <CheckBox id="subject_overridable" text={t('Overridable')}/>
                     </Fieldset>
 
-                    <Fieldset label={t('Mailer Settings')}>
-                        <Dropdown id="type" label={t('Type')} options={this.typeOptions}/>
-                        {mailerForm}
+                    {mailerForm}
+                    {/* TODO - add "Check mail config" button */}
+
+                    <Fieldset label={t('VERP Bounce Handling')}>
+                        <Trans><p>Mailtrain is able to use VERP based routing to detect bounces. In this case the message is sent to the recipient using a custom VERP address as the return path of the message. If the message is not accepted a bounce email is sent to this special VERP address and thus a bounce is detected.</p></Trans>
+                        <Trans><p>To get VERP working you need to set up a DNS MX record that points to your Mailtrain hostname. You must also ensure that Mailtrain VERP interface is available from port 25 of your server (port 25 usually requires root user privileges). This way if anyone tries to send email to someuser@verp-hostname then the email should end up to this server.</p></Trans>
+                        <Trans><p className="text-warning">VERP usually only works if you are using your own SMTP server. Regular relay services (SES, SparkPost, Gmail etc.) tend to remove the VERP address from the message.</p></Trans>
+                        {mailtrainConfig.verpEnabled ?
+                            <div>
+                                <CheckBox id="verpEnabled" text={t('verpEnabled')}/>
+                                {verpEnabled && <InputField id="verp_hostname" label={t('Server hostname')} placeholder={t('The VERP server hostname, eg. bounces.example.com')} help={t('VERP bounce handling server hostname. This hostname is used in the SMTP envelope FROM address and the MX DNS records should point to this server')}/>}
+                            </div>
+                            :
+                            <Trans><p>VERP bounce handling server is not enabled. Modify your server configuration file and restart server to enable it.</p></Trans>
+                        }
+                        <InputField id="from_email" label={t('Default "from" email')}/>
+                        <CheckBox id="from_email_overridable" text={t('Overridable')}/>
+                        <InputField id="from_name" label={t('Default "from" name')}/>
+                        <CheckBox id="from_name_overridable" text={t('Overridable')}/>
+                        <InputField id="subject" label={t('Subject')}/>
+                        <CheckBox id="subject_overridable" text={t('Overridable')}/>
                     </Fieldset>
 
                     <ButtonRow>
@@ -186,16 +228,4 @@ export default class CUD extends Component {
             </div>
         );
     }
-
-/*
-                    <Fieldset label={t('GPG Signing')}>
-                        <Trans><p>Only messages that are encrypted can be signed. Subsribers who have not set up a GPG public key in their profile receive normal email messages. Users with GPG key set receive encrypted messages and if you have signing key also set, the messages are signed with this key.</p></Trans>
-                        <Trans><p className="text-warning">Do not use sensitive keys here. The private key and passphrase are not encrypted in the database.</p></Trans>
-                        <InputField id="gpg_signing_key_passphrase" label={t('Private key passphrase')} placeholder={t('Passphrase for the key if set')} help={t('Only fill this if your private key is encrypted with a passphrase')}/>
-                        <TextArea id="gpg_signing_key" label={t('GPG private key')} placeholder={t('Begins with \'-----BEGIN PGP PRIVATE KEY BLOCK-----\'')} help={t('This value is optional. If you do not provide a private key GPG encrypted messages are sent without signing.')}/>
-
-                    </Fieldset>
-
-
- */
 }

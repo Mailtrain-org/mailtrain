@@ -1,3 +1,5 @@
+const {getGlobalNamespaceId} = require('../../../shared/namespaces');
+
 exports.up = (knex, Promise) => (async() => {
     const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
     await knex.schema.createTable('namespaces', table => {
@@ -8,7 +10,7 @@ exports.up = (knex, Promise) => (async() => {
     });
 
     await knex('namespaces').insert({
-        id: 1, /* Global namespace id */
+        id: getGlobalNamespaceId(),
         name: 'Root',
         description: 'Root namespace'
     });
@@ -19,7 +21,7 @@ exports.up = (knex, Promise) => (async() => {
         });
 
         await knex(`${entityType}s`).update({
-            namespace: 1 /* Global namespace id */
+            namespace: getGlobalNamespaceId()
         });
 
         await knex.schema.table(`${entityType}s`, table => {

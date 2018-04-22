@@ -52,13 +52,11 @@ port=3000
 sandboxPort=8081
 # HTTP interface to listen on
 host="0.0.0.0"
-# URL Base (must end with slash). It can be either relative (starting with slash) or absolute (starting with http:// or https://).
-# If it is relative, an absolute URL will be constructed automatically based on the domain where it is served and the "port" config parameter
-urlBase="/"
-# URL Base for sandbox urls (must end with slash). It can be either relative (starting with slash) or absolute (starting with http:// or https://)
-# If it is relative, an absolute URL will be constructed automatically based on the domain where it is served and the "port" config parameter
-# If not given at all, it is automatically constructed based on urlBase and sandboxPort.
-# sandboxUrlBase="/"
+# URL base for trusted urls. It must be absolute (starting with http:// or https://). If Mailtrain is served on
+# a non-standard port (e.g. 3000), the URL must also specify the port.
+trustedUrlBase="http://localhost:3000"
+# URL base for sandbox urls. It must be absolute (starting with http:// or https://) and contain the sandbox port.
+sandboxUrlBase="http://localhost:8081"
 
 # Secret for signing the session ID cookie
 secret="a cat"

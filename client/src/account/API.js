@@ -7,6 +7,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import URL from 'url-parse';
 import axios from '../lib/axios';
 import { Button } from '../lib/bootstrap-components';
+import { getUrl } from "../lib/urls";
 
 @translate()
 @withPageHelpers
@@ -43,8 +44,6 @@ export default class API extends Component {
     render() {
         const t = this.props.t;
 
-        const thisUrl = new URL();
-        const serviceUrl = thisUrl.origin + '/'; // FIXME - use urls.js and getTrustedUrl
         const accessToken = this.state.accessToken || 'ACCESS_TOKEN';
 
         let accessTokenMsg;
@@ -123,7 +122,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST {serviceUrl}api/subscribe/B16uVTdW?access_token={accessToken} \
+                <pre>curl -XPOST '{getUrl(`api/subscribe/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
                 <h3>POST /api/unsubscribe/:listId – {t('Remove subscription')}</h3>
@@ -150,7 +149,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST {serviceUrl}api/unsubscribe/B16uVTdW?access_token={accessToken} \
+                <pre>curl -XPOST '{getUrl(`api/unsubscribe/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com'</pre>
 
                 <h3>POST /api/delete/:listId – {t('Delete subscription')}</h3>
@@ -177,7 +176,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST {serviceUrl}api/delete/B16uVTdW?access_token={accessToken} \
+                <pre>curl -XPOST '{getUrl(`api/delete/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com'</pre>
 
                 <h3>POST /api/field/:listId – {t('Add new custom field')}</h3>
@@ -225,7 +224,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST {serviceUrl}api/field/B16uVTdW?access_token={accessToken} \
+                <pre>curl -XPOST '{getUrl(`api/field/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>
 
                 <h3>GET /api/blacklist/get – {t('Get list of blacklisted emails')}</h3>
@@ -251,7 +250,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XGET '{serviceUrl}api/blacklist/get?access_token={accessToken}&limit=10&start=10&search=gmail' </pre>
+                <pre>curl -XGET '{getUrl(`api/blacklist/get?access_token=${accessToken}&limit=10&start=10&search=gmail`)}' </pre>
 
                 <h3>POST /api/blacklist/add – {t('Add email to blacklist')}</h3>
 
@@ -277,7 +276,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{serviceUrl}api/blacklist/add?access_token={accessToken}' \
+                <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token={accessToken}`)}' \
 --data 'EMAIL=test@example.com&amp;'</pre>
 
                 <h3>POST /api/blacklist/delete – {t('Delete email from blacklist')}</h3>
@@ -304,7 +303,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{serviceUrl}api/blacklist/delete?access_token={accessToken}' \
+                <pre>curl -XPOST '{getUrl(`api/blacklist/delete?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com&amp;'</pre>
 
                 <h3>GET /api/lists/:email – {t('Get the lists a user has subscribed to')}</h3>
@@ -324,7 +323,7 @@ export default class API extends Component {
                     <strong>{t('Example')}</strong>
                 </p>
 
-                <pre>curl -XGET '{{serviceUrl}}api/lists/test@example.com?access_token={{accessToken}} </pre>
+                <pre>curl -XGET '{getUrl(`api/lists/test@example.com?access_token=${accessToken}`)}'</pre>
             </div>
         );
     }

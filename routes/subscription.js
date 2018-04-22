@@ -205,10 +205,9 @@ async function _renderSubscribe(req, res, list, subscription) {
     data.customFields = await fields.forHbs(contextHelpers.getAdminContext(), list.id, subscription);
     data.useEditor = true;
 
-    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress']);
+    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress']);
     data.hasPubkey = !!configItems.pgpPrivateKey;
     data.defaultAddress = configItems.defaultAddress;
-    data.defaultPostaddress = configItems.defaultPostaddress;
 
     data.template = {
         template: 'subscription/web-subscribe.mjml.hbs',
@@ -407,10 +406,9 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
 
     data.useEditor = true;
 
-    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress']);
+    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress']);
     data.hasPubkey = !!configItems.pgpPrivateKey;
     data.defaultAddress = configItems.defaultAddress;
-    data.defaultPostaddress = configItems.defaultPostaddress;
 
     data.template = {
         template: 'subscription/web-manage.mjml.hbs',
@@ -454,7 +452,7 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
-    const configItems = await settings.get(['defaultAddress', 'defaultPostaddress']);
+    const configItems = await settings.get(['defaultAddress']);
 
     const data = {};
     data.email = subscription.email;
@@ -463,7 +461,6 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
     data.title = list.name;
     data.csrfToken = req.csrfToken();
     data.defaultAddress = configItems.defaultAddress;
-    data.defaultPostaddress = configItems.defaultPostaddress;
 
     data.template = {
         template: 'subscription/web-manage-address.mjml.hbs',
@@ -538,7 +535,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
 router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
 
-    const configItems = await settings.get(['defaultAddress', 'defaultPostaddress']);
+    const configItems = await settings.get(['defaultAddress']);
 
     const autoUnsubscribe = req.query.auto === 'yes';
 
@@ -563,7 +560,6 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
         data.csrfToken = req.csrfToken();
         data.campaign = req.query.c;
         data.defaultAddress = configItems.defaultAddress;
-        data.defaultPostaddress = configItems.defaultPostaddress;
 
         data.template = {
             template: 'subscription/web-unsubscribe.mjml.hbs',
@@ -702,14 +698,13 @@ router.postAsync('/publickey', passport.parseForm, async (req, res) => {
 async function webNotice(type, req, res) {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
 
-    const configItems = await settings.get(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'defaultPostaddress', 'adminEmail']);
+    const configItems = await settings.get(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'adminEmail']);
 
 
     const data = {
         title: list.name,
         homepage: configItems.defaultHomepage || configItems.serviceUrl,
         defaultAddress: configItems.defaultAddress,
-        defaultPostaddress: configItems.defaultPostaddress,
         contactAddress: configItems.defaultAddress,
         template: {
             template: 'subscription/web-' + type + '-notice.mjml.hbs',

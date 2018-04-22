@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('config');
-const router = require('../lib/router-async').create();
+const routerFactory = require('../lib/router-async');
 const passport = require('../lib/passport');
 const clientHelpers = require('../lib/client-helpers');
 const gm = require('gm').subClass({
@@ -110,73 +110,84 @@ function sanitizeSize(val, min, max, defaultVal, allowNull) {
     return val;
 }
 
-router.getAsync('/img/:type/:fileId', passport.loggedIn, async (req, res) => {
-    const method = req.query.method;
-    const params = req.query.params;
-    let [width, height] = params.split(',');
-    let image;
 
-    if (method === 'placeholder') {
-        width = sanitizeSize(width, 1, 2048, 600, false);
-        height = sanitizeSize(height, 1, 2048, 300, false);
-        image = await placeholderImage(width, height);
-    } else {
-        width = sanitizeSize(width, 1, 2048, 600, false);
-        height = sanitizeSize(height, 1, 2048, 300, true);
-        // TODO - validate that one has the rights to read this ???
-        image = await resizedImage(req.query.src, method, width, height);
+
+function getRouter(trusted) {
+    const router = routerFactory.create();
+
+    if (!trusted) {
+        router.getAsync('/img/:type/:fileId', passport.loggedIn, async (req, res) => {
+            const method = req.query.method;
+            const params = req.query.params;
+            let [width, height] = params.split(',');
+            let image;
+
+            if (method === 'placeholder') {
+                width = sanitizeSize(width, 1, 2048, 600, false);
+                height = sanitizeSize(height, 1, 2048, 300, false);
+                image = await placeholderImage(width, height);
+            } else {
+                width = sanitizeSize(width, 1, 2048, 600, false);
+                height = sanitizeSize(height, 1, 2048, 300, true);
+                // TODO - validate that one has the rights to read this ???
+                image = await resizedImage(req.query.src, method, width, height);
+            }
+
+            res.set('Content-Type', 'image/' + image.format);
+            image.stream.pipe(res);
+        });
+
+
+        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', true);
+
+        router.getAsync('/upload/:type/:fileId', passport.loggedIn, async (req, res) => {
+            const entries = await files.list(req.context, req.params.type, req.params.fileId);
+
+            const filesOut = [];
+            for (const entry of entries) {
+                filesOut.push({
+                    name: entry.originalname,
+                    url: `/files/${req.params.type}/${req.params.fileId}/${entry.filename}`,
+                    size: entry.size,
+                    thumbnailUrl: `/files/${req.params.type}/${req.params.fileId}/${entry.filename}` // TODO - use smaller thumbnails
+                })
+            }
+
+            res.json({
+                files: filesOut
+            });
+        });
+
+
+        router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
+            const resourceType = req.query.type;
+            const resourceId = req.query.id;
+
+            const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, trusted);
+
+            let languageStrings = null;
+            if (config.language && config.language !== 'en') {
+                const lang = config.language.split('_')[0];
+                try {
+                    const file = path.join(__dirname, '..', 'client', 'public', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
+                    languageStrings = await fsReadFile(file, 'utf8');
+                } catch (err) {
+                }
+            }
+
+            res.render('mosaico/root', {
+                layout: 'mosaico/layout',
+                editorConfig: config.mosaico,
+                languageStrings: languageStrings,
+                reactCsrfToken: req.csrfToken(),
+                mailtrainConfig: JSON.stringify(mailtrainConfig)
+            });
+        });
     }
 
-    res.set('Content-Type', 'image/' + image.format);
-    image.stream.pipe(res);
-});
+    return router;
+}
 
-
-fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', true);
-
-router.getAsync('/upload/:type/:fileId', passport.loggedIn, async (req, res) => {
-    const entries = await files.list(req.context, req.params.type, req.params.fileId);
-
-    const filesOut = [];
-    for (const entry of entries) {
-        filesOut.push({
-            name: entry.originalname,
-            url: `/files/${req.params.type}/${req.params.fileId}/${entry.filename}`,
-            size: entry.size,
-            thumbnailUrl: `/files/${req.params.type}/${req.params.fileId}/${entry.filename}` // TODO - use smaller thumbnails
-        })
-    }
-
-    res.json({
-        files: filesOut
-    });
-});
-
-
-router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
-    const resourceType = req.query.type;
-    const resourceId = req.query.id;
-
-    const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context);
-
-    let languageStrings = null;
-    if (config.language && config.language !== 'en') {
-        const lang = config.language.split('_')[0];
-        try {
-            const file = path.join(__dirname, '..', 'client', 'public', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
-            languageStrings = await fsReadFile(file, 'utf8');
-        } catch (err) {
-        }
-    }
-
-    res.render('mosaico/root', {
-        layout: 'mosaico/layout',
-        editorConfig: config.mosaico,
-        languageStrings: languageStrings,
-        reactCsrfToken: req.csrfToken(),
-        mailtrainConfig: JSON.stringify(mailtrainConfig)
-    });
-});
-
-
-module.exports = router;
+module.exports = {
+    getRouter
+};

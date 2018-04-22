@@ -293,7 +293,7 @@ export default class CUD extends Component {
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
+                    <TextArea id="description" label={t('Description')}/>
                     <Dropdown id="mime_type" label={t('Type')} options={[{key: 'text/html', label: t('HTML')}, {key: 'text/csv', label: t('CSV')}]}/>
                     <NamespaceSelect/>
                     <ACEEditor id="user_fields" height="250px" mode="json" label={t('User selectable fields')} help={t('JSON specification of user selectable fields.')}/>

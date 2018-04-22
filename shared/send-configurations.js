@@ -1,12 +1,17 @@
 'use strict';
 
 const MailerType = {
-    GENERIC_SMTP: 0,
-    ZONE_MTA: 1,
-    AWS_SES: 2,
+    GENERIC_SMTP: 'generic_smtp',
+    ZONE_MTA: 'zone_mta',
+    AWS_SES: 'aws_ses',
     MAX: 3
 };
 
+function getSystemSendConfigurationId() {
+    return 1;
+}
+
 module.exports = {
-    MailerType
+    MailerType,
+    getSystemSendConfigurationId
 };

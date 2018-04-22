@@ -7,9 +7,9 @@ const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
-const {MailerType} = require('../shared/send-configurations');
+const {MailerType, getSystemSendConfigurationId} = require('../shared/send-configurations');
 
-const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'subject', 'subject_overridable', 'mailer_type', 'mailer_settings', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'subject', 'subject_overridable', 'verp_hostname', 'mailer_type', 'mailer_settings', 'namespace']);
 
 
 function hash(entity) {
@@ -95,6 +95,10 @@ async function updateWithConsistencyCheck(context, entity) {
 }
 
 async function remove(context, id) {
+    if (id === getSystemSendConfigurationId()) {
+        shares.throwPermissionDenied();
+    }
+
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'delete');
 
