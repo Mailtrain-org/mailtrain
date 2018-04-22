@@ -18,7 +18,7 @@ const files = require('../models/files');
 const fileHelpers = require('../lib/file-helpers');
 
 
-users.registerRestrictedAccessTokenMethod('mosaico', ({entityTypeId, entityId}) => {
+users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entityId}) => {
     if (entityTypeId === 'template' || entityTypeId === 'campaign') {
         return {
             permissions: {

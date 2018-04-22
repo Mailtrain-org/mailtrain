@@ -371,12 +371,12 @@ function registerRestrictedAccessTokenMethod(method, getHandlerFromParams) {
     restrictedAccessTokenMethods[method] = getHandlerFromParams;
 }
 
-function getRestrictedAccessToken(context, method, params) {
+async function getRestrictedAccessToken(context, method, params) {
     const token = crypto.randomBytes(24).toString('hex').toLowerCase();
     const tokenEntry = {
         token,
         userId: context.user.id,
-        handler: restrictedAccessTokenMethods[method](params),
+        handler: await restrictedAccessTokenMethods[method](params),
         expires: Date.now() + 120 * 1000
     };
 

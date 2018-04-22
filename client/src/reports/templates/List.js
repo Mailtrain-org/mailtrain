@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { translate } from 'react-i18next';
 import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, DropdownLink } from '../../lib/page';
+import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, MenuLink } from '../../lib/page';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
@@ -78,10 +78,10 @@ export default class List extends Component {
                 {this.state.createPermitted &&
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('Create Report Template')}>
-                            <DropdownLink to="/reports/templates/create">{t('Blank')}</DropdownLink>
-                            <DropdownLink to="/reports/templates/create/subscribers-all">{t('All Subscribers')}</DropdownLink>
-                            <DropdownLink to="/reports/templates/create/subscribers-grouped">{t('Grouped Subscribers')}</DropdownLink>
-                            <DropdownLink to="/reports/templates/create/export-list-csv">{t('Export List as CSV')}</DropdownLink>
+                            <MenuLink to="/reports/templates/create">{t('Blank')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/subscribers-all">{t('All Subscribers')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/subscribers-grouped">{t('Grouped Subscribers')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/export-list-csv">{t('Export List as CSV')}</MenuLink>
                         </DropdownMenu>
                     </Toolbar>
                 }

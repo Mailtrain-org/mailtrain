@@ -437,16 +437,17 @@ class NavButton extends Component {
     }
 }
 
-class DropdownLink extends Component {
+class MenuLink extends Component {
     static propTypes = {
-        to: PropTypes.string
+        to: PropTypes.string,
+        className: PropTypes.string
     }
 
     render() {
         const props = this.props;
 
         return (
-            <li><Link to={props.to}>{props.children}</Link></li>
+            <li className={props.className}><Link to={props.to}>{props.children}</Link></li>
         );
     }
 }
@@ -473,7 +474,7 @@ export {
     Title,
     Toolbar,
     NavButton,
-    DropdownLink,
+    MenuLink,
     withPageHelpers,
     requiresAuthenticatedUser
 };

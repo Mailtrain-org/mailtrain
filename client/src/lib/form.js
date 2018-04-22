@@ -417,6 +417,7 @@ class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
+        placeholder: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         format: PropTypes.string
     }
@@ -432,7 +433,7 @@ class TextArea extends Component {
         const htmlId = 'form_' + id;
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <textarea id={htmlId} value={owner.getFormValue(id) || ''} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
+            <textarea id={htmlId} placeholder={props.placeholder} value={owner.getFormValue(id) || ''} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
 }

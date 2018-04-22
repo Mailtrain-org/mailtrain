@@ -1,11 +1,18 @@
 'use strict';
 
 const knex = require('../lib/knex');
-const tools = require('../lib/tools');
+const shares = require('./shares');
 
-async function get(keyOrKeys) {
+const allowedKeys = new Set(['adminEmail', 'uaCode', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);
+// defaultHomepage is used as a default to list.homepage - if the list.homepage is not filled in
+
+async function get(context, keyOrKeys) {
+    shares.enforceGlobalPermission(context, 'manageSettings');
+
     let keys;
-    if (!Array.isArray(keyOrKeys)) {
+    if (!keyOrKeys) {
+        keys = allowedKeys.values();
+    } else if (!Array.isArray(keyOrKeys)) {
         keys = [ keys ];
     } else {
         keys = keyOrKeys;
@@ -25,11 +32,18 @@ async function get(keyOrKeys) {
     }
 }
 
-async function set(key, value) {
-    try {
-        await knex('settings').insert({key, value});
-    } catch (err) {
-        await knex('settings').where('key', key).update('value', value);
+async function set(context, data) {
+    shares.enforceGlobalPermission(context, 'manageSettings');
+
+    for (const key in data) {
+        if (allowedKeys.has(key)) {
+            const value = data[key];
+            try {
+                await knex('settings').insert({key, value});
+            } catch (err) {
+                await knex('settings').where('key', key).update('value', value);
+            }
+        }
     }
 }
 

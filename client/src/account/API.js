@@ -44,7 +44,7 @@ export default class API extends Component {
         const t = this.props.t;
 
         const thisUrl = new URL();
-        const serviceUrl = thisUrl.origin + '/';
+        const serviceUrl = thisUrl.origin + '/'; // FIXME - use urls.js and getTrustedUrl
         const accessToken = this.state.accessToken || 'ACCESS_TOKEN';
 
         let accessTokenMsg;

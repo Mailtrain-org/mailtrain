@@ -5,6 +5,10 @@ import {ACEEditor} from "../../lib/form";
 import 'brace/mode/html'
 import 'brace/mode/xml'
 
+export function getTemplateTypesOrder() {
+    return ['mjml', 'html'];
+}
+
 export function getTemplateTypes(t) {
     const templateTypes = {};
 
@@ -17,7 +21,6 @@ export function getTemplateTypes(t) {
         typeName: t('HTML'),
         getForm: owner => <ACEEditor id="html" height="700px" mode="html" label={t('Template content')}/>,
         afterLoad: data => {
-            console.log(data);
             data.html = data.data.html;
         },
         beforeSave: (data) => {

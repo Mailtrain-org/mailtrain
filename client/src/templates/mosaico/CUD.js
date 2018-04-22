@@ -10,7 +10,7 @@ import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 
 import { versafix } from "../../../../shared/mosaico-templates";
-import { getTemplateTypes } from "./helpers";
+import { getTemplateTypes, getTemplateTypesOrder } from "./helpers";
 
 @translate()
 @withForm
@@ -22,6 +22,14 @@ export default class CUD extends Component {
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
+
+        this.typeOptions = [];
+        for (const type of getTemplateTypesOrder()) {
+            this.typeOptions.push({
+                key: type,
+                label: this.templateTypes[type].typeName
+            });
+        }
 
         this.state = {};
 
@@ -141,14 +149,6 @@ export default class CUD extends Component {
             form = this.templateTypes[typeKey].getForm(this);
         }
 
-        const typeOptions = [];
-        for (const type of ['html', 'mjml']) {
-            typeOptions.push({
-                key: type,
-                label: this.templateTypes.typeName
-            });
-        }
-
         return (
             <div>
                 {canDelete &&
@@ -158,7 +158,7 @@ export default class CUD extends Component {
                         deleteUrl={`/rest/templates/mosaico/${this.props.entity.id}`}
                         cudUrl={`/templates/mosaico/${this.props.entity.id}/edit`}
                         listUrl="/templates/mosaico"
-                        deletingMsg={t('Deleting mosaico template ...')}
+                        deletingMsg={t('Deleting Mosaico template ...')}
                         deletedMsg={t('Mosaico template deleted')}/>
                 }
 
@@ -167,7 +167,7 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     <InputField id="name" label={t('Name')}/>
                     <TextArea id="description" label={t('Description')} help={t('HTML is allowed')}/>
-                    <Dropdown id="type" label={t('Type')} options={typeOptions}/>
+                    <Dropdown id="type" label={t('Type')} options={this.typeOptions}/>
                     <NamespaceSelect/>
 
                     {form}

@@ -123,6 +123,32 @@ class DropdownMenu extends Component {
     }
 }
 
+class DropdownMenuItem extends Component {
+    static propTypes = {
+        label: PropTypes.string,
+        icon: PropTypes.string,
+        className: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        let className = 'dropdown';
+        if (props.className) {
+            className = className + ' ' + props.className;
+        }
+
+        return (
+            <li className={className}>
+                <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{props.icon && <Icon icon={props.icon}/>}{props.label}{' '}<span className="caret"></span></a>
+                <ul className="dropdown-menu">
+                    {props.children}
+                </ul>
+            </li>
+        );
+    }
+}
+
 @withErrorHandling
 class ActionLink extends Component {
     static propTypes = {
@@ -261,6 +287,7 @@ class ModalDialog extends Component {
 export {
     Button,
     DropdownMenu,
+    DropdownMenuItem,
     ActionLink,
     DismissibleAlert,
     ModalDialog,

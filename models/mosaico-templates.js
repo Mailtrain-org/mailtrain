@@ -36,6 +36,7 @@ async function listDTAjax(context, params) {
 
 async function _validateAndPreprocess(tx, entity) {
     entity.data = JSON.stringify(entity.data);
+    await namespaceHelpers.validateEntity(tx, entity);
 }
 
 async function create(context, entity) {
@@ -43,8 +44,6 @@ async function create(context, entity) {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createMosaicoTemplate');
 
         await _validateAndPreprocess(tx, entity);
-
-        await namespaceHelpers.validateEntity(tx, entity);
 
         const ids = await tx('mosaico_templates').insert(filterObject(entity, allowedKeys));
         const id = ids[0];
@@ -74,7 +73,6 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        await namespaceHelpers.validateEntity(tx, entity);
         await namespaceHelpers.validateMove(context, entity, existing, 'mosaicoTemplate', 'createMosaicoTemplate', 'delete');
 
         await tx('mosaico_templates').where('id', entity.id).update(filterObject(entity, allowedKeys));

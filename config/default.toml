@@ -198,15 +198,16 @@ browser="phantomjs"
 name="Master"
 admin=true
 description="All permissions"
-permissions=["rebuildPermissions", "createJavascriptWithROAccess", "manageBlacklist"]
+permissions=["rebuildPermissions", "createJavascriptWithROAccess", "manageBlacklist", "manageSettings"]
 rootNamespaceRole="master"
 
 [roles.namespace.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "manageUsers"]
+permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "createSendConfiguration", "manageUsers"]
 
 [roles.namespace.master.children]
+sendConfiguration=["view", "edit", "delete", "share", "send", "overrideAllowed", "overrideAll"]
 list=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
 customForm=["view", "edit", "delete", "share"]
 campaign=["view", "edit", "delete", "share", "manageFiles"]
@@ -214,7 +215,12 @@ template=["view", "edit", "delete", "share", "manageFiles"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
 mosaicoTemplate=["view", "edit", "delete", "share", "manageFiles"]
-namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "manageUsers"]
+namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "createSendConfiguration", "manageUsers"]
+
+[roles.sendConfiguration.master]
+name="Master"
+description="All permissions"
+permissions=["view", "edit", "delete", "share", "send", "overrideAllowed", "overrideAll"]
 
 [roles.list.master]
 name="Master"
@@ -264,6 +270,7 @@ description="XXX"
 permissions=["view", "edit", "delete"]
 
 [roles.namespace.editor.children]
+sendConfiguration=[]
 list=[]
 customForm=[]
 campaign=[]
@@ -271,6 +278,7 @@ template=[]
 report=[]
 reportTemplate=[]
 namespace=["view", "edit", "delete"]
+mosaicoTemplate=[]
 
 [roles.list.editor]
 name="Editor"
@@ -304,5 +312,10 @@ permissions=[]
 
 [roles.mosaicoTemplate.editor]
 name="Editor"
-description="All permissions"
+description="XXX"
+permissions=[]
+
+[roles.sendConfiguration.editor]
+name="Editor"
+description="XXX"
 permissions=[]

@@ -1,14 +1,23 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { translate } from 'react-i18next';
-import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, MenuLink } from '../../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { Table } from '../../lib/table';
-import axios from '../../lib/axios';
+import React, {Component} from 'react';
+import {translate} from 'react-i18next';
+import {Icon} from '../lib/bootstrap-components';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from '../lib/page';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import {Table} from '../lib/table';
+import axios from '../lib/axios';
 import moment from 'moment';
-import { getTemplateTypes } from './helpers';
+import {getMailerTypes} from './helpers';
 
 
 @translate()
@@ -19,7 +28,7 @@ export default class List extends Component {
     constructor(props) {
         super(props);
 
-        this.templateTypes = getTemplateTypes(props.t);
+        this.mailerTypes = getMailerTypes(props.t);
 
         this.state = {};
     }
@@ -27,16 +36,16 @@ export default class List extends Component {
     @withAsyncErrorHandler
     async fetchPermissions() {
         const request = {
-            createMosaicoTemplate: {
+            createSendConfiguration: {
                 entityTypeId: 'namespace',
-                requiredOperations: ['createMosaicoTemplate']
+                requiredOperations: ['createSendConfiguration']
             }
         };
 
         const result = await axios.post('/rest/permissions-check', request);
 
         this.setState({
-            createPermitted: result.data.createMosaicoTemplate
+            createPermitted: result.data.createSendConfiguration
         });
     }
 
@@ -50,7 +59,7 @@ export default class List extends Component {
         const columns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('Type'), render: data => this.templateTypes[data].typeName },
+            { data: 3, title: t('Type'), render: data => this.mailerTypes[data].typeName },
             { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
             { data: 5, title: t('Namespace') },
             {
@@ -61,14 +70,14 @@ export default class List extends Component {
                     if (perms.includes('edit')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('Edit')}/>,
-                            link: `/templates/mosaico/${data[0]}/edit`
+                            link: `/send-configurations/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
                             label: <Icon icon="share-alt" title={t('Share')}/>,
-                            link: `/templates/mosaico/${data[0]}/share`
+                            link: `/send-configurations/${data[0]}/share`
                         });
                     }
 
@@ -81,16 +90,13 @@ export default class List extends Component {
             <div>
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <DropdownMenu className="btn-primary" label={t('Create Mosaico Template')}>
-                            <MenuLink to="/templates/mosaico/create">{t('Blank')}</MenuLink>
-                            <MenuLink to="/templates/mosaico/create/versafix">{t('Versafix One')}</MenuLink>
-                        </DropdownMenu>
+                        <NavButton linkTo="/send-configurations/create" className="btn-primary" icon="plus" label={t('Create Send Configuration')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Mosaico Templates')}</Title>
+                <Title>{t('Send Configurations')}</Title>
 
-                <Table withHeader dataUrl="/rest/mosaico-templates-table" columns={columns} />
+                <Table withHeader dataUrl="/rest/send-configurations-table" columns={columns} />
             </div>
         );
     }

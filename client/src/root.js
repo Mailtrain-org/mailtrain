@@ -15,12 +15,18 @@ import namespaces from './namespaces/root';
 import reports from './reports/root';
 import templates from './templates/root';
 import users from './users/root';
-import {Section} from "./lib/page";
+import sendConfigurations from './send-configurations/root';
+
+import {
+    MenuLink,
+    Section
+} from "./lib/page";
 
 import mailtrainConfig from 'mailtrainConfig';
 import Home from "./Home";
 import {
     ActionLink,
+    DropdownMenuItem,
     Icon
 } from "./lib/bootstrap-components";
 import {Link} from "react-router-dom";
@@ -47,9 +53,9 @@ class Root extends Component {
                     const link = entry.link || entry.externalLink;
 
                     if (link && path.startsWith(link)) {
-                        topLevelMenu.push(<li key={entryKey} className="active"><Link to={link}>{entry.title} <span className="sr-only">{t('(current)')}</span></Link></li>);
+                        topLevelMenu.push(<MenuLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('(current)')}</span></MenuLink>);
                     } else {
-                        topLevelMenu.push(<li key={entryKey}><Link to={link}>{entry.title}</Link></li>);
+                        topLevelMenu.push(<MenuLink key={entryKey} to={link}>{entry.title}</MenuLink>);
                     }
                 }
 
@@ -63,51 +69,31 @@ class Root extends Component {
                                     <span className="icon-bar"></span>
                                     <span className="icon-bar"></span>
                                 </button>
-                                <Link className="navbar-brand" to="/"><i className="glyphicon glyphicon-envelope"></i> Mailtrain</Link>
+                                <Link className="navbar-brand" to="/"><Icon icon="envelope"/> Mailtrain</Link>
                             </div>
 
                             {mailtrainConfig.isAuthenticated &&
                             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                                 <ul className="nav navbar-nav">
                                     {topLevelMenu}
-
-                                    <li className="dropdown">
-                                        <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{t('Administration')}<span className="caret"></span></a>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link to="/users"><Icon icon='cog'/> {t('Users')}</Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/namespaces"><Icon icon='cog'/> {t('Namespaces')}</Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/settings"><Icon icon='cog'/> {t('Settings')}</Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/blacklist"><Icon icon='ban-circle'/> {t('Blacklist')}</Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/account/api"><Icon icon='retweet'/> {t('API')}</Link>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    <DropdownMenuItem label={t('Administration')}>
+                                        <MenuLink to="/users"><Icon icon='cog'/> {t('Users')}</MenuLink>
+                                        <MenuLink to="/namespaces"><Icon icon='cog'/> {t('Namespaces')}</MenuLink>
+                                        <MenuLink to="/settings"><Icon icon='cog'/> {t('Settings')}</MenuLink>
+                                        <MenuLink to="/send-configurations"><Icon icon='cog'/> {t('Send Configurations')}</MenuLink>
+                                        <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('Blacklist')}</MenuLink>
+                                        <MenuLink to="/account/api"><Icon icon='retweet'/> {t('API')}</MenuLink>
+                                    </DropdownMenuItem>
                                 </ul>
 
 
                                 <ul className="nav navbar-nav navbar-right">
-                                    <li className="dropdown">
-                                        <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                            <span className="glyphicon glyphicon-user" aria-hidden="true"></span> {mailtrainConfig.user.username}<span className="caret"></span>
-                                        </a>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link to="/account"><Icon icon='user'/> {t('Account')}</Link>
-                                            </li>
-                                            <li>
-                                                <ActionLink onClickAsync={::self.logout}><Icon icon='log-out'/> {t('Log out')}</ActionLink>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    <DropdownMenuItem label={mailtrainConfig.user.username} icon="user">
+                                        <MenuLink to="/account"><Icon icon='user'/> {t('Account')}</MenuLink>
+                                        <li>
+                                            <ActionLink onClickAsync={::self.logout}><Icon icon='log-out'/> {t('Log out')}</ActionLink>
+                                        </li>
+                                    </DropdownMenuItem>
                                 </ul>
                             </div>
                             }
@@ -132,6 +118,7 @@ class Root extends Component {
                     ...users.getMenus(t),
                     ...blacklist.getMenus(t),
                     ...account.getMenus(t),
+                    ...sendConfigurations.getMenus(t)
                 }
             }
         };

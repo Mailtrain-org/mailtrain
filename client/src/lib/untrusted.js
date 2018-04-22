@@ -41,7 +41,7 @@ export class UntrustedContentHost extends Component {
     }
 
     isInitialized() {
-        return !!this.accessToken;
+        return !!this.accessToken && !!this.props.contentProps;
     }
 
     receiveMessage(evt) {
@@ -73,7 +73,6 @@ export class UntrustedContentHost extends Component {
             const msgId = this.rpcCounter;
 
             this.sendMessage('rpcRequest', {
-                method,
                 params,
                 msgId
             });
@@ -123,6 +122,10 @@ export class UntrustedContentHost extends Component {
         this.scheduleRefreshAccessToken();
         window.addEventListener('message', this.receiveMessageHandler, false);
 
+        this.handleUpdate();
+    }
+
+    componentDidUpdate() {
         this.handleUpdate();
     }
 
