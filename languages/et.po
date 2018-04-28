@@ -2770,11 +2770,11 @@ msgid "Could not save subscription"
 msgstr ""
 
 #: lib/models/subscriptions.js:507 lib/models/subscriptions.js:537
-msgid "Missing Subbscription ID"
+msgid "Missing Subscription ID"
 msgstr ""
 
 #: lib/models/subscriptions.js:565
-msgid "Missing Subbscription email address"
+msgid "Missing Subscription email address"
 msgstr ""
 
 #: lib/models/subscriptions.js:644 lib/models/subscriptions.js:893
