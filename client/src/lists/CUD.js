@@ -14,6 +14,7 @@ import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import { UnsubscriptionMode } from '../../../shared/lists';
 import styles from "../lib/styles.scss";
 import mailtrainConfig from 'mailtrainConfig';
+import {getMailerTypes} from "../send-configurations/helpers";
 
 @translate()
 @withForm
@@ -27,6 +28,8 @@ export default class CUD extends Component {
         this.state = {};
 
         this.initForm();
+
+        this.mailerTypes = getMailerTypes(props.t);
     }
 
     static propTypes = {
@@ -148,6 +151,13 @@ export default class CUD extends Component {
             {data: 3, title: t('Namespace')}
         ];
 
+        const sendConfigurationsColumns = [
+            { data: 1, title: t('Name') },
+            { data: 2, title: t('Description') },
+            { data: 3, title: t('Type'), render: data => this.mailerTypes[data].typeName },
+            { data: 5, title: t('Namespace') }
+        ];
+
         return (
             <div>
                 {canDelete &&
@@ -176,13 +186,14 @@ export default class CUD extends Component {
 
                     <InputField id="contact_email" label={t('Contact email')} help={t('Contact email used in subscription forms and emails that are sent out. If not filled in, the admin email from the global settings will be used.')}/>
                     <InputField id="homepage" label={t('Homepage')} help={t('Homepage URL used in subscription forms and emails that are sent out. If not filled in, the default homepage from global settings will be used.')}/>
+                    <TableSelect id="send_configuration" label={t('Send configuration')} withHeader dropdown dataUrl='/rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('Send configuration that will be used for sending out subscription-related emails.')}/>
 
                     <NamespaceSelect/>
 
                     <Dropdown id="form" label={t('Forms')} options={formsOptions} help={t('Web and email forms and templates used in subscription management process.')}/>
 
                     {this.getFormValue('form') === 'custom' &&
-                        <TableSelect id="default_form" label={t('Custom Forms')} withHeader dropdown dataUrl='/rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans>The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.props.entity.id}`}>here</a>.</Trans>}/>
+                        <TableSelect id="default_form" label={t('Custom forms')} withHeader dropdown dataUrl='/rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans>The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.props.entity.id}`}>here</a>.</Trans>}/>
                     }
 
                     <CheckBox id="public_subscribe" label={t('Subscription')} text={t('Allow public users to subscribe themselves')}/>

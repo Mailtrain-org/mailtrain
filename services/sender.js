@@ -1,5 +1,7 @@
 'use strict';
 
+// FIXME - update/rewrite
+
 const { nodeifyFunction } = require('../lib/nodeify');
 const getSettings = nodeifyFunction(require('../models/settings').get);
 
@@ -7,7 +9,7 @@ let log = require('npmlog');
 let config = require('config');
 let db = require('../lib/db');
 let tools = require('../lib/tools');
-let mailer = require('../lib/mailer');
+let mailer = require('../lib/mailers');
 let campaigns = require('../lib/models/campaigns');
 let segments = require('../lib/models/segments');
 let lists = require('../lib/models/lists');
@@ -462,7 +464,7 @@ function formatMessage(message, callback) {
 }
 
 let sendLoop = () => {
-    mailer.getMailer(err => {
+    mailers.getMailer(err => {
         if (err) {
             log.error('Mail', err.stack);
             return setTimeout(sendLoop, 10 * 1000);
@@ -471,14 +473,14 @@ let sendLoop = () => {
         let isThrottled = false;
 
         let getNext = () => {
-            if (!mailer.transport.isIdle() || isThrottled) {
-                // only retrieve new messages if there are free slots in the mailer queue
+            if (!mailers.transport.isIdle() || isThrottled) {
+                // only retrieve new messages if there are free slots in the mailers queue
                 return;
             }
 
             isThrottled = true;
 
-            mailer.transport.checkThrottling(() => {
+            mailers.transport.checkThrottling(() => {
 
                 isThrottled = false;
 
@@ -495,7 +497,7 @@ let sendLoop = () => {
                     }
 
                     // log.verbose('Mail', 'Found new message to be delivered: %s', message.subscription.cid);
-                    // format message to nodemailer message format
+                    // format message to nodemailers message format
                     formatMessage(message, (err, mail) => {
                         if (err) {
                             log.error('Mail', err.stack);
@@ -516,7 +518,7 @@ let sendLoop = () => {
                                     tryCount++;
 
                                     // send the message
-                                    mailer.transport.sendMail(mail, (err, info) => {
+                                    mailers.transport.sendMail(mail, (err, info) => {
                                         if (err) {
                                             log.error('Mail', err.stack);
                                             if (err.responseCode && err.responseCode >= 400 && err.responseCode < 500 && tryCount <= 5) {
@@ -589,7 +591,7 @@ let sendLoop = () => {
             });
         };
 
-        mailer.transport.on('idle', getNext);
+        mailers.transport.on('idle', getNext);
         setImmediate(getNext);
     });
 };
@@ -598,7 +600,7 @@ sendLoop();
 
 process.on('message', m => {
     if (m && m.reload) {
-        log.info('Sender/' + process.pid, 'Reloading mailer config');
-        mailer.update();
+        log.info('Sender/' + process.pid, 'Reloading mailers config');
+        mailers.update();
     }
 });

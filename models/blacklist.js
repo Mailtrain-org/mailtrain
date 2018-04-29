@@ -3,7 +3,7 @@
 const knex = require('../lib/knex');
 const dtHelpers = require('../lib/dt-helpers');
 const shares = require('./shares');
-const tools = require('../lib/tools-async');
+const tools = require('../lib/tools');
 
 async function listDTAjax(context, params) {
     shares.enforceGlobalPermission(context, 'manageBlacklist');

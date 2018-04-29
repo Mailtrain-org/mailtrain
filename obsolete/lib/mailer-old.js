@@ -35,10 +35,20 @@ Handlebars.registerHelper('translate', function (context, options) { // eslint-d
     return new Handlebars.SafeString(result);
 });
 
+async function getTransport(sendConfiguration) {
+    if (!sendConfiguration) {
+
+    }
+}
+
+
+
+
+
 module.exports.transport = false;
 
 module.exports.update = () => {
-    createMailer(() => false);
+    createMailer();
 };
 
 module.exports.getMailer = callback => {

@@ -20,7 +20,6 @@ const hbs = require('hbs');
 const handlebarsHelpers = require('./lib/handlebars-helpers');
 const compression = require('compression');
 const passport = require('./lib/passport');
-const tools = require('./lib/tools');
 const contextHelpers = require('./lib/context-helpers');
 
 const getSettings = nodeifyFunction(require('./models/settings').get);

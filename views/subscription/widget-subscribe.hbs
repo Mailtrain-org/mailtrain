@@ -1,13 +1,13 @@
 <div id="mailtrain-subscription-widget-{{cid}}" class="mailtrain-subscription-widget">
     {{#if hasPubkey}}
-        <form method="post" id="download-pubkey" action="{{serviceUrl}}subscription/publickey" style="display: none;">
+        <form method="post" id="download-pubkey" action="{{publicKeyUrl}}" style="display: none;">
             <input type="hidden" name="cid" value="{{cid}}">
         </form>
     {{/if}}
 
     <h3>{{title}}</h3>
 
-    <form class="form" method="post" action="{{serviceUrl}}subscription/{{cid}}/subscribe">
+    <form class="form" method="post" action="{{subscribeUrl}}">
         <input type="hidden" class="tz-detect" name="tz" value="">
         <input type="hidden" name="address" value="">
         <input type="hidden" class="sub-time" name="sub" value="">

@@ -9,6 +9,7 @@ const premailerPrepareAsync = bluebird.promisify(premailerApi.prepare);
 const router = require('../../lib/router-async').create();
 
 /*
+FIXME
 const { nodeifyFunction } = require('../lib/nodeify');
 const getSettings = nodeifyFunction(require('../models/settings').get);
 

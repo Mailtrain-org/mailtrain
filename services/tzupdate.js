@@ -8,58 +8,47 @@
 // JOIN with subscription table. Subscription table includes timezone name for
 // a subscriber and tzoffset table includes offset from UTC in minutes
 
-let moment = require('moment-timezone');
-let db = require('../lib/db');
-let log = require('npmlog');
+const moment = require('moment-timezone');
+const knex = require('../lib/knex');
+const log = require('npmlog');
 let lastCheck = false;
 
 const timezone_timeout = 60 * 60 * 1000;
 
-function updateTimezoneOffsets(callback) {
+async function updateTimezoneOffsets() {
     log.verbose('UTC', 'Updating timezone offsets');
-    db.getConnection((err, connection) => {
-        if (err) {
-            return callback(err);
-        }
-
-        let values = [];
-        moment.tz.names().forEach(tz => {
-            let time = moment();
-            values.push('(' + connection.escape(tz.toLowerCase().trim()) + ',' + connection.escape(time.tz(tz).utcOffset()) + ')');
+    const values = [];
+    for (const tz of moment.tz.names()) {
+        values.push({
+            tz: tz.toLowerCase().trim(),
+            offset: moment.tz(tz).utcOffset()
         });
+    }
 
-        let query = 'INSERT INTO tzoffset (`tz`, `offset`) VALUES ' + values.join(', ') + ' ON DUPLICATE KEY UPDATE `offset` = VALUES(`offset`)';
-
-        connection.query(query, values, (err, result) => {
-            connection.release();
-            if (err) {
-                return callback(err);
-            }
-            return callback(null, result);
-        });
+    await knex.transaction(async tx => {
+        await tx('tzoffset').del();
+        await tx('tzoffset').insert(values);
     });
 }
 
-module.exports = callback => {
-    updateTimezoneOffsets(err => {
-        if (err) {
-            return callback(err);
-        }
-        let checkLoop = () => {
-            let curUtcDate = new Date().toISOString().split('T').shift();
-            if (curUtcDate !== lastCheck) {
-                updateTimezoneOffsets(err => {
-                    if (err) {
-                        log.error('UTC', err);
-                    }
-                    setTimeout(checkLoop, timezone_timeout);
-                });
-            } else {
-                setTimeout(checkLoop, timezone_timeout);
-            }
-            lastCheck = curUtcDate;
-        };
-        setTimeout(checkLoop, timezone_timeout);
-        callback(null, true);
-    });
+function start() {
+    let curUtcDate = new Date().toISOString().split('T').shift();
+    if (curUtcDate !== lastCheck) {
+        updateTimezoneOffsets()
+            .then(() => {
+                setTimeout(start, timezone_timeout)
+            })
+            .catch(err => {
+                log.error('UTC', err);
+                setTimeout(start, timezone_timeout);
+            });
+    } else {
+        setTimeout(start, timezone_timeout);
+    }
+    lastCheck = curUtcDate;
+}
+
+module.exports = {
+    start
 };
+

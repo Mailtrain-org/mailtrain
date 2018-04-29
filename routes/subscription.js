@@ -12,30 +12,20 @@ const settings = require('../models/settings');
 const _ = require('../lib/translate')._;
 const contextHelpers = require('../lib/context-helpers');
 const forms = require('../models/forms');
+const {getTrustedUrl} = require('../lib/urls');
 
 const { SubscriptionStatus } = require('../shared/lists');
 
 const openpgp = require('openpgp');
-const util = require('util');
 const cors = require('cors');
 const cache = require('memory-cache');
 const geoip = require('geoip-ultralight');
 const passport = require('../lib/passport');
 
-const tools = require('../lib/tools-async');
-const helpers = require('../lib/helpers');
+const tools = require('../lib/tools');
 const mailHelpers = require('../lib/subscription-mail-helpers');
 
 const interoperableErrors = require('../shared/interoperable-errors');
-
-const mjml = require('mjml');
-const hbs = require('hbs');
-
-const mjmlTemplates = new Map();
-const objectHash = require('object-hash');
-
-const bluebird = require('bluebird');
-const fsReadFile = bluebird.promisify(require('fs').readFile);
 
 const { cleanupFromPost } = require('../lib/helpers');
 
@@ -87,7 +77,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
     }
 
     if (!customFormId) {
-        data.formInputStyle = '@import url(/subscription/form-input-style.css);';
+        data.formInputStyle = '@import url(/public/subscription/form-input-style.css);';
         return;
     }
 
@@ -95,38 +85,12 @@ async function injectCustomFormData(customFormId, viewKey, data) {
 
     data.template.template = form[viewKey] || data.template.template;
     data.template.layout = form.layout || data.template.layout;
-    data.formInputStyle = form.formInputStyle || '@import url(/subscription/form-input-style.css);';
+    data.formInputStyle = form.formInputStyle || '@import url(/public/subscription/form-input-style.css);';
 
-    const configItems = await settings.get(['uaCode']);
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['uaCode']);
 
     data.uaCode = configItems.uaCode;
     data.customSubscriptionScripts = config.customSubscriptionScripts || [];
-}
-
-async function getMjmlTemplate(template) {
-    let key = (typeof template === 'object') ? objectHash(template) : template;
-
-    if (mjmlTemplates.has(key)) {
-        return mjmlTemplates.get(key);
-    }
-
-    let source;
-    if (typeof template === 'object') {
-        source = await tools.mergeTemplateIntoLayout(template.template, template.layout);
-    } else {
-        source = await fsReadFile(path.join(__dirname, '..', 'views', template), 'utf-8');
-    }
-
-    const compiled = mjml.mjml2html(source);
-
-    if (compiled.errors.length) {
-        throw new Error(compiled.errors[0].message || compiled.errors[0]);
-    }
-
-    const renderer = hbs.handlebars.compile(compiled.html);
-    mjmlTemplates.set(key, renderer);
-
-    return renderer;
 }
 
 async function captureFlashMessages(res) {
@@ -205,18 +169,18 @@ async function _renderSubscribe(req, res, list, subscription) {
     data.customFields = await fields.forHbs(contextHelpers.getAdminContext(), list.id, subscription);
     data.useEditor = true;
 
-    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress']);
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPrivateKey']);
     data.hasPubkey = !!configItems.pgpPrivateKey;
-    data.defaultAddress = configItems.defaultAddress;
 
     data.template = {
         template: 'subscription/web-subscribe.mjml.hbs',
-        layout: 'subscription/layout.mjml.hbs'
+        layout: 'subscription/layout.mjml.hbs',
+        type: 'mjml'
     };
 
     await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
 
-    const htmlRenderer = await getMjmlTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template);
 
     data.isWeb = true;
     data.needsJsWarning = true;
@@ -354,12 +318,13 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
 
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
 
-    const configItems = await settings.get(['serviceUrl', 'pgpPrivateKey']);
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPrivateKey']);
 
     const data = {
         title: list.name,
         cid: list.cid,
-        serviceUrl: configItems.serviceUrl,
+        publicKeyUrl: getTrustedUrl('subscription/publickey'),
+        subscribeUrl: getTrustedUrl(`subscription/${list.cid}/subscribe`),
         hasPubkey: !!configItems.pgpPrivateKey,
         customFields: await fields.forHbs(contextHelpers.getAdminContext(), list.id),
         template: {},
@@ -406,18 +371,18 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
 
     data.useEditor = true;
 
-    const configItems = await settings.get(['pgpPrivateKey', 'defaultAddress']);
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPrivateKey']);
     data.hasPubkey = !!configItems.pgpPrivateKey;
-    data.defaultAddress = configItems.defaultAddress;
 
     data.template = {
         template: 'subscription/web-manage.mjml.hbs',
-        layout: 'subscription/layout.mjml.hbs'
+        layout: 'subscription/layout.mjml.hbs',
+        type: 'mjml'
     };
 
     await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage', data);
 
-    const htmlRenderer = await getMjmlTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template);
 
     data.isWeb = true;
     data.needsJsWarning = true;
@@ -452,24 +417,22 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
-    const configItems = await settings.get(['defaultAddress']);
-
     const data = {};
     data.email = subscription.email;
     data.cid = subscription.cid;
     data.lcid = req.params.lcid;
     data.title = list.name;
     data.csrfToken = req.csrfToken();
-    data.defaultAddress = configItems.defaultAddress;
 
     data.template = {
         template: 'subscription/web-manage-address.mjml.hbs',
-        layout: 'subscription/layout.mjml.hbs'
+        layout: 'subscription/layout.mjml.hbs',
+        type: 'mjml'
     };
 
     await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage-address', data);
 
-    const htmlRenderer = await getMjmlTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template);
 
     data.isWeb = true;
     data.needsJsWarning = true;
@@ -535,7 +498,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
 router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.lcid);
 
-    const configItems = await settings.get(['defaultAddress']);
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['defaultAddress']);
 
     const autoUnsubscribe = req.query.auto === 'yes';
 
@@ -563,12 +526,13 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
 
         data.template = {
             template: 'subscription/web-unsubscribe.mjml.hbs',
-            layout: 'subscription/layout.mjml.hbs'
+            layout: 'subscription/layout.mjml.hbs',
+            type: 'mjml'
         };
 
         await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-unsubscribe', data);
 
-        const htmlRenderer = await getMjmlTemplate(data.template);
+        const htmlRenderer = await tools.getTemplate(data.template);
 
         data.isWeb = true;
         data.needsJsWarning = true;
@@ -660,7 +624,7 @@ router.getAsync('/:cid/manual-unsubscribe-notice', async (req, res) => {
 });
 
 router.postAsync('/publickey', passport.parseForm, async (req, res) => {
-    const configItems = await settings.get(['pgpPassphrase', 'pgpPrivateKey']);
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPassphrase', 'pgpPrivateKey']);
 
     if (!configItems.pgpPrivateKey) {
         const err = new Error(_('Public key is not set'));
@@ -698,23 +662,22 @@ router.postAsync('/publickey', passport.parseForm, async (req, res) => {
 async function webNotice(type, req, res) {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
 
-    const configItems = await settings.get(['defaultHomepage', 'serviceUrl', 'defaultAddress', 'adminEmail']);
-
+    const configItems = await settings.get(contextHelpers.getAdminContext(), ['defaultHomepage', 'adminEmail']);
 
     const data = {
         title: list.name,
-        homepage: configItems.defaultHomepage || configItems.serviceUrl,
-        defaultAddress: configItems.defaultAddress,
-        contactAddress: configItems.defaultAddress,
+        homepage: configItems.defaultHomepage || getTrustedUrl(),
+        contactAddress: list.from_email || configItems.adminEmail,
         template: {
             template: 'subscription/web-' + type + '-notice.mjml.hbs',
-            layout: 'subscription/layout.mjml.hbs'
+            layout: 'subscription/layout.mjml.hbs',
+            type: 'mjml'
         }
     };
 
     await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-' + type + '-notice', data);
 
-    const htmlRenderer = await getMjmlTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template);
 
     data.isWeb = true;
     data.isConfirmNotice = true; // FIXME: Not sure what this does. Check it in a browser with disabled JS

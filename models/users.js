@@ -7,10 +7,10 @@ const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const passwordValidator = require('../shared/password-validator')();
 const dtHelpers = require('../lib/dt-helpers');
-const tools = require('../lib/tools-async');
+const tools = require('../lib/tools');
 const crypto = require('crypto');
 const settings = require('./settings');
-const urllib = require('url');
+const {getTrustedUrl} = require('../lib/urls');
 const _ = require('../lib/translate')._;
 
 const bluebird = require('bluebird');
@@ -19,8 +19,7 @@ const bcrypt = require('bcrypt-nodejs');
 const bcryptHash = bluebird.promisify(bcrypt.hash);
 const bcryptCompare = bluebird.promisify(bcrypt.compare);
 
-const mailer = require('../lib/mailer');
-const mailerSendMail = bluebird.promisify(mailer.sendMail);
+const mailers = require('../lib/mailers');
 
 const passport = require('../lib/passport');
 
@@ -301,9 +300,10 @@ async function sendPasswordReset(usernameOrEmail) {
                 reset_expire: new Date(Date.now() + 60 * 60 * 1000)
             });
 
-            const { serviceUrl, adminEmail } = await settings.get(['serviceUrl', 'adminEmail']);
+            const { adminEmail } = await settings.get(contextHelpers.getAdminContext(), ['adminEmail']);
 
-            await mailerSendMail({
+            const mailer = await mailers.getOrCreateMailer();
+            await mailer.sendMail({
                 from: {
                     address: adminEmail
                 },
@@ -318,7 +318,7 @@ async function sendPasswordReset(usernameOrEmail) {
                     title: 'Mailtrain',
                     username: user.username,
                     name: user.name,
-                    confirmUrl: urllib.resolve(serviceUrl, `/account/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
+                    confirmUrl: getTrustedUrl(`/account/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
                 }
             });
         }

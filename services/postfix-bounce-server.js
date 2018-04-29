@@ -1,13 +1,15 @@
 'use strict';
 
-let log = require('npmlog');
-let config = require('config');
-let net = require('net');
-let campaigns = require('../lib/models/campaigns');
+// FIXME - port for the new campaigns model
 
-let seenIds = new Set();
+const log = require('npmlog');
+const config = require('config');
+const net = require('net');
+const campaigns = require('../lib/models/campaigns');
 
-let server = net.createServer(socket => {
+const seenIds = new Set();
+
+const server = net.createServer(socket => {
     let remainder = '';
 
     let reading = false;

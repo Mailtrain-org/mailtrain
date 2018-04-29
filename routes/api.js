@@ -1,7 +1,7 @@
 'use strict';
 
 const lists = require('../models/lists');
-const tools = require('../lib/tools-async');
+const tools = require('../lib/tools');
 const blacklist = require('../models/blacklist');
 const fields = require('../models/fields');
 const { SubscriptionStatus } = require('../shared/lists');

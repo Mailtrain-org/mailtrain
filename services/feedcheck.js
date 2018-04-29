@@ -1,5 +1,7 @@
 'use strict';
 
+// FIXME - revisit and rewrite if necessary
+
 let log = require('npmlog');
 
 let db = require('../lib/db');

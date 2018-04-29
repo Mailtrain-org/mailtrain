@@ -37,6 +37,7 @@ exports.up = (knex, Promise) => (async() =>  {
     await knex.schema.table('lists', table => {
         table.string('contact_email');
         table.string('homepage');
+        table.integer('send_configuration').unsigned().references(`send_configurations.id`);
     });
 
     const settingsRows = await knex('settings').select(['key', 'value']);
@@ -100,6 +101,8 @@ exports.up = (knex, Promise) => (async() =>  {
         mailer_settings: JSON.stringify(mailer_settings),
         namespace: getGlobalNamespaceId()
     });
+
+    await knex('lists').update({send_configuration: getSystemSendConfigurationId()});
 
     await knex('settings').del();
     await knex('settings').insert([

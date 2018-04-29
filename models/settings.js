@@ -51,6 +51,8 @@ async function set(context, data) {
             }
         }
     }
+
+    // FIXME - recreate mailers, notify senders to recreate the mailers
 }
 
 module.exports = {

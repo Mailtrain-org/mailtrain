@@ -1,18 +1,18 @@
 'use strict';
 
-let log = require('npmlog');
-let config = require('config');
-let crypto = require('crypto');
-let humanize = require('humanize');
-let http = require('http');
+const log = require('npmlog');
+const config = require('config');
+const crypto = require('crypto');
+const humanize = require('humanize');
+const http = require('http');
 
-let SMTPServer = require('smtp-server').SMTPServer;
-let simpleParser = require('mailparser').simpleParser;
+const SMTPServer = require('smtp-server').SMTPServer;
+const simpleParser = require('mailparser').simpleParser;
 
 let totalMessages = 0;
 let received = 0;
 
-let mailstore = {
+const mailstore = {
     accounts: {},
     saveMessage(address, message) {
         if (!this.accounts[address]) {
@@ -36,7 +36,7 @@ let mailstore = {
 };
 
 // Setup server
-let server = new SMTPServer({
+const server = new SMTPServer({
 
     // log to console
     logger: config.testserver.logger,

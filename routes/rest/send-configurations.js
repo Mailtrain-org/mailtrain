@@ -1,7 +1,7 @@
 'use strict';
 
 const passport = require('../../lib/passport');
-const sendConfigurations = require('../../models/send-configuration');
+const sendConfigurations = require('../../models/send-configurations');
 
 const router = require('../../lib/router-async').create();
 

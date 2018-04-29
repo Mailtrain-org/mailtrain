@@ -7,6 +7,8 @@ let Lock = require('redfour');
 let stringifyDate = require('json-stringify-date');
 let senders = require('./senders');
 
+const bluebird = require('bluebird');
+
 module.exports = mysql.createPool(config.mysql);
 if (config.redis && config.redis.enabled) {
 
@@ -17,7 +19,7 @@ if (config.redis && config.redis.enabled) {
         namespace: 'mailtrain:lock'
     });
 
-    module.exports.getLock = (id, callback) => {
+    module.exports.getLock = bluebird.promisify((id, callback) => {
         queueLock.waitAcquireLock(id, 60 * 1000 /* Lock expires after 60sec */ , 10 * 1000 /* Wait for lock for up to 10sec */ , (err, lock) => {
             if (err) {
                 return callback(err);
@@ -32,13 +34,13 @@ if (config.redis && config.redis.enabled) {
                 }
             });
         });
-    };
+    });
 
-    module.exports.clearCache = (key, callback) => {
+    module.exports.clearCache = bluebird.promisify((key, callback) => {
         module.exports.redis.del('mailtrain:cache:' + key, err => callback(err));
-    };
+    });
 
-    module.exports.addToCache = (key, value, callback) => {
+    module.exports.addToCache = bluebird.promisify((key, value, callback) => {
         if (!value) {
             return setImmediate(() => callback());
         }
@@ -46,9 +48,9 @@ if (config.redis && config.redis.enabled) {
             lpush('mailtrain:cache:' + key, stringifyDate.stringify(value)).
             expire('mailtrain:cache:' + key, 24 * 3600).
             exec(err => callback(err));
-    };
+    });
 
-    module.exports.getFromCache = (key, callback) => {
+    module.exports.getFromCache = bluebird.promisify((key, callback) => {
         module.exports.redis.rpop('mailtrain:cache:' + key, (err, value) => {
             if (err) {
                 return callback(err);
@@ -61,23 +63,24 @@ if (config.redis && config.redis.enabled) {
 
             return callback(null, value);
         });
-    };
+    });
 
 } else {
     // fakelock. does not lock anything
-    module.exports.getLock = (id, callback) => {
+    module.exports.getLock = bluebird.promisify((id, callback) => {
         setImmediate(() => callback(null, {
             lock: false,
             release(done) {
                 setImmediate(done);
             }
         }));
-    };
+    });
 
     let caches = new Map();
 
-    module.exports.clearCache = (key, callback) => {
+    module.exports.clearCache = bluebird.promisify((key, callback) => {
         caches.delete(key);
+        // This notifies the callback below - i.e. process.on(...) - which is installed in the sender process.
         senders.workers.forEach(child => {
             child.send({
                 cmd: 'db.clearCache',
@@ -85,7 +88,7 @@ if (config.redis && config.redis.enabled) {
             });
         });
         setImmediate(() => callback());
-    };
+    });
 
     process.on('message', m => {
         if (m && m.cmd === 'db.clearCache' && m.key) {
@@ -93,13 +96,13 @@ if (config.redis && config.redis.enabled) {
         }
     });
 
-    module.exports.addToCache = (key, value, callback) => {
+    module.exports.addToCache = bluebird.promisify((key, value, callback) => {
         if (!caches.has(key)) {
             caches.set(key, []);
         }
         caches.get(key).push(value);
         setImmediate(() => callback());
-    };
+    });
 
     module.exports.getFromCache = (key, callback) => {
         let value;

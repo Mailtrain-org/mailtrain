@@ -8,6 +8,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const {MailerType, getSystemSendConfigurationId} = require('../shared/send-configurations');
+const contextHelpers = require('../lib/context-helpers');
 
 const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'subject', 'subject_overridable', 'verp_hostname', 'mailer_type', 'mailer_settings', 'namespace']);
 
@@ -92,6 +93,9 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'sendConfiguration', entityId: entity.id });
     });
+
+    // FIXME - recreate respective mailer, notify senders to recreate the mailer
+
 }
 
 async function remove(context, id) {
@@ -102,10 +106,16 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'delete');
 
+        // FIXME - delete send configuration assignment in campaigns
+        await tx('lists').update({send_configuration: null}).where('send_configuration', id);
+
         await tx('send_configurations').where('id', id).del();
     });
 }
 
+async function getSystemSendConfiguration() {
+    return await getById(contextHelpers.getAdminContext(), getSystemSendConfigurationId());
+}
 
 module.exports = {
     MailerType,
@@ -114,5 +124,6 @@ module.exports = {
     getById,
     create,
     updateWithConsistencyCheck,
-    remove
+    remove,
+    getSystemSendConfiguration
 };

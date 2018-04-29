@@ -1,5 +1,7 @@
 'use strict';
 
+// FIXME - port for the new campaigns model
+
 const { nodeifyFunction } = require('../lib/nodeify');
 const getSettings = nodeifyFunction(require('../models/settings').get);
 
