@@ -9,10 +9,10 @@ const axiosInst = axios.create({
 });
 
 const axiosWrapper = {
-    get: (...args) => axiosInst.get(...args).catch(error => { throw interoperableErrors.deserialize(error.response.data) || error }),
-    put: (...args) => axiosInst.put(...args).catch(error => { throw interoperableErrors.deserialize(error.response.data) || error }),
-    post: (...args) => axiosInst.post(...args).catch(error => { throw interoperableErrors.deserialize(error.response.data) || error }),
-    delete: (...args) => axiosInst.delete(...args).catch(error => { throw interoperableErrors.deserialize(error.response.data) || error })
+    get: (...args) => axiosInst.get(...args).catch(error => { throw (error.response && interoperableErrors.deserialize(error.response.data)) || error }),
+    put: (...args) => axiosInst.put(...args).catch(error => { throw (error.response && interoperableErrors.deserialize(error.response.data)) || error }),
+    post: (...args) => axiosInst.post(...args).catch(error => { throw (error.response && interoperableErrors.deserialize(error.response.data)) || error }),
+    delete: (...args) => axiosInst.delete(...args).catch(error => { throw (error.response && interoperableErrors.deserialize(error.response.data)) || error })
 };
 
 const HTTPMethod = {

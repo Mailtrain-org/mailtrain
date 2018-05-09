@@ -151,10 +151,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/segments/${this.props.list.id}/${this.props.entity.id}`
+            url = `rest/segments/${this.props.list.id}/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = `/rest/segments/${this.props.list.id}`
+            url = `rest/segments/${this.props.list.id}`
         }
 
         try {
@@ -172,7 +172,7 @@ export default class CUD extends Component {
 
             if (submitSuccessful) {
                 if (stay) {
-                    await this.getFormValuesFromURL(`/rest/segments/${this.props.list.id}/${this.props.entity.id}`, data => {
+                    await this.getFormValuesFromURL(`rest/segments/${this.props.list.id}/${this.props.entity.id}`, data => {
                         data.rootRuleType = data.settings.rootRule.type;
                         data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
 
@@ -332,7 +332,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/segments/${this.props.list.id}/${this.props.entity.id}`}
+                        deleteUrl={`rest/segments/${this.props.list.id}/${this.props.entity.id}`}
                         cudUrl={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/edit`}
                         listUrl={`/lists/${this.props.list.id}/segments`}
                         deletingMsg={t('Deleting segment ...')}

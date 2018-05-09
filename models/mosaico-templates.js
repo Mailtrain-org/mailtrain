@@ -97,7 +97,6 @@ async function remove(context, id) {
     });
 }
 
-
 module.exports = {
     hash,
     getById,

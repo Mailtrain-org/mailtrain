@@ -1,21 +1,15 @@
 'use strict';
 
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
-import {
-    I18nextProvider,
-    translate
-} from 'react-i18next';
-import i18n from './i18n';
+import {translate} from 'react-i18next';
 import PropTypes from "prop-types";
 import styles from "./mosaico.scss";
-import mailtrainConfig from 'mailtrainConfig';
 
-import { UntrustedContentHost } from './untrusted';
-import {
-    Button,
-    Icon
-} from "./bootstrap-components";
+import {UntrustedContentHost} from './untrusted';
+import {Icon} from "./bootstrap-components";
+import {getUrl} from "./urls";
+import {base, unbase} from "../../../shared/templates";
+
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -36,7 +30,10 @@ export class MosaicoEditor extends Component {
         entityTypeId: PropTypes.string,
         entity: PropTypes.object,
         title: PropTypes.string,
-        onFullscreenAsync: PropTypes.func
+        onFullscreenAsync: PropTypes.func,
+        templateId: PropTypes.number,
+        initialModel: PropTypes.string,
+        initialMetadata: PropTypes.string
     }
 
     async toggleFullscreenAsync() {
@@ -57,18 +54,19 @@ export class MosaicoEditor extends Component {
         const mosaicoData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
-            model: this.props.entity.data.model,
-            metadata: this.props.entity.data.metadata
+            templateId: this.props.templateId,
+            initialModel: this.props.initialModel,
+            initialMetadata: this.props.initialMetadata
         };
 
         return (
             <div className={this.state.fullscreen ? styles.editorFullscreen : styles.editor}>
                 <div className={styles.navbar}>
-                    {this.state.fullscreen && <img className={styles.logo} src="/public/mailtrain-notext.png"/>}
+                    {this.state.fullscreen && <img className={styles.logo} src={getUrl('public/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
                 </div>
-                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} contentProps={mosaicoData} contentSrc="mosaico/editor" tokenMethod="mosaico" tokenParams={mosaicoData}/>
+                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={mosaicoData} contentSrc="mosaico/editor" tokenMethod="mosaico" tokenParams={mosaicoData}/>
             </div>
         );
     }
@@ -92,12 +90,13 @@ export class MosaicoSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
-        model: PropTypes.object,
-        metadata: PropTypes.object
+        templateId: PropTypes.number,
+        initialModel: PropTypes.string,
+        initialMetadata: PropTypes.string
     }
 
     componentDidMount() {
-        const publicPath = '/public/mosaico';
+        const publicPath = 'public/mosaico';
 
         if (!Mosaico.isCompatible()) {
             alert('Update your browser!');
@@ -124,22 +123,23 @@ export class MosaicoSandbox extends Component {
 
         plugins.unshift(vm => {
             // This is an override of the default paths in Mosaico
-            vm.logoPath = publicPath + '/img/mosaico32.png';
+            vm.logoPath = getUrl(publicPath + '/img/mosaico32.png');
             vm.logoUrl = '#';
         });
 
         const config = {
-            imgProcessorBackend: `/mosaico/img/${this.props.entityTypeId}/${this.props.entityId}`,
-            emailProcessorBackend: '/mosaico/dl/',
+            imgProcessorBackend: getUrl(`mosaico/img/${this.props.entityTypeId}/${this.props.entityId}`),
+            emailProcessorBackend: getUrl('mosaico/dl/'),
             fileuploadConfig: {
-                url: `/mosaico/upload/${this.props.entityTypeId}/${this.props.entityId}`
+                url: getUrl(`mosaico/upload/${this.props.entityTypeId}/${this.props.entityId}`)
             },
             strings: window.mosaicoLanguageStrings
         };
 
-        const metadata = this.props.metadata;
-        const model = this.props.model;
-        const template = publicPath + '/templates/versafix-1/index.html';
+        const urlBase = getUrl();
+        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, urlBase));
+        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, urlBase));
+        const template = getUrl(`mosaico/templates/${this.props.templateId}/index.html`);
 
         const allPlugins = plugins.concat(window.mosaicoPlugins);
 
@@ -148,10 +148,11 @@ export class MosaicoSandbox extends Component {
 
     async onMethodAsync(method, params) {
         if (method === 'exportState') {
+            const urlBase = getUrl();
             return {
-                html: this.viewModel.exportHTML(),
-                model: this.viewModel.exportJS(),
-                metadata: this.viewModel.metadata
+                html: unbase(this.viewModel.exportHTML(), urlBase),
+                model: unbase(this.viewModel.exportJSON(), urlBase),
+                metadata: unbase(this.viewModel.exportMetadata(), urlBase)
             };
         }
     }

@@ -8,6 +8,7 @@ import {Table} from "../lib/table";
 import {ButtonRow, Form, InputField, withForm, FormSendMethod} from "../lib/form";
 import {Button, Icon} from "../lib/bootstrap-components";
 import axios from "../lib/axios";
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withForm
@@ -24,7 +25,7 @@ export default class List extends Component {
 
         this.initForm({
             serverValidation: {
-                url: '/rest/blacklist-validate',
+                url: 'rest/blacklist-validate',
                 changed: ['email']
             }
         });
@@ -64,7 +65,7 @@ export default class List extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('Saving ...'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, '/rest/blacklist');
+        const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/blacklist');
 
         if (submitSuccessful) {
             this.hideFormValidation();
@@ -86,7 +87,7 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async deleteBlacklisted(email) {
-        await axios.delete(`/rest/blacklist/${email}`);
+        await axios.delete(getUrl(`rest/blacklist/${email}`));
         this.blacklistTable.refresh();
     }
 
@@ -122,7 +123,7 @@ export default class List extends Component {
 
                 <h3 className="legend">{t('Blacklisted Emails')}</h3>
 
-                <Table ref={node => this.blacklistTable = node} withHeader dataUrl="/rest/blacklist-table" columns={columns} />
+                <Table ref={node => this.blacklistTable = node} withHeader dataUrl="rest/blacklist-table" columns={columns} />
             </div>
         );
     }

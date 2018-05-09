@@ -9,22 +9,22 @@
 
     <title>Mailtrain</title>
 
-    <script src="/public/mosaico/vendor/jquery.min.js"></script>
-    <script src="/public/mosaico/vendor/jquery-migrate.min.js"></script>
-    <script src="/public/mosaico/vendor/knockout.js"></script>
-    <script src="/public/mosaico/vendor/jquery-ui.min.js"></script>
-    <script src="/public/mosaico/vendor/jquery.ui.touch-punch.min.js"></script>
-    <script src="/public/mosaico/vendor/load-image.all.min.js"></script>
-    <script src="/public/mosaico/vendor/canvas-to-blob.min.js"></script>
-    <script src="/public/mosaico/vendor/jquery.iframe-transport.js"></script>
-    <script src="/public/mosaico/vendor/jquery.fileupload.js"></script>
-    <script src="/public/mosaico/vendor/jquery.fileupload-process.js"></script>
-    <script src="/public/mosaico/vendor/jquery.fileupload-image.js"></script>
-    <script src="/public/mosaico/vendor/jquery.fileupload-validate.js"></script>
-    <script src="/public/mosaico/vendor/knockout-jqueryui.min.js"></script>
-    <script src="/public/mosaico/vendor/tinymce.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery-migrate.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/knockout.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery-ui.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.ui.touch-punch.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/load-image.all.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/canvas-to-blob.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.iframe-transport.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload-process.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload-image.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload-validate.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/knockout-jqueryui.min.js"></script>
+    <script src="{{mosaicoPublicPath}}/vendor/tinymce.min.js"></script>
 
-    <script src="/public/mosaico/mosaico.min.js?v=0.16"></script>
+    <script src="{{mosaicoPublicPath}}/mosaico.min.js?v=0.16"></script>
 
     {{#if languageStrings}}<script> window.mosaicoLanguageStrings = {{{languageStrings}}}; </script>{{/if}}
     <script> window.mosaicoPlugins = []; </script>
@@ -41,11 +41,12 @@
         window.mailtrainConfig = {{{mailtrainConfig}}};
     </script>
 
-    <script src="/mailtrain/common.js"></script>
-    <script src="/mailtrain/mosaico.js"></script>
+    {{#each scriptFiles}}
+        <script src="{{this}}"></script>
+    {{/each}}
 
-    <link rel="stylesheet" href="/public/mosaico/mosaico-material.min.css?v=0.10" />
-    <link rel="stylesheet" href="/public/mosaico/vendor/notoregular/stylesheet.css" />
+    <link rel="stylesheet" href="{{mosaicoPublicPath}}/mosaico-material.min.css?v=0.10" />
+    <link rel="stylesheet" href="{{mosaicoPublicPath}}/vendor/notoregular/stylesheet.css" />
 </head>
 <body class="mo-standalone">
 {{{body}}}

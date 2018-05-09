@@ -2,12 +2,18 @@
 
 import mailtrainConfig from "mailtrainConfig";
 
+let restrictedAccessToken = 'ANONYMOUS';
+
+function setRestrictedAccessToken(token) {
+    restrictedAccessToken = token;
+}
+
 function getTrustedUrl(path) {
     return mailtrainConfig.trustedUrlBase + (path || '');
 }
 
 function getSandboxUrl(path) {
-    return mailtrainConfig.sandboxUrlBase + (path || '');
+    return mailtrainConfig.sandboxUrlBase + restrictedAccessToken + '/' + (path || '');
 }
 
 function getUrl(path) {
@@ -22,7 +28,7 @@ function getBaseDir() {
     if (mailtrainConfig.trusted) {
         return mailtrainConfig.trustedUrlBaseDir;
     } else {
-        return mailtrainConfig.sandboxUrlBaseDir;
+        return mailtrainConfig.sandboxUrlBaseDir + 'ANONYMOUS';
     }
 }
 
@@ -30,5 +36,6 @@ export {
     getTrustedUrl,
     getSandboxUrl,
     getUrl,
-    getBaseDir
+    getBaseDir,
+    setRestrictedAccessToken
 }

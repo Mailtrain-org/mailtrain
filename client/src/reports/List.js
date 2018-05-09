@@ -9,6 +9,8 @@ import moment from 'moment';
 import axios from '../lib/axios';
 import { ReportState } from '../../../shared/reports';
 import {Icon} from "../lib/bootstrap-components";
+import {checkPermissions} from "../lib/permissions";
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withErrorHandling
@@ -23,7 +25,7 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async fetchPermissions() {
-        const request = {
+        const result = await checkPermissions({
             createReport: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createReport']
@@ -39,10 +41,8 @@ export default class List extends Component {
             viewReportTemplate: {
                 entityTypeId: 'reportTemplate',
                 requiredOperations: ['view']
-            },
-        };
-
-        const result = await axios.post('/rest/permissions-check', request);
+            }
+        });
 
         this.setState({
             createPermitted: result.data.createReport && result.data.executeReportTemplate,
@@ -56,13 +56,13 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async stop(table, id) {
-        await axios.post(`/rest/report-stop/${id}`);
+        await axios.post(getUrl(`rest/report-stop/${id}`));
         table.refresh();
     }
 
     @withAsyncErrorHandler
     async start(table, id) {
-        await axios.post(`/rest/report-start/${id}`);
+        await axios.post(getUrl(`rest/report-start/${id}`));
         table.refresh();
     }
 
@@ -177,7 +177,7 @@ export default class List extends Component {
 
                 <Title>{t('Reports')}</Title>
 
-                <Table withHeader dataUrl="/rest/reports-table" columns={columns} />
+                <Table withHeader dataUrl="rest/reports-table" columns={columns} />
             </div>
         );
     }

@@ -9,6 +9,7 @@ import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
 import moment from 'moment';
 import mailtrainConfig from 'mailtrainConfig';
+import {checkPermissions} from "../../lib/permissions";
 
 @translate()
 @withPageHelpers
@@ -23,14 +24,12 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async fetchPermissions() {
-        const request = {
+        const result = await checkPermissions({
             createReportTemplate: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createReportTemplate']
             }
-        };
-
-        const result = await axios.post('/rest/permissions-check', request);
+        });
 
         this.setState({
             createPermitted: result.data.createReportTemplate && mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess')
@@ -88,7 +87,7 @@ export default class List extends Component {
 
                 <Title>{t('Report Templates')}</Title>
 
-                <Table withHeader dataUrl="/rest/report-templates-table" columns={columns} />
+                <Table withHeader dataUrl="rest/report-templates-table" columns={columns} />
             </div>
         );
     }

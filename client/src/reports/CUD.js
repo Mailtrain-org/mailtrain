@@ -14,6 +14,7 @@ import moment from 'moment';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withForm
@@ -40,7 +41,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async fetchUserFields(reportTemplateId) {
-        const result = await axios.get(`/rest/report-template-user-fields/${reportTemplateId}`);
+        const result = await axios.get(getUrl(`rest/report-template-user-fields/${reportTemplateId}`));
         this.updateFormValue('user_fields', result.data);
     }
 
@@ -128,10 +129,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/reports/${this.props.entity.id}`
+            url = `rest/reports/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/reports'
+            url = 'rest/reports'
         }
 
         this.disableForm();
@@ -191,7 +192,7 @@ export default class CUD extends Component {
         if (userFieldsSpec) {
             for (const spec of userFieldsSpec) {
                 if (spec.type === 'campaign') {
-                    addUserFieldTableSelect(spec, '/rest/campaigns-table', 1,[
+                    addUserFieldTableSelect(spec, 'rest/campaigns-table', 1,[
                         {data: 0, title: "#"},
                         {data: 1, title: t('Name')},
                         {data: 2, title: t('Description')},
@@ -199,7 +200,7 @@ export default class CUD extends Component {
                         {data: 4, title: t('Created'), render: data => moment(data).fromNow()}
                     ]);
                 } else if (spec.type === 'list') {
-                    addUserFieldTableSelect(spec, '/rest/lists-table', 1,[
+                    addUserFieldTableSelect(spec, 'rest/lists-table', 1,[
                         {data: 0, title: "#"},
                         {data: 1, title: t('Name')},
                         {data: 2, title: t('ID')},
@@ -218,7 +219,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/reports/${this.props.entity.id}`}
+                        deleteUrl={`rest/reports/${this.props.entity.id}`}
                         cudUrl={`/reports/${this.props.entity.id}/edit`}
                         listUrl="/reports"
                         deletingMsg={t('Deleting report ...')}
@@ -231,7 +232,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('Name')}/>
                     <TextArea id="description" label={t('Description')}/>
 
-                    <TableSelect id="report_template" label={t('Report Template')} withHeader dropdown dataUrl="/rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
+                    <TableSelect id="report_template" label={t('Report Template')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
 
                     <NamespaceSelect/>
 

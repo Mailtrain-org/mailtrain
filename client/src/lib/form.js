@@ -15,6 +15,7 @@ import {Button, Icon} from "./bootstrap-components";
 import brace from 'brace';
 import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
+import 'brace/ext/searchbox';
 
 import CKEditorRaw from "react-ckeditor-component";
 
@@ -24,6 +25,7 @@ import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birth
 
 import styles from "./styles.scss";
 import moment from "moment";
+import {getUrl} from "./urls";
 
 const FormState = {
     Loading: 0,
@@ -711,7 +713,8 @@ class TableSelect extends Component {
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string
+        format: PropTypes.string,
+        disabled: PropTypes.bool
     }
 
     static defaultProps = {
@@ -772,11 +775,13 @@ class TableSelect extends Component {
         if (props.dropdown) {
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
-                    <div className={`input-group ${styles.tableSelectDropdown}`}>
-                        <input type="text" className="form-control" value={this.state.selectedLabel} readOnly onClick={::this.toggleOpen}/>
+                    <div className={(props.disabled ? '' : 'input-group ') + styles.tableSelectDropdown}>
+                        <input type="text" className="form-control" value={this.state.selectedLabel} onClick={::this.toggleOpen} readOnly={!props.disabled} disabled={props.disabled}/>
+                        {!props.disabled &&
                         <span className="input-group-btn">
                             <Button label={t('Select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
                         </span>
+                        }
                     </div>
                     <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
                         <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
@@ -926,7 +931,7 @@ function withForm(target) {
             if (payloadNotEmpty) {
                 mutState.set('isServerValidationRunning', true);
 
-                axios.post(settings.serverValidation.url, payload)
+                axios.post(getUrl(settings.serverValidation.url), payload)
                     .then(response => {
 
                         self.setState(previousState => ({
@@ -1011,7 +1016,7 @@ function withForm(target) {
             });
         }, 500);
 
-        const response = await axios.get(url);
+        const response = await axios.get(getUrl(url));
 
         const data = response.data;
 
@@ -1037,7 +1042,7 @@ function withForm(target) {
                 mutator(data);
             }
 
-            const response = await axios.method(method, url, data);
+            const response = await axios.method(method, getUrl(url), data);
 
             return response.data || true;
 

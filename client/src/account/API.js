@@ -24,7 +24,7 @@ export default class API extends Component {
 
     @withAsyncErrorHandler
     async loadAccessToken() {
-        const response = await axios.get('/rest/access-token');
+        const response = await axios.get(getUrl('rest/access-token'));
         this.setState({
             accessToken: response.data
         });
@@ -35,7 +35,7 @@ export default class API extends Component {
     }
 
     async resetAccessToken() {
-        const response = await axios.post('/rest/access-token-reset');
+        const response = await axios.post(getUrl('rest/access-token-reset'));
         this.setState({
             accessToken: response.data
         });

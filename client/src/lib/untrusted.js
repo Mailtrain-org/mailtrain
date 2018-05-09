@@ -3,12 +3,22 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {translate} from "react-i18next";
-import {requiresAuthenticatedUser, withPageHelpers} from "./page";
-import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
+import {
+    requiresAuthenticatedUser,
+    withPageHelpers
+} from "./page";
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from "./error-handling";
 import axios from "./axios";
 import styles from "./styles.scss";
-import {getTrustedUrl, getSandboxUrl} from "./urls";
-import {Table} from "./table";
+import {
+    getSandboxUrl,
+    getTrustedUrl,
+    getUrl,
+    setRestrictedAccessToken
+} from "./urls";
 
 @translate(null, { withRef: true })
 @withPageHelpers
@@ -37,7 +47,8 @@ export class UntrustedContentHost extends Component {
         contentProps: PropTypes.object,
         tokenMethod: PropTypes.string,
         tokenParams: PropTypes.object,
-        className: PropTypes.string
+        className: PropTypes.string,
+        singleToken: PropTypes.bool
     }
 
     isInitialized() {
@@ -73,6 +84,7 @@ export class UntrustedContentHost extends Component {
             const msgId = this.rpcCounter;
 
             this.sendMessage('rpcRequest', {
+                method,
                 params,
                 msgId
             });
@@ -85,20 +97,26 @@ export class UntrustedContentHost extends Component {
 
     @withAsyncErrorHandler
     async refreshAccessToken() {
-        const result = await axios.post(getTrustedUrl('rest/restricted-access-token'), {
-            method: this.props.tokenMethod,
-            params: this.props.tokenParams
-        });
+        if (this.props.singleToken && this.accessToken) {
+            await axios.put(getUrl('rest/restricted-access-token'), {
+                token: this.accessToken
+            });
+        } else {
+            const result = await axios.post(getUrl('rest/restricted-access-token'), {
+                method: this.props.tokenMethod,
+                params: this.props.tokenParams
+            });
 
-        this.accessToken = result.data;
+            this.accessToken = result.data;
 
-        if (!this.state.hasAccessToken) {
-            this.setState({
-                hasAccessToken: true
-            })
+            if (!this.state.hasAccessToken) {
+                this.setState({
+                    hasAccessToken: true
+                })
+            }
+
+            this.sendMessage('accessToken', this.accessToken);
         }
-
-        this.sendMessage('accessToken', this.accessToken);
     }
 
     scheduleRefreshAccessToken() {
@@ -169,11 +187,6 @@ export class UntrustedContentRoot extends Component {
     }
 
 
-    setAccessTokenCookie(token) {
-        document.cookie = 'restricted_access_token=' + token + '; expires=' + (new Date(Date.now()+60000)).toUTCString();
-        console.log(document.cookie);
-    }
-
     async receiveMessage(evt) {
         const msg = evt.data;
         console.log(msg);
@@ -182,14 +195,14 @@ export class UntrustedContentRoot extends Component {
             this.sendMessage('initNeeded');
 
         } else if (msg.type === 'init' && !this.state.initialized) {
-            this.setAccessTokenCookie(msg.data.accessToken);
+            setRestrictedAccessToken(msg.data.accessToken);
             this.setState({
                 initialized: true,
                 contentProps: msg.data.contentProps
             });
 
         } else if (msg.type === 'accessToken') {
-            this.setAccessTokenCookie(msg.data);
+            setRestrictedAccessToken(msg.data);
         } else if (msg.type === 'rpcRequest') {
             const ret = await this.contentNode.onMethodAsync(msg.data.method, msg.data.params);
             this.sendMessage('rpcResponse', {msgId: msg.data.msgId, ret});

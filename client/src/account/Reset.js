@@ -11,6 +11,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import passwordValidator from '../../../shared/password-validator';
 import axios from '../lib/axios';
 import interoperableErrors from '../../../shared/interoperable-errors';
+import {getUrl} from "../lib/urls";
 
 const ResetTokenValidationState = {
     PENDING: 0,
@@ -39,7 +40,7 @@ export default class Account extends Component {
     async validateResetToken() {
         const params = this.props.match.params;
 
-        const response = await axios.post('/rest/password-reset-validate', {
+        const response = await axios.post(getUrl('rest/password-reset-validate'), {
             username: params.username,
             resetToken: params.resetToken
         });
@@ -90,7 +91,7 @@ export default class Account extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Resetting password ...'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, '/rest/password-reset', data => {
+            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/password-reset', data => {
                 delete data.password2;
             });
 

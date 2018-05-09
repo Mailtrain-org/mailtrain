@@ -132,10 +132,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/send-configurations/${this.props.entity.id}`
+            url = `rest/send-configurations/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/send-configurations'
+            url = 'rest/send-configurations'
         }
 
         this.disableForm();
@@ -175,7 +175,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/send-configurations/${this.props.entity.id}`}
+                        deleteUrl={`rest/send-configurations/${this.props.entity.id}`}
                         cudUrl={`/send-configurations/${this.props.entity.id}/edit`}
                         listUrl="/send-configurations"
                         deletingMsg={t('Deleting send configuration ...')}

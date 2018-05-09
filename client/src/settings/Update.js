@@ -55,10 +55,10 @@ export default class Update extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('Saving ...'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.PUT, '/rest/settings');
+        const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.PUT, 'rest/settings');
 
         if (submitSuccessful) {
-            await this.getFormValuesFromURL('/rest/settings');
+            await this.getFormValuesFromURL('rest/settings');
             this.enableForm();
             this.setFormStatusMessage('success', t('Global settings saved'));
         } else {

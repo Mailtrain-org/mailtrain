@@ -21,6 +21,10 @@ function getFilePath(type, entityId, filename) {
     return path.join(path.join(filesDir, type, entityId.toString()), filename);
 }
 
+function getFileUrl(context, type, entityId, filename, getUrl) {
+    return getUrl(`files/${type}/${entityId}/${filename}`, context)
+}
+
 function getFilesTable(type) {
     return entityTypes[type].filesTable;
 }
@@ -46,7 +50,7 @@ async function getFileById(context, type, id) {
     enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
         const file = await tx(getFilesTable(type)).where('id', id).first();
-        await shares.enforceEntityPermissionTx(tx, context, type, file.entity, 'manageFiles');
+        await shares.enforceEntityPermissionTx(tx, context, type, file.entity, 'view');
         return file;
     });
 
@@ -64,7 +68,7 @@ async function getFileById(context, type, id) {
 async function getFileByFilename(context, type, entityId, name) {
     enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, type, entityId, 'view');
+        // XXX - Note that we don't check permissions here. This makes files generally public. However one has to know the generated name of the file.
         const file = await tx(getFilesTable(type)).where({entity: entityId, filename: name}).first();
         return file;
     });
@@ -80,7 +84,17 @@ async function getFileByFilename(context, type, entityId, name) {
     };
 }
 
-async function createFiles(context, type, entityId, files, dontReplace = false) {
+async function getFileByUrl(context, type, entityId, url, getUrl) {
+    const urlPrefix = getUrl(`files/${type}/${entityId}/`, context);
+    if (url.startsWith(urlPrefix)) {
+        const name = url.substring(urlPrefix.length);
+        return await getFileByFilename(context, type, entityId, name);
+    } else {
+        throw new interoperableErrors.NotFoundError();
+    }
+}
+
+async function createFiles(context, type, entityId, files, getUrl = null, dontReplace = false) {
     enforceTypePermitted(type);
     if (files.length == 0) {
         // No files uploaded
@@ -133,14 +147,19 @@ async function createFiles(context, type, entityId, files, dontReplace = false) 
                     size: file.size
                 });
 
-                filesRet.push({
+                const filesRetEntry = {
                     name: file.filename,
                     originalName: originalName,
                     size: file.size,
                     type: file.mimetype,
-                    url: `/files/${type}/${entityId}/${file.filename}`,
-                    thumbnailUrl: `/files/${type}/${entityId}/${file.filename}` // TODO - use smaller thumbnails
-                });
+                };
+
+                if (getUrl) {
+                    filesRetEntry.url = getFileUrl(context, type, entityId, file.filename, getUrl);
+                    filesRetEntry.thumbnailUrl = getFileUrl(context, type, entityId, file.filename, getUrl); // TODO - use smaller thumbnails
+                }
+
+                filesRet.push(filesRetEntry);
 
                 if (existingNameMap.has(originalName)) {
                     removedFiles.push(existingNameMap.get(originalName));
@@ -164,16 +183,16 @@ async function createFiles(context, type, entityId, files, dontReplace = false) 
         // The names should be unique, so overwrite is disabled
         // The directory is created if it does not exist
         // Empty options argument is passed, otherwise fails
-        await fs.move(file.path, filePath, {});
+        await fs.moveAsync(file.path, filePath, {});
     }
     // Remove replaced files from files directory
     for (const file of removedFiles) {
         const filePath = getFilePath(type, entityId, file.filename);
-        await fs.remove(filePath);
+        await fs.removeAsync(filePath);
     }
     // Remove ignored files from upload directory
     for (const file of ignoredFiles) {
-        await fs.remove(file.path);
+        await fs.removeAsync(file.path);
     }
 
     return {
@@ -194,15 +213,18 @@ async function removeFile(context, type, id) {
     });
 
     const filePath = getFilePath(type, file.entity, file.filename);
-    await fs.remove(filePath);
+    await fs.removeAsync(filePath);
 }
 
 module.exports = {
+    filesDir,
     listDTAjax,
     list,
     getFileById,
     getFileByFilename,
+    getFileByUrl,
     createFiles,
     removeFile,
-    filesDir
+    getFileUrl,
+    getFilePath
 };

@@ -63,19 +63,19 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async deleteSubscription(id) {
-        await axios.delete(`/rest/subscriptions/${this.props.list.id}/${id}`);
+        await axios.delete(getUrl(`rest/subscriptions/${this.props.list.id}/${id}`));
         this.blacklistTable.refresh();
     }
 
     @withAsyncErrorHandler
     async unsubscribeSubscription(id) {
-        await axios.post(`/rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`);
+        await axios.post(getUrl(`rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`));
         this.blacklistTable.refresh();
     }
 
     @withAsyncErrorHandler
     async blacklistSubscription(email) {
-        await axios.post("/rest/blacklist", { email });
+        await axios.post(getUrl('rest/blacklist'), { email });
         this.blacklistTable.refresh();
     }
 
@@ -146,7 +146,7 @@ export default class List extends Component {
         ];
 
 
-        let dataUrl = '/rest/subscriptions-table/' + list.id;
+        let dataUrl = 'rest/subscriptions-table/' + list.id;
         if (this.props.segmentId) {
             dataUrl += '/' + this.props.segmentId;
         }

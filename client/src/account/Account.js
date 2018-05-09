@@ -26,7 +26,7 @@ export default class Account extends Component {
 
         this.initForm({
             serverValidation: {
-                url: '/rest/account-validate',
+                url: 'rest/account-validate',
                 changed: ['email', 'currentPassword']
             }
         });
@@ -34,7 +34,7 @@ export default class Account extends Component {
 
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL('/rest/account', data => {
+        await this.getFormValuesFromURL('rest/account', data => {
             data.password = '';
             data.password2 = '';
             data.currentPassword = '';
@@ -113,7 +113,7 @@ export default class Account extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Updating user profile ...'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, '/rest/account', data => {
+            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/account', data => {
                 delete data.password2;
             });
 

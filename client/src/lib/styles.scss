@@ -42,6 +42,12 @@
   opacity: 1;
 }
 
+:global .form-control[disabled] {
+  cursor: default;
+  background-color: #eeeeee;
+  opacity: 1;
+}
+
 :global .ace_editor {
   border: 1px solid #ccc;
 }

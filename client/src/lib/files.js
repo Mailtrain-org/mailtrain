@@ -12,6 +12,7 @@ import {Icon} from "./bootstrap-components";
 import axios from './axios';
 import styles from "./styles.scss";
 import {withPageHelpers} from "./page";
+import {getUrl} from "./urls";
 
 @translate()
 @withErrorHandling
@@ -64,7 +65,7 @@ export default class Files extends Component {
             for (const file of files) {
                 data.append('files[]', file)
             }
-            axios.post(`/rest/files/${this.props.entityTypeId}/${this.props.entity.id}`, data)
+            axios.post(getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entity.id}`), data)
             .then(res => {
                 this.filesTable.refresh();
                 const message = this.getFilesUploadedMessage(res);
@@ -92,7 +93,7 @@ export default class Files extends Component {
 
         try {
             this.setFlashMessage('info', t('Deleting file ...'));
-            await axios.delete(`/rest/files/${this.props.entityTypeId}/${fileToDeleteId}`);
+            await axios.delete(getUrl(`rest/files/${this.props.entityTypeId}/${fileToDeleteId}`));
             this.filesTable.refresh();
             this.setFlashMessage('info', t('File deleted'));
         } catch (err) {
@@ -114,7 +115,7 @@ export default class Files extends Component {
                     if (this.props.usePublicDownloadUrls) {
                         downloadUrl =`/files/${this.props.entityTypeId}/${this.props.entity.id}/${data[2]}`;
                     } else {
-                        downloadUrl =`/rest/files/${this.props.entityTypeId}/${data[0]}`;
+                        downloadUrl =`rest/files/${this.props.entityTypeId}/${data[0]}`;
                     }
 
                     const actions = [
@@ -148,7 +149,7 @@ export default class Files extends Component {
                 <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName="dropZoneActive">
                     {state => state.isDragActive ? t('Drop {{count}} file(s)', {count:state.draggedFiles.length}) : t('Drop files here')}
                 </Dropzone>
-                <Table withHeader ref={node => this.filesTable = node} dataUrl={`/rest/files-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={columns} />
+                <Table withHeader ref={node => this.filesTable = node} dataUrl={`rest/files-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={columns} />
             </div>
         );
     }

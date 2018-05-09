@@ -15,7 +15,7 @@ function getMenus(t) {
                 ':namespaceId([0-9]+)': {
                     title: resolved => t('Namespace "{{name}}"', {name: resolved.namespace.name}),
                     resolve: {
-                        namespace: params => `/rest/namespaces/${params.namespaceId}`
+                        namespace: params => `rest/namespaces/${params.namespaceId}`
                     },
                     link: params => `/namespaces/${params.namespaceId}/edit`,
                     navs: {

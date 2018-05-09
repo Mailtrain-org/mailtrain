@@ -11,6 +11,7 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withForm
@@ -57,7 +58,7 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadTreeData() {
-        const response = await axios.get('/rest/namespaces-tree');
+        const response = await axios.get(getUrl('rest/namespaces-tree'));
         const data = response.data;
         for (const root of data) {
             root.expanded = true;
@@ -112,10 +113,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/namespaces/${this.props.entity.id}`
+            url = `rest/namespaces/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/namespaces'
+            url = 'rest/namespaces'
         }
 
         try {
@@ -182,7 +183,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/namespaces/${this.props.entity.id}`}
+                        deleteUrl={`rest/namespaces/${this.props.entity.id}`}
                         cudUrl={`/namespaces/${this.props.entity.id}/edit`}
                         listUrl="/namespaces"
                         deletingMsg={t('Deleting namespace ...')}

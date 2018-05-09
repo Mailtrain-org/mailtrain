@@ -16,6 +16,7 @@ import axios from './axios';
 import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import styles from "./styles.scss";
+import {getUrl} from "./urls";
 
 //dtFactory();
 //dtSelectFactory();
@@ -122,7 +123,7 @@ class Table extends Component {
     @withAsyncErrorHandler
     async fetchData(data, callback) {
         // This custom ajax fetch function allows us to properly handle the case when the user is not authenticated.
-        const response = await axios.post(this.props.dataUrl, data);
+        const response = await axios.post(getUrl(this.props.dataUrl), data);
         callback(response.data);
     }
 
@@ -138,7 +139,7 @@ class Table extends Component {
                 }
 
                 if (keysToFetch.length > 0) {
-                    const response = await axios.post(this.props.dataUrl, {
+                    const response = await axios.post(getUrl(this.props.dataUrl), {
                         operation: 'getBy',
                         column: this.props.selectionKeyIndex,
                         values: keysToFetch

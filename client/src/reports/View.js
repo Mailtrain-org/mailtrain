@@ -6,6 +6,7 @@ import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
 import { ReportState } from '../../../shared/reports';
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withPageHelpers
@@ -23,8 +24,8 @@ export default class View extends Component {
     @withAsyncErrorHandler
     async loadContent() {
         const id = parseInt(this.props.match.params.id);
-        const contentRespPromise = axios.get(`/rest/report-content/${id}`);
-        const reportRespPromise = axios.get(`/rest/reports/${id}`);
+        const contentRespPromise = axios.get(getUrl(`rest/report-content/${id}`));
+        const reportRespPromise = axios.get(getUrl(`rest/reports/${id}`));
         const [contentResp, reportResp] = await Promise.all([contentRespPromise, reportRespPromise]);
 
         this.setState({

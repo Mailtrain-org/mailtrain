@@ -65,4 +65,9 @@ router.postAsync('/restricted-access-token', passport.loggedIn, async (req, res)
 
 });
 
+router.putAsync('/restricted-access-token', passport.loggedIn, async (req, res) => {
+    await users.refreshRestrictedAccessToken(req.context, req.body.token);
+    return res.json();
+});
+
 module.exports = router;

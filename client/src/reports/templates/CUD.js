@@ -262,10 +262,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/report-templates/${this.props.entity.id}`
+            url = `rest/report-templates/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/report-templates'
+            url = 'rest/report-templates'
         }
 
         this.disableForm();
@@ -275,7 +275,7 @@ export default class CUD extends Component {
 
         if (submitSuccessful) {
             if (stay) {
-                await this.getFormValuesFromURL(`/rest/report-templates/${this.props.entity.id}`);
+                await this.getFormValuesFromURL(`rest/report-templates/${this.props.entity.id}`);
                 this.enableForm();
                 this.setFormStatusMessage('success', t('Report template saved'));
             } else {
@@ -298,7 +298,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/reports/templates/${this.props.entity.id}`}
+                        deleteUrl={`rest/reports/templates/${this.props.entity.id}`}
                         cudUrl={`/reports/templates/${this.props.entity.id}/edit`}
                         listUrl="/reports/templates"
                         deletingMsg={t('Deleting report template ...')}

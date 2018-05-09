@@ -25,8 +25,9 @@
         window.mailtrainConfig = {{{mailtrainConfig}}};
     </script>
 
-    <script src="/mailtrain/common.js"></script>
-    <script src="/mailtrain/root.js"></script>
+    {{#each scriptFiles}}
+    <script src="{{this}}"></script>
+    {{/each}}
     {{/if}}
 </head>
 

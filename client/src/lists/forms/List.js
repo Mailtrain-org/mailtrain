@@ -7,6 +7,7 @@ import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handli
 import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
 import {Icon} from "../../lib/bootstrap-components";
+import {checkPermissions} from "../../lib/permissions";
 
 @translate()
 @withPageHelpers
@@ -21,14 +22,12 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async fetchPermissions() {
-        const request = {
+        const result = await checkPermissions({
             createCustomForm: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createCustomForm']
             }
-        };
-
-        const result = await axios.post('/rest/permissions-check', request);
+        });
 
         this.setState({
             createPermitted: result.data.createCustomForm
@@ -79,7 +78,7 @@ export default class List extends Component {
 
                 <Title>{t('Forms')}</Title>
 
-                <Table withHeader dataUrl="/rest/forms-table" columns={columns} />
+                <Table withHeader dataUrl="rest/forms-table" columns={columns} />
             </div>
         );
     }

@@ -53,7 +53,7 @@ export default class List extends Component {
 
                 <Title>{t('Users')}</Title>
 
-                <Table withHeader dataUrl="/rest/users-table" columns={columns} />
+                <Table withHeader dataUrl="rest/users-table" columns={columns} />
             </div>
         );
     }

@@ -36,7 +36,7 @@ export default class CUD extends Component {
 
         this.initForm({
             serverValidation: {
-                url: `/rest/subscriptions-validate/${this.props.list.id}`,
+                url: `rest/subscriptions-validate/${this.props.list.id}`,
                 changed: ['email'],
                 extra: ['id']
             },
@@ -102,10 +102,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`
+            url = `rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = `/rest/subscriptions/${this.props.list.id}`
+            url = `rest/subscriptions/${this.props.list.id}`
         }
 
         try {
@@ -171,7 +171,7 @@ export default class CUD extends Component {
                             stateOwner={this}
                             visible={this.props.action === 'delete'}
                             actionMethod={HTTPMethod.DELETE}
-                            actionUrl={`/rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`}
+                            actionUrl={`rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`}
                             backUrl={`/lists/${this.props.list.id}/subscriptions/${this.props.entity.id}/edit`}
                             successUrl={`/lists/${this.props.list.id}/subscriptions`}
                             actionInProgressMsg={t('Deleting subscription ...')}

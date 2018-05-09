@@ -153,10 +153,6 @@ function createApp(trusted) {
     }));
 
     app.use(cookieParser());
-    useWith404Fallback('/public', express.static(path.join(__dirname, 'client', 'public')));
-    useWith404Fallback('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
-    useWith404Fallback('/locales', express.static(path.join(__dirname, 'client', 'locales')));
-
     app.use(session({
         store: config.redis.enabled ? new RedisStore(config.redis) : false,
         secret: config.www.secret,
@@ -184,6 +180,10 @@ function createApp(trusted) {
     } else {
         app.use(passport.tryAuthByRestrictedAccessToken);
     }
+
+    useWith404Fallback('/public', express.static(path.join(__dirname, 'client', 'public')));
+    useWith404Fallback('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
+    useWith404Fallback('/locales', express.static(path.join(__dirname, 'client', 'locales')));
 
     /* FIXME - can we remove this???
 

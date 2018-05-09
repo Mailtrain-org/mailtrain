@@ -385,6 +385,16 @@ async function getRestrictedAccessToken(context, method, params) {
     return token;
 }
 
+async function refreshRestrictedAccessToken(context, token) {
+    const tokenEntry = restrictedAccessTokens.get(token);
+
+    if (tokenEntry && tokenEntry.userId === context.user.id) {
+        tokenEntry.expires = Date.now() + 120 * 1000
+    } else {
+        shares.throwPermissionDenied();
+    }
+}
+
 async function getByRestrictedAccessToken(token) {
     const now = Date.now();
     for (const entry of restrictedAccessTokens.values()) {
@@ -398,6 +408,7 @@ async function getByRestrictedAccessToken(token) {
     if (tokenEntry) {
         const user = await getById(contextHelpers.getAdminContext(), tokenEntry.userId);
         user.restrictedAccessHandler = tokenEntry.handler;
+        user.restrictedAccessToken = tokenEntry.token;
 
         return user;
 
@@ -425,5 +436,6 @@ module.exports = {
     resetPassword,
     getByRestrictedAccessToken,
     getRestrictedAccessToken,
+    refreshRestrictedAccessToken,
     registerRestrictedAccessTokenMethod
 };

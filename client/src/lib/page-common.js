@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import {withRouter} from "react-router";
 import {withErrorHandling} from "./error-handling";
 import axios from "../lib/axios";
+import {getUrl} from "./urls";
 
 function needsResolve(route, nextRoute, match, nextMatch) {
     const resolve = route.resolve;
@@ -30,7 +31,7 @@ async function resolve(route, match) {
     const promises = keys.map(key => {
         const url = route.resolve[key](match.params);
         if (url) {
-            return axios.get(url);
+            return axios.get(getUrl(url));
         } else {
             return Promise.resolve({data: null});
         }

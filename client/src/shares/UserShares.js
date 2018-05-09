@@ -9,6 +9,7 @@ import { Table } from '../lib/table';
 import axios from '../lib/axios';
 import mailtrainConfig from 'mailtrainConfig';
 import {Icon} from "../lib/bootstrap-components";
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withPageHelpers
@@ -33,7 +34,7 @@ export default class UserShares extends Component {
             userId: this.props.user.id
         };
 
-        await axios.put('/rest/shares', data);
+        await axios.put(getUrl('rest/shares', data));
         for (const key in this.sharesTables) {
             this.sharesTables[key].refresh();
         }
@@ -70,7 +71,7 @@ export default class UserShares extends Component {
             return (
                 <div>
                     <h3>{title}</h3>
-                    <Table ref={node => this.sharesTables[entityTypeId] = node} withHeader dataUrl={`/rest/shares-table-by-user/${entityTypeId}/${this.props.user.id}`} columns={columns} />
+                    <Table ref={node => this.sharesTables[entityTypeId] = node} withHeader dataUrl={`rest/shares-table-by-user/${entityTypeId}/${this.props.user.id}`} columns={columns} />
                 </div>
             );
         };

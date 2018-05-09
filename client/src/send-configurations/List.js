@@ -18,6 +18,7 @@ import {Table} from '../lib/table';
 import axios from '../lib/axios';
 import moment from 'moment';
 import {getMailerTypes} from './helpers';
+import {checkPermissions} from "../lib/permissions";
 
 
 @translate()
@@ -35,14 +36,12 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async fetchPermissions() {
-        const request = {
+        const result = await checkPermissions({
             createSendConfiguration: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createSendConfiguration']
             }
-        };
-
-        const result = await axios.post('/rest/permissions-check', request);
+        });
 
         this.setState({
             createPermitted: result.data.createSendConfiguration
@@ -96,7 +95,7 @@ export default class List extends Component {
 
                 <Title>{t('Send Configurations')}</Title>
 
-                <Table withHeader dataUrl="/rest/send-configurations-table" columns={columns} />
+                <Table withHeader dataUrl="rest/send-configurations-table" columns={columns} />
             </div>
         );
     }

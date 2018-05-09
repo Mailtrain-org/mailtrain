@@ -1,5 +1,7 @@
 'use strict';
 
+import './lib/public-path';
+
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {
@@ -128,7 +130,7 @@ class Root extends Component {
     }
 
     async logout() {
-        await axios.post('/rest/logout');
+        await axios.post(getUrl('rest/logout'));
         window.location = getUrl();
     }
 

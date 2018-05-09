@@ -20,7 +20,7 @@ function getMenus(t) {
                 ':userId([0-9]+)': {
                     title: resolved => t('User "{{name}}"', {name: resolved.user.name}),
                     resolve: {
-                        user: params => `/rest/users/${params.userId}`
+                        user: params => `rest/users/${params.userId}`
                     },
                     link: params => `/users/${params.userId}/edit`,
                     navs: {

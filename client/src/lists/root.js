@@ -25,14 +25,14 @@ function getMenus(t) {
                 ':listId([0-9]+)': {
                     title: resolved => t('List "{{name}}"', {name: resolved.list.name}),
                     resolve: {
-                        list: params => `/rest/lists/${params.listId}`
+                        list: params => `rest/lists/${params.listId}`
                     },
                     link: params => `/lists/${params.listId}/subscriptions`,
                     navs: {
                         subscriptions: {
                             title: t('Subscribers'),
                             resolve: {
-                                segments: params => `/rest/segments/${params.listId}`,
+                                segments: params => `rest/segments/${params.listId}`,
                             },
                             link: params => `/lists/${params.listId}/subscriptions`,
                             visible: resolved => resolved.list.permissions.includes('viewSubscriptions'),
@@ -41,8 +41,8 @@ function getMenus(t) {
                                 ':subscriptionId([0-9]+)': {
                                     title: resolved => resolved.subscription.email,
                                     resolve: {
-                                        subscription: params => `/rest/subscriptions/${params.listId}/${params.subscriptionId}`,
-                                        fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
+                                        subscription: params => `rest/subscriptions/${params.listId}/${params.subscriptionId}`,
+                                        fieldsGrouped: params => `rest/fields-grouped/${params.listId}`
                                     },
                                     link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
                                     navs: {
@@ -56,7 +56,7 @@ function getMenus(t) {
                                 create: {
                                     title: t('Create'),
                                     resolve: {
-                                        fieldsGrouped: params => `/rest/fields-grouped/${params.listId}`
+                                        fieldsGrouped: params => `rest/fields-grouped/${params.listId}`
                                     },
                                     panelRender: props => <SubscriptionsCUD action="create" list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
                                 }
@@ -76,8 +76,8 @@ function getMenus(t) {
                                 ':fieldId([0-9]+)': {
                                     title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
                                     resolve: {
-                                        field: params => `/rest/fields/${params.listId}/${params.fieldId}`,
-                                        fields: params => `/rest/fields/${params.listId}`
+                                        field: params => `rest/fields/${params.listId}/${params.fieldId}`,
+                                        fields: params => `rest/fields/${params.listId}`
                                     },
                                     link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
                                     navs: {
@@ -91,7 +91,7 @@ function getMenus(t) {
                                 create: {
                                     title: t('Create'),
                                     resolve: {
-                                        fields: params => `/rest/fields/${params.listId}`
+                                        fields: params => `rest/fields/${params.listId}`
                                     },
                                     panelRender: props => <FieldsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
                                 }
@@ -106,8 +106,8 @@ function getMenus(t) {
                                 ':segmentId([0-9]+)': {
                                     title: resolved => t('Segment "{{name}}"', {name: resolved.segment.name}),
                                     resolve: {
-                                        segment: params => `/rest/segments/${params.listId}/${params.segmentId}`,
-                                        fields: params => `/rest/fields/${params.listId}`
+                                        segment: params => `rest/segments/${params.listId}/${params.segmentId}`,
+                                        fields: params => `rest/fields/${params.listId}`
                                     },
                                     link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
                                     navs: {
@@ -121,7 +121,7 @@ function getMenus(t) {
                                 create: {
                                     title: t('Create'),
                                     resolve: {
-                                        fields: params => `/rest/fields/${params.listId}`
+                                        fields: params => `rest/fields/${params.listId}`
                                     },
                                     panelRender: props => <SegmentsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
                                 }
@@ -147,7 +147,7 @@ function getMenus(t) {
                         ':formsId([0-9]+)': {
                             title: resolved => t('Custom Forms "{{name}}"', {name: resolved.forms.name}),
                             resolve: {
-                                forms: params => `/rest/forms/${params.formsId}`
+                                forms: params => `rest/forms/${params.formsId}`
                             },
                             link: params => `/lists/forms/${params.formsId}/edit`,
                             navs: {

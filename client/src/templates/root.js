@@ -20,7 +20,7 @@ function getMenus(t) {
                 ':templateId([0-9]+)': {
                     title: resolved => t('Template "{{name}}"', {name: resolved.template.name}),
                     resolve: {
-                        template: params => `/rest/templates/${params.templateId}`
+                        template: params => `rest/templates/${params.templateId}`
                     },
                     link: params => `/templates/${params.templateId}/edit`,
                     navs: {
@@ -56,7 +56,7 @@ function getMenus(t) {
                         ':mosaiceTemplateId([0-9]+)': {
                             title: resolved => t('Mosaico Template "{{name}}"', {name: resolved.mosaicoTemplate.name}),
                             resolve: {
-                                mosaicoTemplate: params => `/rest/mosaico-templates/${params.mosaiceTemplateId}`
+                                mosaicoTemplate: params => `rest/mosaico-templates/${params.mosaiceTemplateId}`
                             },
                             link: params => `/templates/mosaico/${params.mosaiceTemplateId}/edit`,
                             navs: {

@@ -8,6 +8,7 @@ import { Table } from '../lib/table';
 import axios from '../lib/axios';
 import {Link} from "react-router-dom";
 import {Icon} from "../lib/bootstrap-components";
+import {checkPermissions} from "../lib/permissions";
 
 @translate()
 @withPageHelpers
@@ -22,14 +23,12 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async fetchPermissions() {
-        const request = {
+        const result = await checkPermissions({
             createList: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createList']
             }
-        };
-
-        const result = await axios.post('/rest/permissions-check', request);
+        });
 
         this.setState({
             createPermitted: result.data.createList
@@ -109,7 +108,7 @@ export default class List extends Component {
 
                 <Title>{t('Lists')}</Title>
 
-                <Table withHeader dataUrl="/rest/lists-table" columns={columns} />
+                <Table withHeader dataUrl="rest/lists-table" columns={columns} />
             </div>
         );
     }

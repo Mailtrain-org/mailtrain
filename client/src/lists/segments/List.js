@@ -47,7 +47,7 @@ export default class List extends Component {
 
                 <Title>{t('Segment')}</Title>
 
-                <Table withHeader dataUrl={`/rest/segments-table/${this.props.list.id}`} columns={columns} />
+                <Table withHeader dataUrl={`rest/segments-table/${this.props.list.id}`} columns={columns} />
             </div>
         );
     }

@@ -124,10 +124,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/mosaico-templates/${this.props.entity.id}`
+            url = `rest/mosaico-templates/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/mosaico-templates'
+            url = 'rest/mosaico-templates'
         }
 
         this.disableForm();
@@ -139,7 +139,7 @@ export default class CUD extends Component {
 
         if (submitSuccessful) {
             if (stay) {
-                await this.getFormValuesFromURL(`/rest/mosaico-templates/${this.props.entity.id}`, data => {
+                await this.getFormValuesFromURL(`rest/mosaico-templates/${this.props.entity.id}`, data => {
                     this.templateTypes[data.type].afterLoad(data);
                 });
                 this.enableForm();
@@ -170,7 +170,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/templates/mosaico/${this.props.entity.id}`}
+                        deleteUrl={`rest/mosaico-templates/${this.props.entity.id}`}
                         cudUrl={`/templates/mosaico/${this.props.entity.id}/edit`}
                         listUrl="/templates/mosaico"
                         deletingMsg={t('Deleting Mosaico template ...')}

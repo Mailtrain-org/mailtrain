@@ -22,7 +22,7 @@ function getMenus(t) {
                 ':reportId([0-9]+)': {
                     title: resolved => t('Report "{{name}}"', {name: resolved.report.name}),
                     resolve: {
-                        report: params => `/rest/reports/${params.reportId}`
+                        report: params => `rest/reports/${params.reportId}`
                     },
                     link: params => `/reports/${params.reportId}/edit`,
                     navs: {
@@ -69,7 +69,7 @@ function getMenus(t) {
                         ':templateId([0-9]+)': {
                             title: resolved => t('Template "{{name}}"', {name: resolved.template.name}),
                             resolve: {
-                                template: params => `/rest/report-templates/${params.templateId}`
+                                template: params => `rest/report-templates/${params.templateId}`
                             },
                             link: params => `/reports/templates/${params.templateId}/edit`,
                             navs: {

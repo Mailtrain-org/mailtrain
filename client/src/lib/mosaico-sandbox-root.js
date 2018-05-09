@@ -1,14 +1,13 @@
 'use strict';
 
+import './public-path';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-    I18nextProvider,
-} from 'react-i18next';
+import {I18nextProvider,} from 'react-i18next';
 import i18n from './i18n';
-import styles from "./mosaico.scss";
-import { MosaicoSandbox } from './mosaico';
-import { UntrustedContentRoot } from './untrusted';
+import {MosaicoSandbox} from './mosaico';
+import {UntrustedContentRoot} from './untrusted';
 
 export default function() {
     ReactDOM.render(

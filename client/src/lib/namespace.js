@@ -11,7 +11,7 @@ class NamespaceSelect extends Component {
         const t = this.props.t;
 
         return (
-            <TreeTableSelect id="namespace" label={t('Namespace')} dataUrl="/rest/namespaces-tree"/>
+            <TreeTableSelect id="namespace" label={t('Namespace')} dataUrl="rest/namespaces-tree"/>
         );
     }
 }

@@ -13,6 +13,7 @@ const _ = require('../lib/translate')._;
 const contextHelpers = require('../lib/context-helpers');
 const forms = require('../models/forms');
 const {getTrustedUrl} = require('../lib/urls');
+const bluebird = require('bluebird');
 
 const { SubscriptionStatus } = require('../shared/lists');
 

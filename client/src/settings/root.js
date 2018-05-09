@@ -9,7 +9,7 @@ function getMenus(t) {
             title: t('Global Settings'),
             link: '/settings',
             resolve: {
-                configItems: params => `/rest/settings`
+                configItems: params => `rest/settings`
             },
             panelRender: props => <Update entity={props.resolved.configItems} />
         }

@@ -49,7 +49,6 @@ export function getMailerTypes(t) {
         } else {
             state.setIn([field, 'error'], null);
         }
-
     }
 
     function getInitCommon() {

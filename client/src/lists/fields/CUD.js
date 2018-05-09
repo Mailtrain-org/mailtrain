@@ -34,7 +34,7 @@ export default class CUD extends Component {
 
         this.initForm({
             serverValidation: {
-                url: `/rest/fields-validate/${this.props.list.id}`,
+                url: `rest/fields-validate/${this.props.list.id}`,
                 changed: ['key'],
                 extra: ['id']
             },
@@ -221,10 +221,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/fields/${this.props.list.id}/${this.props.entity.id}`
+            url = `rest/fields/${this.props.list.id}/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = `/rest/fields/${this.props.list.id}`
+            url = `rest/fields/${this.props.list.id}`
         }
 
         try {
@@ -411,7 +411,7 @@ export default class CUD extends Component {
 
                 fieldSettings =
                     <Fieldset label={t('Field settings')}>
-                        <TableSelect id="group" label={t('Group')} withHeader dropdown dataUrl={`/rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('Select group to which the options should belong.')}/>
+                        <TableSelect id="group" label={t('Group')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('Select group to which the options should belong.')}/>
                         <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
                     </Fieldset>;
                 break;
@@ -424,7 +424,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/fields/${this.props.list.id}/${this.props.entity.id}`}
+                        deleteUrl={`rest/fields/${this.props.list.id}/${this.props.entity.id}`}
                         cudUrl={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/edit`}
                         listUrl={`/lists/${this.props.list.id}/fields`}
                         deletingMsg={t('Deleting field ...')}

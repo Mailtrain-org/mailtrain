@@ -9,6 +9,7 @@ import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
 import moment from 'moment';
 import { getTemplateTypes } from './helpers';
+import {checkPermissions} from "../../lib/permissions";
 
 
 @translate()
@@ -26,14 +27,12 @@ export default class List extends Component {
 
     @withAsyncErrorHandler
     async fetchPermissions() {
-        const request = {
+        const result = await checkPermissions({
             createMosaicoTemplate: {
                 entityTypeId: 'namespace',
                 requiredOperations: ['createMosaicoTemplate']
             }
-        };
-
-        const result = await axios.post('/rest/permissions-check', request);
+        });
 
         this.setState({
             createPermitted: result.data.createMosaicoTemplate
@@ -90,7 +89,7 @@ export default class List extends Component {
 
                 <Title>{t('Mosaico Templates')}</Title>
 
-                <Table withHeader dataUrl="/rest/mosaico-templates-table" columns={columns} />
+                <Table withHeader dataUrl="rest/mosaico-templates-table" columns={columns} />
             </div>
         );
     }

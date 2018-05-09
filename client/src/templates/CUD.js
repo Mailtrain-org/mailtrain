@@ -1,30 +1,42 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page'
 import {
-    withForm,
+    Trans,
+    translate
+} from 'react-i18next';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page'
+import {
+    ACEEditor,
+    AlignedRow,
+    Button,
+    ButtonRow,
+    Dropdown,
     Form,
     FormSendMethod,
     InputField,
+    StaticField,
     TextArea,
-    Dropdown,
-    ACEEditor,
-    ButtonRow,
-    Button,
-    AlignedRow,
-    StaticField
+    withForm
 } from '../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { validateNamespace, NamespaceSelect } from '../lib/namespace';
+import {withErrorHandling} from '../lib/error-handling';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import { getTemplateTypes } from './helpers';
+import {getTemplateTypes} from './helpers';
 import {ActionLink} from "../lib/bootstrap-components";
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
+import {getUrl} from "../lib/urls";
 
 
 @translate()
@@ -43,7 +55,11 @@ export default class CUD extends Component {
             elementInFullscreen: false
         };
 
-        this.initForm();
+        this.initForm({
+            onChangeBeforeValidation: {
+                type: ::this.onTypeChanged
+            }
+        });
     }
 
     static propTypes = {
@@ -52,9 +68,17 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
+    onTypeChanged(mutState, key, oldType, type) {
+        if (type) {
+            this.templateTypes[type].afterTypeChange(mutState);
+        }
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity);
+            this.getFormValuesFromEntity(this.props.entity, data => {
+                this.templateTypes[data.type].afterLoad(data);
+            });
         } else {
             this.populateFormValues({
                 name: '',
@@ -63,7 +87,8 @@ export default class CUD extends Component {
                 type: mailtrainConfig.editors[0],
                 text: '',
                 html: '',
-                data: {}
+                data: {},
+                ...this.templateTypes[mailtrainConfig.editors[0]].initData()
             });
         }
     }
@@ -77,13 +102,18 @@ export default class CUD extends Component {
             state.setIn(['name', 'error'], null);
         }
 
-        if (!state.getIn(['type', 'value'])) {
+        const typeKey = state.getIn(['type', 'value']);
+        if (!typeKey) {
             state.setIn(['type', 'error'], t('Type must be selected'));
         } else {
             state.setIn(['type', 'error'], null);
         }
 
         validateNamespace(t, state);
+
+        if (typeKey) {
+            this.templateTypes[typeKey].validate(state);
+        }
     }
 
     async submitHandler() {
@@ -91,22 +121,23 @@ export default class CUD extends Component {
 
         if (this.props.entity) {
             const typeKey = this.getFormValue('type');
-            await this.templateTypes[typeKey].htmlEditorBeforeSave(this);
+            await this.templateTypes[typeKey].exportHTMLEditorData(this);
         }
 
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/templates/${this.props.entity.id}`
+            url = `rest/templates/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/templates'
+            url = 'rest/templates'
         }
 
         this.disableForm();
         this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            this.templateTypes[data.type].beforeSave(data);
         });
 
         if (submitResponse) {
@@ -123,7 +154,7 @@ export default class CUD extends Component {
 
     async extractPlainText() {
         const typeKey = this.getFormValue('type');
-        await this.templateTypes[typeKey].htmlEditorBeforeSave(this);
+        await this.templateTypes[typeKey].exportHTMLEditorData(this);
 
         const html = this.getFormValue('html');
         if (!html) {
@@ -137,7 +168,7 @@ export default class CUD extends Component {
 
         this.disableForm();
 
-        const response = await axios.post('/rest/html-to-text', { html });
+        const response = await axios.post(getUrl('rest/html-to-text', { html }));
 
         this.updateFormValue('text', response.data.text);
 
@@ -258,6 +289,14 @@ export default class CUD extends Component {
             </div>
         }
 
+        let typeForm = null;
+        if (typeKey) {
+            typeForm = <div>
+                {this.templateTypes[typeKey].getTypeForm(this, isEdit)}
+            </div>;
+        }
+
+
 
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
@@ -265,7 +304,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/templates/${this.props.entity.id}`}
+                        deleteUrl={`rest/templates/${this.props.entity.id}`}
                         cudUrl={`/templates/${this.props.entity.id}/edit`}
                         listUrl="/templates"
                         deletingMsg={t('Deleting template ...')}
@@ -287,6 +326,7 @@ export default class CUD extends Component {
                         <Dropdown id="type" label={t('Type')} options={typeOptions}/>
                     }
 
+                    {typeForm}
 
                     <NamespaceSelect/>
 

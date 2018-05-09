@@ -5,6 +5,7 @@ import { translate } from 'react-i18next';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
+import {getUrl} from "../lib/urls";
 
 @translate()
 @withPageHelpers
@@ -22,8 +23,8 @@ export default class Output extends Component {
     @withAsyncErrorHandler
     async loadOutput() {
         const id = parseInt(this.props.match.params.id);
-        const outputRespPromise = axios.get(`/rest/report-output/${id}`);
-        const reportRespPromise = axios.get(`/rest/reports/${id}`);
+        const outputRespPromise = axios.get(getUrl(`rest/report-output/${id}`));
+        const reportRespPromise = axios.get(getUrl(`rest/reports/${id}`));
         const [outputResp, reportResp] = await Promise.all([outputRespPromise, reportRespPromise]);
 
         this.setState({

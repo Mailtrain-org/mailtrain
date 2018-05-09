@@ -52,7 +52,7 @@ export default class CUD extends Component {
 
         this.initForm({
             serverValidation: {
-                url: '/rest/forms-validate',
+                url: 'rest/forms-validate',
                 changed: this.serverValidatedFields
             }
         });
@@ -316,10 +316,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `/rest/forms/${this.props.entity.id}`
+            url = `rest/forms/${this.props.entity.id}`
         } else {
             sendMethod = FormSendMethod.POST;
-            url = '/rest/forms'
+            url = 'rest/forms'
         }
 
         this.disableForm();
@@ -374,7 +374,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`/rest/forms/${this.props.entity.id}`}
+                        deleteUrl={`rest/forms/${this.props.entity.id}`}
                         cudUrl={`/lists/forms/${this.props.entity.id}/edit`}
                         listUrl="/lists/forms"
                         deletingMsg={t('Deleting form ...')}
@@ -391,7 +391,7 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     <Fieldset label={t('Forms Preview')}>
-                        <TableSelect id="previewList" label={t('List To Preview On')} withHeader dropdown dataUrl='/rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('Select list whose fields will be used to preview the forms.')}/>
+                        <TableSelect id="previewList" label={t('List To Preview On')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('Select list whose fields will be used to preview the forms.')}/>
 
                         { previewListId &&
                             <AlignedRow>
