@@ -7,8 +7,14 @@ import styles from "./mosaico.scss";
 
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
-import {getUrl} from "./urls";
-import {base, unbase} from "../../../shared/templates";
+import {
+    getSandboxUrl,
+    getTrustedUrl
+} from "./urls";
+import {
+    base,
+    unbase
+} from "../../../shared/templates";
 
 
 export const ResourceType = {
@@ -62,7 +68,7 @@ export class MosaicoEditor extends Component {
         return (
             <div className={this.state.fullscreen ? styles.editorFullscreen : styles.editor}>
                 <div className={styles.navbar}>
-                    {this.state.fullscreen && <img className={styles.logo} src={getUrl('public/mailtrain-notext.png')}/>}
+                    {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('public/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
                 </div>
@@ -96,8 +102,6 @@ export class MosaicoSandbox extends Component {
     }
 
     componentDidMount() {
-        const publicPath = 'public/mosaico';
-
         if (!Mosaico.isCompatible()) {
             alert('Update your browser!');
             return;
@@ -123,23 +127,24 @@ export class MosaicoSandbox extends Component {
 
         plugins.unshift(vm => {
             // This is an override of the default paths in Mosaico
-            vm.logoPath = getUrl(publicPath + '/img/mosaico32.png');
+            vm.logoPath = getTrustedUrl('public/mosaico/img/mosaico32.png');
             vm.logoUrl = '#';
         });
 
         const config = {
-            imgProcessorBackend: getUrl(`mosaico/img/${this.props.entityTypeId}/${this.props.entityId}`),
-            emailProcessorBackend: getUrl('mosaico/dl/'),
+            imgProcessorBackend: getTrustedUrl(`mosaico/img/${this.props.entityTypeId}/${this.props.entityId}`),
+            emailProcessorBackend: getSandboxUrl('mosaico/dl/'),
             fileuploadConfig: {
-                url: getUrl(`mosaico/upload/${this.props.entityTypeId}/${this.props.entityId}`)
+                url: getSandboxUrl(`mosaico/upload/${this.props.entityTypeId}/${this.props.entityId}`)
             },
             strings: window.mosaicoLanguageStrings
         };
 
-        const urlBase = getUrl();
-        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, urlBase));
-        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, urlBase));
-        const template = getUrl(`mosaico/templates/${this.props.templateId}/index.html`);
+        const sandboxUrlBase = getSandboxUrl();
+        const trustedUrlBase = getTrustedUrl();
+        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, trustedUrlBase, sandboxUrlBase));
+        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, trustedUrlBase, sandboxUrlBase));
+        const template = getSandboxUrl(`mosaico/templates/${this.props.templateId}/index.html`);
 
         const allPlugins = plugins.concat(window.mosaicoPlugins);
 
@@ -148,11 +153,12 @@ export class MosaicoSandbox extends Component {
 
     async onMethodAsync(method, params) {
         if (method === 'exportState') {
-            const urlBase = getUrl();
+            const sandboxUrlBase = getSandboxUrl();
+            const trustedUrlBase = getTrustedUrl();
             return {
-                html: unbase(this.viewModel.exportHTML(), urlBase),
-                model: unbase(this.viewModel.exportJSON(), urlBase),
-                metadata: unbase(this.viewModel.exportMetadata(), urlBase)
+                html: unbase(this.viewModel.exportHTML(), trustedUrlBase, sandboxUrlBase, true),
+                model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase),
+                metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase)
             };
         }
     }

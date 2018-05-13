@@ -21,6 +21,7 @@ const templates = require('../models/templates');
 const mosaicoTemplates = require('../models/mosaico-templates');
 
 const contextHelpers = require('../lib/context-helpers');
+const interoperableErrors = require('../shared/interoperable-errors');
 
 const { getTrustedUrl, getSandboxUrl } = require('../lib/urls');
 const { base } = require('../shared/templates');
@@ -125,43 +126,35 @@ function sanitizeSize(val, min, max, defaultVal, allowNull) {
 function getRouter(trusted) {
     const router = routerFactory.create();
     
-    const getUrl = trusted ? getTrustedUrl : getSandboxUrl; 
-
-    router.getAsync('/img/:type/:entityId', passport.loggedIn, async (req, res) => {
-        const method = req.query.method;
-        const params = req.query.params;
-        let [width, height] = params.split(',');
-        let image;
-
-        if (method === 'placeholder') {
-            width = sanitizeSize(width, 1, 2048, 600, false);
-            height = sanitizeSize(height, 1, 2048, 300, false);
-            image = await placeholderImage(width, height);
-
-        } else {
-            width = sanitizeSize(width, 1, 2048, 600, false);
-            height = sanitizeSize(height, 1, 2048, 300, true);
-
-            const file = await files.getFileByUrl(req.context, req.params.type, req.params.entityId, req.query.src, getUrl);
-            image = await resizedImage(file.path, method, width, height);
-        }
-
-        res.set('Content-Type', 'image/' + image.format);
-        image.stream.pipe(res);
-    });
-
-    router.getAsync('/templates/:mosaicoTemplateId/index.html', passport.loggedIn, async (req, res) => {
-        const tmpl = await mosaicoTemplates.getById(req.context, req.params.mosaicoTemplateId);
-
-        res.set('Content-Type', 'text/html');
-        res.send(base(tmpl.data.html, getUrl('', req.context)));
-    });
-
-    router.use('/templates/:mosaicoTemplateId', express.static(path.join(__dirname, '..', 'client', 'public', 'mosaico', 'templates', 'versafix-1')));
-
-    
     if (!trusted) {
-        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', getUrl, true);
+        router.getAsync('/templates/:mosaicoTemplateId/index.html', passport.loggedIn, async (req, res) => {
+            const tmpl = await mosaicoTemplates.getById(req.context, req.params.mosaicoTemplateId);
+
+            res.set('Content-Type', 'text/html');
+            res.send(base(tmpl.data.html, getTrustedUrl(), getSandboxUrl('', req.context)));
+        });
+
+        // Mosaico looks for block thumbnails in edres folder relative to index.html of the template. We respond to such requests here.
+        // We use the following naming convention in Mosaico templates for the block thumbnails: edres/xxx -> edres-xxx
+        router.getAsync('/templates/:mosaicoTemplateId/edres/:fileName', async (req, res, next) => {
+            try {
+                const file = await files.getFileByOriginalName(contextHelpers.getAdminContext(), 'mosaicoTemplate', req.params.mosaicoTemplateId, req.params.fileName);
+                res.type(file.mimetype);
+                return res.download(file.path, file.name);
+            } catch (err) {
+                if (err instanceof interoperableErrors.NotFoundError) {
+                    next();
+                } else {
+                    throw err;
+                }
+            }
+        });
+
+        // This is a fallback to versafix-1 if the block thumbnail is not defined by the template
+        router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', 'client', 'public', 'mosaico', 'templates', 'versafix-1', 'edres')));
+
+
+        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', getSandboxUrl, true);
 
         router.getAsync('/upload/:type/:entityId', passport.loggedIn, async (req, res) => {
             const entries = await files.list(req.context, req.params.type, req.params.entityId);
@@ -170,9 +163,9 @@ function getRouter(trusted) {
             for (const entry of entries) {
                 filesOut.push({
                     name: entry.originalname,
-                    url: files.getFileUrl(req.context, req.params.type, req.params.entityId, entry.filename, getUrl),
+                    url: files.getFileUrl(req.context, req.params.type, req.params.entityId, entry.filename),
                     size: entry.size,
-                    thumbnailUrl: files.getFileUrl(req.context, req.params.type, req.params.entityId, entry.filename, getUrl) // TODO - use smaller thumbnails
+                    thumbnailUrl: files.getFileUrl(req.context, req.params.type, req.params.entityId, entry.filename) // TODO - use smaller thumbnails
                 })
             }
 
@@ -204,11 +197,37 @@ function getRouter(trusted) {
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
-                    getUrl('mailtrain/common.js'),
-                    getUrl('mailtrain/mosaico.js')
+                    getSandboxUrl('mailtrain/common.js'),
+                    getSandboxUrl('mailtrain/mosaico.js')
                 ],
-                mosaicoPublicPath: getUrl('public/mosaico')
+                mosaicoPublicPath: getSandboxUrl('public/mosaico')
             });
+        });
+
+    } else {
+        router.getAsync('/img/:type/:entityId', async (req, res) => {
+            const method = req.query.method;
+            const params = req.query.params;
+            let [width, height] = params.split(',');
+            let image;
+
+
+            // FIXME - cache the generated files !!!
+            if (method === 'placeholder') {
+                width = sanitizeSize(width, 1, 2048, 600, false);
+                height = sanitizeSize(height, 1, 2048, 300, false);
+                image = await placeholderImage(width, height);
+
+            } else {
+                width = sanitizeSize(width, 1, 2048, 600, false);
+                height = sanitizeSize(height, 1, 2048, 300, true);
+
+                const file = await files.getFileByUrl(contextHelpers.getAdminContext(), req.params.type, req.params.entityId, req.query.src);
+                image = await resizedImage(file.path, method, width, height);
+            }
+
+            res.set('Content-Type', 'image/' + image.format);
+            image.stream.pipe(res);
         });
     }
 

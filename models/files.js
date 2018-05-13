@@ -8,6 +8,7 @@ const fs = require('fs-extra-promise');
 const path = require('path');
 const interoperableErrors = require('../shared/interoperable-errors');
 const permissions = require('../lib/permissions');
+const {getTrustedUrl} = require('../lib/urls');
 
 const entityTypes = permissions.getEntityTypes();
 
@@ -21,8 +22,8 @@ function getFilePath(type, entityId, filename) {
     return path.join(path.join(filesDir, type, entityId.toString()), filename);
 }
 
-function getFileUrl(context, type, entityId, filename, getUrl) {
-    return getUrl(`files/${type}/${entityId}/${filename}`, context)
+function getFileUrl(context, type, entityId, filename) {
+    return getTrustedUrl(`files/${type}/${entityId}/${filename}`, context)
 }
 
 function getFilesTable(type) {
@@ -65,11 +66,11 @@ async function getFileById(context, type, id) {
     };
 }
 
-async function getFileByFilename(context, type, entityId, name) {
+async function _getFileBy(context, type, entityId, key, value) {
     enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
-        // XXX - Note that we don't check permissions here. This makes files generally public. However one has to know the generated name of the file.
-        const file = await tx(getFilesTable(type)).where({entity: entityId, filename: name}).first();
+        await shares.enforceEntityPermissionTx(tx, context, type, entityId, 'view');
+        const file = await tx(getFilesTable(type)).where({entity: entityId, [key]: value}).first();
         return file;
     });
 
@@ -84,8 +85,16 @@ async function getFileByFilename(context, type, entityId, name) {
     };
 }
 
-async function getFileByUrl(context, type, entityId, url, getUrl) {
-    const urlPrefix = getUrl(`files/${type}/${entityId}/`, context);
+async function getFileByOriginalName(context, type, entityId, name) {
+    return await _getFileBy(context, type, entityId, 'originalname', name)
+}
+
+async function getFileByFilename(context, type, entityId, name) {
+    return await _getFileBy(context, type, entityId, 'filename', name)
+}
+
+async function getFileByUrl(context, type, entityId, url) {
+    const urlPrefix = getTrustedUrl(`files/${type}/${entityId}/`, context);
     if (url.startsWith(urlPrefix)) {
         const name = url.substring(urlPrefix.length);
         return await getFileByFilename(context, type, entityId, name);
@@ -154,10 +163,8 @@ async function createFiles(context, type, entityId, files, getUrl = null, dontRe
                     type: file.mimetype,
                 };
 
-                if (getUrl) {
-                    filesRetEntry.url = getFileUrl(context, type, entityId, file.filename, getUrl);
-                    filesRetEntry.thumbnailUrl = getFileUrl(context, type, entityId, file.filename, getUrl); // TODO - use smaller thumbnails
-                }
+                filesRetEntry.url = getFileUrl(context, type, entityId, file.filename);
+                filesRetEntry.thumbnailUrl = getFileUrl(context, type, entityId, file.filename); // TODO - use smaller thumbnails
 
                 filesRet.push(filesRetEntry);
 
@@ -223,6 +230,7 @@ module.exports = {
     getFileById,
     getFileByFilename,
     getFileByUrl,
+    getFileByOriginalName,
     createFiles,
     removeFile,
     getFileUrl,
