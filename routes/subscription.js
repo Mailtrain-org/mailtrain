@@ -185,6 +185,7 @@ async function _renderSubscribe(req, res, list, subscription) {
 
     data.isWeb = true;
     data.needsJsWarning = true;
+
     data.flashMessages = await captureFlashMessages(res);
 
     const result = htmlRenderer(data);

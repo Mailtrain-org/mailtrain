@@ -65,11 +65,13 @@ hbs.registerPartials(__dirname + '/views/subscription/partials/');
  * and the message is never displayed
  */
 hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer-arrow-callback
+    console.log(this.flash);
     if (typeof this.flash !== 'function') { // eslint-disable-line no-invalid-this
         return '';
     }
 
     let messages = this.flash(); // eslint-disable-line no-invalid-this
+    console.log(messages);
     let response = [];
 
     // group messages by type
@@ -185,9 +187,15 @@ function createApp(trusted) {
     useWith404Fallback('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
     useWith404Fallback('/locales', express.static(path.join(__dirname, 'client', 'locales')));
 
-    /* FIXME - can we remove this???
 
-    // make sure flash messages are available
+    // Make sure flash messages are available
+    // Currently, flash messages are used only from routes/subscription.js
+    app.use((req, res, next) => {
+        res.locals.flash = req.flash.bind(req);
+        next();
+    });
+
+    /* FIXME - can we remove this???
     app.use((req, res, next) => {
         res.locals.flash = req.flash.bind(req);
         res.locals.user = req.user;

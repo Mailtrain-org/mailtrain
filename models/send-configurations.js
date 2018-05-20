@@ -114,7 +114,7 @@ async function remove(context, id) {
 }
 
 async function getSystemSendConfiguration() {
-    return await getById(contextHelpers.getAdminContext(), getSystemSendConfigurationId());
+    return await getById(contextHelpers.getAdminContext(), getSystemSendConfigurationId(), false);
 }
 
 module.exports = {
