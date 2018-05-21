@@ -3027,7 +3027,7 @@ msgstr "Tu dirección email"
 
 #: views/users/account.hbs:9
 msgid ""
-"This address is used for account recovery in case you loose your password"
+"This address is used for account recovery in case you lose your password"
 msgstr ""
 "Este email es usado para recuperar una cuenta en caso de que no recuerdes la "
 "contraseña"

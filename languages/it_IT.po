@@ -2944,7 +2944,7 @@ msgstr "Il tuo indirizzo email"
 
 #: views/users/account.hbs:9
 msgid ""
-"This address is used for account recovery in case you loose your password"
+"This address is used for account recovery in case you lose your password"
 msgstr "Questo indirizzo è utilizzato per il recupero della password"
 
 #: views/users/account.hbs:10
