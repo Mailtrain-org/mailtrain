@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-04 00:45+0200\n"
-"PO-Revision-Date: 2018-03-06 14:51+0100\n"
+"PO-Revision-Date: 2018-03-07 14:12+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -918,16 +918,16 @@ msgstr "Mailtrain bietet auch benutzerdefinierte Formulare."
 
 #: views/index.hbs:8
 msgid "List Segmentation"
-msgstr "Listen Segementierung"
+msgstr "Segmentierung"
 
 #: views/index.hbs:9
 msgid ""
 "Send messages only to list subscribers that match predefined segmentation "
 "rules. No need to create separate lists with small differences."
 msgstr ""
-"Senden Sie nur Nachrichten an Abonnenten welche die vordefinierten "
-"Segmentierungsregeln erfüllen. Keine Notwendigkeit, separate Listen mit "
-"kleinen Unterschieden zu erstellen."
+"Senden Sie nur Nachrichten an Abonnenten, welche die vordefinierten "
+"Segmentierungsregeln erfüllen. Es besteht keine Notwendigkeit, separate "
+"Listen mit kleinen Unterschieden zu erstellen."
 
 #: views/index.hbs:11
 msgid "RSS Campaigns"
@@ -2386,7 +2386,7 @@ msgstr "VERP verwenden um bounces zu erfassen"
 
 #: views/settings.hbs:71
 msgid "Server hostname"
-msgstr "Server Hostname"
+msgstr "Hostname"
 
 #: views/settings.hbs:72
 msgid "The VERP server hostname, eg. bounces.example.com"
@@ -2462,7 +2462,7 @@ msgstr ""
 
 #: views/settings.hbs:84
 msgid "DKIM Signing by ZoneMTA"
-msgstr "DKIM Signing by ZoneMTA"
+msgstr "DKIM Signing durch ZoneMTA"
 
 #: views/settings.hbs:85
 msgid ""
@@ -2507,7 +2507,7 @@ msgstr "DKIM Domain"
 
 #: views/settings.hbs:91
 msgid "Domain name for the DKIM key"
-msgstr "Domain-Name für den DKIM Key"
+msgstr "Domain-Name für den DKIM-Key"
 
 #: views/settings.hbs:92
 msgid "Leave blank to use the sender email address domain"
@@ -2731,7 +2731,7 @@ msgstr "Einstellungen aktualisieren"
 
 #: views/subscription/web-subscribe.mjml.hbs:1
 msgid "Subscribe to List"
-msgstr "Diese Liste Abonnieren"
+msgstr "Diese Liste abonnieren"
 
 #: views/subscription/web-subscribed.mjml.hbs:3
 msgid "Thank you for subscribing!"
