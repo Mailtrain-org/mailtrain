@@ -14,6 +14,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const contextHelpers = require('../lib/context-helpers');
 const shares = require('../models/shares');
 const slugify = require('slugify');
+const passport = require('../lib/passport');
 
 class APIError extends Error {
     constructor(msg, status) {
@@ -23,9 +24,10 @@ class APIError extends Error {
 }
 
 
-router.postAsync('/subscribe/:listId', async (req, res) => {
-    const listId = req.params.listId;
-    
+router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
+    const list = await lists.getByCid(req.context, req.params.listCid);
+    await shares.enforceEntityPermission(req.context, 'list', list.id, 'manageSubscriptions');
+
     const input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -37,31 +39,28 @@ router.postAsync('/subscribe/:listId', async (req, res) => {
 
     const emailErr = await tools.validateEmail(input.EMAIL, false);
     if (emailErr) {
-        const errMsg = tools.validateEmailGetMessage(emailErr, email);
+        const errMsg = tools.validateEmailGetMessage(emailErr, input.email);
         log.error('API', errMsg);
         throw new APIError(errMsg, 400);
     }
 
+    const subscription = await fields.fromPost(req.context, list.id, input, true);
+
     if (input.TIMEZONE) {
         subscription.tz = (input.TIMEZONE || '').toString().trim();
     }
-
-    const subscription = await fields.fromPost(req.context, listId);
 
     if (/^(yes|true|1)$/i.test(input.FORCE_SUBSCRIBE)) {
         subscription.status = SubscriptionStatus.SUBSCRIBED;
     }
 
     if (/^(yes|true|1)$/i.test(input.REQUIRE_CONFIRMATION)) { // if REQUIRE_CONFIRMATION is set, we assume that the user is not subscribed and will be subscribed
-        const list = await lists.getByCid(contextHelpers.getAdminContext(), listId);
-        await shares.enforceEntityPermission(req.context, 'list', listId, 'manageSubscriptions');
-
         const data = {
-            email,
+            email: input.EMAIL,
             subscriptionData: subscription
         };
 
-        const confirmCid = await confirmations.addConfirmation(listId, 'subscribe', req.ip, data);
+        const confirmCid = await confirmations.addConfirmation(list.id, 'subscribe', req.ip, data);
         await mailHelpers.sendConfirmSubscription(list, input.EMAIL, confirmCid, subscription);
 
         res.status(200);
@@ -74,10 +73,11 @@ router.postAsync('/subscribe/:listId', async (req, res) => {
         subscription.email = input.EMAIL;
 
         const meta = {
-            updateAllowed: true
+            updateAllowed: true,
+            subscribeIfNoExisting: true
         };
 
-        await subscriptions.create(req.context, listId, subscription, meta);
+        await subscriptions.create(req.context, list.id, subscription, meta);
 
         res.status(200);
         res.json({
@@ -89,7 +89,8 @@ router.postAsync('/subscribe/:listId', async (req, res) => {
 });
 
 
-router.postAsync('/unsubscribe/:listId', async (req, res) => {
+router.postAsync('/unsubscribe/:listCid', passport.loggedIn, async (req, res) => {
+    const list = await lists.getByCid(req.context, req.params.listCid);
     const input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -99,7 +100,7 @@ router.postAsync('/unsubscribe/:listId', async (req, res) => {
         throw new APIError('Missing EMAIL', 400);
     }
 
-    const subscription = await subscriptions.unsubscribeByEmailAndGet(req.context, req.params.listId, input.EMAIL);
+    const subscription = await subscriptions.unsubscribeByEmailAndGet(req.context, list.id, input.EMAIL);
 
     res.status(200);
     res.json({
@@ -111,7 +112,8 @@ router.postAsync('/unsubscribe/:listId', async (req, res) => {
 });
 
 
-router.postAsync('/delete/:listId', async (req, res) => {
+router.postAsync('/delete/:listCid', passport.loggedIn, async (req, res) => {
+    const list = await lists.getByCid(req.context, req.params.listCid);
     const input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -121,7 +123,7 @@ router.postAsync('/delete/:listId', async (req, res) => {
         throw new APIError('Missing EMAIL', 400);
     }
 
-    const subscription = await subscriptions.removeByEmailAndGet(req.context, req.params.listId, input.EMAIL);
+    const subscription = await subscriptions.removeByEmailAndGet(req.context, list.id, input.EMAIL);
 
     res.status(200);
     res.json({
@@ -133,11 +135,12 @@ router.postAsync('/delete/:listId', async (req, res) => {
 });
 
 
-router.getAsync('/subscriptions/:listId', async (req, res) => {
+router.getAsync('/subscriptions/:listCid', passport.loggedIn, async (req, res) => {
+    const list = await lists.getByCid(req.context, req.params.listCid);
     const start = parseInt(req.query.start || 0, 10);
     const limit = parseInt(req.query.limit || 10000, 10);
 
-    const { subscriptions, total } = await subscriptions.list(req.params.listId, false, start, limit);
+    const { subscriptions, total } = await subscriptions.list(list.id, false, start, limit);
 
     res.status(200);
     res.json({
@@ -150,7 +153,7 @@ router.getAsync('/subscriptions/:listId', async (req, res) => {
     });
 });
 
-router.getAsync('/lists/:email', async (req, res) => {
+router.getAsync('/lists/:email', passport.loggedIn, async (req, res) => {
     const lists = await subscriptions.getListsWithEmail(req.context, req.params.email);
 
     res.status(200);
@@ -160,7 +163,8 @@ router.getAsync('/lists/:email', async (req, res) => {
 });
 
 
-router.postAsync('/field/:listId', async (req, res) => {
+router.postAsync('/field/:listCid', passport.loggedIn, async (req, res) => {
+    const list = await lists.getByCid(req.context, req.params.listCid);
     const input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -211,7 +215,7 @@ router.postAsync('/field/:listId', async (req, res) => {
         orderManageBefore: visible ? 'end' : 'none'
     };
 
-    const id = await fields.create(req.context, req.params.listId, field);
+    const id = await fields.create(req.context, list.id, field);
 
     res.status(200);
     res.json({
@@ -223,7 +227,7 @@ router.postAsync('/field/:listId', async (req, res) => {
 });
 
 
-router.postAsync('/blacklist/add', async (req, res) => {
+router.postAsync('/blacklist/add', passport.loggedIn, async (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -240,7 +244,7 @@ router.postAsync('/blacklist/add', async (req, res) => {
 });
 
 
-router.postAsync('/blacklist/delete', async (req, res) => {
+router.postAsync('/blacklist/delete', passport.loggedIn, async (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -257,7 +261,7 @@ router.postAsync('/blacklist/delete', async (req, res) => {
 });
 
 
-router.getAsync('/blacklist/get', async (req, res) => {
+router.getAsync('/blacklist/get', passport.loggedIn, async (req, res) => {
     let start = parseInt(req.query.start || 0, 10);
     let limit = parseInt(req.query.limit || 10000, 10);
     let search = req.query.search || '';

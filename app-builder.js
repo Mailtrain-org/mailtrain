@@ -65,17 +65,15 @@ hbs.registerPartials(__dirname + '/views/subscription/partials/');
  * and the message is never displayed
  */
 hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer-arrow-callback
-    console.log(this.flash);
     if (typeof this.flash !== 'function') { // eslint-disable-line no-invalid-this
         return '';
     }
 
-    let messages = this.flash(); // eslint-disable-line no-invalid-this
-    console.log(messages);
-    let response = [];
+    const messages = this.flash(); // eslint-disable-line no-invalid-this
+    const response = [];
 
     // group messages by type
-    Object.keys(messages).forEach(key => {
+    for (const key in messages) {
         let el = '<div class="alert alert-' + key + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
 
         if (key === 'danger') {
@@ -84,11 +82,9 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
 
         let rows = [];
 
-        messages[key].forEach(message => {
-            message = hbs.handlebars.escapeExpression(message);
-            message = message.replace(/(\r\n|\n|\r)/gm, '<br>');
-            rows.push(message);
-        });
+        for (const message of messages[key]) {
+            rows.push(hbs.handlebars.escapeExpression(message).replace(/(\r\n|\n|\r)/gm, '<br>'));
+        }
 
         if (rows.length > 1) {
             el += '<p>' + rows.join('</p>\n<p>') + '</p>';
@@ -99,7 +95,7 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
         el += '</div>';
 
         response.push(el);
-    });
+    }
 
     return new hbs.handlebars.SafeString(
         response.join('\n')
@@ -375,7 +371,7 @@ function createApp(trusted) {
                     data: []
                 };
 
-                return status(err.status || 500).json(resp);
+                return res.status(err.status || 500).json(resp);
 
             } else {
                 // TODO: Render interoperable errors using a special client that does internationalization of the error message

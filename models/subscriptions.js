@@ -400,11 +400,17 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     }
     const existingWithKey = await existingWithKeyQuery.first();
     if (existingWithKey) {
-        if (meta && (meta.updateAllowed || meta.updateOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED)) {
+        if (meta && (meta.updateAllowed || (meta.updateOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED))) {
             meta.update = true;
             meta.existing = existingWithKey;
         } else {
             throw new interoperableErrors.DuplicitEmailError();
+        }
+    } else {
+        // This is here because of the API, which allows one to send subscriptions without caring about whether they already exist, what their status is, etc.
+        // In the case, the subscription is existing, we should not change the status. If it does not exist, we are fine with changing the status
+        if (meta.subscribeIfNoExisting && !entity.status) {
+            entity.status = SubscriptionStatus.SUBSCRIBED;
         }
     }
 
@@ -455,8 +461,8 @@ async function _create(tx, listId, filteredEntity) {
 
 /*
     Adds a new subscription. Returns error if a subscription with the same email address is already present and is not unsubscribed.
-    If it is unsubscribed, the existing subscription is changed based on the provided data.
-    If meta.partial is true, it updates even an active subscription.
+    If it is unsubscribed and meta.updateOfUnsubscribedAllowed, the existing subscription is changed based on the provided data.
+    If meta.updateAllowed is true, it updates even an active subscription.
  */
 async function create(context, listId, entity, meta /* meta is provided when called from /confirm/subscribe/:cid */) {
     return await knex.transaction(async tx => {

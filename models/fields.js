@@ -583,11 +583,12 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
         };
 
         if (!type.grouped && !type.enumerated) {
-            entry.value = subscription ? type.forHbs(fld, subscription[fldKey]) : '';
+            // subscription[fldKey] may not exists because we are getting the data from "fromPost"
+            entry.value = (subscription ? type.forHbs(fld, subscription[fldKey]) : null) || '';
 
         } else if (type.grouped) {
             const options = [];
-            const value = subscription ? subscription[fldKey] : (type.cardinality === Cardinality.SINGLE ? null : []);
+            const value = (subscription ? subscription[fldKey] : null) || (type.cardinality === Cardinality.SINGLE ? null : []);
 
             for (const optCol in fld.groupedOptions) {
                 const opt = fld.groupedOptions[optCol];
@@ -610,7 +611,7 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
 
         } else if (type.enumerated) {
             const options = [];
-            const value = subscription ? subscription[fldKey] : null;
+            const value = (subscription ? subscription[fldKey] : null) || null;
 
             for (const opt of fld.settings.options) {
                 options.push({
@@ -631,7 +632,8 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
 }
 
 // Converts subscription data received via POST request from subscription form or via subscribe request to API v1 to subscription structure supported by subscriptions model.
-async function fromPost(context, listId, data) { // assumes grouped subscription
+// If a field is not specified in the POST data, it omits it also in the returned subscription
+async function fromPost(context, listId, data, partial) { // assumes grouped subscription
 
     // This is to handle option values from API v1
     function isSelected(value) {
@@ -643,43 +645,45 @@ async function fromPost(context, listId, data) { // assumes grouped subscription
     const subscription = {};
 
     for (const fld of flds) {
-        const type = fieldTypes[fld.type];
-        const fldKey = getFieldKey(fld);
+        if (fld.key in data) {
+            const type = fieldTypes[fld.type];
+            const fldKey = getFieldKey(fld);
 
-        let value = null;
+            let value = null;
 
-        if (!type.grouped && !type.enumerated) {
-            value = type.parsePostValue(fld, cleanupFromPost(data[fld.key]));
+            if (!type.grouped && !type.enumerated) {
+                value = type.parsePostValue(fld, cleanupFromPost(data[fld.key]));
 
-        } else if (type.grouped) {
-            if (type.cardinality === Cardinality.SINGLE) {
-                for (const optCol in fld.groupedOptions) {
-                    const opt = fld.groupedOptions[optCol];
+            } else if (type.grouped) {
+                if (type.cardinality === Cardinality.SINGLE) {
+                    for (const optCol in fld.groupedOptions) {
+                        const opt = fld.groupedOptions[optCol];
 
-                    // This handles two different formats for grouped dropdowns and radios.
-                    // The first part of the condition handles the POST requests from the subscription form, while the
-                    // second part handles the subscribe request to API v1
-                    if (data[fld.key] === opt.key || isSelected(data[opt.key])) {
-                        value = opt.column
+                        // This handles two different formats for grouped dropdowns and radios.
+                        // The first part of the condition handles the POST requests from the subscription form, while the
+                        // second part handles the subscribe request to API v1
+                        if (data[fld.key] === opt.key || isSelected(data[opt.key])) {
+                            value = opt.column
+                        }
+                    }
+                } else {
+                    value = [];
+
+                    for (const optCol in fld.groupedOptions) {
+                        const opt = fld.groupedOptions[optCol];
+
+                        if (isSelected(data[opt.key])) {
+                            value.push(opt.column);
+                        }
                     }
                 }
-            } else {
-                value = [];
 
-                for (const optCol in fld.groupedOptions) {
-                    const opt = fld.groupedOptions[optCol];
-
-                    if (isSelected(data[opt.key])) {
-                        value.push(opt.column);
-                    }
-                }
+            } else if (type.enumerated) {
+                value = data[fld.key];
             }
 
-        } else if (type.enumerated) {
-            value = data[fld.key];
+            subscription[fldKey] = value;
         }
-
-        subscription[fldKey] = value;
     }
 
     return subscription;

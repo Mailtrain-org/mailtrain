@@ -533,6 +533,7 @@ async function enforceEntityPermission(context, entityTypeId, entityId, required
     await knex.transaction(async tx => {
         const result = await _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations);
         if (!result) {
+            log.info(`Denying permission ${entityTypeId}.${entityId} ${requiredOperations}`);
             throwPermissionDenied();
         }
     });
@@ -544,6 +545,7 @@ async function enforceEntityPermissionTx(tx, context, entityTypeId, entityId, re
     }
     const result = await _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations);
     if (!result) {
+        log.info(`Denying permission ${entityTypeId}.${entityId} ${requiredOperations}`);
         throwPermissionDenied();
     }
 }
@@ -552,6 +554,7 @@ async function enforceTypePermission(context, entityTypeId, requiredOperations) 
     await knex.transaction(async tx => {
         const result = await _checkPermissionTx(tx, context, entityTypeId, null, requiredOperations);
         if (!result) {
+            log.info(`Denying permission ${entityTypeId} ${requiredOperations}`);
             throwPermissionDenied();
         }
     });
@@ -560,6 +563,7 @@ async function enforceTypePermission(context, entityTypeId, requiredOperations) 
 async function enforceTypePermissionTx(tx, context, entityTypeId, requiredOperations) {
     const result = await _checkPermissionTx(tx, context, entityTypeId, null, requiredOperations);
     if (!result) {
+        log.info(`Denying permission ${entityTypeId} ${requiredOperations}`);
         throwPermissionDenied();
     }
 }

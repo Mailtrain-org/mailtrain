@@ -67,7 +67,6 @@ function changeSubscriptionData(listConf, subscription) {
     const data = generateSubscriptionData(listConf);
     delete data.EMAIL;
     const changedSubscription = Object.assign({}, subscription, data);
-    // TODO: Make sure values have actually changed.
     return changedSubscription;
 }
 
@@ -543,7 +542,6 @@ suite('Subscription use-cases', () => {
 
 });
 
-
 async function apiSubscribe(listConf, subscription) {
     await step('Add subscription via API call.', async () => {
         const response = await request({
@@ -596,8 +594,8 @@ suite('API Subscription use-cases', () => {
             await page.mailSubscriptionConfirmed.fetchMail(subscription.EMAIL);
         });
 
-        await step('User navigates to manage subscription.', async () => {
-            await page.webManage.navigate({ ucid: subscription.ucid });
+        await step('User clicks the manage subscription button.', async () => {
+            await page.mailSubscriptionConfirmed.click('manageLink');
         });
 
         await step('Systems shows a form containing the data submitted with the API call.', async () => {
