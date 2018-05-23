@@ -12,7 +12,7 @@
 * Email templates
 * Large CSV list import files
 
-Subscribe to Mailtrain Newsletter [here](http://mailtrain.org/subscription/EysIv8sAx) (uses Mailtrain obviously)
+Subscribe to Mailtrain Newsletter [here](https://mailtrain.org/subscription/S18sew2wM) (uses Mailtrain obviously)
 
 ## Hardware Requirements
 * 1 vCPU
