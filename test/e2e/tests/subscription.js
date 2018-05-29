@@ -15,7 +15,7 @@ function getPage(listConf) {
 }
 
 function generateEmail() {
-    return 'keep.' + shortid.generate() + '@mailtrain.org';
+    return 'keep.' + shortid.generate() + '@gmail.com';
 }
 
 function generateCustomFieldValue(field) {
