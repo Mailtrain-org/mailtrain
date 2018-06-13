@@ -379,6 +379,11 @@ function formatMessage(message, callback) {
                                     wordwrap: 130
                                 });
 
+                                let listUnsubscribe = null;
+                                if (!list.listunsubscribeDisabled) {
+                                    listUnsubscribe = url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid);
+                                }
+
                                 return callback(null, {
                                     from: {
                                         name: campaign.from,
@@ -419,7 +424,7 @@ function formatMessage(message, callback) {
                                         }
                                     },
                                     list: {
-                                        unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid)
+                                        unsubscribe: listUnsubscribe
                                     },
                                     subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
                                     html: renderedHtml,
