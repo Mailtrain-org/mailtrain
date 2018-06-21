@@ -114,8 +114,7 @@ host="0.0.0.0"
 [ldap]
 # enable to use ldap user backend
 enabled=false
-host="localhost"
-port=3002
+url="ldap://localhost:3002"
 baseDN="ou=users,dc=company"
 filter="(|(username={{username}})(mail={{username}}))"
 #Username field in LDAP (uid/cn/username)
@@ -128,8 +127,7 @@ bindPassword=""
 [ldapauth]
 # Alternative LDAP implementation using the more popular passport-ldapauth library.
 enabled=false
-host="localhost"
-port=389
+url="ldap://localhost:389"
 # Subtree in which the searchrequest for the user is done
 baseDN="ou=users,dc=company"
 # What whe are searching for. This should return a single user.
