@@ -61,6 +61,16 @@ level="verbose"
 port=3000
 # HTTP interface to listen on
 host="0.0.0.0"
+# Enable HTTPS
+https=false
+# HTTPS certificate file name
+cert="cert.pem"
+# HTTPS certificate private key file name
+key="key.pem"
+# HTTPS ca certificate file name
+#ca="ca-certificate.pem"
+# HTTPS Diffie Hellman parameters (generate with openssl dhparam)
+#dhparams="dhparams.pem"
 # Secret for signing the session ID cookie
 secret="a cat"
 # Session length in seconds when "remember me" is checked
