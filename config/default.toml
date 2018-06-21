@@ -123,6 +123,7 @@ passwordresetlink=""
 # Use a different user to bind LDAP (final bind DN will be: {{uidTag}}={{bindUser}},{{baseDN}})
 bindUser=""
 bindPassword=""
+#ca="self-signed-ca.pem"
 
 [ldapauth]
 # Alternative LDAP implementation using the more popular passport-ldapauth library.
@@ -138,6 +139,7 @@ passwordresetlink=""
 # Credentials for the initial search operation (final bind DN will be exactly as specified)
 bindUser="name@company.net"
 bindPassword="mySecretPassword"
+#ca="self-signed-ca.pem"
 
 [postfixbounce]
 # Enable to allow writing Postfix bounce log to Mailtrain listener
