@@ -41,8 +41,8 @@ app.set('port', port);
 let server = (!config.www.https) ? http.createServer(app) : https.createServer({
     cert: fs.readFileSync(config.www.cert),
     key: fs.readFileSync(config.www.key),
-    ca: fs.readFileSync(config.www.ca),
-    dhparams: fs.readFileSync(config.www.dhparams)
+    ca: config.www.ca ? fs.readFileSync(config.www.ca) : undefined,
+    dhparams: config.www.dhparams ? fs.readFileSync(config.www.dhparams) : undefined
 }, app);
 
 // Check if database needs upgrading before starting the server
