@@ -24,6 +24,20 @@
 
     {{#if columnTypeString}}
         <div class="form-group">
+            <label for="negate" class="col-sm-2 control-label">{{#translate}}Condition{{/translate}}</label>
+            <div class="col-sm-10">
+                <select name="negate" id="negate" class="form-control">
+                    <option value="0">
+                        {{#translate}}Equals{{/translate}}
+                    </option>
+                    <option value="1" {{#if value.negate}} selected {{/if}}>
+                        {{#translate}}Not squals{{/translate}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="value" class="col-sm-2 control-label">{{#translate}}Value{{/translate}}</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" name="value" id="value" value="{{value.value}}" placeholder="{{#translate}}Value{{/translate}}">
