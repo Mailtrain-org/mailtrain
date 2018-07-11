@@ -16,10 +16,12 @@
 
         {{#switch editor.mode}}
             {{#case "mjml"}}
+                <link rel="stylesheet" href="/grapejs/dist/css/grapesjs-mjml.css?v=0.0.7">
                 <script src="/grapejs/dist/js/grapesjs-mjml.min.js?v=0.0.27"></script>
                 <script src="/grapejs/dist/js/grapesjs-preset-mjml.js"></script>
             {{/case}}
             {{#case "html"}}
+                <link rel="stylesheet" href="/grapejs/dist/css/grapesjs-preset-newsletter.css?v=0.2.3">
                 <script src="/grapejs/dist/js/grapesjs-preset-newsletter.min.js?v=0.2.3"></script>
             {{/case}}
         {{/switch}}
