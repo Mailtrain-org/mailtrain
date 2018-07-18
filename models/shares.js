@@ -424,11 +424,14 @@ function checkGlobalPermission(context, requiredOperations) {
     }
 
     if (context.user.restrictedAccessHandler) {
-        log.verbose('check global permissions with restrictedAccessHandler --  requiredOperations: ' + requiredOperations);
+        const originalRequiredOperations = requiredOperations;
         const allowedPerms = context.user.restrictedAccessHandler.globalPermissions;
         if (allowedPerms) {
             requiredOperations = requiredOperations.filter(perm => allowedPerms.has(perm));
+        } else {
+            requiredOperations = [];
         }
+        log.verbose('check global permissions with restrictedAccessHandler --  requiredOperations: [' + originalRequiredOperations + '] -> [' + requiredOperations + ']');
     }
 
     if (requiredOperations.length === 0) {
@@ -471,13 +474,28 @@ async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredO
     }
 
     if (context.user.restrictedAccessHandler) {
-        log.verbose('check permissions with restrictedAccessHandler --  entityTypeId: ' + entityTypeId + '  entityId: ' + entityId + '  requiredOperations: ' + requiredOperations);
-        if (context.user.restrictedAccessHandler.permissions && context.user.restrictedAccessHandler.permissions[entityTypeId]) {
-            const allowedPerms = context.user.restrictedAccessHandler.permissions[entityTypeId][entityId];
-            if (allowedPerms) {
-                requiredOperations = requiredOperations.filter(perm => allowedPerms.has(perm));
+        const originalRequiredOperations = requiredOperations;
+        if (context.user.restrictedAccessHandler.permissions) {
+            const entityPerms = context.user.restrictedAccessHandler.permissions[entityTypeId];
+
+            if (!entityPerms) {
+                requiredOperations = [];
+            } else if (entityPerms === true) {
+                // no change to require operations
+            } else if (entityPerms instanceof Set) {
+                requiredOperations = requiredOperations.filter(perm => entityPerms.has(perm));
+            } else {
+                const allowedPerms = entityPerms[entityId];
+                if (allowedPerms) {
+                    requiredOperations = requiredOperations.filter(perm => allowedPerms.has(perm));
+                } else {
+                    requiredOperations = [];
+                }
             }
+        } else {
+            requiredOperations = [];
         }
+        log.verbose('check permissions with restrictedAccessHandler --  entityTypeId: ' + entityTypeId + '  entityId: ' + entityId + '  requiredOperations: [' + originalRequiredOperations + '] -> [' + requiredOperations + ']');
     }
 
     if (requiredOperations.length === 0) {

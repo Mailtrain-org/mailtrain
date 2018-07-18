@@ -174,7 +174,7 @@ function createApp(trusted) {
     }));
 
     if (trusted) {
-        passport.setup(app);
+        passport.setupRegularAuth(app);
     } else {
         app.use(passport.tryAuthByRestrictedAccessToken);
     }

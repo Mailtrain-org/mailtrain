@@ -88,7 +88,7 @@
     "mailparser": "^2.0.5",
     "marked": "^0.3.9",
     "memory-cache": "^0.2.0",
-    "mjml": "3.3.5",
+    "mjml": "^4.0.5",
     "mkdirp": "^0.5.1",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",

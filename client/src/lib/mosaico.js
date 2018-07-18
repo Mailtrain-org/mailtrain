@@ -5,7 +5,7 @@ import {translate} from 'react-i18next';
 import PropTypes from "prop-types";
 import styles from "./mosaico.scss";
 
-import {UntrustedContentHost} from './untrusted';
+import {UntrustedContentHost, parentRPC} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {
     getSandboxUrl,
@@ -101,7 +101,19 @@ export class MosaicoSandbox extends Component {
         initialMetadata: PropTypes.string
     }
 
+    async exportState(method, params) {
+        const sandboxUrlBase = getSandboxUrl();
+        const trustedUrlBase = getTrustedUrl();
+        return {
+            html: unbase(this.viewModel.exportHTML(), trustedUrlBase, sandboxUrlBase, true),
+            model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase),
+            metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase)
+        };
+    }
+
     componentDidMount() {
+        parentRPC.setMethodHandler('exportState', ::this.exportState);
+
         if (!Mosaico.isCompatible()) {
             alert('Update your browser!');
             return;
@@ -151,23 +163,8 @@ export class MosaicoSandbox extends Component {
         Mosaico.start(config, template, metadata, model, allPlugins);
     }
 
-    async onMethodAsync(method, params) {
-        if (method === 'exportState') {
-            const sandboxUrlBase = getSandboxUrl();
-            const trustedUrlBase = getTrustedUrl();
-            return {
-                html: unbase(this.viewModel.exportHTML(), trustedUrlBase, sandboxUrlBase, true),
-                model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase),
-                metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase)
-            };
-        }
-    }
-
     render() {
         return <div/>;
     }
 }
 
-MosaicoSandbox.prototype.onMethodAsync = async function(method, params) {
-    return await this.getWrappedInstance().onMethodAsync(method, params);
-};

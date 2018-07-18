@@ -324,11 +324,12 @@ class Table extends Component {
         this.fetchAndNotifySelectionData();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
         if (this.props.data) {
             this.table.clear();
             this.table.rows.add(this.props.data);
         } else {
+            // XXX: Changing URL changing from data to dataUrl is not implemented
             this.refresh();
         }
 

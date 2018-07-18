@@ -1,16 +1,30 @@
-:global .DayPicker {
-  border-left: 1px solid lightgray;
-  border-right: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
-  border-radius: 4px;
-  padding: 15px;
+.form { // This is here to give the styles below higher priority than Bootstrap has
+  :global .DayPicker {
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 15px;
+  }
+
+  :global .form-horizontal .control-label {
+    display: block;
+  }
+
+  :global .form-control[disabled] {
+    cursor: default;
+    background-color: #eeeeee;
+    opacity: 1;
+  }
+
+  :global .ace_editor {
+    border: 1px solid #ccc;
+  }
 }
 
 .dayPickerWrapper {
   text-align: right;
 }
-
-
 
 .buttonRow > * {
   margin-right: 15px;
@@ -18,6 +32,11 @@
 
 .buttonRow > *:last-child {
   margin-right: 0px;
+}
+
+.formDisabled {
+  background-color: #eeeeee;
+  opacity: 1;
 }
 
 .formStatus {
@@ -33,25 +52,6 @@
   margin-right: 0px;
 }
 
-:global .form-horizontal .control-label {
-  display: block;
-}
-
-.formDisabled {
-  background-color: #eeeeee;
-  opacity: 1;
-}
-
-:global .form-control[disabled] {
-  cursor: default;
-  background-color: #eeeeee;
-  opacity: 1;
-}
-
-:global .ace_editor {
-  border: 1px solid #ccc;
-}
-
 .tableSelectDropdown {
   margin-bottom: 15px;
 }
@@ -64,6 +64,7 @@
 .tableSelectDropdown input[readonly] {
   background-color: white;
 }
+
 
 :global h3.legend {
   font-size: 21px;
