@@ -26,7 +26,7 @@ import {
 } from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 
-import {versafix} from "../../../../shared/mosaico-templates";
+import {getVersafix} from "../../../../shared/mosaico-templates";
 import {
     getTemplateTypes,
     getTemplateTypesOrder
@@ -77,7 +77,7 @@ export default class CUD extends Component {
                     description: '',
                     namespace: mailtrainConfig.user.namespace,
                     type: 'html',
-                    html: versafix
+                    html: getVersafix()
                 });
 
             } else {

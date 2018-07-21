@@ -10,6 +10,8 @@ exports.up = (knex, Promise) => (async() =>  {
         table.boolean('from_email_overridable').defaultTo(false);
         table.string('from_name');
         table.boolean('from_name_overridable').defaultTo(false);
+        table.string('reply_to');
+        table.boolean('reply_to_overridable').defaultTo(false);
         table.string('subject');
         table.boolean('subject_overridable').defaultTo(false);
         table.string('verp_hostname'); // VERP is not used if verp_hostname is null
@@ -94,6 +96,8 @@ exports.up = (knex, Promise) => (async() =>  {
         from_email_overridable: true,
         from_name: settings.defaultFrom,
         from_name_overridable: true,
+        reply_to: settings.defaultAddress,
+        reply_to_overridable: true,
         subject: settings.defaultSubject,
         subject_overridable: true,
         verp_hostname: settings.verpUse ? settings.verpHostname : null,

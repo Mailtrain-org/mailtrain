@@ -35,7 +35,7 @@ exports.up = (knex, Promise) => (async() =>  {
         table.string('encoding');
         table.integer('size');
         table.timestamp('created').defaultTo(knex.fn.now());
-        table.index(['entity', 'originalname'])
+        table.index(['entity', 'originalname']);
     });
 
     const versafix = {
@@ -44,7 +44,7 @@ exports.up = (knex, Promise) => (async() =>  {
         type: 'html',
         namespace: 1,
         data: JSON.stringify({
-            html: mosaicoTemplates.versafix
+            html: mosaicoTemplates.getVersafix()
         })
     };
 

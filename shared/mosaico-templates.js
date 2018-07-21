@@ -1532,6 +1532,10 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '</body>\n' +
     '</html>\n';
 
+function getVersafix() {
+    return versafix;
+}
+
 module.exports = {
-    versafix
+    getVersafix
 };

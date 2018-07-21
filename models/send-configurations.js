@@ -10,7 +10,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const {MailerType, getSystemSendConfigurationId} = require('../shared/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
 
-const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'subject', 'subject_overridable', 'verp_hostname', 'mailer_type', 'mailer_settings', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable', 'verp_hostname', 'mailer_type', 'mailer_settings', 'namespace']);
 
 const allowedMailerTypes = new Set(Object.values(MailerType));
 

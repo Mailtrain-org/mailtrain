@@ -87,6 +87,7 @@ export default class CUD extends Component {
                 namespace: mailtrainConfig.user.namespace,
                 from_email_overridable: false,
                 from_name_overridable: false,
+                reply_to_overridable: false,
                 subject_overridable: false,
                 verpEnabled: false,
                 verp_hostname: '',
@@ -195,6 +196,8 @@ export default class CUD extends Component {
                         <CheckBox id="from_email_overridable" text={t('Overridable')}/>
                         <InputField id="from_name" label={t('Default "from" name')}/>
                         <CheckBox id="from_name_overridable" text={t('Overridable')}/>
+                        <InputField id="reply_to" label={t('Default "reply-to" email')}/>
+                        <CheckBox id="reply_to_overridable" text={t('Overridable')}/>
                         <InputField id="subject" label={t('Subject')}/>
                         <CheckBox id="subject_overridable" text={t('Overridable')}/>
                     </Fieldset>
