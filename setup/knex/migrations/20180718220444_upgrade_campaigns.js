@@ -109,23 +109,19 @@ exports.up = (knex, Promise) => (async() =>  {
                 campaign.source_type = CampaignSource.CUSTOM;
                 data.source = {
                     type: editorType,
-                    data: JSON.stringify(editorData),
+                    data: editorData,
                     html: campaign.html,
                     text: campaign.text,
                     htmlPrepared: campaign.html_prepared
                 };
             } else {
                 campaign.source_type = CampaignSource.URL;
-                data.source = {
-                    url: campaign.source_url
-                };
+                data.sourceUrl = campaign.source_url;
             }
 
         } else if (campaign.type === CampaignType.RSS) {
             campaign.source_type = CampaignSource.RSS;
-            data.source = {
-                url: campaign.source_url
-            };
+            data.feedUrl = campaign.source_url;
 
             data.checkStatus = campaign.checkStatus;
         }

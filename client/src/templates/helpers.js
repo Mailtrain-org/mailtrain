@@ -5,6 +5,7 @@ import {
     ACEEditor,
     AlignedRow,
     CKEditor,
+    Dropdown,
     TableSelect
 } from "../lib/form";
 import 'brace/mode/text';
@@ -16,6 +17,8 @@ import {
 } from "../lib/mosaico";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
+import {getTrustedUrl, getSandboxUrl} from "../lib/urls";
+import mailtrainConfig from 'mailtrainConfig';
 
 
 export function getTemplateTypes(t) {
@@ -60,7 +63,7 @@ export function getTemplateTypes(t) {
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue('mosaicoData').model}
                     initialMetadata={owner.getFormValue('mosaicoData').metadata}
-                    templateId={owner.getFormValue('mosaicoTemplate')}
+                    templatePath={getSandboxUrl(`mosaico/templates/${owner.getFormValue('mosaicoTemplate')}/index.html`)}
                     entityTypeId={ResourceType.TEMPLATE}
                     title={t('Mosaico Template Designer')}
                     onFullscreenAsync={::owner.setElementInFullscreen}/>
@@ -79,7 +82,6 @@ export function getTemplateTypes(t) {
         }),
         afterLoad: data => {
             data.mosaicoTemplate = data.data.mosaicoTemplate;
-            data.html = data.data.html;
             data.mosaicoData = {
                 metadata: data.data.metadata,
                 model: data.data.model
@@ -104,6 +106,57 @@ export function getTemplateTypes(t) {
                 state.setIn(['mosaicoTemplate', 'error'], null);
             }
         }
+    };
+
+    const mosaicoFsTemplatesOptions = mailtrainConfig.mosaico.fsTemplates.map(([key, label]) => ({key, label}));
+
+    templateTypes.mosaicoWithFsTemplate = {
+        typeName: t('Mosaico with predefined templates'),
+        getTypeForm: (owner, isEdit) =>
+            <Dropdown id="mosaicoFsTemplate" label={t('Mosaico Template')} options={mosaicoFsTemplatesOptions}/>,
+        getHTMLEditor: owner =>
+            <AlignedRow label={t('Template content (HTML)')}>
+                <MosaicoEditor
+                    ref={node => owner.editorNode = node}
+                    entity={owner.props.entity}
+                    initialModel={owner.getFormValue('mosaicoData').model}
+                    initialMetadata={owner.getFormValue('mosaicoData').metadata}
+                    templatePath={getSandboxUrl(`public/mosaico/templates/${owner.getFormValue('mosaicoFsTemplate')}/index.html`)}
+                    entityTypeId={ResourceType.TEMPLATE}
+                    title={t('Mosaico Template Designer')}
+                    onFullscreenAsync={::owner.setElementInFullscreen}/>
+            </AlignedRow>,
+        exportHTMLEditorData: async owner => {
+            const {html, metadata, model} = await owner.editorNode.exportState();
+            owner.updateFormValue('html', html);
+            owner.updateFormValue('mosaicoData', {
+                metadata,
+                model
+            });
+        },
+        initData: () => ({
+            mosaicoFsTemplate: mailtrainConfig.mosaico.fsTemplates[0][0],
+            mosaicoData: {}
+        }),
+        afterLoad: data => {
+            data.mosaicoFsTemplate = data.data.mosaicoFsTemplate;
+            data.mosaicoData = {
+                metadata: data.data.metadata,
+                model: data.data.model
+            };
+        },
+        beforeSave: data => {
+            data.data = {
+                mosaicoFsTemplate: data.mosaicoFsTemplate,
+                metadata: data.mosaicoData.metadata,
+                model: data.mosaicoData.model
+            };
+            clearBeforeSave(data);
+        },
+        afterTypeChange: mutState => {
+            initFieldsIfMissing(mutState, 'mosaico');
+        },
+        validate: state => {}
     };
 
     templateTypes.grapejs = { // TODO

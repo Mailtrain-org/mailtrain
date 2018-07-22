@@ -22,7 +22,7 @@
 title="mailtrain"
 
 # Enabled HTML editors
-editors=["ckeditor", "codeeditor", "mosaico"]
+editors=["ckeditor", "codeeditor", "mosaico", "mosaicoWithFsTemplate"]
 
 # Default language to use
 language="en"
@@ -150,7 +150,7 @@ processes=1
 
 [mosaico]
 # Installed templates
-templates=[["versafix-1", "Versafix One"]]
+fsTemplates=[["versafix-1", "Versafix One"]]
 # Inject custom scripts
 # customscripts=["/mosaico/custom/my-mosaico-plugin.js"]
 

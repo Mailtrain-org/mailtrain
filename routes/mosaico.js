@@ -222,8 +222,18 @@ function getRouter(trusted) {
                 width = sanitizeSize(width, 1, 2048, 600, false);
                 height = sanitizeSize(height, 1, 2048, 300, true);
 
-                const file = await files.getFileByUrl(contextHelpers.getAdminContext(), req.params.type, req.params.entityId, req.query.src);
-                image = await resizedImage(file.path, method, width, height);
+                let filePath;
+                const url = req.query.src;
+
+                const mosaicoLegacyUrlPrefix = getTrustedUrl(`mosaico/uploads/`);
+                if (url.startsWith(mosaicoLegacyUrlPrefix)) {
+                    filePath = path.join(__dirname, '..', 'client', 'public' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
+                } else {
+                    const file = await files.getFileByUrl(contextHelpers.getAdminContext(), req.params.type, req.params.entityId, url);
+                    filePath = file.path;
+                }
+
+                image = await resizedImage(filePath, method, width, height);
             }
 
             res.set('Content-Type', 'image/' + image.format);

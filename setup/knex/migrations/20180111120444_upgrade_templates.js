@@ -14,6 +14,12 @@ exports.up = (knex, Promise) => (async() =>  {
             type = 'ckeditor';
         }
 
+        if (type == 'mosaico') {
+            type = 'mosaicoWithFsTemplate';
+            data.mosaicoFsTemplate = data.template;
+            delete data.template;
+        }
+
         await knex('templates').where('id', template.id).update({type, data: JSON.stringify(data)});
     }
 

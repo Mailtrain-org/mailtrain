@@ -91,7 +91,7 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'delete');
 
-        await reports.removeAllByReportTemplateIdTx(tx, context, id);
+        // FIXME - deal with deletion of dependent entities
 
         await tx('templates').where('id', id).del();
     });
