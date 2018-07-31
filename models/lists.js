@@ -66,12 +66,16 @@ async function getByCid(context, cid) {
     });
 }
 
+async function _validateAndPreprocess(tx, entity) {
+    await namespaceHelpers.validateEntity(tx, entity);
+    enforce(entity.unsubscription_mode >= UnsubscriptionMode.MIN && entity.unsubscription_mode <= UnsubscriptionMode.MAX, 'Unknown unsubscription mode');
+}
+
 async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createList');
 
-        await namespaceHelpers.validateEntity(tx, entity);
-        enforce(entity.unsubscription_mode >= 0 && entity.unsubscription_mode < UnsubscriptionMode.MAX, 'Unknown unsubscription mode');
+        await _validateAndPreprocess(tx, entity);
 
         const filteredEntity = filterObject(entity, allowedKeys);
         filteredEntity.cid = shortid.generate();
@@ -79,9 +83,34 @@ async function create(context, entity) {
         const ids = await tx('lists').insert(filteredEntity);
         const id = ids[0];
 
-        await knex.schema.raw('CREATE TABLE `subscription__' + id + '` LIKE subscription');
-
-        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: id });
+        await knex.schema.raw('CREATE TABLE `subscription__' + id + '` (\n' +
+            '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
+            '  `cid` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
+            '  `email` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT \'\',\n' +
+            '  `opt_in_ip` varchar(100) DEFAULT NULL,\n' +
+            '  `opt_in_country` varchar(2) DEFAULT NULL,\n' +
+            '  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,\n' +
+            '  `imported` int(11) unsigned DEFAULT NULL,\n' +
+            '  `status` tinyint(4) unsigned NOT NULL DEFAULT \'1\',\n' +
+            '  `is_test` tinyint(4) unsigned NOT NULL DEFAULT \'0\',\n' +
+            '  `status_change` timestamp NULL DEFAULT NULL,\n' +
+            '  `latest_open` timestamp NULL DEFAULT NULL,\n' +
+            '  `latest_click` timestamp NULL DEFAULT NULL,\n' +
+            '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
+            '  `first_name` varchar(255) DEFAULT NULL,\n' +
+            '  `last_name` varchar(255) DEFAULT NULL,\n' +
+            '  PRIMARY KEY (`id`),\n' +
+            '  UNIQUE KEY `email` (`email`),\n' +
+            '  UNIQUE KEY `cid` (`cid`),\n' +
+            '  KEY `status` (`status`),\n' +
+            '  KEY `first_name` (`first_name`(191)),\n' +
+            '  KEY `last_name` (`last_name`(191)),\n' +
+            '  KEY `subscriber_tz` (`tz`),\n' +
+            '  KEY `is_test` (`is_test`),\n' +
+            '  KEY `latest_open` (`latest_open`),\n' +
+            '  KEY `latest_click` (`latest_click`),\n' +
+            '  KEY `created` (`created`)\n' +
+            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
 
         return id;
     });
@@ -101,9 +130,9 @@ async function updateWithConsistencyCheck(context, entity) {
             throw new interoperableErrors.ChangedError();
         }
 
-        await namespaceHelpers.validateEntity(tx, entity);
+        await _validateAndPreprocess(tx, entity);
+
         await namespaceHelpers.validateMove(context, entity, existing, 'list', 'createList', 'delete');
-        enforce(entity.unsubscription_mode >= 0 && entity.unsubscription_mode < UnsubscriptionMode.MAX, 'Unknown unsubscription mode');
 
         await tx('lists').where('id', entity.id).update(filterObject(entity, allowedKeys));
 

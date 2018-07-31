@@ -1,14 +1,22 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { translate } from 'react-i18next';
-import { Icon } from '../lib/bootstrap-components';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { Table } from '../lib/table';
-import axios from '../lib/axios';
+import React, {Component} from 'react';
+import {translate} from 'react-i18next';
+import {Icon} from '../lib/bootstrap-components';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from '../lib/page';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import {Table} from '../lib/table';
 import moment from 'moment';
-import { getTemplateTypes } from './helpers';
+import {getTemplateTypes} from './helpers';
 import {checkPermissions} from "../lib/permissions";
 
 @translate()

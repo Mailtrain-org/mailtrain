@@ -21,7 +21,7 @@ function hash(entity) {
 async function listDTAjax(context, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
-        [{ entityTypeId: 'sendConfiguration', requiredOperations: ['view'] }],
+        [{ entityTypeId: 'sendConfiguration', requiredOperations: ['viewPublic'] }],
         params,
         builder => builder
             .from('send_configurations')
@@ -30,11 +30,20 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function getById(context, id, withPermissions = true) {
+async function getById(context, id, withPermissions = true, withPrivateData = true) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'view');
-        const entity = await tx('send_configurations').where('id', id).first();
-        entity.mailer_settings = JSON.parse(entity.mailer_settings);
+        let entity;
+
+        if (withPrivateData) {
+            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPrivate');
+            entity = await tx('send_configurations').where('id', id).first();
+            entity.mailer_settings = JSON.parse(entity.mailer_settings);
+        } else {
+            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPublic');
+            entity = await tx('send_configurations').where('id', id).select(
+                ['id', 'name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable']
+            ).first();
+        }
 
         // note that permissions are optional as as this methods may be used with synthetic admin context
         if (withPermissions) {

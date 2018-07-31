@@ -44,7 +44,7 @@ OK  | namespace               | int(10) unsigned    | NO   | MUL | NULL         
 New columns:
     +-------------------------+---------------------+------+-----+-------------------+----------------+
     | data                    | longtext            | NO   |     | NULL              |                |
-    | source_type             | int(10) unsigned    | NO   |     |                   |                |
+    | source                  | int(10) unsigned    | NO   |     |                   |                |
     | send_configuration      | int(10) unsigned    | NO   |     |                   |                |
     +-------------------------+---------------------+------+-----+-------------------+----------------+
 
@@ -55,38 +55,13 @@ scheduled - used only for campaign type NORMAL
  */
 
 const { getSystemSendConfigurationId } = require('../../../shared/send-configurations');
-
-const CampaignSource = {
-    TEMPLATE: 1,
-    CUSTOM: 2,
-    URL: 3,
-    RSS: 4
-};
-
-const CampaignType = {
-    NORMAL: 1,
-    RSS: 2,
-    RSS_ENTRY: 3,
-    TRIGGERED: 4
-};
-
-const CampaignStatus = {
-    // For campaign types: NORMAL, RSS_ENTRY
-    IDLE: 1,
-    SCHEDULED: 2,
-    FINISHED: 3,
-    PAUSED: 4,
-
-    // For campaign types: RSS, TRIGGERED
-    INACTIVE: 5,
-    ACTIVE: 6
-};
+const { CampaignSource, CampaignType} = require('../../../shared/campaigns');
 
 exports.up = (knex, Promise) => (async() =>  {
 
     await knex.schema.table('campaigns', table => {
         table.text('data', 'longtext');
-        table.integer('source_type').unsigned().notNullable();
+        table.integer('source').unsigned().notNullable();
 
         // Add a default values, such that the new column has some valid non-null value
         table.integer('send_configuration').unsigned().notNullable().references(`send_configurations.id`).defaultTo(getSystemSendConfigurationId());
@@ -97,7 +72,7 @@ exports.up = (knex, Promise) => (async() =>  {
     for (const campaign of campaigns) {
         const data = {};
 
-        if (campaign.type === CampaignType.NORMAL || campaign.type === CampaignType.RSS_ENTRY || campaign.type === CampaignType.NORMAL || campaign.type === CampaignType.TRIGGERED) {
+        if (campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.RSS_ENTRY || campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.TRIGGERED) {
             if (campaign.template) {
                 let editorType = campaign.editor_name;
                 const editorData = JSON.parse(campaign.editor_data || '{}');
@@ -106,21 +81,26 @@ exports.up = (knex, Promise) => (async() =>  {
                     editorType = 'ckeditor';
                 }
 
-                campaign.source_type = CampaignSource.CUSTOM;
-                data.source = {
+                campaign.source = CampaignSource.CUSTOM_FROM_TEMPLATE;
+                data.sourceCustom = {
                     type: editorType,
                     data: editorData,
                     html: campaign.html,
                     text: campaign.text,
                     htmlPrepared: campaign.html_prepared
                 };
+
+                data.sourceTemplate = campaign.template;
+
+                // For source === CampaignSource.TEMPLATE, the data is as follows:
+                // data.sourceTemplate = <template id>
             } else {
-                campaign.source_type = CampaignSource.URL;
+                campaign.source = CampaignSource.URL;
                 data.sourceUrl = campaign.source_url;
             }
 
         } else if (campaign.type === CampaignType.RSS) {
-            campaign.source_type = CampaignSource.RSS;
+            campaign.source = CampaignSource.RSS;
             data.feedUrl = campaign.source_url;
 
             data.checkStatus = campaign.checkStatus;
@@ -150,6 +130,8 @@ exports.up = (knex, Promise) => (async() =>  {
         table.integer('send_configuration').unsigned().notNullable().alter();
     });
 
+    await knex.schema.dropTableIfExists('campaign');
+    await knex.schema.dropTableIfExists('campaign_tracker');
 })();
 
 exports.down = (knex, Promise) => (async() =>  {

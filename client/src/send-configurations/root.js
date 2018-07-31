@@ -17,7 +17,7 @@ function getMenus(t) {
                 ':sendConfigurationId([0-9]+)': {
                     title: resolved => t('Template "{{name}}"', {name: resolved.sendConfiguration.name}),
                     resolve: {
-                        sendConfiguration: params => `rest/send-configurations/${params.sendConfigurationId}`
+                        sendConfiguration: params => `rest/send-configurations-private/${params.sendConfigurationId}`
                     },
                     link: params => `/send-configurations/${params.sendConfigurationId}/edit`,
                     navs: {

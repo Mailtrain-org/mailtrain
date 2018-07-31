@@ -2,10 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {
-    Trans,
-    translate
-} from 'react-i18next';
+import {translate} from 'react-i18next';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -13,8 +10,6 @@ import {
     withPageHelpers
 } from '../lib/page'
 import {
-    ACEEditor,
-    AlignedRow,
     Button,
     ButtonRow,
     Dropdown,
@@ -32,8 +27,11 @@ import {
 } from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import {getTemplateTypes} from './helpers';
-import {ActionLink} from "../lib/bootstrap-components";
+import {
+    getEditForm,
+    getTemplateTypes,
+    getTypeForm
+} from './helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
@@ -158,7 +156,6 @@ export default class CUD extends Component {
 
         const html = this.getFormValue('html');
         if (!html) {
-            alert('Missing HTML content');
             return;
         }
 
@@ -203,99 +200,13 @@ export default class CUD extends Component {
 
         let editForm = null;
         if (isEdit && typeKey) {
-            editForm = <div>
-                <AlignedRow>
-                    <Button className="btn-default" onClickAsync={::this.toggleMergeTagReference} label={t('Merge tag reference')}/>
-                    {this.state.showMergeTagReference &&
-                    <div style={{marginTop: '15px'}}>
-                        <Trans><p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p></Trans>
-                        <Trans><p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p></Trans>
-                        <table className="table table-bordered table-condensed table-striped">
-                            <thead>
-                            <tr>
-                                <th>
-                                    <Trans>Merge tag</Trans>
-                                </th>
-                                <th>
-                                    <Trans>Description</Trans>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <th scope="row">
-                                    [LINK_UNSUBSCRIBE]
-                                </th>
-                                <td>
-                                    <Trans>URL that points to the unsubscribe page</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [LINK_PREFERENCES]
-                                </th>
-                                <td>
-                                    <Trans>URL that points to the preferences page of the subscriber</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [LINK_BROWSER]
-                                </th>
-                                <td>
-                                    <Trans>URL to preview the message in a browser</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [EMAIL]
-                                </th>
-                                <td>
-                                    <Trans>Email address</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [SUBSCRIPTION_ID]
-                                </th>
-                                <td>
-                                    <Trans>Unique ID that identifies the recipient</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [LIST_ID]
-                                </th>
-                                <td>
-                                    <Trans>Unique ID that identifies the list used for this campaign</Trans>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    [CAMPAIGN_ID]
-                                </th>
-                                <td>
-                                    <Trans>Unique ID that identifies current campaign</Trans>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>}
-                </AlignedRow>
-
-                {this.templateTypes[typeKey].getHTMLEditor(this)}
-
-                <ACEEditor id="text" height="400px" mode="text" label={t('Template content (plain text)')} help={<Trans>To extract the text from HTML click <ActionLink onClickAsync={::this.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}/>
-            </div>
+            editForm = getEditForm(this, typeKey);
         }
 
         let typeForm = null;
         if (typeKey) {
-            typeForm = <div>
-                {this.templateTypes[typeKey].getTypeForm(this, isEdit)}
-            </div>;
+            typeForm = getTypeForm(this, typeKey, isEdit);
         }
-
 
 
         return (

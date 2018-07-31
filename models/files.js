@@ -32,7 +32,7 @@ function getFilesTable(type) {
 
 async function listDTAjax(context, type, entityId, params) {
     enforceTypePermitted(type);
-    await shares.enforceEntityPermission(context, type, entityId, 'manageFiles');
+    await shares.enforceEntityPermission(context, type, entityId, 'viewFiles');
     return await dtHelpers.ajaxList(
         params,
         builder => builder.from(getFilesTable(type)).where({entity: entityId}),
@@ -41,8 +41,9 @@ async function listDTAjax(context, type, entityId, params) {
 }
 
 async function list(context, type, entityId) {
+    enforceTypePermitted(type);
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermission(context, type, entityId, 'view');
+        await shares.enforceEntityPermissionTx(tx, context, type, entityId, 'viewFiles');
         return await tx(getFilesTable(type)).where({entity: entityId}).select(['id', 'originalname', 'filename', 'size', 'created']).orderBy('originalname', 'asc');
     });
 }
@@ -51,7 +52,7 @@ async function getFileById(context, type, id) {
     enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
         const file = await tx(getFilesTable(type)).where('id', id).first();
-        await shares.enforceEntityPermissionTx(tx, context, type, file.entity, 'view');
+        await shares.enforceEntityPermissionTx(tx, context, type, file.entity, 'viewFiles');
         return file;
     });
 
@@ -69,7 +70,7 @@ async function getFileById(context, type, id) {
 async function _getFileBy(context, type, entityId, key, value) {
     enforceTypePermitted(type);
     const file = await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, type, entityId, 'view');
+        await shares.enforceEntityPermissionTx(tx, context, type, entityId, 'viewFiles');
         const file = await tx(getFilesTable(type)).where({entity: entityId, [key]: value}).first();
         return file;
     });
@@ -212,6 +213,8 @@ async function createFiles(context, type, entityId, files, getUrl = null, dontRe
 }
 
 async function removeFile(context, type, id) {
+    enforceTypePermitted(type);
+
     const file = await knex.transaction(async tx => {
         const file = await tx(getFilesTable(type)).where('id', id).select('entity', 'filename').first();
         await shares.enforceEntityPermissionTx(tx, context, type, file.entity, 'manageFiles');
@@ -222,6 +225,27 @@ async function removeFile(context, type, id) {
     const filePath = getFilePath(type, file.entity, file.filename);
     await fs.removeAsync(filePath);
 }
+
+async function copyAllTx(tx, context, fromType, fromEntityId, toType, toEntityId) {
+    enforceTypePermitted(fromType);
+    await shares.enforceEntityPermissionTx(tx, context, fromType, fromEntityId, 'viewFiles');
+
+    enforceTypePermitted(toType);
+    await shares.enforceEntityPermissionTx(tx, context, toType, toEntityId, 'manageFiles');
+
+    const rows = await tx(getFilesTable(fromType)).where({entity: fromEntityId});
+    for (const row of rows) {
+        const fromFilePath = getFilePath(fromType, fromEntityId, row.filename);
+        const toFilePath = getFilePath(toType, toEntityId, row.filename);
+        await fs.copyAsync(fromFilePath, toFilePath, {});
+
+        delete row.id;
+        row.entity = toEntityId;
+    }
+
+    await tx(getFilesTable(toType)).insert(rows);
+}
+
 
 module.exports = {
     filesDir,
@@ -234,5 +258,6 @@ module.exports = {
     createFiles,
     removeFile,
     getFileUrl,
-    getFilePath
+    getFilePath,
+    copyAllTx
 };

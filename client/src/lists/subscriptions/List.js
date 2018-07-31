@@ -151,6 +151,8 @@ export default class List extends Component {
             dataUrl += '/' + this.props.segmentId;
         }
 
+
+        // FIXME - presents segments in a data table as in campaign edit
         return (
             <div>
                 <Toolbar>

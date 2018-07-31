@@ -415,7 +415,7 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     }
 
     if ((isCreate && !(meta && meta.update)) || 'status' in entity) {
-        enforce(entity.status >= 0 && entity.status < SubscriptionStatus.MAX, 'Invalid status');
+        enforce(entity.status >= SubscriptionStatus.MIN && entity.status <= SubscriptionStatus.MAX, 'Invalid status');
     }
 
     for (const key in groupedFieldsMap) {

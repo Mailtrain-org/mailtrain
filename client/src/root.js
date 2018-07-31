@@ -15,6 +15,7 @@ import blacklist from './blacklist/root';
 import lists from './lists/root';
 import namespaces from './namespaces/root';
 import reports from './reports/root';
+import campaigns from './campaigns/root';
 import templates from './templates/root';
 import users from './users/root';
 import sendConfigurations from './send-configurations/root';
@@ -45,7 +46,7 @@ class Root extends Component {
         const t = props.t;
         const self = this;
 
-        const topLevelMenuKeys = ['lists', 'templates', 'reports'];
+        const topLevelMenuKeys = ['lists', 'templates', 'campaigns', 'reports'];
 
         class MainMenu extends Component {
             render() {
@@ -123,7 +124,8 @@ class Root extends Component {
                     ...blacklist.getMenus(t),
                     ...account.getMenus(t),
                     ...settings.getMenus(t),
-                    ...sendConfigurations.getMenus(t)
+                    ...sendConfigurations.getMenus(t),
+                    ...campaigns.getMenus(t)
                 }
             }
         };

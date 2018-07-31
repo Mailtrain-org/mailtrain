@@ -6,8 +6,14 @@ const sendConfigurations = require('../../models/send-configurations');
 const router = require('../../lib/router-async').create();
 
 
-router.getAsync('/send-configurations/:sendConfigurationId', passport.loggedIn, async (req, res) => {
-    const sendConfiguration = await sendConfigurations.getById(req.context, req.params.sendConfigurationId);
+router.getAsync('/send-configurations-private/:sendConfigurationId', passport.loggedIn, async (req, res) => {
+    const sendConfiguration = await sendConfigurations.getById(req.context, req.params.sendConfigurationId, true, true);
+    sendConfiguration.hash = sendConfigurations.hash(sendConfiguration);
+    return res.json(sendConfiguration);
+});
+
+router.getAsync('/send-configurations-public/:sendConfigurationId', passport.loggedIn, async (req, res) => {
+    const sendConfiguration = await sendConfigurations.getById(req.context, req.params.sendConfigurationId, true, false);
     sendConfiguration.hash = sendConfigurations.hash(sendConfiguration);
     return res.json(sendConfiguration);
 });

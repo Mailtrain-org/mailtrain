@@ -40,6 +40,10 @@ async function listDTAjax(context, params) {
 }
 
 async function _validateAndPreprocess(tx, entity) {
+    await namespaceHelpers.validateEntity(tx, entity);
+
+    // We don't check contents of the "data" because it is processed solely on the client. The client generates the HTML code we use when sending out campaigns.
+
     entity.data = JSON.stringify(entity.data);
 }
 
@@ -48,8 +52,6 @@ async function create(context, entity) {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
 
         await _validateAndPreprocess(tx, entity);
-
-        await namespaceHelpers.validateEntity(tx, entity);
 
         const ids = await tx('templates').insert(filterObject(entity, allowedKeys));
         const id = ids[0];
@@ -78,7 +80,6 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        await namespaceHelpers.validateEntity(tx, entity);
         await namespaceHelpers.validateMove(context, entity, existing, 'template', 'createTemplate', 'delete');
 
         await tx('templates').where('id', entity.id).update(filterObject(entity, allowedKeys));

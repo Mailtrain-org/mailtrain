@@ -202,28 +202,28 @@ rootNamespaceRole="master"
 [roles.namespace.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "createSendConfiguration", "manageUsers"]
+permissions=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "createSendConfiguration", "createCampaign", "manageUsers"]
 
 [roles.namespace.master.children]
-sendConfiguration=["view", "edit", "delete", "share", "send", "overrideAllowed", "overrideAll"]
-list=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
+sendConfiguration=["viewPublic", "viewPrivate", "edit", "delete", "share", "sendWithoutOverrides", "sendWithAllowedOverrides", "sendWithAnyOverrides"]
+list=["view", "edit", "delete", "share", "viewFields", "manageFields", "viewSubscriptions", "manageSubscriptions", "viewSegments", "manageSegments"]
 customForm=["view", "edit", "delete", "share"]
-campaign=["view", "edit", "delete", "share", "manageFiles"]
-template=["view", "edit", "delete", "share", "manageFiles"]
+campaign=["view", "edit", "delete", "share", "viewFiles", "manageFiles", "manageAttachments", "send", "viewStats"]
+template=["view", "edit", "delete", "share", "viewFiles", "manageFiles"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
-mosaicoTemplate=["view", "edit", "delete", "share", "manageFiles"]
-namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "createSendConfiguration", "manageUsers"]
+mosaicoTemplate=["view", "edit", "delete", "share", "viewFiles", "manageFiles"]
+namespace=["view", "edit", "delete", "share", "createNamespace", "createList", "createCustomForm", "createReport", "createReportTemplate", "createTemplate", "createMosaicoTemplate", "createSendConfiguration", "createCampaign", "manageUsers"]
 
 [roles.sendConfiguration.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "send", "overrideAllowed", "overrideAll"]
+permissions=["viewPublic", "viewPrivate", "edit", "delete", "share", "sendWithoutOverrides", "sendWithAllowedOverrides", "sendWithAnyOverrides"]
 
 [roles.list.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "manageFields", "viewSubscriptions", "manageSubscriptions", "manageSegments"]
+permissions=["view", "edit", "delete", "share", "viewFields", "manageFields", "viewSubscriptions", "manageSubscriptions", "viewSegments", "manageSegments"]
 
 [roles.customForm.master]
 name="Master"
@@ -233,12 +233,12 @@ permissions=["view", "edit", "delete", "share"]
 [roles.campaign.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "manageFiles"]
+permissions=["view", "edit", "delete", "share", "viewFiles", "manageFiles", "manageAttachments", "send", "viewStats"]
 
 [roles.template.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "manageFiles"]
+permissions=["view", "edit", "delete", "share", "viewFiles", "manageFiles"]
 
 [roles.report.master]
 name="Master"
@@ -253,7 +253,8 @@ permissions=["view", "edit", "delete", "share", "execute"]
 [roles.mosaicoTemplate.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "manageFiles"]
+permissions=["view", "edit", "delete", "share", "viewFiles", "manageFiles"]
+
 
 
 [roles.global.editor]
@@ -317,3 +318,4 @@ permissions=[]
 name="Editor"
 description="XXX"
 permissions=[]
+

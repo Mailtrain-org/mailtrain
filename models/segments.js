@@ -214,7 +214,7 @@ function hash(entity) {
 
 async function listDTAjax(context, listId, params) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSegments');
 
         return await dtHelpers.ajaxListTx(
             tx,
@@ -229,18 +229,27 @@ async function listDTAjax(context, listId, params) {
 
 async function listIdName(context, listId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageSegments']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSegments']);
 
         return await tx('segments').select(['id', 'name']).where('list', listId).orderBy('name', 'asc');
     });
 }
 
+async function getByIdTx(tx, context, listId, id) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSegments');
+    const entity = await tx('segments').where({id, list: listId}).first();
+
+    if (!entity) {
+        throw new interoperableErrors.NotFoundError();
+    }
+
+    entity.settings = JSON.parse(entity.settings);
+    return entity;
+}
+
 async function getById(context, listId, id) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
-        const entity = await tx('segments').where({id, list: listId}).first();
-        entity.settings = JSON.parse(entity.settings);
-        return entity;
+        return getByIdTx(tx, context, listId, id);
     });
 }
 
@@ -320,6 +329,8 @@ async function updateWithConsistencyCheck(context, listId, entity) {
 
 async function removeTx(tx, context, listId, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
+
+    // FIXME - check dependencies: campaigns
 
     // The listId "where" is here to prevent deleting segment of a list for which a user does not have permission
     await tx('segments').where({list: listId, id}).del();
@@ -402,6 +413,7 @@ Object.assign(module.exports, {
     listDTAjax,
     listIdName,
     getById,
+    getByIdTx,
     create,
     updateWithConsistencyCheck,
     remove,

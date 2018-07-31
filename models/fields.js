@@ -200,7 +200,7 @@ function hash(entity) {
 
 async function getById(context, listId, id) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewFields');
 
         const entity = await tx('custom_fields').where({list: listId, id}).first();
 
@@ -235,7 +235,7 @@ async function listTx(tx, listId) {
 
 async function list(context, listId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSubscriptions', 'manageFields', 'manageSegments', 'manageSubscriptions']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewFields']);
         return await listTx(tx, listId);
     });
 }
@@ -286,7 +286,7 @@ async function listByOrderListTx(tx, listId, extraColumns = []) {
 
 async function listDTAjax(context, listId, params) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewFields');
 
         return await dtHelpers.ajaxListTx(
             tx,
@@ -330,7 +330,7 @@ async function listDTAjax(context, listId, params) {
 
 async function listGroupedDTAjax(context, listId, params) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewFields');
 
         return await dtHelpers.ajaxListTx(
             tx,
