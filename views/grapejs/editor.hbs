@@ -131,6 +131,9 @@
                 assets: [],
                 upload: '/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{editor.name}}',
                 uploadText: 'Drop images here or click to upload',
+                headers: {
+                    'X-CSRF-TOKEN': '{{csrfToken}}',
+                },
             },
             styleManager: {
 		        clearProperties: true,
@@ -347,7 +350,6 @@
             // TODO: Show a spinner
             getPreparedHtml(function(html) {
                 sender.set('active', 0);
-                var modalContent = md.getContentEl();
                 var mdlDialog = document.querySelector('.gjs-mdl-dialog');
                 testContentEl.value = html;
                 mdlDialog.className += ' ' + mdlClass;
