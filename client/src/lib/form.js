@@ -221,7 +221,7 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
 class StaticField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         className: PropTypes.string,
         format: PropTypes.string
@@ -247,7 +247,7 @@ class StaticField extends Component {
 class InputField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        label: PropTypes.string,
         placeholder: PropTypes.string,
         type: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
@@ -662,7 +662,7 @@ class ButtonRow extends Component {
 class TreeTableSelect extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        label: PropTypes.string,
         dataUrl: PropTypes.string,
         data: PropTypes.array,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
@@ -713,7 +713,7 @@ class TableSelect extends Component {
         dropdown: PropTypes.bool,
 
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         format: PropTypes.string,
         disabled: PropTypes.bool

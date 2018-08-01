@@ -2,9 +2,12 @@
 
 import React, {Component} from 'react';
 import {translate} from 'react-i18next';
-import {Icon} from '../lib/bootstrap-components';
 import {
-    NavButton,
+    DropdownMenu,
+    Icon
+} from '../lib/bootstrap-components';
+import {
+    MenuLink,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -131,7 +134,11 @@ export default class List extends Component {
             <div>
                 <Toolbar>
                     {this.state.createPermitted &&
-                       <NavButton linkTo="/campaigns/create" className="btn-primary" icon="plus" label={t('Create Campaign')}/>
+                    <DropdownMenu className="btn-primary" label={t('Create Campaign')}>
+                        <MenuLink to="/campaigns/create-regular">{t('Regular')}</MenuLink>
+                        <MenuLink to="/campaigns/create-rss">{t('RSS')}</MenuLink>
+                        <MenuLink to="/campaigns/create-triggered">{t('Triggered')}</MenuLink>
+                    </DropdownMenu>
                     }
                 </Toolbar>
 

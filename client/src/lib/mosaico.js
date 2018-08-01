@@ -37,6 +37,7 @@ export class MosaicoEditor extends Component {
         entity: PropTypes.object,
         title: PropTypes.string,
         onFullscreenAsync: PropTypes.func,
+        templateId: PropTypes.number,
         templatePath: PropTypes.string,
         initialModel: PropTypes.string,
         initialMetadata: PropTypes.string
@@ -60,6 +61,7 @@ export class MosaicoEditor extends Component {
         const mosaicoData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
+            templateId: this.props.templateId,
             templatePath: this.props.templatePath,
             initialModel: this.props.initialModel,
             initialMetadata: this.props.initialMetadata
@@ -96,6 +98,7 @@ export class MosaicoSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
+        templateId: PropTypes.number,
         templatePath: PropTypes.string,
         initialModel: PropTypes.string,
         initialMetadata: PropTypes.string
@@ -156,7 +159,7 @@ export class MosaicoSandbox extends Component {
         const trustedUrlBase = getTrustedUrl();
         const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, trustedUrlBase, sandboxUrlBase));
         const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, trustedUrlBase, sandboxUrlBase));
-        const template = this.props.templatePath;
+        const template = this.props.templateId ? getSandboxUrl(`mosaico/templates/${this.props.templateId}/index.html`) : this.props.templatePath;
 
         const allPlugins = plugins.concat(window.mosaicoPlugins);
 

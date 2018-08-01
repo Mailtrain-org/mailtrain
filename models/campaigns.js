@@ -1,20 +1,26 @@
 'use strict';
 
 const knex = require('../lib/knex');
+const hasher = require('node-object-hash')();
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shortid = require('shortid');
+const { enforce, filterObject } = require('../lib/helpers');
 const shares = require('./shares');
+const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const { CampaignSource, CampaignType} = require('../shared/campaigns');
 const segments = require('./segments');
 
 const allowedKeysCommon = ['name', 'description', 'list', 'segment', 'namespace',
-    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override',
-    'source', 'data', 'click_tracking_disabled', 'open_tracking_disabled'];
+    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled'];
 
-const allowedKeysCreate = new Set(['type', ...allowedKeysCommon]);
+const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
 const allowedKeysUpdate = new Set([...allowedKeysCommon]);
+
+function hash(entity) {
+    return hasher.hash(filterObject(entity, allowedKeysUpdate));
+}
 
 async function listDTAjax(context, params) {
     return await dtHelpers.ajaxListWithPermissions(
@@ -29,9 +35,13 @@ async function listDTAjax(context, params) {
 
 async function getById(context, id) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', 'view');
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
         const entity = await tx('campaigns').where('id', id).first();
+
         entity.permissions = await shares.getPermissionsTx(tx, context, 'campaign', id);
+
+        entity.data = JSON.parse(entity.data);
+
         return entity;
     });
 }
@@ -41,6 +51,10 @@ async function _validateAndPreprocess(tx, context, entity, isCreate) {
 
     if (isCreate) {
         enforce(entity.type === CampaignType.REGULAR && entity.type === CampaignType.RSS && entity.type === CampaignType.TRIGGERED, 'Unknown campaign type');
+
+        if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+            await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
+        }
     }
 
     enforce(entity.source >= CampaignSource.MIN && entity.source <= CampaignSource.MAX, 'Unknown campaign source');
@@ -52,11 +66,7 @@ async function _validateAndPreprocess(tx, context, entity, isCreate) {
         await segments.getByIdTx(tx, context, entity.list, entity.segment);
     }
 
-    if (entity.source === CampaignSource.TEMPLATE || (isCreate && entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
-        await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
-    }
-
-    entity.data = JSON.stringify(data);
+    entity.data = JSON.stringify(entity.data);
 }
 
 async function create(context, entity) {
@@ -126,6 +136,7 @@ async function updateWithConsistencyCheck(context, entity) {
             throw new interoperableErrors.NotFoundError();
         }
 
+        existing.data = JSON.parse(existing.data);
         const existingHash = hash(existing);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
@@ -145,6 +156,8 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
 
+        // FIXME - deal with deletion of dependent entities (files)
+
         await tx('campaigns').where('id', id).del();
         await knex.schema.dropTableIfExists('campaign__' + id);
         await knex.schema.dropTableIfExists('campaign_tracker__' + id);
@@ -153,6 +166,10 @@ async function remove(context, id) {
 
 
 module.exports = {
+    hash,
     listDTAjax,
-    getById
+    getById,
+    create,
+    updateWithConsistencyCheck,
+    remove
 };

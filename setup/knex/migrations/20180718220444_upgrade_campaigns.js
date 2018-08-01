@@ -81,6 +81,12 @@ exports.up = (knex, Promise) => (async() =>  {
                     editorType = 'ckeditor';
                 }
 
+                if (editorType == 'mosaico') {
+                    editorType = 'mosaicoWithFsTemplate';
+                    editorData.mosaicoFsTemplate = editorData.template;
+                    delete editorData.template;
+                }
+
                 campaign.source = CampaignSource.CUSTOM_FROM_TEMPLATE;
                 data.sourceCustom = {
                     type: editorType,

@@ -92,7 +92,7 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'delete');
 
-        // FIXME - deal with deletion of dependent entities
+        // FIXME - deal with deletion of dependent entities (files, etc.)
 
         await tx('templates').where('id', id).del();
     });

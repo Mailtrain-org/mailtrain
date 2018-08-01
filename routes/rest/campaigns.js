@@ -10,7 +10,7 @@ router.postAsync('/campaigns-table', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listDTAjax(req.context, req.body));
 });
 
-router.getAsync('/campaings/:campaignId', passport.loggedIn, async (req, res) => {
+router.getAsync('/campaigns/:campaignId', passport.loggedIn, async (req, res) => {
     const campaign = await campaigns.getById(req.context, req.params.campaignId);
     campaign.hash = campaigns.hash(campaign);
     return res.json(campaign);

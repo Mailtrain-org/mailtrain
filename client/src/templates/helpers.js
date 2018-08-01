@@ -6,6 +6,7 @@ import {
     AlignedRow,
     CKEditor,
     Dropdown,
+    StaticField,
     TableSelect
 } from "../lib/form";
 import 'brace/mode/text';
@@ -19,9 +20,16 @@ import {
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
 import {getSandboxUrl} from "../lib/urls";
 import mailtrainConfig from 'mailtrainConfig';
+import {
+    ActionLink,
+    Button
+} from "../lib/bootstrap-components";
+import {Trans} from "react-i18next";
+
+import styles from "../lib/styles.scss";
 
 
-export function getTemplateTypes(t, prefix = '') {
+export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEMPLATE) {
     // The prefix is used to to enable use within other forms (i.e. campaign form)
     const templateTypes = {};
 
@@ -64,8 +72,8 @@ export function getTemplateTypes(t, prefix = '') {
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
                     initialMetadata={owner.getFormValue(prefix + 'mosaicoData').metadata}
-                    templatePath={getSandboxUrl(`mosaico/templates/${owner.getFormValue(prefix + 'mosaicoTemplate')}/index.html`)}
-                    entityTypeId={ResourceType.TEMPLATE}
+                    templateId={owner.getFormValue(prefix + 'mosaicoTemplate')}
+                    entityTypeId={entityTypeId}
                     title={t('Mosaico Template Designer')}
                     onFullscreenAsync={::owner.setElementInFullscreen}/>
             </AlignedRow>,
@@ -110,11 +118,17 @@ export function getTemplateTypes(t, prefix = '') {
     };
 
     const mosaicoFsTemplatesOptions = mailtrainConfig.mosaico.fsTemplates.map(([key, label]) => ({key, label}));
+    const mosaicoFsTemplatesLabels = new Map(mailtrainConfig.mosaico.fsTemplates);
 
     templateTypes.mosaicoWithFsTemplate = {
         typeName: t('Mosaico with predefined templates'),
-        getTypeForm: (owner, isEdit) =>
-            <Dropdown id={prefix + 'mosaicoFsTemplate'} label={t('Mosaico Template')} options={mosaicoFsTemplatesOptions}/>,
+        getTypeForm: (owner, isEdit) => {
+            if (isEdit) {
+                return <StaticField id={prefix + 'mosaicoFsTemplate'} className={styles.formDisabled} label={t('Mosaico Template')}>{mosaicoFsTemplatesLabels.get(owner.getFormValue(prefix + 'mosaicoFsTemplate'))}</StaticField>;
+            } else {
+                return <Dropdown id={prefix + 'mosaicoFsTemplate'} label={t('Mosaico Template')} options={mosaicoFsTemplatesOptions}/>;
+            }
+        },
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
                 <MosaicoEditor
@@ -123,7 +137,7 @@ export function getTemplateTypes(t, prefix = '') {
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
                     initialMetadata={owner.getFormValue(prefix + 'mosaicoData').metadata}
                     templatePath={getSandboxUrl(`public/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/index.html`)}
-                    entityTypeId={ResourceType.TEMPLATE}
+                    entityTypeId={entityTypeId}
                     title={t('Mosaico Template Designer')}
                     onFullscreenAsync={::owner.setElementInFullscreen}/>
             </AlignedRow>,
@@ -140,7 +154,7 @@ export function getTemplateTypes(t, prefix = '') {
             mosaicoData: {}
         }),
         afterLoad: data => {
-            data['mosaicoFsTemplate'] = data[prefix + 'data'].mosaicoFsTemplate;
+            data[prefix + 'mosaicoFsTemplate'] = data[prefix + 'data'].mosaicoFsTemplate;
             data[prefix + 'mosaicoData'] = {
                 metadata: data[prefix + 'data'].metadata,
                 model: data[prefix + 'data'].model
@@ -310,7 +324,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
 
 export function getTypeForm(owner, typeKey, isEdit) {
     return <div>
-        {owner.templateTypes[typeKey].getTypeForm(this, isEdit)}
+        {owner.templateTypes[typeKey].getTypeForm(owner, isEdit)}
     </div>;
 }
 
