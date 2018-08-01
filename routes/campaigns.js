@@ -46,7 +46,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
         data.list = Number(data.list.split(':').shift());
     }
 
-    settings.list(['defaultFrom', 'defaultAddress', 'defaultSubject'], (err, configItems) => {
+    settings.list(['defaultFrom', 'defaultAddress', 'defaultSubject', 'defaultUnsubscribe'], (err, configItems) => {
         if (err) {
             req.flash('danger', err.message || err);
             return res.redirect('/');
@@ -93,6 +93,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
                 data.address = data.address || configItems.defaultAddress;
                 data.replyTo = data.replyTo || '';
                 data.subject = data.subject || configItems.defaultSubject;
+                data.unsubscribe = data.unsubscribe || configItems.defaultUnsubscribe;
 
                 let view;
                 switch (req.query.type) {
