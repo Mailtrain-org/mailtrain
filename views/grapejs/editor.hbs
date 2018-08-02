@@ -435,7 +435,12 @@
             mdlDialog.className += ' gjs-mdl-dialog-lg';
             mergeTagReferenceContainer.style.display = 'block';
             md.setTitle('Merge tag reference');
-            md.setContent(mergeTagReferenceContainer);
+            for(var i=0; i<100; i++) {
+                try {
+                    md.setContent(mergeTagReferenceContainer);
+                    break;
+                } catch(err) {}
+            }
             md.open();
             md.getModel().once('change:open', function() {
                 mdlDialog.className = mdlDialog.className.replace('gjs-mdl-dialog-lg', '');
