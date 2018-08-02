@@ -32,8 +32,10 @@ export default class Files extends Component {
 
     static propTypes = {
         title: PropTypes.string,
-        entity: PropTypes.object,
-        entityTypeId: PropTypes.string,
+        entity: PropTypes.object.isRequired,
+        entityTypeId: PropTypes.string.isRequired,
+        entitySubTypeId: PropTypes.string.isRequired,
+        managePermission: PropTypes.string.isRequired,
         usePublicDownloadUrls: PropTypes.bool
     }
 
@@ -65,7 +67,7 @@ export default class Files extends Component {
             for (const file of files) {
                 data.append('files[]', file)
             }
-            axios.post(getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entity.id}`), data)
+            axios.post(getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${this.props.entity.id}`), data)
             .then(res => {
                 this.filesTable.refresh();
                 const message = this.getFilesUploadedMessage(res);
@@ -93,7 +95,7 @@ export default class Files extends Component {
 
         try {
             this.setFlashMessage('info', t('Deleting file ...'));
-            await axios.delete(getUrl(`rest/files/${this.props.entityTypeId}/${fileToDeleteId}`));
+            await axios.delete(getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${fileToDeleteId}`));
             this.filesTable.refresh();
             this.setFlashMessage('info', t('File deleted'));
         } catch (err) {
@@ -110,24 +112,26 @@ export default class Files extends Component {
             { data: 3, title: "Size" },
             {
                 actions: data => {
+                    const actions = [];
 
                     let downloadUrl;
                     if (this.props.usePublicDownloadUrls) {
-                        downloadUrl =`/files/${this.props.entityTypeId}/${this.props.entity.id}/${data[2]}`;
+                        downloadUrl =`/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${this.props.entity.id}/${data[2]}`;
                     } else {
-                        downloadUrl =`rest/files/${this.props.entityTypeId}/${data[0]}`;
+                        downloadUrl =`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${data[0]}`;
                     }
 
-                    const actions = [
-                        {
-                            label: <Icon icon="download" title={t('Download')}/>,
-                            href: downloadUrl
-                        },
-                        {
+                    actions.push({
+                        label: <Icon icon="download" title={t('Download')}/>,
+                        href: downloadUrl
+                    });
+
+                    if (this.props.entity.permissions.includes(this.props.managePermission)) {
+                        actions.push({
                             label: <Icon icon="remove" title={t('Delete')}/>,
                             action: () => this.deleteFile(data[0], data[1])
-                        }
-                    ];
+                        });
+                    }
 
                     return actions;
                 }
@@ -146,10 +150,15 @@ export default class Files extends Component {
                     ]}>
                     {t('Are you sure you want to delete file "{{name}}"?', {name: this.state.fileToDeleteName})}
                 </ModalDialog>
-                <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName="dropZoneActive">
-                    {state => state.isDragActive ? t('Drop {{count}} file(s)', {count:state.draggedFiles.length}) : t('Drop files here')}
-                </Dropzone>
-                <Table withHeader ref={node => this.filesTable = node} dataUrl={`rest/files-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={columns} />
+
+                {
+                    this.props.entity.permissions.includes(this.props.managePermission) &&
+                    <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName="dropZoneActive">
+                        {state => state.isDragActive ? t('Drop {{count}} file(s)', {count:state.draggedFiles.length}) : t('Drop files here')}
+                    </Dropzone>
+                }
+
+                <Table withHeader ref={node => this.filesTable = node} dataUrl={`rest/files-table/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${this.props.entity.id}`} columns={columns} />
             </div>
         );
     }

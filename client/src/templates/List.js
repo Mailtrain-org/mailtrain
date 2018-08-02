@@ -80,7 +80,7 @@ export default class List extends Component {
                         });
                     }
 
-                    if (perms.includes('manageFiles')) {
+                    if (perms.includes('viewFiles')) {
                         actions.push({
                             label: <Icon icon="hdd" title={t('Files')}/>,
                             link: `/templates/${data[0]}/files`

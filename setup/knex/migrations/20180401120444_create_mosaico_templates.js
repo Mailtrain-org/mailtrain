@@ -52,10 +52,4 @@ exports.up = (knex, Promise) => (async() =>  {
 })();
 
 exports.down = (knex, Promise) => (async() =>  {
-    await knex.schema
-        .dropTable('shares_mosaico_template')
-        .dropTable('permissions_mosaico_template')
-        .dropTable('files_mosaico_template')
-        .dropTable('mosaico_templates')
-    ;
 })();

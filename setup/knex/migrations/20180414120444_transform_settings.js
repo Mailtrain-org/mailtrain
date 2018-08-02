@@ -121,9 +121,4 @@ exports.up = (knex, Promise) => (async() =>  {
 
 
 exports.down = (knex, Promise) => (async() =>  {
-    await knex.schema
-        .dropTable('shares_send_configuration')
-        .dropTable('permissions_send_configuration')
-        .dropTable('send_configurations')
-    ;
 })();

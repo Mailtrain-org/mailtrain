@@ -69,7 +69,7 @@ router.postAsync('/permissions-check', passport.loggedIn, async (req, res) => {
 
 router.postAsync('/permissions-rebuild', passport.loggedIn, async (req, res) => {
     shares.enforceGlobalPermission(req.context, 'rebuildPermissions');
-    shares.rebuildPermissions();
+    await shares.rebuildPermissions();
     return res.json(result);
 });
 

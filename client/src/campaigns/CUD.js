@@ -34,7 +34,6 @@ import {
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {
-    getEditForm,
     getTemplateTypes,
     getTypeForm
 } from '../templates/helpers';
@@ -43,11 +42,13 @@ import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {
     CampaignSource,
+    CampaignStatus,
     CampaignType
 } from "../../../shared/campaigns";
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {ResourceType} from "../lib/mosaico";
+import {getCampaignTypeLabels} from "./helpers";
 
 const overridables = ['from_name', 'from_email', 'reply_to', 'subject'];
 
@@ -65,6 +66,8 @@ export default class CUD extends Component {
         this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
         this.mailerTypes = getMailerTypes(props.t);
 
+        this.campaignTypes = getCampaignTypeLabels(t);
+
         this.createTitles = {
             [CampaignType.REGULAR]: t('Create Regular Campaign'),
             [CampaignType.RSS]: t('Create RSS Campaign'),
@@ -79,7 +82,8 @@ export default class CUD extends Component {
 
         this.sourceLabels = {
             [CampaignSource.TEMPLATE]: t('Template'),
-            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('Custom content'),
+            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('Custom content cloned from template'),
+            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('Custom content cloned from another campaign'),
             [CampaignSource.CUSTOM]: t('Custom content'),
             [CampaignSource.URL]: t('URL')
         };
@@ -95,8 +99,6 @@ export default class CUD extends Component {
         }
 
         this.state = {
-            showMergeTagReference: false,
-            elementInFullscreen: false,
             sendConfiguration: null
         };
 
@@ -112,7 +114,6 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        wizard: PropTypes.string,
         entity: PropTypes.object,
         type: PropTypes.number
     }
@@ -144,37 +145,17 @@ export default class CUD extends Component {
     componentDidMount() {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity, data => {
-                if (data.source === CampaignSource.TEMPLATE || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+                // The source cannot be changed once campaign is created. Thus we don't have to initialize fields for all other sources
+                if (data.source === CampaignSource.TEMPLATE) {
                     data.data_sourceTemplate = data.data.sourceTemplate;
-                } else {
-                    data.data_sourceTemplate = null;
-                }
-
-                if (data.source === CampaignSource.CUSTOM || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                    data.data_sourceCustom_type = data.data.sourceCustom.type;
-                    data.data_sourceCustom_data = data.data.sourceCustom.data;
-                    data.data_sourceCustom_html = data.data.sourceCustom.html;
-                    data.data_sourceCustom_text = data.data.sourceCustom.text;
-
-                    this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
-                    
-                } else {
-                    data.data_sourceCustom_type = null;
-                    data.data_sourceCustom_data = {};
-                    data.data_sourceCustom_html = '';
-                    data.data_sourceCustom_text = '';
                 }
 
                 if (data.source === CampaignSource.URL) {
                     data.data_sourceUrl = data.data.sourceUrl;
-                } else {
-                    data.data_sourceUrl = null;
                 }
 
                 if (data.type === CampaignType.RSS) {
                     data.data_feedUrl = data.data.feedUrl;
-                } else {
-                    data.data_feedUrl = '';
                 }
 
                 data.useSegmentation = !!data.segment;
@@ -211,11 +192,14 @@ export default class CUD extends Component {
 
                 source: CampaignSource.TEMPLATE,
 
-                // This is for CampaignSource.TEMPLATE
+                // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
                 data_sourceTemplate: null,
 
+                // This is for CampaignSource.CUSTOM_FROM_CAMPAIGN
+                data_sourceCampaign: null,
+
                 // This is for CampaignSource.CUSTOM
-                data_sourceCustom_type: null,
+                data_sourceCustom_type: mailtrainConfig.editors[0],
                 data_sourceCustom_data: {},
                 data_sourceCustom_html: '',
                 data_sourceCustom_text: '',
@@ -252,6 +236,12 @@ export default class CUD extends Component {
             state.setIn(['segment', 'error'], null);
         }
 
+        if (!state.getIn(['send_configuration', 'value'])) {
+            state.setIn(['send_configuration', 'error'], t('Send configuration must be selected'));
+        } else {
+            state.setIn(['send_configuration', 'error'], null);
+        }
+
         if (state.getIn(['from_email_overriden', 'value']) && !state.getIn(['from_email_override', 'value'])) {
             state.setIn(['from_email_override', 'error'], t('"From" email must not be empty'));
         } else {
@@ -261,22 +251,29 @@ export default class CUD extends Component {
 
         const campaignTypeKey = state.getIn(['type', 'value']);
 
-        const sourceTypeKey = state.getIn(['source', 'value']);
+        const sourceTypeKey = Number.parseInt(state.getIn(['source', 'value']));
+
+        for (const key of state.keys()) {
+            if (key.startsWith('data_')) {
+                state.setIn([key, 'error'], null);
+            }
+        }
 
         if (sourceTypeKey === CampaignSource.TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
             if (!state.getIn(['data_sourceTemplate', 'value'])) {
                 state.setIn(['data_sourceTemplate', 'error'], t('Template must be selected'));
-            } else {
-                state.setIn(['data_sourceTemplate', 'error'], null);
+            }
+
+        } else if (sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+            if (!state.getIn(['data_sourceCampaign', 'value'])) {
+                state.setIn(['data_sourceCampaign', 'error'], t('Campaign must be selected'));
             }
 
         } else if (sourceTypeKey === CampaignSource.CUSTOM) {
-            // The type is used only in create form. In case of CUSTOM_FROM_TEMPLATE, it is determined by the source template, so no need to check it here
+            // The type is used only in create form. In case of CUSTOM_FROM_TEMPLATE or CUSTOM_FROM_CAMPAIGN, it is determined by the source template, so no need to check it here
             const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
             if (!customTemplateTypeKey) {
                 state.setIn(['data_sourceCustom_type', 'error'], t('Type must be selected'));
-            } else {
-                state.setIn(['data_sourceCustom_type', 'error'], null);
             }
 
             if (customTemplateTypeKey) {
@@ -286,16 +283,12 @@ export default class CUD extends Component {
         } else if (sourceTypeKey === CampaignSource.URL) {
             if (!state.getIn(['data_sourceUrl', 'value'])) {
                 state.setIn(['data_sourceUrl', 'error'], t('URL must not be empty'));
-            } else {
-                state.setIn(['data_sourceUrl', 'error'], null);
             }
         }
 
         if (campaignTypeKey === CampaignType.RSS) {
             if (!state.getIn(['data_feedUrl', 'value'])) {
                 state.setIn(['data_feedUrl', 'error'], t('RSS feed URL must be given'));
-            } else {
-                state.setIn(['data_feedUrl', 'error'], null);
             }
         }
 
@@ -305,14 +298,6 @@ export default class CUD extends Component {
 
     async submitHandler() {
         const t = this.props.t;
-
-        if (this.props.entity) {
-            const sourceTypeKey = this.getFormValue('source');
-            if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
-                await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
-            }
-        }
 
         let sendMethod, url;
         if (this.props.entity) {
@@ -337,7 +322,11 @@ export default class CUD extends Component {
                 data.data.sourceTemplate = data.data_sourceTemplate;
             }
 
-            if (data.source === CampaignSource.CUSTOM || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+            if (data.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+                data.data.sourceCampaign = data.data_sourceCampaign;
+            }
+
+            if (data.source === CampaignSource.CUSTOM) {
                 this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
 
                 data.data.sourceCustom = {
@@ -382,116 +371,18 @@ export default class CUD extends Component {
         }
     }
 
-    async extractPlainText() {
-        const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
-        await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
-
-        const html = this.getFormValue('data_sourceCustom_html');
-        if (!html) {
-            return;
-        }
-
-        if (this.isFormDisabled()) {
-            return;
-        }
-
-        this.disableForm();
-
-        console.log(html);
-
-        const response = await axios.post(getUrl('rest/html-to-text', { html }));
-
-        this.updateFormValue('data_sourceCustom_text', response.data.text);
-
-        this.enableForm();
-    }
-
-    async toggleMergeTagReference() {
-        this.setState({
-            showMergeTagReference: !this.state.showMergeTagReference
-        });
-    }
-
-    async setElementInFullscreen(elementInFullscreen) {
-        this.setState({
-            elementInFullscreen
-        });
-    }
-
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
-        let templateEdit = null;
         let extraSettings = null;
 
-        const sourceTypeKey = this.getFormValue('source');
+        const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
         const campaignTypeKey = this.getFormValue('type');
-
-
-        let sourceEdit;
-        if (isEdit) {
-            sourceEdit = <StaticField id="source" className={styles.formDisabled} label={t('Content source')}>{this.sourceLabels[sourceTypeKey]}</StaticField>;
-        } else {
-            sourceEdit = <Dropdown id="source" label={t('Content source')} options={this.sourceOptions}/>
-        }
-
-
-        if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
-            const templatesColumns = [
-                { data: 1, title: t('Name') },
-                { data: 2, title: t('Description') },
-                { data: 3, title: t('Type'), render: data => this.templateTypes[data].typeName },
-                { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
-                { data: 5, title: t('Namespace') },
-            ];
-
-            let help = null;
-            if (sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                help = t('Selecting a template creates a campaign specific copy from it.');
-            }
-
-            templateEdit = <TableSelect id="data_sourceTemplate" label={t('Template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
-
-        } else if (sourceTypeKey === CampaignSource.CUSTOM || (isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
-            // TODO: Toggle HTML preview
-
-            const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
-
-            let customTemplateEditForm = null;
-            let customTemplateTypeForm = null;
-
-            if (customTemplateTypeKey) {
-                customTemplateTypeForm = getTypeForm(this, customTemplateTypeKey, isEdit);
-
-                if (isEdit) {
-                    customTemplateEditForm = getEditForm(this, customTemplateTypeKey);
-                }
-            }
-
-            templateEdit = <div>
-                {isEdit
-                    ?
-                    <StaticField id="data_sourceCustom_type" className={styles.formDisabled} label={t('Custom template editor')}>
-                        {customTemplateTypeKey && this.templateTypes[customTemplateTypeKey].typeName}
-                    </StaticField>
-                    :
-                    <Dropdown id="data_sourceCustom_type" label={t('Type')} options={this.customTemplateTypeOptions}/>
-                }
-
-                {customTemplateTypeForm}
-
-                {customTemplateEditForm}
-            </div>;
-
-        } else if (sourceTypeKey === CampaignSource.URL) {
-            templateEdit = <InputField id="data_sourceUrl" label={t('Render URL')} help={t('If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself.')}/>
-        }
 
         if (campaignTypeKey === CampaignType.RSS) {
             extraSettings = <InputField id="data_feedUrl" label={t('RSS Feed Url')}/>
-
         }
 
         const listsColumns = [
@@ -545,8 +436,64 @@ export default class CUD extends Component {
         }
 
 
+        let sourceEdit = null;
+        if (isEdit) {
+            if (!(sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
+                sourceEdit = <StaticField id="source" className={styles.formDisabled} label={t('Content source')}>{this.sourceLabels[sourceTypeKey]}</StaticField>;
+            }
+        } else {
+            sourceEdit = <Dropdown id="source" label={t('Content source')} options={this.sourceOptions}/>
+        }
+
+        let templateEdit = null;
+        if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
+            const templatesColumns = [
+                { data: 1, title: t('Name') },
+                { data: 2, title: t('Description') },
+                { data: 3, title: t('Type'), render: data => this.templateTypes[data].typeName },
+                { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
+                { data: 5, title: t('Namespace') },
+            ];
+
+            let help = null;
+            if (sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+                help = t('Selecting a template creates a campaign specific copy from it.');
+            }
+
+            templateEdit = <TableSelect id="data_sourceTemplate" label={t('Template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+
+        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+            const campaignsColumns = [
+                { data: 1, title: t('Name') },
+                { data: 2, title: t('Description') },
+                { data: 3, title: t('Type'), render: data => this.campaignTypes[data] },
+                { data: 7, title: t('Created'), render: data => moment(data).fromNow() },
+                { data: 8, title: t('Namespace') }
+            ];
+
+            templateEdit = <TableSelect id="data_sourceCampaign" label={t('Campaign')} withHeader dropdown dataUrl='rest/campaigns-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('Content of the selected campaign will be copied into this campaign.')}/>;
+
+        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
+            const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
+
+            let customTemplateTypeForm = null;
+
+            if (customTemplateTypeKey) {
+                customTemplateTypeForm = getTypeForm(this, customTemplateTypeKey, isEdit);
+            }
+
+            templateEdit = <div>
+                <Dropdown id="data_sourceCustom_type" label={t('Type')} options={this.customTemplateTypeOptions}/>
+                {customTemplateTypeForm}
+            </div>;
+
+        } else if (sourceTypeKey === CampaignSource.URL) {
+            templateEdit = <InputField id="data_sourceUrl" label={t('Render URL')} help={t('If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself.')}/>
+        }
+
+
         return (
-            <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
+            <div>
                 {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
@@ -588,7 +535,7 @@ export default class CUD extends Component {
                     <CheckBox id="open_trackings_disabled" text={t('Disable opened tracking')}/>
                     <CheckBox id="click_tracking_disabled" text={t('Disable clicked tracking')}/>
 
-                    <hr/>
+                    {sourceEdit && <hr/> }
 
                     {sourceEdit}
 

@@ -120,5 +120,4 @@ exports.up = (knex, Promise) => (async() => {
 })();
 
 exports.down = (knex, Promise) => (async() => {
-    // return knex.schema.dropTable('users');
 })();

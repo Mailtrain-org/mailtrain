@@ -25,6 +25,7 @@ import {
     CampaignType
 } from "../../../shared/campaigns";
 import {checkPermissions} from "../lib/permissions";
+import {getCampaignTypeLabels} from "./helpers";
 
 @translate()
 @withPageHelpers
@@ -44,11 +45,7 @@ export default class List extends Component {
             [CampaignStatus.ACTIVE]: t('Active')
         };
 
-        this.campaignTypes = {
-            [CampaignType.REGULAR]: t('Regular'),
-            [CampaignType.TRIGGERED]: t('Triggered'),
-            [CampaignType.RSS]: t('RSS')
-        };
+        this.campaignTypes = getCampaignTypeLabels(t);
 
         this.state = {};
     }
@@ -109,14 +106,26 @@ export default class List extends Component {
                         });
                     }
 
-                    if (perms.includes('manageFiles') && (campaignSource === CampaignSource.CUSTOM || campaignSource === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
+                    if (perms.includes('edit') && (campaignSource === CampaignSource.CUSTOM || campaignSource === CampaignSource.CUSTOM_FROM_TEMPLATE || campaignSource === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
+                        actions.push({
+                            label: <Icon icon="align-center" title={t('Content')}/>,
+                            link: `/campaigns/${data[0]}/content`
+                        });
+                    }
+
+                    if (perms.includes('viewFiles') && (campaignSource === CampaignSource.CUSTOM || campaignSource === CampaignSource.CUSTOM_FROM_TEMPLATE || campaignSource === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
                         actions.push({
                             label: <Icon icon="hdd" title={t('Files')}/>,
                             link: `/campaigns/${data[0]}/files`
                         });
                     }
 
-                    // FIXME: add attachments
+                    if (perms.includes('viewAttachments')) {
+                        actions.push({
+                            label: <Icon icon="paperclip" title={t('Attachments')}/>,
+                            link: `/campaigns/${data[0]}/attachments`
+                        });
+                    }
 
                     if (perms.includes('share')) {
                         actions.push({

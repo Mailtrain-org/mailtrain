@@ -15,17 +15,21 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
+async function getByIdTx(tx, context, id, withPermissions = true) {
+    await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'view');
+    const entity = await tx('templates').where('id', id).first();
+    entity.data = JSON.parse(entity.data);
+
+    if (withPermissions) {
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'template', id);
+    }
+
+    return entity;
+}
+
 async function getById(context, id, withPermissions = true) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'view');
-        const entity = await tx('templates').where('id', id).first();
-        entity.data = JSON.parse(entity.data);
-
-        if (withPermissions) {
-            entity.permissions = await shares.getPermissionsTx(tx, context, 'template', id);
-        }
-
-        return entity;
+        return await getByIdTx(tx, context, id, withPermissions);
     });
 }
 
@@ -100,6 +104,7 @@ async function remove(context, id) {
 
 module.exports = {
     hash,
+    getByIdTx,
     getById,
     listDTAjax,
     create,

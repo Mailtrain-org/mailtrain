@@ -31,5 +31,4 @@ exports.up = (knex, Promise) => (async() => {
 })();
 
 exports.down = (knex, Promise) => (async() => {
-    await knex.schema.dropTable('namespaces');
 })();

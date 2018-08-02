@@ -64,6 +64,20 @@ export default class List extends Component {
                         });
                     }
 
+                    if (perms.includes('viewFiles')) {
+                        actions.push({
+                            label: <Icon icon="hdd" title={t('Files')}/>,
+                            link: `/templates/mosaico/${data[0]}/files`
+                        });
+                    }
+
+                    if (perms.includes('viewFiles')) {
+                        actions.push({
+                            label: <Icon icon="th-large" title={t('Block thumbnails')}/>,
+                            link: `/templates/mosaico/${data[0]}/blocks`
+                        });
+                    }
+
                     if (perms.includes('share')) {
                         actions.push({
                             label: <Icon icon="share-alt" title={t('Share')}/>,

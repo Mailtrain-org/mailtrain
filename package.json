@@ -57,6 +57,7 @@
     "connect-redis": "^3.3.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "crypto": "^1.0.1",
     "csurf": "^1.9.0",
     "csv-parse": "^1.2.3",
     "device": "^0.3.8",

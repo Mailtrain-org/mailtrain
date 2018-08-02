@@ -6,8 +6,9 @@ const CampaignSource = {
     TEMPLATE: 1,
     CUSTOM: 2,
     CUSTOM_FROM_TEMPLATE: 3,
-    URL: 4,
-    RSS: 5,
+    CUSTOM_FROM_CAMPAIGN: 4,
+    URL: 5,
+    RSS: 6,
 
     MAX: 6
 };

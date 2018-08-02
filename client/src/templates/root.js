@@ -33,8 +33,8 @@ function getMenus(t) {
                         files: {
                             title: t('Files'),
                             link: params => `/templates/${params.templateId}/files`,
-                            visible: resolved => resolved.template.permissions.includes('edit'),
-                            panelRender: props => <Files title={t('Files')} entity={props.resolved.template} entityTypeId="template" />
+                            visible: resolved => resolved.template.permissions.includes('viewFiles'),
+                            panelRender: props => <Files title={t('Files')} entity={props.resolved.template} entityTypeId="template" entitySubTypeId="file" managePermission="manageFiles"/>
                         },
                         share: {
                             title: t('Share'),
@@ -69,8 +69,14 @@ function getMenus(t) {
                                 files: {
                                     title: t('Files'),
                                     link: params => `/templates/mosaico/${params.mosaiceTemplateId}/files`,
-                                    visible: resolved => resolved.mosaicoTemplate.permissions.includes('edit'),
-                                    panelRender: props => <Files title={t('Files')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" />
+                                    visible: resolved => resolved.mosaicoTemplate.permissions.includes('viewFiles'),
+                                    panelRender: props => <Files title={t('Files')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" entitySubTypeId="file" managePermission="manageFiles" />
+                                },
+                                blocks: {
+                                    title: t('Block thumbnails'),
+                                    link: params => `/templates/mosaico/${params.mosaiceTemplateId}/blocks`,
+                                    visible: resolved => resolved.mosaicoTemplate.permissions.includes('viewFiles'),
+                                    panelRender: props => <Files title={t('Block thumbnails')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" entitySubTypeId="block" managePermission="manageFiles" />
                                 },
                                 share: {
                                     title: t('Share'),

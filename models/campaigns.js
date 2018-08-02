@@ -9,6 +9,7 @@ const { enforce, filterObject } = require('../lib/helpers');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
+const templates = require('./templates');
 const { CampaignSource, CampaignType} = require('../shared/campaigns');
 const segments = require('./segments');
 
@@ -33,16 +34,22 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function getById(context, id) {
-    return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
-        const entity = await tx('campaigns').where('id', id).first();
+async function getByIdTx(tx, context, id, withPermissions = true) {
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
+    const entity = await tx('campaigns').where('id', id).first();
 
+    if (withPermissions) {
         entity.permissions = await shares.getPermissionsTx(tx, context, 'campaign', id);
+    }
 
-        entity.data = JSON.parse(entity.data);
+    entity.data = JSON.parse(entity.data);
 
-        return entity;
+    return entity;
+}
+
+async function getById(context, id, withPermissions = true) {
+    return await knex.transaction(async tx => {
+        return await getByIdTx(tx, context, id, withPermissions);
     });
 }
 
@@ -50,7 +57,7 @@ async function _validateAndPreprocess(tx, context, entity, isCreate) {
     await namespaceHelpers.validateEntity(tx, entity);
 
     if (isCreate) {
-        enforce(entity.type === CampaignType.REGULAR && entity.type === CampaignType.RSS && entity.type === CampaignType.TRIGGERED, 'Unknown campaign type');
+        enforce(entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS || entity.type === CampaignType.TRIGGERED, 'Unknown campaign type');
 
         if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
             await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
@@ -66,6 +73,8 @@ async function _validateAndPreprocess(tx, context, entity, isCreate) {
         await segments.getByIdTx(tx, context, entity.list, entity.segment);
     }
 
+    await shares.enforceEntityPermissionTx(tx, context, 'send_configuration', entity.send_configuration, 'viewPublic');
+
     entity.data = JSON.stringify(entity.data);
 }
 
@@ -73,9 +82,30 @@ async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCampaign');
 
-        let copyFilesFromTemplateId;
+        let copyFilesFrom = null;
         if (entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-            copyFilesFromTemplateId = entity.data.sourceTemplate;
+            copyFilesFrom = {
+                entityType: 'template',
+                entityId: entity.data.sourceTemplate
+            };
+
+            const template = await templates.getByIdTx(tx, context, entity.data.sourceTemplate, false);
+
+            entity.data.sourceCustom = {
+                type: template.type,
+                data: template.data,
+                html: template.html,
+                text: template.text
+            };
+        } else if (entity.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+            copyFilesFrom = {
+                entityType: 'campaign',
+                entityId: entity.data.sourceCampaign
+            };
+
+            const sourceCampaign = await getByIdTx(tx, context, entity.data.sourceCampaign, false);
+
+            entity.data.sourceCustom = sourceCampaign.data.sourceCustom;
         }
 
         await _validateAndPreprocess(tx, context, entity, true);
@@ -119,8 +149,8 @@ async function create(context, entity) {
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
 
-        if (copyFilesFromTemplateId) {
-            files.copyAllTx(tx, context, 'template', copyFilesFromTemplateId, 'campaign', id);
+        if (copyFilesFrom) {
+            await files.copyAllTx(tx, context, copyFilesFrom.entityType, copyFilesFrom.entityId, 'campaign', id);
         }
 
         return id;
@@ -168,6 +198,7 @@ async function remove(context, id) {
 module.exports = {
     hash,
     listDTAjax,
+    getByIdTx,
     getById,
     create,
     updateWithConsistencyCheck,

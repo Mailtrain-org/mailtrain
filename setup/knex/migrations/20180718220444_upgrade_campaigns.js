@@ -56,6 +56,8 @@ scheduled - used only for campaign type NORMAL
 
 const { getSystemSendConfigurationId } = require('../../../shared/send-configurations');
 const { CampaignSource, CampaignType} = require('../../../shared/campaigns');
+const files = require('../../../models/files');
+const contextHelpers = require('../../../lib/context-helpers');
 
 exports.up = (knex, Promise) => (async() =>  {
 
@@ -77,11 +79,11 @@ exports.up = (knex, Promise) => (async() =>  {
                 let editorType = campaign.editor_name;
                 const editorData = JSON.parse(campaign.editor_data || '{}');
 
-                if (editorType == 'summernote') {
+                if (editorType === 'summernote') {
                     editorType = 'ckeditor';
                 }
 
-                if (editorType == 'mosaico') {
+                if (editorType === 'mosaico') {
                     editorType = 'mosaicoWithFsTemplate';
                     editorData.mosaicoFsTemplate = editorData.template;
                     delete editorData.template;
@@ -115,6 +117,20 @@ exports.up = (knex, Promise) => (async() =>  {
         campaign.data = JSON.stringify(data);
 
         await knex('campaigns').where('id', campaign.id).update(campaign);
+
+        const attachments = await knex('attachments').where('campaign', campaign.id);
+        const attachmentFiles = [];
+        for (const attachment of attachments) {
+            attachmentFiles.push({
+                originalname: attachment.filename,
+                mimetype: attachment.content_type,
+                // encoding: file.encoding,
+                size: attachment.size,
+                created: attachment.created,
+                data: attachment.content
+            });
+        }
+        await files.createFiles(contextHelpers.getAdminContext(), 'campaign', 'attachment', campaign.id, attachmentFiles, files.ReplacementBehavior.NONE);
     }
 
     await knex.schema.table('campaigns', table => {
@@ -138,6 +154,7 @@ exports.up = (knex, Promise) => (async() =>  {
 
     await knex.schema.dropTableIfExists('campaign');
     await knex.schema.dropTableIfExists('campaign_tracker');
+    await knex.schema.dropTableIfExists('attachments');
 })();
 
 exports.down = (knex, Promise) => (async() =>  {

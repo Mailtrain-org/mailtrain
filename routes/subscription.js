@@ -505,7 +505,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
     const autoUnsubscribe = req.query.auto === 'yes';
 
     if (autoUnsubscribe) {
-        handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, res, next);
+        await handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, res, next);
 
     } else if (req.query.formTest ||
         list.unsubscription_mode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM ||

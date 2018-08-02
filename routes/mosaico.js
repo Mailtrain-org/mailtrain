@@ -135,10 +135,9 @@ function getRouter(trusted) {
         });
 
         // Mosaico looks for block thumbnails in edres folder relative to index.html of the template. We respond to such requests here.
-        // We use the following naming convention in Mosaico templates for the block thumbnails: edres/xxx -> edres-xxx
         router.getAsync('/templates/:mosaicoTemplateId/edres/:fileName', async (req, res, next) => {
             try {
-                const file = await files.getFileByOriginalName(contextHelpers.getAdminContext(), 'mosaicoTemplate', req.params.mosaicoTemplateId, req.params.fileName);
+                const file = await files.getFileByOriginalName(contextHelpers.getAdminContext(), 'mosaicoTemplate', 'block', req.params.mosaicoTemplateId, req.params.fileName);
                 res.type(file.mimetype);
                 return res.download(file.path, file.name);
             } catch (err) {
@@ -154,18 +153,18 @@ function getRouter(trusted) {
         router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', 'client', 'public', 'mosaico', 'templates', 'versafix-1', 'edres')));
 
 
-        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', getSandboxUrl, true);
+        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file');
 
         router.getAsync('/upload/:type/:entityId', passport.loggedIn, async (req, res) => {
-            const entries = await files.list(req.context, req.params.type, req.params.entityId);
+            const entries = await files.list(req.context, req.params.type, 'file', req.params.entityId);
 
             const filesOut = [];
             for (const entry of entries) {
                 filesOut.push({
                     name: entry.originalname,
-                    url: files.getFileUrl(req.context, req.params.type, req.params.entityId, entry.filename),
+                    url: files.getFileUrl(req.context, req.params.type, 'file', req.params.entityId, entry.filename),
                     size: entry.size,
-                    thumbnailUrl: files.getFileUrl(req.context, req.params.type, req.params.entityId, entry.filename) // TODO - use smaller thumbnails
+                    thumbnailUrl: files.getFileUrl(req.context, req.params.type, 'file', req.params.entityId, entry.filename) // TODO - use smaller thumbnails
                 })
             }
 
@@ -175,9 +174,6 @@ function getRouter(trusted) {
         });
 
         router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
-            const resourceType = req.query.type;
-            const resourceId = req.query.id;
-
             const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, trusted);
 
             let languageStrings = null;
@@ -229,7 +225,7 @@ function getRouter(trusted) {
                 if (url.startsWith(mosaicoLegacyUrlPrefix)) {
                     filePath = path.join(__dirname, '..', 'client', 'public' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
                 } else {
-                    const file = await files.getFileByUrl(contextHelpers.getAdminContext(), req.params.type, req.params.entityId, url);
+                    const file = await files.getFileByUrl(contextHelpers.getAdminContext(), req.params.type, 'file', req.params.entityId, url);
                     filePath = file.path;
                 }
 

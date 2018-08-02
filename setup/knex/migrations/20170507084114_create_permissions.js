@@ -32,9 +32,4 @@ exports.up = (knex, Promise) => (async() => {
 })();
 
 exports.down = (knex, Promise) => (async() => {
-    for (const entityType of shareableEntityTypes) {
-        await knex.schema
-            .dropTable(`shares_${entityType}`)
-            .dropTable(`permissions_${entityType}`);
-    }
 })();

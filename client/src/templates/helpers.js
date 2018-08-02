@@ -323,8 +323,6 @@ export function getEditForm(owner, typeKey, prefix = '') {
 }
 
 export function getTypeForm(owner, typeKey, isEdit) {
-    return <div>
-        {owner.templateTypes[typeKey].getTypeForm(owner, isEdit)}
-    </div>;
+    return owner.templateTypes[typeKey].getTypeForm(owner, isEdit);
 }
 

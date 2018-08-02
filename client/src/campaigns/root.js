@@ -3,6 +3,7 @@
 import React from 'react';
 
 import CampaignsCUD from './CUD';
+import Content from './Content';
 import CampaignsList from './List';
 import Share from '../shares/Share';
 import Files from "../lib/files";
@@ -29,13 +30,24 @@ function getMenus(t) {
                             visible: resolved => resolved.campaign.permissions.includes('edit'),
                             panelRender: props => <CampaignsCUD action={props.match.params.action} entity={props.resolved.campaign} />
                         },
+                        content: {
+                            title: t('Content'),
+                            link: params => `/campaigns/${params.campaignId}/content`,
+                            visible: resolved => resolved.campaign.permissions.includes('edit') && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || resolved.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN),
+                            panelRender: props => <Content entity={props.resolved.campaign} />
+                        },
                         files: {
                             title: t('Files'),
                             link: params => `/campaigns/${params.campaignId}/files`,
-                            visible: resolved => resolved.campaign.permissions.includes('edit') && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE),
-                            panelRender: props => <Files title={t('Files')} entity={props.resolved.campaign} entityTypeId="campaign" />
+                            visible: resolved => resolved.campaign.permissions.includes('viewFiles') && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || resolved.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN),
+                            panelRender: props => <Files title={t('Files')} entity={props.resolved.campaign} entityTypeId="campaign" entitySubTypeId="file" managePermission="manageFiles"/>
                         },
-                        // FIXME: add attachments
+                        attachments: {
+                            title: t('Attachments'),
+                            link: params => `/campaigns/${params.campaignId}/attachments`,
+                            visible: resolved => resolved.campaign.permissions.includes('viewAttachments'),
+                            panelRender: props => <Files title={t('Attachments')} entity={props.resolved.campaign} entityTypeId="campaign" entitySubTypeId="attachment" managePermission="manageAttachments"/>
+                        },
                         share: {
                             title: t('Share'),
                             link: params => `/campaigns/${params.campaignId}/share`,
