@@ -357,14 +357,19 @@
                 md.setTitle('Test your Newsletter');
                 
                 var modalContent = $('<div>').append(testContainer).html();
-                md.setContent(modalContent);
+                for(var i=0; i<100; i++) {
+                    try {
+                        md.setContent(modalContent);
+                        break;
+                    } catch(err) {}
+                }
                 
-                testContainer = $(".gjs-mdl-dialog #test-form");
+                testContainerCopy = $(".gjs-mdl-dialog #test-form");
                 
-                var statusFormElC = document.querySelector('.form-status');
-                var statusFormEl = document.querySelector('.form-status i');
+                var statusFormElC = document.querySelector('.gjs-mdl-dialog .form-status');
+                var statusFormEl = document.querySelector('.gjs-mdl-dialog .form-status i');
 
-                var ajaxTest = ajaxable(testContainer, { headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } })
+                var ajaxTest = ajaxable(testContainerCopy, { headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } })
                     .onStart(function() {
                         statusFormEl.className = 'fa fa-refresh anim-spin';
                         statusFormElC.style.opacity = '1';
@@ -391,11 +396,11 @@
                 };
 
                 if (isValidEmail(localStorage.getItem('testemail'))) {
-                    $('#test-form input[name=email]').val(localStorage.getItem('testemail'));
+                    $('.gjs-mdl-dialog #test-form input[name=email]').val(localStorage.getItem('testemail'));
                 }
 
-                $('#test-form').on('submit', function() {
-                    var email = $('#test-form input[name=email]').val();
+                $('.gjs-mdl-dialog #test-form').on('submit', function() {
+                    var email = $('.gjs-mdl-dialog #test-form input[name=email]').val();
                     isValidEmail(email) && localStorage.setItem('testemail', email);
                 });
                 
