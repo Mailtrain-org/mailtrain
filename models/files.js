@@ -176,7 +176,6 @@ async function createFiles(context, type, subType, entityId, files, replacementB
                     filename: file.filename,
                     originalname: originalName,
                     mimetype: file.mimetype,
-                    encoding: file.encoding,
                     size: file.size
                 });
 
@@ -200,8 +199,8 @@ async function createFiles(context, type, subType, entityId, files, replacementB
         }
 
         if (replacementBehavior === ReplacementBehavior.REPLACE) {
+            const idsToRemove = [];
             for (const row of existingNamesRows) {
-                const idsToRemove = [];
                 if (processedNameSet.has(row.originalname)) {
                     removedFiles.push(row);
                     idsToRemove.push(row.id);

@@ -97,14 +97,10 @@ async function create(context, entity) {
             '  `latest_open` timestamp NULL DEFAULT NULL,\n' +
             '  `latest_click` timestamp NULL DEFAULT NULL,\n' +
             '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
-            '  `first_name` varchar(255) DEFAULT NULL,\n' +
-            '  `last_name` varchar(255) DEFAULT NULL,\n' +
             '  PRIMARY KEY (`id`),\n' +
             '  UNIQUE KEY `email` (`email`),\n' +
             '  UNIQUE KEY `cid` (`cid`),\n' +
             '  KEY `status` (`status`),\n' +
-            '  KEY `first_name` (`first_name`(191)),\n' +
-            '  KEY `last_name` (`last_name`(191)),\n' +
             '  KEY `subscriber_tz` (`tz`),\n' +
             '  KEY `is_test` (`is_test`),\n' +
             '  KEY `latest_open` (`latest_open`),\n' +
