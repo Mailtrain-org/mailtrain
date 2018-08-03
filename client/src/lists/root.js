@@ -70,7 +70,7 @@ function getMenus(t) {
                         fields: {
                             title: t('Fields'),
                             link: params => `/lists/${params.listId}/fields/`,
-                            visible: resolved => resolved.list.permissions.includes('manageFields'),
+                            visible: resolved => resolved.list.permissions.includes('viewFields'),
                             panelRender: props => <FieldsList list={props.resolved.list} />,
                             children: {
                                 ':fieldId([0-9]+)': {
@@ -100,7 +100,7 @@ function getMenus(t) {
                         segments: {
                             title: t('Segments'),
                             link: params => `/lists/${params.listId}/segments`,
-                            visible: resolved => resolved.list.permissions.includes('manageSegments'),
+                            visible: resolved => resolved.list.permissions.includes('viewSegments'),
                             panelRender: props => <SegmentsList list={props.resolved.list} />,
                             children: {
                                 ':segmentId([0-9]+)': {

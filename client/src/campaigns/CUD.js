@@ -217,6 +217,7 @@ export default class CUD extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
+        const isEdit = !!this.props.entity;
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
@@ -259,17 +260,17 @@ export default class CUD extends Component {
             }
         }
 
-        if (sourceTypeKey === CampaignSource.TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+        if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
             if (!state.getIn(['data_sourceTemplate', 'value'])) {
                 state.setIn(['data_sourceTemplate', 'error'], t('Template must be selected'));
             }
 
-        } else if (sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             if (!state.getIn(['data_sourceCampaign', 'value'])) {
                 state.setIn(['data_sourceCampaign', 'error'], t('Campaign must be selected'));
             }
 
-        } else if (sourceTypeKey === CampaignSource.CUSTOM) {
+        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             // The type is used only in create form. In case of CUSTOM_FROM_TEMPLATE or CUSTOM_FROM_CAMPAIGN, it is determined by the source template, so no need to check it here
             const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
             if (!customTemplateTypeKey) {
@@ -302,7 +303,7 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `rest/campaigns/${this.props.entity.id}`
+            url = `rest/campaigns-settings/${this.props.entity.id}`;
         } else {
             sendMethod = FormSendMethod.POST;
             url = 'rest/campaigns'
@@ -312,6 +313,8 @@ export default class CUD extends Component {
         this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            data.source = Number.parseInt(data.source);
+
             if (!data.useSegmentation) {
                 data.segment = null;
             }
@@ -460,18 +463,20 @@ export default class CUD extends Component {
                 help = t('Selecting a template creates a campaign specific copy from it.');
             }
 
-            templateEdit = <TableSelect id="data_sourceTemplate" label={t('Template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            // The "key" property here and in the TableSelect below is to tell React that these tables are different and should be rendered by different instances. Otherwise, React will use
+            // only one instance, which fails because Table does not handle updates in "columns" property
+            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('Template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
                 { data: 1, title: t('Name') },
                 { data: 2, title: t('Description') },
                 { data: 3, title: t('Type'), render: data => this.campaignTypes[data] },
-                { data: 7, title: t('Created'), render: data => moment(data).fromNow() },
-                { data: 8, title: t('Namespace') }
+                { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
+                { data: 5, title: t('Namespace') }
             ];
 
-            templateEdit = <TableSelect id="data_sourceCampaign" label={t('Campaign')} withHeader dropdown dataUrl='rest/campaigns-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('Content of the selected campaign will be copied into this campaign.')}/>;
+            templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('Campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('Content of the selected campaign will be copied into this campaign.')}/>;
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');

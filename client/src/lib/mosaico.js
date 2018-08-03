@@ -147,8 +147,8 @@ export class MosaicoSandbox extends Component {
         });
 
         const config = {
-            imgProcessorBackend: getTrustedUrl(`mosaico/img/${this.props.entityTypeId}/${this.props.entityId}`),
-            emailProcessorBackend: getSandboxUrl('mosaico/dl/'),
+            imgProcessorBackend: getTrustedUrl('mosaico/img'),
+            emailProcessorBackend: getSandboxUrl('mosaico/dl'),
             fileuploadConfig: {
                 url: getSandboxUrl(`mosaico/upload/${this.props.entityTypeId}/${this.props.entityId}`)
             },

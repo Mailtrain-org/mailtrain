@@ -88,14 +88,8 @@ export default class CustomContent extends Component {
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
         await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
 
-        let sendMethod, url;
-        if (this.props.entity) {
-            sendMethod = FormSendMethod.PUT;
-            url = `rest/campaigns/${this.props.entity.id}`
-        } else {
-            sendMethod = FormSendMethod.POST;
-            url = 'rest/campaigns'
-        }
+        const sendMethod = FormSendMethod.PUT;
+        const url = `rest/campaigns-content/${this.props.entity.id}`;
 
         this.disableForm();
         this.setFormStatusMessage('info', t('Saving ...'));

@@ -3,7 +3,10 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {translate} from "react-i18next";
-import {requiresAuthenticatedUser} from "./page";
+import {
+    requiresAuthenticatedUser,
+    Title
+} from "./page";
 import {withErrorHandling} from "./error-handling";
 import {Table} from "./table";
 import Dropzone from "react-dropzone";
@@ -32,6 +35,7 @@ export default class Files extends Component {
 
     static propTypes = {
         title: PropTypes.string,
+        help: PropTypes.string,
         entity: PropTypes.object.isRequired,
         entityTypeId: PropTypes.string.isRequired,
         entitySubTypeId: PropTypes.string.isRequired,
@@ -150,6 +154,10 @@ export default class Files extends Component {
                     ]}>
                     {t('Are you sure you want to delete file "{{name}}"?', {name: this.state.fileToDeleteName})}
                 </ModalDialog>
+
+                {this.props.title && <Title>{this.props.title}</Title>}
+
+                {this.props.help && <p>{this.props.help}</p>}
 
                 {
                     this.props.entity.permissions.includes(this.props.managePermission) &&

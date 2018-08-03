@@ -34,7 +34,7 @@ function getMenus(t) {
                             title: t('Files'),
                             link: params => `/templates/${params.templateId}/files`,
                             visible: resolved => resolved.template.permissions.includes('viewFiles'),
-                            panelRender: props => <Files title={t('Files')} entity={props.resolved.template} entityTypeId="template" entitySubTypeId="file" managePermission="manageFiles"/>
+                            panelRender: props => <Files title={t('Files')} help={t('These files are publicly available via HTTP so that they can be linked to from the content of the campaign.')} entity={props.resolved.template} entityTypeId="template" entitySubTypeId="file" managePermission="manageFiles"/>
                         },
                         share: {
                             title: t('Share'),
@@ -70,13 +70,13 @@ function getMenus(t) {
                                     title: t('Files'),
                                     link: params => `/templates/mosaico/${params.mosaiceTemplateId}/files`,
                                     visible: resolved => resolved.mosaicoTemplate.permissions.includes('viewFiles'),
-                                    panelRender: props => <Files title={t('Files')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" entitySubTypeId="file" managePermission="manageFiles" />
+                                    panelRender: props => <Files title={t('Files')} help={t('These files are publicly available via HTTP so that they can be linked to from the Mosaico template.')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" entitySubTypeId="file" managePermission="manageFiles" />
                                 },
                                 blocks: {
                                     title: t('Block thumbnails'),
                                     link: params => `/templates/mosaico/${params.mosaiceTemplateId}/blocks`,
                                     visible: resolved => resolved.mosaicoTemplate.permissions.includes('viewFiles'),
-                                    panelRender: props => <Files title={t('Block thumbnails')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" entitySubTypeId="block" managePermission="manageFiles" />
+                                    panelRender: props => <Files title={t('Block thumbnails')} help={t('These files will be used by Mosaico to search for block thumbnails (the "edres" directory). Place here one file per block type that you have defined in the Mosaico template. Each file must have the same name as the block id. The file will be used as the thumbnail of the corresponding block.')}entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" entitySubTypeId="block" managePermission="manageFiles" />
                                 },
                                 share: {
                                     title: t('Share'),

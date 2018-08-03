@@ -201,7 +201,7 @@ function getRouter(trusted) {
         });
 
     } else {
-        router.getAsync('/img/:type/:entityId', async (req, res) => {
+        router.getAsync('/img', async (req, res) => {
             const method = req.query.method;
             const params = req.query.params;
             let [width, height] = params.split(',');
@@ -225,7 +225,7 @@ function getRouter(trusted) {
                 if (url.startsWith(mosaicoLegacyUrlPrefix)) {
                     filePath = path.join(__dirname, '..', 'client', 'public' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
                 } else {
-                    const file = await files.getFileByUrl(contextHelpers.getAdminContext(), req.params.type, 'file', req.params.entityId, url);
+                    const file = await files.getFileByUrl(contextHelpers.getAdminContext(), url);
                     filePath = file.path;
                 }
 

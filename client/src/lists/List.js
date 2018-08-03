@@ -78,10 +78,17 @@ export default class List extends Component {
                         });
                     }
 
-                    if (perms.includes('manageFields')) {
+                    if (perms.includes('viewFields')) {
                         actions.push({
-                            label: <Icon icon="th-list" title={t('Manage Fields')}/>,
+                            label: <Icon icon="th-list" title={t('Fields')}/>,
                             link: `/lists/${data[0]}/fields`
+                        });
+                    }
+
+                    if (perms.includes('viewSegments')) {
+                        actions.push({
+                            label: <Icon icon="tag" title={t('Segments')}/>,
+                            link: `/lists/${data[0]}/segments`
                         });
                     }
 

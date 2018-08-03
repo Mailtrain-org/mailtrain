@@ -32,18 +32,28 @@ export default class List extends Component {
         const columns = [
             { data: 1, title: t('Name') },
             {
-                actions: data => [{
-                    label: <Icon icon="edit" title={t('Edit')}/>,
-                    link: `/lists/${this.props.list.id}/segments/${data[0]}/edit`
-                }]
+                actions: data => {
+                    const actions = [];
+
+                    if (this.props.list.permissions.includes('manageSegments')) {
+                        actions.push({
+                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            link: `/lists/${this.props.list.id}/segments/${data[0]}/edit`
+                        });
+                    }
+
+                    return actions;
+                }
             }
         ];
 
         return (
             <div>
-                <Toolbar>
-                    <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('Create Segment')}/>
-                </Toolbar>
+                {this.props.list.permissions.includes('manageSegments') &&
+                    <Toolbar>
+                        <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('Create Segment')}/>
+                    </Toolbar>
+                }
 
                 <Title>{t('Segment')}</Title>
 

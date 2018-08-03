@@ -20,6 +20,11 @@
   :global .ace_editor {
     border: 1px solid #ccc;
   }
+
+  .buttonRow:last-child {
+    // This is to move Save/Delete buttons a bit down
+    margin-top: 15px;
+  }
 }
 
 .dayPickerWrapper {
@@ -27,7 +32,6 @@
 }
 
 .buttonRow {
-  margin-top: 15px;
 }
 
 .buttonRow > * {

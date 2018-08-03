@@ -940,7 +940,7 @@ async function migrateAttachments(knex) {
                 data: attachment.content
             });
         }
-        await files.createFiles(contextHelpers.getAdminContext(), 'campaign', 'attachment', campaign.id, attachmentFiles, files.ReplacementBehavior.NONE);
+        await files.createFiles(contextHelpers.getAdminContext(), 'campaign', 'attachment', campaign.id, attachmentFiles);
     }
 
     await knex.schema.dropTableIfExists('attachments');

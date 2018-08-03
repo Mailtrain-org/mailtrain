@@ -11,7 +11,12 @@ function base(text, trustedBaseUrl, sandboxBaseUrl) {
         sandboxBaseUrl = sandboxBaseUrl.substring(0, sandboxBaseUrl.length - 1);
     }
 
-    return text.split('[URL_BASE]').join(trustedBaseUrl).split('[SANDBOX_URL_BASE]').join(sandboxBaseUrl);
+    text = text.split('[URL_BASE]').join(trustedBaseUrl);
+    text = text.split('[SANDBOX_URL_BASE]').join(sandboxBaseUrl);
+    text = text.split('[ENCODED_URL_BASE]').join(encodeURIComponent(trustedBaseUrl));
+    text = text.split('[ENCODED_SANDBOX_URL_BASE]').join(encodeURIComponent(sandboxBaseUrl));
+
+    return text;
 }
 
 function unbase(text, trustedBaseUrl, sandboxBaseUrl, treatSandboxAsTrusted = false) {
@@ -23,7 +28,12 @@ function unbase(text, trustedBaseUrl, sandboxBaseUrl, treatSandboxAsTrusted = fa
         sandboxBaseUrl = sandboxBaseUrl.substring(0, sandboxBaseUrl.length - 1);
     }
 
-    return text.split(trustedBaseUrl).join('[URL_BASE]').split(sandboxBaseUrl).join(treatSandboxAsTrusted ? '[URL_BASE]' : '[SANDBOX_URL_BASE]');
+    text = text.split(trustedBaseUrl).join('[URL_BASE]');
+    text = text.split(sandboxBaseUrl).join(treatSandboxAsTrusted ? '[URL_BASE]' : '[SANDBOX_URL_BASE]');
+    text = text.split(encodeURIComponent(trustedBaseUrl)).join('[ENCODED_URL_BASE]');
+    text = text.split(encodeURIComponent(sandboxBaseUrl)).join(treatSandboxAsTrusted ? '[ENCODED_URL_BASE]' : '[ENCODED_SANDBOX_URL_BASE]');
+
+    return text;
 }
 
 module.exports = {

@@ -20,6 +20,6 @@ router.deleteAsync('/files/:type/:subType/:fileId', passport.loggedIn, async (re
     return res.json();
 });
 
-fileHelpers.installUploadHandler(router, '/files/:type/:subType/:entityId', files.ReplacementBehavior.REPLACE);
+fileHelpers.installUploadHandler(router, '/files/:type/:subType/:entityId');
 
 module.exports = router;

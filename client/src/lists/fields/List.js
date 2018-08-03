@@ -40,18 +40,28 @@ export default class List extends Component {
             { data: 2, title: t('Type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
             { data: 3, title: t('Merge Tag') },
             {
-                actions: data => [{
-                    label: <Icon icon="edit" title={t('Edit')}/>,
-                    link: `/lists/${this.props.list.id}/fields/${data[0]}/edit`
-                }]
+                actions: data => {
+                    const actions = [];
+
+                    if (this.props.list.permissions.includes('manageFields')) {
+                        actions.push({
+                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            link: `/lists/${this.props.list.id}/fields/${data[0]}/edit`
+                        });
+                    }
+
+                    return actions;
+                }
             }
         ];
 
         return (
             <div>
-                <Toolbar>
-                    <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('Create Field')}/>
-                </Toolbar>
+                {this.props.list.permissions.includes('manageFields') &&
+                    <Toolbar>
+                        <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('Create Field')}/>
+                    </Toolbar>
+                }
 
                 <Title>{t('Fields')}</Title>
 

@@ -19,8 +19,32 @@ const allowedKeysCommon = ['name', 'description', 'list', 'segment', 'namespace'
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
 const allowedKeysUpdate = new Set([...allowedKeysCommon]);
 
-function hash(entity) {
-    return hasher.hash(filterObject(entity, allowedKeysUpdate));
+const Content = {
+    ALL: 0,
+    WITHOUT_SOURCE_CUSTOM: 1,
+    ONLY_SOURCE_CUSTOM: 2
+};
+
+function hash(entity, content) {
+    let filteredEntity;
+
+    if (content === Content.ALL) {
+        filteredEntity = filterObject(entity, allowedKeysUpdate);
+
+    } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
+        filteredEntity = filterObject(entity, allowedKeysUpdate);
+        filteredEntity.data = {...filteredEntity.data};
+        delete filteredEntity.data.sourceCustom;
+
+    } else if (content === Content.ONLY_SOURCE_CUSTOM) {
+        filteredEntity = {
+            data: {
+                sourceCustom: entity.data.sourceCustom
+            }
+        };
+    }
+
+    return hasher.hash(filteredEntity);
 }
 
 async function listDTAjax(context, params) {
@@ -34,48 +58,103 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function getByIdTx(tx, context, id, withPermissions = true) {
+async function listWithContentDTAjax(context, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('campaigns')
+            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+            .whereIn('campaigns.source', [CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.CUSTOM_FROM_CAMPAIGN]),
+        ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
+    );
+}
+
+async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
-    const entity = await tx('campaigns').where('id', id).first();
+    let entity = await tx('campaigns').where('id', id).first();
+
+    entity.data = JSON.parse(entity.data);
+
+    if (content === Content.WITHOUT_SOURCE_CUSTOM) {
+        delete entity.data.sourceCustom;
+
+    } else if (content === Content.ONLY_SOURCE_CUSTOM) {
+        entity = {
+            id: entity.id,
+
+            data: {
+                sourceCustom: entity.data.sourceCustom
+            }
+        };
+    }
 
     if (withPermissions) {
         entity.permissions = await shares.getPermissionsTx(tx, context, 'campaign', id);
     }
 
-    entity.data = JSON.parse(entity.data);
-
     return entity;
 }
 
-async function getById(context, id, withPermissions = true) {
+async function getById(context, id, withPermissions = true, content = Content.ALL) {
     return await knex.transaction(async tx => {
-        return await getByIdTx(tx, context, id, withPermissions);
+        return await getByIdTx(tx, context, id, withPermissions, content);
     });
 }
 
-async function _validateAndPreprocess(tx, context, entity, isCreate) {
-    await namespaceHelpers.validateEntity(tx, entity);
+async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
+    if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM) {
+        await namespaceHelpers.validateEntity(tx, entity);
 
-    if (isCreate) {
-        enforce(entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS || entity.type === CampaignType.TRIGGERED, 'Unknown campaign type');
+        if (isCreate) {
+            enforce(entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS || entity.type === CampaignType.TRIGGERED, 'Unknown campaign type');
 
-        if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-            await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
+            if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+                await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
+            }
+
+            enforce(Number.isInteger(entity.source));
+            enforce(entity.source >= CampaignSource.MIN && entity.source <= CampaignSource.MAX, 'Unknown campaign source');
         }
+
+        await shares.enforceEntityPermissionTx(tx, context, 'list', entity.list, 'view');
+
+        if (entity.segment) {
+            // Check that the segment under the list exists
+            await segments.getByIdTx(tx, context, entity.list, entity.segment);
+        }
+
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.send_configuration, 'viewPublic');
+    }
+}
+
+function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityType, toEntityId) {
+
+    function convertText(text) {
+        if (text) {
+            const fromUrl = `/files/${fromEntityType}/file/${fromEntityId}`;
+            const toUrl = `/files/${toEntityType}/file/${toEntityId}`;
+
+            const encodedFromUrl = encodeURIComponent(fromUrl);
+            const encodedToUrl = encodeURIComponent(toUrl);
+
+            text = text.split('[URL_BASE]' + fromUrl).join('[URL_BASE]' + toUrl);
+            text = text.split('[SANDBOX_URL_BASE]' + fromUrl).join('[SANDBOX_URL_BASE]' + toUrl);
+            text = text.split('[ENCODED_URL_BASE]' + encodedFromUrl).join('[ENCODED_URL_BASE]' + encodedToUrl);
+            text = text.split('[ENCODED_SANDBOX_URL_BASE]' + encodedFromUrl).join('[ENCODED_SANDBOX_URL_BASE]' + encodedToUrl);
+        }
+
+        return text;
     }
 
-    enforce(entity.source >= CampaignSource.MIN && entity.source <= CampaignSource.MAX, 'Unknown campaign source');
+    sourceCustom.html = convertText(sourceCustom.html);
+    sourceCustom.text = convertText(sourceCustom.text);
 
-    await shares.enforceEntityPermissionTx(tx, context, 'list', entity.list, 'view');
-
-    if (entity.segment) {
-        // Check that the segment under the list exists
-        await segments.getByIdTx(tx, context, entity.list, entity.segment);
+    if (sourceCustom.type === 'mosaico' || sourceCustom.type === 'mosaicoWithFsTemplate') {
+        sourceCustom.data.model = convertText(sourceCustom.data.model);
+        sourceCustom.data.model = convertText(sourceCustom.data.model);
+        sourceCustom.data.metadata = convertText(sourceCustom.data.metadata);
     }
-
-    await shares.enforceEntityPermissionTx(tx, context, 'send_configuration', entity.send_configuration, 'viewPublic');
-
-    entity.data = JSON.stringify(entity.data);
 }
 
 async function create(context, entity) {
@@ -97,6 +176,7 @@ async function create(context, entity) {
                 html: template.html,
                 text: template.text
             };
+
         } else if (entity.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             copyFilesFrom = {
                 entityType: 'campaign',
@@ -104,15 +184,19 @@ async function create(context, entity) {
             };
 
             const sourceCampaign = await getByIdTx(tx, context, entity.data.sourceCampaign, false);
+            enforce(sourceCampaign.source === CampaignSource.CUSTOM || sourceCampaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceCampaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN, 'Incorrect source type of the source campaign.');
 
             entity.data.sourceCustom = sourceCampaign.data.sourceCustom;
         }
 
-        await _validateAndPreprocess(tx, context, entity, true);
+        await _validateAndPreprocess(tx, context, entity, true, Content.ALL);
 
         const filteredEntity = filterObject(entity, allowedKeysCreate);
         filteredEntity.cid = shortid.generate();
 
+        const data = filteredEntity.data;
+
+        filteredEntity.data = JSON.stringify(filteredEntity.data);
         const ids = await tx('campaigns').insert(filteredEntity);
         const id = ids[0];
 
@@ -150,14 +234,20 @@ async function create(context, entity) {
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
 
         if (copyFilesFrom) {
-            await files.copyAllTx(tx, context, copyFilesFrom.entityType, copyFilesFrom.entityId, 'campaign', id);
+            await files.copyAllTx(tx, context, copyFilesFrom.entityType, 'file', copyFilesFrom.entityId, 'campaign', 'file', id);
+
+            convertFileURLs(data.sourceCustom, copyFilesFrom.entityType, copyFilesFrom.entityId, 'campaign', id);
+            await tx('campaigns')
+                .update({
+                    data: JSON.stringify(data)
+                }).where('id', id);
         }
 
         return id;
     });
 }
 
-async function updateWithConsistencyCheck(context, entity) {
+async function updateWithConsistencyCheck(context, entity, content) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'edit');
 
@@ -167,16 +257,31 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         existing.data = JSON.parse(existing.data);
-        const existingHash = hash(existing);
+        const existingHash = hash(existing, content);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
         }
 
-        await _validateAndPreprocess(tx, context, entity, false);
+        await _validateAndPreprocess(tx, context, entity, false, content);
 
-        await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete');
+        let filteredEntity = filterObject(entity, allowedKeysUpdate);
+        if (content === Content.ALL) {
+            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete');
 
-        await tx('campaigns').where('id', entity.id).update(filterObject(entity, allowedKeysUpdate));
+        } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
+            filteredEntity.data.sourceCustom = existing.data.sourceCustom;
+            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete');
+
+        } else if (content === Content.ONLY_SOURCE_CUSTOM) {
+            const data = existing.data;
+            data.sourceCustom = filteredEntity.data.sourceCustom;
+            filteredEntity = {
+                data
+            };
+        }
+
+        filteredEntity.data = JSON.stringify(filteredEntity.data);
+        await tx('campaigns').where('id', entity.id).update(filteredEntity);
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: entity.id });
     });
@@ -196,8 +301,10 @@ async function remove(context, id) {
 
 
 module.exports = {
+    Content,
     hash,
     listDTAjax,
+    listWithContentDTAjax,
     getByIdTx,
     getById,
     create,

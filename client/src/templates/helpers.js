@@ -37,8 +37,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         const initVals = templateTypes[templateType].initData();
 
         for (const key in initVals) {
-            if (!mutState.hasIn([prefix + key])) {
-                mutState.setIn([prefix + key, 'value'], initVals[key]);
+            if (!mutState.hasIn([key])) {
+                mutState.setIn([key, 'value'], initVals[key]);
             }
         }
     }
@@ -97,6 +97,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             };
         },
         beforeSave: data => {
+                console.log(data);
             data[prefix + 'data'] = {
                 mosaicoTemplate: data[prefix + 'mosaicoTemplate'],
                 metadata: data[prefix + 'mosaicoData'].metadata,
@@ -150,8 +151,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             });
         },
         initData: () => ({
-            mosaicoFsTemplate: mailtrainConfig.mosaico.fsTemplates[0][0],
-            mosaicoData: {}
+            [prefix + 'mosaicoFsTemplate']: mailtrainConfig.mosaico.fsTemplates[0][0],
+            [prefix + 'mosaicoData']: {}
         }),
         afterLoad: data => {
             data[prefix + 'mosaicoFsTemplate'] = data[prefix + 'data'].mosaicoFsTemplate;
@@ -169,7 +170,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             clearBeforeSave(data);
         },
         afterTypeChange: mutState => {
-            initFieldsIfMissing(mutState, 'mosaico');
+            initFieldsIfMissing(mutState, 'mosaicoWithFsTemplate');
         },
         validate: state => {}
     };

@@ -4,7 +4,7 @@ const knex = require('../lib/knex');
 const config = require('config');
 const { enforce } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
-const permissions = require('../lib/permissions');
+const entitySettings = require('../lib/entity-settings');
 const interoperableErrors = require('../shared/interoperable-errors');
 const log = require('npmlog');
 const {getGlobalNamespaceId} = require('../shared/namespaces');
@@ -15,7 +15,7 @@ const {getGlobalNamespaceId} = require('../shared/namespaces');
 
 async function listByEntityDTAjax(context, entityTypeId, entityId, params) {
     return await knex.transaction(async (tx) => {
-        const entityType = permissions.getEntityType(entityTypeId);
+        const entityType = entitySettings.getEntityType(entityTypeId);
         await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
 
         return await dtHelpers.ajaxListTx(
@@ -41,7 +41,7 @@ async function listByUserDTAjax(context, entityTypeId, userId, params) {
 
         await enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
 
-        const entityType = permissions.getEntityType(entityTypeId);
+        const entityType = entitySettings.getEntityType(entityTypeId);
 
         return await dtHelpers.ajaxListWithPermissionsTx(
             tx,
@@ -61,7 +61,7 @@ async function listByUserDTAjax(context, entityTypeId, userId, params) {
 
 async function listUnassignedUsersDTAjax(context, entityTypeId, entityId, params) {
     return await knex.transaction(async (tx) => {
-        const entityType = permissions.getEntityType(entityTypeId);
+        const entityType = entitySettings.getEntityType(entityTypeId);
 
         await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
 
@@ -93,7 +93,7 @@ async function listRolesDTAjax(entityTypeId, params) {
 }
 
 async function assign(context, entityTypeId, entityId, userId, role) {
-    const entityType = permissions.getEntityType(entityTypeId);
+    const entityType = entitySettings.getEntityType(entityTypeId);
 
     await knex.transaction(async tx => {
         await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
@@ -129,17 +129,17 @@ async function assign(context, entityTypeId, entityId, userId, role) {
 async function rebuildPermissionsTx(tx, restriction) {
     restriction = restriction || {};
 
-    const namespaceEntityType = permissions.getEntityType('namespace');
+    const namespaceEntityType = entitySettings.getEntityType('namespace');
 
     // Collect entity types we care about
     let restrictedEntityTypes;
     if (restriction.entityTypeId) {
-        const entityType = permissions.getEntityType(restriction.entityTypeId);
+        const entityType = entitySettings.getEntityType(restriction.entityTypeId);
         restrictedEntityTypes = {
             [restriction.entityTypeId]: entityType
         };
     } else {
-        restrictedEntityTypes = permissions.getEntityTypes();
+        restrictedEntityTypes = entitySettings.getEntityTypes();
     }
 
 
@@ -374,7 +374,7 @@ async function regenerateRoleNamesTable() {
     await knex.transaction(async tx => {
         await tx('generated_role_names').del();
 
-        const entityTypeIds = ['global', ...Object.keys(permissions.getEntityTypes())];
+        const entityTypeIds = ['global', ...Object.keys(entitySettings.getEntityTypes())];
 
         for (const entityTypeId of entityTypeIds) {
             const roles = config.roles[entityTypeId];
@@ -397,7 +397,7 @@ function throwPermissionDenied() {
 }
 
 async function removeDefaultShares(tx, user) {
-    const namespaceEntityType = permissions.getEntityType('namespace');
+    const namespaceEntityType = entitySettings.getEntityType('namespace');
 
     const roleConf = config.roles.global[user.role];
 
@@ -467,7 +467,7 @@ async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredO
         return false;
     }
 
-    const entityType = permissions.getEntityType(entityTypeId);
+    const entityType = entitySettings.getEntityType(entityTypeId);
 
     if (typeof requiredOperations === 'string') {
         requiredOperations = [ requiredOperations ];
@@ -603,7 +603,7 @@ async function getPermissionsTx(tx, context, entityTypeId, entityId) {
 
     enforce(!context.user.admin, 'getPermissions is not supposed to be called by assumed admin');
 
-    const entityType = permissions.getEntityType(entityTypeId);
+    const entityType = entitySettings.getEntityType(entityTypeId);
 
     const rows = await tx(entityType.permissionsTable)
         .select('operation')

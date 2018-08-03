@@ -3,7 +3,6 @@
 const passport = require('../../lib/passport');
 const _ = require('../../lib/translate')._;
 const shares = require('../../models/shares');
-const permissions = require('../../lib/permissions');
 
 const router = require('../../lib/router-async').create();
 

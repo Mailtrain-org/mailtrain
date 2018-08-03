@@ -7,22 +7,18 @@ const shares = require('./shares');
 const fs = require('fs-extra-promise');
 const path = require('path');
 const interoperableErrors = require('../shared/interoperable-errors');
-const permissions = require('../lib/permissions');
+const entitySettings = require('../lib/entity-settings');
 const {getTrustedUrl} = require('../lib/urls');
 
 const crypto = require('crypto');
 const bluebird = require('bluebird');
 const cryptoPseudoRandomBytes = bluebird.promisify(crypto.pseudoRandomBytes);
 
-const entityTypes = permissions.getEntityTypes();
+const entityTypes = entitySettings.getEntityTypes();
 
 const filesDir = path.join(__dirname, '..', 'files');
 
-const ReplacementBehavior = {
-    NONE: 0,
-    REPLACE: 1,
-    RENAME: 2
-};
+const ReplacementBehavior = entitySettings.ReplacementBehavior;
 
 function enforceTypePermitted(type, subType) {
     enforce(type in entityTypes && entityTypes[type].files && entityTypes[type].files[subType]);
@@ -108,10 +104,26 @@ async function getFileByFilename(context, type, subType, entityId, name) {
     return await _getFileBy(context, type, subType, entityId, 'filename', name)
 }
 
-async function getFileByUrl(context, type, subType, entityId, url) {
-    const urlPrefix = getTrustedUrl(`files/${type}/${subType}/${entityId}/`, context);
+async function getFileByUrl(context, url) {
+    const urlPrefix = getTrustedUrl('files/', context);
     if (url.startsWith(urlPrefix)) {
-        const name = url.substring(urlPrefix.length);
+        const path = url.substring(urlPrefix.length);
+        const pathElem = path.split('/');
+
+        if (pathElem.length !== 4) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        const type = pathElem[0];
+        const subType = pathElem[1];
+        const entityId = Number.parseInt(pathElem[2]);
+
+        if (Number.isNaN(entityId)) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        const name = pathElem[3];
+
         return await getFileByFilename(context, type, subType, entityId, name);
     } else {
         throw new interoperableErrors.NotFoundError();
@@ -124,6 +136,10 @@ async function createFiles(context, type, subType, entityId, files, replacementB
     if (files.length == 0) {
         // No files uploaded
         return {uploaded: 0};
+    }
+
+    if (!replacementBehavior) {
+        replacementBehavior = entityTypes[type].files[subType].defaultReplacementBehavior;
     }
 
     const fileEntities = [];
@@ -280,7 +296,9 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
         row.entity = toEntityId;
     }
 
-    await tx(getFilesTable(toType, toSubType)).insert(rows);
+    if (rows.length > 0) {
+        await tx(getFilesTable(toType, toSubType)).insert(rows);
+    }
 }
 
 
