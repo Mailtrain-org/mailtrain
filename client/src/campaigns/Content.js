@@ -28,7 +28,6 @@ import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {ResourceType} from "../lib/mosaico";
 
-const overridables = ['from_name', 'from_email', 'reply_to', 'subject'];
 
 @translate()
 @withForm

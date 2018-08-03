@@ -41,16 +41,14 @@ import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {
+    campaignOverridables,
     CampaignSource,
-    CampaignStatus,
     CampaignType
 } from "../../../shared/campaigns";
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {ResourceType} from "../lib/mosaico";
 import {getCampaignTypeLabels} from "./helpers";
-
-const overridables = ['from_name', 'from_email', 'reply_to', 'subject'];
 
 @translate()
 @withForm
@@ -160,7 +158,7 @@ export default class CUD extends Component {
 
                 data.useSegmentation = !!data.segment;
 
-                for (const overridable of overridables) {
+                for (const overridable of campaignOverridables) {
                     data[overridable + '_overriden'] = !!data[overridable + '_override'];
                 }
 
@@ -169,7 +167,7 @@ export default class CUD extends Component {
 
         } else {
             const data = {};
-            for (const overridable of overridables) {
+            for (const overridable of campaignOverridables) {
                 data[overridable + '_override'] = '';
                 data[overridable + '_overriden'] = false;
             }
@@ -348,7 +346,7 @@ export default class CUD extends Component {
                 data.data.feedUrl = data.data_feedUrl;
             }
 
-            for (const overridable of overridables) {
+            for (const overridable of campaignOverridables) {
                 if (!data[overridable + '_overriden']) {
                     data[overridable + '_override'] = null;
                 }

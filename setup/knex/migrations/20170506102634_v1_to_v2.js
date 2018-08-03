@@ -6,6 +6,8 @@ const {getGlobalNamespaceId} = require('../../../shared/namespaces');
 const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
 const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
 const { MailerType, getSystemSendConfigurationId } = require('../../../shared/send-configurations');
+const { enforce } = require('../../../lib/helpers');
+const { EntityVals: TriggerEntityVals, ActionVals: TriggerActionVals } = require('../../../shared/triggers');
 
 const entityTypesWithFiles = {
     campaign: {
@@ -354,7 +356,7 @@ async function migrateCustomFields(knex) {
     // Upgrade custom fields
     // -----------------------------------------------------------------------------------------------------
     await knex.schema.table('custom_fields', table => {
-        table.text('settings');
+        table.text('settings', 'longtext');
     });
 
     await knex.schema.table('custom_fields', table => {
@@ -410,7 +412,7 @@ async function migrateSegments(knex) {
     // Upgrade segments
     // -----------------------------------------------------------------------------------------------------
     await knex.schema.table('segments', table => {
-        table.text('settings');
+        table.text('settings', 'longtext');
     });
 
     await knex.schema.table('segments', table => {
@@ -946,6 +948,33 @@ async function migrateAttachments(knex) {
     await knex.schema.dropTableIfExists('attachments');
 }
 
+async function migrateTriggers(knex) {
+    await knex.schema.table('triggers', table => {
+        table.renameColumn('rule', 'entity');
+        table.renameColumn('column', 'action');
+        table.renameColumn('dest_campaign', 'campaign');
+        table.renameColumn('seconds', 'seconds_after');
+    });
+
+    const triggers = await knex('triggers');
+
+    for (const trigger of triggers) {
+        const campaign = await knex('campaigns').where('id', trigger.campaign).first();
+
+        enforce(campaign.list === trigger.list, 'The list of trigger and campaign have to be the same.');
+
+        enforce(trigger.entity in TriggerEntityVals);
+        enforce(trigger.action in TriggerActionVals[trigger.entity]);
+    }
+
+    await knex.schema.table('triggers', table => {
+        table.dropForeign('list', 'triggers_ibfk_1');
+        table.dropColumn('list');
+    });
+
+    await knex.schema.dropTableIfExists('trigger');
+}
+
 exports.up = (knex, Promise) => (async() => {
     await migrateBase(knex);
     await addNamespaces(knex);
@@ -966,6 +995,8 @@ exports.up = (knex, Promise) => (async() => {
     await addFiles(knex);
 
     await migrateAttachments(knex);
+
+    await migrateTriggers(knex);
 })();
 
 exports.down = (knex, Promise) => (async() => {

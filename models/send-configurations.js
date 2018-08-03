@@ -30,27 +30,31 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function getByIdTx(tx, context, id, withPermissions = true, withPrivateData = true) {
+    let entity;
+
+    if (withPrivateData) {
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPrivate');
+        entity = await tx('send_configurations').where('id', id).first();
+        entity.mailer_settings = JSON.parse(entity.mailer_settings);
+    } else {
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPublic');
+        entity = await tx('send_configurations').where('id', id).select(
+            ['id', 'name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable']
+        ).first();
+    }
+
+    // note that permissions are optional as as this methods may be used with synthetic admin context
+    if (withPermissions) {
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'sendConfiguration', id);
+    }
+
+    return entity;
+}
+
 async function getById(context, id, withPermissions = true, withPrivateData = true) {
     return await knex.transaction(async tx => {
-        let entity;
-
-        if (withPrivateData) {
-            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPrivate');
-            entity = await tx('send_configurations').where('id', id).first();
-            entity.mailer_settings = JSON.parse(entity.mailer_settings);
-        } else {
-            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPublic');
-            entity = await tx('send_configurations').where('id', id).select(
-                ['id', 'name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable']
-            ).first();
-        }
-
-        // note that permissions are optional as as this methods may be used with synthetic admin context
-        if (withPermissions) {
-            entity.permissions = await shares.getPermissionsTx(tx, context, 'sendConfiguration', id);
-        }
-
-        return entity;
+        return await getByIdTx(tx, context, id, withPermissions, withPrivateData);
     });
 }
 
@@ -130,6 +134,7 @@ module.exports = {
     MailerType,
     hash,
     listDTAjax,
+    getByIdTx,
     getById,
     create,
     updateWithConsistencyCheck,

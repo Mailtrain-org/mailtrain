@@ -208,7 +208,7 @@ permissions=["view", "edit", "delete", "share", "createNamespace", "createList",
 sendConfiguration=["viewPublic", "viewPrivate", "edit", "delete", "share", "sendWithoutOverrides", "sendWithAllowedOverrides", "sendWithAnyOverrides"]
 list=["view", "edit", "delete", "share", "viewFields", "manageFields", "viewSubscriptions", "manageSubscriptions", "viewSegments", "manageSegments"]
 customForm=["view", "edit", "delete", "share"]
-campaign=["view", "edit", "delete", "share", "viewFiles", "manageFiles", "viewAttachments", "manageAttachments", "send", "viewStats"]
+campaign=["view", "edit", "delete", "share", "viewFiles", "manageFiles", "viewAttachments", "manageAttachments", "viewTriggers", "manageTriggers", "send", "viewStats"]
 template=["view", "edit", "delete", "share", "viewFiles", "manageFiles"]
 report=["view", "edit", "delete", "share", "execute", "viewContent", "viewOutput"]
 reportTemplate=["view", "edit", "delete", "share", "execute"]
@@ -233,7 +233,7 @@ permissions=["view", "edit", "delete", "share"]
 [roles.campaign.master]
 name="Master"
 description="All permissions"
-permissions=["view", "edit", "delete", "share", "viewFiles", "manageFiles", "viewAttachments", "manageAttachments", "send", "viewStats"]
+permissions=["view", "edit", "delete", "share", "viewFiles", "manageFiles", "viewAttachments", "manageAttachments", "viewTriggers", "manageTriggers", "send", "viewStats"]
 
 [roles.template.master]
 name="Master"
@@ -254,6 +254,7 @@ permissions=["view", "edit", "delete", "share", "execute"]
 name="Master"
 description="All permissions"
 permissions=["view", "edit", "delete", "share", "viewFiles", "manageFiles"]
+
 
 
 
@@ -278,6 +279,11 @@ report=[]
 reportTemplate=[]
 namespace=["view", "edit", "delete"]
 mosaicoTemplate=[]
+
+[roles.sendConfiguration.editor]
+name="Editor"
+description="XXX"
+permissions=[]
 
 [roles.list.editor]
 name="Editor"
@@ -310,11 +316,6 @@ description="XXX"
 permissions=[]
 
 [roles.mosaicoTemplate.editor]
-name="Editor"
-description="XXX"
-permissions=[]
-
-[roles.sendConfiguration.editor]
 name="Editor"
 description="XXX"
 permissions=[]

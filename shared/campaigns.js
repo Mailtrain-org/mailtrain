@@ -40,9 +40,37 @@ const CampaignStatus = {
     MAA: 6
 };
 
+const campaignOverridables = ['from_name', 'from_email', 'reply_to', 'subject'];
+
+function getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration) {
+    let allowedOverride = false;
+    let disallowedOverride = false;
+
+    for (const overridable of campaignOverridables) {
+        if (campaign[overridable + '_override'] !== null) {
+            if (sendConfiguration[overridable + '_overridable']) {
+                allowedOverride = true;
+            } else {
+                disallowedOverride = true;
+            }
+        }
+    }
+
+    let requiredPermission = 'send';
+    if (allowedOverride) {
+        requiredPermission = 'sendWithAllowedOverrides';
+    }
+    if (disallowedOverride) {
+        requiredPermission = 'sendWithAnyOverrides';
+    }
+
+    return requiredPermission;
+}
 
 module.exports = {
     CampaignSource,
     CampaignType,
-    CampaignStatus
+    CampaignStatus,
+    campaignOverridables,
+    getSendConfigurationPermissionRequiredForSend
 };

@@ -10,8 +10,10 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
-const { CampaignSource, CampaignType} = require('../shared/campaigns');
+const { CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend} = require('../shared/campaigns');
 const segments = require('./segments');
+const sendConfigurations = require('./send-configurations');
+const triggers = require('./triggers');
 
 const allowedKeysCommon = ['name', 'description', 'list', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled'];
@@ -293,14 +295,26 @@ async function remove(context, id) {
 
         // FIXME - deal with deletion of dependent entities (files)
 
+        await triggers.removeAllByCampaignIdTx(tx, context, id);
+
         await tx('campaigns').where('id', id).del();
         await knex.schema.dropTableIfExists('campaign__' + id);
         await knex.schema.dropTableIfExists('campaign_tracker__' + id);
     });
 }
 
+async function enforceSendPermissionTx(tx, context, campaignId) {
+    const campaign = await getByIdTx(tx, context, campaignId, false);
+    const sendConfiguration = await sendConfigurations.getByIdTx(tx, context, campaign.send_configuration, false, false);
 
-module.exports = {
+    const requiredPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
+
+    await shares.enforceEntityPermissionTx(tx, context, 'send_configuration', campaign.send_configuration, requiredPermission);
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, requiredPermission);
+}
+
+// This is to handle circular dependency with triggers.js
+Object.assign(module.exports, {
     Content,
     hash,
     listDTAjax,
@@ -309,5 +323,6 @@ module.exports = {
     getById,
     create,
     updateWithConsistencyCheck,
-    remove
-};
+    remove,
+    enforceSendPermissionTx
+});

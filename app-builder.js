@@ -38,6 +38,7 @@ const accountRest = require('./routes/rest/account');
 const reportTemplatesRest = require('./routes/rest/report-templates');
 const reportsRest = require('./routes/rest/reports');
 const campaignsRest = require('./routes/rest/campaigns');
+const triggersRest = require('./routes/rest/triggers');
 const listsRest = require('./routes/rest/lists');
 const formsRest = require('./routes/rest/forms');
 const fieldsRest = require('./routes/rest/fields');
@@ -279,6 +280,7 @@ function createApp(trusted) {
     app.use('/rest', usersRest);
     app.use('/rest', accountRest);
     app.use('/rest', campaignsRest);
+    app.use('/rest', triggersRest);
     app.use('/rest', listsRest);
     app.use('/rest', formsRest);
     app.use('/rest', fieldsRest);
