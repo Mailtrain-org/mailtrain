@@ -72,6 +72,19 @@ async function listWithContentDTAjax(context, params) {
     );
 }
 
+async function listOthersByListDTAjax(context, campaignId, listId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('campaigns')
+            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+            .whereNot('campaigns.id', campaignId)
+            .where('campaigns.list', listId),
+        ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
+    );
+}
+
 async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
     let entity = await tx('campaigns').where('id', id).first();
@@ -309,8 +322,8 @@ async function enforceSendPermissionTx(tx, context, campaignId) {
 
     const requiredPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
 
-    await shares.enforceEntityPermissionTx(tx, context, 'send_configuration', campaign.send_configuration, requiredPermission);
-    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, requiredPermission);
+    await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', campaign.send_configuration, requiredPermission);
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
 }
 
 // This is to handle circular dependency with triggers.js
@@ -319,6 +332,7 @@ Object.assign(module.exports, {
     hash,
     listDTAjax,
     listWithContentDTAjax,
+    listOthersByListDTAjax,
     getByIdTx,
     getById,
     create,

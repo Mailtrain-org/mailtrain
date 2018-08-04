@@ -217,46 +217,34 @@ export default class CUD extends Component {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
 
+        for (const key of state.keys()) {
+            state.setIn([key, 'error'], null);
+        }
+
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
-        } else {
-            state.setIn(['name', 'error'], null);
         }
 
         if (!state.getIn(['list', 'value'])) {
             state.setIn(['list', 'error'], t('List must be selected'));
-        } else {
-            state.setIn(['list', 'error'], null);
         }
 
         if (state.getIn(['useSegmentation', 'value']) && !state.getIn(['segment', 'value'])) {
             state.setIn(['segment', 'error'], t('Segment must be selected'));
-        } else {
-            state.setIn(['segment', 'error'], null);
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
             state.setIn(['send_configuration', 'error'], t('Send configuration must be selected'));
-        } else {
-            state.setIn(['send_configuration', 'error'], null);
         }
 
         if (state.getIn(['from_email_overriden', 'value']) && !state.getIn(['from_email_override', 'value'])) {
             state.setIn(['from_email_override', 'error'], t('"From" email must not be empty'));
-        } else {
-            state.setIn(['from_email_override', 'error'], null);
         }
 
 
         const campaignTypeKey = state.getIn(['type', 'value']);
 
         const sourceTypeKey = Number.parseInt(state.getIn(['source', 'value']));
-
-        for (const key of state.keys()) {
-            if (key.startsWith('data_')) {
-                state.setIn([key, 'error'], null);
-            }
-        }
 
         if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
             if (!state.getIn(['data_sourceTemplate', 'value'])) {
@@ -292,7 +280,6 @@ export default class CUD extends Component {
         }
 
         validateNamespace(t, state);
-
     }
 
     async submitHandler() {
@@ -361,8 +348,11 @@ export default class CUD extends Component {
         });
 
         if (submitResponse) {
+            const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
             if (this.props.entity) {
                 this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign saved'));
+            } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/content`, 'success', t('Campaign saved'));
             } else {
                 this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/edit`, 'success', t('Campaign saved'));
             }
@@ -494,6 +484,14 @@ export default class CUD extends Component {
             templateEdit = <InputField id="data_sourceUrl" label={t('Render URL')} help={t('If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself.')}/>
         }
 
+        let saveButtonLabel;
+        if (isEdit) {
+            saveButtonLabel = t('Save');
+        } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+            saveButtonLabel = t('Save and edit content');
+        } else {
+            saveButtonLabel = t('Save and edit campaign');
+        }
 
         return (
             <div>
@@ -545,7 +543,7 @@ export default class CUD extends Component {
                     {templateEdit}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={isEdit ? t('Save') : t('Save and edit campaign')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={saveButtonLabel}/>
                         {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/campaigns/${this.props.entity.id}/delete`}/> }
                     </ButtonRow>
                 </Form>

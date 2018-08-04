@@ -1,8 +1,9 @@
 'use strict';
 
+import {anonymousRestrictedAccessToken} from '../../../shared/urls';
 import mailtrainConfig from "mailtrainConfig";
 
-let restrictedAccessToken = 'ANONYMOUS';
+let restrictedAccessToken = anonymousRestrictedAccessToken;
 
 function setRestrictedAccessToken(token) {
     restrictedAccessToken = token;
@@ -28,7 +29,7 @@ function getBaseDir() {
     if (mailtrainConfig.trusted) {
         return mailtrainConfig.trustedUrlBaseDir;
     } else {
-        return mailtrainConfig.sandboxUrlBaseDir + 'ANONYMOUS';
+        return mailtrainConfig.sandboxUrlBaseDir + anonymousRestrictedAccessToken;
     }
 }
 

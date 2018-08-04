@@ -13,7 +13,7 @@ import SubscriptionsCUD from './subscriptions/CUD';
 import SegmentsList from './segments/List';
 import SegmentsCUD from './segments/CUD';
 import Share from '../shares/Share';
-
+import TriggersList from './TriggersList';
 
 function getMenus(t) {
     return {
@@ -126,6 +126,11 @@ function getMenus(t) {
                                     panelRender: props => <SegmentsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
                                 }
                             }
+                        },
+                        triggers: {
+                            title: t('Triggers'),
+                            link: params => `/lists/${params.listId}/triggers`,
+                            panelRender: props => <TriggersList list={props.resolved.list} />
                         },
                         share: {
                             title: t('Share'),

@@ -94,17 +94,17 @@ export default class CUD extends Component {
     localValidateFormValues(state) {
         const t = this.props.t;
 
+        for (const key of state.keys()) {
+            state.setIn([key, 'error'], null);
+        }
+
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
-        } else {
-            state.setIn(['name', 'error'], null);
         }
 
         const typeKey = state.getIn(['type', 'value']);
         if (!typeKey) {
             state.setIn(['type', 'error'], t('Type must be selected'));
-        } else {
-            state.setIn(['type', 'error'], null);
         }
 
         validateNamespace(t, state);

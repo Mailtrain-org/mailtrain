@@ -112,14 +112,12 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             const mosaicoTemplate = state.getIn([prefix + 'mosaicoTemplate', 'value']);
             if (!mosaicoTemplate) {
                 state.setIn([prefix + 'mosaicoTemplate', 'error'], t('Mosaico template must be selected'));
-            } else {
-                state.setIn([prefix + 'mosaicoTemplate', 'error'], null);
             }
         }
     };
 
-    const mosaicoFsTemplatesOptions = mailtrainConfig.mosaico.fsTemplates.map(([key, label]) => ({key, label}));
-    const mosaicoFsTemplatesLabels = new Map(mailtrainConfig.mosaico.fsTemplates);
+    const mosaicoFsTemplatesOptions = mailtrainConfig.mosaico.fsTemplates;
+    const mosaicoFsTemplatesLabels = new Map(mailtrainConfig.mosaico.fsTemplates.map(({key, label}) => ([key, label])));
 
     templateTypes.mosaicoWithFsTemplate = {
         typeName: t('Mosaico with predefined templates'),
@@ -151,7 +149,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             });
         },
         initData: () => ({
-            [prefix + 'mosaicoFsTemplate']: mailtrainConfig.mosaico.fsTemplates[0][0],
+            [prefix + 'mosaicoFsTemplate']: mailtrainConfig.mosaico.fsTemplates[0].key,
             [prefix + 'mosaicoData']: {}
         }),
         afterLoad: data => {

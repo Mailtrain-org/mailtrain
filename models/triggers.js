@@ -6,10 +6,10 @@ const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
-const {EntityVals, ActionVals} = require('../shared/triggers');
+const {EntityVals, EventVals, Entity} = require('../shared/triggers');
 const campaigns = require('./campaigns');
 
-const allowedKeys = new Set(['name', 'description', 'entity', 'action', 'seconds_after', 'enabled', 'source_campaign']);
+const allowedKeys = new Set(['name', 'description', 'entity', 'event', 'seconds_after', 'enabled', 'source_campaign']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
@@ -34,9 +34,10 @@ async function listByCampaignDTAjax(context, campaignId, params) {
             params,
             builder => builder
                 .from('triggers')
-                .innerJoin('campaigns', 'campaign.id', 'triggers.campaign')
+                .innerJoin('campaigns', 'campaigns.id', 'triggers.campaign')
+                .innerJoin('lists', 'lists.id', 'campaigns.list')
                 .where('triggers.campaign', campaignId),
-            [ 'triggers.id', 'triggers.name', 'campaign.list', 'triggers.entity', 'triggers.action', 'triggers.source_campaign', 'triggers.enabled' ]
+            [ 'triggers.id', 'triggers.name', 'triggers.description', 'lists.name', 'triggers.entity', 'triggers.event', 'triggers.seconds_after', 'triggers.enabled' ]
         );
     });
 }
@@ -44,13 +45,13 @@ async function listByCampaignDTAjax(context, campaignId, params) {
 async function listByListDTAjax(context, listId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
-        [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
+        [{ entityTypeId: 'campaign', requiredOperations: ['viewTriggers'] }],
         params,
         builder => builder
             .from('triggers')
-            .innerJoin('campaigns', 'campaign.id', 'triggers.campaign')
-            .where('campaign.list', listId),
-        [ 'triggers.id', 'triggers.name', 'trigger.campaign', 'triggers.entity', 'triggers.action', 'triggers.source_campaign', 'triggers.enabled' ]
+            .innerJoin('campaigns', 'campaigns.id', 'triggers.campaign')
+            .where('campaigns.list', listId),
+        [ 'triggers.id', 'triggers.name', 'triggers.description', 'campaigns.name', 'triggers.entity', 'triggers.event', 'triggers.seconds_after', 'triggers.enabled', 'triggers.campaign' ]
     );
 }
 
@@ -58,7 +59,7 @@ async function _validateAndPreprocess(tx, context, campaignId, entity) {
     enforce(Number.isInteger(entity.seconds_after));
     enforce(entity.seconds_after >= 0, 'Seconds after must not be negative');
     enforce(entity.entity in EntityVals, 'Invalid entity');
-    enforce(entity.action in ActionVals[entity.entity], 'Invalid action');
+    enforce(entity.event in EventVals[entity.entity], 'Invalid event');
 
     if (entity.entity === Entity.CAMPAIGN) {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.source_campaign, 'view');
@@ -94,7 +95,7 @@ async function updateWithConsistencyCheck(context, campaignId, entity) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'manageTriggers');
 
-        const existing = await tx('campaign').where({campaign: campaignId, id: entity.id}).first();
+        const existing = await tx('triggers').where({campaign: campaignId, id: entity.id}).first();
         if (!existing) {
             throw new interoperableErrors.NotFoundError();
         }
@@ -138,7 +139,8 @@ Object.assign(module.exports, {
     hash,
     getById,
     listByCampaignDTAjax,
-    listByListDTAjax,    create,
+    listByListDTAjax,
+    create,
     updateWithConsistencyCheck,
     removeTx,
     remove,

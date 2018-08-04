@@ -97,6 +97,7 @@ export default class List extends Component {
                 actions: data => {
                     const actions = [];
                     const perms = data[9];
+                    const campaignType = data[3];
                     const campaignSource = data[6];
 
                     if (perms.includes('edit')) {
@@ -124,6 +125,13 @@ export default class List extends Component {
                         actions.push({
                             label: <Icon icon="paperclip" title={t('Attachments')}/>,
                             link: `/campaigns/${data[0]}/attachments`
+                        });
+                    }
+
+                    if (campaignType === CampaignType.TRIGGERED && perms.includes('viewTriggers')) {
+                        actions.push({
+                            label: <Icon icon="flash" title={t('Triggers')}/>,
+                            link: `/campaigns/${data[0]}/triggers`
                         });
                     }
 

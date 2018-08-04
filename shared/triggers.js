@@ -5,7 +5,7 @@ const Entity = {
     CAMPAIGN: 'campaign'
 };
 
-const Action = {
+const Event = {
     [Entity.SUBSCRIPTION]: {
         CREATED: 'created',
         LATEST_OPEN: 'latest_open',
@@ -25,7 +25,7 @@ const EntityVals = {
     campaign: 'CAMPAIGN'
 };
 
-const ActionVals = {
+const EventVals = {
     [Entity.SUBSCRIPTION]: {
         created: 'CREATED',
         latest_open: 'LATEST_OPEN',
@@ -42,7 +42,7 @@ const ActionVals = {
 
 module.exports = {
     Entity,
-    Action,
+    Event,
     EntityVals,
-    ActionVals
+    EventVals
 };

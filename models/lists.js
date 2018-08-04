@@ -10,6 +10,7 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const fields = require('./fields');
 const segments = require('./segments');
+const entitySettings = require('../lib/entity-settings');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
@@ -21,6 +22,8 @@ function hash(entity) {
 
 
 async function listDTAjax(context, params) {
+    const campaignEntityType = entitySettings.getEntityType('campaign');
+
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'list', requiredOperations: ['view'] }],
@@ -28,7 +31,16 @@ async function listDTAjax(context, params) {
         builder => builder
             .from('lists')
             .innerJoin('namespaces', 'namespaces.id', 'lists.namespace'),
-        ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name']
+        ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
+            { query: builder =>
+                builder.from('campaigns')
+                    .whereRaw('campaigns.list = lists.id')
+                    .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
+                    .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
+                    .innerJoin('triggers', 'campaigns.id', 'triggers.campaign')
+                    .count()
+            }
+        ]
     );
 }
 

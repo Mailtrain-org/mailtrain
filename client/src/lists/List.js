@@ -47,7 +47,7 @@ export default class List extends Component {
                 data: 1,
                 title: t('Name'),
                 actions: data => {
-                    const perms = data[6];
+                    const perms = data[7];
                     if (perms.includes('viewSubscriptions')) {
                         return [{label: data[1], link: `/lists/${data[0]}/subscriptions`}];
                     } else {
@@ -62,7 +62,9 @@ export default class List extends Component {
             {
                 actions: data => {
                     const actions = [];
-                    const perms = data[6];
+                    const triggersCount = data[6];
+                    const perms = data[7];
+                    console.log(data);
 
                     if (perms.includes('viewSubscriptions')) {
                         actions.push({
@@ -89,6 +91,13 @@ export default class List extends Component {
                         actions.push({
                             label: <Icon icon="tag" title={t('Segments')}/>,
                             link: `/lists/${data[0]}/segments`
+                        });
+                    }
+
+                    if (triggersCount > 0) {
+                        actions.push({
+                            label: <Icon icon="flash" title={t('Triggers')}/>,
+                            link: `/lists/${data[0]}/triggers`
                         });
                     }
 

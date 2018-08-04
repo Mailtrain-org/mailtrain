@@ -14,6 +14,11 @@ router.postAsync('/campaigns-with-content-table', passport.loggedIn, async (req,
     return res.json(await campaigns.listWithContentDTAjax(req.context, req.body));
 });
 
+router.postAsync('/campaigns-others-by-list-table/:campaignId/:listId', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listOthersByListDTAjax(req.context, req.params.campaignId, req.params.listId, req.body));
+});
+
+
 router.getAsync('/campaigns-settings/:campaignId', passport.loggedIn, async (req, res) => {
     const campaign = await campaigns.getById(req.context, req.params.campaignId, true, campaigns.Content.WITHOUT_SOURCE_CUSTOM);
     campaign.hash = campaigns.hash(campaign, campaigns.Content.WITHOUT_SOURCE_CUSTOM);

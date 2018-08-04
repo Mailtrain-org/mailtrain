@@ -7,7 +7,7 @@ const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 
 const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
 const { MailerType, getSystemSendConfigurationId } = require('../../../shared/send-configurations');
 const { enforce } = require('../../../lib/helpers');
-const { EntityVals: TriggerEntityVals, ActionVals: TriggerActionVals } = require('../../../shared/triggers');
+const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../shared/triggers');
 
 const entityTypesWithFiles = {
     campaign: {
@@ -951,7 +951,7 @@ async function migrateAttachments(knex) {
 async function migrateTriggers(knex) {
     await knex.schema.table('triggers', table => {
         table.renameColumn('rule', 'entity');
-        table.renameColumn('column', 'action');
+        table.renameColumn('column', 'event');
         table.renameColumn('dest_campaign', 'campaign');
         table.renameColumn('seconds', 'seconds_after');
     });
@@ -964,7 +964,7 @@ async function migrateTriggers(knex) {
         enforce(campaign.list === trigger.list, 'The list of trigger and campaign have to be the same.');
 
         enforce(trigger.entity in TriggerEntityVals);
-        enforce(trigger.action in TriggerActionVals[trigger.entity]);
+        enforce(trigger.event in TriggerEventVals[trigger.entity]);
     }
 
     await knex.schema.table('triggers', table => {
