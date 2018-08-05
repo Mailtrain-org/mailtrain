@@ -224,7 +224,12 @@ class StaticField extends Component {
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         className: PropTypes.string,
-        format: PropTypes.string
+        format: PropTypes.string,
+        withValidation: PropTypes.bool
+    }
+
+    static contextTypes = {
+        formStateOwner: PropTypes.object.isRequired
     }
 
     render() {
@@ -238,7 +243,7 @@ class StaticField extends Component {
             className += ' ' + props.className;
         }
 
-        return wrapInput(null, htmlId, owner, props.format, '', props.label, props.help,
+        return wrapInput(props.withValidation ? id : null, htmlId, owner, props.format, '', props.label, props.help,
             <div id={htmlId} className={className} aria-describedby={htmlId + '_help'}>{props.children}</div>
         );
     }
@@ -1020,14 +1025,17 @@ function withForm(target) {
 
         const response = await axios.get(getUrl(url));
 
-        const data = response.data;
+        let data = response.data;
 
         data.originalHash = data.hash;
         delete data.hash;
 
         if (mutator) {
-            // FIXME - change the interface such that if the mutator is provided, it is supposed to return which fields to keep in the form
-            mutator(data);
+            const newData = mutator(data);
+
+            if (newData !== undefined) {
+                data = newData;
+            }
         }
 
         this.populateFormValues(data);
@@ -1037,11 +1045,13 @@ function withForm(target) {
         await this.waitForFormServerValidated();
 
         if (this.isFormWithoutErrors()) {
-            const data = this.getFormValues();
+            let data = this.getFormValues();
 
             if (mutator) {
-                // FIXME - change the interface such that the mutator is supposed to create the object to be submitted
-                mutator(data);
+                const newData = mutator(data);
+                if (newData !== undefined) {
+                    data = newData;
+                }
             }
 
             const response = await axios.method(method, getUrl(url), data);

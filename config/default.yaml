@@ -198,7 +198,7 @@ roles:
       name: Master
       admin: true
       description: All permissions
-      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings]
+      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings, setupAutomation]
       rootNamespaceRole: master
 
   namespace:
@@ -208,7 +208,7 @@ roles:
       permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createReportTemplate, createTemplate, createMosaicoTemplate, createSendConfiguration, createCampaign, manageUsers]
       children:
         sendConfiguration: [viewPublic, viewPrivate, edit, delete, share, sendWithoutOverrides, sendWithAllowedOverrides, sendWithAnyOverrides]
-        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments]
+        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
         customForm: [view, edit, delete, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats]
         template: [view, edit, delete, share, viewFiles, manageFiles]
@@ -227,7 +227,7 @@ roles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments]
+      permissions: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
 
   customForm:
     master:

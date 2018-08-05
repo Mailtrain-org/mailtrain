@@ -14,6 +14,7 @@ import {withErrorHandling} from '../../lib/error-handling';
 import {Table} from '../../lib/table';
 import {getTriggerTypes} from './helpers';
 import {Icon} from "../../lib/bootstrap-components";
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withPageHelpers
@@ -52,7 +53,7 @@ export default class List extends Component {
                 actions: data => {
                     const actions = [];
 
-                    if (this.props.campaign.permissions.includes('manageTriggers')) {
+                    if (mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.campaign.permissions.includes('manageTriggers')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/campaigns/${this.props.campaign.id}/triggers/${data[0]}/edit`
@@ -66,7 +67,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {this.props.campaign.permissions.includes('manageTriggers') &&
+                {mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.campaign.permissions.includes('manageTriggers') &&
                     <Toolbar>
                         <NavButton linkTo={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('Create Trigger')}/>
                     </Toolbar>

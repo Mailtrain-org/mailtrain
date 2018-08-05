@@ -975,6 +975,44 @@ async function migrateTriggers(knex) {
     await knex.schema.dropTableIfExists('trigger');
 }
 
+async function migrateImporter(knex) {
+    await knex.schema.dropTableIfExists('import_failed');
+    await knex.schema.dropTableIfExists('importer');
+
+    await knex.schema.createTable('imports', table => {
+        table.increments('id').primary();
+        table.string('name');
+        table.text('description');
+        table.integer('list').unsigned().references('lists.id');
+        table.integer('type').unsigned().notNullable();
+        table.integer('status').unsigned().notNullable();
+        table.text('settings', 'longtext');
+        table.timestamp('last_run');
+        table.timestamp('created').defaultTo(knex.fn.now());
+    });
+
+    await knex.schema.createTable('import_runs', table => {
+        table.increments('id').primary();
+        table.integer('import').unsigned().references('imports.id');
+        table.integer('status').unsigned().notNullable();
+        table.integer('new').defaultTo(0);
+        table.integer('failed').defaultTo(0);
+        table.integer('processed').defaultTo(0);
+        table.text('error');
+        table.timestamp('created').defaultTo(knex.fn.now());
+        table.timestamp('finished');
+    });
+
+    await knex.schema.createTable('import_failed', table => {
+        table.increments('id').primary();
+        table.integer('run').unsigned().references('import_runs.id');
+        table.string('email').notNullable();
+        table.text('reason');
+        table.timestamp('created').defaultTo(knex.fn.now());
+    });
+}
+
+
 exports.up = (knex, Promise) => (async() => {
     await migrateBase(knex);
     await addNamespaces(knex);
@@ -997,6 +1035,8 @@ exports.up = (knex, Promise) => (async() => {
     await migrateAttachments(knex);
 
     await migrateTriggers(knex);
+
+    await migrateImporter(knex);
 })();
 
 exports.down = (knex, Promise) => (async() => {

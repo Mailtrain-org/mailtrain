@@ -12,6 +12,8 @@ import SubscriptionsList from './subscriptions/List';
 import SubscriptionsCUD from './subscriptions/CUD';
 import SegmentsList from './segments/List';
 import SegmentsCUD from './segments/CUD';
+import ImportsList from './imports/List';
+import ImportsCUD from './imports/CUD';
 import Share from '../shares/Share';
 import TriggersList from './TriggersList';
 
@@ -124,6 +126,32 @@ function getMenus(t) {
                                         fields: params => `rest/fields/${params.listId}`
                                     },
                                     panelRender: props => <SegmentsCUD action="create" list={props.resolved.list} fields={props.resolved.fields} />
+                                }
+                            }
+                        },
+                        imports: {
+                            title: t('Imports'),
+                            link: params => `/lists/${params.listId}/imports/`,
+                            visible: resolved => resolved.list.permissions.includes('viewImports'),
+                            panelRender: props => <ImportsList list={props.resolved.list} />,
+                            children: {
+                                ':importId([0-9]+)': {
+                                    title: resolved => t('Import "{{name}}"', {name: resolved.import.name}),
+                                    resolve: {
+                                        import: params => `rest/imports/${params.listId}/${params.importId}`,
+                                    },
+                                    link: params => `/lists/${params.listId}/imports/${params.importId}/edit`,
+                                    navs: {
+                                        ':action(edit|delete)': {
+                                            title: t('Edit'),
+                                            link: params => `/lists/${params.listId}/imports/${params.importId}/edit`,
+                                            panelRender: props => <ImportsCUD action={props.match.params.action} entity={props.resolved.import} list={props.resolved.list} imports={props.resolved.imports} />
+                                        }
+                                    }
+                                },
+                                create: {
+                                    title: t('Create'),
+                                    panelRender: props => <ImportsCUD action="create" list={props.resolved.list} imports={props.resolved.imports} />
                                 }
                             }
                         },

@@ -171,8 +171,8 @@ export default class CUD extends Component {
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
                         deleteUrl={`rest/mosaico-templates/${this.props.entity.id}`}
-                        cudUrl={`/templates/mosaico/${this.props.entity.id}/edit`}
-                        listUrl="/templates/mosaico"
+                        backUrl={`/templates/mosaico/${this.props.entity.id}/edit`}
+                        successUrl="/templates/mosaico"
                         deletingMsg={t('Deleting Mosaico template ...')}
                         deletedMsg={t('Mosaico template deleted')}/>
                 }

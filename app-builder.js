@@ -5,8 +5,6 @@ const log = require('npmlog');
 
 const _ = require('./lib/translate')._;
 
-const { nodeifyFunction } = require('./lib/nodeify');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -22,7 +20,6 @@ const compression = require('compression');
 const passport = require('./lib/passport');
 const contextHelpers = require('./lib/context-helpers');
 
-const getSettings = nodeifyFunction(require('./models/settings').get);
 const api = require('./routes/api');
 
 // These are routes for the new React-based client
@@ -42,6 +39,7 @@ const triggersRest = require('./routes/rest/triggers');
 const listsRest = require('./routes/rest/lists');
 const formsRest = require('./routes/rest/forms');
 const fieldsRest = require('./routes/rest/fields');
+const importsRest = require('./routes/rest/imports');
 const sharesRest = require('./routes/rest/shares');
 const segmentsRest = require('./routes/rest/segments');
 const subscriptionsRest = require('./routes/rest/subscriptions');
@@ -284,6 +282,7 @@ function createApp(trusted) {
     app.use('/rest', listsRest);
     app.use('/rest', formsRest);
     app.use('/rest', fieldsRest);
+    app.use('/rest', importsRest);
     app.use('/rest', sharesRest);
     app.use('/rest', segmentsRest);
     app.use('/rest', subscriptionsRest);

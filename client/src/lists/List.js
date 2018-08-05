@@ -64,7 +64,6 @@ export default class List extends Component {
                     const actions = [];
                     const triggersCount = data[6];
                     const perms = data[7];
-                    console.log(data);
 
                     if (perms.includes('viewSubscriptions')) {
                         actions.push({
@@ -91,6 +90,13 @@ export default class List extends Component {
                         actions.push({
                             label: <Icon icon="tag" title={t('Segments')}/>,
                             link: `/lists/${data[0]}/segments`
+                        });
+                    }
+
+                    if (perms.includes('viewImports')) {
+                        actions.push({
+                            label: <Icon icon="arrow-down" title={t('Imports')}/>,
+                            link: `/lists/${data[0]}/imports`
                         });
                     }
 

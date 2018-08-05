@@ -184,8 +184,8 @@ export default class CUD extends Component {
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
                         deleteUrl={`rest/namespaces/${this.props.entity.id}`}
-                        cudUrl={`/namespaces/${this.props.entity.id}/edit`}
-                        listUrl="/namespaces"
+                        backUrl={`/namespaces/${this.props.entity.id}/edit`}
+                        successUrl="/namespaces"
                         deletingMsg={t('Deleting namespace ...')}
                         deletedMsg={t('Namespace deleted')}
                         onErrorAsync={::this.onDeleteError}/>

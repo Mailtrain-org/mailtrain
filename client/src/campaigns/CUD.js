@@ -500,8 +500,8 @@ export default class CUD extends Component {
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
                         deleteUrl={`rest/campaigns/${this.props.entity.id}`}
-                        cudUrl={`/campaigns/${this.props.entity.id}/edit`}
-                        listUrl="/campaigns"
+                        backUrl={`/campaigns/${this.props.entity.id}/edit`}
+                        successUrl="/campaigns"
                         deletingMsg={t('Deleting campaign ...')}
                         deletedMsg={t('Campaign deleted')}/>
                 }

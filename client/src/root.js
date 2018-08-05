@@ -84,9 +84,9 @@ class Root extends Component {
                                     <DropdownMenuItem label={t('Administration')}>
                                         <MenuLink to="/users"><Icon icon='cog'/> {t('Users')}</MenuLink>
                                         <MenuLink to="/namespaces"><Icon icon='cog'/> {t('Namespaces')}</MenuLink>
-                                        <MenuLink to="/settings"><Icon icon='cog'/> {t('Global Settings')}</MenuLink>
+                                        {mailtrainConfig.globalPermissions.includes('manageSettings') && <MenuLink to="/settings"><Icon icon='cog'/> {t('Global Settings')}</MenuLink>}
                                         <MenuLink to="/send-configurations"><Icon icon='cog'/> {t('Send Configurations')}</MenuLink>
-                                        <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('Blacklist')}</MenuLink>
+                                        {mailtrainConfig.globalPermissions.includes('manageBlacklist') && <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('Blacklist')}</MenuLink>}
                                         <MenuLink to="/account/api"><Icon icon='retweet'/> {t('API')}</MenuLink>
                                     </DropdownMenuItem>
                                 </ul>

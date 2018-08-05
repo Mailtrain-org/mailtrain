@@ -68,8 +68,8 @@ class DeleteModalDialog extends Component {
         stateOwner: PropTypes.object.isRequired,
         visible: PropTypes.bool.isRequired,
         deleteUrl: PropTypes.string.isRequired,
-        cudUrl: PropTypes.string.isRequired,
-        listUrl: PropTypes.string.isRequired,
+        backUrl: PropTypes.string.isRequired,
+        successUrl: PropTypes.string.isRequired,
         deletingMsg:  PropTypes.string.isRequired,
         deletedMsg:  PropTypes.string.isRequired,
         onErrorAsync: PropTypes.func
@@ -86,8 +86,8 @@ class DeleteModalDialog extends Component {
             visible={this.props.visible}
             actionMethod={HTTPMethod.DELETE}
             actionUrl={this.props.deleteUrl} 
-            backUrl={this.props.cudUrl}
-            successUrl={this.props.listUrl}
+            backUrl={this.props.backUrl}
+            successUrl={this.props.successUrl}
             actionInProgressMsg={this.props.deletingMsg}
             actionDoneMsg={this.props.deletedMsg}
             onErrorAsync={this.props.onErrorAsync}

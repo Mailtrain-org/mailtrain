@@ -70,6 +70,7 @@ async function _validateAndPreprocess(tx, context, campaignId, entity) {
 
 async function create(context, campaignId, entity) {
     return await knex.transaction(async tx => {
+        shares.enforceGlobalPermission(context, 'setupAutomation');
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'manageTriggers');
 
         await _validateAndPreprocess(tx, context, campaignId, entity);
@@ -93,6 +94,7 @@ async function create(context, campaignId, entity) {
 
 async function updateWithConsistencyCheck(context, campaignId, entity) {
     await knex.transaction(async tx => {
+        shares.enforceGlobalPermission(context, 'setupAutomation');
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'manageTriggers');
 
         const existing = await tx('triggers').where({campaign: campaignId, id: entity.id}).first();

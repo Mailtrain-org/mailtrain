@@ -97,7 +97,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             };
         },
         beforeSave: data => {
-                console.log(data);
             data[prefix + 'data'] = {
                 mosaicoTemplate: data[prefix + 'mosaicoTemplate'],
                 metadata: data[prefix + 'mosaicoData'].metadata,

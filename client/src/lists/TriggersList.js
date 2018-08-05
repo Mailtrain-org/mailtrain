@@ -12,6 +12,7 @@ import {withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import {getTriggerTypes} from '../campaigns/triggers/helpers';
 import {Icon} from "../lib/bootstrap-components";
+import mailtrainConfig from 'mailtrainConfig';
 
 @translate()
 @withPageHelpers
@@ -52,7 +53,7 @@ export default class List extends Component {
                     const perms = data[9];
                     const campaignId = data[8];
 
-                    if (perms.includes('manageTriggers')) {
+                    if (mailtrainConfig.globalPermissions.includes('setupAutomation') && perms.includes('manageTriggers')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/campaigns/${campaignId}/triggers/${data[0]}/edit`
