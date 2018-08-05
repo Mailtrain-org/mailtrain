@@ -3650,6 +3650,22 @@ msgstr "Eingeloggt als %s"
 msgid "Incorrect username or password"
 msgstr "Falscher Benutzername oder Passwort"
 
+#: lib/subscription-mail-helpers.js:39
+msgid "%s: Email Address Already Registered"
+msgstr "%s: Email-Adresse bereits registriert"
+
+#: lib/subscription-mail-helpers.js:49
+msgid "%s: Please Confirm Email Change in Subscription"
+msgstr "%s: Bitte bestätigen Sie die Änderung der Email-Adresse"
+
+#: lib/subscription-mail-helpers.js:69
+msgid "%s: Please Confirm Unsubscription"
+msgstr "%s: Bitte bestätigen Sie die Kündigung des Abonnements"
+
+#: lib/subscription-mail-helpers.js:76
+msgid "%s: Unsubscription Confirmed"
+msgstr "%s: Kündigung des Abonnements bestätigt"
+
 #: lib/tools.js:148
 msgid "Blocked email address \"%s\""
 msgstr "Gesperrte E-Mail-Adresse \"%s\""
@@ -4593,3 +4609,31 @@ msgstr "Unbekannter Trigger-Typ %s"
 
 #~ msgid "Yes, subscribe me to this list:"
 #~ msgstr "Ja, tragen Sie mich in diese Liste ein:"
+
+#: lib/models/subscriptions.js:910 routes/subscription.js:472
+#: routes/subscription.js:544 routes/subscription.js:580
+#: routes/subscription.js:696 routes/subscription.js:771
+msgid "Subscription not found in this list"
+msgstr "Das Abonnement wurde in dieser Liste nicht gefunden"
+
+#: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:2
+msgid ""
+"We need to confirm your email address. To complete the unsubscription "
+"process, please click the link in the email we just sent you."
+msgstr ""
+"Wir müssen Ihre E-Mail-Adresse bestätigen. Um die Kündigung Ihres Abonnements abzuschließen, "
+"klicken Sie bitte auf den Link in der E-Mail, die wir Ihnen gerade geschickt "
+"haben."
+
+msgid "Please Confirm Unsubscription"
+msgstr "Bitte bestätigen Sie die Kündigung Ihres Abonnements"
+
+msgid "Yes, unsubscribe me from this list"
+msgstr "Ja, ich möchte dieses Abonnement kündigen"
+
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"unsubscribed if you don't click the confirmation link above."
+msgstr ""
+"Wenn Sie diese E-Mail versehentlich erhalten haben, löschen Sie sie einfach. "
+"Ihr Abonnement wird nicht gekündigt, wenn Sie nicht auf den Bestätigungslink oben klicken."
