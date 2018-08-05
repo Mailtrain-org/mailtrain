@@ -30,7 +30,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">{{#translate}}List{{/translate}}</label>
         <div class="col-sm-10">
-            <p class="form-control-static"><a href="/lists/view/{{list.id}}">{{list.name}}</a> <span class="text-muted"> – {{list.subscribers}} {{#translate}}subscribers{{/translate}}</span></p>
+            <p class="form-control-static"><a href="/lists/view/{{list.id}}">{{list.name}}</a> <span class="text-muted"> {{#if segment.id}}– <a href="/lists/view/{{list.id}}?segment={{segment.id}}">{{segment.name}}</a>{{/if}} <span class="text-muted"> – {{#if segment.id}} {{segmentSubscribers}} {{else}} {{list.subscribers}} {{/if}} {{#translate}}subscribers{{/translate}}</span><input id="segmentId" name="segmentId" type="hidden" value="{{segment.id}}"></p>
         </div>
     </div>
 
