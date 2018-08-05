@@ -8,6 +8,8 @@ const config = require('config');
 const log = require('npmlog');
 const app = require('./app');
 const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const fork = require('child_process').fork;
 const triggers = require('./services/triggers');
 const importer = require('./services/importer');
@@ -33,10 +35,15 @@ log.level = config.log.level;
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Create HTTP/HTTPS server.
  */
 
-let server = http.createServer(app);
+let server = (!config.www.https) ? http.createServer(app) : https.createServer({
+    cert: fs.readFileSync(config.www.cert),
+    key: fs.readFileSync(config.www.key),
+    ca: config.www.ca ? fs.readFileSync(config.www.ca) : undefined,
+    dhparams: config.www.dhparams ? fs.readFileSync(config.www.dhparams) : undefined
+}, app);
 
 // Check if database needs upgrading before starting the server
 dbcheck(err => {
