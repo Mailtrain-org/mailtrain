@@ -381,7 +381,7 @@ function formatMessage(message, callback) {
 
                                 let listUnsubscribe = null;
                                 if (!list.listunsubscribeDisabled) {
-                                    listUnsubscribe = url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid);
+                                    listUnsubscribe = campaign.unsubscribe ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.unsubscribe) : url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid);
                                 }
 
                                 return callback(null, {
