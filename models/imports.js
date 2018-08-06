@@ -49,6 +49,11 @@ async function _validateAndPreprocess(tx, listId, entity, isCreate) {
     enforce(entity.type >= ImportType.MIN && entity.type <= ImportType.MAX, 'Invalid import type');
 
     entity.settings = entity.settings || {};
+
+    if (entity.type === ImportType.CSV_FILE) {
+        entity.settings.csv = entity.settings.csv || {};
+        enforce(entity.settings.csv.delimiter.trim(), 'CSV delimiter must not be empty');
+    }
 }
 
 async function create(context, listId, entity, files) {
@@ -68,10 +73,11 @@ async function create(context, listId, entity, files) {
 
             entity.settings.csv = {
                 originalname: csvFile.originalname,
-                filename: csvFile.filename
+                filename: csvFile.filename,
+                delimiter: entity.settings.csv.delimiter
             };
 
-            entity.status = ImportStatus.NOT_READY;
+            entity.status = ImportStatus.PREP_SCHEDULED;
         }
 
 
@@ -151,6 +157,7 @@ async function removeAllByListIdTx(tx, context, listId) {
 
 // This is to handle circular dependency with segments.js
 module.exports = {
+    filesDir,
     hash,
     getById,
     listDTAjax,

@@ -425,6 +425,32 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     }
 }
 
+function updateSourcesAndHash(subscription, source, groupedFieldsMap) {
+    if ('email' in subscription) {
+        subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
+        subscription.source_email = source;
+    }
+
+    for (const fldKey in groupedFieldsMap) {
+        const fld = groupedFieldsMap[fldKey];
+
+        const fieldType = fields.getFieldType(fld.type);
+        if (fieldType.grouped) {
+            for (const optionKey in fld.groupedOptions) {
+                const option = fld.groupedOptions[optionKey];
+
+                if (option.column in subscription) {
+                    subscription['source_' + option.column] = source;
+                }
+            }
+        } else {
+            if (fldKey in subscription) {
+                subscription['source_' + fldKey] = source;
+            }
+        }
+    }
+}
+
 async function _update(tx, listId, existing, filteredEntity) {
     if ('status' in filteredEntity) {
         if (existing.status !== filteredEntity.status) {
@@ -464,7 +490,7 @@ async function _create(tx, listId, filteredEntity) {
     If it is unsubscribed and meta.updateOfUnsubscribedAllowed, the existing subscription is changed based on the provided data.
     If meta.updateAllowed is true, it updates even an active subscription.
  */
-async function create(context, listId, entity, meta /* meta is provided when called from /confirm/subscribe/:cid */) {
+async function create(context, listId, entity, source, meta /* meta is provided when called from /confirm/subscribe/:cid */) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
@@ -477,6 +503,8 @@ async function create(context, listId, entity, meta /* meta is provided when cal
         filteredEntity.status_change = new Date();
 
         ungroupSubscription(groupedFieldsMap, filteredEntity);
+
+        updateSourcesAndHash(filteredEntity, source, groupedFieldsMap);
 
         filteredEntity.opt_in_ip = meta && meta.ip;
         filteredEntity.opt_in_country = meta && meta.country;
@@ -498,7 +526,7 @@ async function create(context, listId, entity, meta /* meta is provided when cal
     });
 }
 
-async function updateWithConsistencyCheck(context, listId, entity) {
+async function updateWithConsistencyCheck(context, listId, entity, source) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
@@ -522,6 +550,8 @@ async function updateWithConsistencyCheck(context, listId, entity) {
         const filteredEntity = filterObject(entity, allowedKeys);
 
         ungroupSubscription(groupedFieldsMap, filteredEntity);
+
+        updateSourcesAndHash(filteredEntity, source, groupedFieldsMap);
 
         await _update(tx, listId, existing, filteredEntity);
     });

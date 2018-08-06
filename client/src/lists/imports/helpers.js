@@ -11,10 +11,14 @@ export function getImportTypes(t) {
     };
 
     const importStatusLabels = {
-        [ImportStatus.NOT_READY]: t('Preparing'),
-        [ImportStatus.RUNNING]: t('Running'),
-        [ImportStatus.SCHEDULED]: t('Scheduled'),
-        [ImportStatus.FINISHED]: t('Finished')
+        [ImportStatus.PREP_SCHEDULED]: t('Created'),
+        [ImportStatus.PREP_RUNNING]: t('Preparing'),
+        [ImportStatus.PREP_FINISHED]: t('Ready'),
+        [ImportStatus.PREP_FAILED]: t('Preparation failed'),
+        [ImportStatus.RUN_SCHEDULED]: t('Scheduled'),
+        [ImportStatus.RUN_RUNNING]: t('Running'),
+        [ImportStatus.RUN_FINISHED]: t('Finished'),
+        [ImportStatus.RUN_FAILED]: t('Failed')
     };
 
     return {

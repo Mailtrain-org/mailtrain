@@ -2,6 +2,7 @@
 
 const passport = require('../../lib/passport');
 const subscriptions = require('../../models/subscriptions');
+const { SubscriptionSource } = require('../../shared/lists');
 
 const router = require('../../lib/router-async').create();
 
@@ -17,14 +18,14 @@ router.getAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, asy
 });
 
 router.postAsync('/subscriptions/:listId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await subscriptions.create(req.context, req.params.listId, req.body));
+    return res.json(await subscriptions.create(req.context, req.params.listId, req.body, SubscriptionSource.ADMIN_FORM));
 });
 
 router.putAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const entity = req.body;
     entity.id = parseInt(req.params.subscriptionId);
 
-    await subscriptions.updateWithConsistencyCheck(req.context, req.params.listId, entity);
+    await subscriptions.updateWithConsistencyCheck(req.context, req.params.listId, entity, SubscriptionSource.ADMIN_FORM);
     return res.json();
 });
 

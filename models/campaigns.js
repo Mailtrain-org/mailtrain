@@ -16,7 +16,7 @@ const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
 
 const allowedKeysCommon = ['name', 'description', 'list', 'segment', 'namespace',
-    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled'];
+    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
 const allowedKeysUpdate = new Set([...allowedKeysCommon]);

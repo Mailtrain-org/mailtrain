@@ -8,6 +8,7 @@ const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 're
 const { MailerType, getSystemSendConfigurationId } = require('../../../shared/send-configurations');
 const { enforce } = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../shared/triggers');
+const { SubscriptionSource } = require('../../../shared/lists');
 
 const entityTypesWithFiles = {
     campaign: {
@@ -72,7 +73,7 @@ async function migrateBase(knex) {
     // Original Mailtrain migration is executed before this one. So here we check that the original migration
     // ended where it should have and we take it from here.
     const row = await knex('settings').where({key: 'db_schema_version'}).first('value');
-    if (!row || Number(row.value) !== 29) {
+    if (!row || Number(row.value) !== 33) {
         throw new Error('Unsupported DB schema version: ' + row.value);
     }
 
@@ -148,6 +149,7 @@ async function migrateBase(knex) {
 
         .raw('ALTER TABLE `triggers` MODIFY `id` int unsigned not null auto_increment')
         .raw('ALTER TABLE `triggers` MODIFY `list` int unsigned not null')
+        .raw('ALTER TABLE `triggers` MODIFY `segment` int unsigned not null')
         .raw('ALTER TABLE `triggers` MODIFY `source_campaign` int unsigned default null')
         .raw('ALTER TABLE `triggers` MODIFY `dest_campaign` int unsigned default null')
 
@@ -231,6 +233,40 @@ async function migrateUsers(knex) {
 
 async function migrateSubscriptions(knex) {
     await knex.schema.dropTableIfExists('subscription');
+
+    const lists = await knex('lists');
+    for (const list of lists) {
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_email` int(10) unsigned DEFAULT NULL');
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `hash_email` varchar(255) CHARACTER SET ascii');
+
+
+        const fields = await knex('custom_fields').where('list', list.id);
+        for (const field of fields) {
+            if (field.column != null) {
+                await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_' + field.column +'` int(11) DEFAULT NULL');
+            }
+        }
+
+        const subscriptionsStream = knex('subscription__' + list.id).stream();
+        let subscription;
+        while ((subscription = subscriptionsStream.read()) != null) {
+            subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
+            subscription.source_email = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
+            for (const field of fields) {
+                if (field.column != null) {
+                    subscription['source_' + field.column] = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
+                }
+            }
+
+            await knex('subscription__' + list.id).where('id', subscription.id).update(subscription);
+        }
+
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` MODIFY `hash_email` varchar(255) CHARACTER SET ascii NOT NULL');
+
+        await knex.schema.table('subscription__' + list.id, table => {
+            table.dropColumn('imported');
+        });
+    }
 }
 
 async function migrateCustomForms(knex) {
@@ -626,6 +662,7 @@ async function migrateSettings(knex) {
         table.text('mailer_settings', 'longtext');
         table.timestamp('created').defaultTo(knex.fn.now());
         table.integer('namespace').unsigned().references('namespaces.id');
+        table.string('x_mailer');
     });
 
     await knex.schema.table('lists', table => {
@@ -695,6 +732,7 @@ async function migrateSettings(knex) {
         verp_hostname: settings.verpUse ? settings.verpHostname : null,
         mailer_type,
         mailer_settings: JSON.stringify(mailer_settings),
+        x_mailer: settings.x_mailer,
         namespace: getGlobalNamespaceId()
     });
 
@@ -917,6 +955,8 @@ async function migrateCampaigns(knex) {
         table.renameColumn('address', 'from_email_override');
         table.renameColumn('reply_to', 'reply_to_override');
         table.renameColumn('subject', 'subject_override');
+        table.renameColumn('unsubscribe', 'unsubscribe_url');
+
 
         // Remove the default value
         table.integer('send_configuration').unsigned().notNullable().alter();
@@ -970,6 +1010,7 @@ async function migrateTriggers(knex) {
     await knex.schema.table('triggers', table => {
         table.dropForeign('list', 'triggers_ibfk_1');
         table.dropColumn('list');
+        table.dropColumn('segment');
     });
 
     await knex.schema.dropTableIfExists('trigger');
@@ -988,6 +1029,7 @@ async function migrateImporter(knex) {
         table.integer('status').unsigned().notNullable();
         table.text('settings', 'longtext');
         table.timestamp('last_run');
+        table.text('error');
         table.timestamp('created').defaultTo(knex.fn.now());
     });
 

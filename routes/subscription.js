@@ -15,7 +15,7 @@ const forms = require('../models/forms');
 const {getTrustedUrl} = require('../lib/urls');
 const bluebird = require('bluebird');
 
-const { SubscriptionStatus } = require('../shared/lists');
+const { SubscriptionStatus, SubscriptionSource } = require('../shared/lists');
 
 const openpgp = require('openpgp');
 const cors = require('cors');
@@ -115,7 +115,7 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
     subscription.status = SubscriptionStatus.SUBSCRIBED;
 
     try {
-        await subscriptions.create(contextHelpers.getAdminContext(), confirmation.list, subscription, meta);
+        await subscriptions.create(contextHelpers.getAdminContext(), confirmation.list, subscription,  SubscriptionSource.SUBSCRIPTION_FORM, meta);
     } catch (err) {
         if (err instanceof interoperableErrors.DuplicitEmailError) {
             throw new interoperableErrors.DuplicitEmailError('Subscription already present'); // This is here to provide some meaningful error message.

@@ -188,6 +188,8 @@ export default class CUD extends Component {
                 click_tracking_disabled: false,
                 open_trackings_disabled: false,
 
+                unsubscribe_url: '',
+
                 source: CampaignSource.TEMPLATE,
 
                 // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
@@ -530,6 +532,8 @@ export default class CUD extends Component {
                     <TableSelect id="send_configuration" label={t('Send configuration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
                     {sendSettings}
+
+                    <InputField id="unsubscribe_url" label={t('Custom unsubscribe URL')}/>
 
                     <hr/>
 

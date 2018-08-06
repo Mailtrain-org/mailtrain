@@ -91,6 +91,7 @@ export default class CUD extends Component {
                 subject_overridable: false,
                 verpEnabled: false,
                 verp_hostname: '',
+                x_mailer: '',
                 mailer_type: MailerType.ZONE_MTA,
                 ...this.mailerTypes[MailerType.ZONE_MTA].initData()
             });
@@ -200,6 +201,7 @@ export default class CUD extends Component {
                         <CheckBox id="reply_to_overridable" text={t('Overridable')}/>
                         <InputField id="subject" label={t('Subject')}/>
                         <CheckBox id="subject_overridable" text={t('Overridable')}/>
+                        <InputField id="x_mailer" label={t('X-Mailer')}/>
                     </Fieldset>
 
                     {mailerForm}

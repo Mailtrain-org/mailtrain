@@ -23,6 +23,14 @@ const SubscriptionStatus = {
     MAX: 4
 };
 
+const SubscriptionSource = {
+    ADMIN_FORM: -1,
+    SUBSCRIPTION_FORM: -2,
+    API: -3,
+    NOT_IMPORTED_V1: -4,
+    IMPORTED_V1: -5
+};
+
 function getFieldKey(field) {
     return field.column || 'grouped_' + field.id;
 }
@@ -30,5 +38,6 @@ function getFieldKey(field) {
 module.exports = {
     UnsubscriptionMode,
     SubscriptionStatus,
+    SubscriptionSource,
     getFieldKey
 };

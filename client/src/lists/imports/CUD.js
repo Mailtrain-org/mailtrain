@@ -63,6 +63,7 @@ export default class CUD extends Component {
 
                 if (data.type === ImportType.CSV_FILE) {
                     data.csvFileName = data.settings.csv.originalname;
+                    data.csvDelimiter = data.settings.csv.delimiter;
                 }
             });
 
@@ -71,7 +72,8 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 type: ImportType.CSV_FILE,
-                csvFileName: ''
+                csvFileName: '',
+                csvDelimiter: ','
             });
         }
     }
@@ -92,6 +94,10 @@ export default class CUD extends Component {
         if (!isEdit && type === ImportType.CSV_FILE) {
             if (!this.csvFile || this.csvFile.files.length === 0) {
                 state.setIn(['csvFileName', 'error'], t('File must be selected'));
+            }
+
+            if (!state.getIn(['csvDelimiter', 'value']).trim()) {
+                state.setIn(['csvDelimiter', 'error'], t('CSV delimiter must not be empty'));
             }
         }
     }
@@ -119,7 +125,12 @@ export default class CUD extends Component {
 
                 const formData = new FormData();
                 if (!isEdit && data.type === ImportType.CSV_FILE) {
+                    data.settings.csv = {};
                     formData.append('csvFile', this.csvFile.files[0]);
+                    data.settings.csv.delimiter = data.csvDelimiter.trim();
+
+                    delete data.csvFile;
+                    delete data.csvDelimiter;
                 }
 
                 formData.append('entity', JSON.stringify(data));
@@ -151,9 +162,17 @@ export default class CUD extends Component {
         let settings = null;
         if (type === ImportType.CSV_FILE) {
             if (isEdit) {
-                settings = <StaticField id="csvFileName" className={styles.formDisabled} label={t('File')}>{this.getFormValue('csvFileName')}</StaticField>;
+                settings =
+                    <div>
+                        <StaticField id="csvFileName" className={styles.formDisabled} label={t('File')}>{this.getFormValue('csvFileName')}</StaticField>
+                        <StaticField id="csvDelimiter" className={styles.formDisabled} label={t('Delimiter')}>{this.getFormValue('csvDelimiter')}</StaticField>
+                    </div>;
             } else {
-                settings = <StaticField withValidation id="csvFileName" label={t('File')}><input ref={node => this.csvFile = node} type="file" onChange={::this.onFileSelected}/></StaticField>;
+                settings =
+                    <div>
+                        <StaticField withValidation id="csvFileName" label={t('File')}><input ref={node => this.csvFile = node} type="file" onChange={::this.onFileSelected}/></StaticField>
+                        <InputField id="csvDelimiter" label={t('Delimiter')}/>
+                    </div>;
             }
         }
 

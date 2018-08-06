@@ -5,7 +5,7 @@ const log = require('npmlog');
 const appBuilder = require('./app-builder');
 const http = require('http');
 //const triggers = require('./services/triggers');
-// const importer = require('./services/importer');
+const importer = require('./lib/importer');
 // const verpServer = require('./services/verp-server');
 const testServer = require('./services/test-server');
 //const postfixBounceServer = require('./services/postfix-bounce-server');
@@ -89,20 +89,21 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                             privilegeHelpers.dropRootPrivileges();
 
                             tzupdate.start();
-                            //importer(() => {
+
+                            importer.spawn(() => {
                                 //triggers(() => {
                                     //senders.spawn(() => {
                                         //feedcheck(() => {
                                             //postfixBounceServer(async () => {
-                            (async () => {
+                                                (async () => {
                                                     await reportProcessor.init();
                                                     log.info('Service', 'All services started');
-                            })();
+                                                })();
                                             //});
                                         //});
                                     //});
                                 //});
-                            //});
+                            });
                         });
                     });
                 //});

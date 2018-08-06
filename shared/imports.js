@@ -10,10 +10,15 @@ const ImportType = {
 };
 
 const ImportStatus = {
-    NOT_READY: 0,
-    SCHEDULED: 1,
-    RUNNING: 2,
-    FINISHED: 3
+    PREP_SCHEDULED: 0,
+    PREP_RUNNING: 1,
+    PREP_FINISHED: 2,
+    PREP_FAILED: 3,
+
+    RUN_SCHEDULED: 4,
+    RUN_RUNNING: 5,
+    RUN_FINISHED: 6,
+    RUN_FAILED: 7
 };
 
 const RunStatus = {

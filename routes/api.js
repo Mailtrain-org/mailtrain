@@ -4,7 +4,7 @@ const lists = require('../models/lists');
 const tools = require('../lib/tools');
 const blacklist = require('../models/blacklist');
 const fields = require('../models/fields');
-const { SubscriptionStatus } = require('../shared/lists');
+const { SubscriptionStatus, SubscriptionSource } = require('../shared/lists');
 const subscriptions = require('../models/subscriptions');
 const confirmations = require('../models/confirmations');
 const log = require('npmlog');
@@ -77,7 +77,7 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
             subscribeIfNoExisting: true
         };
 
-        await subscriptions.create(req.context, list.id, subscription, meta);
+        await subscriptions.create(req.context, list.id, subscription, SubscriptionSource.API, meta);
 
         res.status(200);
         res.json({
