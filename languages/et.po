@@ -2300,7 +2300,7 @@ msgstr ""
 
 #: views/users/account.hbs:9
 msgid ""
-"This address is used for account recovery in case you loose your password"
+"This address is used for account recovery in case you lose your password"
 msgstr ""
 
 #: views/users/account.hbs:10
@@ -2770,11 +2770,11 @@ msgid "Could not save subscription"
 msgstr ""
 
 #: lib/models/subscriptions.js:507 lib/models/subscriptions.js:537
-msgid "Missing Subbscription ID"
+msgid "Missing Subscription ID"
 msgstr ""
 
 #: lib/models/subscriptions.js:565
-msgid "Missing Subbscription email address"
+msgid "Missing Subscription email address"
 msgstr ""
 
 #: lib/models/subscriptions.js:644 lib/models/subscriptions.js:893

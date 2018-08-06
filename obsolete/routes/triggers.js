@@ -5,6 +5,7 @@ let router = new express.Router();
 let triggers = require('../lib/models/triggers');
 let campaigns = require('../lib/models/campaigns');
 let lists = require('../lib/models/lists');
+let segments = require('../lib/models/segments');
 let fields = require('../lib/models/fields');
 let striptags = require('striptags');
 let passport = require('../lib/passport');
@@ -58,15 +59,23 @@ router.get('/create-select', passport.csrfProtection, (req, res, next) => {
 });
 
 router.post('/create-select', passport.parseForm, passport.csrfProtection, (req, res) => {
-    if (!req.body.list) {
+    // Check if req.body.list is in correct format ("listId:segmentId")
+    if (!req.body.list || !/([\d]+):([\d]+)/.test(req.body.list)) {
         req.flash('danger', _('Could not find selected list'));
         return res.redirect('/triggers/create-select');
     }
-    res.redirect('/triggers/' + encodeURIComponent(req.body.list) + '/create');
+
+    let listId = parseInt(req.body.list.split(':')[0]);
+    let segmentId = parseInt(req.body.list.split(':')[1]);
+    
+    res.redirect('/triggers/' + encodeURIComponent(listId) + '/' + encodeURIComponent(segmentId) + '/create');
 });
 
 
-router.get('/:listId/create', passport.csrfProtection, (req, res, next) => {
+router.get('/:listId/:segmentId/create', passport.csrfProtection, (req, res, next) => {
+    let listId = parseInt(req.params.listId);
+    let segmentId = parseInt(req.params.segmentId);
+
     let data = tools.convertKeys(req.query, {
         skip: ['layout']
     });
@@ -74,52 +83,69 @@ router.get('/:listId/create', passport.csrfProtection, (req, res, next) => {
     data.csrfToken = req.csrfToken();
     data.days = Math.max(Number(data.days) || 1, 1);
 
-    lists.get(req.params.listId, (err, list) => {
+    lists.get(listId, (err, list) => {
         if (err || !list) {
             req.flash('danger', err && err.message || err || _('Could not find selected list'));
             return res.redirect('/triggers/create-select');
         }
-        fields.list(list.id, (err, fieldList) => {
-            if (err && !fieldList) {
-                fieldList = [];
+
+        segments.get(segmentId, (err, segment) => {
+            if (segmentId > 0 && err) {
+                req.flash('danger', err && err.message || err || _('Error while finding selected segment'));
+                return res.redirect('/triggers/create-select');
             }
 
-            data.columns = triggers.defaultColumns.concat(fieldList.filter(field => fields.genericTypes[field.type] === 'date')).map(field => ({
-                column: field.column,
-                name: field.name,
-                selected: data.column === field.column
-            }));
-
-            campaigns.list(0, 300, (err, campaignList) => {
-                if (err) {
-                    return next(err);
+            segments.subscribers(segmentId, true, (err, segmentSubscribers) => {
+                if (segmentId > 0 && err) {
+                    req.flash('danger', err && err.message || err || _('Error while finding selected segment'));
+                    return res.redirect('/triggers/create-select');
                 }
 
-                data.sourceCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id).map(campaign => ({
-                    id: campaign.id,
-                    name: campaign.name,
-                    selected: Number(data.sourceCampaign) === campaign.id
-                }));
+                fields.list(list.id, (err, fieldList) => {
+                    if (err && !fieldList) {
+                        fieldList = [];
+                    }
 
-                data.destCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id && campaign.type === 4).map(campaign => ({
-                    id: campaign.id,
-                    name: campaign.name,
-                    selected: Number(data.destCampaign) === campaign.id
-                }));
+                    data.columns = triggers.defaultColumns.concat(fieldList.filter(field => fields.genericTypes[field.type] === 'date')).map(field => ({
+                        column: field.column,
+                        name: field.name,
+                        selected: data.column === field.column
+                    }));
 
-                data.list = list;
-                data.isSubscription = data.rule === 'subscription' || !data.rule;
-                data.isCampaign = data.rule === 'campaign';
+                    campaigns.list(0, 300, (err, campaignList) => {
+                        if (err) {
+                            return next(err);
+                        }
 
-                data.campaignOptions = triggers.defaultCampaignEvents.map(evt => ({
-                    option: evt.option,
-                    name: evt.name,
-                    selected: Number(data.sourceCampaign) === evt.option
-                }));
+                        data.sourceCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id).map(campaign => ({
+                            id: campaign.id,
+                            name: campaign.name,
+                            selected: Number(data.sourceCampaign) === campaign.id
+                        }));
 
-                data.isSend = true;
+                        data.destCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id && (segmentId <= 0 || campaign.segment === segmentId) && campaign.type === 4).map(campaign => ({
+                            id: campaign.id,
+                            name: campaign.name,
+                            selected: Number(data.destCampaign) === campaign.id
+                        }));
 
-                res.render('triggers/create', data);
+                        data.list = list;
+                        data.segment = segment;
+                        data.segmentSubscribers = segmentSubscribers;
+                        data.isSubscription = data.rule === 'subscription' || !data.rule;
+                        data.isCampaign = data.rule === 'campaign';
+
+                        data.campaignOptions = triggers.defaultCampaignEvents.map(evt => ({
+                            option: evt.option,
+                            name: evt.name,
+                            selected: Number(data.sourceCampaign) === evt.option
+                        }));
+
+                        data.isSend = true;
+
+                        res.render('triggers/create', data);
+                    });
+                });
             });
         });
     });
@@ -154,51 +180,73 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                 req.flash('danger', err && err.message || err || _('Could not find selected list'));
                 return res.redirect('/triggers');
             }
-            fields.list(list.id, (err, fieldList) => {
-                if (err && !fieldList) {
-                    fieldList = [];
+
+            segments.get(trigger.segment, (err, segment) => {
+                if (trigger.segment > 0 && err) {
+                    req.flash('danger', err && err.message || err || _('Error while finding selected segment'));
+                    return res.redirect('/triggers');
+                }
+                
+                let segmentId = 0;
+                if (trigger.segment > 0) {
+                    segmentId = segment.id;
                 }
 
-                campaigns.list(0, 300, (err, campaignList) => {
-                    if (err) {
-                        return next(err);
+                segments.subscribers(segmentId, true, (err, segmentSubscribers) => {
+                    if (trigger.segment > 0 && err) {
+                        req.flash('danger', err && err.message || err || _('Error while finding selected segment subscribers'));
+                        return res.redirect('/triggers');
                     }
 
-                    trigger.sourceCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id).map(campaign => ({
-                        id: campaign.id,
-                        name: campaign.name,
-                        selected: Number(trigger.sourceCampaign) === campaign.id
-                    }));
+                    fields.list(list.id, (err, fieldList) => {
+                        if (err && !fieldList) {
+                            fieldList = [];
+                        }
 
-                    trigger.destCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id && campaign.type === 4).map(campaign => ({
-                        id: campaign.id,
-                        name: campaign.name,
-                        selected: Number(trigger.destCampaign) === campaign.id
-                    }));
+                        campaigns.list(0, 300, (err, campaignList) => {
+                            if (err) {
+                                return next(err);
+                            }
 
-                    trigger.list = list;
-                    trigger.isSubscription = trigger.rule === 'subscription' || !trigger.rule;
-                    trigger.isCampaign = trigger.rule === 'campaign';
+                            trigger.sourceCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id).map(campaign => ({
+                                id: campaign.id,
+                                name: campaign.name,
+                                selected: Number(trigger.sourceCampaign) === campaign.id
+                            }));
 
-                    trigger.columns = triggers.defaultColumns.concat(fieldList.filter(field => fields.genericTypes[field.type] === 'date')).map(field => ({
-                        column: field.column,
-                        name: field.name,
-                        selected: trigger.isSubscription && trigger.column === field.column
-                    }));
+                            trigger.destCampaigns = (campaignList || []).filter(campaign => campaign.list === list.id && campaign.type === 4).map(campaign => ({
+                                id: campaign.id,
+                                name: campaign.name,
+                                selected: Number(trigger.destCampaign) === campaign.id
+                            }));
 
-                    trigger.campaignOptions = triggers.defaultCampaignEvents.map(evt => ({
-                        option: evt.option,
-                        name: evt.name,
-                        selected: trigger.isCampaign && trigger.column === evt.option
-                    }));
+                            trigger.list = list;
+                            trigger.segment = segment;
+                            trigger.segmentSubscribers = segmentSubscribers;
+                            trigger.isSubscription = trigger.rule === 'subscription' || !trigger.rule;
+                            trigger.isCampaign = trigger.rule === 'campaign';
 
-                    if (trigger.rule !== 'subscription') {
-                        trigger.column = null;
-                    }
+                            trigger.columns = triggers.defaultColumns.concat(fieldList.filter(field => fields.genericTypes[field.type] === 'date')).map(field => ({
+                                column: field.column,
+                                name: field.name,
+                                selected: trigger.isSubscription && trigger.column === field.column
+                            }));
 
-                    trigger.isSend = true;
+                            trigger.campaignOptions = triggers.defaultCampaignEvents.map(evt => ({
+                                option: evt.option,
+                                name: evt.name,
+                                selected: trigger.isCampaign && trigger.column === evt.option
+                            }));
 
-                    res.render('triggers/edit', trigger);
+                            if (trigger.rule !== 'subscription') {
+                                trigger.column = null;
+                            }
+
+                            trigger.isSend = true;
+
+                            res.render('triggers/edit', trigger);
+                        });
+                    });
                 });
             });
         });

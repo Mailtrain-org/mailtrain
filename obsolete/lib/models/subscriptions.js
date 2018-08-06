@@ -247,7 +247,7 @@ module.exports.get = (listId, cid, callback) => {
     cid = (cid || '').toString().trim();
 
     if (!cid) {
-        return callback(new Error(_('Missing Subbscription ID')));
+        return callback(new Error(_('Missing Subscription ID')));
     }
 
     db.getConnection((err, connection) => {
@@ -277,7 +277,7 @@ module.exports.getById = (listId, id, callback) => {
     id = Number(id) || 0;
 
     if (!id) {
-        return callback(new Error(_('Missing Subbscription ID')));
+        return callback(new Error(_('Missing Subscription ID')));
     }
 
     db.getConnection((err, connection) => {
@@ -305,7 +305,7 @@ module.exports.getById = (listId, id, callback) => {
 
 module.exports.getByEmail = (listId, email, callback) => {
     if (!email) {
-        return callback(new Error(_('Missing Subbscription email address')));
+        return callback(new Error(_('Missing Subscription email address')));
     }
 
     db.getConnection((err, connection) => {

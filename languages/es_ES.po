@@ -3027,7 +3027,7 @@ msgstr "Tu dirección email"
 
 #: views/users/account.hbs:9
 msgid ""
-"This address is used for account recovery in case you loose your password"
+"This address is used for account recovery in case you lose your password"
 msgstr ""
 "Este email es usado para recuperar una cuenta en caso de que no recuerdes la "
 "contraseña"
@@ -3614,17 +3614,13 @@ msgstr "El segmento especificado no se encontra"
 msgid "Selected rule not found"
 msgstr "La regla seleccionada no se encontra"
 
-#: lib/models/subscriptions.js:254 lib/models/subscriptions.js:284
-msgid "Missing Subbscription ID"
+#: lib/models/subscriptions.js:254 lib/models/subscriptions.js:284 lib/models/subscriptions.js:391
+msgid "Missing Subscription ID"
 msgstr "Falta el ID de Suscripción"
 
 #: lib/models/subscriptions.js:312
-msgid "Missing Subbscription email address"
+msgid "Missing Subscription email address"
 msgstr "Falta el correo electrónico de suscripción"
-
-#: lib/models/subscriptions.js:391
-msgid "Missing Subscription ID"
-msgstr "Falta el ID de suscripción"
 
 #: lib/models/subscriptions.js:567 lib/models/subscriptions.js:817
 msgid "Missing subscription ID"

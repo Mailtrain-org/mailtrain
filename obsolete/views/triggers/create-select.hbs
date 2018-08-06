@@ -17,9 +17,19 @@
             <select class="form-control" name="list" required>
                 <option value=""> –– {{#translate}}Select{{/translate}} ––</option>
                 {{#each listItems}}
-                    <option value="{{id}}">
+                    <option value="{{id}}:0">
                         {{name}} <span class="text-muted"> &mdash; {{subscribers}} {{#translate}}subscribers{{/translate}}</span>
                     </option>
+
+                    {{#if segments}}
+                        <optgroup label="{{name}} segments">
+                            {{#each segments}}
+                                <option value="{{../id}}:{{id}}" {{#if selected}} selected {{/if}}>
+                                    {{../name}}: {{name}}
+                                </option>
+                            {{/each}}
+                        </optgroup>
+                    {{/if}}
                 {{/each}}
             </select>
         </div>
