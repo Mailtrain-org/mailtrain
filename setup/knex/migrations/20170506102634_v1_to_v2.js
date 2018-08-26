@@ -1025,9 +1025,10 @@ async function migrateImporter(knex) {
         table.string('name');
         table.text('description');
         table.integer('list').unsigned().references('lists.id');
-        table.integer('type').unsigned().notNullable();
+        table.integer('source').unsigned().notNullable();
         table.integer('status').unsigned().notNullable();
         table.text('settings', 'longtext');
+        table.integer('mapping_type').unsigned().notNullable();
         table.text('mapping', 'longtext');
         table.timestamp('last_run');
         table.text('error');

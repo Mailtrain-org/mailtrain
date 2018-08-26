@@ -31,8 +31,8 @@ export default class Status extends Component {
             entity: props.entity
         };
 
-        const {importTypeLabels, importStatusLabels, runStatusLabels} = getImportTypes(props.t);
-        this.importTypeLabels = importTypeLabels;
+        const {importSourceLabels, importStatusLabels, runStatusLabels} = getImportTypes(props.t);
+        this.importSourceLabels = importSourceLabels;
         this.importStatusLabels = importStatusLabels;
         this.runStatusLabels = runStatusLabels;
 
@@ -57,7 +57,9 @@ export default class Status extends Component {
     async periodicRefreshTask() {
         if (runStatusInProgress(this.state.entity.status)) {
             await this.refreshEntity();
-            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 2000);
+            if (this.refreshTimeoutHandler) { // For some reason the task gets rescheduled if server is restarted while the page is shown. That why we have this check here.
+                this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 2000);
+            }
         }
     }
 
@@ -67,6 +69,7 @@ export default class Status extends Component {
 
     componentWillUnmount() {
         clearTimeout(this.refreshTimeoutId);
+        this.refreshTimeoutHandler = null;
     }
 
     render() {
@@ -79,7 +82,7 @@ export default class Status extends Component {
                 <Title>{t('Import Run Status')}</Title>
 
                 <AlignedRow label={t('Import name')}>{imprt.name}</AlignedRow>
-                <AlignedRow label={t('Import type')}>{this.importTypeLabels[imprt.type]}</AlignedRow>
+                <AlignedRow label={t('Import source')}>{this.importSourceLabels[imprt.source]}</AlignedRow>
                 <AlignedRow label={t('Run started')}>{moment(entity.created).fromNow()}</AlignedRow>
                 {entity.finished && <AlignedRow label={t('Run finished')}>{moment(entity.finished).fromNow()}</AlignedRow>}
                 <AlignedRow label={t('Run status')}>{this.runStatusLabels[entity.status]}</AlignedRow>

@@ -6,15 +6,15 @@ const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
-const {ImportType, ImportStatus, RunStatus, prepFinished, prepFinishedAndNotInProgress, runInProgress} = require('../shared/imports');
+const {ImportSource, MappingType, ImportStatus, RunStatus, prepFinished, prepFinishedAndNotInProgress, runInProgress} = require('../shared/imports');
 const fs = require('fs-extra-promise');
 const path = require('path');
 const importer = require('../lib/importer');
 
 const filesDir = path.join(__dirname, '..', 'files', 'imports');
 
-const allowedKeysCreate = new Set(['name', 'description', 'type', 'settings', 'mapping']);
-const allowedKeysUpdate = new Set(['name', 'description', 'mapping']);
+const allowedKeysCreate = new Set(['name', 'description', 'source', 'settings']);
+const allowedKeysUpdate = new Set(['name', 'description', 'mapping_type', 'mapping']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeysUpdate));
@@ -34,7 +34,7 @@ async function getById(context, listId, id, withSampleRow = false) {
         entity.mapping = JSON.parse(entity.mapping);
 
         if (withSampleRow && prepFinished(entity.status)) {
-            if (entity.type === ImportType.CSV_FILE) {
+            if (entity.source === ImportSource.CSV_FILE) {
                 const importTable = 'import_file__' + id;
 
                 const row = await tx(importTable).first();
@@ -58,21 +58,28 @@ async function listDTAjax(context, listId, params) {
             builder => builder
                 .from('imports')
                 .where('imports.list', listId),
-            [ 'imports.id', 'imports.name', 'imports.description', 'imports.type', 'imports.status', 'imports.last_run' ]
+            [ 'imports.id', 'imports.name', 'imports.description', 'imports.source', 'imports.status', 'imports.last_run' ]
         );
     });
 }
 
 async function _validateAndPreprocess(tx, listId, entity, isCreate) {
-    enforce(Number.isInteger(entity.type));
-    enforce(entity.type >= ImportType.MIN && entity.type <= ImportType.MAX, 'Invalid import type');
+    if (isCreate) {
+        enforce(Number.isInteger(entity.source));
+        enforce(entity.source >= ImportSource.MIN && entity.source <= ImportSource.MAX, 'Invalid import source');
 
-    entity.settings = entity.settings || {};
-    entity.mapping = entity.mapping || {};
+        entity.settings = entity.settings || {};
 
-    if (isCreate && entity.type === ImportType.CSV_FILE) {
-        entity.settings.csv = entity.settings.csv || {};
-        enforce(entity.settings.csv.delimiter && entity.settings.csv.delimiter.trim(), 'CSV delimiter must not be empty');
+        if (entity.source === ImportSource.CSV_FILE) {
+            entity.settings.csv = entity.settings.csv || {};
+            enforce(entity.settings.csv.delimiter && entity.settings.csv.delimiter.trim(), 'CSV delimiter must not be empty');
+        }
+
+    } else {
+        enforce(Number.isInteger(entity.mapping_type));
+        enforce(entity.mapping_type >= MappingType.MIN && entity.mapping_type <= MappingType.MAX, 'Invalid mapping type');
+
+        entity.mapping = entity.mapping || { settings: {}, fields: {} };
     }
 }
 
@@ -83,7 +90,7 @@ async function create(context, listId, entity, files) {
 
         await _validateAndPreprocess(tx, listId, entity, true);
 
-        if (entity.type === ImportType.CSV_FILE) {
+        if (entity.source === ImportSource.CSV_FILE) {
             enforce(files.csvFile, 'File must be included');
             const csvFile = files.csvFile[0];
             const filePath = path.join(filesDir, csvFile.filename);
@@ -98,11 +105,12 @@ async function create(context, listId, entity, files) {
             entity.status = ImportStatus.PREP_SCHEDULED;
         }
 
-
         const filteredEntity = filterObject(entity, allowedKeysCreate);
         filteredEntity.list = listId;
         filteredEntity.settings = JSON.stringify(filteredEntity.settings);
-        filteredEntity.mapping = JSON.stringify(filteredEntity.mapping);
+
+        filteredEntity.mapping_type = MappingType.BASIC_SUBSCRIBE; // This is not set in the create form. It can be changed in the update form.
+        filteredEntity.mapping = JSON.stringify({});
 
         const ids = await tx('imports').insert(filteredEntity);
         const id = ids[0];
@@ -130,13 +138,11 @@ async function updateWithConsistencyCheck(context, listId, entity) {
             throw new interoperableErrors.ChangedError();
         }
 
-        enforce(prepFinishedAndNotInProgress(existing.status), 'Cannot save updates until preparation or run is finished');
+        enforce(prepFinished(existing.status), 'Cannot save updates until preparation is finished');
 
-        enforce(entity.type === existing.type, 'Import type cannot be changed');
         await _validateAndPreprocess(tx, listId, entity, false);
 
         const filteredEntity = filterObject(entity, allowedKeysUpdate);
-        filteredEntity.list = listId;
         filteredEntity.mapping = JSON.stringify(filteredEntity.mapping);
 
         await tx('imports').where({list: listId, id: entity.id}).update(filteredEntity);

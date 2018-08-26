@@ -12,6 +12,7 @@ import {
 import {
     Button,
     ButtonRow,
+    CheckBox,
     Dropdown,
     Fieldset,
     Form,
@@ -28,8 +29,9 @@ import {
 import {DeleteModalDialog} from "../../lib/modals";
 import {getImportTypes} from './helpers';
 import {
-    ImportType,
+    ImportSource,
     inProgress,
+    MappingType,
     prepInProgress,
     runInProgress
 } from '../../../../shared/imports';
@@ -60,13 +62,18 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        const {importTypeLabels} = getImportTypes(props.t);
+        const {importSourceLabels, mappingTypeLabels} = getImportTypes(props.t);
 
-        this.importTypeLabels = importTypeLabels;
+        this.importSourceLabels = importSourceLabels;
 
-        this.importTypeOptions = [
-            {key: ImportType.CSV_FILE, label: importTypeLabels[ImportType.CSV_FILE]},
-            // {key: ImportType.LIST, label: importTypeLabels[ImportType.LIST]}
+        this.importSourceOptions = [
+            {key: ImportSource.CSV_FILE, label: importSourceLabels[ImportSource.CSV_FILE]},
+            // {key: ImportSource.LIST, label: importSourceLabels[ImportSource.LIST]}
+        ];
+
+        this.mappingOptions = [
+            {key: MappingType.BASIC_SUBSCRIBE, label: mappingTypeLabels[MappingType.BASIC_SUBSCRIBE]},
+            {key: MappingType.BASIC_UNSUBSCRIBE, label: mappingTypeLabels[MappingType.BASIC_UNSUBSCRIBE]},
         ];
 
         this.refreshTimeoutHandler = ::this.refreshEntity;
@@ -87,26 +94,30 @@ export default class CUD extends Component {
             data.settings = data.settings || {};
             const mapping = data.mapping || {};
 
-            if (data.type === ImportType.CSV_FILE) {
+            if (data.source === ImportSource.CSV_FILE) {
                 data.csvFileName = data.settings.csv.originalname;
                 data.csvDelimiter = data.settings.csv.delimiter;
             }
 
+            const mappingSettings = mapping.settings || {};
+            data.mapping_settings_checkEmails = 'checkEmails' in mappingSettings ? !!mappingSettings.checkEmails : true;
+
+            const mappingFlds = mapping.fields || {};
             for (const field of this.props.fieldsGrouped) {
                 if (field.column) {
-                    const colMapping = mapping[field.column] || {};
-                    data['mapping_' + field.column + '_column'] = colMapping.column || '';
+                    const colMapping = mappingFlds[field.column] || {};
+                    data['mapping_fields_' + field.column + '_column'] = colMapping.column || '';
                 } else {
                     for (const option of field.settings.options) {
                         const col = field.groupedOptions[option.key].column;
-                        const colMapping = mapping[col] || {};
-                        data['mapping_' + col + '_column'] = colMapping.column || '';
+                        const colMapping = mappingFlds[col] || {};
+                        data['mapping_fields_' + col + '_column'] = colMapping.column || '';
                     }
                 }
             }
 
-            const emailMapping = mapping.email || {};
-            data.mapping_email_column = emailMapping.column || '';
+            const emailMapping = mappingFlds.email || {};
+            data.mapping_fields_email_column = emailMapping.column || '';
         });
 
         if (inProgress(entity.status)) {
@@ -121,9 +132,9 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                type: ImportType.CSV_FILE,
+                source: ImportSource.CSV_FILE,
                 csvFileName: '',
-                csvDelimiter: ','
+                csvDelimiter: ',',
             });
         }
     }
@@ -141,8 +152,7 @@ export default class CUD extends Component {
     localValidateFormValues(state) {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
-        const type = Number.parseInt(state.getIn(['type', 'value']));
-        const status = this.getFormValue('status');
+        const source = Number.parseInt(state.getIn(['source', 'value']));
 
         for (const key of state.keys()) {
             state.setIn([key, 'error'], null);
@@ -152,19 +162,23 @@ export default class CUD extends Component {
             state.setIn(['name', 'error'], t('Name must not be empty'));
         }
 
-        if (!isEdit && type === ImportType.CSV_FILE) {
-            if (!this.csvFile || this.csvFile.files.length === 0) {
-                state.setIn(['csvFileName', 'error'], t('File must be selected'));
-            }
+        if (!isEdit) {
+            if (source === ImportSource.CSV_FILE) {
+                if (!this.csvFile || this.csvFile.files.length === 0) {
+                    state.setIn(['csvFileName', 'error'], t('File must be selected'));
+                }
 
-            if (!state.getIn(['csvDelimiter', 'value']).trim()) {
-                state.setIn(['csvDelimiter', 'error'], t('CSV delimiter must not be empty'));
+                if (!state.getIn(['csvDelimiter', 'value']).trim()) {
+                    state.setIn(['csvDelimiter', 'error'], t('CSV delimiter must not be empty'));
+                }
             }
-        }
+        } else  {
+            const mappingType = Number.parseInt(state.getIn(['mapping_type', 'value']));
 
-        if (isEdit) {
-            if (!state.getIn(['mapping_email_column', 'value'])) {
-                state.setIn(['mapping_email_column', 'error'], t('Email mapping has to be provided'));
+            if (mappingType === MappingType.BASIC_SUBSCRIBE) {
+                if (!state.getIn(['mapping_fields_email_column', 'value'])) {
+                    state.setIn(['mapping_fields_email_column', 'error'], t('Email mapping has to be provided'));
+                }
             }
         }
     }
@@ -173,7 +187,6 @@ export default class CUD extends Component {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
 
-        const type = Number.parseInt(this.getFormValue('type'));
 
         let sendMethod, url;
         if (this.props.entity) {
@@ -189,42 +202,54 @@ export default class CUD extends Component {
             this.setFormStatusMessage('info', t('Saving ...'));
 
             const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                data.type = Number.parseInt(data.type);
+                data.source = Number.parseInt(data.source);
                 data.settings = {};
 
                 const formData = new FormData();
-                if (!isEdit && data.type === ImportType.CSV_FILE) {
-                    data.settings.csv = {};
-                    formData.append('csvFile', this.csvFile.files[0]);
-                    data.settings.csv.delimiter = data.csvDelimiter.trim();
-                }
-
-                if (isEdit) {
-                    const mapping = {};
-                    for (const field of this.props.fieldsGrouped) {
-                        if (field.column) {
-                            mapping[field.column] = {
-                                column: data['mapping_' + field.column + '_column']
-                            };
-
-                            delete data['mapping_' + field.column + '_column'];
-                        } else {
-                            for (const option of field.settings.options) {
-                                const col = field.groupedOptions[option.key].column;
-                                mapping[col] = {
-                                    column: data['mapping_' + col + '_column']
-                                };
-
-                                delete data['mapping_' + col + '_column'];
-                            }
-                        }
+                if (!isEdit) {
+                    if (data.source === ImportSource.CSV_FILE) {
+                        data.settings.csv = {};
+                        formData.append('csvFile', this.csvFile.files[0]);
+                        data.settings.csv.delimiter = data.csvDelimiter.trim();
                     }
 
-                    mapping.email = {
-                        column: data.mapping_email_column
+                } else {
+                    data.mapping_type = Number.parseInt(data.mapping_type);
+                    const mapping = {
+                        fields: {},
+                        settings: {}
                     };
 
+                    if (data.mapping_type === MappingType.BASIC_SUBSCRIBE) {
+                        mapping.settings.checkEmails = data.mapping_settings_checkEmails;
+
+                        for (const field of this.props.fieldsGrouped) {
+                            if (field.column) {
+                                mapping.fields[field.column] = {
+                                    column: data['mapping_fields_' + field.column + '_column']
+                                };
+                            } else {
+                                for (const option of field.settings.options) {
+                                    const col = field.groupedOptions[option.key].column;
+                                    mapping.fields[col] = {
+                                        column: data['mapping_fields_' + col + '_column']
+                                    };
+                                }
+                            }
+                        }
+
+                        mapping.fields.email = {
+                            column: data.mapping_fields_email_column
+                        };
+                    }
+
                     data.mapping = mapping;
+                }
+
+                for (const key in data) {
+                    if (key.startsWith('mapping_fields') || key.startsWith('mapping_settings')) {
+                        delete data[key];
+                    }
                 }
 
                 delete data.csvFile;
@@ -237,7 +262,7 @@ export default class CUD extends Component {
             });
 
             if (submitResponse) {
-                if (!isEdit && type === ImportType.CSV_FILE) {
+                if (!isEdit) {
                     this.navigateTo(`/lists/${this.props.list.id}/imports/${submitResponse}/edit`);
                 } else {
                     this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/imports/${this.props.entity.id}/status`, 'success', t('Import saved'));
@@ -260,12 +285,12 @@ export default class CUD extends Component {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
 
-        const type = Number.parseInt(this.getFormValue('type'));
+        const source = Number.parseInt(this.getFormValue('source'));
         const status = this.getFormValue('status');
         const settings = this.getFormValue('settings');
 
         let settingsEdit = null;
-        if (type === ImportType.CSV_FILE) {
+        if (source === ImportSource.CSV_FILE) {
             if (isEdit) {
                 settingsEdit =
                     <div>
@@ -284,49 +309,69 @@ export default class CUD extends Component {
         let mappingEdit;
         if (isEdit) {
             if (prepInProgress(status)) {
-                mappingEdit = <div>{t('Preparation in progress. Please wait till it is done or visit this page later.')}</div>;
-            } else if (runInProgress(status)) {
-                    mappingEdit = <div>{t('Run in progress. Please wait till it is done or visit this page later.')}</div>;
+                mappingEdit = (
+                    <div>{t('Preparation in progress. Please wait till it is done or visit this page later.')}</div>
+                );
+
             } else {
-                const sampleRow = this.getFormValue('sampleRow');
-                const sourceOpts = [];
-                sourceOpts.push({key: '', label: t('–– Select ––')});
-                if (type === ImportType.CSV_FILE) {
-                    for (const csvCol of settings.csv.columns) {
-                        let help = '';
-                        if (sampleRow) {
-                            help = ' (' + t('e.g.:', {keySeparator: '>', nsSeparator: '|'}) + ' ' + truncate(sampleRow[csvCol.column], 50) + ')';
+                let mappingSettings = null;
+                const mappingType = Number.parseInt(this.getFormValue('mapping_type'));
+
+                if (mappingType === MappingType.BASIC_SUBSCRIBE) {
+                    const sampleRow = this.getFormValue('sampleRow');
+                    const sourceOpts = [];
+                    sourceOpts.push({key: '', label: t('–– Select ––')});
+                    if (source === ImportSource.CSV_FILE) {
+                        for (const csvCol of settings.csv.columns) {
+                            let help = '';
+                            if (sampleRow) {
+                                help = ' (' + t('e.g.:', {keySeparator: '>', nsSeparator: '|'}) + ' ' + truncate(sampleRow[csvCol.column], 50) + ')';
+                            }
+
+                            sourceOpts.push({key: csvCol.column, label: csvCol.name + help});
                         }
-
-                        sourceOpts.push({key: csvCol.column, label: csvCol.name + help});
                     }
-                }
 
-                const mappingRows = [
-                    <Dropdown key="email" id="mapping_email_column" label={t('Email')} options={sourceOpts}/>
-                ];
+                    const mappingRows = [
+                        <Dropdown key="email" id="mapping_fields_email_column" label={t('Email')} options={sourceOpts}/>
+                    ];
 
-                for (const field of this.props.fieldsGrouped) {
-                    if (field.column) {
-                        mappingRows.push(
-                            <Dropdown key={field.column} id={'mapping_' + field.column + '_column'} label={field.name} options={sourceOpts}/>
-                        );
-                    } else {
-                        for (const option of field.settings.options) {
-                            const col = field.groupedOptions[option.key].column;
+                    for (const field of this.props.fieldsGrouped) {
+                        if (field.column) {
                             mappingRows.push(
-                                <Dropdown key={col} id={'mapping_' + col + '_column'} label={field.groupedOptions[option.key].name} options={sourceOpts}/>
+                                <Dropdown key={field.column} id={'mapping_fields_' + field.column + '_column'} label={field.name} options={sourceOpts}/>
                             );
+                        } else {
+                            for (const option of field.settings.options) {
+                                const col = field.groupedOptions[option.key].column;
+                                mappingRows.push(
+                                    <Dropdown key={col} id={'mapping_fields_' + col + '_column'} label={field.groupedOptions[option.key].name} options={sourceOpts}/>
+                                );
+                            }
                         }
                     }
+
+                    mappingSettings = (
+                        <div>
+                            <CheckBox id="mapping_settings_checkEmails" text={t('Check imported emails')}/>
+                            <Fieldset label={t('Mapping')} className={styles.mapping}>
+                                {mappingRows}
+                            </Fieldset>
+                        </div>
+                    );
                 }
 
-                mappingEdit = mappingRows;
+                mappingEdit = (
+                    <div>
+                        <Dropdown id="mapping_type" label={t('Type')} options={this.mappingOptions}/>
+                        {mappingSettings}
+                    </div>
+                );
             }
         }
 
         let saveButtonLabel;
-        if (!isEdit && type === ImportType.CSV_FILE) {
+        if (!isEdit) {
             saveButtonLabel = t('Save and edit mapping');
         } else {
             saveButtonLabel = t('Save');
@@ -352,18 +397,14 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('Description')}/>
 
                     {isEdit ?
-                        <StaticField id="type" className={styles.formDisabled} label={t('Type')}>{this.importTypeLabels[this.getFormValue('type')]}</StaticField>
+                        <StaticField id="source" className={styles.formDisabled} label={t('Source')}>{this.importSourceLabels[this.getFormValue('source')]}</StaticField>
                     :
-                        <Dropdown id="type" label={t('Type')} options={this.importTypeOptions}/>
+                        <Dropdown id="source" label={t('Source')} options={this.importSourceOptions}/>
                     }
 
                     {settingsEdit}
 
-                    {mappingEdit &&
-                        <Fieldset label={t('Mapping')} className={styles.mapping}>
-                            {mappingEdit}
-                        </Fieldset>
-                    }
+                    {mappingEdit}
 
 
                     <ButtonRow>

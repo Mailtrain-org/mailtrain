@@ -326,7 +326,9 @@ class SectionContent extends Component {
 
     errorHandler(error) {
         if (error instanceof interoperableErrors.NotLoggedInError) {
-            this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
+            if (window.location.pathname !== '/account/login') { // There may be multiple async requests failing at the same time. So we take the pathname only from the first one.
+                this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
+            }
         } else if (error.response && error.response.data && error.response.data.message) {
             console.error(error);
             this.navigateToWithFlashMessage(this.props.root, 'danger', error.response.data.message);

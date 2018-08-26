@@ -46,8 +46,8 @@ export default class Status extends Component {
             entity: props.entity
         };
 
-        const {importTypeLabels, importStatusLabels, runStatusLabels} = getImportTypes(props.t);
-        this.importTypeLabels = importTypeLabels;
+        const {importSourceLabels, importStatusLabels, runStatusLabels} = getImportTypes(props.t);
+        this.importSourceLabels = importSourceLabels;
         this.importStatusLabels = importStatusLabels;
         this.runStatusLabels = runStatusLabels;
 
@@ -71,7 +71,9 @@ export default class Status extends Component {
     async periodicRefreshTask() {
         // The periodic task runs all the time, so that we don't have to worry about starting/stopping it as a reaction to the buttons.
         await this.refreshEntity();
-        this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 2000);
+        if (this.refreshTimeoutHandler) { // For some reason the task gets rescheduled if server is restarted while the page is shown. That why we have this check here.
+            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 2000);
+        }
     }
 
     componentDidMount() {
@@ -80,6 +82,7 @@ export default class Status extends Component {
 
     componentWillUnmount() {
         clearTimeout(this.refreshTimeoutId);
+        this.refreshTimeoutHandler = null;
     }
 
     async startRunAsync() {
@@ -94,6 +97,7 @@ export default class Status extends Component {
         }
 
         await this.refreshEntity();
+        this.runsTableNode.refresh();
     }
 
     async stopRunAsync() {
@@ -108,6 +112,7 @@ export default class Status extends Component {
         }
 
         await this.refreshEntity();
+        this.runsTableNode.refresh();
     }
 
     render() {
@@ -147,7 +152,7 @@ export default class Status extends Component {
                 <Title>{t('Import Status')}</Title>
 
                 <AlignedRow label={t('Name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('Type')}>{this.importTypeLabels[entity.type]}</AlignedRow>
+                <AlignedRow label={t('Source')}>{this.importSourceLabels[entity.source]}</AlignedRow>
                 <AlignedRow label={t('Status')}>{this.importStatusLabels[entity.status]}</AlignedRow>
                 {entity.error && <AlignedRow label={t('Error')}><pre>{entity.error}</pre></AlignedRow>}
 
@@ -158,7 +163,7 @@ export default class Status extends Component {
 
                 <hr/>
                 <h3>{t('Import Runs')}</h3>
-                <Table withHeader dataUrl={`rest/import-runs-table/${this.props.list.id}/${this.props.entity.id}`} columns={columns} />
+                <Table ref={node => this.runsTableNode = node} withHeader dataUrl={`rest/import-runs-table/${this.props.list.id}/${this.props.entity.id}`} columns={columns} />
             </div>
         );
     }

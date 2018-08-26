@@ -1,10 +1,19 @@
 'use strict';
 
-const ImportType = {
+const ImportSource = {
     MIN: 0,
 
     CSV_FILE: 0,
     LIST: 1,
+
+    MAX: 1
+};
+
+const MappingType = {
+    MIN: 0,
+
+    BASIC_SUBSCRIBE: 0,
+    BASIC_UNSUBSCRIBE: 1,
 
     MAX: 1
 };
@@ -59,7 +68,8 @@ function runStatusInProgress(status) {
 }
 
 module.exports = {
-    ImportType,
+    ImportSource,
+    MappingType,
     ImportStatus,
     RunStatus,
     prepInProgress,

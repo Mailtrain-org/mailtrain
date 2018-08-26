@@ -4,9 +4,10 @@ const knex = require('../lib/knex');
 const path = require('path');
 const log = require('npmlog');
 const fsExtra = require('fs-extra-promise');
-const {ImportType, ImportStatus, RunStatus} = require('../shared/imports');
+const {ImportSource, MappingType, ImportStatus, RunStatus} = require('../shared/imports');
 const imports = require('../models/imports');
 const { Writable } = require('stream');
+const { enforce } = require('../lib/helpers');
 
 const csvparse = require('csv-parse');
 const fs = require('fs');
@@ -50,7 +51,6 @@ function prepareCsv(impt) {
     };
 
     const processRows = async (chunks) => {
-        console.log('process row');
         let insertBatch = [];
         for (const chunkEntry of chunks) {
             const record = chunkEntry.chunk;
@@ -126,6 +126,29 @@ function prepareCsv(impt) {
     inputStream.pipe(parser);
 }
 
+async function basicSubscribe(impt) {
+    let imptRun;
+    while (imptRun = await knex('import_runs').where('import', impt.id).whereIn('status', [RunStatus.SCHEDULED]).orderBy('created', 'asc').first()) {
+        await knex('import_runs').where('id', imptRun.id).update({
+            status: RunStatus.RUNNING
+        });
+
+
+
+        await knex('import_runs').where('id', imptRun.id).update({
+            status: RunStatus.FINISHED
+        });
+    }
+
+    await knex('imports').where('id', impt.id).update({
+        status: ImportStatus.RUN_FINISHED
+    });
+}
+
+async function basicUnsubscribe(impt) {
+    // FIXME
+}
+
 async function getTask() {
     return await knex.transaction(async tx => {
         const impt = await tx('imports').whereIn('status', [ImportStatus.PREP_SCHEDULED, ImportStatus.RUN_SCHEDULED]).orderBy('created', 'asc').first();
@@ -133,9 +156,17 @@ async function getTask() {
         if (impt) {
             impt.settings = JSON.parse(impt.settings);
 
-            if (impt.type === ImportType.CSV_FILE && impt.status === ImportStatus.PREP_SCHEDULED) {
+            if (impt.source === ImportSource.CSV_FILE && impt.status === ImportStatus.PREP_SCHEDULED) {
                 await tx('imports').where('id', impt.id).update('status', ImportStatus.PREP_RUNNING);
                 return () => prepareCsv(impt);
+
+            } else if (impt.status === ImportStatus.RUN_SCHEDULED && impt.settings.mappingType === MappingType.BASIC_SUBSCRIBE) {
+                await tx('imports').where('id', impt.id).update('status', ImportStatus.RUN_RUNNING);
+                return () => basicSubscribe(impt);
+
+            } else if (impt.status === ImportStatus.RUN_SCHEDULED && impt.settings.mappingType === MappingType.BASIC_UNSUBSCRIBE) {
+                await tx('imports').where('id', impt.id).update('status', ImportStatus.RUN_RUNNING);
+                return () => basicUnsubscribe(impt);
             }
 
         } else {

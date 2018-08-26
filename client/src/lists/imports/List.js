@@ -28,8 +28,8 @@ export default class List extends Component {
 
         this.state = {};
 
-        const {importTypeLabels, importStatusLabels} = getImportTypes(props.t);
-        this.importTypeLabels = importTypeLabels;
+        const {importSourceLabels, importStatusLabels} = getImportTypes(props.t);
+        this.importSourceLabels = importSourceLabels;
         this.importStatusLabels = importStatusLabels;
     }
 
@@ -46,7 +46,7 @@ export default class List extends Component {
         const columns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('Source'), render: data => this.importTypeLabels[data], sortable: false, searchable: false },
+            { data: 3, title: t('Source'), render: data => this.importSourceLabels[data], sortable: false, searchable: false },
             { data: 4, title: t('Status'), render: data => this.importStatusLabels[data], sortable: false, searchable: false },
             { data: 5, title: t('Last run'), render: data => moment(data).fromNow() },
             {

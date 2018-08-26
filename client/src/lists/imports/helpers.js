@@ -1,13 +1,13 @@
 'use strict';
 
 import React from 'react';
-import {ImportType, ImportStatus, RunStatus} from '../../../../shared/imports';
+import {ImportSource, MappingType, ImportStatus, RunStatus} from '../../../../shared/imports';
 
 export function getImportTypes(t) {
 
-    const importTypeLabels = {
-        [ImportType.CSV_FILE]: t('CSV file'),
-        [ImportType.LIST]: t('List'),
+    const importSourceLabels = {
+        [ImportSource.CSV_FILE]: t('CSV file'),
+        [ImportSource.LIST]: t('List'),
     };
 
     const importStatusLabels = {
@@ -30,9 +30,15 @@ export function getImportTypes(t) {
         [RunStatus.FINISHED]: t('Finished')
     };
 
+    const mappingTypeLabels = {
+        [MappingType.BASIC_SUBSCRIBE]: t('Basic import of subscribers'),
+        [MappingType.BASIC_UNSUBSCRIBE]: t('Unsubscribe emails'),
+    }
+
     return {
         importStatusLabels,
-        importTypeLabels,
+        mappingTypeLabels,
+        importSourceLabels,
         runStatusLabels
     };
 }
