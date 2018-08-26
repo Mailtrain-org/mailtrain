@@ -112,6 +112,12 @@ class DependencyPresentError extends InteroperableError {
     }
 }
 
+class InvalidStateError extends InteroperableError {
+    constructor(msg, data) {
+        super('InvalidStateError', msg, data);
+    }
+}
+
 
 const errorTypes = {
     InteroperableError,
@@ -131,7 +137,8 @@ const errorTypes = {
     InvalidConfirmationForSubscriptionError,
     InvalidConfirmationForAddressChangeError,
     InvalidConfirmationForUnsubscriptionError,
-    DependencyPresentError
+    DependencyPresentError,
+    InvalidStateError
 };
 
 function deserialize(errorObj) {

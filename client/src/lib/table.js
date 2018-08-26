@@ -347,6 +347,11 @@ class Table extends Component {
         this.fetchAndNotifySelectionData();
     }
 
+    componentWillUnmount() {
+        clearInterval(this.refreshIntervalId);
+        clearTimeout(this.refreshTimeoutId);
+    }
+
     async notifySelection(eventCallback, newSelectionMap) {
         if (eventCallback) {
             const selPairs = Array.from(newSelectionMap).sort((l, r) => l[0] - r[0]);

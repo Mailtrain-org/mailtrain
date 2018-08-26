@@ -112,7 +112,8 @@ class Fieldset extends Component {
         id: PropTypes.string,
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        flat: PropTypes.bool
+        flat: PropTypes.bool,
+        className: PropTypes.string
     }
 
     static contextTypes = {
@@ -125,7 +126,10 @@ class Fieldset extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        const className = id ? owner.addFormValidationClass('', id) : null;
+        let className = id ? owner.addFormValidationClass('', id) : null;
+        if (this.props.className) {
+            className = (className || '') + ' ' + this.props.className;
+        }
 
         let helpBlock = null;
         if (this.props.help) {
@@ -154,7 +158,17 @@ class Fieldset extends Component {
 }
 
 function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, input) {
-    const className = id ? owner.addFormValidationClass('form-group', id) : 'form-group';
+    // wrapInput may be used also outside forms to make a kind of fake read-only forms
+    let className;
+    if (owner) {
+        if (id) {
+            className = owner.addFormValidationClass('form-group', id);
+        } else {
+            className = 'form-group';
+        }
+    } else {
+        className = 'row ' + styles.staticFormGroup;
+    }
 
     let colLeft = '';
     let colRight = '';
@@ -580,7 +594,6 @@ class Dropdown extends Component {
         label: PropTypes.string.isRequired,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         options: PropTypes.array,
-        optGroups: PropTypes.array,
         className: PropTypes.string,
         format: PropTypes.string
     }
@@ -595,16 +608,20 @@ class Dropdown extends Component {
         const owner = this.context.formStateOwner;
         const id = this.props.id;
         const htmlId = 'form_' + id;
-        let options = [];
+        const options = [];
 
         if (this.props.options) {
-            options = props.options.map(option => <option key={option.key} value={option.key}>{option.label}</option>);
-        } else if (this.props.optGroups) {
-            options = props.optGroups.map(optGroup =>
-                <optgroup key={optGroup.key} label={optGroup.label}>
-                    {optGroup.options.map(option => <option key={option.key} value={option.key}>{option.label}</option>)}
-                </optgroup>
-            );
+            for (const optOrGrp of props.options) {
+                if (optOrGrp.options) {
+                    options.push(
+                        <optgroup key={optOrGrp.key} label={optOrGrp.label}>
+                            {optOrGrp.options.map(opt => <option key={opt.key} value={opt.key}>{opt.label}</option>)}
+                        </optgroup>
+                    )
+                } else {
+                    options.push(<option key={optOrGrp.key} value={optOrGrp.key}>{optOrGrp.label}</option>)
+                }
+            }
         }
 
         let className = 'form-control';
@@ -629,7 +646,7 @@ class AlignedRow extends Component {
     }
 
     static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
+        formStateOwner: PropTypes.object // AlignedRow may be used also outside forms to make a kind of fake read-only forms
     }
 
     static defaultProps = {

@@ -10,10 +10,10 @@ import {
     withPageHelpers
 } from '../../lib/page';
 import {
-    AlignedRow,
     Button,
     ButtonRow,
     Dropdown,
+    Fieldset,
     Form,
     FormSendMethod,
     InputField,
@@ -21,11 +21,33 @@ import {
     TextArea,
     withForm
 } from '../../lib/form';
-import {withErrorHandling} from '../../lib/error-handling';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
 import {getImportTypes} from './helpers';
-import styles from "../../lib/styles.scss";
-import {ImportType} from '../../../../shared/imports';
+import {
+    ImportType,
+    inProgress,
+    prepInProgress,
+    runInProgress
+} from '../../../../shared/imports';
+import axios from "../../lib/axios";
+import {getUrl} from "../../lib/urls";
+import styles from "../styles.scss";
+
+
+function truncate(str, len, ending = '...') {
+    str = str.trim();
+
+    if (str.length > len) {
+        return str.substring(0, len - ending.length) + ending;
+    } else {
+        return str;
+    }
+}
+
 
 @translate()
 @withForm
@@ -47,26 +69,54 @@ export default class CUD extends Component {
             // {key: ImportType.LIST, label: importTypeLabels[ImportType.LIST]}
         ];
 
+        this.refreshTimeoutHandler = ::this.refreshEntity;
+        this.refreshTimeoutId = 0;
+
         this.initForm();
     }
 
     static propTypes = {
         action: PropTypes.string.isRequired,
         list: PropTypes.object,
+        fieldsGrouped: PropTypes.array,
         entity: PropTypes.object
+    }
+
+    initFromEntity(entity) {
+        this.getFormValuesFromEntity(entity, data => {
+            data.settings = data.settings || {};
+            const mapping = data.mapping || {};
+
+            if (data.type === ImportType.CSV_FILE) {
+                data.csvFileName = data.settings.csv.originalname;
+                data.csvDelimiter = data.settings.csv.delimiter;
+            }
+
+            for (const field of this.props.fieldsGrouped) {
+                if (field.column) {
+                    const colMapping = mapping[field.column] || {};
+                    data['mapping_' + field.column + '_column'] = colMapping.column || '';
+                } else {
+                    for (const option of field.settings.options) {
+                        const col = field.groupedOptions[option.key].column;
+                        const colMapping = mapping[col] || {};
+                        data['mapping_' + col + '_column'] = colMapping.column || '';
+                    }
+                }
+            }
+
+            const emailMapping = mapping.email || {};
+            data.mapping_email_column = emailMapping.column || '';
+        });
+
+        if (inProgress(entity.status)) {
+            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 1000);
+        }
     }
 
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.settings = data.settings || {};
-
-                if (data.type === ImportType.CSV_FILE) {
-                    data.csvFileName = data.settings.csv.originalname;
-                    data.csvDelimiter = data.settings.csv.delimiter;
-                }
-            });
-
+            this.initFromEntity(this.props.entity);
         } else {
             this.populateFormValues({
                 name: '',
@@ -78,10 +128,21 @@ export default class CUD extends Component {
         }
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.refreshTimeoutId);
+    }
+
+    @withAsyncErrorHandler
+    async refreshEntity() {
+        const resp = await axios.get(getUrl(`rest/imports/${this.props.list.id}/${this.props.entity.id}`));
+        this.initFromEntity(resp.data);
+    }
+
     localValidateFormValues(state) {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
         const type = Number.parseInt(state.getIn(['type', 'value']));
+        const status = this.getFormValue('status');
 
         for (const key of state.keys()) {
             state.setIn([key, 'error'], null);
@@ -100,11 +161,19 @@ export default class CUD extends Component {
                 state.setIn(['csvDelimiter', 'error'], t('CSV delimiter must not be empty'));
             }
         }
+
+        if (isEdit) {
+            if (!state.getIn(['mapping_email_column', 'value'])) {
+                state.setIn(['mapping_email_column', 'error'], t('Email mapping has to be provided'));
+            }
+        }
     }
 
     async submitHandler() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+
+        const type = Number.parseInt(this.getFormValue('type'));
 
         let sendMethod, url;
         if (this.props.entity) {
@@ -119,7 +188,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('Saving ...'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 data.type = Number.parseInt(data.type);
                 data.settings = {};
 
@@ -128,18 +197,52 @@ export default class CUD extends Component {
                     data.settings.csv = {};
                     formData.append('csvFile', this.csvFile.files[0]);
                     data.settings.csv.delimiter = data.csvDelimiter.trim();
-
-                    delete data.csvFile;
-                    delete data.csvDelimiter;
                 }
+
+                if (isEdit) {
+                    const mapping = {};
+                    for (const field of this.props.fieldsGrouped) {
+                        if (field.column) {
+                            mapping[field.column] = {
+                                column: data['mapping_' + field.column + '_column']
+                            };
+
+                            delete data['mapping_' + field.column + '_column'];
+                        } else {
+                            for (const option of field.settings.options) {
+                                const col = field.groupedOptions[option.key].column;
+                                mapping[col] = {
+                                    column: data['mapping_' + col + '_column']
+                                };
+
+                                delete data['mapping_' + col + '_column'];
+                            }
+                        }
+                    }
+
+                    mapping.email = {
+                        column: data.mapping_email_column
+                    };
+
+                    data.mapping = mapping;
+                }
+
+                delete data.csvFile;
+                delete data.csvDelimiter;
+                delete data.sampleRow;
 
                 formData.append('entity', JSON.stringify(data));
 
                 return formData;
             });
 
-            if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/imports`, 'success', t('Import saved'));
+            if (submitResponse) {
+                if (!isEdit && type === ImportType.CSV_FILE) {
+                    this.navigateTo(`/lists/${this.props.list.id}/imports/${submitResponse}/edit`);
+                } else {
+                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/imports/${this.props.entity.id}/status`, 'success', t('Import saved'));
+                }
+
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
@@ -158,22 +261,75 @@ export default class CUD extends Component {
         const isEdit = !!this.props.entity;
 
         const type = Number.parseInt(this.getFormValue('type'));
+        const status = this.getFormValue('status');
+        const settings = this.getFormValue('settings');
 
-        let settings = null;
+        let settingsEdit = null;
         if (type === ImportType.CSV_FILE) {
             if (isEdit) {
-                settings =
+                settingsEdit =
                     <div>
                         <StaticField id="csvFileName" className={styles.formDisabled} label={t('File')}>{this.getFormValue('csvFileName')}</StaticField>
                         <StaticField id="csvDelimiter" className={styles.formDisabled} label={t('Delimiter')}>{this.getFormValue('csvDelimiter')}</StaticField>
                     </div>;
             } else {
-                settings =
+                settingsEdit =
                     <div>
                         <StaticField withValidation id="csvFileName" label={t('File')}><input ref={node => this.csvFile = node} type="file" onChange={::this.onFileSelected}/></StaticField>
                         <InputField id="csvDelimiter" label={t('Delimiter')}/>
                     </div>;
             }
+        }
+
+        let mappingEdit;
+        if (isEdit) {
+            if (prepInProgress(status)) {
+                mappingEdit = <div>{t('Preparation in progress. Please wait till it is done or visit this page later.')}</div>;
+            } else if (runInProgress(status)) {
+                    mappingEdit = <div>{t('Run in progress. Please wait till it is done or visit this page later.')}</div>;
+            } else {
+                const sampleRow = this.getFormValue('sampleRow');
+                const sourceOpts = [];
+                sourceOpts.push({key: '', label: t('–– Select ––')});
+                if (type === ImportType.CSV_FILE) {
+                    for (const csvCol of settings.csv.columns) {
+                        let help = '';
+                        if (sampleRow) {
+                            help = ' (' + t('e.g.:', {keySeparator: '>', nsSeparator: '|'}) + ' ' + truncate(sampleRow[csvCol.column], 50) + ')';
+                        }
+
+                        sourceOpts.push({key: csvCol.column, label: csvCol.name + help});
+                    }
+                }
+
+                const mappingRows = [
+                    <Dropdown key="email" id="mapping_email_column" label={t('Email')} options={sourceOpts}/>
+                ];
+
+                for (const field of this.props.fieldsGrouped) {
+                    if (field.column) {
+                        mappingRows.push(
+                            <Dropdown key={field.column} id={'mapping_' + field.column + '_column'} label={field.name} options={sourceOpts}/>
+                        );
+                    } else {
+                        for (const option of field.settings.options) {
+                            const col = field.groupedOptions[option.key].column;
+                            mappingRows.push(
+                                <Dropdown key={col} id={'mapping_' + col + '_column'} label={field.groupedOptions[option.key].name} options={sourceOpts}/>
+                            );
+                        }
+                    }
+                }
+
+                mappingEdit = mappingRows;
+            }
+        }
+
+        let saveButtonLabel;
+        if (!isEdit && type === ImportType.CSV_FILE) {
+            saveButtonLabel = t('Save and edit mapping');
+        } else {
+            saveButtonLabel = t('Save');
         }
 
         return (
@@ -201,10 +357,17 @@ export default class CUD extends Component {
                         <Dropdown id="type" label={t('Type')} options={this.importTypeOptions}/>
                     }
 
-                    {settings}
+                    {settingsEdit}
+
+                    {mappingEdit &&
+                        <Fieldset label={t('Mapping')} className={styles.mapping}>
+                            {mappingEdit}
+                        </Fieldset>
+                    }
+
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={saveButtonLabel}/>
                         {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

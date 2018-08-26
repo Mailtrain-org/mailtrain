@@ -19,7 +19,7 @@ router.postAsync('/imports-table/:listId', passport.loggedIn, async (req, res) =
 });
 
 router.getAsync('/imports/:listId/:importId', passport.loggedIn, async (req, res) => {
-    const entity = await imports.getById(req.context, req.params.listId, req.params.importId);
+    const entity = await imports.getById(req.context, req.params.listId, req.params.importId, true);
     entity.hash = imports.hash(entity);
     return res.json(entity);
 });
@@ -47,5 +47,12 @@ router.deleteAsync('/imports/:listId/:importId', passport.loggedIn, passport.csr
     return res.json();
 });
 
+router.postAsync('/import-start/:listId/:importId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    return res.json(await imports.start(req.context, req.params.listId, req.params.importId));
+});
+
+router.postAsync('/import-stop/:listId/:importId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    return res.json(await imports.stop(req.context, req.params.listId, req.params.importId));
+});
 
 module.exports = router;

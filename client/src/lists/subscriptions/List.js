@@ -15,6 +15,7 @@ import {
 import {Icon, Button} from "../../lib/bootstrap-components";
 import axios from '../../lib/axios';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
+import {getUrl} from "../../lib/urls";
 
 @translate()
 @withForm

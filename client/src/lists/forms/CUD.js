@@ -427,7 +427,7 @@ export default class CUD extends Component {
 
                     { selectedTemplate &&
                         <Fieldset label={t('Templates')}>
-                            <Dropdown id="selectedTemplate" label={t('Edit')} optGroups={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
+                            <Dropdown id="selectedTemplate" label={t('Edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
                             <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
                         </Fieldset>
                     }

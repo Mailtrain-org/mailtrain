@@ -1028,6 +1028,7 @@ async function migrateImporter(knex) {
         table.integer('type').unsigned().notNullable();
         table.integer('status').unsigned().notNullable();
         table.text('settings', 'longtext');
+        table.text('mapping', 'longtext');
         table.timestamp('last_run');
         table.text('error');
         table.timestamp('created').defaultTo(knex.fn.now());
@@ -1037,6 +1038,7 @@ async function migrateImporter(knex) {
         table.increments('id').primary();
         table.integer('import').unsigned().references('imports.id');
         table.integer('status').unsigned().notNullable();
+        table.text('mapping', 'longtext');
         table.integer('new').defaultTo(0);
         table.integer('failed').defaultTo(0);
         table.integer('processed').defaultTo(0);

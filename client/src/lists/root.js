@@ -14,6 +14,8 @@ import SegmentsList from './segments/List';
 import SegmentsCUD from './segments/CUD';
 import ImportsList from './imports/List';
 import ImportsCUD from './imports/CUD';
+import ImportsStatus from './imports/Status';
+import ImportRunsStatus from './imports/RunStatus';
 import Share from '../shares/Share';
 import TriggersList from './TriggersList';
 
@@ -140,18 +142,36 @@ function getMenus(t) {
                                     resolve: {
                                         import: params => `rest/imports/${params.listId}/${params.importId}`,
                                     },
-                                    link: params => `/lists/${params.listId}/imports/${params.importId}/edit`,
+                                    link: params => `/lists/${params.listId}/imports/${params.importId}/status`,
                                     navs: {
                                         ':action(edit|delete)': {
                                             title: t('Edit'),
+                                            resolve: {
+                                                fieldsGrouped: params => `rest/fields-grouped/${params.listId}`
+                                            },
                                             link: params => `/lists/${params.listId}/imports/${params.importId}/edit`,
-                                            panelRender: props => <ImportsCUD action={props.match.params.action} entity={props.resolved.import} list={props.resolved.list} imports={props.resolved.imports} />
+                                            panelRender: props => <ImportsCUD action={props.match.params.action} entity={props.resolved.import} list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped}/>
+                                        },
+                                        'status': {
+                                            title: t('Status'),
+                                            link: params => `/lists/${params.listId}/imports/${params.importId}/status`,
+                                            panelRender: props => <ImportsStatus entity={props.resolved.import} list={props.resolved.list} />,
+                                            children: {
+                                                ':importRunId([0-9]+)': {
+                                                    title: resolved => t('Run'),
+                                                    resolve: {
+                                                        importRun: params => `rest/import-runs/${params.listId}/${params.importId}/${params.importRunId}`,
+                                                    },
+                                                    link: params => `/lists/${params.listId}/imports/${params.importId}/status/${params.importRunId}`,
+                                                    panelRender: props => <ImportRunsStatus entity={props.resolved.importRun} imprt={props.resolved.import} list={props.resolved.list} />
+                                                }
+                                            }
                                         }
                                     }
                                 },
                                 create: {
                                     title: t('Create'),
-                                    panelRender: props => <ImportsCUD action="create" list={props.resolved.list} imports={props.resolved.imports} />
+                                    panelRender: props => <ImportsCUD action="create" list={props.resolved.list} />
                                 }
                             }
                         },
