@@ -175,7 +175,7 @@ export default class CUD extends Component {
         } else  {
             const mappingType = Number.parseInt(state.getIn(['mapping_type', 'value']));
 
-            if (mappingType === MappingType.BASIC_SUBSCRIBE) {
+            if (mappingType === MappingType.BASIC_SUBSCRIBE || mappingType === MappingType.BASIC_UNSUBSCRIBE) {
                 if (!state.getIn(['mapping_fields_email_column', 'value'])) {
                     state.setIn(['mapping_fields_email_column', 'error'], t('Email mapping has to be provided'));
                 }
@@ -225,23 +225,32 @@ export default class CUD extends Component {
 
                         for (const field of this.props.fieldsGrouped) {
                             if (field.column) {
-                                mapping.fields[field.column] = {
-                                    column: data['mapping_fields_' + field.column + '_column']
-                                };
+                                const colMapping = data['mapping_fields_' + field.column + '_column'];
+                                if (colMapping) {
+                                    mapping.fields[field.column] = {
+                                        column: colMapping
+                                    };
+                                }
                             } else {
                                 for (const option of field.settings.options) {
                                     const col = field.groupedOptions[option.key].column;
-                                    mapping.fields[col] = {
-                                        column: data['mapping_fields_' + col + '_column']
-                                    };
+                                    const colMapping = data['mapping_fields_' + col + '_column'];
+                                    if (colMapping) {
+                                        mapping.fields[col] = {
+                                            column: colMapping
+                                        };
+                                    }
                                 }
                             }
                         }
+                    }
 
+                    if (data.mapping_type === MappingType.BASIC_SUBSCRIBE || data.mapping_type === MappingType.BASIC_UNSUBSCRIBE) {
                         mapping.fields.email = {
                             column: data.mapping_fields_email_column
                         };
                     }
+
 
                     data.mapping = mapping;
                 }
@@ -317,7 +326,7 @@ export default class CUD extends Component {
                 let mappingSettings = null;
                 const mappingType = Number.parseInt(this.getFormValue('mapping_type'));
 
-                if (mappingType === MappingType.BASIC_SUBSCRIBE) {
+                if (mappingType === MappingType.BASIC_SUBSCRIBE || mappingType === MappingType.BASIC_UNSUBSCRIBE) {
                     const sampleRow = this.getFormValue('sampleRow');
                     const sourceOpts = [];
                     sourceOpts.push({key: '', label: t('–– Select ––')});
@@ -332,28 +341,33 @@ export default class CUD extends Component {
                         }
                     }
 
+                    const settingsRows = [];
                     const mappingRows = [
                         <Dropdown key="email" id="mapping_fields_email_column" label={t('Email')} options={sourceOpts}/>
                     ];
 
-                    for (const field of this.props.fieldsGrouped) {
-                        if (field.column) {
-                            mappingRows.push(
-                                <Dropdown key={field.column} id={'mapping_fields_' + field.column + '_column'} label={field.name} options={sourceOpts}/>
-                            );
-                        } else {
-                            for (const option of field.settings.options) {
-                                const col = field.groupedOptions[option.key].column;
+                    if (mappingType === MappingType.BASIC_SUBSCRIBE) {
+                        settingsRows.push(<CheckBox key="checkEmails" id="mapping_settings_checkEmails" text={t('Check imported emails')}/>)
+
+                        for (const field of this.props.fieldsGrouped) {
+                            if (field.column) {
                                 mappingRows.push(
-                                    <Dropdown key={col} id={'mapping_fields_' + col + '_column'} label={field.groupedOptions[option.key].name} options={sourceOpts}/>
+                                    <Dropdown key={field.column} id={'mapping_fields_' + field.column + '_column'} label={field.name} options={sourceOpts}/>
                                 );
+                            } else {
+                                for (const option of field.settings.options) {
+                                    const col = field.groupedOptions[option.key].column;
+                                    mappingRows.push(
+                                        <Dropdown key={col} id={'mapping_fields_' + col + '_column'} label={field.groupedOptions[option.key].name} options={sourceOpts}/>
+                                    );
+                                }
                             }
                         }
                     }
 
                     mappingSettings = (
                         <div>
-                            <CheckBox id="mapping_settings_checkEmails" text={t('Check imported emails')}/>
+                            {settingsRows}
                             <Fieldset label={t('Mapping')} className={styles.mapping}>
                                 {mappingRows}
                             </Fieldset>

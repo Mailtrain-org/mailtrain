@@ -97,7 +97,10 @@ export default class Status extends Component {
         }
 
         await this.refreshEntity();
-        this.runsTableNode.refresh();
+
+        if (this.runsTableNode) {
+            this.runsTableNode.refresh();
+        }
     }
 
     async stopRunAsync() {
@@ -112,7 +115,10 @@ export default class Status extends Component {
         }
 
         await this.refreshEntity();
-        this.runsTableNode.refresh();
+
+        if (this.runsTableNode) {
+            this.runsTableNode.refresh();
+        }
     }
 
     render() {

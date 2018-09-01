@@ -8,6 +8,7 @@ const entitySettings = require('../lib/entity-settings');
 const interoperableErrors = require('../shared/interoperable-errors');
 const log = require('npmlog');
 const {getGlobalNamespaceId} = require('../shared/namespaces');
+const {getAdminId} = require('../shared/users');
 
 // TODO: This would really benefit from some permission cache connected to rebuildPermissions
 // A bit of the problem is that the cache would have to expunged as the result of other processes modifying entites/permissions
@@ -146,7 +147,7 @@ async function rebuildPermissionsTx(tx, restriction) {
     // To prevent users locking out themselves, we consider user with id 1 to be the admin and always assign it
     // the admin role. The admin role is a global role that has admin===true
     // If this behavior is not desired, it is enough to delete the user with id 1.
-    const adminUser = await tx('users').where('id', 1 /* Admin user id */).first();
+    const adminUser = await tx('users').where('id', getAdminId()).first();
     if (adminUser) {
         let adminRole;
         for (const role in config.roles.global) {
@@ -157,7 +158,7 @@ async function rebuildPermissionsTx(tx, restriction) {
         }
 
         if (adminRole) {
-            await tx('users').update('role', adminRole).where('id', 1 /* Admin user id */);
+            await tx('users').update('role', adminRole).where('id', getAdminId());
         }
     }
 

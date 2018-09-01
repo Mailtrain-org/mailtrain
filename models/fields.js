@@ -11,7 +11,7 @@ const validators = require('../shared/validators');
 const shortid = require('shortid');
 const segments = require('./segments');
 const { formatDate, formatBirthday, parseDate, parseBirthday } = require('../shared/date');
-const { getFieldKey } = require('../shared/lists');
+const { getFieldColumn } = require('../shared/lists');
 const { cleanupFromPost } = require('../lib/helpers');
 
 
@@ -157,7 +157,8 @@ fieldTypes.option = {
     indexed: true,
     grouped: false,
     enumerated: false,
-    cardinality: Cardinality.SINGLE
+    cardinality: Cardinality.SINGLE,
+    parsePostValue: (field, value) => !(['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0)
 };
 
 fieldTypes['date'] = {
@@ -572,7 +573,7 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
 
     for (const fld of flds) {
         const type = fieldTypes[fld.type];
-        const fldKey = getFieldKey(fld);
+        const fldCol = getFieldColumn(fld);
 
         const entry = {
             name: fld.name,
@@ -583,12 +584,12 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
         };
 
         if (!type.grouped && !type.enumerated) {
-            // subscription[fldKey] may not exists because we are getting the data from "fromPost"
-            entry.value = (subscription ? type.forHbs(fld, subscription[fldKey]) : null) || '';
+            // subscription[fldCol] may not exists because we are getting the data from "fromPost"
+            entry.value = (subscription ? type.forHbs(fld, subscription[fldCol]) : null) || '';
 
         } else if (type.grouped) {
             const options = [];
-            const value = (subscription ? subscription[fldKey] : null) || (type.cardinality === Cardinality.SINGLE ? null : []);
+            const value = (subscription ? subscription[fldCol] : null) || (type.cardinality === Cardinality.SINGLE ? null : []);
 
             for (const optCol in fld.groupedOptions) {
                 const opt = fld.groupedOptions[optCol];
@@ -611,7 +612,7 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
 
         } else if (type.enumerated) {
             const options = [];
-            const value = (subscription ? subscription[fldKey] : null) || null;
+            const value = (subscription ? subscription[fldCol] : null) || null;
 
             for (const opt of fld.settings.options) {
                 options.push({
@@ -631,64 +632,97 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
     return customFields;
 }
 
-// Converts subscription data received via POST request from subscription form or via subscribe request to API v1 to subscription structure supported by subscriptions model.
-// If a field is not specified in the POST data, it omits it also in the returned subscription
-async function fromPost(context, listId, data, partial) { // assumes grouped subscription
-
-    // This is to handle option values from API v1
-    function isSelected(value) {
-        return ['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0 ? false : true;
-    }
-
-    const flds = await listGrouped(context, listId);
+// Converts subscription data received via (1) POST request from subscription form, (2) via subscribe request to API v1 to subscription structure supported by subscriptions model,
+// or (3) from import.
+// If a field is not specified in the POST data, it is also omitted in the returned subscription
+function _fromText(listId, data, flds, isGrouped, keyName, singleCardUsesKeyName) {
 
     const subscription = {};
 
-    for (const fld of flds) {
-        if (fld.key in data) {
-            const type = fieldTypes[fld.type];
-            const fldKey = getFieldKey(fld);
+    if (isGrouped) {
+        for (const fld of flds) {
+            const fldKey = fld[keyName];
+            if (fldKey && fldKey in data) {
+                const type = fieldTypes[fld.type];
+                const fldCol = getFieldColumn(fld);
 
-            let value = null;
+                let value = null;
 
-            if (!type.grouped && !type.enumerated) {
-                value = type.parsePostValue(fld, cleanupFromPost(data[fld.key]));
+                if (!type.grouped && !type.enumerated) {
+                    value = type.parsePostValue(fld, cleanupFromPost(data[fldKey]));
 
-            } else if (type.grouped) {
-                if (type.cardinality === Cardinality.SINGLE) {
-                    for (const optCol in fld.groupedOptions) {
-                        const opt = fld.groupedOptions[optCol];
+                } else if (type.grouped) {
+                    if (type.cardinality === Cardinality.SINGLE) {
+                        for (const optCol in fld.groupedOptions) {
+                            const opt = fld.groupedOptions[optCol];
+                            const optKey = opt[keyName];
 
-                        // This handles two different formats for grouped dropdowns and radios.
-                        // The first part of the condition handles the POST requests from the subscription form, while the
-                        // second part handles the subscribe request to API v1
-                        if (data[fld.key] === opt.key || isSelected(data[opt.key])) {
-                            value = opt.column
+                            // This handles two different formats for grouped dropdowns and radios.
+                            // The first part of the condition handles the POST requests from the subscription form, while the
+                            // second part handles the subscribe request to API v1
+                            if (singleCardUsesKeyName) {
+                                if (data[fldKey] === optKey) {
+                                    value = opt.column
+                                }
+                            } else {
+                                const optType = fieldTypes[opt.type];
+                                const optValue = optType.parsePostValue(fld, cleanupFromPost(data[optKey]));
+                                if (optValue) {
+                                    value = opt.column
+                                }
+                            }
+                        }
+                    } else {
+                        value = [];
+
+                        for (const optCol in fld.groupedOptions) {
+                            const opt = fld.groupedOptions[optCol];
+                            const optKey = opt[keyName];
+                            const optType = fieldTypes[opt.type];
+                            const optValue = optType.parsePostValue(fld, cleanupFromPost(data[optKey]));
+
+                            if (optValue) {
+                                value.push(opt.column);
+                            }
                         }
                     }
-                } else {
-                    value = [];
 
-                    for (const optCol in fld.groupedOptions) {
-                        const opt = fld.groupedOptions[optCol];
-
-                        if (isSelected(data[opt.key])) {
-                            value.push(opt.column);
-                        }
-                    }
+                } else if (type.enumerated) {
+                    value = data[fldKey];
                 }
 
-            } else if (type.enumerated) {
-                value = data[fld.key];
+                subscription[fldCol] = value;
             }
+        }
 
-            subscription[fldKey] = value;
+    } else {
+        for (const fld of flds) {
+            const fldKey = fld[keyName];
+            if (fldKey && fldKey in data) {
+                const type = fieldTypes[fld.type];
+                const fldCol = getFieldColumn(fld);
+
+                subscription[fldCol] = type.parsePostValue(fld, cleanupFromPost(data[fldKey]));
+            }
         }
     }
 
     return subscription;
 }
 
+async function fromPost(context, listId, data) { // assumes grouped subscription and indexation by merge key
+    const flds = await listGrouped(context, listId);
+    return _fromText(listId, data, flds, true, 'key', true);
+}
+
+async function fromAPI(context, listId, data) { // assumes grouped subscription and indexation by merge key
+    const flds = await listGrouped(context, listId);
+    return _fromText(listId, data, flds, true, 'key', false);
+}
+
+function fromImport(listId, flds, data) { // assumes ungrouped subscription and indexation by column
+    return _fromText(listId, data, flds, true, 'column', false);
+}
 
 // This is to handle circular dependency with segments.js
 Object.assign(module.exports, {
@@ -709,5 +743,7 @@ Object.assign(module.exports, {
     removeAllByListIdTx,
     serverValidate,
     forHbs,
-    fromPost
+    fromPost,
+    fromAPI,
+    fromImport
 });

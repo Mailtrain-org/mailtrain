@@ -7,11 +7,12 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const fields = require('./fields');
-const { SubscriptionStatus, getFieldKey } = require('../shared/lists');
+const { SubscriptionStatus, getFieldColumn } = require('../shared/lists');
 const segments = require('./segments');
 const { enforce, filterObject } = require('../lib/helpers');
 const moment = require('moment');
 const { formatDate, formatBirthday } = require('../shared/date');
+const crypto = require('crypto');
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
 
@@ -54,7 +55,7 @@ fieldTypes['radio-enum'] = fieldTypes['dropdown-enum'] = fieldTypes['radio-group
 
 fieldTypes.date = {
     afterJSON: (groupedField, entity) => {
-        const key = getFieldKey(groupedField);
+        const key = getFieldColumn(groupedField);
         if (key in entity) {
             entity[key] = entity[key] ? moment(entity[key]).toDate() : null;
         }
@@ -64,7 +65,7 @@ fieldTypes.date = {
 
 fieldTypes.birthday = {
     afterJSON: (groupedField, entity) => {
-        const key = getFieldKey(groupedField);
+        const key = getFieldColumn(groupedField);
         if (key in entity) {
             entity[key] = entity[key] ? moment(entity[key]).toDate() : null;
         }
@@ -86,14 +87,14 @@ async function getGroupedFieldsMap(tx, listId) {
     const groupedFields = await fields.listGroupedTx(tx, listId);
     const result = {};
     for (const fld of groupedFields) {
-        result[getFieldKey(fld)] = fld;
+        result[getFieldColumn(fld)] = fld;
     }
     return result;
 }
 
 function groupSubscription(groupedFieldsMap, entity) {
-    for (const fldKey in groupedFieldsMap) {
-        const fld = groupedFieldsMap[fldKey];
+    for (const fldCol in groupedFieldsMap) {
+        const fld = groupedFieldsMap[fldCol];
         const fieldType = fields.getFieldType(fld.type);
 
         if (fieldType.grouped) {
@@ -124,7 +125,7 @@ function groupSubscription(groupedFieldsMap, entity) {
                 }
             }
 
-            entity[fldKey] = value;
+            entity[fldCol] = value;
 
         } else if (fieldType.enumerated) {
             // This is enum-xxx type. We just make sure that the options we give out match the field settings.
@@ -132,36 +133,36 @@ function groupSubscription(groupedFieldsMap, entity) {
 
             const allowedKeys = new Set(fld.settings.options.map(x => x.key));
 
-            if (!allowedKeys.has(entity[fldKey])) {
-                entity[fldKey] = null;
+            if (!allowedKeys.has(entity[fldCol])) {
+                entity[fldCol] = null;
             }
         }
     }
 }
 
 function ungroupSubscription(groupedFieldsMap, entity) {
-    for (const fldKey in groupedFieldsMap) {
-        const fld = groupedFieldsMap[fldKey];
+    for (const fldCol in groupedFieldsMap) {
+        const fld = groupedFieldsMap[fldCol];
 
         const fieldType = fields.getFieldType(fld.type);
         if (fieldType.grouped) {
 
             if (fieldType.cardinality === fields.Cardinality.SINGLE) {
-                const value = entity[fldKey];
+                const value = entity[fldCol];
                 for (const optionKey in fld.groupedOptions) {
                     const option = fld.groupedOptions[optionKey];
                     entity[option.column] = option.column === value;
                 }
 
             } else {
-                const values = entity[fldKey] || []; // The default (empty array) is here because create may be called with an entity that has some fields not filled in
+                const values = entity[fldCol] || []; // The default (empty array) is here because create may be called with an entity that has some fields not filled in
                 for (const optionKey in fld.groupedOptions) {
                     const option = fld.groupedOptions[optionKey];
                     entity[option.column] = values.includes(option.column);
                 }
             }
 
-            delete entity[fldKey];
+            delete entity[fldCol];
 
         } else if (fieldType.enumerated) {
             // This is enum-xxx type. We just make sure that the options we give out match the field settings.
@@ -169,8 +170,8 @@ function ungroupSubscription(groupedFieldsMap, entity) {
 
             const allowedKeys = new Set(fld.settings.options.map(x => x.key));
 
-            if (!allowedKeys.has(entity[fldKey])) {
-                entity[fldKey] = null;
+            if (!allowedKeys.has(entity[fldCol])) {
+                entity[fldCol] = null;
             }
         }
     }
@@ -259,29 +260,29 @@ async function listDTAjax(context, listId, segmentId, params) {
         const idxMap = {};
 
         for (const listFld of listFlds) {
-            const fldKey = getFieldKey(listFld);
-            const fld = groupedFieldsMap[fldKey];
+            const fldCol = getFieldColumn(listFld);
+            const fld = groupedFieldsMap[fldCol];
 
             if (fld.column) {
                 columns.push(listTable + '.' + fld.column);
             } else {
                 columns.push({
-                    name: listTable + '.' + fldKey,
+                    name: listTable + '.' + fldCol,
                     raw: 0
                 })
             }
 
-            idxMap[fldKey] = listFldIdx;
+            idxMap[fldCol] = listFldIdx;
             listFldIdx += 1;
         }
 
-        for (const fldKey in groupedFieldsMap) {
-            const fld = groupedFieldsMap[fldKey];
+        for (const fldCol in groupedFieldsMap) {
+            const fld = groupedFieldsMap[fldCol];
 
             if (fld.column) {
-                if (!(fldKey in idxMap)) {
+                if (!(fldCol in idxMap)) {
                     extraColumns.push(listTable + '.' + fld.column);
-                    idxMap[fldKey] = listFldIdx;
+                    idxMap[fldCol] = listFldIdx;
                     listFldIdx += 1;
                 }
 
@@ -313,19 +314,19 @@ async function listDTAjax(context, listId, segmentId, params) {
             {
                 mapFun: data => {
                     const entity = {};
-                    for (const fldKey in idxMap) {
+                    for (const fldCol in idxMap) {
                         // This is a bit of hacking. We rely on the fact that if a field has a column, then the column is the field key.
                         // Then it has the group id with value 0. groupSubscription will be able to process the fields that have a column
                         // and it will assign values to the fields that don't have a value (i.e. those that currently have the group id and value 0).
-                        entity[fldKey] = data[idxMap[fldKey]];
+                        entity[fldCol] = data[idxMap[fldCol]];
                     }
 
                     groupSubscription(groupedFieldsMap, entity);
 
                     for (const listFld of listFlds) {
-                        const fldKey = getFieldKey(listFld);
-                        const fld = groupedFieldsMap[fldKey];
-                        data[idxMap[fldKey]] = fieldTypes[fld.type].listRender(fld, entity[fldKey]);
+                        const fldCol = getFieldColumn(listFld);
+                        const fld = groupedFieldsMap[fldCol];
+                        data[idxMap[fldCol]] = fieldTypes[fld.type].listRender(fld, entity[fldCol]);
                     }
                 },
 
@@ -393,7 +394,7 @@ async function serverValidate(context, listId, data) {
 async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, isCreate) {
     enforce(entity.email, 'Email must be set');
 
-    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('email', entity.email);
+    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(entity.email));
 
     if (!isCreate) {
         existingWithKeyQuery.whereNot('id', entity.id);
@@ -407,9 +408,11 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
             throw new interoperableErrors.DuplicitEmailError();
         }
     } else {
-        // This is here because of the API, which allows one to send subscriptions without caring about whether they already exist, what their status is, etc.
-        // In the case, the subscription is existing, we should not change the status. If it does not exist, we are fine with changing the status
-        if (meta.subscribeIfNoExisting && !entity.status) {
+        // This is here because of the API endpoint, which allows one to submit subscriptions without caring about whether they already exist, what their status is, etc.
+        // The same for import where we need to subscribed only those (existing and new) that have not been unsubscribed already.
+        // In the case, the subscription is existing, we should not change the status. If it does not exist, we are fine with changing the status to SUBSCRIBED
+
+        if (meta && meta.subscribeIfNoExisting && !entity.status) {
             entity.status = SubscriptionStatus.SUBSCRIBED;
         }
     }
@@ -425,14 +428,18 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     }
 }
 
-function updateSourcesAndHash(subscription, source, groupedFieldsMap) {
+function hashEmail(email) {
+    return crypto.createHash('sha512').update(email).digest("base64");
+}
+
+function updateSourcesAndHashEmail(subscription, source, groupedFieldsMap) {
     if ('email' in subscription) {
-        subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
+        subscription.hash_email = hashEmail(subscription.email);
         subscription.source_email = source;
     }
 
-    for (const fldKey in groupedFieldsMap) {
-        const fld = groupedFieldsMap[fldKey];
+    for (const fldCol in groupedFieldsMap) {
+        const fld = groupedFieldsMap[fldCol];
 
         const fieldType = fields.getFieldType(fld.type);
         if (fieldType.grouped) {
@@ -444,8 +451,8 @@ function updateSourcesAndHash(subscription, source, groupedFieldsMap) {
                 }
             }
         } else {
-            if (fldKey in subscription) {
-                subscription['source_' + fldKey] = source;
+            if (fldCol in subscription) {
+                subscription['source_' + fldCol] = source;
             }
         }
     }
@@ -490,39 +497,42 @@ async function _create(tx, listId, filteredEntity) {
     If it is unsubscribed and meta.updateOfUnsubscribedAllowed, the existing subscription is changed based on the provided data.
     If meta.updateAllowed is true, it updates even an active subscription.
  */
-async function create(context, listId, entity, source, meta /* meta is provided when called from /confirm/subscribe/:cid */) {
-    return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
+async function createTxWithGroupedFieldsMap(tx, context, listId, groupedFieldsMap, entity, source, meta) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
-        const allowedKeys = getAllowedKeys(groupedFieldsMap);
+    const allowedKeys = getAllowedKeys(groupedFieldsMap);
 
-        await _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, true);
+    await _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, true);
 
-        const filteredEntity = filterObject(entity, allowedKeys);
-        filteredEntity.status_change = new Date();
+    const filteredEntity = filterObject(entity, allowedKeys);
+    filteredEntity.status_change = new Date();
 
-        ungroupSubscription(groupedFieldsMap, filteredEntity);
+    ungroupSubscription(groupedFieldsMap, filteredEntity);
 
-        updateSourcesAndHash(filteredEntity, source, groupedFieldsMap);
+    updateSourcesAndHashEmail(filteredEntity, source, groupedFieldsMap);
 
-        filteredEntity.opt_in_ip = meta && meta.ip;
-        filteredEntity.opt_in_country = meta && meta.country;
-        filteredEntity.imported = meta && !!meta.imported;
+    filteredEntity.opt_in_ip = meta && meta.ip;
+    filteredEntity.opt_in_country = meta && meta.country;
 
-        if (meta && meta.update) { // meta.update is set by _validateAndPreprocess
-            await _update(tx, listId, meta.existing, filteredEntity);
-            meta.cid = meta.existing.cid; // The cid is needed by /confirm/subscribe/:cid
-            return meta.existing.id;
-        } else {
-            filteredEntity.cid = shortid.generate();
+    if (meta && meta.update) { // meta.update is set by _validateAndPreprocess
+        await _update(tx, listId, meta.existing, filteredEntity);
+        meta.cid = meta.existing.cid; // The cid is needed by /confirm/subscribe/:cid
+        return meta.existing.id;
+    } else {
+        filteredEntity.cid = shortid.generate();
 
-            if (meta) {
-                meta.cid = filteredEntity.cid; // The cid is needed by /confirm/subscribe/:cid
-            }
-
-            return await _create(tx, listId, filteredEntity);
+        if (meta) {
+            meta.cid = filteredEntity.cid; // The cid is needed by /confirm/subscribe/:cid
         }
+
+        return await _create(tx, listId, filteredEntity);
+    }
+}
+
+async function create(context, listId, entity, source, meta) {
+    return await knex.transaction(async tx => {
+        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        return await createTxWithGroupedFieldsMap(tx, context, listId, groupedFieldsMap, entity, source, meta);
     });
 }
 
@@ -551,7 +561,7 @@ async function updateWithConsistencyCheck(context, listId, entity, source) {
 
         ungroupSubscription(groupedFieldsMap, filteredEntity);
 
-        updateSourcesAndHash(filteredEntity, source, groupedFieldsMap);
+        updateSourcesAndHashEmail(filteredEntity, source, groupedFieldsMap);
 
         await _update(tx, listId, existing, filteredEntity);
     });
@@ -580,7 +590,7 @@ async function remove(context, listId, id) {
 
 async function removeByEmailAndGet(context, listId, email) {
     return await knex.transaction(async tx => {
-        const existing = await tx(getSubscriptionTableName(listId)).where('email', email).first();
+        const existing = await tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(email)).first();
         return await _removeAndGetTx(tx, context, listId, existing);
     });
 }
@@ -624,21 +634,25 @@ async function _unsubscribeAndGetTx(tx, context, listId, existingSubscription, c
 async function unsubscribeByIdAndGet(context, listId, subscriptionId) {
     return await knex.transaction(async tx => {
         const existing = await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).first();
-        return _unsubscribeAndGetTx(tx, context, listId, existing);
+        return await _unsubscribeAndGetTx(tx, context, listId, existing);
     });
 }
 
 async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaignCid) {
     return await knex.transaction(async tx => {
         const existing = await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).first();
-        return _unsubscribeAndGetTx(tx, context, listId, existing, campaignCid);
+        return await _unsubscribeAndGetTx(tx, context, listId, existing, campaignCid);
     });
+}
+
+async function unsubscribeByEmailAndGetTx(tx, context, listId, email) {
+    const existing = await tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(email)).first();
+    return await _unsubscribeAndGetTx(tx, context, listId, existing);
 }
 
 async function unsubscribeByEmailAndGet(context, listId, email) {
     return await knex.transaction(async tx => {
-        const existing = await tx(getSubscriptionTableName(listId)).where('email', email).first();
-        return _unsubscribeAndGetTx(tx, context, listId, existing);
+        return await unsubscribeByEmailAndGetTx(tx, context, listId, email);
     });
 }
 
@@ -652,7 +666,7 @@ async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
         }
 
         if (existing.email !== emailNew) {
-            await tx(getSubscriptionTableName(listId)).where('email', emailNew).del();
+            await tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(emailNew)).del();
 
             await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).update({
                 email: emailNew
@@ -717,12 +731,15 @@ module.exports = {
     listDTAjax,
     serverValidate,
     create,
+    getGroupedFieldsMap,
+    createTxWithGroupedFieldsMap,
     updateWithConsistencyCheck,
     remove,
     removeByEmailAndGet,
     unsubscribeByCidAndGet,
     unsubscribeByIdAndGet,
     unsubscribeByEmailAndGet,
+    unsubscribeByEmailAndGetTx,
     updateAddressAndGet,
     updateManaged,
     getListsWithEmail

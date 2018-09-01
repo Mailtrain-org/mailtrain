@@ -4,7 +4,7 @@ import React from "react";
 import {SubscriptionStatus} from "../../../../shared/lists";
 import {ACEEditor, CheckBoxGroup, DatePicker, Dropdown, InputField, RadioGroup, TextArea} from "../../lib/form";
 import {formatBirthday, formatDate, parseBirthday, parseDate} from "../../../../shared/date";
-import {getFieldKey} from '../../../../shared/lists';
+import {getFieldColumn} from '../../../../shared/lists';
 import 'brace/mode/json';
 
 export function getSubscriptionStatusLabels(t) {
@@ -24,13 +24,13 @@ export function getFieldTypes(t) {
     const groupedFieldTypes = {};
 
     const stringFieldType = long => ({
-        form: groupedField => long ? <TextArea key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name}/> : <InputField key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name}/>,
+        form: groupedField => long ? <TextArea key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name}/> : <InputField key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name}/>,
         assignFormData: (groupedField, data) => {
-            const value = data[getFieldKey(groupedField)];
-            data[getFieldKey(groupedField)] = value || '';
+            const value = data[getFieldColumn(groupedField)];
+            data[getFieldColumn(groupedField)] = value || '';
         },
         initFormData: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = '';
+            data[getFieldColumn(groupedField)] = '';
         },
         assignEntity: (groupedField, data) => {},
         validate: (groupedField, state) => {},
@@ -38,86 +38,86 @@ export function getFieldTypes(t) {
     });
 
     const numberFieldType = {
-        form: groupedField => <InputField key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name}/>,
+        form: groupedField => <InputField key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name}/>,
         assignFormData: (groupedField, data) => {
-            const value = data[getFieldKey(groupedField)];
-            data[getFieldKey(groupedField)] = value ? value.toString() : '';
+            const value = data[getFieldColumn(groupedField)];
+            data[getFieldColumn(groupedField)] = value ? value.toString() : '';
         },
         initFormData: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = '';
+            data[getFieldColumn(groupedField)] = '';
         },
         assignEntity: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = parseInt(data[getFieldKey(groupedField)]);
+            data[getFieldColumn(groupedField)] = parseInt(data[getFieldColumn(groupedField)]);
         },
         validate: (groupedField, state) => {
-            const value = state.getIn([getFieldKey(groupedField), 'value']).trim();
+            const value = state.getIn([getFieldColumn(groupedField), 'value']).trim();
             if (value !== '' && isNaN(value)) {
-                state.setIn([getFieldKey(groupedField), 'error'], t('Value must be a number'));
+                state.setIn([getFieldColumn(groupedField), 'error'], t('Value must be a number'));
             } else {
-                state.setIn([getFieldKey(groupedField), 'error'], null);
+                state.setIn([getFieldColumn(groupedField), 'error'], null);
             }
         },
         indexable: true
     };
 
     const dateFieldType = {
-        form: groupedField => <DatePicker key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} />,
+        form: groupedField => <DatePicker key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} />,
         assignFormData: (groupedField, data) => {
-            const value = data[getFieldKey(groupedField)];
-            data[getFieldKey(groupedField)] = value ? formatDate(groupedField.settings.dateFormat, value) : '';
+            const value = data[getFieldColumn(groupedField)];
+            data[getFieldColumn(groupedField)] = value ? formatDate(groupedField.settings.dateFormat, value) : '';
         },
         initFormData: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = '';
+            data[getFieldColumn(groupedField)] = '';
         },
         assignEntity: (groupedField, data) => {
-            const date = parseDate(groupedField.settings.dateFormat, data[getFieldKey(groupedField)]);
-            data[getFieldKey(groupedField)] = date;
+            const date = parseDate(groupedField.settings.dateFormat, data[getFieldColumn(groupedField)]);
+            data[getFieldColumn(groupedField)] = date;
         },
         validate: (groupedField, state) => {
-            const value = state.getIn([getFieldKey(groupedField), 'value']);
+            const value = state.getIn([getFieldColumn(groupedField), 'value']);
             const date = parseDate(groupedField.settings.dateFormat, value);
             if (value !== '' && !date) {
-                state.setIn([getFieldKey(groupedField), 'error'], t('Date is invalid'));
+                state.setIn([getFieldColumn(groupedField), 'error'], t('Date is invalid'));
             } else {
-                state.setIn([getFieldKey(groupedField), 'error'], null);
+                state.setIn([getFieldColumn(groupedField), 'error'], null);
             }
         },
         indexable: true
     };
 
     const birthdayFieldType = {
-        form: groupedField => <DatePicker key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} birthday />,
+        form: groupedField => <DatePicker key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} birthday />,
         assignFormData: (groupedField, data) => {
-            const value = data[getFieldKey(groupedField)];
-            data[getFieldKey(groupedField)] = value ? formatBirthday(groupedField.settings.dateFormat, value) : '';
+            const value = data[getFieldColumn(groupedField)];
+            data[getFieldColumn(groupedField)] = value ? formatBirthday(groupedField.settings.dateFormat, value) : '';
         },
         initFormData: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = '';
+            data[getFieldColumn(groupedField)] = '';
         },
         assignEntity: (groupedField, data) => {
-            const date = parseBirthday(groupedField.settings.dateFormat, data[getFieldKey(groupedField)]);
-            data[getFieldKey(groupedField)] = date;
+            const date = parseBirthday(groupedField.settings.dateFormat, data[getFieldColumn(groupedField)]);
+            data[getFieldColumn(groupedField)] = date;
         },
         validate: (groupedField, state) => {
-            const value = state.getIn([getFieldKey(groupedField), 'value']);
+            const value = state.getIn([getFieldColumn(groupedField), 'value']);
             const date = parseBirthday(groupedField.settings.dateFormat, value);
             if (value !== '' && !date) {
-                state.setIn([getFieldKey(groupedField), 'error'], t('Date is invalid'));
+                state.setIn([getFieldColumn(groupedField), 'error'], t('Date is invalid'));
             } else {
-                state.setIn([getFieldKey(groupedField), 'error'], null);
+                state.setIn([getFieldColumn(groupedField), 'error'], null);
             }
         },
         indexable: true
     };
 
     const jsonFieldType = {
-        form: groupedField => <ACEEditor key={getFieldKey(groupedField)} id={getFieldKey(groupedField)} label={groupedField.name} mode="json" height="300px"/>,
+        form: groupedField => <ACEEditor key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} mode="json" height="300px"/>,
         assignFormData: (groupedField, data) => {
-            const value = data[getFieldKey(groupedField)];
-            data[getFieldKey(groupedField)] = value || '';
+            const value = data[getFieldColumn(groupedField)];
+            data[getFieldColumn(groupedField)] = value || '';
         },
         initFormData: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = '';
+            data[getFieldColumn(groupedField)] = '';
         },
         assignEntity: (groupedField, data) => {},
         validate: (groupedField, state) => {},
@@ -125,25 +125,25 @@ export function getFieldTypes(t) {
     };
 
     const enumSingleFieldType = componentType => ({
-        form: groupedField => React.createElement(componentType, { key: getFieldKey(groupedField), id: getFieldKey(groupedField), label: groupedField.name, options: groupedField.settings.options }, null),
+        form: groupedField => React.createElement(componentType, { key: getFieldColumn(groupedField), id: getFieldColumn(groupedField), label: groupedField.name, options: groupedField.settings.options }, null),
         assignFormData: (groupedField, data) => {
-            if (data[getFieldKey(groupedField)] === null) {
+            if (data[getFieldColumn(groupedField)] === null) {
                 if (groupedField.default_value) {
-                    data[getFieldKey(groupedField)] = groupedField.default_value;
+                    data[getFieldColumn(groupedField)] = groupedField.default_value;
                 } else if (groupedField.settings.options.length > 0) {
-                    data[getFieldKey(groupedField)] = groupedField.settings.options[0].key;
+                    data[getFieldColumn(groupedField)] = groupedField.settings.options[0].key;
                 } else {
-                    data[getFieldKey(groupedField)] = '';
+                    data[getFieldColumn(groupedField)] = '';
                 }
             }
         },
         initFormData: (groupedField, data) => {
             if (groupedField.default_value) {
-                data[getFieldKey(groupedField)] = groupedField.default_value;
+                data[getFieldColumn(groupedField)] = groupedField.default_value;
             } else if (groupedField.settings.options.length > 0) {
-                data[getFieldKey(groupedField)] = groupedField.settings.options[0].key;
+                data[getFieldColumn(groupedField)] = groupedField.settings.options[0].key;
             } else {
-                data[getFieldKey(groupedField)] = '';
+                data[getFieldColumn(groupedField)] = '';
             }
         },
         assignEntity: (groupedField, data) => {
@@ -153,14 +153,14 @@ export function getFieldTypes(t) {
     });
 
     const enumMultipleFieldType = componentType => ({
-        form: groupedField => React.createElement(componentType, { key: getFieldKey(groupedField), id: getFieldKey(groupedField), label: groupedField.name, options: groupedField.settings.options }, null),
+        form: groupedField => React.createElement(componentType, { key: getFieldColumn(groupedField), id: getFieldColumn(groupedField), label: groupedField.name, options: groupedField.settings.options }, null),
         assignFormData: (groupedField, data) => {
-            if (data[getFieldKey(groupedField)] === null) {
-                data[getFieldKey(groupedField)] = [];
+            if (data[getFieldColumn(groupedField)] === null) {
+                data[getFieldColumn(groupedField)] = [];
             }
         },
         initFormData: (groupedField, data) => {
-            data[getFieldKey(groupedField)] = [];
+            data[getFieldColumn(groupedField)] = [];
         },
         assignEntity: (groupedField, data) => {},
         validate: (groupedField, state) => {},

@@ -3,12 +3,14 @@ const files = require('../../../models/files');
 const contextHelpers = require('../../../lib/context-helpers');
 const mosaicoTemplates = require('../../../shared/mosaico-templates');
 const {getGlobalNamespaceId} = require('../../../shared/namespaces');
+const {getAdminId} = require('../../../shared/users');
 const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
 const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
 const { MailerType, getSystemSendConfigurationId } = require('../../../shared/send-configurations');
 const { enforce } = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../shared/triggers');
 const { SubscriptionSource } = require('../../../shared/lists');
+const crypto = require('crypto');
 
 const entityTypesWithFiles = {
     campaign: {
@@ -226,7 +228,7 @@ async function migrateUsers(knex) {
     });
     /* The user role is set automatically in rebuild permissions, which is called upon every start */
 
-    await knex('users').where('id', 1 /* Admin user id */).update({
+    await knex('users').where('id', getAdminId()).update({
         name: 'Administrator'
     });
 }
@@ -1030,7 +1032,7 @@ async function migrateImporter(knex) {
         table.text('settings', 'longtext');
         table.integer('mapping_type').unsigned().notNullable();
         table.text('mapping', 'longtext');
-        table.timestamp('last_run');
+        table.dateTime('last_run');
         table.text('error');
         table.timestamp('created').defaultTo(knex.fn.now());
     });
@@ -1040,17 +1042,19 @@ async function migrateImporter(knex) {
         table.integer('import').unsigned().references('imports.id');
         table.integer('status').unsigned().notNullable();
         table.text('mapping', 'longtext');
+        table.integer('last_id');
         table.integer('new').defaultTo(0);
         table.integer('failed').defaultTo(0);
         table.integer('processed').defaultTo(0);
         table.text('error');
         table.timestamp('created').defaultTo(knex.fn.now());
-        table.timestamp('finished');
+        table.dateTime('finished');
     });
 
     await knex.schema.createTable('import_failed', table => {
         table.increments('id').primary();
         table.integer('run').unsigned().references('import_runs.id');
+        table.integer('source_id').unsigned();
         table.string('email').notNullable();
         table.text('reason');
         table.timestamp('created').defaultTo(knex.fn.now());
@@ -1063,9 +1067,9 @@ exports.up = (knex, Promise) => (async() => {
     await addNamespaces(knex);
 
     await migrateUsers(knex);
-    await migrateSubscriptions(knex);
     await migrateCustomForms(knex);
     await migrateCustomFields(knex);
+    await migrateSubscriptions(knex);
     await migrateSegments(knex);
     await migrateReports(knex);
     await migrateSettings(knex);

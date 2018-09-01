@@ -27,7 +27,8 @@ export function getImportTypes(t) {
         [RunStatus.SCHEDULED]: t('Starting'),
         [RunStatus.RUNNING]: t('Running'),
         [RunStatus.STOPPING]: t('Stopping'),
-        [RunStatus.FINISHED]: t('Finished')
+        [RunStatus.FINISHED]: t('Finished'),
+        [RunStatus.FAILED]: t('Failed')
     };
 
     const mappingTypeLabels = {

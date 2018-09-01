@@ -37,14 +37,14 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
         throw new APIError('Missing EMAIL', 400);
     }
 
-    const emailErr = await tools.validateEmail(input.EMAIL, false);
+    const emailErr = await tools.validateEmail(input.EMAIL);
     if (emailErr) {
         const errMsg = tools.validateEmailGetMessage(emailErr, input.email);
         log.error('API', errMsg);
         throw new APIError(errMsg, 400);
     }
 
-    const subscription = await fields.fromPost(req.context, list.id, input, true);
+    const subscription = await fields.fromAPI(req.context, list.id, input);
 
     if (input.TIMEZONE) {
         subscription.tz = (input.TIMEZONE || '').toString().trim();

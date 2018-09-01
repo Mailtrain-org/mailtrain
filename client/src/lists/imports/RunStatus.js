@@ -18,6 +18,7 @@ import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
 import moment from "moment";
 import {runStatusInProgress} from "../../../../shared/imports";
+import {Table} from "../../lib/table";
 
 @translate()
 @withPageHelpers
@@ -52,6 +53,10 @@ export default class Status extends Component {
         this.setState({
             entity: resp.data
         });
+
+        if (this.failedTableNode) {
+            this.failedTableNode.refresh();
+        }
     }
 
     async periodicRefreshTask() {
@@ -77,7 +82,13 @@ export default class Status extends Component {
         const entity = this.state.entity;
         const imprt = this.props.imprt;
 
-       return (
+        const columns = [
+            { data: 1, title: t('Row') },
+            { data: 2, title: t('Email') },
+            { data: 3, title: t('Reason') }
+        ];
+
+        return (
             <div>
                 <Title>{t('Import Run Status')}</Title>
 
@@ -90,6 +101,11 @@ export default class Status extends Component {
                 <AlignedRow label={t('New entries')}>{entity.new}</AlignedRow>
                 <AlignedRow label={t('Failed entries')}>{entity.failed}</AlignedRow>
                 {entity.error && <AlignedRow label={t('Error')}><pre>{entity.error}</pre></AlignedRow>}
+
+                <hr/>
+                <h3>{t('Failed Rows')}</h3>
+                <Table ref={node => this.failedTableNode = node} withHeader dataUrl={`rest/import-run-failed-table/${this.props.list.id}/${this.props.imprt.id}/${this.props.entity.id}`} columns={columns} />
+
             </div>
         );
     }

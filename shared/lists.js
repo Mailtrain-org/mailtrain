@@ -31,7 +31,7 @@ const SubscriptionSource = {
     IMPORTED_V1: -5
 };
 
-function getFieldKey(field) {
+function getFieldColumn(field) {
     return field.column || 'grouped_' + field.id;
 }
 
@@ -39,5 +39,5 @@ module.exports = {
     UnsubscriptionMode,
     SubscriptionStatus,
     SubscriptionSource,
-    getFieldKey
+    getFieldColumn
 };

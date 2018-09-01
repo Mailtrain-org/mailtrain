@@ -35,8 +35,27 @@ async function listDTAjax(context, listId, importId, params) {
             builder => builder
                 .from('import_runs')
                 .innerJoin('imports', 'import_runs.import', 'imports.id')
-                .where({'imports.list': listId, 'imports.id': importId}),
+                .where({'imports.list': listId, 'imports.id': importId})
+                .orderBy('import_runs.id', 'desc'),
             [ 'import_runs.id', 'import_runs.created', 'import_runs.finished', 'import_runs.status', 'import_runs.processed', 'import_runs.new', 'import_runs.failed']
+        );
+    });
+}
+
+async function listFailedDTAjax(context, listId, importId, importRunId, params) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewImports');
+
+        return await dtHelpers.ajaxListTx(
+            tx,
+            params,
+            builder => builder
+                .from('import_failed')
+                .innerJoin('import_runs', 'import_failed.run', 'import_runs.id')
+                .innerJoin('imports', 'import_runs.import', 'imports.id')
+                .where({'imports.list': listId, 'imports.id': importId, 'import_runs.id': importRunId})
+                .orderBy('import_failed.source_id', 'asc'),
+            [ 'import_failed.id', 'import_failed.source_id', 'import_failed.email', 'import_failed.reason']
         );
     });
 }
@@ -45,5 +64,6 @@ async function listDTAjax(context, listId, importId, params) {
 
 module.exports = {
     getById,
-    listDTAjax
+    listDTAjax,
+    listFailedDTAjax
 };
