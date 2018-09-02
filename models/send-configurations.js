@@ -9,6 +9,8 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const {MailerType, getSystemSendConfigurationId} = require('../shared/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
+const mailers = require('../lib/mailers');
+const senders = require('../lib/senders');
 
 const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable', 'x_mailer', 'verp_hostname', 'mailer_type', 'mailer_settings', 'namespace']);
 
@@ -107,8 +109,8 @@ async function updateWithConsistencyCheck(context, entity) {
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'sendConfiguration', entityId: entity.id });
     });
 
-    // FIXME - recreate respective mailer, notify senders to recreate the mailer
-
+    mailers.invalidateMailer(entity.id);
+    senders.reloadConfig(entity.id);
 }
 
 async function remove(context, id) {
@@ -119,9 +121,9 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'delete');
 
-        // FIXME - delete send configuration assignment in campaigns
         await tx('lists').update({send_configuration: null}).where('send_configuration', id);
 
+        // If any campaign with the send configuration exists, this fails due to sql foreign key
         await tx('send_configurations').where('id', id).del();
     });
 }

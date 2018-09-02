@@ -14,6 +14,37 @@ let util = require('util');
 const feed_timeout = 15 * 1000;
 const rss_timeout = 1 * 1000;
 
+const feedparser = require('feedparser-promised');
+
+async function fetch(url) {
+    const httpOptions = {
+        uri: 'http://feeds.feedwrench.com/JavaScriptJabber.rss',
+        headers: {
+            'user-agent': 'Mailtrain',
+            'accept': 'text/html,application/xhtml+xml'
+        }
+    };
+
+    const items = await feedparser.parse(httpOptions);
+
+    const entries = [];
+    for (const item of items) {
+        const entry = {
+            title: item.title,
+            date: item.date || item.pubdate || item.pubDate || new Date(),
+            guid: item.guid || item.link,
+            link: item.link,
+            content: item.description || item.summary,
+            summary: item.summary || item.description,
+            image_url: item.image.url
+        };
+        entries.push(entry);
+    }
+
+    return entries;
+}
+
+
 function feedLoop() {
 
     db.getConnection((err, connection) => {

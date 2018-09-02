@@ -26,25 +26,25 @@ function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
     fs.open(outFile, 'w', (err, outFd) => {
         if (err) {
             log.error('Executor', err);
-            reportFail('Cannot create standard output file.');
+            reportFail('Cannot create standard output file');
             return;
         }
 
         fs.open(errFile, 'w', (err, errFd) => {
             if (err) {
                 log.error('Executor', err);
-                reportFail('Cannot create standard error file.');
+                reportFail('Cannot create standard error file');
                 return;
             }
 
             privilegeHelpers.ensureMailtrainOwner(outFile, err => {
                 if (err) {
-                    log.warn('Executor', 'Cannot change owner of output file of process tid:%s.', tid);
+                    log.warn('Executor', 'Cannot change owner of output file of process tid:%s', tid);
                 }
 
                 privilegeHelpers.ensureMailtrainOwner(errFile, err => {
                     if (err) {
-                        log.warn('Executor', 'Cannot change owner of error output file of process tid:%s.', tid);
+                        log.warn('Executor', 'Cannot change owner of error output file of process tid:%s', tid);
                     }
 
                     const options = {
@@ -60,15 +60,15 @@ function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
                     try {
                         child = fork(executable, args, options);
                     } catch (err) {
-                        log.error('Executor', 'Cannot start process with tid:%s.', tid);
-                        reportFail('Cannot start process.');
+                        log.error('Executor', 'Cannot start process with tid:%s', tid);
+                        reportFail('Cannot start process');
                         return;
                     }
 
                     const pid = child.pid;
                     processes[tid] = child;
 
-                    log.info('Executor', 'Process started with tid:%s pid:%s.', tid, pid);
+                    log.info('Executor', 'Process started with tid:%s pid:%s', tid, pid);
                     process.send({
                         type: 'process-started',
                         tid
@@ -77,7 +77,7 @@ function spawnProcess(tid, executable, args, outFile, errFile, cwd, uid, gid) {
                     child.on('close', (code, signal) => {
 
                         delete processes[tid];
-                        log.info('Executor', 'Process tid:%s pid:%s exited with code %s signal %s.', tid, pid, code, signal);
+                        log.info('Executor', 'Process tid:%s pid:%s exited with code %s signal %s', tid, pid, code, signal);
 
                         fs.close(outFd, err => {
                             if (err) {

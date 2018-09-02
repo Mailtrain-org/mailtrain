@@ -24,7 +24,8 @@ const allowedKeysUpdate = new Set([...allowedKeysCommon]);
 const Content = {
     ALL: 0,
     WITHOUT_SOURCE_CUSTOM: 1,
-    ONLY_SOURCE_CUSTOM: 2
+    ONLY_SOURCE_CUSTOM: 2,
+    RSS_ENTRY: 3
 };
 
 function hash(entity, content) {
@@ -118,11 +119,13 @@ async function getById(context, id, withPermissions = true, content = Content.AL
 }
 
 async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
-    if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM) {
+    if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM || content === Content.RSS_ENTRY) {
         await namespaceHelpers.validateEntity(tx, entity);
 
         if (isCreate) {
-            enforce(entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS || entity.type === CampaignType.TRIGGERED, 'Unknown campaign type');
+            enforce(entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS || entity.type === CampaignType.TRIGGERED ||
+                    (content === Content.RSS_ENTRY && entity.type === CampaignType.RSS_ENTRY),
+                'Unknown campaign type');
 
             if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
                 await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
@@ -172,7 +175,7 @@ function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityTyp
     }
 }
 
-async function create(context, entity) {
+async function _createTx(tx, context, entity, content) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCampaign');
 
@@ -204,7 +207,7 @@ async function create(context, entity) {
             entity.data.sourceCustom = sourceCampaign.data.sourceCustom;
         }
 
-        await _validateAndPreprocess(tx, context, entity, true, Content.ALL);
+        await _validateAndPreprocess(tx, context, entity, true, content);
 
         const filteredEntity = filterObject(entity, allowedKeysCreate);
         filteredEntity.cid = shortid.generate();
@@ -260,6 +263,16 @@ async function create(context, entity) {
 
         return id;
     });
+}
+
+async function create(context, entity) {
+    return await knex.transaction(async tx => {
+        return await _createTx(tx, context, entity, Content.ALL);
+    });
+}
+
+async function createRssTx(tx, context, entity) {
+    return await _createTx(tx, context, entity, Content.RSS_ENTRY);
 }
 
 async function updateWithConsistencyCheck(context, entity, content) {
@@ -336,6 +349,7 @@ Object.assign(module.exports, {
     getByIdTx,
     getById,
     create,
+    createRssTx,
     updateWithConsistencyCheck,
     remove,
     enforceSendPermissionTx

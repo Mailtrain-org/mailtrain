@@ -838,7 +838,7 @@ async function migrateCampaigns(knex) {
     OK  | id                      | int(10) unsigned    | NO   | PRI | NULL              | auto_increment |
     OK  | cid                     | varchar(255)        | NO   | UNI | NULL              |                |
     OK  | type                    | tinyint(4) unsigned | NO   | MUL | 1                 |                |
-    OK  | parent                  | int(10) unsigned    | YES  | MUL | NULL              |                |
+    X  | parent                  | int(10) unsigned    | YES  | MUL | NULL              |                |
     OK  | name                    | varchar(255)        | NO   | MUL |                   |                |
     OK  | description             | text                | YES  |     | NULL              |                |
     OK  | list                    | int(10) unsigned    | NO   |     | NULL              |                |
@@ -880,9 +880,10 @@ async function migrateCampaigns(knex) {
         +-------------------------+---------------------+------+-----+-------------------+----------------+
 
     list - we will probably need some strategy how to consistently treat stats when list/segment changes
-    parent - used only for campaign type RSS
     last_check - used only for campaign type RSS
     scheduled - used only for campaign type NORMAL
+
+    parent - discarded because it duplicates the info in table `rss`. `rss` can be used to establish a db link between RSS campaign and its entries
      */
 
     await knex.schema.table('campaigns', table => {
@@ -898,7 +899,7 @@ async function migrateCampaigns(knex) {
     for (const campaign of campaigns) {
         const data = {};
 
-        if (campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.RSS_ENTRY || campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.TRIGGERED) {
+        if (campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.RSS || campaign.type === CampaignType.RSS_ENTRY || campaign.type === CampaignType.TRIGGERED) {
             if (campaign.template) {
                 let editorType = campaign.editor_name;
                 const editorData = JSON.parse(campaign.editor_data || '{}');
@@ -930,12 +931,11 @@ async function migrateCampaigns(knex) {
                 campaign.source = CampaignSource.URL;
                 data.sourceUrl = campaign.source_url;
             }
+        }
 
-        } else if (campaign.type === CampaignType.RSS) {
-            campaign.source = CampaignSource.RSS;
+        if (campaign.type === CampaignType.RSS) {
             data.feedUrl = campaign.source_url;
-
-            data.checkStatus = campaign.checkStatus;
+            data.checkStatus = campaign.check_status;
         }
 
         campaign.data = JSON.stringify(data);

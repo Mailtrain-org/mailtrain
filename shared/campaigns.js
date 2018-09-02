@@ -8,9 +8,8 @@ const CampaignSource = {
     CUSTOM_FROM_TEMPLATE: 3,
     CUSTOM_FROM_CAMPAIGN: 4,
     URL: 5,
-    RSS: 6,
 
-    MAX: 6
+    MAX: 5
 };
 
 const CampaignType = {

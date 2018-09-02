@@ -6,13 +6,13 @@ const appBuilder = require('./app-builder');
 const http = require('http');
 //const triggers = require('./services/triggers');
 const importer = require('./lib/importer');
+const feedcheck = require('./lib/feedcheck');
 // const verpServer = require('./services/verp-server');
 const testServer = require('./services/test-server');
 //const postfixBounceServer = require('./services/postfix-bounce-server');
 const tzupdate = require('./services/tzupdate');
-//const feedcheck = require('./services/feedcheck');
 const dbcheck = require('./lib/dbcheck');
-//const senders = require('./lib/senders');
+const senders = require('./lib/senders');
 const reportProcessor = require('./lib/report-processor');
 const executor = require('./lib/executor');
 const privilegeHelpers = require('./lib/privilege-helpers');
@@ -91,18 +91,18 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                             tzupdate.start();
 
                             importer.spawn(() => {
-                                //triggers(() => {
-                                    //senders.spawn(() => {
-                                        //feedcheck(() => {
-                                            //postfixBounceServer(async () => {
-                                                (async () => {
-                                                    await reportProcessor.init();
-                                                    log.info('Service', 'All services started');
-                                                })();
-                                            //});
+                                feedcheck.spawn(() => {
+                                    senders.spawn(() => {
+                                        //triggers(() => {
+                                        //postfixBounceServer(async () => {
+                                            (async () => {
+                                                await reportProcessor.init();
+                                                log.info('Service', 'All services started');
+                                            })();
                                         //});
-                                    //});
-                                //});
+                                        //});
+                                    });
+                                });
                             });
                         });
                     });

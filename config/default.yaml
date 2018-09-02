@@ -79,15 +79,6 @@ mysql:
   # The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
   timezone: local
 
-redis:
-  # enable to use Redis session cache or disable if Redis is not installed
-  enabled: false
-  host: localhost
-  port: 6379
-  db: 5
-  # Uncomment if your Redis installation requires a password
-  #password:
-
 verp:
   # Enable to start an MX server that detects bounced messages using VERP
   # In most cases you do not want to use it
