@@ -44,11 +44,10 @@ export default class List extends Component {
         const columns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('List') },
-            { data: 4, title: t('Entity'), render: data => this.entityLabels[data], searchable: false },
-            { data: 5, title: t('Event'), render: (data, cmd, rowData) => this.eventLabels[rowData[4]][data], searchable: false },
-            { data: 6, title: t('Days after'), render: data => Math.round(data / (3600 * 24)) },
-            { data: 7, title: t('Enabled'), render: data => data ? t('Yes') : t('No'), searchable: false},
+            { data: 3, title: t('Entity'), render: data => this.entityLabels[data], searchable: false },
+            { data: 4, title: t('Event'), render: (data, cmd, rowData) => this.eventLabels[rowData[3]][data], searchable: false },
+            { data: 5, title: t('Days after'), render: data => Math.round(data / (3600 * 24)) },
+            { data: 6, title: t('Enabled'), render: data => data ? t('Yes') : t('No'), searchable: false},
             {
                 actions: data => {
                     const actions = [];

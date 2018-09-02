@@ -841,8 +841,8 @@ async function migrateCampaigns(knex) {
     X  | parent                  | int(10) unsigned    | YES  | MUL | NULL              |                |
     OK  | name                    | varchar(255)        | NO   | MUL |                   |                |
     OK  | description             | text                | YES  |     | NULL              |                |
-    OK  | list                    | int(10) unsigned    | NO   |     | NULL              |                |
-    OK  | segment                 | int(10) unsigned    | YES  |     | NULL              |                |
+    X  | list                    | int(10) unsigned    | NO   |     | NULL              |                |
+    X  | segment                 | int(10) unsigned    | YES  |     | NULL              |                |
     X   | template                | int(10) unsigned    | NO   |     | NULL              |                |
     X   | source_url              | varchar(255)        | YES  |     | NULL              |                |
     X   | editor_name             | varchar(50)         | YES  |     |                   |                |
@@ -884,7 +884,15 @@ async function migrateCampaigns(knex) {
     scheduled - used only for campaign type NORMAL
 
     parent - discarded because it duplicates the info in table `rss`. `rss` can be used to establish a db link between RSS campaign and its entries
+    list, segment - held in campaign_lists table
      */
+
+    await knex.schema.createTable('campaign_lists', table => {
+        table.increments('id').primary();
+        table.integer('campaign').unsigned().notNullable().references('campaigns.id').onDelete('CASCADE');
+        table.integer('list').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
+        table.integer('segment').unsigned().references('segments.id').onDelete('CASCADE');
+    });
 
     await knex.schema.table('campaigns', table => {
         table.text('data', 'longtext');
@@ -940,10 +948,18 @@ async function migrateCampaigns(knex) {
 
         campaign.data = JSON.stringify(data);
 
+        await knex('campaign_lists').insert({
+            campaign: campaign.id,
+            list: campaign.list,
+            segment: campaign.segment || null
+        });
+
         await knex('campaigns').where('id', campaign.id).update(campaign);
     }
 
     await knex.schema.table('campaigns', table => {
+        table.dropColumn('list');
+        table.dropColumn('segment');
         table.dropColumn('template');
         table.dropColumn('source_url');
         table.dropColumn('editor_name');
@@ -1001,9 +1017,17 @@ async function migrateTriggers(knex) {
     const triggers = await knex('triggers');
 
     for (const trigger of triggers) {
-        const campaign = await knex('campaigns').where('id', trigger.campaign).first();
+        const campaign = await knex('campaigns')
+            .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+            .groupBy('campaigns.id')
+            .select(
+                knex.raw(`GROUP_CONCAT(campaign_lists.list SEPARATOR \';\') as lists`)
+            )
+            .where('id', trigger.campaign).first();
 
-        enforce(campaign.list === trigger.list, 'The list of trigger and campaign have to be the same.');
+        campaign.lists = campaign.lists.split(';').map(x => Number.parseInt(x));
+
+        enforce(campaign.lists.includes(trigger.list), 'The list of trigger and campaign have to be the same.');
 
         enforce(trigger.entity in TriggerEntityVals);
         enforce(trigger.event in TriggerEventVals[trigger.entity]);

@@ -15,6 +15,7 @@ import {
     ButtonRow,
     CheckBox,
     Dropdown,
+    Fieldset,
     Form,
     FormSendMethod,
     InputField,
@@ -39,6 +40,7 @@ import {
 } from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
+import campaignsStyles from "./styles.scss";
 import {getUrl} from "../lib/urls";
 import {
     campaignOverridables,
@@ -100,6 +102,8 @@ export default class CUD extends Component {
             sendConfiguration: null
         };
 
+        this.nextListEntryId = 0;
+
         this.initForm({
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
@@ -114,6 +118,12 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object,
         type: PropTypes.number
+    }
+
+    getNextListEntryId() {
+        const id = this.nextListEntryId;
+        this.nextListEntryId += 1;
+        return id;
     }
 
     onCustomTemplateTypeChanged(mutState, key, oldType, type) {
@@ -156,11 +166,23 @@ export default class CUD extends Component {
                     data.data_feedUrl = data.data.feedUrl;
                 }
 
-                data.useSegmentation = !!data.segment;
-
                 for (const overridable of campaignOverridables) {
                     data[overridable + '_overriden'] = !!data[overridable + '_override'];
                 }
+
+                const lsts = [];
+                for (const lst of data.lists) {
+                    const lstUid = this.getNextListEntryId();
+
+                    const prefix = 'lists_' + lstUid + '_';
+
+                    data[prefix + 'list'] = lst.list;
+                    data[prefix + 'segment'] = lst.segment;
+                    data[prefix + 'useSegmentation'] = !!lst.segment;
+
+                    lsts.push(lstUid);
+                }
+                data.lists = lsts;
 
                 this.fetchSendConfiguration(data.send_configuration);
             });
@@ -172,6 +194,9 @@ export default class CUD extends Component {
                 data[overridable + '_overriden'] = false;
             }
 
+            const lstUid = this.getNextListEntryId();
+            const lstPrefix = 'lists_' + lstUid + '_';
+
             this.populateFormValues({
                 ...data,
 
@@ -179,9 +204,12 @@ export default class CUD extends Component {
 
                 name: '',
                 description: '',
-                list: null,
-                segment: null,
-                useSegmentation: false,
+
+                [lstPrefix + 'list']: null,
+                [lstPrefix + 'segment']: null,
+                [lstPrefix + 'useSegmentation']: false,
+                lists: [lstUid],
+
                 send_configuration: null,
                 namespace: mailtrainConfig.user.namespace,
 
@@ -225,14 +253,6 @@ export default class CUD extends Component {
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('Name must not be empty'));
-        }
-
-        if (!state.getIn(['list', 'value'])) {
-            state.setIn(['list', 'error'], t('List must be selected'));
-        }
-
-        if (state.getIn(['useSegmentation', 'value']) && !state.getIn(['segment', 'value'])) {
-            state.setIn(['segment', 'error'], t('Segment must be selected'));
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
@@ -281,10 +301,25 @@ export default class CUD extends Component {
             }
         }
 
+        for (const lstUid of state.getIn(['lists', 'value'])) {
+            const prefix = 'lists_' + lstUid + '_';
+
+            if (!state.getIn([prefix + 'list', 'value'])) {
+                state.setIn([prefix + 'list', 'error'], t('List must be selected'));
+            }
+
+            if (campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) {
+                if (state.getIn([prefix + 'useSegmentation', 'value']) && !state.getIn([prefix + 'segment', 'value'])) {
+                    state.setIn([prefix + 'segment', 'error'], t('Segment must be selected'));
+                }
+            }
+        }
+
         validateNamespace(t, state);
     }
 
     async submitHandler() {
+        const isEdit = !!this.props.entity;
         const t = this.props.t;
 
         let sendMethod, url;
@@ -302,11 +337,6 @@ export default class CUD extends Component {
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             data.source = Number.parseInt(data.source);
 
-            if (!data.useSegmentation) {
-                data.segment = null;
-            }
-            delete data.useSegmentation;
-
             data.data = {};
             if (data.source === CampaignSource.TEMPLATE || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
                 data.data.sourceTemplate = data.data_sourceTemplate;
@@ -316,7 +346,7 @@ export default class CUD extends Component {
                 data.data.sourceCampaign = data.data_sourceCampaign;
             }
 
-            if (data.source === CampaignSource.CUSTOM) {
+            if (!isEdit && data.source === CampaignSource.CUSTOM) {
                 this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
 
                 data.data.sourceCustom = {
@@ -342,8 +372,21 @@ export default class CUD extends Component {
                 delete data[overridable + '_overriden'];
             }
 
+            const lsts = [];
+            for (const lstUid of data.lists) {
+                const prefix = 'lists_' + lstUid + '_';
+
+                const useSegmentation = data[prefix + 'useSegmentation'] && (data.type === CampaignType.REGULAR || data.type === CampaignType.RSS);
+
+                lsts.push({
+                    list: data[prefix + 'list'],
+                    segment: useSegmentation ? data[prefix + 'segment'] : null
+                });
+            }
+            data.lists = lsts;
+
             for (const key in data) {
-                if (key.startsWith('data_')) {
+                if (key.startsWith('data_') || key.startsWith('lists_')) {
                     delete data[key];
                 }
             }
@@ -362,6 +405,47 @@ export default class CUD extends Component {
             this.enableForm();
             this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
         }
+    }
+
+    onAddListEntry(orderBeforeIdx) {
+        this.updateForm(mutState => {
+            const lsts = mutState.getIn(['lists', 'value']);
+            let paramId = 0;
+
+            const lstUid = this.getNextListEntryId();
+
+            const prefix = 'lists_' + lstUid + '_';
+
+            mutState.setIn([prefix + 'list', 'value'], null);
+            mutState.setIn([prefix + 'segment', 'value'], null);
+            mutState.setIn([prefix + 'useSegmentation', 'value'], false);
+
+            mutState.setIn(['lists', 'value'], [...lsts.slice(0, orderBeforeIdx), lstUid, ...lsts.slice(orderBeforeIdx)]);
+        });
+    }
+
+    onRemoveListEntry(lstUid) {
+        this.updateForm(mutState => {
+            const lsts = this.getFormValue('lists');
+
+            const prefix = 'lists_' + lstUid + '_';
+
+            mutState.delete(prefix + 'list');
+            mutState.delete(prefix + 'segment');
+            mutState.delete(prefix + 'useSegmentation');
+
+            mutState.setIn(['lists', 'value'], lsts.filter(val => val !== lstUid));
+        });
+    }
+
+    onListEntryMoveUp(orderIdx) {
+        const lsts = this.getFormValue('lists');
+        this.updateFormValue('lists', [...lsts.slice(0, orderIdx - 1), lsts[orderIdx], lsts[orderIdx - 1], ...lsts.slice(orderIdx + 1)]);
+    }
+
+    onListEntryMoveDown(orderIdx) {
+        const lsts = this.getFormValue('lists');
+        this.updateFormValue('lists', [...lsts.slice(0, orderIdx), lsts[orderIdx + 1], lsts[orderIdx], ...lsts.slice(orderIdx + 2)]);
     }
 
     render() {
@@ -389,6 +473,81 @@ export default class CUD extends Component {
         const segmentsColumns = [
             { data: 1, title: t('Name') }
         ];
+
+        const lstsEditEntries = [];
+        const lsts = this.getFormValue('lists') || [];
+        let lstOrderIdx = 0;
+        for (const lstUid of lsts) {
+            const prefix = 'lists_' + lstUid + '_';
+            const lstOrderIdxClosure = lstOrderIdx;
+
+            const selectedList = this.getFormValue(prefix + 'list');
+
+            lstsEditEntries.push(
+                <div key={lstUid} className={campaignsStyles.entry + ' ' + campaignsStyles.entryWithButtons}>
+                    <div className={campaignsStyles.entryButtons}>
+                        {lsts.length > 1 &&
+                        <Button
+                            className="btn-default"
+                            icon="remove"
+                            title={t('Remove')}
+                            onClickAsync={() => this.onRemoveListEntry(lstUid)}
+                        />
+                        }
+                        <Button
+                            className="btn-default"
+                            icon="plus"
+                            title={t('Insert new entry before this one')}
+                            onClickAsync={() => this.onAddListEntry(lstOrderIdxClosure)}
+                        />
+                        {lstOrderIdx > 0 &&
+                        <Button
+                            className="btn-default"
+                            icon="chevron-up"
+                            title={t('Move up')}
+                            onClickAsync={() => this.onListEntryMoveUp(lstOrderIdxClosure)}
+                        />
+                        }
+                        {lstOrderIdx < lsts.length - 1 &&
+                        <Button
+                            className="btn-default"
+                            icon="chevron-down"
+                            title={t('Move down')}
+                            onClickAsync={() => this.onListEntryMoveDown(lstOrderIdxClosure)}
+                        />
+                        }
+                    </div>
+                    <div className={campaignsStyles.entryContent}>
+                        <TableSelect id={prefix + 'list'} label={t('List')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
+
+                        {(campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) &&
+                            <div>
+                                <CheckBox id={prefix + 'useSegmentation'} label={t('Segment')} text={t('Use a particular segment')}/>
+                                {selectedList && this.getFormValue(prefix + 'useSegmentation') &&
+                                    <TableSelect id={prefix + 'segment'} withHeader dropdown dataUrl={`rest/segments-table/${selectedList}`} columns={segmentsColumns} selectionLabelIndex={1} />
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            );
+
+            lstOrderIdx += 1;
+        }
+
+        const lstsEdit =
+            <Fieldset label={t('Lists')}>
+                {lstsEditEntries}
+                <div key="newEntry" className={campaignsStyles.newEntry}>
+                    <Button
+                        className="btn-default"
+                        icon="plus"
+                        label={t('Add list')}
+                        onClickAsync={() => this.onAddListEntry(lsts.length)}
+                    />
+                </div>
+            </Fieldset>;
+
 
         const sendConfigurationsColumns = [
             { data: 1, title: t('Name') },
@@ -495,6 +654,8 @@ export default class CUD extends Component {
             saveButtonLabel = t('Save and edit campaign');
         }
 
+
+
         return (
             <div>
                 {canDelete &&
@@ -520,12 +681,7 @@ export default class CUD extends Component {
 
                     <hr/>
 
-                    <TableSelect id="list" label={t('List')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
-
-                    <CheckBox id="useSegmentation" label={t('Segment')} text={t('Use a particular segment')}/>
-                    {this.getFormValue('useSegmentation') &&
-                        <TableSelect id="segment" withHeader dropdown dataUrl={`rest/segments-table/${this.getFormValue('list')}`} columns={segmentsColumns} selectionLabelIndex={1} />
-                    }
+                    {lstsEdit}
 
                     <hr/>
 

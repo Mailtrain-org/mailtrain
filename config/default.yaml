@@ -129,7 +129,6 @@ nodemailer:
 
 queue:
   # How many parallel sender processes to spawn
-  # You can use more than 1 process only if you have Redis enabled
   processes: 1
 
 cors:

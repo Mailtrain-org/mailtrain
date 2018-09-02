@@ -35,9 +35,8 @@ async function listByCampaignDTAjax(context, campaignId, params) {
             builder => builder
                 .from('triggers')
                 .innerJoin('campaigns', 'campaigns.id', 'triggers.campaign')
-                .innerJoin('lists', 'lists.id', 'campaigns.list')
                 .where('triggers.campaign', campaignId),
-            [ 'triggers.id', 'triggers.name', 'triggers.description', 'lists.name', 'triggers.entity', 'triggers.event', 'triggers.seconds_after', 'triggers.enabled' ]
+            [ 'triggers.id', 'triggers.name', 'triggers.description', 'triggers.entity', 'triggers.event', 'triggers.seconds_after', 'triggers.enabled' ]
         );
     });
 }
@@ -50,7 +49,8 @@ async function listByListDTAjax(context, listId, params) {
         builder => builder
             .from('triggers')
             .innerJoin('campaigns', 'campaigns.id', 'triggers.campaign')
-            .where('campaigns.list', listId),
+            .innerJoin('campaign_lists', 'campaign_lists.campaign', 'campaigns.id')
+            .where('campaign_lists.list', listId),
         [ 'triggers.id', 'triggers.name', 'triggers.description', 'campaigns.name', 'triggers.entity', 'triggers.event', 'triggers.seconds_after', 'triggers.enabled', 'triggers.campaign' ]
     );
 }
@@ -128,7 +128,7 @@ async function remove(context, campaignId, id) {
 }
 
 async function removeAllByCampaignIdTx(tx, context, campaignId) {
-    const entities = await tx('triggers').where('list', campaignId).select(['id']);
+    const entities = await tx('triggers').where('campaign', campaignId).select(['id']);
     for (const entity of entities) {
         await removeTx(tx, context, campaignId, entity.id);
     }

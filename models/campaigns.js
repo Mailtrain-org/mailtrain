@@ -15,7 +15,7 @@ const segments = require('./segments');
 const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
 
-const allowedKeysCommon = ['name', 'description', 'list', 'segment', 'namespace',
+const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
@@ -33,9 +33,11 @@ function hash(entity, content) {
 
     if (content === Content.ALL) {
         filteredEntity = filterObject(entity, allowedKeysUpdate);
+        filteredEntity.lists = entity.lists;
 
     } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
         filteredEntity = filterObject(entity, allowedKeysUpdate);
+        filteredEntity.lists = entity.lists;
         filteredEntity.data = {...filteredEntity.data};
         delete filteredEntity.data.sourceCustom;
 
@@ -73,7 +75,7 @@ async function listWithContentDTAjax(context, params) {
     );
 }
 
-async function listOthersByListDTAjax(context, campaignId, listId, params) {
+async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listIds, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -81,16 +83,43 @@ async function listOthersByListDTAjax(context, campaignId, listId, params) {
         builder => builder.from('campaigns')
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
             .whereNot('campaigns.id', campaignId)
-            .where('campaigns.list', listId),
+            .whereNotExists(qry => qry.from('campaign_lists').whereRaw('campaign_lists.campaign = campaigns.id').whereNotIn('campaign_lists.list', listIds)),
         ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
     );
 }
 
-async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
-    await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
-    let entity = await tx('campaigns').where('id', id).first();
+async function rawGetByIdTx(tx, id) {
+    const entity = await tx('campaigns').where('campaigns.id', id)
+        .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+        .groupBy('campaigns.id')
+        .select([
+            'campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
+            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject_override',
+            'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url',
+            knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
+        ])
+        .first();
+
+    if (!entity) {
+        throw new interoperableErrors.NotFoundError();
+    }
+
+    entity.lists = entity.lists.split(';').map(x => {
+        const entries = x.split(':');
+        const list = Number.parseInt(entries[0]);
+        const segment = entries[1] ? Number.parseInt(entries[1]) : null;
+        return {list, segment};
+    });
 
     entity.data = JSON.parse(entity.data);
+
+    return entity;
+}
+
+async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
+
+    let entity = await rawGetByIdTx(tx, id);
 
     if (content === Content.WITHOUT_SOURCE_CUSTOM) {
         delete entity.data.sourceCustom;
@@ -135,11 +164,13 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
             enforce(entity.source >= CampaignSource.MIN && entity.source <= CampaignSource.MAX, 'Unknown campaign source');
         }
 
-        await shares.enforceEntityPermissionTx(tx, context, 'list', entity.list, 'view');
+        for (const lstSeg of entity.lists) {
+            await shares.enforceEntityPermissionTx(tx, context, 'list', lstSeg.list, 'view');
 
-        if (entity.segment) {
-            // Check that the segment under the list exists
-            await segments.getByIdTx(tx, context, entity.list, entity.segment);
+            if (lstSeg.segment) {
+                // Check that the segment under the list exists
+                await segments.getByIdTx(tx, context, lstSeg.list, lstSeg.segment);
+            }
         }
 
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.send_configuration, 'viewPublic');
@@ -218,6 +249,8 @@ async function _createTx(tx, context, entity, content) {
         const ids = await tx('campaigns').insert(filteredEntity);
         const id = ids[0];
 
+        await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: id, ...x})));
+
         await knex.schema.raw('CREATE TABLE `campaign__' + id + '` (\n' +
             '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
             '  `list` int(10) unsigned NOT NULL,\n' +
@@ -279,12 +312,8 @@ async function updateWithConsistencyCheck(context, entity, content) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'edit');
 
-        const existing = await tx('campaigns').where('id', entity.id).first();
-        if (!existing) {
-            throw new interoperableErrors.NotFoundError();
-        }
+        const existing = await rawGetByIdTx(tx, entity.id);
 
-        existing.data = JSON.parse(existing.data);
         const existingHash = hash(existing, content);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
@@ -310,6 +339,9 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         filteredEntity.data = JSON.stringify(filteredEntity.data);
         await tx('campaigns').where('id', entity.id).update(filteredEntity);
+
+        await tx('campaign_lists').where('campaign', entity.id).del();
+        await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: entity.id, ...x})));
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: entity.id });
     });
@@ -345,7 +377,7 @@ Object.assign(module.exports, {
     hash,
     listDTAjax,
     listWithContentDTAjax,
-    listOthersByListDTAjax,
+    listOthersWhoseListsAreIncludedDTAjax,
     getByIdTx,
     getById,
     create,

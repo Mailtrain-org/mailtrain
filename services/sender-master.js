@@ -1,18 +1,17 @@
 'use strict';
 
+const config = require('config');
 const fork = require('child_process').fork;
 const log = require('npmlog');
 const path = require('path');
+const knex = require('../lib/knex');
 
 let messageTid = 0;
 let workerProcesses = new Map();
 
-const numOfWorkerProcesses = 5;
-
 let running = false;
 
 /*
-const knex = require('../lib/knex');
 const path = require('path');
 const log = require('npmlog');
 const fsExtra = require('fs-extra-promise');
@@ -28,9 +27,16 @@ const shares = require('../models/shares');
 const _ = require('../lib/translate')._;
 */
 
+
+async function processCampaign(campaignId) {
+    const campaignSubscribersTable = 'campaign__' + campaignId;
+
+
+}
+
 async function spawnWorker(workerId) {
     return await new Promise((resolve, reject) => {
-        log.info('Senders', `Spawning worker process ${workerId}`);
+        log.verbose('Senders', `Spawning worker process ${workerId}`);
 
         const senderProcess = fork(path.join(__dirname, 'sender-worker.js'), [workerId], {
             cwd: path.join(__dirname, '..'),
@@ -79,7 +85,7 @@ function sendToWorker(workerId, msgType, data) {
 async function init() {
     const spawnWorkerFutures = [];
     let workerId;
-    for (workerId = 0; workerId < numOfWorkerProcesses; workerId++) {
+    for (workerId = 0; workerId < config.queue.processes; workerId++) {
         spawnWorkerFutures.push(spawnWorker(workerId));
     }
 

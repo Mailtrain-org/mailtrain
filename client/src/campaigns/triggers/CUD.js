@@ -191,6 +191,8 @@ export default class CUD extends Component {
             { data: 5, title: t('Namespace') }
         ];
 
+        const campaignLists = this.props.campaign.lists.map(x => x.list).join(';');
+
         return (
             <div>
                 {isEdit &&
@@ -221,7 +223,7 @@ export default class CUD extends Component {
                     {entityKey === Entity.CAMPAIGN && <Dropdown id="campaignEvent" label={t('Event')} options={this.eventOptions[Entity.CAMPAIGN]} help={t('Select the event that triggers sending the campaign.')}/>}
 
                     {entityKey === Entity.CAMPAIGN &&
-                        <TableSelect id="source_campaign" label={t('Campaign')} withHeader dropdown dataUrl={`rest/campaigns-others-by-list-table/${this.props.campaign.id}/${this.props.campaign.list}`} columns={campaignsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="source_campaign" label={t('Campaign')} withHeader dropdown dataUrl={`rest/campaigns-others-by-list-table/${this.props.campaign.id}/${campaignLists}`} columns={campaignsColumns} selectionLabelIndex={1} />
                     }
 
                     <CheckBox id="enabled" text={t('Enabled')}/>

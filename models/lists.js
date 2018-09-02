@@ -34,10 +34,11 @@ async function listDTAjax(context, params) {
         ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
             { query: builder =>
                 builder.from('campaigns')
-                    .whereRaw('campaigns.list = lists.id')
-                    .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
-                    .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
+                    .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
                     .innerJoin('triggers', 'campaigns.id', 'triggers.campaign')
+                    .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
+                    .whereRaw('campaign_lists.list = lists.id')
+                    .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
                     .count()
             }
         ]

@@ -51,20 +51,20 @@ async function run() {
 
     running = true;
 
-    let rssCampaign;
+    let rssCampaignIdRow;
 
-    while (rssCampaign = await knex('campaigns')
+    while (rssCampaignIdRow = await knex('campaigns')
         .where('type', CampaignType.RSS)
         .where('status', CampaignStatus.ACTIVE)
         .where(qry => qry.whereNull('last_check').orWhere('last_check', '<', new Date(Date.now() - feedCheckInterval)))
-        // 'SELECT `id`, `source_url`, `from`, `address`, `subject`, `list`, `segment`, `html`, `open_tracking_disabled`, `click_tracking_disabled`
+        .select('id')
         .first()) {
+
+        const rssCampaign = campaigns.getById(contextHelpers.getAdminContext(), rssCampaignIdRow.id);
 
         let checkStatus = null;
 
         try {
-            rssCampaign.data = JSON.parse(rssCampaign.data);
-
             const entries = await fetch(rssCampaign.data.feedUrl);
 
             let added = 0;
@@ -95,8 +95,7 @@ async function run() {
                             type: CampaignType.RSS_ENTRY,
                             source,
                             name: entry.title || `RSS entry ${entry.guid.substr(0, 67)}`,
-                            list: rssCampaign.list,
-                            segment: rssCampaign.segment,
+                            lists: rssCampaign.lists,
                             namespace: rssCampaign.namespace,
                             send_configuration: rssCampaign.send_configuration,
 

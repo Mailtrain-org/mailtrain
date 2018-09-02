@@ -14,8 +14,8 @@ router.postAsync('/campaigns-with-content-table', passport.loggedIn, async (req,
     return res.json(await campaigns.listWithContentDTAjax(req.context, req.body));
 });
 
-router.postAsync('/campaigns-others-by-list-table/:campaignId/:listId', passport.loggedIn, async (req, res) => {
-    return res.json(await campaigns.listOthersByListDTAjax(req.context, req.params.campaignId, req.params.listId, req.body));
+router.postAsync('/campaigns-others-by-list-table/:campaignId/:listIds', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listOthersWhoseListsAreIncludedDTAjax(req.context, req.params.campaignId, req.params.listIds.split(';'), req.body));
 });
 
 
