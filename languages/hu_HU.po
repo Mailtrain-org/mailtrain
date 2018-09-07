@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Language-Team: \n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2018-07-29 03:02+0200\n"
+"PO-Revision-Date: 2018-09-07 16:53+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -531,35 +531,35 @@ msgstr "Méret"
 #: views/lists/fields/fields.hbs:12 views/lists/forms/forms.hbs:9
 #: views/lists/view.hbs:33
 msgid "No data available in table"
-msgstr ""
+msgstr "Nincs adat a táblázatban."
 
 #: views/campaigns/edit.hbs:34 views/campaigns/upload-attachment.hbs:4
 msgid "Add Attachment"
-msgstr ""
+msgstr "Csatolmány hozzáadása"
 
 #: views/campaigns/opened.hbs:3 views/campaigns/opened.hbs:4
 msgid "Opened info"
-msgstr ""
+msgstr "Megnyitásokról információ"
 
 #: views/campaigns/opened.hbs:6
 msgid "Subscribers who opened this message:"
-msgstr ""
+msgstr "Feliratkozók, akik megnyitották ezt az üzenetet:"
 
 #: views/campaigns/opened.hbs:12
 msgid "First open"
-msgstr ""
+msgstr "Első megnyitás"
 
 #: views/campaigns/opened.hbs:13
 msgid "Opened count"
-msgstr ""
+msgstr "Megnyitások száma"
 
 #: views/campaigns/unsubscribed.hbs:3 views/campaigns/unsubscribed.hbs:4
 msgid "Unsubscribed info"
-msgstr ""
+msgstr "Leiratkozásokról információ:"
 
 #: views/campaigns/unsubscribed.hbs:6
 msgid "Subscribers who unsubscribed:"
-msgstr ""
+msgstr "Feliratkozók, akik leiratkoztak:"
 
 #: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:28
 #: views/lists/subscription/import.hbs:13 routes/lists.js:206
@@ -572,11 +572,11 @@ msgstr "Feltöltés"
 
 #: views/campaigns/view.hbs:4
 msgid "Overview"
-msgstr ""
+msgstr "Áttekintés"
 
 #: views/campaigns/view.hbs:5
 msgid "Links"
-msgstr ""
+msgstr "Linkek"
 
 #: views/campaigns/view.hbs:7
 msgid "Feed URL"
@@ -596,19 +596,19 @@ msgstr ""
 
 #: views/campaigns/view.hbs:11
 msgid "RSS status"
-msgstr ""
+msgstr "RSS státusz"
 
 #: views/campaigns/view.hbs:16
 msgid "Preview campaign as"
-msgstr ""
+msgstr "Kampány előnezete, mint"
 
 #: views/campaigns/view.hbs:17
 msgid "Add new test user"
-msgstr ""
+msgstr "Teszt felhasználó hozzáadása"
 
 #: views/campaigns/view.hbs:18
 msgid "No test users yet, create one here"
-msgstr ""
+msgstr "Nincs még teszt felhasználó, hozzon létre egyet itt"
 
 #: views/campaigns/view.hbs:19
 msgid "Go"
@@ -616,19 +616,21 @@ msgstr ""
 
 #: views/campaigns/view.hbs:20 lib/models/triggers.js:26
 msgid "Delivered"
-msgstr ""
+msgstr "Készbesítve"
 
 #: views/campaigns/view.hbs:21
 msgid "List subscribers who received this message"
-msgstr ""
+msgstr "Azon felhasználók listázása, akik megkapták ezt az üzenetet"
 
 #: views/campaigns/view.hbs:22
 msgid "Blacklisted"
-msgstr ""
+msgstr "Feketelistán szereplők"
 
 #: views/campaigns/view.hbs:23
 msgid "List subscribers who blacklisted by global blacklist"
 msgstr ""
+"Azon felhasználók listázása, akik feketelistára kerültek, mert a globális "
+"feketelistán szerepeltek"
 
 #: views/campaigns/view.hbs:24 routes/lists.js:206
 msgid "Bounced"
@@ -897,7 +899,7 @@ msgstr ""
 
 #: views/index.hbs:14
 msgid "GPG Encryption"
-msgstr ""
+msgstr "GPG titkosítás"
 
 #: views/index.hbs:15
 msgid ""
@@ -990,7 +992,7 @@ msgstr "Forráskód a GitHub-on"
 
 #: views/layout.hbs:13
 msgid "Subscribe to Our Newsletter"
-msgstr ""
+msgstr "Feliratkozás hírlevelünkre"
 
 #: views/lists/create.hbs:2 views/lists/edit.hbs:2
 #: views/lists/fields/create.hbs:2 views/lists/fields/edit.hbs:2
@@ -1083,16 +1085,16 @@ msgstr "Mező létrehozása"
 
 #: views/lists/fields/create.hbs:5 views/lists/fields/fields.hbs:4
 msgid "Create Custom Field"
-msgstr ""
+msgstr "Egyedi mező létrehozása"
 
 #: views/lists/fields/create.hbs:6 views/lists/fields/create.hbs:7
 #: views/lists/fields/edit.hbs:7 views/lists/fields/edit.hbs:8
 msgid "Field Name"
-msgstr ""
+msgstr "Mező neve"
 
 #: views/lists/fields/create.hbs:8 views/lists/fields/edit.hbs:9
 msgid "Field Type"
-msgstr ""
+msgstr "Mező típusa"
 
 #: views/lists/fields/create.hbs:9 views/lists/fields/edit.hbs:10
 #: lib/models/fields.js:17
@@ -1355,7 +1357,7 @@ msgstr "Mezők"
 
 #: views/lists/forms/edit.hbs:27
 msgid "Form Fields"
-msgstr ""
+msgstr "Űrlap mezők"
 
 #: views/lists/forms/edit.hbs:28
 msgid "Fields hidden on subscription page:"
@@ -1375,7 +1377,7 @@ msgstr ""
 
 #: views/lists/forms/edit.hbs:32
 msgid "Delete Form"
-msgstr ""
+msgstr "Űrlap törlése"
 
 #: views/lists/forms/forms.hbs:10
 msgid "The default form for this list is:"
@@ -1592,11 +1594,13 @@ msgid ""
 "Insert a GPG public key that will be used to encrypt messages sent this "
 "subscriber"
 msgstr ""
+"Adjon meg egy GPG publikus kulcsot, amivel az üzenetek titkosítva lesznek "
+"küldéskor"
 
 #: views/lists/subscription/add.hbs:11 views/lists/subscription/edit.hbs:12
 #: views/lists/subscription/import-preview.hbs:9
 msgid "Timezone"
-msgstr ""
+msgstr "Időzóna"
 
 #: views/lists/subscription/add.hbs:13 views/lists/subscription/edit.hbs:13
 msgid "Test user?"
@@ -1616,31 +1620,31 @@ msgstr ""
 
 #: views/lists/subscription/edit.hbs:3 views/lists/subscription/edit.hbs:4
 msgid "Edit subscriber"
-msgstr ""
+msgstr "Feliratkozó szerkesztése"
 
 #: views/lists/subscription/edit.hbs:5
 #: views/lists/subscription/import-failed.hbs:5
 msgid "Back to list"
-msgstr ""
+msgstr "Vissza a listához"
 
 #: views/lists/subscription/edit.hbs:6
 #: views/lists/subscription/import-preview.hbs:6
 #: views/subscription/partials/subscription-unsubscribe-form.hbs:1
 #: lib/helpers.js:42 lib/models/segments.js:11
 msgid "Email address"
-msgstr ""
+msgstr "Email cím"
 
 #: views/lists/subscription/edit.hbs:17
 msgid "Delete Subscription"
-msgstr ""
+msgstr "Feliratkozás törlése"
 
 #: views/lists/subscription/import-failed.hbs:3
 msgid "Import status"
-msgstr ""
+msgstr "Importálás státusza"
 
 #: views/lists/subscription/import-failed.hbs:4
 msgid "Failed addresses"
-msgstr ""
+msgstr "Hibás címek"
 
 #: views/lists/subscription/import-failed.hbs:6
 msgid ""
@@ -1655,13 +1659,13 @@ msgstr ""
 
 #: views/lists/subscription/import-failed.hbs:9
 msgid "Fail reason"
-msgstr ""
+msgstr "Hiba oka"
 
 #: views/lists/subscription/import-preview.hbs:3
 #: views/lists/subscription/import-preview.hbs:4
 #: views/lists/subscription/import.hbs:3 views/lists/subscription/import.hbs:4
 msgid "Import subscribers"
-msgstr ""
+msgstr "Feliratkozók imprtálása"
 
 #: views/lists/subscription/import-preview.hbs:10 views/users/api.hbs:21
 #: views/users/api.hbs:36 views/users/api.hbs:44 views/users/api.hbs:52
@@ -1669,23 +1673,23 @@ msgstr ""
 #: views/users/api.hbs:91 views/users/api.hbs:96 views/users/api.hbs:101
 #: views/users/api.hbs:106
 msgid "Example"
-msgstr ""
+msgstr "Példa"
 
 #: views/lists/subscription/import-preview.hbs:11
 msgid "Start import"
-msgstr ""
+msgstr "Importálás megkezdése"
 
 #: views/lists/subscription/import.hbs:5
 msgid "CSV File"
-msgstr ""
+msgstr "CSV file"
 
 #: views/lists/subscription/import.hbs:6
 msgid "The first line must contain column headings"
-msgstr ""
+msgstr "Az első sor fejlécet kell, hogy tartalmazzon"
 
 #: views/lists/subscription/import.hbs:7
 msgid "CSV delimiter"
-msgstr ""
+msgstr "CSV elválasztó"
 
 #: views/lists/subscription/import.hbs:8
 msgid "Categorize the imported subscribers as"
@@ -1752,7 +1756,7 @@ msgstr ""
 
 #: views/lists/view.hbs:16
 msgid "Filter"
-msgstr ""
+msgstr "Szűrő"
 
 #: views/lists/view.hbs:17
 msgid "Subscriptions"
@@ -1764,15 +1768,15 @@ msgstr ""
 
 #: views/lists/view.hbs:25 routes/campaigns.js:255 routes/lists.js:300
 msgid "Finished"
-msgstr ""
+msgstr "Befejezve"
 
 #: views/lists/view.hbs:27
 msgid "Added"
-msgstr ""
+msgstr "Hozzáadva"
 
 #: views/lists/view.hbs:28
 msgid "Updated"
-msgstr ""
+msgstr "Frissítve"
 
 #: views/lists/view.hbs:29
 msgid "Failed"
@@ -1785,7 +1789,7 @@ msgstr ""
 
 #: views/lists/view.hbs:32
 msgid "Restart"
-msgstr ""
+msgstr "Újrakezdés"
 
 #: views/mosaico/editor.hbs:1 views/partials/merge-tag-reference.hbs:1
 msgid "Merge tag reference"
@@ -1834,7 +1838,7 @@ msgstr "GrapeJS megnyitása"
 
 #: views/partials/html-preview.hbs:1
 msgid "Toggle HTML preview"
-msgstr ""
+msgstr "HTML előnézet átváltása"
 
 #: views/partials/html-to-text.hbs:1
 msgid ""
@@ -1892,20 +1896,20 @@ msgstr "Sablon létrehozása"
 
 #: views/report-templates/create.hbs:5 routes/report-templates.js:231
 msgid "Create Report Template"
-msgstr ""
+msgstr "Jelentés sablon létrehozása"
 
 #: views/report-templates/edit.hbs:4 views/templates/edit.hbs:3
 #: views/templates/edit.hbs:4
 msgid "Edit Template"
-msgstr ""
+msgstr "Sablon szerkesztése"
 
 #: views/report-templates/edit.hbs:5 routes/report-templates.js:262
 msgid "Edit Report Template"
-msgstr ""
+msgstr "Jelentés sablon szerkesztése"
 
 #: views/report-templates/edit.hbs:6 views/templates/edit.hbs:12
 msgid "Delete Template"
-msgstr ""
+msgstr "Sablon törlése"
 
 #: views/report-templates/edit.hbs:7
 msgid "Update and Stay"
@@ -1917,7 +1921,7 @@ msgstr ""
 
 #: views/report-templates/partials/report-template-fields.hbs:2
 msgid "Template Name"
-msgstr ""
+msgstr "Sablon neve"
 
 #: views/report-templates/partials/report-template-fields.hbs:6
 msgid "User selectable fields"
@@ -1945,31 +1949,31 @@ msgstr ""
 
 #: views/report-templates/report-templates.hbs:8
 msgid "Export List as CSV"
-msgstr ""
+msgstr "Lista exportálása CSV-be"
 
 #: views/report-templates/report-templates.hbs:9 views/reports/reports.hbs:4
 #: routes/report-templates.js:29
 msgid "Report Templates"
-msgstr ""
+msgstr "Jelentés sablonok"
 
 #: views/reports/create-select-template.hbs:3
 #: views/reports/create-select-template.hbs:4 views/reports/create.hbs:3
 #: views/reports/create.hbs:4 views/reports/create.hbs:5
 #: views/reports/reports.hbs:3 routes/reports.js:81
 msgid "Create Report"
-msgstr ""
+msgstr "Jelentés létrehozása"
 
 #: views/reports/edit.hbs:3 views/reports/edit.hbs:4 routes/reports.js:151
 msgid "Edit Report"
-msgstr ""
+msgstr "Jelentés szerkesztése"
 
 #: views/reports/edit.hbs:5
 msgid "Delete Report"
-msgstr ""
+msgstr "Jelentés törlése"
 
 #: views/reports/partials/report-fields.hbs:2
 msgid "Report Name"
-msgstr ""
+msgstr "Jelentés neve"
 
 #: views/reports/partials/report-fields.hbs:8
 #: views/reports/partials/report-fields.hbs:11
@@ -1980,19 +1984,19 @@ msgstr ""
 
 #: views/reports/partials/report-select-template.hbs:1
 msgid "Report Template"
-msgstr ""
+msgstr "Jelentés sablon"
 
 #: views/settings.hbs:5
 msgid "Service Address (URL)"
-msgstr ""
+msgstr "Szolgáltatás címe (URL)"
 
 #: views/settings.hbs:6
 msgid "Enter the URL this service can be reached from"
-msgstr ""
+msgstr "Adja meg az URL-t, amiről ez a szolgáltatás elérhető"
 
 #: views/settings.hbs:7
 msgid "Admin Email"
-msgstr ""
+msgstr "Admin email"
 
 #: views/settings.hbs:8
 msgid ""
@@ -2020,11 +2024,11 @@ msgstr ""
 
 #: views/settings.hbs:13
 msgid "Tracking ID"
-msgstr ""
+msgstr "Követő ID"
 
 #: views/settings.hbs:14
 msgid "Enter Google Analytics tracking code"
-msgstr ""
+msgstr "Google Analytics követőkód megadása"
 
 #: views/settings.hbs:15
 msgid "Frontpage shout out"
@@ -2040,11 +2044,11 @@ msgstr ""
 
 #: views/settings.hbs:18
 msgid "Sender name"
-msgstr ""
+msgstr "Küldő neve"
 
 #: views/settings.hbs:19
 msgid "Sender name, eg. My Awesome Company Ltd."
-msgstr ""
+msgstr "Küldő neve, pl.: Éncégem Kft."
 
 #: views/settings.hbs:20
 msgid "Default address"
@@ -2085,15 +2089,15 @@ msgstr ""
 
 #: views/settings.hbs:32
 msgid "SMTP"
-msgstr ""
+msgstr "SMTP"
 
 #: views/settings.hbs:33
 msgid "AWS SES"
-msgstr ""
+msgstr "AWS SES"
 
 #: views/settings.hbs:34
 msgid "Use SMTP for sending mail"
-msgstr ""
+msgstr "SMTP használata levélküldéshez"
 
 #: views/settings.hbs:35
 msgid "Hostname"
@@ -2101,7 +2105,7 @@ msgstr ""
 
 #: views/settings.hbs:36
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: views/settings.hbs:37
 msgid "Port, eg. 465. Autodetected if left blank"
@@ -2122,7 +2126,7 @@ msgstr "Felhasználónév"
 
 #: views/settings.hbs:41
 msgid "Username, eg. myaccount@example.com"
-msgstr ""
+msgstr "Felhasználónév, pl.: myaccount@example.com"
 
 #: views/settings.hbs:42 views/settings.hbs:43 views/users/login.hbs:6
 #: views/users/login.hbs:7
@@ -2131,7 +2135,7 @@ msgstr "Jelszó"
 
 #: views/settings.hbs:44
 msgid "Use SES API for sending mail"
-msgstr ""
+msgstr "SES API használata levélküldéshez"
 
 #: views/settings.hbs:45
 msgid "Access Key"
@@ -2151,7 +2155,7 @@ msgstr ""
 
 #: views/settings.hbs:49
 msgid "Region"
-msgstr ""
+msgstr "Régió"
 
 #: views/settings.hbs:50
 msgid "Checking"
@@ -2167,7 +2171,7 @@ msgstr ""
 
 #: views/settings.hbs:53
 msgid "Log SMTP transactions"
-msgstr ""
+msgstr "SMTP tranzakciók naplózása"
 
 #: views/settings.hbs:54
 msgid "Allow self-signed certificates"
@@ -2271,7 +2275,7 @@ msgstr ""
 
 #: views/settings.hbs:73
 msgid "GPG Signing"
-msgstr ""
+msgstr "GPG aláírás"
 
 #: views/settings.hbs:74
 msgid ""
@@ -2301,7 +2305,7 @@ msgstr ""
 
 #: views/settings.hbs:79
 msgid "GPG Private Key"
-msgstr ""
+msgstr "GPG privát kulcs"
 
 #: views/settings.hbs:81
 msgid ""
@@ -2754,13 +2758,13 @@ msgstr ""
 #: views/triggers/create.hbs:16 views/triggers/create.hbs:21
 #: views/triggers/edit.hbs:18 views/triggers/edit.hbs:23
 msgid "Event"
-msgstr ""
+msgstr "Esemény"
 
 #: views/triggers/create.hbs:18 views/triggers/create.hbs:19
 #: views/triggers/create.hbs:25 views/triggers/edit.hbs:20
 #: views/triggers/edit.hbs:21 views/triggers/edit.hbs:27
 msgid "Campaign"
-msgstr ""
+msgstr "Kampány"
 
 #: views/triggers/create.hbs:23 views/triggers/edit.hbs:25
 msgid "Trigger action"
