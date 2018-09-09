@@ -82,6 +82,21 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label for="recaptcha-site-key" class="col-sm-2 control-label">{{#translate}}Recaptcha site key{{/translate}}</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="recaptcha-site-key" id="recaptcha-site-key" value="{{recaptchaSiteKey}}">
+                <span class="help-block">{{#translate}}To obtain keys, visit https://www.google.com/recaptcha/{{/translate}}</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="recaptcha-secret-key" class="col-sm-2 control-label">{{#translate}}Recaptcha secret key{{/translate}}</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="recaptcha-secret-key" id="recaptcha-secret-key" value="{{recaptchaSecretKey}}">
+            </div>
+        </div>
+
     </fieldset>
 
     <fieldset>

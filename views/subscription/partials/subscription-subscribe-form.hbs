@@ -14,6 +14,10 @@
 
 {{> subscription_custom_fields}}
 
+{{#if captchaEnabled}}
+    <div class="g-recaptcha" data-sitekey="{{recaptchaSiteKey}}"></div>
+{{/if}}
+
     <button type="submit" style="position: absolute; top: -9999px; left: -9999px;">{{#translate}}Subscribe to list{{/translate}}</button>
 </form>
 
@@ -23,3 +27,6 @@
 
 <script src="/moment/moment.min.js"></script>
 <script src="/moment/moment-timezone-with-data.min.js"></script>
+{{#if captchaEnabled}}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{{/if}}

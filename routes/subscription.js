@@ -19,6 +19,7 @@ let cache = require('memory-cache');
 let geoip = require('geoip-ultralight');
 let confirmations = require('../lib/models/confirmations');
 let mailHelpers = require('../lib/subscription-mail-helpers');
+let Recaptcha = require('express-recaptcha').Recaptcha;
 
 let originWhitelist = config.cors && config.cors.origins || [];
 
@@ -44,6 +45,27 @@ let corsOrCsrfProtection = (req, res, next) => {
         passport.csrfProtection(req, res, next);
     }
 };
+
+let validateCaptcha = (req, captchaEnabled, callback) => {
+    if (!captchaEnabled) {
+        return callback(null, {});
+    }
+
+    settings.list(['recaptchaSiteKey', 'recaptchaSecretKey'], (err, configItems) => {
+        if (err) {
+            return callback(err, {});
+        }
+
+        // key not set, pass validation
+        if (!configItems.recaptchaSiteKey || !configItems.recaptchaSecretKey) {
+            return callback(null, {});
+        }
+
+        let recaptcha = new Recaptcha(configItems.recaptchaSiteKey, configItems.recaptchaSecretKey);
+
+        return recaptcha.verify(req, callback);
+    });
+}
 
 function checkAndExecuteConfirmation(req, action, errorMsg, next, exec) {
     confirmations.takeConfirmation(req.params.cid, (err, confirmation) => {
@@ -193,6 +215,7 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
         data.layout = 'subscription/layout';
         data.title = list.name;
         data.cid = list.cid;
+        data.captchaEnabled = list.captcha;
         data.csrfToken = req.csrfToken();
 
 
@@ -205,13 +228,15 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
                 data.customFields = fields.getRow(fieldList, data);
                 data.useEditor = true;
 
-                settings.list(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress'], (err, configItems) => {
+                settings.list(['pgpPrivateKey', 'defaultAddress', 'defaultPostaddress', 'recaptchaSiteKey', 'recaptchaSecretKey'], (err, configItems) => {
                     if (err) {
                         return next(err);
                     }
                     data.hasPubkey = !!configItems.pgpPrivateKey;
                     data.defaultAddress = configItems.defaultAddress;
                     data.defaultPostaddress = configItems.defaultPostaddress;
+                    data.captchaEnabled = data.captchaEnabled && !!configItems.recaptchaSiteKey && !!configItems.recaptchaSecretKey;
+                    data.recaptchaSiteKey = configItems.recaptchaSiteKey;
 
                     data.template = {
                         template: 'subscription/web-subscribe.mjml.hbs',
@@ -391,63 +416,74 @@ router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, r
                 return req.xhr ? sendJsonError(err) : next(err);
             }
 
-            let subscriptionData = {};
-            Object.keys(req.body).forEach(key => {
-                if (key !== 'email' && key.charAt(0) !== '_') {
-                    subscriptionData[key] = (req.body[key] || '').toString().trim();
-                }
-            });
-            subscriptionData = tools.convertKeys(subscriptionData);
-
-            subscriptions.getByEmail(list.id, email, (err, subscription) => {
+            validateCaptcha(req, list.captcha, (err, captchaData) => {
                 if (err) {
-                    return req.xhr ? sendJsonError(err) : next(err);
+                    let captchaError = _('Captcha validation failed.');
+                    if (req.xhr) {
+                        return sendJsonError(captchaError, 400);
+                    }
+                    req.flash('danger', captchaError);
+                    return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
                 }
 
-                if (subscription && subscription.status === subscriptions.Status.SUBSCRIBED) {
-                    mailHelpers.sendAlreadySubscribed(list, email, subscription, (err) => {
-                        if (err) {
-                            return req.xhr ? sendJsonError(err) : next(err);
-                        }
-                        res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
-                    });
-                } else {
-                    const data = {
-                        email,
-                        subscriptionData
-                    };
+                let subscriptionData = {};
+                Object.keys(req.body).forEach(key => {
+                    if (key !== 'email' && key.charAt(0) !== '_') {
+                        subscriptionData[key] = (req.body[key] || '').toString().trim();
+                    }
+                });
+                subscriptionData = tools.convertKeys(subscriptionData);
 
-                    confirmations.addConfirmation(list.id, 'subscribe', req.ip, data, (err, confirmCid) => {
-                        if (err) {
-                            if (req.xhr) {
-                                return sendJsonError(err);
-                            }
-                            req.flash('danger', err.message || err);
-                            return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
-                        }
+                subscriptions.getByEmail(list.id, email, (err, subscription) => {
+                    if (err) {
+                        return req.xhr ? sendJsonError(err) : next(err);
+                    }
 
-                        function sendWebResponse() {
-                            if (req.xhr) {
-                                return res.status(200).json({
-                                    msg: _('Please Confirm Subscription')
-                                });
+                    if (subscription && subscription.status === subscriptions.Status.SUBSCRIBED) {
+                        mailHelpers.sendAlreadySubscribed(list, email, subscription, (err) => {
+                            if (err) {
+                                return req.xhr ? sendJsonError(err) : next(err);
                             }
                             res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
-                        }
+                        });
+                    } else {
+                        const data = {
+                            email,
+                            subscriptionData
+                        };
 
-                        if (!testsPass) {
-                            log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
-                            sendWebResponse();
-                        } else {
-                            mailHelpers.sendConfirmSubscription(list, email, confirmCid, subscriptionData, (err) => {
-                                if (err) {
-                                    return req.xhr ? sendJsonError(err) : sendWebResponse(err);
+                        confirmations.addConfirmation(list.id, 'subscribe', req.ip, data, (err, confirmCid) => {
+                            if (err) {
+                                if (req.xhr) {
+                                    return sendJsonError(err);
                                 }
+                                req.flash('danger', err.message || err);
+                                return res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '?' + tools.queryParams(req.body));
+                            }
+
+                            function sendWebResponse() {
+                                if (req.xhr) {
+                                    return res.status(200).json({
+                                        msg: _('Please Confirm Subscription')
+                                    });
+                                }
+                                res.redirect('/subscription/' + req.params.cid + '/confirm-subscription-notice');
+                            }
+
+                            if (!testsPass) {
+                                log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
                                 sendWebResponse();
-                            })
-                        }
-                    });
-                }
+                            } else {
+                                mailHelpers.sendConfirmSubscription(list, email, confirmCid, subscriptionData, (err) => {
+                                    if (err) {
+                                        return req.xhr ? sendJsonError(err) : sendWebResponse(err);
+                                    }
+                                    sendWebResponse();
+                                })
+                            }
+                        });
+                    }
+                });
             });
         });
     });

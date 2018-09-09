@@ -68,6 +68,7 @@
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.15.5",
+    "express-recaptcha": "^4.0.0",
     "express-session": "^1.15.5",
     "faker": "^4.1.0",
     "feedparser": "^2.2.1",
