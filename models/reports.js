@@ -147,13 +147,13 @@ async function bulkChangeState(oldState, newState) {
 
 
 const campaignFieldsMapping = {
-    tracker_count: 'tracker.count',
-    country: 'tracker.country',
-    device_type: 'tracker.device_type',
-    status: 'campaign.status',
-    first_name: 'subscribers.first_name',
-    last_name: 'subscribers.last_name',
-    email: 'subscribers.email'
+    tracker_count: 'campaign_links.count',
+    country: 'campaign_links.country',
+    device_type: 'campaign_links.device_type',
+    status: 'campaign_messages.status',
+    first_name: 'subscriptions.first_name',
+    last_name: 'subscriptions.last_name',
+    email: 'subscriptions.email'
 };
 
 async function getCampaignResults(context, campaign, select, extra) {
@@ -164,7 +164,7 @@ async function getCampaignResults(context, campaign, select, extra) {
         /* Dropdown and checkbox groups have field.column == null
            TODO - For the time being, we don't group options and we don't expand enums. We just provide it as it is in the DB. */
         if (fld.column) {
-            fieldsMapping[fld.key.toLowerCase()] = 'subscribers.' + fld.column;
+            fieldsMapping[fld.key.toLowerCase()] = 'subscriptions.' + fld.column;
         }
     }
 
@@ -180,9 +180,11 @@ async function getCampaignResults(context, campaign, select, extra) {
         }
     }
 
-    let query = knex(`subscription__${campaign.list} AS subscribers`)
-        .innerJoin(`campaign__${campaign.id} AS campaign`, 'subscribers.id', 'campaign.subscription')
-        .leftJoin(`campaign_tracker__${campaign.id} AS tracker`, 'subscribers.id', 'tracker.subscriber')
+    let query = knex(`subscription__${campaign.list} AS subscriptions`)
+        .innerJoin('campaign_messages', 'subscriptions.id', 'campaign_messages.subscription')
+        .leftJoin('campaign_links', 'subscriptions.id', 'campaign_links.subscription')
+        .where('campaign_messages.list', campaign.list)
+        .where('campaign_links.list', campaign.list)
         .select(selFields);
 
     if (extra) {
@@ -194,17 +196,15 @@ async function getCampaignResults(context, campaign, select, extra) {
 
 
 
-module.exports = {
-    ReportState,
-    hash,
-    getByIdWithTemplate,
-    listDTAjax,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    removeAllByReportTemplateIdTx,
-    updateFields,
-    listByState,
-    bulkChangeState,
-    getCampaignResults,
-};
+module.exports.ReportState = ReportState;
+module.exports.hash = hash;
+module.exports.getByIdWithTemplate = getByIdWithTemplate;
+module.exports.listDTAjax = listDTAjax;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.removeAllByReportTemplateIdTx = removeAllByReportTemplateIdTx;
+module.exports.updateFields = updateFields;
+module.exports.listByState = listByState;
+module.exports.bulkChangeState = bulkChangeState;
+module.exports.getCampaignResults = getCampaignResults;

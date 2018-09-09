@@ -3,7 +3,7 @@
 import React from 'react';
 import {ImportSource, MappingType, ImportStatus, RunStatus} from '../../../../shared/imports';
 
-export function getImportTypes(t) {
+export function getImportLabels(t) {
 
     const importSourceLabels = {
         [ImportSource.CSV_FILE]: t('CSV file'),

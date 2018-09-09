@@ -265,13 +265,11 @@ function checkForMjmlErrors(form) {
     return errors;
 }
 
-module.exports = {
-    listDTAjax,
-    hash,
-    getById,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    getDefaultCustomFormValues,
-    serverValidate
-};
+module.exports.listDTAjax = listDTAjax;
+module.exports.hash = hash;
+module.exports.getById = getById;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.getDefaultCustomFormValues = getDefaultCustomFormValues;
+module.exports.serverValidate = serverValidate;

@@ -10,6 +10,10 @@ router.postAsync('/lists-table', passport.loggedIn, async (req, res) => {
     return res.json(await lists.listDTAjax(req.context, req.body));
 });
 
+router.postAsync('/lists-with-segment-by-campaign-table/:campaignId', passport.loggedIn, async (req, res) => {
+    return res.json(await lists.listWithSegmentByCampaignDTAjax(req.context, req.params.campaignId, req.body));
+});
+
 router.getAsync('/lists/:listId', passport.loggedIn, async (req, res) => {
     const list = await lists.getByIdWithListFields(req.context, req.params.listId);
     list.hash = lists.hash(list);

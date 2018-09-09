@@ -10,10 +10,13 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
-const { CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend} = require('../shared/campaigns');
-const segments = require('./segments');
+const { CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend} = require('../shared/campaigns');
 const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
+const {SubscriptionStatus} = require('../shared/lists');
+const subscriptions = require('./subscriptions');
+const segments = require('./segments');
+const senders = require('../lib/senders');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
@@ -25,8 +28,10 @@ const Content = {
     ALL: 0,
     WITHOUT_SOURCE_CUSTOM: 1,
     ONLY_SOURCE_CUSTOM: 2,
-    RSS_ENTRY: 3
+    RSS_ENTRY: 3,
+    SETTINGS_WITH_STATS: 4
 };
+
 
 function hash(entity, content) {
     let filteredEntity;
@@ -88,6 +93,67 @@ async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listId
     );
 }
 
+async function listTestUsersDTAjax(context, campaignId, params) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
+
+        const subscriptionsQueries = [];
+        const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
+
+        for (const cpgList of cpgLists) {
+            const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {
+            };
+            const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
+
+            subscriptionsQueries.push(function () {
+                this.from(subsTable)
+                    .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
+                    .where(subsTable + '.is_test', true)
+                    .where(function() {
+                        addSegmentQuery(this);
+                    })
+                    .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('? AS list', [cpgList.list]), knex.raw('? AS segment', [cpgList.segment])]);
+            });
+        }
+
+        if (subscriptionsQueries.length > 0) {
+            return await dtHelpers.ajaxListWithPermissions(
+                context,
+                [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'] }],
+                params,
+                builder => {
+                    let ret;
+                    if (subscriptionsQueries.length > 1) {
+                        ret = builder.unionAll(subscriptionsQueries, true)
+                            .as('test_subscriptions');
+                    } else {
+                        ret = builder.from(function () { subscriptionsQueries[0].apply(this); this.as('test_subscriptions'); })
+                            .as('test_subscriptions');
+                    }
+
+                    ret = ret
+                        .innerJoin('lists', 'test_subscriptions.list', 'lists.id')
+                        .innerJoin('segments', 'test_subscriptions.segment', 'segments.id')
+                        .innerJoin('namespaces', 'lists.namespace', 'namespaces.id');
+
+                    return ret;
+                },
+                ['test_subscriptions.campaign_list_id', 'test_subscriptions.email', 'test_subscriptions.list', 'test_subscriptions.segment', 'lists.cid', 'lists.name', 'segments.name', 'namespaces.name']
+            );
+
+        } else {
+            const result = {
+                draw: params.draw,
+                recordsTotal: 0,
+                recordsFiltered: 0,
+                data: []
+            };
+
+            return result;
+        }
+    });
+}
+
 async function rawGetByIdTx(tx, id) {
     const entity = await tx('campaigns').where('campaigns.id', id)
         .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
@@ -121,7 +187,27 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 
     let entity = await rawGetByIdTx(tx, id);
 
-    if (content === Content.WITHOUT_SOURCE_CUSTOM) {
+    if (content === Content.ALL || content === Content.RSS_ENTRY) {
+        // Return everything
+
+    } else if (content === Content.SETTINGS_WITH_STATS) {
+        delete entity.data.sourceCustom;
+
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
+
+        const unsentQryGen = await getSubscribersQueryGeneratorTx(tx, id, true);
+        if (unsentQryGen) {
+            const res = await unsentQryGen(tx).count('* AS subscriptionsToSend').first();
+            entity.subscriptionsToSend = res.subscriptionsToSend;
+        }
+
+        const totalQryGen = await getSubscribersQueryGeneratorTx(tx, id, false);
+        if (totalQryGen) {
+            const res = await totalQryGen(tx).count('* AS subscriptionsTotal').first();
+            entity.subscriptionsTotal = res.subscriptionsTotal;
+        }
+
+    } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
         delete entity.data.sourceCustom;
 
     } else if (content === Content.ONLY_SOURCE_CUSTOM) {
@@ -251,37 +337,6 @@ async function _createTx(tx, context, entity, content) {
 
         await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: id, ...x})));
 
-        await knex.schema.raw('CREATE TABLE `campaign__' + id + '` (\n' +
-            '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
-            '  `list` int(10) unsigned NOT NULL,\n' +
-            '  `segment` int(10) unsigned NOT NULL,\n' +
-            '  `subscription` int(10) unsigned NOT NULL,\n' +
-            '  `status` tinyint(4) unsigned NOT NULL DEFAULT \'0\',\n' +
-            '  `response` varchar(255) DEFAULT NULL,\n' +
-            '  `response_id` varchar(255) CHARACTER SET ascii DEFAULT NULL,\n' +
-            '  `updated` timestamp NULL DEFAULT NULL,\n' +
-            '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
-            '  PRIMARY KEY (`id`),\n' +
-            '  UNIQUE KEY `list` (`list`,`segment`,`subscription`),\n' +
-            '  KEY `created` (`created`),\n' +
-            '  KEY `response_id` (`response_id`),\n' +
-            '  KEY `status_index` (`status`),\n' +
-            '  KEY `subscription_index` (`subscription`)\n' +
-            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
-
-        await knex.schema.raw('CREATE TABLE `campaign__tracker' + id + '` (\n' +
-            '  `list` int(10) unsigned NOT NULL,\n' +
-            '  `subscriber` int(10) unsigned NOT NULL,\n' +
-            '  `link` int(10) NOT NULL,\n' +
-            '  `ip` varchar(100) CHARACTER SET ascii DEFAULT NULL,\n' +
-            '  `device_type` varchar(50) DEFAULT NULL,\n' +
-            '  `country` varchar(2) CHARACTER SET ascii DEFAULT NULL,\n' +
-            '  `count` int(11) unsigned NOT NULL DEFAULT \'1\',\n' +
-            '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
-            '  PRIMARY KEY (`list`,`subscriber`,`link`),\n' +
-            '  KEY `created_index` (`created`)\n' +
-            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
-
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
 
         if (copyFilesFrom) {
@@ -351,13 +406,16 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
 
+        const existing = tx('campaigns').where('id', id);
+        if (existing.status === CampaignStatus.SENDING) {
+            return new interoperableErrors.InvalidStateError;
+        }
+
         // FIXME - deal with deletion of dependent entities (files)
 
         await triggers.removeAllByCampaignIdTx(tx, context, id);
 
         await tx('campaigns').where('id', id).del();
-        await knex.schema.dropTableIfExists('campaign__' + id);
-        await knex.schema.dropTableIfExists('campaign_tracker__' + id);
     });
 }
 
@@ -371,18 +429,253 @@ async function enforceSendPermissionTx(tx, context, campaignId) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
 }
 
-// This is to handle circular dependency with triggers.js
-Object.assign(module.exports, {
-    Content,
-    hash,
-    listDTAjax,
-    listWithContentDTAjax,
-    listOthersWhoseListsAreIncludedDTAjax,
-    getByIdTx,
-    getById,
-    create,
-    createRssTx,
-    updateWithConsistencyCheck,
-    remove,
-    enforceSendPermissionTx
-});
+
+// Message API
+
+function getMessageCid(campaignCid, listCid, subscriptionCid) {
+    return [campaignCid, listCid, subscriptionCid].join('.')
+}
+
+async function getMessageByCid(messageCid) {
+    const messageCid = messageCid.split('.');
+
+    if (messageCid.length !== 3) {
+        return null;
+    }
+
+    const [campaignCid, listCid, subscriptionCid] = messageCid;
+
+    await knex.transaction(async tx => {
+        const list = await tx('lists').where('cid', listCid).select('id');
+        const subscrTblName = subscriptions.getSubscriptionTableName(list.id);
+
+        const message = await tx('campaign_messages')
+            .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
+            .innerJoin(subscrTblName, subscrTblName + '.id', 'campaign_messages.subscription')
+            .leftJoin('segments', 'segment.id', 'campaign_messages.segment') // This is just to make sure that the respective segment still exists or return null if it doesn't
+            .leftJoin('send_configurations', 'send_configurations.id', 'campaign_messages.send_configuration') // This is just to make sure that the respective send_configuration still exists or return null if it doesn't
+            .where(subscrTblName + '.cid', subscriptionCid)
+            .where('campaigns.cid', campaignCid)
+            .select([
+                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'segments.id AS segment', 'campaign_messages.subscription',
+                'send_configurations.id AS send_configuration', 'campaign_messages.status', 'campaign_messages.response', 'campaign_messages.response_id',
+                'campaign_messages.updated', 'campaign_messages.created', 'send_configurations.verp_hostname AS verp_hostname'
+            ]);
+
+        if (message) {
+            await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
+        }
+
+        return message;
+    });
+}
+
+async function getMessageByResponseId(responseId) {
+    await knex.transaction(async tx => {
+        const message = await tx('campaign_messages')
+            .leftJoin('segments', 'segment.id', 'campaign_messages.segment') // This is just to make sure that the respective segment still exists or return null if it doesn't
+            .leftJoin('send_configurations', 'send_configurations.id', 'campaign_messages.send_configuration') // This is just to make sure that the respective send_configuration still exists or return null if it doesn't
+            .where('campaign_messages.response_id', responseId)
+            .select([
+                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'segments.id AS segment', 'campaign_messages.subscription',
+                'send_configurations.id AS send_configuration', 'campaign_messages.status', 'campaign_messages.response', 'campaign_messages.response_id',
+                'campaign_messages.updated', 'campaign_messages.created', 'send_configurations.verp_hostname AS verp_hostname'
+            ]);
+
+        if (message) {
+            await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
+        }
+
+        return message;
+    });
+}
+
+const statusFieldMapping = {
+    [SubscriptionStatus.UNSUBSCRIBED]: 'unsubscribed',
+    [SubscriptionStatus.BOUNCED]: 'bounced',
+    [SubscriptionStatus.COMPLAINED]: 'complained'
+};
+
+async function _changeStatusByMessageTx(tx, context, message, subscriptionStatus) {
+    enforce(subscriptionStatus !== SubscriptionStatus.SUBSCRIBED);
+
+    if (message.status === SubscriptionStatus.SUBSCRIBED) {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
+
+        if (!subscriptionStatus in statusFieldMapping) {
+            throw new Error('Unrecognized message status');
+        }
+
+        const statusField = statusFieldMapping[subscriptionStatus];
+
+        if (message.status === SubscriptionStatus.SUBSCRIBED) {
+            await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
+        }
+
+        await tx('campaign_messages')
+            .where('id', message.id)
+            .update({
+                status: subscriptionStatus,
+                updated: knex.fn.now()
+            });
+    }
+}
+
+async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, subscriptionStatus) {
+    const campaign = await tx('campaigns').where('cid', campaignCid);
+    const message = await tx('campaign_messages')
+        .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
+        .where('campaigns.cid', campaignCid)
+        .where({subscription: subscriptionId, list: listId});
+
+    if (!message) {
+        throw new Error('Invalid campaign.')
+    }
+
+    await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
+}
+
+async function changeStatusByMessage(context, message, subscriptionStatus, updateSubscription) {
+    await knex.transaction(async tx => {
+        if (updateSubscription) {
+            await subscriptions.changeStatusTx(tx, context, message.list, message.subscription, subscriptionStatus);
+        }
+
+        await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
+    });
+}
+
+async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchSize) {
+    const subscriptionsQueries = [];
+    const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
+
+    for (const cpgList of cpgLists) {
+        const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
+        const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
+
+        subscriptionsQueries.push(function() {
+            this.from(subsTable)
+                .leftJoin('campaign_messages', 'campaign_messages.subscription', subsTable + '.id')
+                .where('campaign_messages.campaign', cpgList.campaign)
+                .where('campaign_messages.list', cpgList.list)
+                .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
+                .where(function() {
+                    addSegmentQuery(this);
+                })
+                .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('campaign_messages.id IS NOT NULL AS sent')]);
+        });
+    }
+
+    if (subscriptionsQueries.length > 0) {
+        return knx => knx.from('campaign_lists')
+            .where('campaign_lists.campaign', campaignId)
+            .innerJoin(
+                function () {
+                    let ret;
+                    if (subscriptionsQueries.length > 1) {
+                        ret = this.unionAll(subscriptionsQueries, true)
+                            .groupBy('email')
+                            .select(['email']).min('campaign_list_id AS campaign_list_id')
+                            .select(['sent']).max('sent AS sent');
+                    } else {
+                        ret = this.from(function () { subscriptionsQueries[0].apply(this); this.as('pending_subscriptions'); })
+                            .select(['email', 'sent', 'campaign_list_id']);
+                    }
+
+                    ret = ret.where('sent', false)
+                        .as('pending_subscriptions');
+
+                    if (batchSize) {
+                        ret = ret.limit(retrieveBatchSize);
+                    }
+
+                    return ret;
+                },
+                'campaign_lists.id',
+                'pending_subscriptions.campaign_list_id'
+            );
+
+    } else {
+        return null;
+    }
+}
+
+async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, scheduled = null) {
+    await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
+
+        const entity = await tx('campaigns').where('id', campaignId).first();
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        if (!permittedCurrentStates.includes(entity.status)) {
+            throw new interoperableErrors.InvalidStateError(invalidStateMessage);
+        }
+
+        await tx('campaigns').where('id', campaignId).update({
+            status: newState,
+            scheduled
+        });
+    });
+
+    senders.scheduleCheck();
+}
+
+
+async function start(context, campaignId, startAt) {
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.PAUSED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
+}
+
+async function stop(context, campaignId) {
+    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED], CampaignStatus.PAUSED, 'Cannot stop campaign until it is in SCHEDULED state');
+}
+
+async function reset(context, campaignId) {
+    await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
+
+        const entity = await tx('campaigns').where('id', campaignId).first();
+        if (!entity) {
+            throw new interoperableErrors.NotFoundError();
+        }
+
+        if (entity.status !== CampaignStatus.FINISHED && entity.status !== CampaignStatus.PAUSED) {
+            throw new interoperableErrors.InvalidStateError('Cannot reset campaign until it is FINISHED or PAUSED state');
+        }
+
+        await tx('campaigns').where('id', campaignId).update({
+            status: CampaignStatus.IDLE
+        });
+
+        await tx('campaign_messages').where('campaign', campaignId).del();
+        await tx('campaign_links').where('campaign', campaignId).del();
+    });
+}
+
+module.exports.Content = Content;
+module.exports.hash = hash;
+module.exports.listDTAjax = listDTAjax;
+module.exports.listWithContentDTAjax = listWithContentDTAjax;
+module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;
+module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
+module.exports.getByIdTx = getByIdTx;
+module.exports.getById = getById;
+module.exports.create = create;
+module.exports.createRssTx = createRssTx;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.enforceSendPermissionTx = enforceSendPermissionTx;
+
+module.exports.getMessageCid = getMessageCid;
+module.exports.getMessageByCid = getMessageByCid;
+module.exports.getMessageByResponseId = getMessageByResponseId;
+
+module.exports.changeStatusByCampaignCidAndSubscriptionIdTx = changeStatusByCampaignCidAndSubscriptionIdTx;
+module.exports.changeStatusByMessage = changeStatusByMessage;
+
+module.exports.getSubscribersQueryGeneratorTx = getSubscribersQueryGeneratorTx;
+
+module.exports.start = start;
+module.exports.stop = stop;
+module.exports.reset = reset;

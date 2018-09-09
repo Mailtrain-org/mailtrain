@@ -137,14 +137,12 @@ async function removeAllByCampaignIdTx(tx, context, campaignId) {
 
 
 // This is to handle circular dependency with campaigns.js
-Object.assign(module.exports, {
-    hash,
-    getById,
-    listByCampaignDTAjax,
-    listByListDTAjax,
-    create,
-    updateWithConsistencyCheck,
-    removeTx,
-    remove,
-    removeAllByCampaignIdTx
-});
+module.exports.hash = hash;
+module.exports.getById = getById;
+module.exports.listByCampaignDTAjax = listByCampaignDTAjax;
+module.exports.listByListDTAjax = listByListDTAjax;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.removeTx = removeTx;
+module.exports.remove = remove;
+module.exports.removeAllByCampaignIdTx = removeAllByCampaignIdTx;

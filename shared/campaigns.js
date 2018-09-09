@@ -36,7 +36,10 @@ const CampaignStatus = {
     INACTIVE: 5,
     ACTIVE: 6,
 
-    MAA: 6
+    // For campaign types: NORMAL, RSS_ENTRY
+    SENDING: 7,
+
+    MAX: 8
 };
 
 const campaignOverridables = ['from_name', 'from_email', 'reply_to', 'subject'];

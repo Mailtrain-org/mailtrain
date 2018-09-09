@@ -132,14 +132,12 @@ async function getSystemSendConfiguration() {
     return await getById(contextHelpers.getAdminContext(), getSystemSendConfigurationId(), false);
 }
 
-module.exports = {
-    MailerType,
-    hash,
-    listDTAjax,
-    getByIdTx,
-    getById,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    getSystemSendConfiguration
-};
+module.exports.MailerType = MailerType;
+module.exports.hash = hash;
+module.exports.listDTAjax = listDTAjax;
+module.exports.getByIdTx = getByIdTx;
+module.exports.getById = getById;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.getSystemSendConfiguration = getSystemSendConfiguration;

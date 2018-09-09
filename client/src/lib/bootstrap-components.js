@@ -249,6 +249,7 @@ class ModalDialog extends Component {
         // are capture, converted to onClose callback and prevented. It's up to the parent to decide whether to
         // hide the modal or not.
         if (!this.props.hidden) {
+            // noinspection JSIgnoredPromiseFromCall
             this.onClose();
             evt.preventDefault();
         }

@@ -82,6 +82,7 @@ class TreeTable extends Component {
                 treeData: nextProps.data
             });
         } else if (nextProps.dataUrl && this.props.dataUrl !== nextProps.dataUrl) {
+            // noinspection JSIgnoredPromiseFromCall
             this.loadData(next.props.dataUrl);
         }
     }
@@ -107,6 +108,7 @@ class TreeTable extends Component {
 
     componentDidMount() {
         if (!this.props.data && this.props.dataUrl) {
+            // noinspection JSIgnoredPromiseFromCall
             this.loadData(this.props.dataUrl);
         }
 
@@ -229,6 +231,7 @@ class TreeTable extends Component {
         const selection = this.destringifyKey(this.tree.getActiveNode().key);
 
         if (selection !== this.props.selection) {
+            // noinspection JSIgnoredPromiseFromCall
             this.onSelectionChanged(selection);
         }
     }
@@ -252,6 +255,7 @@ class TreeTable extends Component {
         }
 
         if (updated) {
+            // noinspection JSIgnoredPromiseFromCall
             this.onSelectionChanged(selection);
         }
     }

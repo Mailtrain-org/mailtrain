@@ -154,6 +154,7 @@ class Table extends Component {
                 }
             }
 
+            // noinspection JSIgnoredPromiseFromCall
             this.notifySelection(this.props.onSelectionDataAsync, this.selectionMap);
         }
     }
@@ -278,6 +279,7 @@ class Table extends Component {
 
                 if (self.props.selectMode === TableSelectMode.SINGLE) {
                     if (selectionMap.size !== 1 || !selectionMap.has(rowKey)) {
+                        // noinspection JSIgnoredPromiseFromCall
                         self.notifySelection(self.props.onSelectionChangedAsync, new Map([[rowKey, data]]));
                     }
 
@@ -290,6 +292,7 @@ class Table extends Component {
                         newSelMap.set(rowKey, data);
                     }
 
+                    // noinspection JSIgnoredPromiseFromCall
                     self.notifySelection(self.props.onSelectionChangedAsync, newSelMap);
                 }
             });
@@ -321,6 +324,7 @@ class Table extends Component {
            clearTimeout(this.refreshTimeoutId);
         });
 
+        // noinspection JSIgnoredPromiseFromCall
         this.fetchAndNotifySelectionData();
     }
 
@@ -344,6 +348,8 @@ class Table extends Component {
         });
 
         this.updateSelectInfo();
+
+        // noinspection JSIgnoredPromiseFromCall
         this.fetchAndNotifySelectionData();
     }
 
@@ -375,6 +381,8 @@ class Table extends Component {
 
     async deselectAll(evt) {
         evt.preventDefault();
+
+        // noinspection JSIgnoredPromiseFromCall
         this.notifySelection(this.props.onSelectionChangedAsync, new Map());
     }
 

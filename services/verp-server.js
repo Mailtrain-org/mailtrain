@@ -1,66 +1,58 @@
 'use strict';
 
-// FIXME - port for the new campaigns model
-
-const { nodeifyFunction } = require('../lib/nodeify');
+const { nodeifyFunction, nodeifyPromise } = require('../lib/nodeify');
 const log = require('npmlog');
 const config = require('config');
-const verpHelpers = require('../lib/verp-helpers');
+const {MailerError} = require('../lib/mailers');
 const campaigns = require('../models/campaigns');
+const contextHelpers = require('../lib/context-helpers');
+const {SubscriptionStatus} = require('../shared/lists');
+
 const BounceHandler = require('bounce-handler').BounceHandler;
 const SMTPServer = require('smtp-server').SMTPServer;
 
 async function onRcptTo(address, session) {
+    const addrSplit = address.split('@');
 
+    if (addrSplit.length !== 2) {
+        throw new MailerError('Unknown user ' + address.address, 510);
+    }
 
-    const user = address.address.split('@').shift();
-    const host = address.address.split('@').pop();
+    const [user, host] = addrSplit;
 
+    const message = await campaigns.getMessageByCid(user);
 
-        if (host !== configItems.verpHostname || !/^[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+$/i.test(user)) {
-            err = new Error('Unknown user ' + address.address);
-            err.responseCode = 510;
-            return callback(err);
-        }
+    if (!message) {
+        throw new MailerError('Unknown user ' + address.address, 510);
+    }
 
-        campaigns.findMailByCampaign(user, (err, message) => {
-            if (err) {
-                err = new Error('Failed to load user data');
-                err.responseCode = 421;
-                return callback(err);
-            }
+    if (message.verp_hostname !== host) {
+        throw new MailerError('Unknown user ' + address.address, 510);
+    }
 
-            if (!message) {
-                err = new Error('Unknown user ' + address.address);
-                err.responseCode = 510;
-                return callback(err);
-            }
+    session.message = message;
 
-            session.campaignId = user;
-            session.message = message;
-
-            log.verbose('VERP', 'Incoming message for Campaign %s, List %s, Subscription %s', message.campaign, message.list, message.subscription);
-
-            callback();
-        });
-    });
+    log.verbose('VERP', 'Incoming message for Campaign %s, List %s, Subscription %s', cids.campaignId, cids.listId, cids.subscriptionId);
 }
 
-async function onData(stream, session) {
+function onData(stream, session, callback) {
     let chunks = [];
-    let chunklen = 0;
+    let totalLen = 0;
+
     stream.on('data', chunk => {
-        if (!chunk || !chunk.length || chunklen > 60 * 1024) {
+        if (!chunk || !chunk.length || totalLen > 60 * 1024) {
             return;
         }
         chunks.push(chunk);
-        chunklen += chunk.length;
+        totalLen += chunk.length;
     });
-    stream.on('end', () => {
 
-        let body = Buffer.concat(chunks, chunklen).toString();
+    stream.on('end', () => nodeifyPromise(onStreamEnd(), callback));
 
-        let bh = new BounceHandler();
+    const onStreamEnd = async () => {
+        const body = Buffer.concat(chunks, totalLen).toString();
+
+        const bh = new BounceHandler();
         let bounceResult;
 
         try {
@@ -71,19 +63,12 @@ async function onData(stream, session) {
         }
 
         if (!bounceResult || ['failed', 'transient'].indexOf(bounceResult.action) < 0) {
-            return callback(null, 'Message accepted');
+            return 'Message accepted';
         } else {
-            campaigns.updateMessage(session.message, 'bounced', bounceResult.action === 'failed', (err, updated) => {
-                if (err) {
-                    log.error('VERP', 'Failed updating message: %s', err);
-                } else if (updated) {
-                    log.verbose('VERP', 'Marked message %s as unsubscribed', session.campaignId);
-                }
-                callback(null, 'Message accepted');
-            });
+            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), session.message, SubscriptionStatus.BOUNCED, bounceResult.action === 'failed');
+            log.verbose('VERP', 'Marked message %s as unsubscribed', session.message.campaign);
         }
-    });
-
+    };
 }
 
 // Setup server
@@ -97,7 +82,7 @@ const server = new SMTPServer({
     disabledCommands: ['AUTH', 'STARTTLS'],
 
     onRcptTo: nodeifyFunction(onRcptTo),
-    onData: nodeifyFunction(onData)
+    onData: onData
 });
 
 module.exports = callback => {

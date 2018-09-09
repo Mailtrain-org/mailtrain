@@ -12,7 +12,7 @@ import {
 } from '../../lib/page';
 import {withErrorHandling} from '../../lib/error-handling';
 import {Table} from '../../lib/table';
-import {getImportTypes} from './helpers';
+import {getImportLabels} from './helpers';
 import {Icon} from "../../lib/bootstrap-components";
 import mailtrainConfig from 'mailtrainConfig';
 import moment from "moment";
@@ -28,7 +28,7 @@ export default class List extends Component {
 
         this.state = {};
 
-        const {importSourceLabels, importStatusLabels} = getImportTypes(props.t);
+        const {importSourceLabels, importStatusLabels} = getImportLabels(props.t);
         this.importSourceLabels = importSourceLabels;
         this.importStatusLabels = importStatusLabels;
     }

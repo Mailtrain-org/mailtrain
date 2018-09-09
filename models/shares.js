@@ -614,25 +614,23 @@ async function getPermissionsTx(tx, context, entityTypeId, entityId) {
     return rows.map(x => x.operation);
 }
 
-module.exports = {
-    listByEntityDTAjax,
-    listByUserDTAjax,
-    listUnassignedUsersDTAjax,
-    listRolesDTAjax,
-    assign,
-    rebuildPermissionsTx,
-    rebuildPermissions,
-    removeDefaultShares,
-    enforceEntityPermission,
-    enforceEntityPermissionTx,
-    enforceTypePermission,
-    enforceTypePermissionTx,
-    checkEntityPermission,
-    checkTypePermission,
-    enforceGlobalPermission,
-    checkGlobalPermission,
-    throwPermissionDenied,
-    regenerateRoleNamesTable,
-    getGlobalPermissions,
-    getPermissionsTx
-};
+module.exports.listByEntityDTAjax = listByEntityDTAjax;
+module.exports.listByUserDTAjax = listByUserDTAjax;
+module.exports.listUnassignedUsersDTAjax = listUnassignedUsersDTAjax;
+module.exports.listRolesDTAjax = listRolesDTAjax;
+module.exports.assign = assign;
+module.exports.rebuildPermissionsTx = rebuildPermissionsTx;
+module.exports.rebuildPermissions = rebuildPermissions;
+module.exports.removeDefaultShares = removeDefaultShares;
+module.exports.enforceEntityPermission = enforceEntityPermission;
+module.exports.enforceEntityPermissionTx = enforceEntityPermissionTx;
+module.exports.enforceTypePermission = enforceTypePermission;
+module.exports.enforceTypePermissionTx = enforceTypePermissionTx;
+module.exports.checkEntityPermission = checkEntityPermission;
+module.exports.checkTypePermission = checkTypePermission;
+module.exports.enforceGlobalPermission = enforceGlobalPermission;
+module.exports.checkGlobalPermission = checkGlobalPermission;
+module.exports.throwPermissionDenied = throwPermissionDenied;
+module.exports.regenerateRoleNamesTable = regenerateRoleNamesTable;
+module.exports.getGlobalPermissions = getGlobalPermissions;
+module.exports.getPermissionsTx = getPermissionsTx;

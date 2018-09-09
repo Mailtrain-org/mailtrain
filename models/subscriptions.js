@@ -13,6 +13,7 @@ const { enforce, filterObject } = require('../lib/helpers');
 const moment = require('moment');
 const { formatDate, formatBirthday } = require('../shared/date');
 const crypto = require('crypto');
+const campaigns = require('./campaigns');
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
 
@@ -77,10 +78,6 @@ fieldTypes.birthday = {
 
 function getSubscriptionTableName(listId) {
     return `subscription__${listId}`;
-}
-
-function getCampaignTableName(campaignId) {
-    return `campaign__${campaignId}`;
 }
 
 async function getGroupedFieldsMap(tx, listId) {
@@ -596,58 +593,54 @@ async function removeByEmailAndGet(context, listId, email) {
 }
 
 
-async function _unsubscribeAndGetTx(tx, context, listId, existingSubscription, campaignCid) {
+async function _changeStatusTx(tx, context, listId, existing, newStatus) {
+    enforce(newStatus !== SubscriptionStatus.SUBSCRIBED);
+
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-    if (!(existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED)) {
+    await tx(getSubscriptionTableName(listId)).where('id', existing.id).update({
+        status: newStatus
+    });
+
+    if (existing.status === SubscriptionStatus.SUBSCRIBED) {
+        await tx('lists').where('id', listId).decrement('subscribers', 1);
+    }
+}
+
+async function _unsubscribeExistingAndGetTx(tx, context, listId, existing) {
+    if (!(existing && existing.status === SubscriptionStatus.SUBSCRIBED)) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    existingSubscription.status = SubscriptionStatus.UNSUBSCRIBED;
+    await _changeStatusTx(tx, context, listId, existing, SubscriptionStatus.UNSUBSCRIBED);
 
-    await tx(getSubscriptionTableName(listId)).where('id', existingSubscription.id).update({
-        status: SubscriptionStatus.UNSUBSCRIBED
-    });
+    existing.status = SubscriptionStatus.SUBSCRIBED;
 
-    await tx('lists').where('id', listId).decrement('subscribers', 1);
-
-    if (campaignCid) {
-        const campaign = await tx('campaigns').where('cid', campaignCid);
-        const subscriptionInCampaign = await tx(getCampaignTableName(campaign.id)).where({subscription: existingSubscription.id, list: listId});
-
-        if (!subscriptionInCampaign) {
-            throw new Error('Invalid campaign.')
-        }
-
-        if (subscriptionInCampaign.status === SubscriptionStatus.SUBSCRIBED) {
-            await tx('campaigns').where('id', campaign.id).increment('unsubscribed', 1);
-            await tx(getCampaignTableName(campaign.id)).where({subscription: existingSubscription.id, list: listId}).update({
-                status: SubscriptionStatus.UNSUBSCRIBED
-            });
-        }
-    }
-
-    return existingSubscription;
+    return existing;
 }
-
 
 async function unsubscribeByIdAndGet(context, listId, subscriptionId) {
     return await knex.transaction(async tx => {
         const existing = await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).first();
-        return await _unsubscribeAndGetTx(tx, context, listId, existing);
+        return await _unsubscribeExistingAndGetTx(tx, context, listId, existing);
     });
 }
 
 async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaignCid) {
     return await knex.transaction(async tx => {
         const existing = await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).first();
-        return await _unsubscribeAndGetTx(tx, context, listId, existing, campaignCid);
+
+        if (campaignCid) {
+            await campaigns.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, SubscriptionStatus.UNSUBSCRIBED);
+        }
+
+        return await _unsubscribeExistingAndGetTx(tx, context, listId, existing);
     });
 }
 
 async function unsubscribeByEmailAndGetTx(tx, context, listId, email) {
     const existing = await tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(email)).first();
-    return await _unsubscribeAndGetTx(tx, context, listId, existing);
+    return await _unsubscribeExistingAndGetTx(tx, context, listId, existing);
 }
 
 async function unsubscribeByEmailAndGet(context, listId, email) {
@@ -655,6 +648,13 @@ async function unsubscribeByEmailAndGet(context, listId, email) {
         return await unsubscribeByEmailAndGetTx(tx, context, listId, email);
     });
 }
+
+async function changeStatusTx(tx, context, listId, subscriptionId, subscriptionStatus) {
+    const existing = await tx(getSubscriptionTableName(listId)).where('id', subscriptionId).first();
+    await _changeStatusTx(tx, context, listId, existing, subscriptionStatus);
+}
+
+
 
 async function updateAddressAndGet(context, listId, subscriptionId, emailNew) {
     return await knex.transaction(async tx => {
@@ -722,25 +722,25 @@ async function getListsWithEmail(context, email) {
     });
 }
 
-module.exports = {
-    hashByList,
-    getById,
-    getByCid,
-    getByEmail,
-    list,
-    listDTAjax,
-    serverValidate,
-    create,
-    getGroupedFieldsMap,
-    createTxWithGroupedFieldsMap,
-    updateWithConsistencyCheck,
-    remove,
-    removeByEmailAndGet,
-    unsubscribeByCidAndGet,
-    unsubscribeByIdAndGet,
-    unsubscribeByEmailAndGet,
-    unsubscribeByEmailAndGetTx,
-    updateAddressAndGet,
-    updateManaged,
-    getListsWithEmail
-};
+module.exports.getSubscriptionTableName = getSubscriptionTableName;
+module.exports.hashByList = hashByList;
+module.exports.getById = getById;
+module.exports.getByCid = getByCid;
+module.exports.getByEmail = getByEmail;
+module.exports.list = list;
+module.exports.listDTAjax = listDTAjax;
+module.exports.serverValidate = serverValidate;
+module.exports.create = create;
+module.exports.getGroupedFieldsMap = getGroupedFieldsMap;
+module.exports.createTxWithGroupedFieldsMap = createTxWithGroupedFieldsMap;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.removeByEmailAndGet = removeByEmailAndGet;
+module.exports.unsubscribeByCidAndGet = unsubscribeByCidAndGet;
+module.exports.unsubscribeByIdAndGet = unsubscribeByIdAndGet;
+module.exports.unsubscribeByEmailAndGet = unsubscribeByEmailAndGet;
+module.exports.unsubscribeByEmailAndGetTx = unsubscribeByEmailAndGetTx;
+module.exports.updateAddressAndGet = updateAddressAndGet;
+module.exports.updateManaged = updateManaged;
+module.exports.getListsWithEmail = getListsWithEmail;
+module.exports.changeStatusTx = changeStatusTx;

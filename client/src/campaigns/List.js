@@ -25,7 +25,7 @@ import {
     CampaignType
 } from "../../../shared/campaigns";
 import {checkPermissions} from "../lib/permissions";
-import {getCampaignTypeLabels} from "./helpers";
+import {getCampaignLabels} from "./helpers";
 
 @translate()
 @withPageHelpers
@@ -37,15 +37,9 @@ export default class List extends Component {
 
         const t = props.t;
 
-        this.campaignStatuses = {
-            [CampaignStatus.IDLE]: t('Idle'),
-            [CampaignStatus.FINISHED]: t('Finished'),
-            [CampaignStatus.PAUSED]: t('Paused'),
-            [CampaignStatus.INACTIVE]: t('Inactive'),
-            [CampaignStatus.ACTIVE]: t('Active')
-        };
-
-        this.campaignTypes = getCampaignTypeLabels(t);
+        const { campaignTypeLabels, campaignStatusLabels } = getCampaignLabels(t);
+        this.campaignTypeLabels = campaignTypeLabels;
+        this.campaignStatusLabels = campaignStatusLabels;
 
         this.state = {};
     }
@@ -65,6 +59,7 @@ export default class List extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.fetchPermissions();
     }
 
@@ -74,7 +69,7 @@ export default class List extends Component {
         const columns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('Type'), render: data => this.campaignTypes[data] },
+            { data: 3, title: t('Type'), render: data => this.campaignTypeLabels[data] },
             {
                 data: 4,
                 title: t('Status'),
@@ -87,7 +82,7 @@ export default class List extends Component {
                             return t('Sending');
                         }
                     } else {
-                        return this.campaignStatuses[data];
+                        return this.campaignStatusLabels[data];
                     }
                 }
             },
@@ -99,6 +94,13 @@ export default class List extends Component {
                     const perms = data[9];
                     const campaignType = data[3];
                     const campaignSource = data[6];
+
+                    if (perms.includes('viewStats')) {
+                        actions.push({
+                            label: <Icon icon="send" title={t('Status')}/>,
+                            link: `/campaigns/${data[0]}/status`
+                        });
+                    }
 
                     if (perms.includes('edit')) {
                         actions.push({

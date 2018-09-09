@@ -35,6 +35,7 @@ export default class View extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.loadContent();
     }
 

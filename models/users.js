@@ -418,24 +418,22 @@ async function getByRestrictedAccessToken(token) {
 }
 
 
-module.exports = {
-    listDTAjax,
-    remove,
-    updateWithConsistencyCheck,
-    create,
-    hash,
-    getById,
-    serverValidate,
-    getByAccessToken,
-    getByUsername,
-    getByUsernameIfPasswordMatch,
-    getAccessToken,
-    resetAccessToken,
-    sendPasswordReset,
-    isPasswordResetTokenValid,
-    resetPassword,
-    getByRestrictedAccessToken,
-    getRestrictedAccessToken,
-    refreshRestrictedAccessToken,
-    registerRestrictedAccessTokenMethod
-};
+module.exports.listDTAjax = listDTAjax;
+module.exports.remove = remove;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.create = create;
+module.exports.hash = hash;
+module.exports.getById = getById;
+module.exports.serverValidate = serverValidate;
+module.exports.getByAccessToken = getByAccessToken;
+module.exports.getByUsername = getByUsername;
+module.exports.getByUsernameIfPasswordMatch = getByUsernameIfPasswordMatch;
+module.exports.getAccessToken = getAccessToken;
+module.exports.resetAccessToken = resetAccessToken;
+module.exports.sendPasswordReset = sendPasswordReset;
+module.exports.isPasswordResetTokenValid = isPasswordResetTokenValid;
+module.exports.resetPassword = resetPassword;
+module.exports.getByRestrictedAccessToken = getByRestrictedAccessToken;
+module.exports.getRestrictedAccessToken = getRestrictedAccessToken;
+module.exports.refreshRestrictedAccessToken = refreshRestrictedAccessToken;
+module.exports.registerRestrictedAccessTokenMethod = registerRestrictedAccessTokenMethod;

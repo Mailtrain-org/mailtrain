@@ -60,6 +60,7 @@ export default class Account extends Component {
             password2: ''
         });
 
+        // noinspection JSIgnoredPromiseFromCall
         this.validateResetToken();
     }
 

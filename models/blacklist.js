@@ -69,11 +69,9 @@ async function serverValidate(context, data) {
     return result;
 }
 
-module.exports = {
-    listDTAjax,
-    add,
-    remove,
-    search,
-    isBlacklisted,
-    serverValidate
-};
+module.exports.listDTAjax = listDTAjax;
+module.exports.add = add;
+module.exports.remove = remove;
+module.exports.search = search;
+module.exports.isBlacklisted = isBlacklisted;
+module.exports.serverValidate = serverValidate;

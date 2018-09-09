@@ -23,7 +23,7 @@ const shares = require('../models/shares');
 const _ = require('../lib/translate')._;
 */
 
-async function sendMail() {
+async function processMessages(msgs) {
     if (running) {
         log.error('Senders', `Worker ${workerId} assigned work while working`);
         return;
@@ -31,9 +31,12 @@ async function sendMail() {
 
     running = true;
 
+    console.log(msgs);
     // FIXME
 
     running = false;
+
+    sendToMaster('messages-processed');
 }
 
 function sendToMaster(msgType) {
@@ -46,11 +49,12 @@ process.on('message', msg => {
     if (msg) {
         const type = msg.type;
 
-        if (type === 'reloadConfig') {
+        if (type === 'reload-config') {
             mailers.invalidateMailer(msg.data.sendConfigurationId);
 
-        } else if (type === 'sendMail') {
-            // FIXME
+        } else if (type === 'process-messages') {
+            // noinspection JSIgnoredPromiseFromCall
+            processMessages(msg.data)
         }
 
     }

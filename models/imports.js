@@ -238,16 +238,13 @@ async function stop(context, listId, id) {
 }
 
 
-// This is to handle circular dependency with segments.js
-module.exports = {
-    filesDir,
-    hash,
-    getById,
-    listDTAjax,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    removeAllByListIdTx,
-    start,
-    stop
-};
+module.exports.filesDir = filesDir;
+module.exports.hash = hash;
+module.exports.getById = getById;
+module.exports.listDTAjax = listDTAjax;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.removeAllByListIdTx = removeAllByListIdTx;
+module.exports.start = start;
+module.exports.stop = stop;

@@ -125,6 +125,7 @@ export class UntrustedContentHost extends Component {
 
     scheduleRefreshAccessToken() {
         this.refreshAccessTokenTimeout = setTimeout(() => {
+            // noinspection JSIgnoredPromiseFromCall
             this.refreshAccessToken();
             this.scheduleRefreshAccessToken();
         }, 60 * 1000);
@@ -136,6 +137,7 @@ export class UntrustedContentHost extends Component {
         }
 
         if (!this.state.hasAccessToken) {
+            // noinspection JSIgnoredPromiseFromCall
             this.refreshAccessToken();
         }
     }

@@ -1,8 +1,11 @@
 'use strict';
 
-import {CampaignType} from "../../../shared/campaigns";
+import {
+    CampaignStatus,
+    CampaignType
+} from "../../../shared/campaigns";
 
-export function getCampaignTypeLabels(t) {
+export function getCampaignLabels(t) {
 
     const campaignTypeLabels = {
         [CampaignType.REGULAR]: t('Regular'),
@@ -10,5 +13,19 @@ export function getCampaignTypeLabels(t) {
         [CampaignType.RSS]: t('RSS')
     };
 
-    return campaignTypeLabels;
+    const campaignStatusLabels = {
+        [CampaignStatus.IDLE]: t('Idle'),
+        [CampaignStatus.SCHEDULED]: t('Scheduled'),
+        [CampaignStatus.PAUSED]: t('Paused'),
+        [CampaignStatus.FINISHED]: t('Finished'),
+        [CampaignStatus.PAUSED]: t('Paused'),
+        [CampaignStatus.INACTIVE]: t('Inactive'),
+        [CampaignStatus.ACTIVE]: t('Active')
+    };
+
+
+    return {
+        campaignStatusLabels,
+        campaignTypeLabels
+    };
 }

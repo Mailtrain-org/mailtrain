@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import Status from './Status';
 import CampaignsCUD from './CUD';
 import Content from './Content';
 import CampaignsList from './List';
@@ -29,6 +30,12 @@ function getMenus(t) {
                     },
                     link: params => `/campaigns/${params.campaignId}/edit`,
                     navs: {
+                        status: {
+                            title: t('Status'),
+                            link: params => `/campaigns/${params.campaignId}/status`,
+                            visible: resolved => resolved.campaign.permissions.includes('viewStats'),
+                            panelRender: props => <Status entity={props.resolved.campaign} />
+                        },
                         ':action(edit|delete)': {
                             title: t('Edit'),
                             link: params => `/campaigns/${params.campaignId}/edit`,

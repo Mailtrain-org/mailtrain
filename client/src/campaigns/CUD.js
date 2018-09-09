@@ -45,12 +45,13 @@ import {getUrl} from "../lib/urls";
 import {
     campaignOverridables,
     CampaignSource,
+    CampaignStatus,
     CampaignType
 } from "../../../shared/campaigns";
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {ResourceType} from "../lib/mosaico";
-import {getCampaignTypeLabels} from "./helpers";
+import {getCampaignLabels} from "./helpers";
 
 @translate()
 @withForm
@@ -66,7 +67,8 @@ export default class CUD extends Component {
         this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
         this.mailerTypes = getMailerTypes(props.t);
 
-        this.campaignTypes = getCampaignTypeLabels(t);
+        const { campaignTypeLabels } = getCampaignLabels(t);
+        this.campaignTypeLabels = campaignTypeLabels;
 
         this.createTitles = {
             [CampaignType.REGULAR]: t('Create Regular Campaign'),
@@ -134,6 +136,7 @@ export default class CUD extends Component {
 
     onSendConfigurationChanged(newState, key, oldValue, sendConfigurationId) {
         newState.sendConfiguration = null;
+        // noinspection JSIgnoredPromiseFromCall
         this.fetchSendConfiguration(sendConfigurationId);
     }
 
@@ -167,7 +170,7 @@ export default class CUD extends Component {
                 }
 
                 for (const overridable of campaignOverridables) {
-                    data[overridable + '_overriden'] = !!data[overridable + '_override'];
+                    data[overridable + '_overriden'] = data[overridable + '_override'] === null;
                 }
 
                 const lsts = [];
@@ -184,8 +187,13 @@ export default class CUD extends Component {
                 }
                 data.lists = lsts;
 
+                // noinspection JSIgnoredPromiseFromCall
                 this.fetchSendConfiguration(data.send_configuration);
             });
+
+            if (this.props.entity.status === CampaignStatus.SENDING) {
+                this.disableForm();
+            }
 
         } else {
             const data = {};
@@ -620,7 +628,7 @@ export default class CUD extends Component {
             const campaignsColumns = [
                 { data: 1, title: t('Name') },
                 { data: 2, title: t('Description') },
-                { data: 3, title: t('Type'), render: data => this.campaignTypes[data] },
+                { data: 3, title: t('Type'), render: data => this.campaignTypeLabels[data] },
                 { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
                 { data: 5, title: t('Namespace') }
             ];
@@ -670,6 +678,12 @@ export default class CUD extends Component {
                 }
 
                 <Title>{isEdit ? this.editTitles[this.getFormValue('type')] : this.createTitles[this.getFormValue('type')]}</Title>
+
+                {isEdit && this.props.entity.status === CampaignStatus.SENDING &&
+                    <div className={`alert alert-info`} role="alert">
+                        {t('Form cannot be edited because the campaign is currently being sent out. Wait till the sending is finished and refresh.')}
+                    </div>
+                }
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>

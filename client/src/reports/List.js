@@ -51,6 +51,7 @@ export default class List extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.fetchPermissions();
     }
 

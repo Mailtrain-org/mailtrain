@@ -27,7 +27,7 @@ import {
     withErrorHandling
 } from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
-import {getImportTypes} from './helpers';
+import {getImportLabels} from './helpers';
 import {
     ImportSource,
     inProgress,
@@ -62,7 +62,7 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        const {importSourceLabels, mappingTypeLabels} = getImportTypes(props.t);
+        const {importSourceLabels, mappingTypeLabels} = getImportLabels(props.t);
 
         this.importSourceLabels = importSourceLabels;
 

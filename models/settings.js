@@ -55,9 +55,7 @@ async function set(context, data) {
     // FIXME - recreate mailers, notify senders to recreate the mailers
 }
 
-module.exports = {
-    hash,
-    get,
-    set
-};
+module.exports.hash = hash;
+module.exports.get = get;
+module.exports.set = set;
 

@@ -45,6 +45,22 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'list', requiredOperations: ['view'] }],
+        params,
+        builder => builder
+            .from('lists')
+            .innerJoin('campaign_lists', 'campaign_lists.list', 'lists.id')
+            .leftJoin('segments', 'segments.id', 'campaign_lists.segment')
+            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace')
+            .where('campaign_lists.campaign', campaignId)
+            .orderBy('campaign_lists.id', 'asc'),
+        ['lists.id', 'lists.name', 'lists.cid', 'namespaces.name', 'segments.name']
+    );
+}
+
 async function _getByIdTx(tx, context, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
     const entity = await tx('lists').where('id', id).first();
@@ -192,16 +208,15 @@ async function getMergeTags(context, id) {
 }
 
 
-module.exports = {
-    UnsubscriptionMode,
-    hash,
-    listDTAjax,
-    getById,
-    getByIdWithListFields,
-    getByCid,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    removeFormFromAllTx,
-    getMergeTags
-};
+module.exports.UnsubscriptionMode = UnsubscriptionMode;
+module.exports.hash = hash;
+module.exports.listDTAjax = listDTAjax;
+module.exports.listWithSegmentByCampaignDTAjax = listWithSegmentByCampaignDTAjax;
+module.exports.getById = getById;
+module.exports.getByIdWithListFields = getByIdWithListFields;
+module.exports.getByCid = getByCid;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.removeFormFromAllTx = removeFormFromAllTx;
+module.exports.getMergeTags = getMergeTags;

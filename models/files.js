@@ -302,18 +302,16 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
 }
 
 
-module.exports = {
-    filesDir,
-    listDTAjax,
-    list,
-    getFileById,
-    getFileByFilename,
-    getFileByUrl,
-    getFileByOriginalName,
-    createFiles,
-    removeFile,
-    getFileUrl,
-    getFilePath,
-    copyAllTx,
-    ReplacementBehavior
-};
+module.exports.filesDir = filesDir;
+module.exports.listDTAjax = listDTAjax;
+module.exports.list = list;
+module.exports.getFileById = getFileById;
+module.exports.getFileByFilename = getFileByFilename;
+module.exports.getFileByUrl = getFileByUrl;
+module.exports.getFileByOriginalName = getFileByOriginalName;
+module.exports.createFiles = createFiles;
+module.exports.removeFile = removeFile;
+module.exports.getFileUrl = getFileUrl;
+module.exports.getFilePath = getFilePath;
+module.exports.copyAllTx = copyAllTx;
+module.exports.ReplacementBehavior = ReplacementBehavior;

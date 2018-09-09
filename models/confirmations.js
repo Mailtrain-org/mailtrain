@@ -45,7 +45,5 @@ async function takeConfirmation(cid) {
     });
 }
 
-module.exports = {
-    addConfirmation,
-    takeConfirmation
-};
+module.exports.addConfirmation = addConfirmation;
+module.exports.takeConfirmation = takeConfirmation;

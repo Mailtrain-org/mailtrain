@@ -97,11 +97,9 @@ async function remove(context, id) {
     });
 }
 
-module.exports = {
-    hash,
-    getById,
-    listDTAjax,
-    create,
-    updateWithConsistencyCheck,
-    remove
-};
+module.exports.hash = hash;
+module.exports.getById = getById;
+module.exports.listDTAjax = listDTAjax;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;

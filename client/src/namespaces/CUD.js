@@ -85,6 +85,7 @@ export default class CUD extends Component {
         }
 
         if (!this.isEditGlobal()) {
+            // noinspection JSIgnoredPromiseFromCall
             this.loadTreeData();
         }
     }

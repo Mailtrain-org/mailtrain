@@ -31,6 +31,7 @@ export default class API extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.loadAccessToken();
     }
 

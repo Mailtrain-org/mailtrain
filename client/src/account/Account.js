@@ -42,6 +42,7 @@ export default class Account extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.loadFormValues();
     }
 

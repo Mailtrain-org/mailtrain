@@ -408,16 +408,14 @@ async function getQueryGeneratorTx(tx, listId, id) {
 } 
 
 // This is to handle circular dependency with fields.js
-Object.assign(module.exports, {
-    hash,
-    listDTAjax,
-    listIdName,
-    getById,
-    getByIdTx,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    removeAllByListIdTx,
-    removeRulesByColumnTx,
-    getQueryGeneratorTx
-});
+module.exports.hash = hash;
+module.exports.listDTAjax = listDTAjax;
+module.exports.listIdName = listIdName;
+module.exports.getById = getById;
+module.exports.getByIdTx = getByIdTx;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.removeAllByListIdTx = removeAllByListIdTx;
+module.exports.removeRulesByColumnTx = removeRulesByColumnTx;
+module.exports.getQueryGeneratorTx = getQueryGeneratorTx;

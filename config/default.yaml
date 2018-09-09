@@ -129,7 +129,7 @@ nodemailer:
 
 queue:
   # How many parallel sender processes to spawn
-  processes: 1
+  processes: 2
 
 cors:
   # Allow subscription widgets to be embedded
@@ -229,7 +229,7 @@ roles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats]
+      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, manageMessages]
 
   template:
     master:

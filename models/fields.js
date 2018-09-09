@@ -724,26 +724,23 @@ function fromImport(listId, flds, data) { // assumes ungrouped subscription and 
     return _fromText(listId, data, flds, true, 'column', false);
 }
 
-// This is to handle circular dependency with segments.js
-Object.assign(module.exports, {
-    Cardinality,
-    getFieldType,
-    hash,
-    getById,
-    list,
-    listTx,
-    listGrouped,
-    listGroupedTx,
-    listByOrderListTx,
-    listDTAjax,
-    listGroupedDTAjax,
-    create,
-    updateWithConsistencyCheck,
-    remove,
-    removeAllByListIdTx,
-    serverValidate,
-    forHbs,
-    fromPost,
-    fromAPI,
-    fromImport
-});
+module.exports.Cardinality = Cardinality;
+module.exports.getFieldType = getFieldType;
+module.exports.hash = hash;
+module.exports.getById = getById;
+module.exports.list = list;
+module.exports.listTx = listTx;
+module.exports.listGrouped = listGrouped;
+module.exports.listGroupedTx = listGroupedTx;
+module.exports.listByOrderListTx = listByOrderListTx;
+module.exports.listDTAjax = listDTAjax;
+module.exports.listGroupedDTAjax = listGroupedDTAjax;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
+module.exports.removeAllByListIdTx = removeAllByListIdTx;
+module.exports.serverValidate = serverValidate;
+module.exports.forHbs = forHbs;
+module.exports.fromPost = fromPost;
+module.exports.fromAPI = fromAPI;
+module.exports.fromImport = fromImport;

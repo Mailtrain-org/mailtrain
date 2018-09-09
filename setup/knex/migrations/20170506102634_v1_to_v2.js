@@ -72,14 +72,14 @@ async function migrateBase(knex) {
             });
     */
 
-    // Original Mailtrain migration is executed before this one. So here we check that the original migration
-    // ended where it should have and we take it from here.
+    // The original Mailtrain migration is executed before this one. So here we check whether the original migration
+    // ended where it should have and we take it from there.
     const row = await knex('settings').where({key: 'db_schema_version'}).first('value');
     if (!row || Number(row.value) !== 33) {
         throw new Error('Unsupported DB schema version: ' + row.value);
     }
 
-    // We have to update data types of primary keys and related foreign keys. Mailtrain uses unsigned int(11), while
+    // Update data types of primary keys and related foreign keys. Mailtrain uses unsigned int(11), while
     // Knex uses unsigned int (which is unsigned int(10) ).
     await knex.schema
         .raw('ALTER TABLE `attachments` MODIFY `id` int unsigned not null auto_increment')
@@ -894,6 +894,40 @@ async function migrateCampaigns(knex) {
         table.integer('segment').unsigned().references('segments.id').onDelete('CASCADE');
     });
 
+    await knex.schema.raw('CREATE TABLE `campaign_messages` (\n' +
+        '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
+        '  `campaign` int(10) unsigned NOT NULL,\n' +
+        '  `list` int(10) unsigned NOT NULL,\n' +
+        '  `subscription` int(10) unsigned NOT NULL,\n' +
+        '  `send_configuration` int(10) unsigned NOT NULL,\n' +
+        '  `status` tinyint(4) unsigned NOT NULL DEFAULT \'0\',\n' +
+        '  `response` varchar(255) DEFAULT NULL,\n' +
+        '  `response_id` varchar(255) CHARACTER SET ascii DEFAULT NULL,\n' +
+        '  `updated` timestamp NULL DEFAULT NULL,\n' +
+        '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
+        '  PRIMARY KEY (`id`),\n' +
+        '  UNIQUE KEY `cls` (`campaign`, `list`, `subscription`),\n' +
+        '  KEY `created` (`created`),\n' +
+        '  KEY `response_id` (`response_id`),\n' +
+        '  KEY `status_index` (`status`),\n' +
+        '  KEY `subscription_index` (`subscription`)\n' +
+        ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
+
+    await knex.schema.raw('CREATE TABLE `campaign_links` (\n' +
+        '  `campaign` int(10) unsigned NOT NULL,\n' +
+        '  `list` int(10) unsigned NOT NULL,\n' +
+        '  `subscription` int(10) unsigned NOT NULL,\n' +
+        '  `link` int(10) NOT NULL,\n' +
+        '  `ip` varchar(100) CHARACTER SET ascii DEFAULT NULL,\n' +
+        '  `device_type` varchar(50) DEFAULT NULL,\n' +
+        '  `country` varchar(2) CHARACTER SET ascii DEFAULT NULL,\n' +
+        '  `count` int(11) unsigned NOT NULL DEFAULT \'1\',\n' +
+        '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
+        '  PRIMARY KEY (`campaign`, `list`,`subscription`,`link`),\n' +
+        '  KEY `created_index` (`created`)\n' +
+        ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
+
+
     await knex.schema.table('campaigns', table => {
         table.text('data', 'longtext');
         table.integer('source').unsigned().notNullable();
@@ -906,6 +940,15 @@ async function migrateCampaigns(knex) {
 
     for (const campaign of campaigns) {
         const data = {};
+
+        await knex.raw('INSERT INTO `campaign_messages` (`id`, `campaign`, `list`, `subscription`, `send_configuration`, `status`, `response`, `response_id`, `updated`, `created`) ' +
+            'SELECT `id`, ' + campaign.id + ', `list`, `subscription`, ' + getSystemSendConfigurationId() + ', `status`, `response`, `response_id`, `updated`, `created` FROM `campaign__' + campaign.id + '`;');
+
+        await knex.raw('INSERT INTO `campaign_links` (`campaign`, `list`, `subscription`, `link`, `ip`, `device_type`, `country`, `count`, `created`) ' +
+            'SELECT ' + campaign.id + ', `list`, `subscriber`, `link`, `ip`, `device_type`, `country`, `count`, `created` FROM `campaign_tracker__' + campaign.id + '`;');
+
+        await knex.schema.dropTableIfExists('campaign__' + campaign.id);
+        await knex.schema.dropTableIfExists('campaign_tracker__' + campaign.id);
 
         if (campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.RSS || campaign.type === CampaignType.RSS_ENTRY || campaign.type === CampaignType.TRIGGERED) {
             if (campaign.template) {
@@ -979,6 +1022,7 @@ async function migrateCampaigns(knex) {
         // Remove the default value
         table.integer('send_configuration').unsigned().notNullable().alter();
     });
+
 
     await knex.schema.dropTableIfExists('campaign');
     await knex.schema.dropTableIfExists('campaign_tracker');

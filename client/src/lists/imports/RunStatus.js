@@ -13,7 +13,7 @@ import {
     withAsyncErrorHandler,
     withErrorHandling
 } from '../../lib/error-handling';
-import {getImportTypes} from './helpers';
+import {getImportLabels} from './helpers';
 import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
 import moment from "moment";
@@ -32,7 +32,7 @@ export default class Status extends Component {
             entity: props.entity
         };
 
-        const {importSourceLabels, importStatusLabels, runStatusLabels} = getImportTypes(props.t);
+        const {importSourceLabels, importStatusLabels, runStatusLabels} = getImportLabels(props.t);
         this.importSourceLabels = importSourceLabels;
         this.importStatusLabels = importStatusLabels;
         this.runStatusLabels = runStatusLabels;
@@ -69,6 +69,7 @@ export default class Status extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.periodicRefreshTask();
     }
 

@@ -34,6 +34,7 @@ export default class Output extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.loadOutput();
     }
 

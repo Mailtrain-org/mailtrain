@@ -7,7 +7,7 @@ const http = require('http');
 //const triggers = require('./services/triggers');
 const importer = require('./lib/importer');
 const feedcheck = require('./lib/feedcheck');
-// const verpServer = require('./services/verp-server');
+const verpServer = require('./services/verp-server');
 const testServer = require('./services/test-server');
 //const postfixBounceServer = require('./services/postfix-bounce-server');
 const tzupdate = require('./services/tzupdate');
@@ -83,7 +83,7 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
     .then(() =>
         executor.spawn(() => {
             testServer(() => {
-                //verpServer(() => {
+                verpServer(() => {
                     startHTTPServer(true, trustedPort, () => {
                         startHTTPServer(false, sandboxPort, () => {
                             privilegeHelpers.dropRootPrivileges();
@@ -106,7 +106,7 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                             });
                         });
                     });
-                //});
+                });
             });
         })
     );

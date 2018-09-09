@@ -30,7 +30,7 @@ import {
     Event
 } from '../../../../shared/triggers';
 import moment from 'moment';
-import {getCampaignTypeLabels} from "../helpers";
+import {getCampaignLabels} from "../helpers";
 
 
 @translate()
@@ -44,7 +44,7 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        this.campaignTypes = getCampaignTypeLabels(props.t);
+        this.campaignTypeLabels = getCampaignLabels(props.t);
 
         const {entityLabels, eventLabels} = getTriggerTypes(props.t);
         this.entityLabels = entityLabels;
@@ -186,7 +186,7 @@ export default class CUD extends Component {
         const campaignsColumns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('Description') },
-            { data: 3, title: t('Type'), render: data => this.campaignTypes[data] },
+            { data: 3, title: t('Type'), render: data => this.campaignTypeLabels[data] },
             { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
             { data: 5, title: t('Namespace') }
         ];

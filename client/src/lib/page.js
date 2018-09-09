@@ -185,6 +185,7 @@ class RouteContent extends Component {
     }
 
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
         this.resolve(this.props);
     }
 
@@ -193,6 +194,7 @@ class RouteContent extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (this.props.match.params !== nextProps.match.params && needsResolve(this.props.route, nextProps.route, this.props.match, nextProps.match)) {
+            // noinspection JSIgnoredPromiseFromCall
             this.resolve(nextProps);
         }
     }
@@ -279,6 +281,7 @@ class SectionContent extends Component {
         }
 
         this.historyUnlisten = props.history.listen((location, action) => {
+            // noinspection JSIgnoredPromiseFromCall
             this.closeFlashMessage();
         })
     }

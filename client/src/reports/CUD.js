@@ -50,6 +50,7 @@ export default class CUD extends Component {
             state.formState = state.formState.setIn(['data', 'user_fields', 'value'], '');
 
             if (newVal) {
+                // noinspection JSIgnoredPromiseFromCall
                 this.fetchUserFields(newVal);
             }
         }

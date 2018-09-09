@@ -62,8 +62,6 @@ async function listFailedDTAjax(context, listId, importId, importRunId, params) 
 
 
 
-module.exports = {
-    getById,
-    listDTAjax,
-    listFailedDTAjax
-};
+module.exports.getById = getById;
+module.exports.listDTAjax = listDTAjax;
+module.exports.listFailedDTAjax = listFailedDTAjax;

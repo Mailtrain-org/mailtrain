@@ -187,11 +187,9 @@ async function remove(context, id) {
     });
 }
 
-module.exports = {
-    hash,
-    listTree,
-    getById,
-    create,
-    updateWithConsistencyCheck,
-    remove
-};
+module.exports.hash = hash;
+module.exports.listTree = listTree;
+module.exports.getById = getById;
+module.exports.create = create;
+module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.remove = remove;
