@@ -237,6 +237,7 @@ router.get('/:cid', passport.csrfProtection, (req, res, next) => {
                     data.defaultPostaddress = configItems.defaultPostaddress;
                     data.captchaEnabled = data.captchaEnabled && !!configItems.recaptchaSiteKey && !!configItems.recaptchaSecretKey;
                     data.recaptchaSiteKey = configItems.recaptchaSiteKey;
+                    data.language = config.language;
 
                     data.template = {
                         template: 'subscription/web-subscribe.mjml.hbs',
