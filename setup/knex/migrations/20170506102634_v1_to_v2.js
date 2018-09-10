@@ -1062,7 +1062,7 @@ async function migrateTriggers(knex) {
 
     for (const trigger of triggers) {
         const campaign = await knex('campaigns')
-            .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+            .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign') // We assume here that every campaign has a list.
             .groupBy('campaigns.id')
             .select(
                 knex.raw(`GROUP_CONCAT(campaign_lists.list SEPARATOR \';\') as lists`)

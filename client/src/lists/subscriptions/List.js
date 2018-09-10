@@ -86,7 +86,7 @@ export default class List extends Component {
         const segments = this.props.segments;
 
         const columns = [
-            { data: 1, title: t('CID') },
+            { data: 1, title: t('ID'), render: data => <code>{data}</code> },
             { data: 2, title: t('Email') },
             { data: 3, title: t('Status'), render: (data, display, rowData) => this.subscriptionStatusLabels[data] + (rowData[5] ? ', ' + t('Blacklisted') : '') },
             { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' }

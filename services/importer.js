@@ -137,7 +137,6 @@ function prepareCsv(impt) {
 }
 
 async function _execImportRun(impt, handlers) {
-    // FIXME - handle STOPPING
     try {
         let imptRun;
 

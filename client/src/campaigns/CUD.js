@@ -170,7 +170,7 @@ export default class CUD extends Component {
                 }
 
                 for (const overridable of campaignOverridables) {
-                    data[overridable + '_overriden'] = data[overridable + '_override'] === null;
+                    data[overridable + '_overriden'] = data[overridable + '_override'] !== null;
                 }
 
                 const lsts = [];

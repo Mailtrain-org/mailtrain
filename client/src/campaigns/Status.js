@@ -243,11 +243,11 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
             return (
                 <div>
-                    <div>
+                    <AlignedRow label={t('Send status')}>
                         {t('Campaign is being sent out.')}
-                    </div>
+                    </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="stop" label={t('Stop')} onClickAsync={::this.pauseAsync}/>
+                        <Button className="btn-primary" icon="stop" label={t('Stop')} onClickAsync={::this.stopAsync}/>
                     </ButtonRow>
                 </div>
             );
@@ -255,9 +255,9 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.FINISHED) {
             return (
                 <div>
-                    <div>
+                    <AlignedRow label={t('Send status')}>
                         {t('All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers.')}
-                    </div>
+                    </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('Continue')} onClickAsync={::this.startAsync}/>
                         <Button className="btn-primary" icon="refresh" label={t('Reset')} onClickAsync={::this.resetAsync}/>
@@ -356,8 +356,8 @@ export default class Status extends Component {
         const listsColumns = [
             { data: 1, title: t('Name') },
             { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Namespace') },
-            { data: 4, title: t('Segment') }
+            { data: 4, title: t('Segment') },
+            { data: 3, title: t('List namespace') }
         ];
 
         return (

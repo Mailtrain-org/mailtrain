@@ -97,46 +97,66 @@ async function listTestUsersDTAjax(context, campaignId, params) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
 
-        const subscriptionsQueries = [];
+        /*
+        This is supposed to produce queries like this:
+
+        select * from (
+          (select `subscription__1`.`email`, 2 AS campaign_list_id, 1 AS list, NULL AS segment from `subscription__1` left join `campaign_messages` on
+            `campaign_messages`.`subscription` = `subscription__1`.`id` where `subscription__1`.`status` = 1 and `subscription__1`.`is_test` = true)
+        UNION ALL
+          (select `subscription__2`.`email`, 4 AS campaign_list_id, 2 AS list, NULL AS segment from `subscription__2` left join `campaign_messages` on
+          `campaign_messages`.`subscription` = `subscription__2`.`id` where `subscription__2`.`status` = 1 and `subscription__2`.`is_test` = true)
+        ) as `test_subscriptions` inner join `lists` on `test_subscriptions`.`list` = `lists`.`id` inner join `segments` on `test_subscriptions`.`segment` = `segments`.`id`
+          inner join `namespaces` on `lists`.`namespace` = `namespaces`.`id`
+
+        This was too much for Knex, so we partially construct these queries directly as strings;
+        */
+
+        const subsQrys = [];
         const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
 
         for (const cpgList of cpgLists) {
-            const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {
-            };
+            const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
             const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
 
-            subscriptionsQueries.push(function () {
-                this.from(subsTable)
-                    .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
-                    .where(subsTable + '.is_test', true)
-                    .where(function() {
-                        addSegmentQuery(this);
-                    })
-                    .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('? AS list', [cpgList.list]), knex.raw('? AS segment', [cpgList.segment])]);
-            });
+            const sqlQry = knex.from(subsTable)
+                .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
+                .where(subsTable + '.is_test', true)
+                .where(function() {
+                    addSegmentQuery(this);
+                })
+                .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('? AS list', [cpgList.list]), knex.raw('? AS segment', [cpgList.segment])])
+                .toSQL().toNative();
+
+            subsQrys.push(sqlQry);
         }
 
-        if (subscriptionsQueries.length > 0) {
+        if (subsQrys.length > 0) {
+            let subsQry;
+
+            if (subsQrys.length === 1) {
+                const subsUnionSql = '(' + subsQrys[0].sql + ') as `test_subscriptions`'
+                subsQry = knex.raw(subsUnionSql, subsQrys[0].bindings);
+
+            } else {
+                const subsUnionSql = '(' +
+                    subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ') +
+                    ') as `test_subscriptions`';
+                const subsUnionBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
+                subsQry = knex.raw(subsUnionSql, subsUnionBindings);
+            }
+
             return await dtHelpers.ajaxListWithPermissions(
                 context,
                 [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'] }],
                 params,
                 builder => {
-                    let ret;
-                    if (subscriptionsQueries.length > 1) {
-                        ret = builder.unionAll(subscriptionsQueries, true)
-                            .as('test_subscriptions');
-                    } else {
-                        ret = builder.from(function () { subscriptionsQueries[0].apply(this); this.as('test_subscriptions'); })
-                            .as('test_subscriptions');
-                    }
-
-                    ret = ret
+                    const qry = builder.from(subsQry)
                         .innerJoin('lists', 'test_subscriptions.list', 'lists.id')
-                        .innerJoin('segments', 'test_subscriptions.segment', 'segments.id')
-                        .innerJoin('namespaces', 'lists.namespace', 'namespaces.id');
+                        .leftJoin('segments', 'test_subscriptions.segment', 'segments.id')
+                        .innerJoin('namespaces', 'lists.namespace', 'namespaces.id')
 
-                    return ret;
+                    return qry
                 },
                 ['test_subscriptions.campaign_list_id', 'test_subscriptions.email', 'test_subscriptions.list', 'test_subscriptions.segment', 'lists.cid', 'lists.name', 'segments.name', 'namespaces.name']
             );
@@ -156,7 +176,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
 
 async function rawGetByIdTx(tx, id) {
     const entity = await tx('campaigns').where('campaigns.id', id)
-        .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+        .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
         .select([
             'campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
@@ -170,12 +190,16 @@ async function rawGetByIdTx(tx, id) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    entity.lists = entity.lists.split(';').map(x => {
-        const entries = x.split(':');
-        const list = Number.parseInt(entries[0]);
-        const segment = entries[1] ? Number.parseInt(entries[1]) : null;
-        return {list, segment};
-    });
+    if (entity.lists) {
+        entity.lists = entity.lists.split(';').map(x => {
+            const entries = x.split(':');
+            const list = Number.parseInt(entries[0]);
+            const segment = entries[1] ? Number.parseInt(entries[1]) : null;
+            return {list, segment};
+        });
+    } else {
+        entity.lists = [];
+    }
 
     entity.data = JSON.parse(entity.data);
 
@@ -546,54 +570,63 @@ async function changeStatusByMessage(context, message, subscriptionStatus, updat
 }
 
 async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchSize) {
-    const subscriptionsQueries = [];
+    /*
+    This is supposed to produce queries like this:
+
+    select count(*) as `subscriptionsToSend` from `campaign_lists` inner join (
+        select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (
+            (select `subscription__1`.`email`, 2 AS campaign_list_id, campaign_messages.id IS NOT NULL AS sent from `subscription__1` left join `campaign_messages` on
+            `campaign_messages`.`subscription` = `subscription__1`.`id` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 1 and `subscription__1`.`status` = 1)
+         UNION ALL
+            (select `subscription__2`.`email`, 4 AS campaign_list_id, campaign_messages.id IS NOT NULL AS sent from `subscription__2` left join `campaign_messages` on
+            `campaign_messages`.`subscription` = `subscription__2`.`id` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 2 and `subscription__2`.`status` = 1)
+         )
+         as `pending_subscriptions_all` where `sent` = false group by `email`
+     ) as `pending_subscriptions` on `campaign_lists`.`id` = `pending_subscriptions`.`campaign_list_id` where `campaign_lists`.`campaign` = 1 limit 1
+
+     This was too much for Knex, so we partially construct these queries directly as strings;
+     */
+
+    const subsQrys = [];
     const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
 
     for (const cpgList of cpgLists) {
         const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
         const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
 
-        subscriptionsQueries.push(function() {
-            this.from(subsTable)
-                .leftJoin('campaign_messages', 'campaign_messages.subscription', subsTable + '.id')
-                .where('campaign_messages.campaign', cpgList.campaign)
-                .where('campaign_messages.list', cpgList.list)
-                .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
-                .where(function() {
-                    addSegmentQuery(this);
-                })
-                .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('campaign_messages.id IS NOT NULL AS sent')]);
-        });
+        const sqlQry = knex.from(subsTable)
+            .leftJoin('campaign_messages', 'campaign_messages.subscription', subsTable + '.id')
+            .where('campaign_messages.campaign', cpgList.campaign)
+            .where('campaign_messages.list', cpgList.list)
+            .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
+            .where(function() {
+                addSegmentQuery(this);
+            })
+            .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('campaign_messages.id IS NOT NULL AS sent')])
+            .toSQL().toNative();
+
+        subsQrys.push(sqlQry);
     }
 
-    if (subscriptionsQueries.length > 0) {
+    if (subsQrys.length > 0) {
+        let subsQry;
+        const unsentWhere = onlyUnsent ? ' where `sent` = false' : '';
+
+        if (subsQrys.length === 1) {
+            const subsUnionSql = '(select `email`, `campaign_list_id`, `sent` from (' + subsQrys[0].sql + ') as `pending_subscriptions_all`' +  unsentWhere + ') as `pending_subscriptions`'
+            subsQry = knex.raw(subsUnionSql, subsQrys[0].bindings);
+
+        } else {
+            const subsUnionSql = '(select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (' +
+                subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ') +
+                ') as `pending_subscriptions_all`' +  unsentWhere + ' group by `email`) as `pending_subscriptions`';
+            const subsUnionBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
+            subsQry = knex.raw(subsUnionSql, subsUnionBindings);
+        }
+
         return knx => knx.from('campaign_lists')
             .where('campaign_lists.campaign', campaignId)
-            .innerJoin(
-                function () {
-                    let ret;
-                    if (subscriptionsQueries.length > 1) {
-                        ret = this.unionAll(subscriptionsQueries, true)
-                            .groupBy('email')
-                            .select(['email']).min('campaign_list_id AS campaign_list_id')
-                            .select(['sent']).max('sent AS sent');
-                    } else {
-                        ret = this.from(function () { subscriptionsQueries[0].apply(this); this.as('pending_subscriptions'); })
-                            .select(['email', 'sent', 'campaign_list_id']);
-                    }
-
-                    ret = ret.where('sent', false)
-                        .as('pending_subscriptions');
-
-                    if (batchSize) {
-                        ret = ret.limit(retrieveBatchSize);
-                    }
-
-                    return ret;
-                },
-                'campaign_lists.id',
-                'pending_subscriptions.campaign_list_id'
-            );
+            .innerJoin(subsQry, 'campaign_lists.id', 'pending_subscriptions.campaign_list_id');
 
     } else {
         return null;
@@ -624,7 +657,7 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 
 
 async function start(context, campaignId, startAt) {
-    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.PAUSED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
 }
 
 async function stop(context, campaignId) {
