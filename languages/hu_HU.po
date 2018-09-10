@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Language-Team: \n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2018-09-07 16:53+0200\n"
+"PO-Revision-Date: 2018-09-10 16:02+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -464,12 +464,12 @@ msgstr ""
 
 #: views/campaigns/edit-rss.hbs:3 views/campaigns/edit-rss.hbs:4
 msgid "Edit RSS Campaign"
-msgstr ""
+msgstr "RSS kampány szerkesztése"
 
 #: views/campaigns/edit-rss.hbs:7 views/campaigns/edit-triggered.hbs:8
 #: views/campaigns/edit.hbs:9 views/settings.hbs:4 views/users/account.hbs:6
 msgid "General Settings"
-msgstr ""
+msgstr "Általános beállítások"
 
 #: views/campaigns/edit-rss.hbs:17
 msgid ""
@@ -503,11 +503,11 @@ msgstr ""
 
 #: views/campaigns/edit-triggered.hbs:24 views/campaigns/edit.hbs:27
 msgid "Template Settings"
-msgstr ""
+msgstr "Sablon beállítások"
 
 #: views/campaigns/edit-triggered.hbs:25 views/campaigns/edit.hbs:28
 msgid "Template URL"
-msgstr ""
+msgstr "Sablon URL"
 
 #: views/campaigns/edit.hbs:3 views/campaigns/edit.hbs:4
 #: views/campaigns/upload-attachment.hbs:3
@@ -634,7 +634,7 @@ msgstr ""
 
 #: views/campaigns/view.hbs:24 routes/lists.js:206
 msgid "Bounced"
-msgstr ""
+msgstr "Visszapattant"
 
 #: views/campaigns/view.hbs:25
 msgid "List subscribers who bounced"
@@ -699,7 +699,7 @@ msgstr "Mégse"
 
 #: views/campaigns/view.hbs:41
 msgid "Sending scheduled"
-msgstr ""
+msgstr "Küldés időzítve"
 
 #: views/campaigns/view.hbs:42 views/campaigns/view.hbs:54
 msgid "Pause"
@@ -863,7 +863,7 @@ msgstr ""
 #: views/lists/fields/edit.hbs:3 views/lists/fields/fields.hbs:3
 #: views/lists/fields/fields.hbs:5 views/lists/view.hbs:6
 msgid "Custom Fields"
-msgstr ""
+msgstr "Egyedi mezők"
 
 #: views/index.hbs:5
 msgid ""
@@ -888,7 +888,7 @@ msgstr ""
 
 #: views/index.hbs:11
 msgid "RSS Campaigns"
-msgstr ""
+msgstr "RSS kampányok"
 
 #: views/index.hbs:12
 msgid ""
@@ -1027,7 +1027,7 @@ msgstr "Feliratkozás"
 
 #: views/lists/create.hbs:10 views/lists/edit.hbs:16
 msgid "Allow public users to subscribe themselves"
-msgstr ""
+msgstr "Nyilvános űrlapról való feliratkozás engedélyezése"
 
 #: views/lists/create.hbs:11 views/lists/edit.hbs:17
 msgid "Unsubscription"
@@ -1066,14 +1066,16 @@ msgid ""
 "The custom form used for this list. You can create a form <a href=\"/forms/"
 "{{id}}/create\">here</a>."
 msgstr ""
+"Egyedi űrlap ehhez a listához. <a href=\"/forms/{{id}}/create\">Itt</a> "
+"hozhat létre új űrlapot."
 
 #: views/lists/edit.hbs:19
 msgid "Unsubscribe Header"
-msgstr ""
+msgstr "Leiratkozás fejléc"
 
 #: views/lists/edit.hbs:20
 msgid "Do not send List-Unsubscribe headers"
-msgstr ""
+msgstr "Leiratkozás fejléc küldésének letiltása"
 
 #: views/lists/edit.hbs:21
 msgid "Delete List"
@@ -1176,7 +1178,7 @@ msgstr ""
 
 #: views/lists/fields/create.hbs:26 views/lists/fields/edit.hbs:27
 msgid "Group"
-msgstr ""
+msgstr "Csoport"
 
 #: views/lists/fields/create.hbs:28 views/lists/fields/edit.hbs:29
 msgid "Required for group options"
@@ -1445,13 +1447,13 @@ msgstr ""
 #: views/lists/segments/rule-create.hbs:5 views/lists/segments/rule-edit.hbs:5
 #: views/lists/segments/view.hbs:4
 msgid "Create Rule"
-msgstr ""
+msgstr "Szabály létrehozása"
 
 #: views/lists/segments/rule-configure.hbs:6
 #: views/lists/segments/rule-create.hbs:6 views/lists/segments/rule-edit.hbs:6
 #: views/lists/segments/view.hbs:10
 msgid "Rule"
-msgstr ""
+msgstr "Szabály"
 
 #: views/lists/segments/rule-configure.hbs:7
 #: views/lists/segments/rule-configure.hbs:8
@@ -1464,7 +1466,7 @@ msgstr ""
 #: views/lists/segments/rule-edit.hbs:29 views/lists/segments/rule-edit.hbs:34
 #: views/lists/segments/view.hbs:11
 msgid "Value"
-msgstr ""
+msgstr "Érték"
 
 #: views/lists/segments/rule-configure.hbs:9
 #: views/lists/segments/rule-edit.hbs:9
@@ -1479,7 +1481,7 @@ msgstr ""
 #: views/lists/segments/rule-edit.hbs:11 views/lists/segments/rule-edit.hbs:16
 #: views/lists/segments/rule-edit.hbs:30
 msgid "Use exact match"
-msgstr ""
+msgstr "Pontos találat használata"
 
 #: views/lists/segments/rule-configure.hbs:12
 #: views/lists/segments/rule-configure.hbs:15
@@ -1487,12 +1489,12 @@ msgstr ""
 #: views/lists/segments/rule-edit.hbs:12 views/lists/segments/rule-edit.hbs:17
 #: views/lists/segments/rule-edit.hbs:31
 msgid "Use range match"
-msgstr ""
+msgstr "Tartomány találat használata"
 
 #: views/lists/segments/rule-configure.hbs:16
 #: views/lists/segments/rule-edit.hbs:20
 msgid "Use relative range match"
-msgstr ""
+msgstr "Relatív tartomány találat használata"
 
 #: views/lists/segments/rule-configure.hbs:17
 #: views/lists/segments/rule-configure.hbs:28
@@ -1729,11 +1731,11 @@ msgstr ""
 
 #: views/lists/view.hbs:3
 msgid "Subscription Form"
-msgstr ""
+msgstr "Feliratkozós űrlap"
 
 #: views/lists/view.hbs:4
 msgid "List Actions"
-msgstr ""
+msgstr "Lista műveletek"
 
 #: views/lists/view.hbs:9 views/triggers/create-select.hbs:3
 #: views/triggers/create-select.hbs:4 views/triggers/create.hbs:3
@@ -1744,11 +1746,11 @@ msgstr ""
 
 #: views/lists/view.hbs:10
 msgid "Add Subscriber"
-msgstr ""
+msgstr "Feliratkozó hozzáadása"
 
 #: views/lists/view.hbs:11
 msgid "Import Subscribers"
-msgstr ""
+msgstr "Feliratkozók importálása"
 
 #: views/lists/view.hbs:15
 msgid "Create New Segment"
@@ -1756,7 +1758,7 @@ msgstr ""
 
 #: views/lists/view.hbs:16
 msgid "Filter"
-msgstr "Szűrő"
+msgstr "Szűrés"
 
 #: views/lists/view.hbs:17
 msgid "Subscriptions"
@@ -1941,7 +1943,7 @@ msgstr ""
 
 #: views/report-templates/report-templates.hbs:6
 msgid "All Subscribers"
-msgstr ""
+msgstr "Összes feliratkozó"
 
 #: views/report-templates/report-templates.hbs:7
 msgid "Grouped Subscribers"
@@ -2113,11 +2115,11 @@ msgstr ""
 
 #: views/settings.hbs:38
 msgid "Encryption"
-msgstr ""
+msgstr "Titkosítás"
 
 #: views/settings.hbs:39
 msgid "Disable SMTP authentication"
-msgstr ""
+msgstr "SMTP azonosítás letiltása"
 
 #: views/settings.hbs:40 views/users/forgot.hbs:9 views/users/login.hbs:4
 #: views/users/login.hbs:5
@@ -3609,59 +3611,59 @@ msgstr ""
 
 #: lib/models/users.js:371
 msgid "Invalid new password"
-msgstr ""
+msgstr "Érvénytelen új jelszó"
 
 #: lib/passport.js:49
 msgid "%s  logged out"
-msgstr ""
+msgstr "%s kijelentkezett"
 
 #: lib/passport.js:64
 msgid "Failed to authenticate user"
-msgstr ""
+msgstr "Felhasználó azonosítása nem sikerült"
 
 #: lib/passport.js:80
 msgid "Logged in as %s"
-msgstr ""
+msgstr "Bejelenetezve, mint %s"
 
 #: lib/passport.js:180
 msgid "Incorrect username or password"
-msgstr ""
+msgstr "Helytelen felhasználónév vagy jelszó"
 
 #: lib/subscription-mail-helpers.js:28
 msgid "%s: Subscription Confirmed"
-msgstr ""
+msgstr "%s: Feliratkozás megerősítve"
 
 #: lib/subscription-mail-helpers.js:39
 msgid "%s: Email Address Already Registered"
-msgstr ""
+msgstr "%s: Emailcím már regisztrálva van"
 
 #: lib/subscription-mail-helpers.js:49
 msgid "%s: Please Confirm Email Change in Subscription"
-msgstr ""
+msgstr "%s: Kérjük erősítse meg email címének megváltoztatását"
 
 #: lib/subscription-mail-helpers.js:59
 msgid "%s: Please Confirm Subscription"
-msgstr ""
+msgstr "%s: Kérjük erősítse meg a feliratkozást"
 
 #: lib/subscription-mail-helpers.js:69
 msgid "%s: Please Confirm Unsubscription"
-msgstr ""
+msgstr "%s: Kérjük erősítse meg a leiratkozást"
 
 #: lib/subscription-mail-helpers.js:76
 msgid "%s: Unsubscription Confirmed"
-msgstr ""
+msgstr "%s: Leiratkozás megerősítve"
 
 #: lib/tools.js:154
 msgid "Blocked email address \"%s\""
-msgstr ""
+msgstr "Blokkolt email cím \"%s\""
 
 #: lib/tools.js:163
 msgid "Invalid email address \"%s\"."
-msgstr ""
+msgstr "Érvénytelen email cím \"%s\""
 
 #: lib/tools.js:166
 msgid "MX record not found for domain"
-msgstr ""
+msgstr "MX rekord nem található a domain-hez"
 
 #: lib/tools.js:169
 msgid "Address domain not found"
@@ -3673,7 +3675,7 @@ msgstr ""
 
 #: routes/archive.js:31 routes/archive.js:43 routes/archive.js:55 app.js:230
 msgid "Not Found"
-msgstr ""
+msgstr "Nem található"
 
 #: routes/archive.js:121 services/sender.js:454
 msgid "Received status code %s from %s"
@@ -3681,7 +3683,7 @@ msgstr ""
 
 #: routes/archive.js:153 routes/campaigns.js:894
 msgid "Attachment not found"
-msgstr ""
+msgstr "Csatolmány nem található"
 
 #: routes/blacklist.js:13 routes/campaigns.js:26 routes/editorapi.js:32
 #: routes/fields.js:13 routes/forms.js:16 routes/grapejs.js:15
@@ -3710,11 +3712,11 @@ msgstr ""
 
 #: routes/campaigns.js:227 routes/campaigns.js:744
 msgid "Campaign deleted"
-msgstr ""
+msgstr "Kampány törölve"
 
 #: routes/campaigns.js:229 routes/campaigns.js:746
 msgid "Could not delete specified campaign"
-msgstr ""
+msgstr "Kampány törlése nem sikerült"
 
 #: routes/campaigns.js:248
 msgid "Idling"
@@ -3722,7 +3724,7 @@ msgstr ""
 
 #: routes/campaigns.js:251
 msgid "Scheduled"
-msgstr ""
+msgstr "Időzítve"
 
 #: routes/campaigns.js:257
 msgid "Paused"
@@ -3730,11 +3732,11 @@ msgstr ""
 
 #: routes/campaigns.js:259
 msgid "Inactive"
-msgstr ""
+msgstr "Inaktív"
 
 #: routes/campaigns.js:261
 msgid "Active"
-msgstr ""
+msgstr "Aktív"
 
 #: routes/campaigns.js:263
 msgid "Other"
@@ -4361,11 +4363,11 @@ msgstr ""
 #: routes/subscription.js:682 routes/subscription.js:760
 #: routes/subscription.js:897
 msgid "Selected list not found"
-msgstr ""
+msgstr "Lista nem található"
 
 #: routes/subscription.js:93
 msgid "Could not save subscription"
-msgstr ""
+msgstr "Feliratkozás mentése nem sikerült"
 
 #: routes/subscription.js:118
 msgid "Subscriber info corrupted or missing"
@@ -4394,7 +4396,7 @@ msgstr "Publikus kulcs nincs megadva."
 
 #: routes/templates.js:84
 msgid "Could not create template"
-msgstr ""
+msgstr "Sablon létrehozása nem sikerült"
 
 #: routes/templates.js:87
 msgid "Template created"
@@ -4402,7 +4404,7 @@ msgstr "Sablon létrehozva."
 
 #: routes/templates.js:126
 msgid "Template settings updated"
-msgstr ""
+msgstr "Sablon beállításai frissítve"
 
 #: routes/templates.js:128
 msgid "Template settings not updated"
@@ -4512,7 +4514,7 @@ msgstr "RSS bejegyzés %s"
 
 #: services/importer.js:249
 msgid "Could not access import file"
-msgstr ""
+msgstr "Import file nem érhető el"
 
 #: services/triggers.js:51
 msgid "Unknown trigger type %s"
