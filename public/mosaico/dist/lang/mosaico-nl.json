@@ -84,5 +84,7 @@
     "File upload aborted": "Bestandsupload is afgebroken",
     "Failed to resize image": "Kon de grootte van het plaatje niet aanpassen",
     "Unexpected upload error": "Onverwachte fout bij upload",
-    "Unexpected error listing files": "Onverwachte fout bij tonen van de plaatjes"
+    "Unexpected error listing files": "Onverwachte fout bij tonen van de plaatjes",
+    "__current__ of __total__": "__current__ van __total__",
+    "Select from gallery": "Selecteer uit galerij"
 }

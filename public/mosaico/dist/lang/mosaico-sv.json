@@ -84,5 +84,7 @@
     "File upload aborted": "Uppladdning avbruten",
     "Failed to resize image": "Det gick inte att ändra storlek på bild",
     "Unexpected upload error": "Oväntat uppladdningsfel",
-    "Unexpected error listing files": "Oväntat fel vid inläsning av fillista"
+    "Unexpected error listing files": "Oväntat fel vid inläsning av fillista",
+    "__current__ of __total__": "__current__ av __total__",
+    "Select from gallery": "Välj från galleri"
 }

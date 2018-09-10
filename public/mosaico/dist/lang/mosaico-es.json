@@ -84,5 +84,7 @@
     "File upload aborted": "Subida de archivo abortada",
     "Failed to resize image": "Falló el cambio de tamaño de la imagen",
     "Unexpected upload error": "Error inesperado en la subida",
-    "Unexpected error listing files": "Error inesperado al listar los archivos"
+    "Unexpected error listing files": "Error inesperado al listar los archivos",
+    "__current__ of __total__": "__current__ de __total__",
+    "Select from gallery": "Seleccionar de la galería"
 }

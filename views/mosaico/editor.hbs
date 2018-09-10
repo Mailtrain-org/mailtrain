@@ -70,6 +70,7 @@
 {{/if}}
 
 
+
 <script>
     $(function() {
 
@@ -259,6 +260,12 @@
                 });
                 return html;
             };
+        });
+
+        // custom icon
+        plugins.push(function(viewModel) {
+            viewModel.logoPath = 'dist/img/mosaico32.png';
+            viewModel.logoUrl = 'javascript:void(0)';
         });
 
 
