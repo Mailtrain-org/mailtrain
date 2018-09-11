@@ -318,7 +318,7 @@ export default class Status extends Component {
         // The periodic task runs all the time, so that we don't have to worry about starting/stopping it as a reaction to the buttons.
         await this.refreshEntity();
         if (this.refreshTimeoutHandler) { // For some reason the task gets rescheduled if server is restarted while the page is shown. That why we have this check here.
-            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 2000);
+            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 10000);
         }
     }
 

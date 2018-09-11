@@ -101,11 +101,9 @@ async function listTestUsersDTAjax(context, campaignId, params) {
         This is supposed to produce queries like this:
 
         select * from (
-          (select `subscription__1`.`email`, 2 AS campaign_list_id, 1 AS list, NULL AS segment from `subscription__1` left join `campaign_messages` on
-            `campaign_messages`.`subscription` = `subscription__1`.`id` where `subscription__1`.`status` = 1 and `subscription__1`.`is_test` = true)
+          (select `subscription__1`.`email`, 2 AS campaign_list_id, 1 AS list, NULL AS segment from `subscription__1` where `subscription__1`.`status` = 1 and `subscription__1`.`is_test` = true)
         UNION ALL
-          (select `subscription__2`.`email`, 4 AS campaign_list_id, 2 AS list, NULL AS segment from `subscription__2` left join `campaign_messages` on
-          `campaign_messages`.`subscription` = `subscription__2`.`id` where `subscription__2`.`status` = 1 and `subscription__2`.`is_test` = true)
+          (select `subscription__2`.`email`, 4 AS campaign_list_id, 2 AS list, NULL AS segment from `subscription__2` where `subscription__2`.`status` = 1 and `subscription__2`.`is_test` = true)
         ) as `test_subscriptions` inner join `lists` on `test_subscriptions`.`list` = `lists`.`id` inner join `segments` on `test_subscriptions`.`segment` = `segments`.`id`
           inner join `namespaces` on `lists`.`namespace` = `namespaces`.`id`
 
@@ -573,16 +571,17 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchS
     /*
     This is supposed to produce queries like this:
 
-    select count(*) as `subscriptionsToSend` from `campaign_lists` inner join (
+    select ... from `campaign_lists` inner join (
         select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (
-            (select `subscription__1`.`email`, 2 AS campaign_list_id, campaign_messages.id IS NOT NULL AS sent from `subscription__1` left join `campaign_messages` on
-            `campaign_messages`.`subscription` = `subscription__1`.`id` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 1 and `subscription__1`.`status` = 1)
-         UNION ALL
-            (select `subscription__2`.`email`, 4 AS campaign_list_id, campaign_messages.id IS NOT NULL AS sent from `subscription__2` left join `campaign_messages` on
-            `campaign_messages`.`subscription` = `subscription__2`.`id` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 2 and `subscription__2`.`status` = 1)
-         )
-         as `pending_subscriptions_all` where `sent` = false group by `email`
-     ) as `pending_subscriptions` on `campaign_lists`.`id` = `pending_subscriptions`.`campaign_list_id` where `campaign_lists`.`campaign` = 1 limit 1
+            (select `subscription__2`.`email`, 8 AS campaign_list_id, related_campaign_messages.id IS NOT NULL AS sent from `subscription__2` left join
+                (select * from `campaign_messages` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 2)
+                    as `related_campaign_messages` on `related_campaign_messages`.`subscription` = `subscription__2`.`id` where `subscription__2`.`status` = 1)
+            UNION ALL
+            (select `subscription__1`.`email`, 9 AS campaign_list_id, related_campaign_messages.id IS NOT NULL AS sent from `subscription__1` left join
+                (select * from `campaign_messages` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 1)
+                    as `related_campaign_messages` on `related_campaign_messages`.`subscription` = `subscription__1`.`id` where `subscription__1`.`status` = 1)
+        ) as `pending_subscriptions_all` where `sent` = false group by `email`)
+            as `pending_subscriptions` on `campaign_lists`.`id` = `pending_subscriptions`.`campaign_list_id` where `campaign_lists`.`campaign` = '1'
 
      This was too much for Knex, so we partially construct these queries directly as strings;
      */
@@ -595,14 +594,19 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchS
         const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
 
         const sqlQry = knex.from(subsTable)
-            .leftJoin('campaign_messages', 'campaign_messages.subscription', subsTable + '.id')
-            .where('campaign_messages.campaign', cpgList.campaign)
-            .where('campaign_messages.list', cpgList.list)
+            .leftJoin(
+                function () {
+                    return this.from('campaign_messages')
+                        .where('campaign_messages.campaign', cpgList.campaign)
+                        .where('campaign_messages.list', cpgList.list)
+                        .as('related_campaign_messages');
+                },
+                'related_campaign_messages.subscription', subsTable + '.id')
             .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
             .where(function() {
                 addSegmentQuery(this);
             })
-            .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('campaign_messages.id IS NOT NULL AS sent')])
+            .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('related_campaign_messages.id IS NOT NULL AS sent')])
             .toSQL().toNative();
 
         subsQrys.push(sqlQry);

@@ -27,7 +27,7 @@ const workerBatchSize = 100;
 const messageQueue = new Map(); // campaignId -> [{listId, email}]
 const messageQueueCont = new Map(); // campaignId -> next batch callback
 
-const workerSchedulerCont = null;
+let workerSchedulerCont = null;
 
 
 function messagesProcessed(workerId) {
@@ -202,7 +202,7 @@ async function spawnWorker(workerId) {
                     return resolve();
 
                 } else if (msg.type === 'messages-processed') {
-                    messageProcessed(workerId);
+                    messagesProcessed(workerId);
                 }
 
             }
