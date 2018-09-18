@@ -583,6 +583,17 @@ async function changeStatusByMessage(context, message, subscriptionStatus, updat
     });
 }
 
+async function updateMessageResponse(context, message, response, responseId) {
+    await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
+
+        await tx('campaign_messages').where('id', message.id).update({
+            response,
+            response_id: responseId
+        });
+    });
+}
+
 async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchSize) {
     /*
     This is supposed to produce queries like this:
@@ -728,6 +739,7 @@ module.exports.getMessageByResponseId = getMessageByResponseId;
 
 module.exports.changeStatusByCampaignCidAndSubscriptionIdTx = changeStatusByCampaignCidAndSubscriptionIdTx;
 module.exports.changeStatusByMessage = changeStatusByMessage;
+module.exports.updateMessageResponse = updateMessageResponse;
 
 module.exports.getSubscribersQueryGeneratorTx = getSubscribersQueryGeneratorTx;
 

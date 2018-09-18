@@ -96,12 +96,12 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                                     feedcheck.spawn(() => {
                                         senders.spawn(() => {
                                             //triggers(() => {
-                                            //postfixBounceServer(async () => {
-                                            (async () => {
-                                                await reportProcessor.init();
-                                                log.info('Service', 'All services started');
-                                            })();
-                                            //});
+                                            postfixBounceServer(async () => {
+                                                (async () => {
+                                                    await reportProcessor.init();
+                                                    log.info('Service', 'All services started');
+                                                })();
+                                            });
                                             //});
                                         });
                                     });
