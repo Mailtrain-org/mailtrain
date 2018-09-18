@@ -194,27 +194,29 @@ async function hashByList(listId, entity) {
     });
 }
 
+async function _getByTx(tx, context, listId, key, value, grouped) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+
+    const entity = await tx(getSubscriptionTableName(listId)).where(key, value).first();
+
+    if (!entity) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+    }
+
+    const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+
+    if (grouped) {
+        groupSubscription(groupedFieldsMap, entity);
+    }
+
+    return entity;
+}
 
 async function _getBy(context, listId, key, value, grouped) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
-
-        const entity = await tx(getSubscriptionTableName(listId)).where(key, value).first();
-
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError('Subscription not found in this list');
-        }
-
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
-
-        if (grouped) {
-            groupSubscription(groupedFieldsMap, entity);
-        }
-
-        return entity;
+        return _getByTx(tx, context, listId, key, value, grouped);
     });
 }
-
 
 async function getById(context, listId, id, grouped = true) {
     return await _getBy(context, listId, 'id', id, grouped);
@@ -226,6 +228,10 @@ async function getByEmail(context, listId, email, grouped = true) {
 
 async function getByCid(context, listId, cid, grouped = true) {
     return await _getBy(context, listId, 'cid', cid, grouped);
+}
+
+async function getByCidTx(tx, context, listId, cid, grouped = true) {
+    return await _getByTx(tx, context, listId, 'cid', cid, grouped);
 }
 
 async function listDTAjax(context, listId, segmentId, params) {
@@ -725,6 +731,7 @@ async function getListsWithEmail(context, email) {
 module.exports.getSubscriptionTableName = getSubscriptionTableName;
 module.exports.hashByList = hashByList;
 module.exports.getById = getById;
+module.exports.getByCidTx = getByCidTx;
 module.exports.getByCid = getByCid;
 module.exports.getByEmail = getByEmail;
 module.exports.list = list;

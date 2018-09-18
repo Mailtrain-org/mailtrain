@@ -54,6 +54,9 @@ const index = require('./routes/index');
 
 const interoperableErrors = require('./shared/interoperable-errors');
 
+const { getTrustedUrl } = require('./lib/urls');
+const { AppType } = require('./shared/app');
+
 hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerPartials(__dirname + '/views/subscription/partials/');
 
@@ -104,7 +107,8 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
 handlebarsHelpers.registerHelpers(hbs.handlebars);
 
 
-function createApp(trusted) {
+
+function createApp(appType) {
     const app = express();
 
     function install404Fallback(url) {
@@ -171,9 +175,9 @@ function createApp(trusted) {
         limit: config.www.postSize
     }));
 
-    if (trusted) {
+    if (appType === AppType.TRUSTED) {
         passport.setupRegularAuth(app);
-    } else {
+    } else if (appType === AppType.SANDBOXED) {
         app.use(passport.tryAuthByRestrictedAccessToken);
     }
 
@@ -189,52 +193,6 @@ function createApp(trusted) {
         next();
     });
 
-    /* FIXME - can we remove this???
-    app.use((req, res, next) => {
-        res.locals.flash = req.flash.bind(req);
-        res.locals.user = req.user;
-        res.locals.admin = req.user && req.user.id == 1; // FIXME, this should verify the admin privileges and set this accordingly
-        res.locals.ldap = {
-            enabled: config.ldap.enabled,
-            passwordresetlink: config.ldap.passwordresetlink
-        };
-
-        let menu = [{
-            title: _('Home'),
-            url: '/',
-            selected: true
-        }];
-
-        res.setSelectedMenu = key => {
-            menu.forEach(item => {
-                item.selected = (item.key === key);
-            });
-        };
-
-        res.locals.menu = menu;
-        tools.updateMenu(res);
-
-        res.locals.customStyles = config.customstyles || [];
-        res.locals.customScripts = config.customscripts || [];
-
-        let bodyClasses = [];
-        if (req.user) {
-            bodyClasses.push('logged-in user-' + req.user.username);
-        }
-        res.locals.bodyClass = bodyClasses.join(' ');
-
-        getSettings(['uaCode', 'shoutout'], (err, configItems) => {
-            if (err) {
-                return next(err);
-            }
-            Object.keys(configItems).forEach(key => {
-                res.locals[key] = configItems[key];
-            });
-            next();
-        });
-    });
-    */
-
     // Endpoint under /api are authenticated by access token
     app.all('/api/*', passport.authByAccessToken);
 
@@ -244,12 +202,10 @@ function createApp(trusted) {
         next();
     });
 
-
     app.all('/rest/*', (req, res, next) => {
         req.needsRESTJSONResponse = true;
         next();
     });
-
 
     // Initializes the request context to be used for authorization
     app.use((req, res, next) => {
@@ -257,49 +213,53 @@ function createApp(trusted) {
         next();
     });
 
-
-    // Regular endpoints
-    useWith404Fallback('/subscription', subscription);
-    useWith404Fallback('/files', files);
-    useWith404Fallback('/mosaico', mosaico.getRouter(trusted));
-
-    if (config.reports && config.reports.enabled === true) {
-        useWith404Fallback('/reports', reports);
+    if (appType === AppType.PUBLIC) {
+        useWith404Fallback('/subscription', subscription);
     }
 
+    if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
+        // Regular endpoints
+        useWith404Fallback('/files', files);
+        useWith404Fallback('/mosaico', mosaico.getRouter(appType));
 
-    // API endpoints
-    useWith404Fallback('/api', api);
+        if (config.reports && config.reports.enabled === true) {
+            useWith404Fallback('/reports', reports);
+        }
 
-    // REST endpoints
-    app.use('/rest', namespacesRest);
-    app.use('/rest', sendConfigurationsRest);
-    app.use('/rest', usersRest);
-    app.use('/rest', accountRest);
-    app.use('/rest', campaignsRest);
-    app.use('/rest', triggersRest);
-    app.use('/rest', listsRest);
-    app.use('/rest', formsRest);
-    app.use('/rest', fieldsRest);
-    app.use('/rest', importsRest);
-    app.use('/rest', importRunsRest);
-    app.use('/rest', sharesRest);
-    app.use('/rest', segmentsRest);
-    app.use('/rest', subscriptionsRest);
-    app.use('/rest', templatesRest);
-    app.use('/rest', mosaicoTemplatesRest);
-    app.use('/rest', blacklistRest);
-    app.use('/rest', editorsRest);
-    app.use('/rest', filesRest);
-    app.use('/rest', settingsRest);
 
-    if (config.reports && config.reports.enabled === true) {
-        app.use('/rest', reportTemplatesRest);
-        app.use('/rest', reportsRest);
+        // API endpoints
+        useWith404Fallback('/api', api);
+
+        // REST endpoints
+        app.use('/rest', namespacesRest);
+        app.use('/rest', sendConfigurationsRest);
+        app.use('/rest', usersRest);
+        app.use('/rest', accountRest);
+        app.use('/rest', campaignsRest);
+        app.use('/rest', triggersRest);
+        app.use('/rest', listsRest);
+        app.use('/rest', formsRest);
+        app.use('/rest', fieldsRest);
+        app.use('/rest', importsRest);
+        app.use('/rest', importRunsRest);
+        app.use('/rest', sharesRest);
+        app.use('/rest', segmentsRest);
+        app.use('/rest', subscriptionsRest);
+        app.use('/rest', templatesRest);
+        app.use('/rest', mosaicoTemplatesRest);
+        app.use('/rest', blacklistRest);
+        app.use('/rest', editorsRest);
+        app.use('/rest', filesRest);
+        app.use('/rest', settingsRest);
+
+        if (config.reports && config.reports.enabled === true) {
+            app.use('/rest', reportTemplatesRest);
+            app.use('/rest', reportsRest);
+        }
+        install404Fallback('/rest');
     }
-    install404Fallback('/rest');
 
-    app.use('/', index.getRouter(trusted));
+    app.use('/', index.getRouter(appType));
 
     // Error handlers
     if (app.get('env') === 'development') {
@@ -333,7 +293,7 @@ function createApp(trusted) {
 
             } else {
                 if (err instanceof interoperableErrors.NotLoggedInError) {
-                    return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
+                    return res.redirect(getTrustedUrl('/account/login?next=' + encodeURIComponent(req.originalUrl)));
                 } else {
                     res.status(err.status || 500);
                     res.render('error', {
@@ -378,7 +338,7 @@ function createApp(trusted) {
                 // TODO: Render interoperable errors using a special client that does internationalization of the error message
 
                 if (err instanceof interoperableErrors.NotLoggedInError) {
-                    return res.redirect('/account/login?next=' + encodeURIComponent(req.originalUrl));
+                    return res.redirect(getTrustedUrl('/account/login?next=' + encodeURIComponent(req.originalUrl)));
                 } else {
                     res.status(err.status || 500);
                     res.render('error', {
@@ -393,6 +353,4 @@ function createApp(trusted) {
     return app;
 }
 
-module.exports = {
-    createApp
-};
+module.exports.createApp = createApp;

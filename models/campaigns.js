@@ -255,6 +255,22 @@ async function getById(context, id, withPermissions = true, content = Content.AL
     });
 }
 
+async function getByCidTx(tx, context, cid) {
+    const entity = await tx('campaigns').where('cid', cid).first();
+    if (!entity) {
+        shares.throwPermissionDenied();
+    }
+
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'view');
+    return entity;
+}
+
+async function getByCid(context, cid) {
+    return await knex.transaction(async tx => {
+        return getByCidTx(tx, context, cid);
+    });
+}
+
 async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
     if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM || content === Content.RSS_ENTRY) {
         await namespaceHelpers.validateEntity(tx, entity);
@@ -698,6 +714,8 @@ module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIn
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
+module.exports.getByCidTx = getByCidTx;
+module.exports.getByCid = getByCid;
 module.exports.create = create;
 module.exports.createRssTx = createRssTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;

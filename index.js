@@ -19,8 +19,9 @@ const privilegeHelpers = require('./lib/privilege-helpers');
 const knex = require('./lib/knex');
 const shares = require('./models/shares');
 
-const trustedPort = config.www.port;
+const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
+const publicPort = config.www.publicPort;
 const host = config.www.host;
 
 if (config.title) {
@@ -30,8 +31,8 @@ if (config.title) {
 log.level = config.log.level;
 
 
-function startHTTPServer(trusted, port, callback) {
-    const app = appBuilder.createApp(trusted);
+function startHTTPServer(appType, port, callback) {
+    const app = appBuilder.createApp(appType);
     app.set('port', port);
 
     const server = http.createServer(app);
@@ -84,23 +85,25 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
         executor.spawn(() => {
             testServer(() => {
                 verpServer(() => {
-                    startHTTPServer(true, trustedPort, () => {
-                        startHTTPServer(false, sandboxPort, () => {
-                            privilegeHelpers.dropRootPrivileges();
+                    startHTTPServer(AppType.TRUSTED, trustedPort, () => {
+                        startHTTPServer(AppType.SANDBOXED, sandboxPort, () => {
+                            startHTTPServer(AppType.PUBLIC, publicPort, () => {
+                                privilegeHelpers.dropRootPrivileges();
 
-                            tzupdate.start();
+                                tzupdate.start();
 
-                            importer.spawn(() => {
-                                feedcheck.spawn(() => {
-                                    senders.spawn(() => {
-                                        //triggers(() => {
-                                        //postfixBounceServer(async () => {
+                                importer.spawn(() => {
+                                    feedcheck.spawn(() => {
+                                        senders.spawn(() => {
+                                            //triggers(() => {
+                                            //postfixBounceServer(async () => {
                                             (async () => {
                                                 await reportProcessor.init();
                                                 log.info('Service', 'All services started');
                                             })();
-                                        //});
-                                        //});
+                                            //});
+                                            //});
+                                        });
                                     });
                                 });
                             });

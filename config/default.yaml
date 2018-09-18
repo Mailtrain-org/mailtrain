@@ -43,17 +43,22 @@ log:
   level: verbose
 
 www:
-  # HTTP port to listen on
-  port: 3000
-  # HTTP port to listen on for sandboxed requests
+  # HTTP port to listen on for trusted requests (logged-in users)
+  trustedPort: 3000
+  # HTTP port to listen on for sandboxed requests (logged-in users)
   sandboxPort: 8081
+  # HTTP port to listen on for public requests (campaign recipients)
+  publicPort: 8082
   # HTTP interface to listen on
   host: 0.0.0.0
-  # URL base for trusted urls. It must be absolute (starting with http:// or https://). If Mailtrain is served on
+  # URL base for trusted urls (logged-in users). It must be absolute (starting with http:// or https://). If Mailtrain is served on
   # a non-standard port (e.g. 3000), the URL must also specify the port.
   trustedUrlBase: http://localhost:3000
-  # URL base for sandbox urls. It must be absolute (starting with http:// or https://) and contain the sandbox port.
+  # URL base for sandbox urls (logged-in users). It must be absolute (starting with http:// or https://) and contain the sandbox port.
   sandboxUrlBase: http://localhost:8081
+  # URL base for public urls (campaign recipients). It must be absolute (starting with http:// or https://) and contain the sandbox port.
+  publicUrlBase: http://localhost:8082
+
 
   # Secret for signing the session ID cookie
   secret: a cat

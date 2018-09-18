@@ -71,7 +71,7 @@ module.exports = {
         }
     },
     settings: {
-        'service-url': 'http://localhost:' + config.www.port + '/',
+        'service-url': 'http://localhost:' + config.www.publicPort + '/',
         'admin-email': 'keep.admin@mailtrain.org',
         'default-homepage': 'https://mailtrain.org',
         'smtp-hostname': config.testserver.host,

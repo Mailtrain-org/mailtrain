@@ -203,7 +203,7 @@ async function getDefaultCustomFormValues() {
     }
 
     form.layout = await getContents('views/subscription/layout.mjml.hbs') || '';
-    form.form_input_style = await getContents('public/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
+    form.form_input_style = await getContents('static/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
 
     return form;
 }

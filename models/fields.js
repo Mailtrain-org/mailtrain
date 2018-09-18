@@ -557,8 +557,7 @@ async function removeAllByListIdTx(tx, context, listId) {
     }
 }
 
-// Returns an array that can be used for rendering by Handlebars
-async function forHbs(context, listId, subscription) { // assumes grouped subscription
+function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes grouped subscription
     const customFields = [{
         name: 'Email Address',
         column: 'email',
@@ -569,9 +568,7 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
         order_manage: -1
     }];
 
-    const flds = await listGrouped(context, listId);
-
-    for (const fld of flds) {
+    for (const fld of fieldsGrouped) {
         const type = fieldTypes[fld.type];
         const fldCol = getFieldColumn(fld);
 
@@ -630,6 +627,13 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
     }
 
     return customFields;
+
+}
+
+// Returns an array that can be used for rendering by Handlebars
+async function forHbs(context, listId, subscription) { // assumes grouped subscription
+    const flds = await listGrouped(context, listId);
+    return forHbsWithFieldsGrouped(flds, subscription);
 }
 
 // Converts subscription data received via (1) POST request from subscription form, (2) via subscribe request to API v1 to subscription structure supported by subscriptions model,
@@ -741,6 +745,7 @@ module.exports.remove = remove;
 module.exports.removeAllByListIdTx = removeAllByListIdTx;
 module.exports.serverValidate = serverValidate;
 module.exports.forHbs = forHbs;
+module.exports.forHbsWithFieldsGrouped = forHbsWithFieldsGrouped;
 module.exports.fromPost = fromPost;
 module.exports.fromAPI = fromAPI;
 module.exports.fromImport = fromImport;

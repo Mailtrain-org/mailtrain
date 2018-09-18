@@ -70,7 +70,7 @@ export class MosaicoEditor extends Component {
         return (
             <div className={this.state.fullscreen ? styles.editorFullscreen : styles.editor}>
                 <div className={styles.navbar}>
-                    {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('public/mailtrain-notext.png')}/>}
+                    {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
                 </div>
@@ -142,7 +142,7 @@ export class MosaicoSandbox extends Component {
 
         plugins.unshift(vm => {
             // This is an override of the default paths in Mosaico
-            vm.logoPath = getTrustedUrl('public/mosaico/img/mosaico32.png');
+            vm.logoPath = getTrustedUrl('static/mosaico/img/mosaico32.png');
             vm.logoUrl = '#';
         });
 

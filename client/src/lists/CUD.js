@@ -52,7 +52,8 @@ export default class CUD extends Component {
                 contact_email: '',
                 homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
-                namespace: mailtrainConfig.user.namespace
+                namespace: mailtrainConfig.user.namespace,
+                to_name: '[FIRST_NAME] [LAST_NAME]'
             });
         }
     }
@@ -186,6 +187,7 @@ export default class CUD extends Component {
 
                     <InputField id="contact_email" label={t('Contact email')} help={t('Contact email used in subscription forms and emails that are sent out. If not filled in, the admin email from the global settings will be used.')}/>
                     <InputField id="homepage" label={t('Homepage')} help={t('Homepage URL used in subscription forms and emails that are sent out. If not filled in, the default homepage from global settings will be used.')}/>
+                    <InputField id="to_name" label={t('Recipients name template')} help={t('Specify using merge tags of this list how to construct full name of the recipient. This full name is used as "To" header when sending emails.')}/>
                     <TableSelect id="send_configuration" label={t('Send configuration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('Send configuration that will be used for sending out subscription-related emails.')}/>
 
                     <NamespaceSelect/>

@@ -15,7 +15,7 @@ import {
 import {Icon, Button} from "../../lib/bootstrap-components";
 import axios from '../../lib/axios';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
-import {getUrl} from "../../lib/urls";
+import {getUrl, getPublicUrl} from "../../lib/urls";
 
 @translate()
 @withForm
@@ -158,7 +158,7 @@ export default class List extends Component {
         return (
             <div>
                 <Toolbar>
-                    <a href={`/subscription/${this.props.list.cid}`} className="btn-default"><Button label={t('Subscription Form')} className="btn-default"/></a>
+                    <a href={getPublicUrl(`subscription/${this.props.list.cid}`)} className="btn-default"><Button label={t('Subscription Form')} className="btn-default"/></a>
                     <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('Add Subscriber')}/>
                 </Toolbar>
 

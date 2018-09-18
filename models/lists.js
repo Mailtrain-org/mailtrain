@@ -14,7 +14,7 @@ const entitySettings = require('../lib/entity-settings');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
-const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
@@ -61,7 +61,7 @@ async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {
     );
 }
 
-async function _getByIdTx(tx, context, id) {
+async function getByIdTx(tx, context, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
     const entity = await tx('lists').where('id', id).first();
     return entity;
@@ -70,28 +70,32 @@ async function _getByIdTx(tx, context, id) {
 async function getById(context, id) {
     return await knex.transaction(async tx => {
         // note that permissions are not obtained here as this methods is used only with synthetic admin context
-        return await _getByIdTx(tx, context, id);
+        return await getByIdTx(tx, context, id);
     });
 }
 
 async function getByIdWithListFields(context, id) {
     return await knex.transaction(async tx => {
-        const entity = await _getByIdTx(tx, context, id);
+        const entity = await getByIdTx(tx, context, id);
         entity.permissions = await shares.getPermissionsTx(tx, context, 'list', id);
         entity.listFields = await fields.listByOrderListTx(tx, id);
         return entity;
     });
 }
 
+async function getByCidTx(tx, context, cid) {
+    const entity = await tx('lists').where('cid', cid).first();
+    if (!entity) {
+        shares.throwPermissionDenied();
+    }
+
+    await shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'view');
+    return entity;
+}
+
 async function getByCid(context, cid) {
     return await knex.transaction(async tx => {
-        const entity = await tx('lists').where('cid', cid).first();
-        if (!entity) {
-            shares.throwPermissionDenied();
-        }
-
-        await shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'view');
-        return entity;
+        return getByCidTx(tx, context, cid);
     });
 }
 
@@ -212,8 +216,10 @@ module.exports.UnsubscriptionMode = UnsubscriptionMode;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
 module.exports.listWithSegmentByCampaignDTAjax = listWithSegmentByCampaignDTAjax;
+module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.getByIdWithListFields = getByIdWithListFields;
+module.exports.getByCidTx = getByCidTx;
 module.exports.getByCid = getByCid;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;

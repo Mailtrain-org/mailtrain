@@ -40,7 +40,6 @@ export default class CustomContent extends Component {
 
         const t = props.t;
 
-        console.log(props);
         this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
 
         this.customTemplateTypeOptions = [];

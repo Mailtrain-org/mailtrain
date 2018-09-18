@@ -78,7 +78,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
     }
 
     if (!customFormId) {
-        data.formInputStyle = '@import url(/public/subscription/form-input-style.css);';
+        data.formInputStyle = '@import url(/static/subscription/form-input-style.css);';
         return;
     }
 
@@ -86,7 +86,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
 
     data.template.template = form[viewKey] || data.template.template;
     data.template.layout = form.layout || data.template.layout;
-    data.formInputStyle = form.formInputStyle || '@import url(/public/subscription/form-input-style.css);';
+    data.formInputStyle = form.formInputStyle || '@import url(/static/subscription/form-input-style.css);';
 
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['uaCode']);
 

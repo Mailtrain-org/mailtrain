@@ -15,19 +15,6 @@ dump.rdb
 # generate POT file every time you want to update your PO file
 languages/mailtrain.pot
 
-public/mosaico/uploads/*
-!public/mosaico/uploads/README.md
-public/mosaico/custom/*
-!public/mosaico/custom/README.md
-public/mosaico/templates/*
-!public/mosaico/templates/versafix-1
-
-public/grapejs/uploads/*
-!public/grapejs/uploads/README.md
-public/grapejs/templates/*
-!public/grapejs/templates/demo
-!public/grapejs/templates/aves
-
 config/production.toml
 workers/reports/config/production.toml
 docker-compose.override.yml

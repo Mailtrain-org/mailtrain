@@ -4,15 +4,16 @@ const passport = require('../lib/passport');
 const _ = require('../lib/translate')._;
 const clientHelpers = require('../lib/client-helpers');
 const { getTrustedUrl } = require('../lib/urls');
+const { AppType } = require('../shared/app');
 
 const routerFactory = require('../lib/router-async');
 
-function getRouter(trusted) {
+function getRouter(appType) {
     const router = routerFactory.create();
 
-    if (trusted) {
+    if (appType === AppType.TRUSTED) {
         router.getAsync('/*', passport.csrfProtection, async (req, res) => {
-            const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, trusted);
+            const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
             if (req.user) {
                 Object.assign(mailtrainConfig, await clientHelpers.getAuthenticatedConfig(req.context));
             }
@@ -32,6 +33,4 @@ function getRouter(trusted) {
 }
 
 
-module.exports = {
-    getRouter
-};
+module.exports.getRouter = getRouter;

@@ -1,7 +1,5 @@
 'use strict';
 
-// FIXME - process also urlencoded strings - this is for the mosaico/img/template, which passes the file in src parameter
-
 function base(text, trustedBaseUrl, sandboxBaseUrl) {
     if (trustedBaseUrl.endsWith('/')) {
         trustedBaseUrl = trustedBaseUrl.substring(0, trustedBaseUrl.length - 1);

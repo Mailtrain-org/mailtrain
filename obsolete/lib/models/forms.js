@@ -339,7 +339,7 @@ function setDefaultValues(form) {
     });
 
     form.layout = getContents('views/subscription/layout.mjml.hbs') || '';
-    form.formInputStyle = getContents('public/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
+    form.formInputStyle = getContents('static/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
 
     return form;
 }

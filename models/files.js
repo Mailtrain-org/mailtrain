@@ -50,11 +50,15 @@ async function listDTAjax(context, type, subType, entityId, params) {
     );
 }
 
-async function list(context, type, subType, entityId) {
+async function listTx(tx, context, type, subType, entityId) {
     enforceTypePermitted(type, subType);
+    await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'view'));
+    return await tx(getFilesTable(type, subType)).where({entity: entityId}).select(['id', 'originalname', 'filename', 'size', 'created']).orderBy('originalname', 'asc');
+}
+
+async function list(context, type, subType, entityId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'view'));
-        return await tx(getFilesTable(type, subType)).where({entity: entityId}).select(['id', 'originalname', 'filename', 'size', 'created']).orderBy('originalname', 'asc');
+        return listTx(tx, context, type, subType, entityId);
     });
 }
 
@@ -304,6 +308,7 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
 
 module.exports.filesDir = filesDir;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listTx = listTx;
 module.exports.list = list;
 module.exports.getFileById = getFileById;
 module.exports.getFileByFilename = getFileByFilename;

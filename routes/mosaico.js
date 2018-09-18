@@ -25,6 +25,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 
 const { getTrustedUrl, getSandboxUrl } = require('../lib/urls');
 const { base } = require('../shared/templates');
+const { AppType } = require('../shared/app');
 
 
 users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entityId}) => {
@@ -123,10 +124,10 @@ function sanitizeSize(val, min, max, defaultVal, allowNull) {
 
 
 
-function getRouter(trusted) {
+function getRouter(appType) {
     const router = routerFactory.create();
     
-    if (!trusted) {
+    if (appType === AppType.SANDBOXED) {
         router.getAsync('/templates/:mosaicoTemplateId/index.html', passport.loggedIn, async (req, res) => {
             const tmpl = await mosaicoTemplates.getById(req.context, req.params.mosaicoTemplateId);
 
@@ -174,7 +175,7 @@ function getRouter(trusted) {
         });
 
         router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
-            const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, trusted);
+            const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
 
             let languageStrings = null;
             if (config.language && config.language !== 'en') {
@@ -196,7 +197,7 @@ function getRouter(trusted) {
                     getSandboxUrl('mailtrain/common.js'),
                     getSandboxUrl('mailtrain/mosaico.js')
                 ],
-                mosaicoPublicPath: getSandboxUrl('public/mosaico')
+                mosaicoPublicPath: getSandboxUrl('static/mosaico')
             });
         });
 
@@ -240,6 +241,4 @@ function getRouter(trusted) {
     return router;
 }
 
-module.exports = {
-    getRouter
-};
+module.exports.getRouter = getRouter;

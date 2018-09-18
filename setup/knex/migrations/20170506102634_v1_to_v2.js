@@ -670,6 +670,7 @@ async function migrateSettings(knex) {
     await knex.schema.table('lists', table => {
         table.string('contact_email');
         table.string('homepage');
+        table.string('to_name');
         table.integer('send_configuration').unsigned().references(`send_configurations.id`);
     });
 
@@ -679,8 +680,11 @@ async function migrateSettings(knex) {
         settings[row.key] = row.value;
     }
 
-    await knex('lists').update({contact_email: settings.defaultAddress});
-    await knex('lists').update({homepage: settings.defaultHomepage});
+    await knex('lists').update({
+        contact_email: settings.defaultAddress,
+        homepage: settings.defaultHomepage,
+        to_name: '[FIRST_NAME] [LAST_NAME]'
+    });
 
     let mailer_settings;
     let mailer_type;
@@ -971,7 +975,6 @@ async function migrateCampaigns(knex) {
                     data: editorData,
                     html: campaign.html,
                     text: campaign.text,
-                    htmlPrepared: campaign.html_prepared
                 };
 
                 data.sourceTemplate = campaign.template;

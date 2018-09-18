@@ -8,9 +8,6 @@ const knex = require('../lib/knex');
 const {CampaignStatus, CampaignType} = require('../shared/campaigns');
 const { enforce } = require('../lib/helpers');
 const campaigns = require('../models/campaigns');
-const subscriptions = require('../models/subscriptions');
-const { SubscriptionStatus } = require('../shared/lists');
-const segments = require('../models/segments');
 
 let messageTid = 0;
 const workerProcesses = new Map();
@@ -72,14 +69,17 @@ async function scheduleWorkers() {
             const queue = messageQueue.get(campaignId);
 
             if (queue.length > 0) {
-                const msgs = queue.splice(0, workerBatchSize);
+                const subscribers = queue.splice(0, workerBatchSize);
 
                 if (queue.length === 0 && messageQueueCont.has(campaignId)) {
                     const scheduleMessages = messageQueueCont.get(campaignId);
                     setImmediate(scheduleMessages);
                 }
 
-                sendToWorker(workerId, 'process-messages', msgs);
+                sendToWorker(workerId, 'process-messages', {
+                    campaignId,
+                    subscribers
+                });
                 workerId = await getAvailableWorker();
 
                 keepLooping = true;

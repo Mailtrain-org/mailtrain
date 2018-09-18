@@ -134,7 +134,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
                     initialMetadata={owner.getFormValue(prefix + 'mosaicoData').metadata}
-                    templatePath={getSandboxUrl(`public/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/index.html`)}
+                    templatePath={getSandboxUrl(`static/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/index.html`)}
                     entityTypeId={entityTypeId}
                     title={t('Mosaico Template Designer')}
                     onFullscreenAsync={::owner.setElementInFullscreen}/>
@@ -283,6 +283,14 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </th>
                         <td>
                             <Trans>Email address</Trans>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            [TO_NAME]
+                        </th>
+                        <td>
+                            <Trans>Recipient name as it appears in email's 'To' header</Trans>
                         </td>
                     </tr>
                     <tr>
