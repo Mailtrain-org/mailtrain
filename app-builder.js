@@ -3,8 +3,6 @@
 const config = require('config');
 const log = require('npmlog');
 
-const _ = require('./lib/translate')._;
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -27,6 +25,7 @@ const subscription = require('./routes/subscription');
 const mosaico = require('./routes/mosaico');
 const files = require('./routes/files');
 const links = require('./routes/links');
+const archive = require('./routes/archive');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const sendConfigurationsRest = require('./routes/rest/send-configurations');
@@ -217,6 +216,7 @@ function createApp(appType) {
     if (appType === AppType.PUBLIC) {
         useWith404Fallback('/subscription', subscription);
         useWith404Fallback('/links', links);
+        useWith404Fallback('/archive', archive);
     }
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {

@@ -68,7 +68,11 @@ class TestUser extends Component {
         if (this.isFormWithoutErrors()) {
             const data = this.getFormValues();
 
+            console.log(this.props.entity);
+            console.log(data);
+
             // FIXME - navigate to campaign preview
+            // window.location =
         } else {
             this.showFormValidation();
         }

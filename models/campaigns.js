@@ -172,8 +172,8 @@ async function listTestUsersDTAjax(context, campaignId, params) {
     });
 }
 
-async function rawGetByIdTx(tx, id) {
-    const entity = await tx('campaigns').where('campaigns.id', id)
+async function rawGetByTx(tx, key, id) {
+    const entity = await tx('campaigns').where('campaigns.' + key, id)
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
         .select([
@@ -207,7 +207,7 @@ async function rawGetByIdTx(tx, id) {
 async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
 
-    let entity = await rawGetByIdTx(tx, id);
+    let entity = await rawGetByTx(tx, 'id', id);
 
     if (content === Content.ALL || content === Content.RSS_ENTRY) {
         // Return everything
@@ -252,22 +252,6 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 async function getById(context, id, withPermissions = true, content = Content.ALL) {
     return await knex.transaction(async tx => {
         return await getByIdTx(tx, context, id, withPermissions, content);
-    });
-}
-
-async function getByCidTx(tx, context, cid) {
-    const entity = await tx('campaigns').where('cid', cid).first();
-    if (!entity) {
-        shares.throwPermissionDenied();
-    }
-
-    await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'view');
-    return entity;
-}
-
-async function getByCid(context, cid) {
-    return await knex.transaction(async tx => {
-        return getByCidTx(tx, context, cid);
     });
 }
 
@@ -405,7 +389,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'edit');
 
-        const existing = await rawGetByIdTx(tx, entity.id);
+        const existing = await rawGetByTx(tx, 'id', entity.id);
 
         const existingHash = hash(existing, content);
         if (existingHash !== entity.originalHash) {
@@ -746,3 +730,5 @@ module.exports.getSubscribersQueryGeneratorTx = getSubscribersQueryGeneratorTx;
 module.exports.start = start;
 module.exports.stop = stop;
 module.exports.reset = reset;
+
+module.exports.rawGetBy = rawGetBy;

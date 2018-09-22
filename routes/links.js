@@ -4,6 +4,7 @@ const log = require('npmlog');
 const config = require('config');
 const router = require('../lib/router-async').create();
 const links = require('../models/links');
+const interoperableErrors = require('../shared/interoperable-errors');
 
 const trackImg = new Buffer('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 
@@ -20,17 +21,6 @@ router.getAsync('/:campaign/:list/:subscription', async (req, res) => {
 
 
 router.getAsync('/:campaign/:list/:subscription/:link', async (req, res) => {
-    const notFound = () => {
-        res.status(404);
-        return res.render('archive/view', {
-            layout: 'archive/layout',
-            message: _('Oops, we couldn\'t find a link for the URL you clicked'),
-            campaign: {
-                subject: 'Error 404'
-            }
-        });
-    };
-
     const link = await links.resolve(req.params.link);
 
     if (link) {
@@ -40,7 +30,7 @@ router.getAsync('/:campaign/:list/:subscription/:link', async (req, res) => {
         return res.redirect(url);
     } else {
         log.error('Redirect', 'Unresolved URL: <%s>', req.url);
-        return notFound();
+        throw new interoperableErrors.NotFoundError('Oops, we couldn\'t find a link for the URL you clicked');
     }
 });
 
