@@ -1,5 +1,6 @@
 'use strict';
 
+const log = require('npmlog');
 const knex = require('../lib/knex');
 const dtHelpers = require('../lib/dt-helpers');
 const shares = require('./shares');
@@ -13,6 +14,7 @@ const uaParser = require('device');
 const he = require('he');
 const { enforce } = require('../lib/helpers');
 const { getTrustedUrl } = require('../lib/urls');
+const tools = require('../lib/tools');
 
 const LinkId = {
     OPEN: -1,
@@ -124,7 +126,7 @@ async function addOrGet(campaignId, url) {
     });
 }
 
-async function updateLinks(campaign, list, subscription, message) {
+async function updateLinks(campaign, list, subscription, mergeTags, message) {
     if ((campaign.open_tracking_disabled && campaign.click_tracking_disabled) || !message || !message.trim()) {
         // tracking is disabled, do not modify the message
         return message;
@@ -156,7 +158,9 @@ async function updateLinks(campaign, list, subscription, message) {
 
         const urls = new Map(); // url -> {id, cid} (as returned by add)
         for (const url of urlsToBeReplaced) {
-            const link = await addOrGet(campaign.id, url);
+            // url might include variables, need to rewrite those just as we do with message content
+            const expanedUrl = tools.formatMessage(campaign, list, subscription, mergeTags, url);
+            const link = await addOrGet(campaign.id, expanedUrl);
             urls.set(url, link);
         }
 

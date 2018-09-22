@@ -26,6 +26,7 @@ const reports = require('./routes/reports');
 const subscription = require('./routes/subscription');
 const mosaico = require('./routes/mosaico');
 const files = require('./routes/files');
+const links = require('./routes/links');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const sendConfigurationsRest = require('./routes/rest/send-configurations');
@@ -215,6 +216,7 @@ function createApp(appType) {
 
     if (appType === AppType.PUBLIC) {
         useWith404Fallback('/subscription', subscription);
+        useWith404Fallback('/links', links);
     }
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {

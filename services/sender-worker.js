@@ -68,7 +68,6 @@ class CampaignSender {
         }
 
         const subscriptionGrouped = await subscriptions.getByEmail(contextHelpers.getAdminContext(), listId, email);
-        console.log(subscriptionGrouped);
 
         const flds = this.listsFieldsGrouped.get(listId);
         const campaign = this.campaign;
@@ -119,7 +118,7 @@ class CampaignSender {
             renderTags = true;
         }
 
-        html = await links.updateLinks(campaign, list, subscriptionGrouped, html);
+        html = await links.updateLinks(campaign, list, subscriptionGrouped, mergeTags, html);
 
         const attachments = this.attachments.slice();
         // replace data: images with embedded attachments
