@@ -624,7 +624,7 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchS
             .leftJoin(
                 function () {
                     return this.from('campaign_messages')
-                        .where('campaign_messages.campaign', cpgList.campaign)
+                        .where('campaign_messages.campaign', campaignId)
                         .where('campaign_messages.list', cpgList.list)
                         .as('related_campaign_messages');
                 },

@@ -81,13 +81,6 @@ async function create(context, campaignId, entity) {
         const ids = await tx('triggers').insert(filteredEntity);
         const id = ids[0];
 
-        await knex.schema.raw('CREATE TABLE `trigger__' + id + '` (\n' +
-            '  `list` int(11) unsigned NOT NULL,\n' +
-            '  `subscription` int(11) unsigned NOT NULL,\n' +
-            '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
-            '  PRIMARY KEY (`list`,`subscription`)\n' +
-            ') ENGINE=InnoDB DEFAULT CHARSET=utf8;\n');
-
         return id;
     });
 }
@@ -116,9 +109,13 @@ async function updateWithConsistencyCheck(context, campaignId, entity) {
 async function removeTx(tx, context, campaignId, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'manageTriggers');
 
-    await tx('triggers').where({campaign: campaignId, id}).del();
+    const existing = await tx('triggers').where({campaign: campaignId, id}).first();
+    if (!existing) {
+        throw new interoperableErrors.NotFoundError();
+    }
 
-    await knex.schema.dropTableIfExists('trigger__' + id);
+    await tx('trigger_messages').where({trigger: id}).del();
+    await tx('triggers').where('id', id).del();
 }
 
 async function remove(context, campaignId, id) {

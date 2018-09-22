@@ -168,7 +168,7 @@ async function updateLinks(campaign, list, subscription, message) {
     }
 }
 
-
+module.exports.LinkId = LinkId;
 module.exports.resolve = resolve;
 module.exports.countLink = countLink;
 module.exports.addOrGet = addOrGet;

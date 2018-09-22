@@ -4,12 +4,12 @@ const config = require('config');
 const log = require('npmlog');
 const appBuilder = require('./app-builder');
 const http = require('http');
-//const triggers = require('./services/triggers');
+const triggers = require('./services/triggers');
 const importer = require('./lib/importer');
 const feedcheck = require('./lib/feedcheck');
 const verpServer = require('./services/verp-server');
 const testServer = require('./services/test-server');
-//const postfixBounceServer = require('./services/postfix-bounce-server');
+const postfixBounceServer = require('./services/postfix-bounce-server');
 const tzupdate = require('./services/tzupdate');
 const dbcheck = require('./lib/dbcheck');
 const senders = require('./lib/senders');
@@ -95,14 +95,14 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                                 importer.spawn(() => {
                                     feedcheck.spawn(() => {
                                         senders.spawn(() => {
-                                            //triggers(() => {
+                                            triggers.start();
+
                                             postfixBounceServer(async () => {
                                                 (async () => {
                                                     await reportProcessor.init();
                                                     log.info('Service', 'All services started');
                                                 })();
                                             });
-                                            //});
                                         });
                                     });
                                 });

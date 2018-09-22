@@ -1054,6 +1054,11 @@ async function migrateAttachments(knex) {
 }
 
 async function migrateTriggers(knex) {
+    await knex.schema.table('queued', table => {
+        table.renameColumn('subscriber', 'subscription');
+        table.renameColumn('source', 'trigger');
+    });
+
     await knex.schema.table('triggers', table => {
         table.renameColumn('rule', 'entity');
         table.renameColumn('column', 'event');
@@ -1085,6 +1090,14 @@ async function migrateTriggers(knex) {
         table.dropColumn('list');
         table.dropColumn('segment');
     });
+
+    await knex.schema.raw('CREATE TABLE `trigger_messages` (\n' +
+        '  `trigger` int(10) unsigned NOT NULL,\n' +
+        '  `list` int(11) unsigned NOT NULL,\n' +
+        '  `subscription` int(11) unsigned NOT NULL,\n' +
+        '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
+        '  PRIMARY KEY (`trigger`, `list`,`subscription`)\n' +
+        ') ENGINE=InnoDB DEFAULT CHARSET=utf8;\n');
 
     await knex.schema.dropTableIfExists('trigger');
 }

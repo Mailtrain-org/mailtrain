@@ -25,21 +25,6 @@ let libmime = require('libmime');
 const workerId = Number.parseInt(process.argv[2]);
 let running = false;
 
-/*
-const knex = require('../lib/knex');
-const path = require('path');
-const log = require('npmlog');
-const fsExtra = require('fs-extra-promise');
-const {ImportSource, MappingType, ImportStatus, RunStatus} = require('../shared/imports');
-const imports = require('../models/imports');
-const fields = require('../models/fields');
-const { Writable } = require('stream');
-const { cleanupFromPost, enforce } = require('../lib/helpers');
-const tools = require('../lib/tools');
-const shares = require('../models/shares');
-const _ = require('../lib/translate')._;
-*/
-
 class CampaignSender {
     constructor(campaignId) {
         this.campaignId = campaignId;
