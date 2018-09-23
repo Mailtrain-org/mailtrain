@@ -14,7 +14,7 @@ const entitySettings = require('../lib/entity-settings');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
-const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name']);
+const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));

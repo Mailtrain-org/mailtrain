@@ -1,6 +1,6 @@
 ## Migration from Mailtrain v1 to Mailtrain v2
 
-The migration should almost happen automatically. There are however the following caveats:
+The migration should happen almost automatically. There are however the following caveats:
 
 1. Structure of config files (under `config`) has changed at many places. Revisit the default config (`config/default.toml`)
    and update your configs accordingly.
@@ -11,3 +11,6 @@ The migration should almost happen automatically. There are however the followin
 3. Directory for custom Mosaico templates has changed from `public/mosaico/templates` to `client/static/mosaico/templates`.
 
 4. Imports are not migrated. If you have any pending imports, complete them before migration to v2.
+
+5. Zone MTA configuration endpoint (webhooks/zone-mta/sender-config) has changed. The send-configuration CID has to be
+   part of the URL - e.g. webhooks/zone-mta/sender-config/default.

@@ -41,6 +41,7 @@ export default class CUD extends Component {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity, data => {
                 data.form = data.default_form ? 'custom' : 'default';
+                data.listunsubscribe_disabled = !!data.listunsubscribe_disabled;
             });
         } else {
             this.populateFormValues({
@@ -53,7 +54,8 @@ export default class CUD extends Component {
                 homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
                 namespace: mailtrainConfig.user.namespace,
-                to_name: '[FIRST_NAME] [LAST_NAME]'
+                to_name: '[FIRST_NAME] [LAST_NAME]',
+                listunsubscribe_disabled: false
             });
         }
     }
@@ -202,6 +204,7 @@ export default class CUD extends Component {
 
                     <Dropdown id="unsubscription_mode" label={t('Unsubscription')} options={unsubcriptionModeOptions} help={t('Select how an unsuscription request by subscriber is handled.')}/>
 
+                    <CheckBox id="listunsubscribe_disabled" label={t('Unsubscribe header')} text={t('Do not send List-Unsubscribe headers')}/>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
