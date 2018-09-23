@@ -6,7 +6,7 @@ const {getGlobalNamespaceId} = require('../../../shared/namespaces');
 const {getAdminId} = require('../../../shared/users');
 const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
 const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
-const { MailerType, getSystemSendConfigurationId } = require('../../../shared/send-configurations');
+const { MailerType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../shared/send-configurations');
 const { enforce } = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../shared/triggers');
 const { SubscriptionSource } = require('../../../shared/lists');
@@ -649,6 +649,7 @@ async function migrateSettings(knex) {
     // -----------------------------------------------------------------------------------------------------
     await knex.schema.createTable('send_configurations', table => {
         table.increments('id').primary();
+        table.string('cid');
         table.string('name');
         table.text('description');
         table.string('from_email');
@@ -725,6 +726,7 @@ async function migrateSettings(knex) {
 
     await knex('send_configurations').insert({
         id: getSystemSendConfigurationId(),
+        cid: getSystemSendConfigurationCid(),
         name: 'System',
         description: 'Send configuration used to deliver system emails',
         from_email: settings.defaultAddress,

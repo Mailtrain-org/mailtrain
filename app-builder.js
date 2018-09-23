@@ -26,6 +26,7 @@ const mosaico = require('./routes/mosaico');
 const files = require('./routes/files');
 const links = require('./routes/links');
 const archive = require('./routes/archive');
+const webhooks = require('./routes/webhooks');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const sendConfigurationsRest = require('./routes/rest/send-configurations');
@@ -228,6 +229,7 @@ function createApp(appType) {
             useWith404Fallback('/reports', reports);
         }
 
+        useWith404Fallback('/webhooks', webhooks);
 
         // API endpoints
         useWith404Fallback('/api', api);

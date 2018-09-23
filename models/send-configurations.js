@@ -3,6 +3,7 @@
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
 const dtHelpers = require('../lib/dt-helpers');
+const shortid = require('shortid');
 const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
@@ -28,22 +29,33 @@ async function listDTAjax(context, params) {
         builder => builder
             .from('send_configurations')
             .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace'),
-        ['send_configurations.id', 'send_configurations.name', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
+        ['send_configurations.id', 'send_configurations.name', 'send_configurations.cid', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
     );
 }
 
-async function getByIdTx(tx, context, id, withPermissions = true, withPrivateData = true) {
+async function _getByTx(tx, context, key, id, withPermissions, withPrivateData) {
     let entity;
 
     if (withPrivateData) {
-        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPrivate');
-        entity = await tx('send_configurations').where('id', id).first();
+        entity = await tx('send_configurations').where(key, id).first();
+
+        if (!entity) {
+            shares.throwPermissionDenied();
+        }
+
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.id, 'viewPrivate');
+
         entity.mailer_settings = JSON.parse(entity.mailer_settings);
     } else {
-        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', id, 'viewPublic');
-        entity = await tx('send_configurations').where('id', id).select(
-            ['id', 'name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable']
+        entity = await tx('send_configurations').where(key, id).select(
+            ['id', 'name', 'cid', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable']
         ).first();
+
+        if (!entity) {
+            shares.throwPermissionDenied();
+        }
+
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.id, 'viewPublic');
     }
 
     // note that permissions are optional as as this methods may be used with synthetic admin context
@@ -52,11 +64,22 @@ async function getByIdTx(tx, context, id, withPermissions = true, withPrivateDat
     }
 
     return entity;
+
+}
+
+async function getByIdTx(tx, context, id, withPermissions = true, withPrivateData = true) {
+    return await _getByTx(tx, context, 'id', id, withPermissions, withPrivateData);
 }
 
 async function getById(context, id, withPermissions = true, withPrivateData = true) {
     return await knex.transaction(async tx => {
         return await getByIdTx(tx, context, id, withPermissions, withPrivateData);
+    });
+}
+
+async function getByCid(context, cid, withPermissions = true, withPrivateData = true) {
+    return await knex.transaction(async tx => {
+        return await _getByTx(tx, context, 'cid', cid, withPermissions, withPrivateData);
     });
 }
 
@@ -75,7 +98,10 @@ async function create(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        const ids = await tx('send_configurations').insert(filterObject(entity, allowedKeys));
+        const filteredEntity = filterObject(entity, allowedKeys);
+        filteredEntity.cid = shortid.generate();
+
+        const ids = await tx('send_configurations').insert(filteredEntity);
         const id = ids[0];
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'sendConfiguration', entityId: id });
@@ -137,6 +163,7 @@ module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
+module.exports.getByCid = getByCid;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

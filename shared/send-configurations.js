@@ -10,7 +10,12 @@ function getSystemSendConfigurationId() {
     return 1;
 }
 
+function getSystemSendConfigurationCid() {
+    return 'default';
+}
+
 module.exports = {
     MailerType,
-    getSystemSendConfigurationId
+    getSystemSendConfigurationId,
+    getSystemSendConfigurationCid
 };
