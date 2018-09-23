@@ -559,10 +559,11 @@ export default class CUD extends Component {
 
         const sendConfigurationsColumns = [
             { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Type'), render: data => this.mailerTypes[data].typeName },
-            { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 5, title: t('Namespace') }
+            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
+            { data: 3, title: t('Description') },
+            { data: 4, title: t('Type'), render: data => this.mailerTypes[data].typeName },
+            { data: 5, title: t('Created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('Namespace') }
         ];
 
         let sendSettings;

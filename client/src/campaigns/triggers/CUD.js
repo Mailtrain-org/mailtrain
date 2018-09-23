@@ -84,7 +84,7 @@ export default class CUD extends Component {
     componentDidMount() {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity, data => {
-                data.daysAfter = (Math.round(data.seconds_after / (3600 * 24))).toString();
+                data.daysAfter = (Math.round(data.seconds / (3600 * 24))).toString();
 
                 if (data.entity === Entity.SUBSCRIPTION) {
                     data.subscriptionEvent = data.event;
@@ -157,7 +157,7 @@ export default class CUD extends Component {
             this.setFormStatusMessage('info', t('Saving ...'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                data.seconds_after = Number.parseInt(data.daysAfter) * 3600 * 24;
+                data.seconds = Number.parseInt(data.daysAfter) * 3600 * 24;
 
                 if (data.entity === Entity.SUBSCRIPTION) {
                     data.event = data.subscriptionEvent;

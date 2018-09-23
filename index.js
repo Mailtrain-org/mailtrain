@@ -18,6 +18,7 @@ const executor = require('./lib/executor');
 const privilegeHelpers = require('./lib/privilege-helpers');
 const knex = require('./lib/knex');
 const shares = require('./models/shares');
+const { AppType } = require('./shared/app');
 
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
@@ -31,7 +32,7 @@ if (config.title) {
 log.level = config.log.level;
 
 
-function startHTTPServer(appType, port, callback) {
+function startHTTPServer(appType, appName, port, callback) {
     const app = appBuilder.createApp(appType);
     app.set('port', port);
 
@@ -60,7 +61,7 @@ function startHTTPServer(appType, port, callback) {
     server.on('listening', () => {
         const addr = server.address();
         const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-        log.info('Express', 'WWW server listening on %s', bind);
+        log.info('Express', 'WWW server [%s] listening on %s', appName, bind);
     });
 
     server.listen({port, host}, callback);
@@ -85,9 +86,9 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
         executor.spawn(() => {
             testServer(() => {
                 verpServer(() => {
-                    startHTTPServer(AppType.TRUSTED, trustedPort, () => {
-                        startHTTPServer(AppType.SANDBOXED, sandboxPort, () => {
-                            startHTTPServer(AppType.PUBLIC, publicPort, () => {
+                    startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () => {
+                        startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () => {
+                            startHTTPServer(AppType.PUBLIC, 'public', publicPort, () => {
                                 privilegeHelpers.dropRootPrivileges();
 
                                 tzupdate.start();

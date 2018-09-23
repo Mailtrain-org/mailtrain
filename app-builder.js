@@ -141,7 +141,7 @@ function createApp(appType) {
     app.disable('x-powered-by');
 
     app.use(compression());
-    app.use(favicon(path.join(__dirname, 'client', 'public', 'favicon.ico')));
+    app.use(favicon(path.join(__dirname, 'client', 'static', 'favicon.ico')));
 
     app.use(logger(config.www.log, {
         stream: {
@@ -182,7 +182,7 @@ function createApp(appType) {
         app.use(passport.tryAuthByRestrictedAccessToken);
     }
 
-    useWith404Fallback('/public', express.static(path.join(__dirname, 'client', 'public')));
+    useWith404Fallback('/static', express.static(path.join(__dirname, 'client', 'static')));
     useWith404Fallback('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
     useWith404Fallback('/locales', express.static(path.join(__dirname, 'client', 'locales')));
 

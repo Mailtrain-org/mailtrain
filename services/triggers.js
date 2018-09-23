@@ -131,7 +131,7 @@ async function start() {
                     }
 
 
-                    sqlQry = sqlQry.where(column, '<=', currentTs - trigger.seconds_after);
+                    sqlQry = sqlQry.where(column, '<=', currentTs - trigger.seconds);
 
                     if (trigger.last_check !== null) {
                         sqlQry = sqlQry.where(column, '>', trigger.last_check);

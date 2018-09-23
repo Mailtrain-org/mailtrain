@@ -11,7 +11,7 @@ function getSystemSendConfigurationId() {
 }
 
 function getSystemSendConfigurationCid() {
-    return 'default';
+    return 'system';
 }
 
 module.exports = {

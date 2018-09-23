@@ -154,25 +154,23 @@ router.postAsync('/mailgun', uploads.any(), async (req, res) => {
     const evt = req.body;
 
     const message = await campaigns.getMessageByCid([].concat(evt && evt.campaign_id || []).shift());
-    if (!message) {
-        continue;
-    }
+    if (message) {
+        switch (evt.event) {
+            case 'bounced':
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                log.verbose('Mailgun', 'Marked message %s as bounced', evt.campaign_id);
+                break;
 
-    switch (evt.event) {
-        case 'bounced':
-            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
-            log.verbose('Mailgun', 'Marked message %s as bounced', evt.campaign_id);
-            break;
+            case 'complained':
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.COMPLAINED, true);
+                log.verbose('Mailgun', 'Marked message %s as complaint', evt.campaign_id);
+                break;
 
-        case 'complained':
-            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.COMPLAINED, true);
-            log.verbose('Mailgun', 'Marked message %s as complaint', evt.campaign_id);
-            break;
-
-        case 'unsubscribed':
-            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.UNSUBSCRIBED, true);
-            log.verbose('Mailgun', 'Marked message %s as unsubscribed', evt.campaign_id);
-            break;
+            case 'unsubscribed':
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.UNSUBSCRIBED, true);
+                log.verbose('Mailgun', 'Marked message %s as unsubscribed', evt.campaign_id);
+                break;
+        }
     }
 
     return res.json({
@@ -188,12 +186,11 @@ router.postAsync('/zone-mta', async (req, res) => {
 
     if (req.body.id) {
         const message = await campaigns.getMessageByCid(req.body.id);
-        if (!message) {
-            continue;
-        }
 
-        await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
-        log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+        if (message) {
+            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+            log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+        }
     }
 
     res.json({

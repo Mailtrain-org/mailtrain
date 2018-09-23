@@ -96,7 +96,7 @@ export default class List extends Component {
 
                     if (perms.includes('viewImports')) {
                         actions.push({
-                            label: <Icon icon="sort" title={t('Imports')}/>,
+                            label: <Icon icon="sort" title={t('Imports & Tasks')}/>,
                             link: `/lists/${data[0]}/imports`
                         });
                     }

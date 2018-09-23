@@ -1,3 +1,6 @@
+### Front page
+- Some dashboard
+
 ### Deletion
 - Delete button in Lists
 - Check/delete dependencies
@@ -19,4 +22,13 @@
 - Add X-Mailer header option in settings to override or disable it - 44fe8882b876bdfd9990110496d16f819dc64ac3
 - Add custom unsubscribe option in a campaign - 68cb8384f7dfdbcaf2932293ec5a2f1ec0a1554e
 
+### API
 - Add API extensions
+
+### GDPR
+- Removal of personal data upon unsubscribe (settable per list)
+- Refuse editing subscriptions which have been anonymized
+- Add field to subscriptions which says till when the consent has been given
+- Provide a link (and merge tag) that will update the consent date to now
+- Add campaign trigger that triggers if the consent for specific subscription field is about to expire (i.e. it is greater than now - seconds)
+- Removal of personal data upon consent expiration (settable per list)

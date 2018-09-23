@@ -13,4 +13,4 @@ The migration should happen almost automatically. There are however the followin
 4. Imports are not migrated. If you have any pending imports, complete them before migration to v2.
 
 5. Zone MTA configuration endpoint (webhooks/zone-mta/sender-config) has changed. The send-configuration CID has to be
-   part of the URL - e.g. webhooks/zone-mta/sender-config/default.
+   part of the URL - e.g. webhooks/zone-mta/sender-config/system.

@@ -172,6 +172,20 @@ async function listTestUsersDTAjax(context, campaignId, params) {
     });
 }
 
+async function getTrackingSettingsByCidTx(tx, cid) {
+    const entity = await tx('campaigns').where('campaigns.cid', cid)
+        .select([
+            'campaigns.id', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled'
+        ])
+        .first();
+
+    if (!entity) {
+        throw new interoperableErrors.NotFoundError();
+    }
+
+    return entity;
+}
+
 async function rawGetByTx(tx, key, id) {
     const entity = await tx('campaigns').where('campaigns.' + key, id)
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
@@ -709,8 +723,6 @@ module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIn
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
-module.exports.getByCidTx = getByCidTx;
-module.exports.getByCid = getByCid;
 module.exports.create = create;
 module.exports.createRssTx = createRssTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
@@ -731,4 +743,5 @@ module.exports.start = start;
 module.exports.stop = stop;
 module.exports.reset = reset;
 
-module.exports.rawGetBy = rawGetBy;
+module.exports.rawGetByTx = rawGetByTx;
+module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;

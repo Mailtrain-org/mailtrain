@@ -81,11 +81,11 @@ export default class List extends Component {
             <div>
                 {mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.list.permissions.includes('manageImports') &&
                     <Toolbar>
-                        <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('Create Import')}/>
+                        <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('Create Import/Task')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Imports')}</Title>
+                <Title>{t('Imports & Tasks')}</Title>
 
                 <Table withHeader dataUrl={`rest/imports-table/${this.props.list.id}`} columns={columns} />
             </div>

@@ -1065,7 +1065,6 @@ async function migrateTriggers(knex) {
         table.renameColumn('rule', 'entity');
         table.renameColumn('column', 'event');
         table.renameColumn('dest_campaign', 'campaign');
-        table.renameColumn('seconds', 'seconds_after');
     });
 
     const triggers = await knex('triggers');

@@ -386,7 +386,7 @@ export default class CUD extends Component {
 
         let saveButtonLabel;
         if (!isEdit) {
-            saveButtonLabel = t('Save and edit mapping');
+            saveButtonLabel = t('Save and edit settings');
         } else {
             saveButtonLabel = t('Save');
         }
@@ -404,7 +404,7 @@ export default class CUD extends Component {
                         deletedMsg={t('Field deleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Import') : t('Create Import')}</Title>
+                <Title>{isEdit ? t('Edit Import/Task') : t('Create Import/Task')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>

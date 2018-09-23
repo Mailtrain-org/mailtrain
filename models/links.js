@@ -4,7 +4,6 @@ const log = require('npmlog');
 const knex = require('../lib/knex');
 const dtHelpers = require('../lib/dt-helpers');
 const shares = require('./shares');
-const tools = require('../lib/tools');
 const campaigns = require('./campaigns');
 const lists = require('./lists');
 const subscriptions = require('./subscriptions');
@@ -28,7 +27,7 @@ async function resolve(linkCid) {
 async function countLink(remoteIp, userAgent, campaignCid, listCid, subscriptionCid, linkId) {
     await knex.transaction(async tx => {
         const list = await lists.getByCidTx(tx, contextHelpers.getAdminContext(), listCid);
-        const campaign = await campaigns.getByCidTx(tx, contextHelpers.getAdminContext(), campaignCid);
+        const campaign = await campaigns.getTrackingSettingsByCidTx(tx, campaignCid);
         const subscription = await subscriptions.getByCidTx(tx, contextHelpers.getAdminContext(), subscriptionCid);
 
         const country = geoip.lookupCountry(remoteIp) || null;
