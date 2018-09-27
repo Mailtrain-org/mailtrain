@@ -101,9 +101,9 @@ async function listTestUsersDTAjax(context, campaignId, params) {
         This is supposed to produce queries like this:
 
         select * from (
-          (select `subscription__1`.`email`, 2 AS campaign_list_id, 1 AS list, NULL AS segment from `subscription__1` where `subscription__1`.`status` = 1 and `subscription__1`.`is_test` = true)
+          (select `subscription__1`.`email`, `subscription__1`.`cid`, 1 AS list, NULL AS segment from `subscription__1` where `subscription__1`.`status` = 1 and `subscription__1`.`is_test` = true)
         UNION ALL
-          (select `subscription__2`.`email`, 4 AS campaign_list_id, 2 AS list, NULL AS segment from `subscription__2` where `subscription__2`.`status` = 1 and `subscription__2`.`is_test` = true)
+          (select `subscription__2`.`email`, `subscription__2`.`cid`, 2 AS list, NULL AS segment from `subscription__2` where `subscription__2`.`status` = 1 and `subscription__2`.`is_test` = true)
         ) as `test_subscriptions` inner join `lists` on `test_subscriptions`.`list` = `lists`.`id` inner join `segments` on `test_subscriptions`.`segment` = `segments`.`id`
           inner join `namespaces` on `lists`.`namespace` = `namespaces`.`id`
 
@@ -123,7 +123,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
                 .where(function() {
                     addSegmentQuery(this);
                 })
-                .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('? AS list', [cpgList.list]), knex.raw('? AS segment', [cpgList.segment])])
+                .select([subsTable + '.email', subsTable + '.cid', knex.raw('? AS list', [cpgList.list]), knex.raw('? AS segment', [cpgList.segment])])
                 .toSQL().toNative();
 
             subsQrys.push(sqlQry);
@@ -146,17 +146,22 @@ async function listTestUsersDTAjax(context, campaignId, params) {
 
             return await dtHelpers.ajaxListWithPermissions(
                 context,
-                [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'] }],
+                [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'], column: 'subs.list_id' }],
                 params,
                 builder => {
-                    const qry = builder.from(subsQry)
-                        .innerJoin('lists', 'test_subscriptions.list', 'lists.id')
-                        .leftJoin('segments', 'test_subscriptions.segment', 'segments.id')
-                        .innerJoin('namespaces', 'lists.namespace', 'namespaces.id')
-
-                    return qry
+                    return builder.from(function () {
+                        return this.from(subsQry)
+                            .innerJoin('lists', 'test_subscriptions.list', 'lists.id')
+                            .innerJoin('namespaces', 'lists.namespace', 'namespaces.id')
+                            .select([
+                                knex.raw('CONCAT_WS(":", lists.cid, test_subscriptions.cid) AS cid'),
+                                'test_subscriptions.email', 'test_subscriptions.cid AS subscription_cid', 'lists.cid AS list_cid',
+                                'lists.name as list_name', 'namespaces.name AS namespace_name', 'lists.id AS list_id'
+                            ])
+                            .as('subs');
+                    });
                 },
-                ['test_subscriptions.campaign_list_id', 'test_subscriptions.email', 'test_subscriptions.list', 'test_subscriptions.segment', 'lists.cid', 'lists.name', 'segments.name', 'namespaces.name']
+                [ 'subs.cid', 'subs.email', 'subs.subscription_cid', 'subs.list_cid', 'subs.list_name', 'subs.namespace_name' ]
             );
 
         } else {

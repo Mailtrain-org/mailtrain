@@ -26,7 +26,7 @@ import {getCampaignLabels} from './helpers';
 import {Table} from "../lib/table";
 import {Button} from "../lib/bootstrap-components";
 import axios from "../lib/axios";
-import {getUrl} from "../lib/urls";
+import {getUrl, getPublicUrl} from "../lib/urls";
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {CampaignStatus} from "../../../shared/campaigns";
 import moment from 'moment';
@@ -66,13 +66,10 @@ class TestUser extends Component {
 
     async previewAsync() {
         if (this.isFormWithoutErrors()) {
-            const data = this.getFormValues();
+            const campaignCid = this.props.entity.cid;
+            const [listCid, subscriptionCid] = this.getFormValue('testUser').split(':');
 
-            console.log(this.props.entity);
-            console.log(data);
-
-            // FIXME - navigate to campaign preview
-            // window.location =
+            window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`), '_blank');
         } else {
             this.showFormValidation();
         }
@@ -83,10 +80,10 @@ class TestUser extends Component {
 
         const testUsersColumns = [
             { data: 1, title: t('Email') },
-            { data: 4, title: t('List ID'), render: data => <code>{data}</code> },
-            { data: 5, title: t('List') },
-            { data: 6, title: t('Segment') },
-            { data: 7, title: t('List namespace') }
+            { data: 2, title: t('Subscription ID'), render: data => <code>{data}</code> },
+            { data: 3, title: t('List ID'), render: data => <code>{data}</code> },
+            { data: 4, title: t('List') },
+            { data: 5, title: t('List namespace') }
         ];
 
         return (
