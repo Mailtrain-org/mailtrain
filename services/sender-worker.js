@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('config');
-const log = require('npmlog');
+const log = require('../lib/log');
 const mailers = require('../lib/mailers');
 const CampaignSender = require('../lib/campaign-sender');
 
@@ -25,6 +25,7 @@ async function processMessages(campaignId, subscribers) {
             log.verbose('Senders', 'Message sent and status updated for %s:%s', subData.listId, subData.email);
         } catch (err) {
             log.error('Senders', `Sending message to ${subData.listId}:${subData.email} failed with error: ${err.message}`)
+            log.verbose(err);
         }
     }
 

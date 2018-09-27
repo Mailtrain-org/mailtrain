@@ -7,7 +7,7 @@ const sendConfigurations = require('../models/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
 const {SubscriptionStatus} = require('../shared/lists');
 const {MailerType} = require('../shared/send-configurations');
-const log = require('npmlog');
+const log = require('../lib/log');
 const multer = require('multer');
 const uploads = multer();
 

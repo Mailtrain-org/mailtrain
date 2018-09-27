@@ -2,7 +2,7 @@
 
 const knex = require('../lib/knex');
 const path = require('path');
-const log = require('npmlog');
+const log = require('../lib/log');
 const fsExtra = require('fs-extra-promise');
 const {ImportSource, MappingType, ImportStatus, RunStatus} = require('../shared/imports');
 const imports = require('../models/imports');

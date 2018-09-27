@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('npmlog');
+const log = require('../lib/log');
 const knex = require('../lib/knex');
 const dtHelpers = require('../lib/dt-helpers');
 const shares = require('./shares');

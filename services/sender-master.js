@@ -2,7 +2,7 @@
 
 const config = require('config');
 const fork = require('child_process').fork;
-const log = require('npmlog');
+const log = require('../lib/log');
 const path = require('path');
 const knex = require('../lib/knex');
 const {CampaignStatus, CampaignType} = require('../shared/campaigns');
@@ -24,10 +24,13 @@ const workerBatchSize = 100;
 const messageQueue = new Map(); // campaignId -> [{listId, email}]
 const messageQueueCont = new Map(); // campaignId -> next batch callback
 
+const workAssignment = new Map(); // workerId -> { campaignId, subscribers: [{listId, email}] }
+
 let workerSchedulerCont = null;
 
 
 function messagesProcessed(workerId) {
+    workAssignment.delete(workerId);
     idleWorkers.push(workerId);
 
     if (workerSchedulerCont) {
@@ -70,6 +73,7 @@ async function scheduleWorkers() {
 
             if (queue.length > 0) {
                 const subscribers = queue.splice(0, workerBatchSize);
+                workAssignment.set(workerId, {campaignId, subscribers});
 
                 if (queue.length === 0 && messageQueueCont.has(campaignId)) {
                     const scheduleMessages = messageQueueCont.get(campaignId);
@@ -113,11 +117,21 @@ async function processCampaign(campaignId) {
 
         let qryGen;
         await knex.transaction(async tx => {
-            qryGen = await campaigns.getSubscribersQueryGeneratorTx(tx, campaignId, true, retrieveBatchSize);
+            qryGen = await campaigns.getSubscribersQueryGeneratorTx(tx, campaignId, true);
         });
 
         if (qryGen) {
-            const qry = qryGen(knex).select(['pending_subscriptions.email', 'campaign_lists.list']);
+            let subscribersInProcessing = [...msgQueue];
+            for (const wa of workAssignment.values()) {
+                if (wa.campaignId === campaignId) {
+                    subscribersInProcessing = subscribersInProcessing.concat(wa.subscribers);
+                }
+            }
+
+            const qry = qryGen(knex)
+                .whereNotIn('pending_subscriptions.email', subscribersInProcessing.map(x => x.email))
+                .select(['pending_subscriptions.email', 'campaign_lists.list'])
+                .limit(retrieveBatchSize);
             const subs = await qry;
 
             if (subs.length === 0) {
@@ -261,7 +275,7 @@ async function init() {
     });
 
     process.send({
-        type: 'sender-started'
+        type: 'master-sender-started'
     });
 
     periodicCampaignsCheck();

@@ -599,7 +599,7 @@ async function updateMessageResponse(context, message, response, responseId) {
     });
 }
 
-async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent, batchSize) {
+async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent) {
     /*
     This is supposed to produce queries like this:
 

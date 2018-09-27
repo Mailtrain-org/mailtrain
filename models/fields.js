@@ -130,7 +130,7 @@ fieldTypes['checkbox-grouped'] = {
     cardinality: Cardinality.MULTIPLE,
     getHbsType: field => 'typeCheckboxGrouped',
     render: (field, value) => {
-        const subItems = value.map(col => field.groupedOptions[col].name);
+        const subItems = (value || []).map(col => field.groupedOptions[col].name);
 
         if (field.settings.groupTemplate) {
             return render(field.settings.groupTemplate, {
@@ -149,7 +149,10 @@ fieldTypes['radio-grouped'] = {
     enumerated: false,
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeRadioGrouped',
-    render: (field, value) => field.groupedOptions[value].name
+    render: (field, value) => {
+        const fld = field.groupedOptions[value];
+        return fld ? fld.name : '';
+    }
 };
 
 fieldTypes['dropdown-grouped'] = {
@@ -159,7 +162,10 @@ fieldTypes['dropdown-grouped'] = {
     enumerated: false,
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeDropdownGrouped',
-    render: (field, value) => field.groupedOptions[value].name
+    render: (field, value) => {
+        const fld = field.groupedOptions[value];
+        return fld ? fld.name : '';
+    }
 };
 
 fieldTypes['radio-enum'] = {
@@ -173,7 +179,10 @@ fieldTypes['radio-enum'] = {
     enumerated: true,
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeRadioEnum',
-    render: (field, value) => field.groupedOptions[value].name
+    render: (field, value) => {
+        const fld = field.groupedOptions[value];
+        return fld ? fld.name : '';
+    }
 };
 
 fieldTypes['dropdown-enum'] = {
@@ -187,7 +196,10 @@ fieldTypes['dropdown-enum'] = {
     enumerated: true,
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeDropdownEnum',
-    render: (field, value) => field.groupedOptions[value].name
+    render: (field, value) => {
+        const fld = field.groupedOptions[value];
+        return fld ? fld.name : '';
+    }
 };
 
 fieldTypes.option = {

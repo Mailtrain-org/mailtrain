@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('npmlog');
+const log = require('../lib/log');
 const config = require('config');
 const router = require('../lib/router-async').create();
 const confirmations = require('../models/confirmations');

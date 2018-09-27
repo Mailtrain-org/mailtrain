@@ -7,7 +7,7 @@
 const reportHelpers = require('../lib/report-helpers');
 const fork = require('child_process').fork;
 const path = require('path');
-const log = require('npmlog');
+const log = require('../lib/log');
 const fs = require('fs');
 const privilegeHelpers = require('../lib/privilege-helpers');
 

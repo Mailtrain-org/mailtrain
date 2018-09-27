@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('config');
-const log = require('npmlog');
+const log = require('./lib/log');
 const appBuilder = require('./app-builder');
 const http = require('http');
 const triggers = require('./services/triggers');
@@ -28,8 +28,6 @@ const host = config.www.host;
 if (config.title) {
     process.title = config.title;
 }
-
-log.level = config.log.level;
 
 
 function startHTTPServer(appType, appName, port, callback) {
@@ -81,6 +79,15 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
 
     .then(() => shares.regenerateRoleNamesTable())
     .then(() => shares.rebuildPermissions())
+
+/*
+    .then(() =>
+        testServer(() => {
+            senders.spawn(() => {
+            });
+        })
+    );
+*/
 
     .then(() =>
         executor.spawn(() => {

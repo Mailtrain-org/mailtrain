@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('config');
-const log = require('npmlog');
+const log = require('./lib/log');
 
 const express = require('express');
 const bodyParser = require('body-parser');

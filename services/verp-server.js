@@ -1,7 +1,7 @@
 'use strict';
 
 const { nodeifyFunction, nodeifyPromise } = require('../lib/nodeify');
-const log = require('npmlog');
+const log = require('../lib/log');
 const config = require('config');
 const {MailerError} = require('../lib/mailers');
 const campaigns = require('../models/campaigns');

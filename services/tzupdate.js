@@ -10,7 +10,7 @@
 
 const moment = require('moment-timezone');
 const knex = require('../lib/knex');
-const log = require('npmlog');
+const log = require('../lib/log');
 let lastCheck = false;
 
 const timezone_timeout = 60 * 60 * 1000;

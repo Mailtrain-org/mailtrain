@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('npmlog');
+const log = require('../lib/log');
 const config = require('config');
 const crypto = require('crypto');
 const humanize = require('humanize');

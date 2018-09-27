@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('npmlog');
+const log = require('../lib/log');
 const knex = require('../lib/knex');
 const feedparser = require('feedparser-promised');
 const { CampaignType, CampaignStatus, CampaignSource } = require('../shared/campaigns');

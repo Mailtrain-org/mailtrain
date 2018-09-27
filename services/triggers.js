@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('npmlog');
+const log = require('../lib/log');
 const knex = require('../lib/knex');
 const triggers = require('../models/triggers');
 const campaigns = require('../models/campaigns');
