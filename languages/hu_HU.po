@@ -1,0 +1,4521 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Language-Team: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2018-09-10 16:02+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2018-07-29 01:47+0200\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: hu_HU\n"
+
+#: views/archive/layout.hbs:1 views/layout.hbs:1
+msgid "Self hosted email newsletter app"
+msgstr "Saját üzemeltetésű hírlevél-program"
+
+#: views/blacklist.hbs:1 views/campaigns/blacklisted.hbs:1
+#: views/campaigns/bounced.hbs:1 views/campaigns/campaigns.hbs:1
+#: views/campaigns/clicked.hbs:1 views/campaigns/complained.hbs:1
+#: views/campaigns/create-rss.hbs:1 views/campaigns/create-triggered.hbs:1
+#: views/campaigns/create.hbs:1 views/campaigns/delivered.hbs:1
+#: views/campaigns/edit-rss.hbs:1 views/campaigns/edit-triggered.hbs:1
+#: views/campaigns/edit.hbs:1 views/campaigns/opened.hbs:1
+#: views/campaigns/unsubscribed.hbs:1 views/campaigns/upload-attachment.hbs:1
+#: views/campaigns/view.hbs:1 views/lists/create.hbs:1 views/lists/edit.hbs:1
+#: views/lists/fields/create.hbs:1 views/lists/fields/edit.hbs:1
+#: views/lists/fields/fields.hbs:1 views/lists/forms/create.hbs:1
+#: views/lists/forms/edit.hbs:1 views/lists/forms/forms.hbs:1
+#: views/lists/lists.hbs:1 views/lists/segments/create.hbs:1
+#: views/lists/segments/edit.hbs:1 views/lists/segments/rule-configure.hbs:1
+#: views/lists/segments/rule-create.hbs:1 views/lists/segments/rule-edit.hbs:1
+#: views/lists/segments/segments.hbs:1 views/lists/segments/view.hbs:1
+#: views/lists/subscription/add.hbs:1 views/lists/subscription/edit.hbs:1
+#: views/lists/subscription/import-failed.hbs:1
+#: views/lists/subscription/import-preview.hbs:1
+#: views/lists/subscription/import.hbs:1 views/lists/view.hbs:1
+#: views/report-templates/create.hbs:1 views/report-templates/edit.hbs:1
+#: views/report-templates/report-templates.hbs:1
+#: views/reports/create-select-template.hbs:1 views/reports/create.hbs:1
+#: views/reports/edit.hbs:1 views/reports/output.hbs:1
+#: views/reports/reports.hbs:1 views/reports/view.hbs:1 views/settings.hbs:1
+#: views/templates/create.hbs:1 views/templates/edit.hbs:1
+#: views/templates/templates.hbs:1 views/triggers/create-select.hbs:1
+#: views/triggers/create.hbs:1 views/triggers/edit.hbs:1
+#: views/triggers/triggered.hbs:1 views/triggers/triggers.hbs:1
+#: views/users/account.hbs:1 views/users/api.hbs:1 views/users/forgot.hbs:1
+#: views/users/login.hbs:1 views/users/reset.hbs:1 app.js:169
+msgid "Home"
+msgstr "Nyitólap"
+
+#: views/blacklist.hbs:2 views/blacklist.hbs:3 views/layout.hbs:7
+#: views/lists/subscription/edit.hbs:15
+msgid "Blacklist"
+msgstr "Feketelista"
+
+#: views/blacklist.hbs:4 views/users/api.hbs:76
+msgid "Add email to blacklist"
+msgstr "Email feketelistázása"
+
+#: views/blacklist.hbs:5
+msgid "Add"
+msgstr "Hozzáadás"
+
+#: views/blacklist.hbs:6
+msgid "Email"
+msgstr "Email"
+
+#: views/campaigns/blacklisted.hbs:2 views/campaigns/bounced.hbs:2
+#: views/campaigns/campaigns.hbs:2 views/campaigns/campaigns.hbs:7
+#: views/campaigns/clicked.hbs:2 views/campaigns/complained.hbs:2
+#: views/campaigns/create-rss.hbs:2 views/campaigns/create-triggered.hbs:2
+#: views/campaigns/create.hbs:2 views/campaigns/delivered.hbs:2
+#: views/campaigns/edit-rss.hbs:2 views/campaigns/edit-triggered.hbs:2
+#: views/campaigns/edit.hbs:2 views/campaigns/opened.hbs:2
+#: views/campaigns/unsubscribed.hbs:2 views/campaigns/upload-attachment.hbs:2
+#: views/campaigns/view.hbs:2 lib/tools.js:133 routes/campaigns.js:35
+msgid "Campaigns"
+msgstr "Kampányok"
+
+#: views/campaigns/blacklisted.hbs:3 views/campaigns/blacklisted.hbs:4
+msgid "Blacklisted info"
+msgstr "Feketelista info"
+
+#: views/campaigns/blacklisted.hbs:5 views/campaigns/bounced.hbs:5
+#: views/campaigns/clicked.hbs:5 views/campaigns/complained.hbs:5
+#: views/campaigns/delivered.hbs:5 views/campaigns/edit-rss.hbs:5
+#: views/campaigns/edit-triggered.hbs:5 views/campaigns/edit.hbs:5
+#: views/campaigns/opened.hbs:5 views/campaigns/unsubscribed.hbs:5
+#: views/campaigns/upload-attachment.hbs:6
+msgid "View campaign"
+msgstr "Kampány megtekintése"
+
+#: views/campaigns/blacklisted.hbs:6
+msgid "Subscribers who blacklisted by global blacklist:"
+msgstr "Feliratkozók, akik szerepelnek a globális feketelistán"
+
+#: views/campaigns/blacklisted.hbs:7 views/campaigns/bounced.hbs:7
+#: views/campaigns/clicked.hbs:15 views/campaigns/complained.hbs:7
+#: views/campaigns/delivered.hbs:7 views/campaigns/opened.hbs:9
+#: views/campaigns/unsubscribed.hbs:7
+#: views/lists/subscription/import-failed.hbs:8 views/lists/view.hbs:19
+#: views/triggers/triggered.hbs:6
+msgid "Address"
+msgstr "Cím"
+
+#: views/campaigns/blacklisted.hbs:8 views/campaigns/bounced.hbs:8
+#: views/campaigns/clicked.hbs:16 views/campaigns/complained.hbs:8
+#: views/campaigns/delivered.hbs:8 views/campaigns/opened.hbs:10
+#: views/campaigns/unsubscribed.hbs:8 views/lists/subscription/add.hbs:6
+#: views/lists/subscription/edit.hbs:7
+#: views/lists/subscription/import-preview.hbs:7 views/lists/view.hbs:20
+#: views/subscription/partials/subscription-custom-fields.hbs:3
+#: views/triggers/triggered.hbs:7
+msgid "First Name"
+msgstr "Keresztnév"
+
+#: views/campaigns/blacklisted.hbs:9 views/campaigns/bounced.hbs:9
+#: views/campaigns/clicked.hbs:17 views/campaigns/complained.hbs:9
+#: views/campaigns/delivered.hbs:9 views/campaigns/opened.hbs:11
+#: views/campaigns/unsubscribed.hbs:9 views/lists/subscription/add.hbs:7
+#: views/lists/subscription/edit.hbs:8
+#: views/lists/subscription/import-preview.hbs:8 views/lists/view.hbs:21
+#: views/subscription/partials/subscription-custom-fields.hbs:4
+#: views/triggers/triggered.hbs:8
+msgid "Last Name"
+msgstr "Vezetéknév"
+
+#: views/campaigns/blacklisted.hbs:10
+msgid "Reason"
+msgstr "Ok"
+
+#: views/campaigns/blacklisted.hbs:11
+msgid "Time"
+msgstr "Időpont"
+
+#: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
+msgid "Bounced info"
+msgstr "Visszapattanás info"
+
+#: views/campaigns/bounced.hbs:6
+msgid "Subscribers who bounced and were unsubscribed:"
+msgstr "Feliratkozók, akik visszapattanás miatt le lettek íratva:"
+
+#: views/campaigns/bounced.hbs:10 views/campaigns/complained.hbs:10
+#: views/campaigns/delivered.hbs:10 views/campaigns/unsubscribed.hbs:10
+msgid "SMTP response"
+msgstr "SMTP válasz"
+
+#: views/campaigns/bounced.hbs:11
+msgid "Bounce time"
+msgstr "Visszapattanás ideje"
+
+#: views/campaigns/campaigns.hbs:3 views/campaigns/create-triggered.hbs:26
+#: views/campaigns/create.hbs:3 views/campaigns/create.hbs:4
+#: views/campaigns/create.hbs:28
+msgid "Create Campaign"
+msgstr "Kampány létrehozása"
+
+#: views/campaigns/campaigns.hbs:4
+msgid "Regular Campaign"
+msgstr "Sima kampány"
+
+#: views/campaigns/campaigns.hbs:5
+msgid "RSS Campaign"
+msgstr "RSS kampány"
+
+#: views/campaigns/campaigns.hbs:6
+msgid "Triggered Campaign"
+msgstr ""
+
+#: views/campaigns/campaigns.hbs:8 views/campaigns/create-rss.hbs:6
+#: views/campaigns/create-triggered.hbs:5 views/campaigns/create.hbs:5
+#: views/campaigns/edit-rss.hbs:8 views/campaigns/edit-triggered.hbs:9
+#: views/campaigns/edit.hbs:10 views/campaigns/view.hbs:73
+#: views/lists/create.hbs:5 views/lists/edit.hbs:6
+#: views/lists/fields/fields.hbs:6 views/lists/forms/forms.hbs:6
+#: views/lists/lists.hbs:5 views/lists/segments/segments.hbs:6
+#: views/report-templates/partials/report-template-fields.hbs:1
+#: views/report-templates/report-templates.hbs:10
+#: views/reports/partials/report-fields.hbs:1
+#: views/reports/partials/report-fields.hbs:5
+#: views/reports/partials/report-fields.hbs:9 views/reports/reports.hbs:6
+#: views/templates/templates.hbs:5 views/triggers/triggers.hbs:5
+msgid "Name"
+msgstr "Név"
+
+#: views/campaigns/campaigns.hbs:9 views/campaigns/create-rss.hbs:8
+#: views/campaigns/create-triggered.hbs:7 views/campaigns/create.hbs:7
+#: views/campaigns/edit-rss.hbs:10 views/campaigns/edit-triggered.hbs:11
+#: views/campaigns/edit.hbs:12 views/campaigns/view.hbs:74
+#: views/lists/create.hbs:7 views/lists/edit.hbs:10
+#: views/lists/forms/edit.hbs:9 views/lists/forms/forms.hbs:7
+#: views/lists/lists.hbs:8 views/mosaico/editor.hbs:3
+#: views/partials/merge-tag-reference.hbs:4
+#: views/report-templates/partials/report-template-fields.hbs:3
+#: views/report-templates/report-templates.hbs:11
+#: views/reports/partials/report-fields.hbs:3
+#: views/reports/partials/report-fields.hbs:6 views/reports/reports.hbs:8
+#: views/templates/create.hbs:9 views/templates/edit.hbs:8
+#: views/templates/templates.hbs:6 views/triggers/create.hbs:7
+#: views/triggers/edit.hbs:8 views/triggers/triggers.hbs:7
+msgid "Description"
+msgstr "Leírás"
+
+#: views/campaigns/campaigns.hbs:10 views/campaigns/view.hbs:75
+#: views/lists/view.hbs:22 views/lists/view.hbs:30
+#: views/triggers/triggers.hbs:6
+msgid "Status"
+msgstr "Státusz"
+
+#: views/campaigns/campaigns.hbs:11 views/campaigns/view.hbs:76
+#: views/lists/view.hbs:23 views/lists/view.hbs:24
+#: views/report-templates/report-templates.hbs:12
+#: views/reports/partials/report-fields.hbs:7 views/reports/reports.hbs:9
+msgid "Created"
+msgstr "Létrehozva"
+
+#: views/campaigns/clicked.hbs:3 views/campaigns/clicked.hbs:4
+msgid "Link info"
+msgstr "Link információ"
+
+#: views/campaigns/clicked.hbs:6 views/campaigns/view.hbs:63
+msgid "URL"
+msgstr "URL"
+
+#: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:64
+msgid "Clicks"
+msgstr "Kattintások"
+
+#: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:65
+msgid "% of clicks"
+msgstr "%-a a kattintásoknak"
+
+#: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:66
+msgid "% of messages"
+msgstr "%-a az üzeneteknek"
+
+#: views/campaigns/clicked.hbs:10 views/campaigns/view.hbs:69
+msgid "Aggregated clicks"
+msgstr "Összesített kattintások"
+
+#: views/campaigns/clicked.hbs:11
+msgid "Subscribers who clicked on a link:"
+msgstr "Feliratkozók, akik rákattintottak egy linkre:"
+
+#: views/campaigns/clicked.hbs:12
+msgid "Subscribers who clicked on this link:"
+msgstr "Feliratkozók, akik rákattintottak erre a linkre:"
+
+#: views/campaigns/clicked.hbs:13 views/campaigns/opened.hbs:7
+msgid "Stats by country"
+msgstr "Országok szerinti statisztika"
+
+#: views/campaigns/clicked.hbs:14 views/campaigns/opened.hbs:8
+msgid "Stats by device type"
+msgstr "Eszköz szerinti statisztika"
+
+#: views/campaigns/clicked.hbs:18
+msgid "First click time"
+msgstr ""
+
+#: views/campaigns/clicked.hbs:19
+msgid "Click count"
+msgstr "Kattintások száma"
+
+#: views/campaigns/complained.hbs:3 views/campaigns/complained.hbs:4
+msgid "Complained info"
+msgstr "Reklamálások info"
+
+#: views/campaigns/complained.hbs:6
+msgid "Subscribers who complained and were unsubscribed:"
+msgstr "Felhasználók, akik reklamáltak, ezért le lettek íratva"
+
+#: views/campaigns/complained.hbs:11
+msgid "Complain time"
+msgstr "Reklamálás ideje"
+
+#: views/campaigns/create-rss.hbs:3 views/campaigns/create-rss.hbs:4
+#: views/campaigns/create-rss.hbs:21
+msgid "Create RSS Campaign"
+msgstr "RSS kampány létrehozása"
+
+#: views/campaigns/create-rss.hbs:5 views/campaigns/edit-rss.hbs:6
+msgid ""
+"RSS campaign sets up a tracker against selected RSS feed address. Whenever a "
+"new entry is found from this feed it is sent to selected list as an email "
+"message."
+msgstr ""
+
+#: views/campaigns/create-rss.hbs:7 views/campaigns/create-triggered.hbs:6
+#: views/campaigns/create.hbs:6 views/campaigns/edit-rss.hbs:9
+#: views/campaigns/edit-triggered.hbs:10 views/campaigns/edit.hbs:11
+msgid "Campaign Name"
+msgstr "Kampány neve"
+
+#: views/campaigns/create-rss.hbs:9 views/campaigns/create-triggered.hbs:8
+#: views/campaigns/create.hbs:8 views/campaigns/edit-rss.hbs:11
+#: views/campaigns/edit-triggered.hbs:12 views/campaigns/edit.hbs:13
+#: views/lists/create.hbs:8 views/lists/edit.hbs:11
+#: views/report-templates/partials/report-template-fields.hbs:4
+#: views/reports/partials/report-fields.hbs:4 views/templates/create.hbs:11
+#: views/templates/edit.hbs:10 views/triggers/create.hbs:9
+#: views/triggers/edit.hbs:10
+msgid "HTML is allowed"
+msgstr "HTML megengedett"
+
+#: views/campaigns/create-rss.hbs:10 views/campaigns/create-triggered.hbs:9
+#: views/campaigns/create.hbs:9 views/campaigns/edit-rss.hbs:12
+#: views/campaigns/edit-triggered.hbs:13 views/campaigns/edit.hbs:14
+#: views/campaigns/view.hbs:6 views/triggers/create-select.hbs:6
+#: views/triggers/create.hbs:10 views/triggers/edit.hbs:12
+#: views/triggers/triggers.hbs:8
+msgid "List"
+msgstr "Lista"
+
+#: views/campaigns/create-rss.hbs:11 views/campaigns/create-triggered.hbs:10
+#: views/campaigns/create-triggered.hbs:14 views/campaigns/create.hbs:10
+#: views/campaigns/create.hbs:14 views/campaigns/edit-rss.hbs:13
+#: views/campaigns/edit-triggered.hbs:14 views/campaigns/edit.hbs:15
+#: views/lists/fields/create.hbs:27 views/lists/fields/edit.hbs:28
+#: views/lists/segments/create.hbs:9 views/lists/segments/edit.hbs:10
+#: views/lists/segments/rule-create.hbs:7 views/lists/subscription/add.hbs:10
+#: views/lists/subscription/add.hbs:12 views/lists/subscription/edit.hbs:11
+#: views/lists/subscription/import-preview.hbs:5
+#: views/reports/partials/report-select-template.hbs:2
+#: views/subscription/partials/subscription-custom-fields.hbs:9
+#: views/templates/create.hbs:8 views/triggers/create-select.hbs:7
+#: views/triggers/create.hbs:17 views/triggers/create.hbs:20
+#: views/triggers/create.hbs:22 views/triggers/create.hbs:26
+#: views/triggers/edit.hbs:19 views/triggers/edit.hbs:22
+#: views/triggers/edit.hbs:24 views/triggers/edit.hbs:28
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: views/campaigns/create-rss.hbs:12 views/campaigns/create-triggered.hbs:11
+#: views/campaigns/create.hbs:11 views/campaigns/edit-rss.hbs:14
+#: views/campaigns/edit-triggered.hbs:15 views/campaigns/edit.hbs:16
+#: views/triggers/create-select.hbs:8 views/triggers/create.hbs:11
+#: views/triggers/edit.hbs:13
+msgid "subscribers"
+msgstr "feliratkozók"
+
+#: views/campaigns/create-rss.hbs:13 views/campaigns/edit-rss.hbs:15
+msgid "RSS Feed Url"
+msgstr "RSS URL-je"
+
+#: views/campaigns/create-rss.hbs:14 views/campaigns/edit-rss.hbs:16
+msgid ""
+"New entries from this RSS URL are sent out to list subscribers as email "
+"messages"
+msgstr ""
+
+#: views/campaigns/create-rss.hbs:15 views/campaigns/create-triggered.hbs:18
+#: views/campaigns/create.hbs:18 views/campaigns/edit-rss.hbs:18
+#: views/campaigns/edit-triggered.hbs:16 views/campaigns/edit.hbs:17
+#: views/campaigns/view.hbs:12
+msgid "Email \"from name\""
+msgstr "Email feladó neve"
+
+#: views/campaigns/create-rss.hbs:16 views/campaigns/create-triggered.hbs:19
+#: views/campaigns/create.hbs:19 views/campaigns/edit-rss.hbs:19
+#: views/campaigns/edit-triggered.hbs:17 views/campaigns/edit.hbs:18
+#: views/settings.hbs:23
+msgid "This is the name your emails will come from"
+msgstr "Ez az a név, ami alatt az emailek meg fognak jelenni"
+
+#: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:20
+#: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
+#: views/campaigns/edit-triggered.hbs:18 views/campaigns/edit.hbs:19
+#: views/campaigns/view.hbs:13
+msgid "Email \"from\" address"
+msgstr "Email feladó címe"
+
+#: views/campaigns/create-rss.hbs:18 views/campaigns/create-triggered.hbs:21
+#: views/campaigns/edit-rss.hbs:21 views/campaigns/edit-triggered.hbs:19
+#: views/settings.hbs:25
+msgid "This is the address people will send replies to"
+msgstr "Ez a cím, amiről érkezni látják majd a leveleket"
+
+#: views/campaigns/create-rss.hbs:19 views/campaigns/create-triggered.hbs:24
+#: views/campaigns/create.hbs:26 views/campaigns/edit-rss.hbs:22
+#: views/campaigns/edit-triggered.hbs:22 views/campaigns/edit.hbs:25
+msgid "Disable opened tracking"
+msgstr "Megnyitások követésének letiltása"
+
+#: views/campaigns/create-rss.hbs:20 views/campaigns/create-triggered.hbs:25
+#: views/campaigns/create.hbs:27 views/campaigns/edit-rss.hbs:23
+#: views/campaigns/edit-triggered.hbs:23 views/campaigns/edit.hbs:26
+msgid "Disable clicked tracking"
+msgstr "Kattintások követésének letiltása"
+
+#: views/campaigns/create-triggered.hbs:3
+#: views/campaigns/create-triggered.hbs:4
+msgid "Create Triggered Campaign"
+msgstr ""
+
+#: views/campaigns/create-triggered.hbs:12 views/campaigns/create.hbs:12
+#: views/campaigns/edit-triggered.hbs:7 views/campaigns/edit.hbs:7
+#: views/lists/fields/create.hbs:31 views/lists/fields/edit.hbs:33
+#: views/reports/reports.hbs:7 views/templates/create.hbs:13
+msgid "Template"
+msgstr "Sablon"
+
+#: views/campaigns/create-triggered.hbs:13 views/campaigns/create.hbs:13
+msgid "Select a template:"
+msgstr "Sablon kiválasztása:"
+
+#: views/campaigns/create-triggered.hbs:15 views/campaigns/create.hbs:15
+msgid "Selecting a template creates a campaign specific copy from it"
+msgstr ""
+
+#: views/campaigns/create-triggered.hbs:16 views/campaigns/create.hbs:16
+msgid "Or alternatively use an URL as the message content source:"
+msgstr ""
+
+#: views/campaigns/create-triggered.hbs:17 views/campaigns/create.hbs:17
+#: views/campaigns/edit-triggered.hbs:26 views/campaigns/edit.hbs:29
+msgid ""
+"If a message is sent then this URL will be POSTed to using Merge Tags as "
+"POST body. Use this if you want to generate the HTML message yourself"
+msgstr ""
+
+#: views/campaigns/create-triggered.hbs:22 views/campaigns/create.hbs:24
+#: views/campaigns/edit-triggered.hbs:20 views/campaigns/edit.hbs:23
+#: views/campaigns/view.hbs:15
+msgid "Email \"subject line\""
+msgstr "Email tárgya"
+
+#: views/campaigns/create-triggered.hbs:23 views/campaigns/create.hbs:25
+#: views/campaigns/edit-triggered.hbs:21 views/campaigns/edit.hbs:24
+#: views/settings.hbs:27
+msgid "Keep it relevant and non-spammy"
+msgstr ""
+
+#: views/campaigns/create.hbs:21 views/campaigns/edit.hbs:20
+msgid ""
+"This is the address people will send replies to unless reply-to address is "
+"set"
+msgstr ""
+
+#: views/campaigns/create.hbs:22 views/campaigns/edit.hbs:21
+#: views/campaigns/view.hbs:14
+msgid "Email \"reply-to\" address"
+msgstr ""
+
+#: views/campaigns/create.hbs:23 views/campaigns/edit.hbs:22
+msgid "If set, this is the address people will send replies to"
+msgstr ""
+
+#: views/campaigns/delivered.hbs:3 views/campaigns/delivered.hbs:4
+msgid "Delivered info"
+msgstr ""
+
+#: views/campaigns/delivered.hbs:6
+msgid "Subscribers who received the message and did not bounce/unsubscribe:"
+msgstr ""
+
+#: views/campaigns/delivered.hbs:11
+msgid "Delivery time"
+msgstr ""
+
+#: views/campaigns/edit-rss.hbs:3 views/campaigns/edit-rss.hbs:4
+msgid "Edit RSS Campaign"
+msgstr "RSS kampány szerkesztése"
+
+#: views/campaigns/edit-rss.hbs:7 views/campaigns/edit-triggered.hbs:8
+#: views/campaigns/edit.hbs:9 views/settings.hbs:4 views/users/account.hbs:6
+msgid "General Settings"
+msgstr "Általános beállítások"
+
+#: views/campaigns/edit-rss.hbs:17
+msgid ""
+"Use special merge tag [RSS_ENTRY] to mark the position for the RSS post "
+"content. Additionally you can use any valid merge tag as well."
+msgstr ""
+
+#: views/campaigns/edit-rss.hbs:24 views/campaigns/edit-triggered.hbs:27
+#: views/campaigns/edit.hbs:35
+msgid "Delete Campaign"
+msgstr "Kampány törlése"
+
+#: views/campaigns/edit-rss.hbs:25 views/campaigns/edit-triggered.hbs:28
+#: views/campaigns/edit.hbs:36 views/lists/edit.hbs:22
+#: views/lists/fields/edit.hbs:39 views/lists/forms/edit.hbs:33
+#: views/lists/forms/forms.hbs:12 views/lists/segments/edit.hbs:14
+#: views/lists/segments/rule-edit.hbs:38 views/lists/subscription/edit.hbs:18
+#: views/reports/edit.hbs:6 views/settings.hbs:97 views/templates/edit.hbs:13
+#: views/triggers/edit.hbs:30 views/users/account.hbs:18
+msgid "Update"
+msgstr "Frissítés"
+
+#: views/campaigns/edit-triggered.hbs:3 views/campaigns/edit-triggered.hbs:4
+msgid "Edit Triggered Campaign"
+msgstr ""
+
+#: views/campaigns/edit-triggered.hbs:6 views/campaigns/edit.hbs:6
+#: routes/forms.js:143
+msgid "General"
+msgstr ""
+
+#: views/campaigns/edit-triggered.hbs:24 views/campaigns/edit.hbs:27
+msgid "Template Settings"
+msgstr "Sablon beállítások"
+
+#: views/campaigns/edit-triggered.hbs:25 views/campaigns/edit.hbs:28
+msgid "Template URL"
+msgstr "Sablon URL"
+
+#: views/campaigns/edit.hbs:3 views/campaigns/edit.hbs:4
+#: views/campaigns/upload-attachment.hbs:3
+#: views/campaigns/upload-attachment.hbs:5 views/campaigns/view.hbs:3
+msgid "Edit Campaign"
+msgstr "Kampány szerkesztése"
+
+#: views/campaigns/edit.hbs:8 views/campaigns/edit.hbs:30
+msgid "Attachments"
+msgstr "Csatolmányok"
+
+#: views/campaigns/edit.hbs:31
+msgid "File"
+msgstr "File"
+
+#: views/campaigns/edit.hbs:32
+msgid "Size"
+msgstr "Méret"
+
+#: views/campaigns/edit.hbs:33 views/campaigns/view.hbs:68
+#: views/lists/fields/fields.hbs:12 views/lists/forms/forms.hbs:9
+#: views/lists/view.hbs:33
+msgid "No data available in table"
+msgstr "Nincs adat a táblázatban."
+
+#: views/campaigns/edit.hbs:34 views/campaigns/upload-attachment.hbs:4
+msgid "Add Attachment"
+msgstr "Csatolmány hozzáadása"
+
+#: views/campaigns/opened.hbs:3 views/campaigns/opened.hbs:4
+msgid "Opened info"
+msgstr "Megnyitásokról információ"
+
+#: views/campaigns/opened.hbs:6
+msgid "Subscribers who opened this message:"
+msgstr "Feliratkozók, akik megnyitották ezt az üzenetet:"
+
+#: views/campaigns/opened.hbs:12
+msgid "First open"
+msgstr "Első megnyitás"
+
+#: views/campaigns/opened.hbs:13
+msgid "Opened count"
+msgstr "Megnyitások száma"
+
+#: views/campaigns/unsubscribed.hbs:3 views/campaigns/unsubscribed.hbs:4
+msgid "Unsubscribed info"
+msgstr "Leiratkozásokról információ:"
+
+#: views/campaigns/unsubscribed.hbs:6
+msgid "Subscribers who unsubscribed:"
+msgstr "Feliratkozók, akik leiratkoztak:"
+
+#: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:28
+#: views/lists/subscription/import.hbs:13 routes/lists.js:206
+msgid "Unsubscribed"
+msgstr ""
+
+#: views/campaigns/upload-attachment.hbs:7
+msgid "Upload"
+msgstr "Feltöltés"
+
+#: views/campaigns/view.hbs:4
+msgid "Overview"
+msgstr "Áttekintés"
+
+#: views/campaigns/view.hbs:5
+msgid "Links"
+msgstr "Linkek"
+
+#: views/campaigns/view.hbs:7
+msgid "Feed URL"
+msgstr ""
+
+#: views/campaigns/view.hbs:8
+msgid "Last check"
+msgstr ""
+
+#: views/campaigns/view.hbs:9
+msgid "Not yet checked"
+msgstr ""
+
+#: views/campaigns/view.hbs:10
+msgid "activate campaign to start checking feed for new messages"
+msgstr ""
+
+#: views/campaigns/view.hbs:11
+msgid "RSS status"
+msgstr "RSS státusz"
+
+#: views/campaigns/view.hbs:16
+msgid "Preview campaign as"
+msgstr "Kampány előnezete, mint"
+
+#: views/campaigns/view.hbs:17
+msgid "Add new test user"
+msgstr "Teszt felhasználó hozzáadása"
+
+#: views/campaigns/view.hbs:18
+msgid "No test users yet, create one here"
+msgstr "Nincs még teszt felhasználó, hozzon létre egyet itt"
+
+#: views/campaigns/view.hbs:19
+msgid "Go"
+msgstr ""
+
+#: views/campaigns/view.hbs:20 lib/models/triggers.js:26
+msgid "Delivered"
+msgstr "Készbesítve"
+
+#: views/campaigns/view.hbs:21
+msgid "List subscribers who received this message"
+msgstr "Azon felhasználók listázása, akik megkapták ezt az üzenetet"
+
+#: views/campaigns/view.hbs:22
+msgid "Blacklisted"
+msgstr "Feketelistán szereplők"
+
+#: views/campaigns/view.hbs:23
+msgid "List subscribers who blacklisted by global blacklist"
+msgstr ""
+"Azon felhasználók listázása, akik feketelistára kerültek, mert a globális "
+"feketelistán szerepeltek"
+
+#: views/campaigns/view.hbs:24 routes/lists.js:206
+msgid "Bounced"
+msgstr "Visszapattant"
+
+#: views/campaigns/view.hbs:25
+msgid "List subscribers who bounced"
+msgstr ""
+
+#: views/campaigns/view.hbs:26
+msgid "Complaints"
+msgstr ""
+
+#: views/campaigns/view.hbs:27
+msgid "List subscribers who complained for this message"
+msgstr ""
+
+#: views/campaigns/view.hbs:29
+msgid "List subscribers who unsubscribed after this message"
+msgstr ""
+
+#: views/campaigns/view.hbs:30
+msgid "Opened"
+msgstr ""
+
+#: views/campaigns/view.hbs:31
+msgid "List subscribers who opened this message"
+msgstr ""
+
+#: views/campaigns/view.hbs:32
+msgid "Clicked"
+msgstr ""
+
+#: views/campaigns/view.hbs:33 views/campaigns/view.hbs:70
+msgid "List subscribers who clicked on a link"
+msgstr ""
+
+#: views/campaigns/view.hbs:34
+msgid ""
+"Are you sure? This action would start sending messages to the selected list"
+msgstr ""
+
+#: views/campaigns/view.hbs:35
+msgid "Delay sending"
+msgstr ""
+
+#: views/campaigns/view.hbs:36
+msgid "hours"
+msgstr "óra"
+
+#: views/campaigns/view.hbs:37
+msgid "minutes"
+msgstr "perc"
+
+#: views/campaigns/view.hbs:38
+msgid "Send to subscribers:"
+msgstr ""
+
+#: views/campaigns/view.hbs:39
+msgid "Are you sure? This action would reset scheduling"
+msgstr ""
+
+#: views/campaigns/view.hbs:40
+msgid "Cancel"
+msgstr "Mégse"
+
+#: views/campaigns/view.hbs:41
+msgid "Sending scheduled"
+msgstr "Küldés időzítve"
+
+#: views/campaigns/view.hbs:42 views/campaigns/view.hbs:54
+msgid "Pause"
+msgstr ""
+
+#: views/campaigns/view.hbs:43 routes/campaigns.js:253
+msgid "Sending"
+msgstr "Küldés folyamatban"
+
+#: views/campaigns/view.hbs:44 views/campaigns/view.hbs:48
+msgid ""
+"Are you sure? This action would resume sending messages to the selected list"
+msgstr ""
+
+#: views/campaigns/view.hbs:45 views/campaigns/view.hbs:49
+msgid "Are you sure? This action would reset all stats about current progress"
+msgstr ""
+
+#: views/campaigns/view.hbs:46
+msgid "Resume"
+msgstr "Folytatás"
+
+#: views/campaigns/view.hbs:47 views/campaigns/view.hbs:51
+msgid "Reset"
+msgstr ""
+
+#: views/campaigns/view.hbs:50
+msgid "Continue"
+msgstr "Tovább"
+
+#: views/campaigns/view.hbs:52
+msgid ""
+"All messages sent! Hit \"Continue\" if you you want to send this campaign to "
+"new subscribers"
+msgstr ""
+
+#: views/campaigns/view.hbs:53
+msgid ""
+"Are you sure? This action would pause sending new entries in RSS feed as "
+"email messages to the selected list"
+msgstr ""
+
+#: views/campaigns/view.hbs:55 views/campaigns/view.hbs:59
+msgid "Campaign status:"
+msgstr "Kampány státusza"
+
+#: views/campaigns/view.hbs:56
+msgid "ACTIVE"
+msgstr "AKTÍV"
+
+#: views/campaigns/view.hbs:57
+msgid ""
+"Are you sure? This action would start sending new entries in RSS feed as "
+"email messages to the selected list"
+msgstr ""
+
+#: views/campaigns/view.hbs:58
+msgid "Activate"
+msgstr "Aktív"
+
+#: views/campaigns/view.hbs:60
+msgid "INACTIVE"
+msgstr "INAKTÍV"
+
+#: views/campaigns/view.hbs:61
+msgid ""
+"This is a triggered campaign. Messages are only sent to subscribers that hit "
+"some trigger that invokes this campaign"
+msgstr ""
+
+#: views/campaigns/view.hbs:62
+msgid "see more"
+msgstr ""
+
+#: views/campaigns/view.hbs:67
+msgid "List subscribers who clicked this link"
+msgstr ""
+
+#: views/campaigns/view.hbs:71
+msgid ""
+"Clicks are counted as unique subscribers that clicked on a specific link or "
+"on any link (in aggregated view)"
+msgstr ""
+
+#: views/campaigns/view.hbs:72
+msgid ""
+"If a new entry is found from campaign feed a new subcampaign is created of "
+"that entry and it will be listed here"
+msgstr ""
+
+#: views/emails/password-reset-html.hbs:1
+#: views/emails/password-reset-text.hbs:1
+msgid "Change your password"
+msgstr "Jelszó megváltoztatása"
+
+#: views/emails/password-reset-html.hbs:2
+#: views/emails/password-reset-text.hbs:2
+msgid "We have received a password change request for your Mailtrain account:"
+msgstr ""
+
+#: views/emails/password-reset-html.hbs:3
+#: views/emails/password-reset-text.hbs:3
+msgid "Reset password"
+msgstr ""
+
+#: views/emails/password-reset-html.hbs:4
+#: views/emails/password-reset-text.hbs:4
+msgid ""
+"If you did not ask to change your password, then you can ignore this email "
+"and your password will not be changed."
+msgstr ""
+
+#: views/emails/rss-html.hbs:1 views/emails/stationery-html.hbs:3
+#: views/emails/stationery-text.hbs:3
+msgid "Preferences"
+msgstr "Beállítások"
+
+#: views/emails/rss-html.hbs:2 views/emails/stationery-html.hbs:4
+#: views/emails/stationery-text.hbs:4 views/lists/forms/edit.hbs:20
+#: views/lists/subscription/edit.hbs:16
+#: views/subscription/partials/subscription-unsubscribe-form.hbs:2
+#: views/subscription/web-manage.mjml.hbs:3
+#: views/subscription/web-unsubscribe.mjml.hbs:1
+#: views/subscription/web-unsubscribe.mjml.hbs:2 routes/forms.js:223
+#: routes/lists.js:288
+msgid "Unsubscribe"
+msgstr "Leiratkozás"
+
+#: views/emails/rss-html.hbs:3 views/emails/stationery-html.hbs:5
+#: views/emails/stationery-text.hbs:5
+msgid "View this email in your browser"
+msgstr "Üzenet megtekintése böngészőben"
+
+#: views/emails/stationery-html.hbs:1 views/emails/stationery-text.hbs:1
+msgid "Hey [FIRST_NAME/Customer],"
+msgstr "Kedves [FIRST_NAME/Customer]!"
+
+#: views/emails/stationery-html.hbs:2 views/emails/stationery-text.hbs:2
+msgid "Cheers,"
+msgstr "Üdvözlettel,"
+
+#: views/index.hbs:1
+msgid "List Management"
+msgstr "A lista kezelői"
+
+#: views/index.hbs:2
+msgid ""
+"Mailtrain allows you to easily manage even very large lists. Million "
+"subscribers? Not a problem. You can add subscribers manually, through the "
+"API or import from a CSV file. All lists come with support for custom fields "
+"and merge tags as well."
+msgstr ""
+
+#: views/index.hbs:3 views/index.hbs:7 views/index.hbs:10 views/index.hbs:13
+#: views/index.hbs:16 views/index.hbs:19 views/index.hbs:22 views/index.hbs:25
+#: views/index.hbs:28
+msgid "Show more"
+msgstr ""
+
+#: views/index.hbs:4 views/lists/fields/create.hbs:3
+#: views/lists/fields/edit.hbs:3 views/lists/fields/fields.hbs:3
+#: views/lists/fields/fields.hbs:5 views/lists/view.hbs:6
+msgid "Custom Fields"
+msgstr "Egyedi mezők"
+
+#: views/index.hbs:5
+msgid ""
+"Text fields, numbers, drop downs or checkboxes, Mailtrain has them all. "
+"Every custom field can be included in the generated newsletters through "
+"merge tags."
+msgstr ""
+
+#: views/index.hbs:6
+msgid "Mailtrain also supports custom forms."
+msgstr ""
+
+#: views/index.hbs:8
+msgid "List Segmentation"
+msgstr ""
+
+#: views/index.hbs:9
+msgid ""
+"Send messages only to list subscribers that match predefined segmentation "
+"rules. No need to create separate lists with small differences."
+msgstr ""
+
+#: views/index.hbs:11
+msgid "RSS Campaigns"
+msgstr "RSS kampányok"
+
+#: views/index.hbs:12
+msgid ""
+"Setup Mailtrain to track RSS feeds and if a new entry is detected in a feed "
+"then Mailtrain auto-generates a new campaign using entry data as message "
+"contents and sends it to selected subscribers."
+msgstr ""
+
+#: views/index.hbs:14
+msgid "GPG Encryption"
+msgstr "GPG titkosítás"
+
+#: views/index.hbs:15
+msgid ""
+"If a list has a custom field for a GPG Public Key set then subscribers can "
+"upload their GPG public key to receive encrypted messages from the list."
+msgstr ""
+
+#: views/index.hbs:17
+msgid "Click Stats"
+msgstr ""
+
+#: views/index.hbs:18
+msgid ""
+"After a campaign is sent, check individual click statistics for every link "
+"included in the message."
+msgstr ""
+
+#: views/index.hbs:20
+msgid "Template Editors"
+msgstr ""
+
+#: views/index.hbs:21
+msgid ""
+"Mailtrain ships with GrapeJS and Mosaico built in, two advanced template "
+"editors. Mailtrain also offers a code editor if you prefer to handcraft the "
+"HTML yourself."
+msgstr ""
+
+#: views/index.hbs:23
+msgid "Send via Any Provider"
+msgstr ""
+
+#: views/index.hbs:24
+msgid ""
+"You can use any provider that supports SMTP protocol to send out your "
+"newsletters. Bounce and complaints handling via webhooks is supported for "
+"SES, SparkPost, SendGrid and Mailgun, also for Postfix and ZoneMTA."
+msgstr ""
+
+#: views/index.hbs:26 lib/tools.js:137
+msgid "Automation"
+msgstr ""
+
+#: views/index.hbs:27
+msgid ""
+"Define automation triggers to send specific messages when a user activates "
+"the trigger."
+msgstr ""
+
+#: views/layout.hbs:2
+msgid "Toggle navigation"
+msgstr ""
+
+#: views/layout.hbs:3
+msgid "Wiki"
+msgstr "Wiki"
+
+#: views/layout.hbs:4
+msgid "Blog"
+msgstr "Blog"
+
+#: views/layout.hbs:5 views/users/account.hbs:2 views/users/account.hbs:3
+msgid "Account"
+msgstr "Fiók"
+
+#: views/layout.hbs:6 views/settings.hbs:2 views/settings.hbs:3
+msgid "Settings"
+msgstr "Beállítások"
+
+#: views/layout.hbs:8 views/users/api.hbs:2 views/users/api.hbs:3
+msgid "API"
+msgstr "API"
+
+#: views/layout.hbs:9
+msgid "Log out"
+msgstr "Kijelentkezés"
+
+#: views/layout.hbs:10 views/users/forgot.hbs:2 views/users/login.hbs:2
+#: views/users/login.hbs:3 views/users/login.hbs:9 views/users/reset.hbs:2
+msgid "Sign in"
+msgstr "Bejelentkezés"
+
+#: views/layout.hbs:11
+msgid "Self Hosted Newsletter App Built on Top of Nodemailer"
+msgstr ""
+
+#: views/layout.hbs:12 views/layout.hbs:14
+msgid "Source on GitHub"
+msgstr "Forráskód a GitHub-on"
+
+#: views/layout.hbs:13
+msgid "Subscribe to Our Newsletter"
+msgstr "Feliratkozás hírlevelünkre"
+
+#: views/lists/create.hbs:2 views/lists/edit.hbs:2
+#: views/lists/fields/create.hbs:2 views/lists/fields/edit.hbs:2
+#: views/lists/fields/fields.hbs:2 views/lists/forms/create.hbs:2
+#: views/lists/forms/edit.hbs:2 views/lists/forms/forms.hbs:2
+#: views/lists/lists.hbs:2 views/lists/lists.hbs:4
+#: views/lists/segments/create.hbs:2 views/lists/segments/edit.hbs:2
+#: views/lists/segments/rule-configure.hbs:2
+#: views/lists/segments/rule-create.hbs:2 views/lists/segments/rule-edit.hbs:2
+#: views/lists/segments/segments.hbs:2 views/lists/segments/view.hbs:2
+#: views/lists/subscription/add.hbs:2 views/lists/subscription/edit.hbs:2
+#: views/lists/subscription/import-failed.hbs:2
+#: views/lists/subscription/import-preview.hbs:2
+#: views/lists/subscription/import.hbs:2 views/lists/view.hbs:2
+#: lib/tools.js:125 routes/lists.js:59
+msgid "Lists"
+msgstr "Listák"
+
+#: views/lists/create.hbs:3 views/lists/create.hbs:4 views/lists/create.hbs:13
+#: views/lists/lists.hbs:3
+msgid "Create List"
+msgstr "Lista létrehozása"
+
+#: views/lists/create.hbs:6 views/lists/edit.hbs:7
+msgid "List Name"
+msgstr "Lista neve"
+
+#: views/lists/create.hbs:9 views/lists/edit.hbs:15
+#: views/triggers/create.hbs:15 views/triggers/edit.hbs:17
+msgid "Subscription"
+msgstr "Feliratkozás"
+
+#: views/lists/create.hbs:10 views/lists/edit.hbs:16
+msgid "Allow public users to subscribe themselves"
+msgstr "Nyilvános űrlapról való feliratkozás engedélyezése"
+
+#: views/lists/create.hbs:11 views/lists/edit.hbs:17
+msgid "Unsubscription"
+msgstr "Leiratkozás"
+
+#: views/lists/create.hbs:12 views/lists/edit.hbs:18
+msgid "Select how an unsuscription request by subscriber is handled."
+msgstr ""
+
+#: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:8
+msgid "Edit List"
+msgstr "Lista szerkesztése"
+
+#: views/lists/edit.hbs:5
+msgid "View List"
+msgstr "Lista megtekintése"
+
+#: views/lists/edit.hbs:8
+msgid "List ID"
+msgstr "Lista ID"
+
+#: views/lists/edit.hbs:9
+msgid "This is the list ID displayed to the subscribers"
+msgstr ""
+
+#: views/lists/edit.hbs:12
+msgid "Custom Form"
+msgstr "Egyedi űrlap"
+
+#: views/lists/edit.hbs:13 views/lists/forms/forms.hbs:11
+msgid "Default Mailtrain Form"
+msgstr "Alapértelmezett Mailtrain űrlap"
+
+#: views/lists/edit.hbs:14
+msgid ""
+"The custom form used for this list. You can create a form <a href=\"/forms/"
+"{{id}}/create\">here</a>."
+msgstr ""
+"Egyedi űrlap ehhez a listához. <a href=\"/forms/{{id}}/create\">Itt</a> "
+"hozhat létre új űrlapot."
+
+#: views/lists/edit.hbs:19
+msgid "Unsubscribe Header"
+msgstr "Leiratkozás fejléc"
+
+#: views/lists/edit.hbs:20
+msgid "Do not send List-Unsubscribe headers"
+msgstr "Leiratkozás fejléc küldésének letiltása"
+
+#: views/lists/edit.hbs:21
+msgid "Delete List"
+msgstr "Lista törlése"
+
+#: views/lists/fields/create.hbs:4
+msgid "Create Field"
+msgstr "Mező létrehozása"
+
+#: views/lists/fields/create.hbs:5 views/lists/fields/fields.hbs:4
+msgid "Create Custom Field"
+msgstr "Egyedi mező létrehozása"
+
+#: views/lists/fields/create.hbs:6 views/lists/fields/create.hbs:7
+#: views/lists/fields/edit.hbs:7 views/lists/fields/edit.hbs:8
+msgid "Field Name"
+msgstr "Mező neve"
+
+#: views/lists/fields/create.hbs:8 views/lists/fields/edit.hbs:9
+msgid "Field Type"
+msgstr "Mező típusa"
+
+#: views/lists/fields/create.hbs:9 views/lists/fields/edit.hbs:10
+#: lib/models/fields.js:17
+msgid "Text"
+msgstr "Szöveg"
+
+#: views/lists/fields/create.hbs:10 views/lists/fields/edit.hbs:11
+#: lib/models/fields.js:21
+msgid "Number"
+msgstr "Szám"
+
+#: views/lists/fields/create.hbs:11 views/lists/fields/edit.hbs:12
+#: lib/models/fields.js:18
+msgid "Website"
+msgstr "Weboldal"
+
+#: views/lists/fields/create.hbs:12 views/lists/fields/edit.hbs:13
+#: lib/models/fields.js:20
+msgid "GPG Public Key"
+msgstr "GPG publikus kulcs"
+
+#: views/lists/fields/create.hbs:13 views/lists/fields/edit.hbs:14
+#: lib/models/fields.js:19
+msgid "Multi-line text"
+msgstr "Többsoros szöveg"
+
+#: views/lists/fields/create.hbs:14 views/lists/fields/edit.hbs:15
+msgid "JSON"
+msgstr "JSON"
+
+#: views/lists/fields/create.hbs:15 views/lists/fields/edit.hbs:16
+msgid "Date"
+msgstr "Dátum"
+
+#: views/lists/fields/create.hbs:16 views/lists/fields/edit.hbs:17
+msgid "Date (MM/DD/YYYY)"
+msgstr "Dátum (HH/NN/ÉÉÉÉ)"
+
+#: views/lists/fields/create.hbs:17 views/lists/fields/edit.hbs:18
+#: lib/models/fields.js:26
+msgid "Date (DD/MM/YYYY)"
+msgstr "Dátum (NN/HH/ÉÉÉÉ)"
+
+#: views/lists/fields/create.hbs:18 views/lists/fields/edit.hbs:19
+msgid "Birthday"
+msgstr "Születésnap"
+
+#: views/lists/fields/create.hbs:19 views/lists/fields/edit.hbs:20
+#: lib/models/fields.js:27
+msgid "Birthday (MM/DD)"
+msgstr "Születésnap (HH/NN)"
+
+#: views/lists/fields/create.hbs:20 views/lists/fields/edit.hbs:21
+#: lib/models/fields.js:28
+msgid "Birthday (DD/MM)"
+msgstr "Születésnap (NN/HH)"
+
+#: views/lists/fields/create.hbs:21 views/lists/fields/edit.hbs:22
+msgid "Grouped"
+msgstr "Csoportosított"
+
+#: views/lists/fields/create.hbs:22 views/lists/fields/edit.hbs:23
+msgid "Drop Downs"
+msgstr "Lenyíló menük"
+
+#: views/lists/fields/create.hbs:23 views/lists/fields/edit.hbs:24
+#: lib/models/fields.js:22
+msgid "Radio Buttons"
+msgstr "Rádió gombok"
+
+#: views/lists/fields/create.hbs:24 views/lists/fields/edit.hbs:25
+#: lib/models/fields.js:23
+msgid "Checkboxes"
+msgstr "Jelölőmezők"
+
+#: views/lists/fields/create.hbs:25 views/lists/fields/edit.hbs:26
+msgid "Option for a group value"
+msgstr ""
+
+#: views/lists/fields/create.hbs:26 views/lists/fields/edit.hbs:27
+msgid "Group"
+msgstr "Csoport"
+
+#: views/lists/fields/create.hbs:28 views/lists/fields/edit.hbs:29
+msgid "Required for group options"
+msgstr ""
+
+#: views/lists/fields/create.hbs:29 views/lists/fields/create.hbs:30
+#: views/lists/fields/edit.hbs:35 views/lists/fields/edit.hbs:36
+#: views/lists/fields/fields.hbs:9
+msgid "Default merge tag value"
+msgstr ""
+
+#: views/lists/fields/create.hbs:32 views/lists/fields/edit.hbs:34
+msgid ""
+"For group elements like checkboxes you can control the appearance of the "
+"merge tag with an optional template. The template uses handlebars syntax and "
+"you can find all values from <code>{{values}}</code> array, for example "
+"<code>{{#each values}} {{this}} {{/each}}</code>. If template is not defined "
+"then multiple values are joined with commas. You can also use this template "
+"to render JSON values (if the JSON is an array then the array is exposed as "
+"<code>values</code>, otherwise you can access the JSON keys directly)."
+msgstr ""
+
+#: views/lists/fields/create.hbs:33 views/lists/fields/edit.hbs:37
+msgid "Visible"
+msgstr "Látható"
+
+#: views/lists/fields/create.hbs:34
+msgid "Add Field"
+msgstr "Mező hozzáadása"
+
+#: views/lists/fields/edit.hbs:4
+msgid "Edit Field"
+msgstr "Mező szerkesztése"
+
+#: views/lists/fields/edit.hbs:5
+msgid "Edit Custom Field"
+msgstr ""
+
+#: views/lists/fields/edit.hbs:6
+msgid "Back to fields"
+msgstr ""
+
+#: views/lists/fields/edit.hbs:30 views/lists/fields/fields.hbs:8
+#: views/mosaico/editor.hbs:2 views/partials/merge-tag-reference.hbs:3
+msgid "Merge tag"
+msgstr ""
+
+#: views/lists/fields/edit.hbs:31
+msgid "Merge Tag"
+msgstr ""
+
+#: views/lists/fields/edit.hbs:32
+msgid "Put this tag in your content:"
+msgstr ""
+
+#: views/lists/fields/edit.hbs:38
+msgid "Delete Field"
+msgstr "Mező törlése"
+
+#: views/lists/fields/fields.hbs:7 views/lists/view.hbs:26
+#: views/report-templates/partials/report-template-fields.hbs:5
+msgid "Type"
+msgstr "Típus"
+
+#: views/lists/fields/fields.hbs:10 views/lists/fields/fields.hbs:11
+#: views/lists/forms/edit.hbs:26 views/lists/forms/forms.hbs:8
+#: views/lists/segments/segments.hbs:8 views/lists/segments/view.hbs:12
+#: views/triggers/triggers.hbs:14 routes/campaigns.js:276
+#: routes/campaigns.js:568 routes/campaigns.js:657 routes/campaigns.js:706
+#: routes/lists.js:170 routes/lists.js:257 routes/report-templates.js:51
+#: routes/templates.js:183 routes/triggers.js:297
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#: views/lists/forms/create.hbs:3 views/lists/forms/edit.hbs:3
+#: views/lists/forms/forms.hbs:3 views/lists/forms/forms.hbs:5
+#: views/lists/view.hbs:5
+msgid "Custom Forms"
+msgstr ""
+
+#: views/lists/forms/create.hbs:4
+msgid "Create Form"
+msgstr ""
+
+#: views/lists/forms/create.hbs:5 views/lists/forms/forms.hbs:4
+msgid "Create Custom Form"
+msgstr ""
+
+#: views/lists/forms/create.hbs:6 views/lists/forms/create.hbs:7
+#: views/lists/forms/edit.hbs:7 views/lists/forms/edit.hbs:8
+msgid "Form Name"
+msgstr ""
+
+#: views/lists/forms/create.hbs:8
+msgid "Add Form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:4
+msgid "Edit Form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:5
+msgid "Edit Custom Form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:6
+msgid "Back to forms"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:10
+msgid "Optional comments about this form"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:11
+msgid "Form Preview"
+msgstr "Űrlap előnézete"
+
+#: views/lists/forms/edit.hbs:12
+msgid ""
+"Note: These links are solely for a quick preview. If you submit a preview "
+"form you'll get redirected to the list's default form."
+msgstr ""
+
+#: views/lists/forms/edit.hbs:13 views/lists/subscription/add.hbs:16
+#: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:4
+#: views/subscription/mail-unsubscription-confirmed-text.hbs:4
+#: routes/forms.js:157 routes/lists.js:288
+msgid "Subscribe"
+msgstr "Feliratkozás"
+
+#: views/lists/forms/edit.hbs:14
+msgid "Confirm Subscription Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:15
+msgid "Confirm Unsubscription Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:16
+msgid "Subscribed Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:17
+msgid "Updated Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:18
+msgid "Unsubscribed Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:19
+msgid "Manual Unsubscribe Notice"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:21 routes/forms.js:205
+msgid "Manage"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:22
+msgid "Manage Address"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:23
+msgid "Create a test user for additional options"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:24 views/report-templates/create.hbs:3
+#: views/report-templates/edit.hbs:3
+#: views/report-templates/report-templates.hbs:3 views/templates/create.hbs:2
+#: views/templates/edit.hbs:2 views/templates/templates.hbs:2
+#: views/templates/templates.hbs:4 lib/tools.js:129 routes/templates.js:27
+msgid "Templates"
+msgstr "Sablonok"
+
+#: views/lists/forms/edit.hbs:25
+msgid "Fields"
+msgstr "Mezők"
+
+#: views/lists/forms/edit.hbs:27
+msgid "Form Fields"
+msgstr "Űrlap mezők"
+
+#: views/lists/forms/edit.hbs:28
+msgid "Fields hidden on subscription page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:29
+msgid "Fields shown on subscription page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:30
+msgid "Fields hidden on preferences page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:31
+msgid "Fields shown on preferences page:"
+msgstr ""
+
+#: views/lists/forms/edit.hbs:32
+msgid "Delete Form"
+msgstr "Űrlap törlése"
+
+#: views/lists/forms/forms.hbs:10
+msgid "The default form for this list is:"
+msgstr ""
+
+#: views/lists/lists.hbs:6
+msgid "ID"
+msgstr "ID"
+
+#: views/lists/lists.hbs:7 views/reports/partials/report-fields.hbs:10
+msgid "Subscribers"
+msgstr "Feliratkozók"
+
+#: views/lists/segments/create.hbs:3 views/lists/segments/edit.hbs:3
+#: views/lists/segments/rule-configure.hbs:3
+#: views/lists/segments/rule-create.hbs:3 views/lists/segments/rule-edit.hbs:3
+#: views/lists/segments/segments.hbs:3 views/lists/segments/segments.hbs:5
+#: views/lists/segments/view.hbs:3 views/lists/view.hbs:7
+#: views/lists/view.hbs:14
+msgid "Segments"
+msgstr ""
+
+#: views/lists/segments/create.hbs:4 views/lists/segments/create.hbs:5
+#: views/lists/segments/rule-configure.hbs:4
+#: views/lists/segments/rule-create.hbs:4 views/lists/segments/rule-edit.hbs:4
+#: views/lists/segments/segments.hbs:4
+msgid "Create Segment"
+msgstr ""
+
+#: views/lists/segments/create.hbs:6 views/lists/segments/create.hbs:7
+#: views/lists/segments/edit.hbs:7 views/lists/segments/edit.hbs:8
+msgid "Segment Name"
+msgstr ""
+
+#: views/lists/segments/create.hbs:8 views/lists/segments/edit.hbs:9
+msgid "Rule match"
+msgstr ""
+
+#: views/lists/segments/create.hbs:10 views/lists/segments/edit.hbs:11
+msgid "All rules must match"
+msgstr ""
+
+#: views/lists/segments/create.hbs:11 views/lists/segments/edit.hbs:12
+msgid "Any rule can match"
+msgstr ""
+
+#: views/lists/segments/create.hbs:12
+msgid "Add Segment"
+msgstr ""
+
+#: views/lists/segments/edit.hbs:4 views/lists/segments/edit.hbs:5
+#: views/lists/segments/view.hbs:6 views/lists/view.hbs:12
+msgid "Edit Segment"
+msgstr ""
+
+#: views/lists/segments/edit.hbs:6
+msgid "Back to segments"
+msgstr ""
+
+#: views/lists/segments/edit.hbs:13
+msgid "Delete Segment"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:5
+#: views/lists/segments/rule-create.hbs:5 views/lists/segments/rule-edit.hbs:5
+#: views/lists/segments/view.hbs:4
+msgid "Create Rule"
+msgstr "Szabály létrehozása"
+
+#: views/lists/segments/rule-configure.hbs:6
+#: views/lists/segments/rule-create.hbs:6 views/lists/segments/rule-edit.hbs:6
+#: views/lists/segments/view.hbs:10
+msgid "Rule"
+msgstr "Szabály"
+
+#: views/lists/segments/rule-configure.hbs:7
+#: views/lists/segments/rule-configure.hbs:8
+#: views/lists/segments/rule-configure.hbs:10
+#: views/lists/segments/rule-configure.hbs:13
+#: views/lists/segments/rule-configure.hbs:25
+#: views/lists/segments/rule-configure.hbs:30
+#: views/lists/segments/rule-edit.hbs:7 views/lists/segments/rule-edit.hbs:8
+#: views/lists/segments/rule-edit.hbs:10 views/lists/segments/rule-edit.hbs:15
+#: views/lists/segments/rule-edit.hbs:29 views/lists/segments/rule-edit.hbs:34
+#: views/lists/segments/view.hbs:11
+msgid "Value"
+msgstr "Érték"
+
+#: views/lists/segments/rule-configure.hbs:9
+#: views/lists/segments/rule-edit.hbs:9
+msgid ""
+"Use % for wildcard character, e.g. \"%test\" to match all values that end "
+"with \"test\""
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:11
+#: views/lists/segments/rule-configure.hbs:14
+#: views/lists/segments/rule-configure.hbs:26
+#: views/lists/segments/rule-edit.hbs:11 views/lists/segments/rule-edit.hbs:16
+#: views/lists/segments/rule-edit.hbs:30
+msgid "Use exact match"
+msgstr "Pontos találat használata"
+
+#: views/lists/segments/rule-configure.hbs:12
+#: views/lists/segments/rule-configure.hbs:15
+#: views/lists/segments/rule-configure.hbs:27
+#: views/lists/segments/rule-edit.hbs:12 views/lists/segments/rule-edit.hbs:17
+#: views/lists/segments/rule-edit.hbs:31
+msgid "Use range match"
+msgstr "Tartomány találat használata"
+
+#: views/lists/segments/rule-configure.hbs:16
+#: views/lists/segments/rule-edit.hbs:20
+msgid "Use relative range match"
+msgstr "Relatív tartomány találat használata"
+
+#: views/lists/segments/rule-configure.hbs:17
+#: views/lists/segments/rule-configure.hbs:28
+#: views/lists/segments/rule-edit.hbs:13 views/lists/segments/rule-edit.hbs:18
+#: views/lists/segments/rule-edit.hbs:21 views/lists/segments/rule-edit.hbs:32
+msgid "From"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:18
+#: views/lists/segments/rule-configure.hbs:22
+#: views/lists/segments/rule-edit.hbs:22 views/lists/segments/rule-edit.hbs:26
+msgid "days"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:19
+#: views/lists/segments/rule-configure.hbs:23
+#: views/lists/segments/rule-edit.hbs:23 views/lists/segments/rule-edit.hbs:27
+msgid "before today"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:20
+#: views/lists/segments/rule-configure.hbs:24
+#: views/lists/segments/rule-edit.hbs:24 views/lists/segments/rule-edit.hbs:28
+msgid "after today"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:21
+#: views/lists/segments/rule-configure.hbs:29
+#: views/lists/segments/rule-edit.hbs:14 views/lists/segments/rule-edit.hbs:19
+#: views/lists/segments/rule-edit.hbs:25 views/lists/segments/rule-edit.hbs:33
+msgid "to"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:31
+#: views/lists/segments/rule-edit.hbs:35 lib/models/segments.js:156
+#: lib/models/segments.js:418
+msgid "Selected"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:32
+#: views/lists/segments/rule-edit.hbs:36 lib/models/segments.js:156
+#: lib/models/segments.js:418
+msgid "Not selected"
+msgstr ""
+
+#: views/lists/segments/rule-configure.hbs:33
+msgid "Add Rule"
+msgstr ""
+
+#: views/lists/segments/rule-create.hbs:8
+#: views/lists/subscription/import.hbs:18
+#: views/reports/create-select-template.hbs:5
+#: views/triggers/create-select.hbs:9
+msgid "Next"
+msgstr "Következő"
+
+#: views/lists/segments/rule-edit.hbs:37
+msgid "Delete Rule"
+msgstr ""
+
+#: views/lists/segments/segments.hbs:7
+msgid "Match"
+msgstr ""
+
+#: views/lists/segments/view.hbs:5 views/lists/view.hbs:13
+msgid "Segment"
+msgstr ""
+
+#: views/lists/segments/view.hbs:7
+msgid "Match rules"
+msgstr ""
+
+#: views/lists/segments/view.hbs:8
+msgid "Matching subscribers"
+msgstr ""
+
+#: views/lists/segments/view.hbs:9
+msgid "show"
+msgstr ""
+
+#: views/lists/subscription/add.hbs:3 views/lists/subscription/add.hbs:4
+msgid "Add subscriber"
+msgstr "Feliratkozó hozzáadása"
+
+#: views/lists/subscription/add.hbs:5
+#: views/subscription/partials/subscription-custom-fields.hbs:1
+#: views/users/account.hbs:7
+msgid "Email Address"
+msgstr "Email cím"
+
+#: views/lists/subscription/add.hbs:8 views/lists/subscription/edit.hbs:9
+#: views/settings.hbs:80 views/settings.hbs:95
+#: views/subscription/partials/subscription-custom-fields.hbs:6
+msgid "Begins with"
+msgstr ""
+
+#: views/lists/subscription/add.hbs:9 views/lists/subscription/edit.hbs:10
+msgid ""
+"Insert a GPG public key that will be used to encrypt messages sent this "
+"subscriber"
+msgstr ""
+"Adjon meg egy GPG publikus kulcsot, amivel az üzenetek titkosítva lesznek "
+"küldéskor"
+
+#: views/lists/subscription/add.hbs:11 views/lists/subscription/edit.hbs:12
+#: views/lists/subscription/import-preview.hbs:9
+msgid "Timezone"
+msgstr "Időzóna"
+
+#: views/lists/subscription/add.hbs:13 views/lists/subscription/edit.hbs:13
+msgid "Test user?"
+msgstr "Teszt felhasználó?"
+
+#: views/lists/subscription/add.hbs:14 views/lists/subscription/edit.hbs:14
+msgid ""
+"If checked then this subscription can be used for previewing campaign "
+"messages"
+msgstr ""
+
+#: views/lists/subscription/add.hbs:15
+msgid ""
+"This person will not receive a confirmation email so make sure that you have "
+"permission to email them."
+msgstr ""
+
+#: views/lists/subscription/edit.hbs:3 views/lists/subscription/edit.hbs:4
+msgid "Edit subscriber"
+msgstr "Feliratkozó szerkesztése"
+
+#: views/lists/subscription/edit.hbs:5
+#: views/lists/subscription/import-failed.hbs:5
+msgid "Back to list"
+msgstr "Vissza a listához"
+
+#: views/lists/subscription/edit.hbs:6
+#: views/lists/subscription/import-preview.hbs:6
+#: views/subscription/partials/subscription-unsubscribe-form.hbs:1
+#: lib/helpers.js:42 lib/models/segments.js:11
+msgid "Email address"
+msgstr "Email cím"
+
+#: views/lists/subscription/edit.hbs:17
+msgid "Delete Subscription"
+msgstr "Feliratkozás törlése"
+
+#: views/lists/subscription/import-failed.hbs:3
+msgid "Import status"
+msgstr "Importálás státusza"
+
+#: views/lists/subscription/import-failed.hbs:4
+msgid "Failed addresses"
+msgstr "Hibás címek"
+
+#: views/lists/subscription/import-failed.hbs:6
+msgid ""
+"Role-based addresses like postmaster@example.com are blocked when importing. "
+"Subscribers with role-based email addresses can join your list using the "
+"subscription form"
+msgstr ""
+
+#: views/lists/subscription/import-failed.hbs:7
+msgid "see here"
+msgstr ""
+
+#: views/lists/subscription/import-failed.hbs:9
+msgid "Fail reason"
+msgstr "Hiba oka"
+
+#: views/lists/subscription/import-preview.hbs:3
+#: views/lists/subscription/import-preview.hbs:4
+#: views/lists/subscription/import.hbs:3 views/lists/subscription/import.hbs:4
+msgid "Import subscribers"
+msgstr "Feliratkozók imprtálása"
+
+#: views/lists/subscription/import-preview.hbs:10 views/users/api.hbs:21
+#: views/users/api.hbs:36 views/users/api.hbs:44 views/users/api.hbs:52
+#: views/users/api.hbs:64 views/users/api.hbs:75 views/users/api.hbs:83
+#: views/users/api.hbs:91 views/users/api.hbs:96 views/users/api.hbs:101
+#: views/users/api.hbs:106
+msgid "Example"
+msgstr "Példa"
+
+#: views/lists/subscription/import-preview.hbs:11
+msgid "Start import"
+msgstr "Importálás megkezdése"
+
+#: views/lists/subscription/import.hbs:5
+msgid "CSV File"
+msgstr "CSV file"
+
+#: views/lists/subscription/import.hbs:6
+msgid "The first line must contain column headings"
+msgstr "Az első sor fejlécet kell, hogy tartalmazzon"
+
+#: views/lists/subscription/import.hbs:7
+msgid "CSV delimiter"
+msgstr "CSV elválasztó"
+
+#: views/lists/subscription/import.hbs:8
+msgid "Categorize the imported subscribers as"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:9 routes/lists.js:206
+msgid "Subscribed"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:10
+msgid "Regular subscriber addresses"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:11
+msgid "Subscribed (Force)"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:12
+msgid "Regular subscriber addresses, resubscribe users that have unsubscribed"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:14
+msgid "Suppressed emails that will be unsubscribed from your list"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:15
+msgid "Check imported emails"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:16 views/triggers/triggers.hbs:12
+msgid "Enabled"
+msgstr ""
+
+#: views/lists/subscription/import.hbs:17 views/triggers/triggers.hbs:13
+msgid "Disabled"
+msgstr ""
+
+#: views/lists/view.hbs:3
+msgid "Subscription Form"
+msgstr "Feliratkozós űrlap"
+
+#: views/lists/view.hbs:4
+msgid "List Actions"
+msgstr "Lista műveletek"
+
+#: views/lists/view.hbs:9 views/triggers/create-select.hbs:3
+#: views/triggers/create-select.hbs:4 views/triggers/create.hbs:3
+#: views/triggers/create.hbs:4 views/triggers/create.hbs:27
+#: views/triggers/triggers.hbs:3
+msgid "Create Trigger"
+msgstr ""
+
+#: views/lists/view.hbs:10
+msgid "Add Subscriber"
+msgstr "Feliratkozó hozzáadása"
+
+#: views/lists/view.hbs:11
+msgid "Import Subscribers"
+msgstr "Feliratkozók importálása"
+
+#: views/lists/view.hbs:15
+msgid "Create New Segment"
+msgstr ""
+
+#: views/lists/view.hbs:16
+msgid "Filter"
+msgstr "Szűrés"
+
+#: views/lists/view.hbs:17
+msgid "Subscriptions"
+msgstr ""
+
+#: views/lists/view.hbs:18
+msgid "Imports"
+msgstr ""
+
+#: views/lists/view.hbs:25 routes/campaigns.js:255 routes/lists.js:300
+msgid "Finished"
+msgstr "Befejezve"
+
+#: views/lists/view.hbs:27
+msgid "Added"
+msgstr "Hozzáadva"
+
+#: views/lists/view.hbs:28
+msgid "Updated"
+msgstr "Frissítve"
+
+#: views/lists/view.hbs:29
+msgid "Failed"
+msgstr ""
+
+#: views/lists/view.hbs:31
+msgid ""
+"Are you sure? This action should only be called to resolve stalled imports"
+msgstr ""
+
+#: views/lists/view.hbs:32
+msgid "Restart"
+msgstr "Újrakezdés"
+
+#: views/mosaico/editor.hbs:1 views/partials/merge-tag-reference.hbs:1
+msgid "Merge tag reference"
+msgstr ""
+
+#: views/mosaico/editor.hbs:4
+msgid "MOSAICO Responsive Email Designer"
+msgstr ""
+
+#: views/mosaico/editor.hbs:5
+msgid "Sucessfully saved"
+msgstr "Sikeres mentés"
+
+#: views/mosaico/editor.hbs:6
+msgid "An error occured while saving the document"
+msgstr "A dokumentum mentése közben hiba lépett fel."
+
+#: views/mosaico/editor.hbs:7
+msgid "Unsaved changes will be lost. Close now?"
+msgstr "Az el nem mentett változtatások el fognak veszni. Bezárja?"
+
+#: views/mosaico/editor.hbs:8 views/mosaico/editor.hbs:9
+msgid "Tags"
+msgstr "Címkék"
+
+#: views/partials/codeeditor.hbs:1 views/partials/grapejs.hbs:1
+#: views/partials/mosaico.hbs:1 views/partials/summernote.hbs:1
+msgid "Template content (HTML)"
+msgstr "Sablon tartalma (HTML)"
+
+#: views/partials/editor-navbar.hbs:1
+msgid "SAVE"
+msgstr "MENTÉS"
+
+#: views/partials/editor-navbar.hbs:2
+msgid "SAVING"
+msgstr "MENTÉS FOLYMATBAN"
+
+#: views/partials/editor-navbar.hbs:3
+msgid "CLOSE"
+msgstr "BEZÁRÁS"
+
+#: views/partials/grapejs.hbs:2
+msgid "Open GrapeJS"
+msgstr "GrapeJS megnyitása"
+
+#: views/partials/html-preview.hbs:1
+msgid "Toggle HTML preview"
+msgstr "HTML előnézet átváltása"
+
+#: views/partials/html-to-text.hbs:1
+msgid ""
+"To extract the text from HTML click <a id=\"html-to-plaintext-btn\" role="
+"\"button\">here</a>."
+msgstr ""
+
+#: views/partials/html-to-text.hbs:2
+msgid ""
+"Please note that your existing plaintext in the field above will be "
+"overwritten. This feature uses the <a href=\"http://premailer.dialect.ca/api"
+"\" target=\"_blank\" rel=\"noreferrer\">Premailer API</a>, a third party "
+"service. Their Terms of Service and Privacy Policy apply."
+msgstr ""
+
+#: views/partials/html-to-text.hbs:3
+msgid "An error occurred while talking to the server"
+msgstr ""
+
+#: views/partials/merge-tag-reference.hbs:2
+msgid ""
+"Merge tags are tags that are replaced before sending out the message. The "
+"format of the merge tag is the following: <code>[TAG_NAME]</code> or "
+"<code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional "
+"text value used when <code>TAG_NAME</code> is empty."
+msgstr ""
+
+#: views/partials/modal-carousel.hbs:1
+msgid "{{title}}"
+msgstr ""
+
+#: views/partials/mosaico.hbs:2
+msgid "Open Mosaico"
+msgstr "Mosaico megnyitása"
+
+#: views/partials/plaintext.hbs:1
+msgid "Template content (plaintext)"
+msgstr "Sablon tartalma (sima szöveg)"
+
+#: views/report-templates/create.hbs:2 views/report-templates/edit.hbs:2
+#: views/report-templates/report-templates.hbs:2
+#: views/reports/create-select-template.hbs:2 views/reports/create.hbs:2
+#: views/reports/edit.hbs:2 views/reports/output.hbs:2
+#: views/reports/reports.hbs:2 views/reports/reports.hbs:5
+#: views/reports/view.hbs:2 lib/tools.js:144 routes/reports.js:31
+msgid "Reports"
+msgstr "Jelentések"
+
+#: views/report-templates/create.hbs:4 views/report-templates/create.hbs:6
+#: views/report-templates/report-templates.hbs:4 views/templates/create.hbs:3
+#: views/templates/create.hbs:4 views/templates/create.hbs:12
+#: views/templates/templates.hbs:3
+msgid "Create Template"
+msgstr "Sablon létrehozása"
+
+#: views/report-templates/create.hbs:5 routes/report-templates.js:231
+msgid "Create Report Template"
+msgstr "Jelentés sablon létrehozása"
+
+#: views/report-templates/edit.hbs:4 views/templates/edit.hbs:3
+#: views/templates/edit.hbs:4
+msgid "Edit Template"
+msgstr "Sablon szerkesztése"
+
+#: views/report-templates/edit.hbs:5 routes/report-templates.js:262
+msgid "Edit Report Template"
+msgstr "Jelentés sablon szerkesztése"
+
+#: views/report-templates/edit.hbs:6 views/templates/edit.hbs:12
+msgid "Delete Template"
+msgstr "Sablon törlése"
+
+#: views/report-templates/edit.hbs:7
+msgid "Update and Stay"
+msgstr ""
+
+#: views/report-templates/edit.hbs:8
+msgid "Update and Leave"
+msgstr ""
+
+#: views/report-templates/partials/report-template-fields.hbs:2
+msgid "Template Name"
+msgstr "Sablon neve"
+
+#: views/report-templates/partials/report-template-fields.hbs:6
+msgid "User selectable fields"
+msgstr ""
+
+#: views/report-templates/partials/report-template-fields.hbs:7
+msgid "Data processing code"
+msgstr ""
+
+#: views/report-templates/partials/report-template-fields.hbs:8
+msgid "Rendering template"
+msgstr ""
+
+#: views/report-templates/report-templates.hbs:5
+msgid "Blank"
+msgstr ""
+
+#: views/report-templates/report-templates.hbs:6
+msgid "All Subscribers"
+msgstr "Összes feliratkozó"
+
+#: views/report-templates/report-templates.hbs:7
+msgid "Grouped Subscribers"
+msgstr ""
+
+#: views/report-templates/report-templates.hbs:8
+msgid "Export List as CSV"
+msgstr "Lista exportálása CSV-be"
+
+#: views/report-templates/report-templates.hbs:9 views/reports/reports.hbs:4
+#: routes/report-templates.js:29
+msgid "Report Templates"
+msgstr "Jelentés sablonok"
+
+#: views/reports/create-select-template.hbs:3
+#: views/reports/create-select-template.hbs:4 views/reports/create.hbs:3
+#: views/reports/create.hbs:4 views/reports/create.hbs:5
+#: views/reports/reports.hbs:3 routes/reports.js:81
+msgid "Create Report"
+msgstr "Jelentés létrehozása"
+
+#: views/reports/edit.hbs:3 views/reports/edit.hbs:4 routes/reports.js:151
+msgid "Edit Report"
+msgstr "Jelentés szerkesztése"
+
+#: views/reports/edit.hbs:5
+msgid "Delete Report"
+msgstr "Jelentés törlése"
+
+#: views/reports/partials/report-fields.hbs:2
+msgid "Report Name"
+msgstr "Jelentés neve"
+
+#: views/reports/partials/report-fields.hbs:8
+#: views/reports/partials/report-fields.hbs:11
+msgid ""
+"Select a campaign in the table above by clicking on the respective row "
+"number."
+msgstr ""
+
+#: views/reports/partials/report-select-template.hbs:1
+msgid "Report Template"
+msgstr "Jelentés sablon"
+
+#: views/settings.hbs:5
+msgid "Service Address (URL)"
+msgstr "Szolgáltatás címe (URL)"
+
+#: views/settings.hbs:6
+msgid "Enter the URL this service can be reached from"
+msgstr "Adja meg az URL-t, amiről ez a szolgáltatás elérhető"
+
+#: views/settings.hbs:7
+msgid "Admin Email"
+msgstr "Admin email"
+
+#: views/settings.hbs:8
+msgid ""
+"Enter the email address that will be used as \"from\" for system messages"
+msgstr ""
+
+#: views/settings.hbs:9
+msgid "Disable WYSIWYG editor"
+msgstr ""
+
+#: views/settings.hbs:10
+msgid "If checked then message editor displays HTML code without the preview"
+msgstr ""
+
+#: views/settings.hbs:11
+msgid "Disable subscription confirmation messages"
+msgstr ""
+
+#: views/settings.hbs:12
+msgid ""
+"If checked then do not send a confirmation message that states the "
+"subscriber is now subscribed or unsubscribed. This does not disable double "
+"opt-in messages."
+msgstr ""
+
+#: views/settings.hbs:13
+msgid "Tracking ID"
+msgstr "Követő ID"
+
+#: views/settings.hbs:14
+msgid "Enter Google Analytics tracking code"
+msgstr "Google Analytics követőkód megadása"
+
+#: views/settings.hbs:15
+msgid "Frontpage shout out"
+msgstr ""
+
+#: views/settings.hbs:16
+msgid "HTML code shown in the front page header section"
+msgstr ""
+
+#: views/settings.hbs:17
+msgid "Campaign defaults"
+msgstr ""
+
+#: views/settings.hbs:18
+msgid "Sender name"
+msgstr "Küldő neve"
+
+#: views/settings.hbs:19
+msgid "Sender name, eg. My Awesome Company Ltd."
+msgstr "Küldő neve, pl.: Éncégem Kft."
+
+#: views/settings.hbs:20
+msgid "Default address"
+msgstr "Alapértelmezett postai cím"
+
+#: views/settings.hbs:21
+msgid ""
+"Contact address to provide, eg. 1234 Main Street, Anywhere, MA 01234, USA"
+msgstr ""
+
+#: views/settings.hbs:22
+msgid "Default \"from name\""
+msgstr ""
+
+#: views/settings.hbs:24
+msgid "Default \"from\" email"
+msgstr ""
+
+#: views/settings.hbs:26
+msgid "Default \"subject line\""
+msgstr ""
+
+#: views/settings.hbs:28
+msgid "Default homepage (URL)"
+msgstr ""
+
+#: views/settings.hbs:29
+msgid "URL to redirect the subscribed users to, eg. http://example.com/"
+msgstr ""
+
+#: views/settings.hbs:30
+msgid "Mailer Settings"
+msgstr ""
+
+#: views/settings.hbs:31
+msgid "These settings are required to send out e-mail messages"
+msgstr ""
+
+#: views/settings.hbs:32
+msgid "SMTP"
+msgstr "SMTP"
+
+#: views/settings.hbs:33
+msgid "AWS SES"
+msgstr "AWS SES"
+
+#: views/settings.hbs:34
+msgid "Use SMTP for sending mail"
+msgstr "SMTP használata levélküldéshez"
+
+#: views/settings.hbs:35
+msgid "Hostname"
+msgstr ""
+
+#: views/settings.hbs:36
+msgid "Port"
+msgstr "Port"
+
+#: views/settings.hbs:37
+msgid "Port, eg. 465. Autodetected if left blank"
+msgstr ""
+
+#: views/settings.hbs:38
+msgid "Encryption"
+msgstr "Titkosítás"
+
+#: views/settings.hbs:39
+msgid "Disable SMTP authentication"
+msgstr "SMTP azonosítás letiltása"
+
+#: views/settings.hbs:40 views/users/forgot.hbs:9 views/users/login.hbs:4
+#: views/users/login.hbs:5
+msgid "Username"
+msgstr "Felhasználónév"
+
+#: views/settings.hbs:41
+msgid "Username, eg. myaccount@example.com"
+msgstr "Felhasználónév, pl.: myaccount@example.com"
+
+#: views/settings.hbs:42 views/settings.hbs:43 views/users/login.hbs:6
+#: views/users/login.hbs:7
+msgid "Password"
+msgstr "Jelszó"
+
+#: views/settings.hbs:44
+msgid "Use SES API for sending mail"
+msgstr "SES API használata levélküldéshez"
+
+#: views/settings.hbs:45
+msgid "Access Key"
+msgstr ""
+
+#: views/settings.hbs:46
+msgid "AWS Access Key Id"
+msgstr ""
+
+#: views/settings.hbs:47
+msgid "Secret Key"
+msgstr ""
+
+#: views/settings.hbs:48
+msgid "AWS Secret Access Key"
+msgstr ""
+
+#: views/settings.hbs:49
+msgid "Region"
+msgstr "Régió"
+
+#: views/settings.hbs:50
+msgid "Checking"
+msgstr ""
+
+#: views/settings.hbs:51
+msgid "Check Mailer config"
+msgstr ""
+
+#: views/settings.hbs:52
+msgid "Advanced Mailer settings"
+msgstr ""
+
+#: views/settings.hbs:53
+msgid "Log SMTP transactions"
+msgstr "SMTP tranzakciók naplózása"
+
+#: views/settings.hbs:54
+msgid "Allow self-signed certificates"
+msgstr ""
+
+#: views/settings.hbs:55
+msgid "Max connections"
+msgstr ""
+
+#: views/settings.hbs:56
+msgid "The count of max connections, eg. 10"
+msgstr ""
+
+#: views/settings.hbs:57
+msgid ""
+"The count of maximum simultaneous connections to make against the SMTP "
+"server (defaults to 5). This limit is per sending process."
+msgstr ""
+
+#: views/settings.hbs:58
+msgid "Max messages"
+msgstr ""
+
+#: views/settings.hbs:59
+msgid "The count of max messages, eg. 100"
+msgstr ""
+
+#: views/settings.hbs:60
+msgid ""
+"The number of messages to send through a single connection before the "
+"connection is closed and reopened (defaults to 100)"
+msgstr ""
+
+#: views/settings.hbs:61
+msgid "Throttling"
+msgstr ""
+
+#: views/settings.hbs:62
+msgid "Messages per hour eg. 1000"
+msgstr ""
+
+#: views/settings.hbs:63
+msgid ""
+"Maximum number of messages to send in an hour. Leave empty or zero for no "
+"throttling. If your provider uses a different speed limit (messages/minute "
+"or messages/second) then convert this limit into messages/hour (1m/s => "
+"3600m/h). This limit is per sending process."
+msgstr ""
+
+#: views/settings.hbs:64
+msgid "VERP bounce handling"
+msgstr ""
+
+#: views/settings.hbs:65
+msgid ""
+"Mailtrain is able to use VERP based routing to detect bounces. In this case "
+"the message is sent to the recipient using a custom VERP address as the "
+"return path of the message. If the message is not accepted a bounce email is "
+"sent to this special VERP address and thus a bounce is detected."
+msgstr ""
+
+#: views/settings.hbs:66
+msgid ""
+"To get VERP working you need to set up a DNS MX record that points to your "
+"Mailtrain hostname. You must also ensure that Mailtrain VERP interface is "
+"available from port 25 of your server (port 25 usually requires root user "
+"privileges). This way if anyone tries to send email to someuser@verp-"
+"hostname then the email should end up to this server."
+msgstr ""
+
+#: views/settings.hbs:67
+msgid ""
+"VERP usually only works if you are using your own SMTP server. Regular relay "
+"services (SES, SparkPost, Gmail etc.) tend to remove the VERP address from "
+"the message."
+msgstr ""
+
+#: views/settings.hbs:68
+msgid "Use VERP to catch bounces"
+msgstr ""
+
+#: views/settings.hbs:69
+msgid "Server hostname"
+msgstr ""
+
+#: views/settings.hbs:70
+msgid "The VERP server hostname, eg. bounces.example.com"
+msgstr ""
+
+#: views/settings.hbs:71
+msgid ""
+"VERP bounce handling server hostname. This hostname is used in the SMTP "
+"envelope FROM address and the MX DNS records should point to this server"
+msgstr ""
+
+#: views/settings.hbs:72
+msgid ""
+"VERP bounce handling server is not enabled. Modify your server configuration "
+"file and restart server to enable it"
+msgstr ""
+
+#: views/settings.hbs:73
+msgid "GPG Signing"
+msgstr "GPG aláírás"
+
+#: views/settings.hbs:74
+msgid ""
+"Only messages that are encrypted can be signed. Subsribers who have not set "
+"up a GPG public key in their profile receive normal email messages. Users "
+"with GPG key set receive encrypted messages and if you have signing key also "
+"set, the messages are signed with this key."
+msgstr ""
+
+#: views/settings.hbs:75
+msgid ""
+"Do not use sensitive keys here. The private key and passphrase are not "
+"encrypted in the database."
+msgstr ""
+
+#: views/settings.hbs:76
+msgid "Private Key Passphrase"
+msgstr ""
+
+#: views/settings.hbs:77
+msgid "Passphrase for the key if set"
+msgstr ""
+
+#: views/settings.hbs:78
+msgid "Only fill this if your private key is encrypted with a passphrase"
+msgstr ""
+
+#: views/settings.hbs:79
+msgid "GPG Private Key"
+msgstr "GPG privát kulcs"
+
+#: views/settings.hbs:81
+msgid ""
+"This value is optional. If you do not provide a private key GPG encrypted "
+"messages are sent without signing."
+msgstr ""
+
+#: views/settings.hbs:82
+msgid "DKIM Signing by ZoneMTA"
+msgstr ""
+
+#: views/settings.hbs:83
+msgid ""
+"If you are using ZoneMTA then Mailtrain can provide a DKIM key for signing "
+"all outgoing messages. Other services usually provide their own means to "
+"DKIM sign your messages"
+msgstr ""
+
+#: views/settings.hbs:84
+msgid ""
+"Do not use sensitive keys here. The private key is not encrypted in the "
+"database."
+msgstr ""
+
+#: views/settings.hbs:85
+msgid "ZoneMTA DKIM API Key"
+msgstr ""
+
+#: views/settings.hbs:86
+msgid "Some secret value"
+msgstr ""
+
+#: views/settings.hbs:87
+msgid ""
+"Secret value known to ZoneMTA for requesting DKIM key information. If this "
+"value was generated by the Mailtrain installation script then you can keep "
+"it as it is"
+msgstr ""
+
+#: views/settings.hbs:88
+msgid "DKIM domain"
+msgstr ""
+
+#: views/settings.hbs:89
+msgid "Domain name for the DKIM key"
+msgstr ""
+
+#: views/settings.hbs:90
+msgid "Leave blank to use the sender email address domain"
+msgstr ""
+
+#: views/settings.hbs:91 views/settings.hbs:92
+msgid "DKIM key selector"
+msgstr ""
+
+#: views/settings.hbs:93
+msgid "Signing is disabled without a valid selector value"
+msgstr ""
+
+#: views/settings.hbs:94
+msgid "DKIM Private Key"
+msgstr ""
+
+#: views/settings.hbs:96
+msgid ""
+"This value is optional. If you do not provide a private key then messages "
+"are not signed."
+msgstr ""
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:1
+#: views/subscription/mail-already-subscribed-text.hbs:1
+#: lib/models/subscriptions.js:174 lib/models/subscriptions.js:895
+msgid "Email address already registered"
+msgstr "Ezt az email címet már regisztrálták."
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:2
+#: views/subscription/mail-already-subscribed-text.hbs:2
+msgid ""
+"We have received a subscription request. Your email address is however "
+"already registered."
+msgstr ""
+"Megkaptuk a feliratkozási kérelmét, viszont címe már eddig is regisztrálva "
+"volt."
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:3
+#: views/subscription/mail-already-subscribed-text.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. Your existing "
+"subscription won't be affected."
+msgstr ""
+"Ha véletlenül kapta ezt a levelet, egyszerűen törölje. A feliratkozás "
+"státusza nem fog változni."
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:4
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:3
+msgid "If you want to modify your subscription then you can "
+msgstr "Ha szeretné megváltoztatni feliratkozását, akkor"
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:5
+#: views/subscription/mail-already-subscribed-text.hbs:5
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:4
+#: views/subscription/mail-subscription-confirmed-text.hbs:4
+msgid "manage your preferences"
+msgstr "módosíthatja beállításait"
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:6
+#: views/subscription/mail-already-subscribed-text.hbs:6
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:5
+#: views/subscription/mail-subscription-confirmed-text.hbs:5
+#: views/users/login.hbs:10
+msgid "or"
+msgstr "vagy"
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:7
+#: views/subscription/mail-already-subscribed-text.hbs:7
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:6
+#: views/subscription/mail-subscription-confirmed-text.hbs:6
+msgid "unsubscribe here"
+msgstr "leiratkozhat itt"
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:8
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:7
+#: views/subscription/web-confirm-subscription-notice.mjml.hbs:3
+#: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:3
+#: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:4
+#: views/subscription/web-subscribed-notice.mjml.hbs:4
+#: views/subscription/web-unsubscribed-notice.mjml.hbs:3
+#: views/subscription/web-updated-notice.mjml.hbs:3
+msgid "Return to our website"
+msgstr "Visszatérés az odalunkra"
+
+#: views/subscription/mail-already-subscribed-html.mjml.hbs:9
+#: views/subscription/mail-already-subscribed-text.hbs:8
+#: views/subscription/mail-confirm-address-change-html.mjml.hbs:4
+#: views/subscription/mail-confirm-address-change-text.hbs:4
+#: views/subscription/mail-confirm-subscription-html.mjml.hbs:4
+#: views/subscription/mail-confirm-subscription-text.hbs:4
+#: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:4
+#: views/subscription/mail-confirm-unsubscription-text.hbs:4
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:8
+#: views/subscription/mail-subscription-confirmed-text.hbs:7
+#: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:5
+#: views/subscription/mail-unsubscription-confirmed-text.hbs:5
+msgid "For questions about this list, please contact:"
+msgstr "A listával kapcsolatos kérdéseivel itt tud megkeresni minket:"
+
+#: views/subscription/mail-already-subscribed-text.hbs:4
+#: views/subscription/mail-subscription-confirmed-text.hbs:3
+msgid "If you want to modify your subscription then you can:"
+msgstr "Ha szeretné megváltoztatni feliratkozását, akkor"
+
+#: views/subscription/mail-confirm-address-change-html.mjml.hbs:1
+#: views/subscription/mail-confirm-address-change-text.hbs:1
+msgid "Please Confirm Subscription Address Change"
+msgstr "Kérjük erősítse meg a feliratkozáshoz használt emailcímének változását"
+
+#: views/subscription/mail-confirm-address-change-html.mjml.hbs:2
+#: views/subscription/mail-confirm-address-change-text.hbs:2
+msgid "Yes, subscribe this email address to the list"
+msgstr "Igen, szeretnék feliratkozni a listára ezzel az email-lel."
+
+#: views/subscription/mail-confirm-address-change-html.mjml.hbs:3
+#: views/subscription/mail-confirm-subscription-html.mjml.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"subscribed if you don't click the confirmation link above."
+msgstr ""
+"Ha nem ön kérte ezt a levelet, nyugodtan törölheti. Ha nem kattint a fenti "
+"linkre, továbbra is feliratkozva marad."
+
+#: views/subscription/mail-confirm-address-change-text.hbs:3
+#: views/subscription/mail-confirm-subscription-text.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"subscribed unless you click the confirmation link above."
+msgstr ""
+"Ha nem ön kérte ezt a levelet, nyugodtan törölheti. Ha nem kattint a fenti "
+"linkre, nem vesszük fel a listára."
+
+#: views/subscription/mail-confirm-subscription-html.mjml.hbs:1
+#: views/subscription/mail-confirm-subscription-text.hbs:1
+#: views/subscription/mail-confirm-unsubscription-text.hbs:1
+#: routes/subscription.js:432
+msgid "Please Confirm Subscription"
+msgstr "Erősítse meg a feliratkozást"
+
+#: views/subscription/mail-confirm-subscription-html.mjml.hbs:2
+#: views/subscription/mail-confirm-subscription-text.hbs:2
+msgid "Yes, subscribe me to this list"
+msgstr "Igen, szeretnék feliratkozni a listára."
+
+#: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:1
+msgid "Please Confirm Unsubscription"
+msgstr "Erősítse meg a leiratkozást"
+
+#: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:2
+#: views/subscription/mail-confirm-unsubscription-text.hbs:2
+msgid "Yes, unsubscribe me from this list"
+msgstr "Igen, szeretnék leiratkozni a listáról."
+
+#: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"unsubscribed if you don't click the confirmation link above."
+msgstr ""
+"Ha nem ön kérte ezt a levelet, nyugodtan törölheti. Ha nem kattint a fenti "
+"linkre, továbbra is feliratkozva marad."
+
+#: views/subscription/mail-confirm-unsubscription-text.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"unsubscribed unless you click the confirmation link above."
+msgstr ""
+"Ha nem ön kérte ezt a levelet, nyugodtan törölheti. Ha nem kattint a fenti "
+"linkre, továbbra is feliratkozva marad."
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:1
+#: views/subscription/mail-subscription-confirmed-text.hbs:1
+#: views/subscription/web-subscribed-notice.mjml.hbs:1
+msgid "Subscription Confirmed"
+msgstr "Feliratkozás megerősítve"
+
+#: views/subscription/mail-subscription-confirmed-html.mjml.hbs:2
+msgid "Your subscription to our list has been confirmed"
+msgstr "A listára való feliratkozása megerősítve."
+
+#: views/subscription/mail-subscription-confirmed-text.hbs:2
+#: views/subscription/web-subscribed-notice.mjml.hbs:2
+msgid "Your subscription to our list has been confirmed."
+msgstr "A listára való feliratkozása megerősítve."
+
+#: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:1
+#: views/subscription/mail-unsubscription-confirmed-text.hbs:1
+msgid "You Are Now Unsubscribed"
+msgstr "Leiratkozott a listáról."
+
+#: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:2
+msgid "We have removed your email address from our list"
+msgstr "Email címét eltávolítottuk a listánkról."
+
+#: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:3
+#: views/subscription/mail-unsubscription-confirmed-text.hbs:3
+msgid "If you unsubscribed by mistake, you can re-subscribe at:"
+msgstr "Ha véletlenül iratkozott le, újra feliratkozhat itt:"
+
+#: views/subscription/mail-unsubscription-confirmed-text.hbs:2
+msgid "We have removed your email address from our list."
+msgstr "Email címét eltávolítottuk a listánkról."
+
+#: views/subscription/partials/subscription-custom-fields.hbs:2
+msgid "want to change it?"
+msgstr "meg akarja változtatni?"
+
+#: views/subscription/partials/subscription-custom-fields.hbs:5
+msgid "Download signature verification key"
+msgstr ""
+
+#: views/subscription/partials/subscription-custom-fields.hbs:7
+msgid ""
+"Insert your GPG public key here to encrypt messages sent to your address"
+msgstr "Adja meg publikus GPG kulcsát, hogy kódolt üzeneteket küldhessünk"
+
+#: views/subscription/partials/subscription-custom-fields.hbs:8
+msgid "optional"
+msgstr "nem kötelező"
+
+#: views/subscription/partials/subscription-flash-messages.hbs:1
+#: views/subscription/partials/subscription-flash-messages.hbs:3
+msgid "Warning!"
+msgstr "Figyelem!"
+
+#: views/subscription/partials/subscription-flash-messages.hbs:2
+msgid "If JavaScript was not enabled then no confirmation message was sent"
+msgstr ""
+"Ha a JavaScript nem volt engedélyezve, akkor nem küldünk megerősítő levelet."
+
+#: views/subscription/partials/subscription-flash-messages.hbs:4
+msgid "JavaScript must be enabled in order for this form to work"
+msgstr "Engedélyezni kell a JavaScriptet az űrlap használatához."
+
+#: views/subscription/partials/subscription-manage-address-form.hbs:1
+msgid "Existing Email Address"
+msgstr "Eddigi email cím"
+
+#: views/subscription/partials/subscription-manage-address-form.hbs:2
+msgid "New Email Address"
+msgstr "Új email cím"
+
+#: views/subscription/partials/subscription-manage-address-form.hbs:3
+msgid "Your new email address"
+msgstr "Az ön új email címe"
+
+#: views/subscription/partials/subscription-manage-address-form.hbs:4
+msgid ""
+"You will receive a confirmation request to your new email address that you "
+"need to accept before your email is actually changed"
+msgstr ""
+"Küldünk egy megerősítést kérő üzenetet az új email címére. Az új cím csak "
+"akkor lép érvénybe, ha az üzenetben rákattint a megerősítésre."
+
+#: views/subscription/partials/subscription-manage-address-form.hbs:5
+#: views/subscription/web-manage-address.mjml.hbs:2
+msgid "Update Email Address"
+msgstr "Email cím cseréje"
+
+#: views/subscription/partials/subscription-manage-form.hbs:1
+#: views/subscription/web-manage.mjml.hbs:2
+msgid "Update Profile"
+msgstr "Profil frissítése"
+
+#: views/subscription/partials/subscription-subscribe-form.hbs:1
+#: views/subscription/web-subscribe.mjml.hbs:2
+#: views/subscription/widget-subscribe.hbs:1
+msgid "Subscribe to list"
+msgstr "Feliratkozás"
+
+#: views/subscription/web-confirm-subscription-notice.mjml.hbs:1
+#: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:1
+#: views/subscription/widget-subscribe.hbs:4
+msgid "Almost Finished"
+msgstr "Majdnem kész"
+
+#: views/subscription/web-confirm-subscription-notice.mjml.hbs:2
+#: views/subscription/widget-subscribe.hbs:5
+msgid ""
+"We need to confirm your email address. To complete the subscription process, "
+"please click the link in the email we just sent you."
+msgstr ""
+"Meg kell erősítenie email címét. A feliratkozás befejezéséhez kattintson a "
+"linkre, amit a megerősítést kérő üzenetben küldtünk."
+
+#: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:2
+msgid ""
+"We need to confirm your email address. To complete the unsubscription "
+"process, please click the link in the email we just sent you."
+msgstr ""
+"Meg kell erősítenie email címét. A leiratkozás befejezéséhez kattintson a "
+"linkre, amit a megerősítést kérő üzenetben küldtünk."
+
+#: views/subscription/web-manage-address.mjml.hbs:1
+msgid "Update Your Email Address"
+msgstr "Email cím frissítése"
+
+#: views/subscription/web-manage.mjml.hbs:1
+msgid "Update Your Preferences"
+msgstr "Beállítások frissítése"
+
+#: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:1
+msgid "Online Unsubscription Is Not Possible"
+msgstr "Nem lehetséges az online feliratkozás."
+
+#: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:2
+msgid "Please contact us at"
+msgstr "Vegye fel velünk a kapcsolatot itt:"
+
+#: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:3
+msgid "to get removed from the list"
+msgstr "hogy eltávolítsuk a listáról."
+
+#: views/subscription/web-subscribe.mjml.hbs:1
+msgid "Subscribe to List"
+msgstr "Feliratkozás a listára"
+
+#: views/subscription/web-subscribed-notice.mjml.hbs:3
+msgid "Thank you for subscribing!"
+msgstr "Köszönjük, hogy feliratkozott!"
+
+#: views/subscription/web-unsubscribed-notice.mjml.hbs:1
+msgid "Unsubscribe Successful"
+msgstr "Sikeresen leiratkozott."
+
+#: views/subscription/web-unsubscribed-notice.mjml.hbs:2
+msgid "You have been removed from:"
+msgstr "El lett távolítva innen:"
+
+#: views/subscription/web-updated-notice.mjml.hbs:1
+msgid "Profile Updated"
+msgstr "Profil frissítve."
+
+#: views/subscription/web-updated-notice.mjml.hbs:2
+msgid "Your profile information has been updated."
+msgstr "A profilja frissült."
+
+#: views/subscription/widget-subscribe.hbs:2
+msgid "Sending ..."
+msgstr "Küldés..."
+
+#: views/subscription/widget-subscribe.hbs:3
+msgid "It looks like you are already subscribed to this list."
+msgstr "Úgy tűnik, korábban már feliratkozott a listára."
+
+#: views/templates/create.hbs:5 views/templates/edit.hbs:6
+msgid "Template name"
+msgstr "Sablon neve"
+
+#: views/templates/create.hbs:6 views/templates/edit.hbs:7
+msgid "Name for this template, eg. Newsletter"
+msgstr ""
+
+#: views/templates/create.hbs:7
+msgid "HTML Editor"
+msgstr "HTML szerkesztő"
+
+#: views/templates/create.hbs:10 views/templates/edit.hbs:9
+msgid "Optional comments about this template"
+msgstr ""
+
+#: views/templates/edit.hbs:5
+msgid "Back to templates"
+msgstr ""
+
+#: views/templates/edit.hbs:11
+msgid "Duplicate"
+msgstr "Duplikálás"
+
+#: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2
+#: views/triggers/edit.hbs:2 views/triggers/triggered.hbs:2
+#: views/triggers/triggers.hbs:2 views/triggers/triggers.hbs:4
+msgid "Automation Triggers"
+msgstr ""
+
+#: views/triggers/create-select.hbs:5
+msgid "Select a list for the trigger"
+msgstr ""
+
+#: views/triggers/create.hbs:5 views/triggers/edit.hbs:6
+msgid "Trigger name"
+msgstr ""
+
+#: views/triggers/create.hbs:6 views/triggers/edit.hbs:7
+msgid "Name for this trigger, eg. Inactive subscribers"
+msgstr ""
+
+#: views/triggers/create.hbs:8 views/triggers/edit.hbs:9
+msgid "Optional comments about this trigger"
+msgstr ""
+
+#: views/triggers/create.hbs:12 views/triggers/edit.hbs:14
+msgid "Trigger rule"
+msgstr ""
+
+#: views/triggers/create.hbs:13 views/triggers/edit.hbs:15
+msgid "Trigger fires"
+msgstr ""
+
+#: views/triggers/create.hbs:14 views/triggers/edit.hbs:16
+msgid "days after:"
+msgstr ""
+
+#: views/triggers/create.hbs:16 views/triggers/create.hbs:21
+#: views/triggers/edit.hbs:18 views/triggers/edit.hbs:23
+msgid "Event"
+msgstr "Esemény"
+
+#: views/triggers/create.hbs:18 views/triggers/create.hbs:19
+#: views/triggers/create.hbs:25 views/triggers/edit.hbs:20
+#: views/triggers/edit.hbs:21 views/triggers/edit.hbs:27
+msgid "Campaign"
+msgstr "Kampány"
+
+#: views/triggers/create.hbs:23 views/triggers/edit.hbs:25
+msgid "Trigger action"
+msgstr ""
+
+#: views/triggers/create.hbs:24 views/triggers/edit.hbs:26
+msgid "Send campaign"
+msgstr ""
+
+#: views/triggers/edit.hbs:3 views/triggers/edit.hbs:4
+msgid "Edit Trigger"
+msgstr ""
+
+#: views/triggers/edit.hbs:5
+msgid "Back to triggers"
+msgstr ""
+
+#: views/triggers/edit.hbs:11
+msgid "Trigger is enabled"
+msgstr ""
+
+#: views/triggers/edit.hbs:29
+msgid "Delete Trigger"
+msgstr ""
+
+#: views/triggers/triggered.hbs:3
+msgid "Triggered"
+msgstr ""
+
+#: views/triggers/triggered.hbs:4
+msgid "Triggered subscribers"
+msgstr ""
+
+#: views/triggers/triggered.hbs:5
+msgid "Subscribers who caused this trigger to fire"
+msgstr ""
+
+#: views/triggers/triggered.hbs:9
+msgid "Triggered time"
+msgstr ""
+
+#: views/triggers/triggers.hbs:9
+msgid "Trigger"
+msgstr ""
+
+#: views/triggers/triggers.hbs:10
+msgid "Target Campaign"
+msgstr ""
+
+#: views/triggers/triggers.hbs:11
+msgid "Triggered count"
+msgstr ""
+
+#: views/users/account.hbs:4
+msgid "This account is managed through LDAP."
+msgstr ""
+
+#: views/users/account.hbs:5
+msgid "Associated Email Address"
+msgstr ""
+
+#: views/users/account.hbs:8
+msgid "Your e-mail address"
+msgstr ""
+
+#: views/users/account.hbs:9
+msgid ""
+"This address is used for account recovery in case you lose your password"
+msgstr ""
+
+#: views/users/account.hbs:10
+msgid "Password change"
+msgstr ""
+
+#: views/users/account.hbs:11
+msgid ""
+"You only need to fill out this form if you want to change your current "
+"password"
+msgstr ""
+
+#: views/users/account.hbs:12 views/users/account.hbs:13
+msgid "Current Password"
+msgstr ""
+
+#: views/users/account.hbs:14 views/users/account.hbs:15
+#: views/users/reset.hbs:6 views/users/reset.hbs:7
+msgid "New Password"
+msgstr ""
+
+#: views/users/account.hbs:16 views/users/reset.hbs:8
+msgid "Confirm Password"
+msgstr ""
+
+#: views/users/account.hbs:17 views/users/reset.hbs:9
+msgid "Confirm New Password"
+msgstr ""
+
+#: views/users/api.hbs:4
+msgid "Are you sure? Resetting would invalidate the currently existing token."
+msgstr ""
+
+#: views/users/api.hbs:5
+msgid "Are you sure?"
+msgstr ""
+
+#: views/users/api.hbs:6
+msgid "Reset Access Token"
+msgstr ""
+
+#: views/users/api.hbs:7
+msgid "Generate Access Token"
+msgstr ""
+
+#: views/users/api.hbs:8
+msgid "Personal access token:"
+msgstr ""
+
+#: views/users/api.hbs:9
+msgid "Access token not yet generated"
+msgstr ""
+
+#: views/users/api.hbs:10
+msgid "Notes about the API"
+msgstr ""
+
+#: views/users/api.hbs:11
+msgid ""
+"API response is a JSON structure with <code>error</code> and <code>data</"
+"code> properties. If the response <code>error</code> has a value set then "
+"the request failed."
+msgstr ""
+
+#: views/users/api.hbs:12
+msgid ""
+"You need to define proper <code>Content-Type</code> when making a request. "
+"You can either use <code>application/x-www-form-urlencoded</code> for normal "
+"form data or <code>application/json</code> for a JSON payload. Using "
+"<code>multipart/form-data</code> is not supported."
+msgstr ""
+
+#: views/users/api.hbs:13
+msgid "Get list of subscriptions"
+msgstr ""
+
+#: views/users/api.hbs:14
+msgid ""
+"Retrieve a list of subscriptions to the list referenced by :listId. All "
+"fields of the subscribers will be returned. Note that custom fields will "
+"have generated names."
+msgstr ""
+
+#: views/users/api.hbs:15 views/users/api.hbs:24 views/users/api.hbs:26
+#: views/users/api.hbs:39 views/users/api.hbs:41 views/users/api.hbs:47
+#: views/users/api.hbs:49 views/users/api.hbs:55 views/users/api.hbs:57
+#: views/users/api.hbs:67 views/users/api.hbs:78 views/users/api.hbs:80
+#: views/users/api.hbs:86 views/users/api.hbs:88 views/users/api.hbs:94
+#: views/users/api.hbs:99 views/users/api.hbs:104
+msgid "arguments"
+msgstr ""
+
+#: views/users/api.hbs:16 views/users/api.hbs:25 views/users/api.hbs:40
+#: views/users/api.hbs:48 views/users/api.hbs:56 views/users/api.hbs:68
+#: views/users/api.hbs:79 views/users/api.hbs:87 views/users/api.hbs:95
+#: views/users/api.hbs:100 views/users/api.hbs:105
+msgid "your personal access token"
+msgstr ""
+
+#: views/users/api.hbs:17 views/users/api.hbs:69
+msgid "Start position"
+msgstr ""
+
+#: views/users/api.hbs:18 views/users/api.hbs:70
+msgid "optional, default 0"
+msgstr ""
+
+#: views/users/api.hbs:19
+msgid "limit subscription count in response"
+msgstr ""
+
+#: views/users/api.hbs:20 views/users/api.hbs:72
+msgid "optional, default 10000"
+msgstr ""
+
+#: views/users/api.hbs:22
+msgid "Add subscription"
+msgstr ""
+
+#: views/users/api.hbs:23
+msgid ""
+"This API call either inserts a new subscription or updates existing. Fields "
+"not included are left as is, so if you update only LAST_NAME value, then "
+"FIRST_NAME is kept untouched for an existing subscription."
+msgstr ""
+
+#: views/users/api.hbs:27 views/users/api.hbs:42 views/users/api.hbs:50
+msgid "subscriber's email address"
+msgstr ""
+
+#: views/users/api.hbs:28 views/users/api.hbs:43 views/users/api.hbs:51
+#: views/users/api.hbs:59 views/users/api.hbs:82 views/users/api.hbs:90
+msgid "required"
+msgstr ""
+
+#: views/users/api.hbs:29
+msgid "subscriber's first name"
+msgstr "feliratkozó keresztneve"
+
+#: views/users/api.hbs:30
+msgid "subscriber's last name"
+msgstr "feliratkozó vezetékneve"
+
+#: views/users/api.hbs:31
+msgid ""
+"subscriber's timezone (eg. \"Europe/Tallinn\", \"PST\" or \"UTC\"). If not "
+"set defaults to \"UTC\""
+msgstr ""
+"Feliratkozó időzónája (pl.: \"Europe/Budapest\", \"CEST\", \"UTC\"). "
+"Alapértelmezés szerint \"UTC\"."
+
+#: views/users/api.hbs:32
+msgid ""
+"custom field value. Use yes/no for option group values (checkboxes, radios, "
+"drop downs)"
+msgstr ""
+
+#: views/users/api.hbs:33
+msgid "Additional POST arguments"
+msgstr ""
+
+#: views/users/api.hbs:34
+msgid ""
+"set to \"yes\" if you want to make sure the email is marked as subscribed "
+"even if it was previously marked as unsubscribed. If the email was already "
+"unsubscribed/blocked then subscription status is not changed"
+msgstr ""
+
+#: views/users/api.hbs:35
+msgid ""
+"set to \"yes\" if you want to send confirmation email to the subscriber "
+"before actually marking as subscribed"
+msgstr ""
+
+#: views/users/api.hbs:37
+msgid "Remove subscription"
+msgstr ""
+
+#: views/users/api.hbs:38
+msgid "This API call marks a subscription as unsubscribed"
+msgstr ""
+
+#: views/users/api.hbs:45
+msgid "Delete subscription"
+msgstr ""
+
+#: views/users/api.hbs:46
+msgid "This API call deletes a subscription"
+msgstr ""
+
+#: views/users/api.hbs:53
+msgid "Add new custom field"
+msgstr ""
+
+#: views/users/api.hbs:54
+msgid "This API call creates a new custom field for a list."
+msgstr ""
+
+#: views/users/api.hbs:58
+msgid "field name"
+msgstr ""
+
+#: views/users/api.hbs:60
+msgid "one of the following types:"
+msgstr ""
+
+#: views/users/api.hbs:61
+msgid ""
+"If the type is 'option' then you also need to specify the parent element ID"
+msgstr ""
+
+#: views/users/api.hbs:62
+msgid ""
+"Template for the group element. If not set, then values of the elements are "
+"joined with commas"
+msgstr ""
+
+#: views/users/api.hbs:63
+msgid ""
+"if not visible then the subscriber can not view or modify this value at the "
+"profile page"
+msgstr ""
+
+#: views/users/api.hbs:65
+msgid "Get list of blacklisted emails"
+msgstr ""
+
+#: views/users/api.hbs:66
+msgid "This API call get list of blacklisted emails."
+msgstr ""
+
+#: views/users/api.hbs:71
+msgid "limit emails count in response"
+msgstr ""
+
+#: views/users/api.hbs:73
+msgid "filter by part of email"
+msgstr ""
+
+#: views/users/api.hbs:74
+msgid "optional, default ''"
+msgstr ""
+
+#: views/users/api.hbs:77
+msgid "This API call either add emails to blacklist"
+msgstr ""
+
+#: views/users/api.hbs:81 views/users/api.hbs:89
+msgid "email address"
+msgstr ""
+
+#: views/users/api.hbs:84
+msgid "Delete email from blacklist"
+msgstr ""
+
+#: views/users/api.hbs:85
+msgid "This API call either delete emails from blacklist"
+msgstr ""
+
+#: views/users/api.hbs:92
+msgid "Get the lists a user has subscribed to"
+msgstr ""
+
+#: views/users/api.hbs:93
+msgid "Retrieve the lists that the user with :email has subscribed to. "
+msgstr ""
+
+#: views/users/api.hbs:97
+msgid "Get all lists"
+msgstr ""
+
+#: views/users/api.hbs:98
+msgid "Retrieve every list. "
+msgstr ""
+
+#: views/users/api.hbs:102
+msgid "Get list by id"
+msgstr ""
+
+#: views/users/api.hbs:103
+msgid "Retrieve the list with :id "
+msgstr ""
+
+#: views/users/forgot.hbs:3 views/users/reset.hbs:3
+msgid "Password Reset"
+msgstr ""
+
+#: views/users/forgot.hbs:4
+msgid "Reset your password?"
+msgstr ""
+
+#: views/users/forgot.hbs:5
+msgid "Accounts are managed through LDAP."
+msgstr ""
+
+#: views/users/forgot.hbs:6 views/users/reset.hbs:10
+msgid "Reset Password"
+msgstr ""
+
+#: views/users/forgot.hbs:7
+msgid ""
+"Please provide the username or email address that you used when you signed "
+"up for your Mailtrain account."
+msgstr ""
+
+#: views/users/forgot.hbs:8
+msgid "We will send you an email that will allow you to reset your password."
+msgstr ""
+
+#: views/users/forgot.hbs:10
+msgid "Username or email address"
+msgstr ""
+
+#: views/users/forgot.hbs:11
+msgid "Send verification email"
+msgstr ""
+
+#: views/users/login.hbs:8
+msgid "Remember me"
+msgstr "Emlékezzen rám"
+
+#: views/users/login.hbs:11 views/users/login.hbs:12
+msgid "Forgot password?"
+msgstr "Elfelejtett jelszó"
+
+#: views/users/reset.hbs:4
+msgid "Choose your new password"
+msgstr ""
+
+#: views/users/reset.hbs:5
+msgid "Please enter a new password."
+msgstr ""
+
+#: lib/editor-helpers.js:17 routes/templates.js:95
+msgid "Could not find template with specified ID"
+msgstr ""
+
+#: lib/editor-helpers.js:33 routes/archive.js:145 routes/campaigns.js:131
+#: routes/campaigns.js:284 routes/campaigns.js:379 routes/campaigns.js:427
+#: routes/campaigns.js:467 routes/campaigns.js:844 routes/campaigns.js:867
+#: routes/campaigns.js:886 routes/campaigns.js:908 routes/triggers.js:146
+msgid "Could not find campaign with specified ID"
+msgstr ""
+
+#: lib/editor-helpers.js:47 routes/editorapi.js:320
+msgid "Invalid resource type"
+msgstr ""
+
+#: lib/feed.js:31
+msgid "Bad status code %s"
+msgstr ""
+
+#: lib/helpers.js:33
+msgid "URL that points to the unsubscribe page"
+msgstr ""
+
+#: lib/helpers.js:36
+msgid "URL that points to the preferences page of the subscriber"
+msgstr ""
+
+#: lib/helpers.js:39
+msgid "URL to preview the message in a browser"
+msgstr ""
+
+#: lib/helpers.js:45 lib/models/segments.js:31
+msgid "First name"
+msgstr "Keresztnév"
+
+#: lib/helpers.js:48 lib/models/segments.js:35
+msgid "Last name"
+msgstr "Vezetéknév"
+
+#: lib/helpers.js:51
+msgid "Full name (first and last name combined)"
+msgstr "Teljes név (vezetéknév + keresztnév)"
+
+#: lib/helpers.js:54
+msgid "Unique ID that identifies the recipient"
+msgstr ""
+
+#: lib/helpers.js:57
+msgid "Unique ID that identifies the list used for this campaign"
+msgstr ""
+
+#: lib/helpers.js:60
+msgid "Unique ID that identifies current campaign"
+msgstr ""
+
+#: lib/helpers.js:68 lib/helpers.js:80
+msgid "content from an RSS entry"
+msgstr ""
+
+#: lib/helpers.js:71
+msgid "RSS entry title"
+msgstr ""
+
+#: lib/helpers.js:74
+msgid "RSS entry date"
+msgstr ""
+
+#: lib/helpers.js:77
+msgid "RSS entry link"
+msgstr ""
+
+#: lib/helpers.js:83
+msgid "RSS entry summary"
+msgstr ""
+
+#: lib/helpers.js:86
+msgid "RSS entry image URL"
+msgstr ""
+
+#: lib/mailer.js:245
+msgid "Invalid mail transport"
+msgstr ""
+
+#: lib/models/campaigns.js:105 lib/models/campaigns.js:132
+#: lib/models/campaigns.js:205 lib/models/campaigns.js:328
+#: lib/models/campaigns.js:590 lib/models/campaigns.js:723
+msgid "Missing Campaign ID"
+msgstr ""
+
+#: lib/models/campaigns.js:241
+msgid "Emtpy or too large attahcment"
+msgstr ""
+
+#: lib/models/campaigns.js:408 lib/models/campaigns.js:600
+msgid "Campaign Name must be set"
+msgstr ""
+
+#: lib/models/campaigns.js:412
+msgid "RSS URL must be set and needs to be a valid URL"
+msgstr ""
+
+#: lib/models/campaigns.js:568
+msgid "Selected template not found"
+msgstr ""
+
+#: lib/models/campaigns.js:924
+msgid "Invalid or missing message ID"
+msgstr ""
+
+#: lib/models/campaigns.js:1065
+msgid "Unrecognized message status"
+msgstr ""
+
+#: lib/models/confirmations.js:27
+msgid "Could not store confirmation data"
+msgstr ""
+
+#: lib/models/fields.js:24
+msgid "Drop Down"
+msgstr ""
+
+#: lib/models/fields.js:25
+msgid "Date (MM/DD/YYY)"
+msgstr "Dátum (NN/HH/ÉÉÉÉ)"
+
+#: lib/models/fields.js:29
+msgid "JSON value for custom rendering"
+msgstr ""
+
+#: lib/models/fields.js:30
+msgid "Option"
+msgstr ""
+
+#: lib/models/fields.js:53 lib/models/fields.js:98 lib/models/fields.js:123
+#: lib/models/forms.js:46 lib/models/lists.js:115 lib/models/lists.js:150
+#: lib/models/lists.js:265 lib/models/segments.js:43 lib/models/segments.js:176
+#: lib/models/subscriptions.js:79 lib/models/subscriptions.js:390
+#: lib/models/subscriptions.js:566 lib/models/subscriptions.js:657
+#: lib/models/subscriptions.js:710 lib/models/subscriptions.js:773
+#: lib/models/subscriptions.js:816
+msgid "Missing List ID"
+msgstr ""
+
+#: lib/models/fields.js:129
+msgid "Option field requires a group to be selected"
+msgstr ""
+
+#: lib/models/fields.js:149 lib/models/fields.js:199
+msgid "Missing Field ID"
+msgstr ""
+
+#: lib/models/fields.js:153 lib/models/segments.js:185
+#: lib/models/segments.js:225
+msgid "Field Name must be set"
+msgstr ""
+
+#: lib/models/fields.js:216
+msgid "Custom field not found"
+msgstr ""
+
+#: lib/models/fields.js:289
+msgid "Unknown column type %s"
+msgstr ""
+
+#: lib/models/fields.js:293
+msgid "Missing column name"
+msgstr ""
+
+#: lib/models/fields.js:297
+msgid "Missing list ID"
+msgstr ""
+
+#: lib/models/fields.js:305
+msgid "Provided List ID not found"
+msgstr ""
+
+#: lib/models/forms.js:70 lib/models/forms.js:113 lib/models/forms.js:201
+#: lib/models/forms.js:291
+msgid "Missing Form ID"
+msgstr ""
+
+#: lib/models/forms.js:121 lib/models/forms.js:205
+msgid "Form Name must be set"
+msgstr ""
+
+#: lib/models/forms.js:307
+msgid "Custom form not found"
+msgstr ""
+
+#: lib/models/links.js:337 routes/campaigns.js:533 routes/campaigns.js:581
+#: routes/campaigns.js:621 routes/campaigns.js:671 services/sender.js:305
+msgid "Campaign not found"
+msgstr ""
+
+#: lib/models/links.js:345 routes/lists.js:181 services/sender.js:312
+msgid "List not found"
+msgstr "Lista nem található."
+
+#: lib/models/links.js:353
+msgid "Subscription not found"
+msgstr ""
+
+#: lib/models/lists.js:167 lib/models/lists.js:211
+msgid "List Name must be set"
+msgstr ""
+
+#: lib/models/lists.js:294
+msgid "Missing List CID"
+msgstr ""
+
+#: lib/models/report-templates.js:26 lib/models/report-templates.js:70
+#: lib/models/report-templates.js:142
+msgid "Missing report template ID"
+msgstr ""
+
+#: lib/models/report-templates.js:77
+msgid "Report template name must be set"
+msgstr ""
+
+#: lib/models/reports.js:40 lib/models/reports.js:110 lib/models/reports.js:188
+msgid "Missing report ID"
+msgstr ""
+
+#: lib/models/reports.js:116
+msgid "Report name must be set"
+msgstr ""
+
+#: lib/models/segments.js:15
+msgid "Signup country"
+msgstr ""
+
+#: lib/models/segments.js:19 lib/models/triggers.js:12
+msgid "Sign up date"
+msgstr "Feliratkozás ideje"
+
+#: lib/models/segments.js:23 lib/models/triggers.js:16
+msgid "Latest open"
+msgstr ""
+
+#: lib/models/segments.js:27 lib/models/triggers.js:20
+msgid "Latest click"
+msgstr ""
+
+#: lib/models/segments.js:69 lib/models/segments.js:216
+#: lib/models/segments.js:256 lib/models/segments.js:278
+msgid "Missing Segment ID"
+msgstr ""
+
+#: lib/models/segments.js:85 lib/models/segments.js:549
+#: lib/models/segments.js:658
+msgid "Segment not found"
+msgstr ""
+
+#: lib/models/segments.js:146 lib/models/segments.js:147
+#: lib/models/segments.js:408 lib/models/segments.js:409
+msgid "%s days after today"
+msgstr ""
+
+#: lib/models/segments.js:146 lib/models/segments.js:147
+#: lib/models/segments.js:408 lib/models/segments.js:409
+msgid "%s days before today"
+msgstr ""
+
+#: lib/models/segments.js:148 lib/models/segments.js:410
+msgid "today"
+msgstr ""
+
+#: lib/models/segments.js:189 lib/models/segments.js:229
+msgid "Invalid segment rule type"
+msgstr ""
+
+#: lib/models/segments.js:289 lib/models/segments.js:454 routes/segments.js:266
+#: routes/segments.js:300 routes/segments.js:370 routes/segments.js:381
+msgid "Selected segment not found"
+msgstr ""
+
+#: lib/models/segments.js:294 lib/models/segments.js:459 routes/segments.js:272
+#: routes/segments.js:306 routes/segments.js:387
+msgid "Invalid rule type"
+msgstr ""
+
+#: lib/models/segments.js:358 lib/models/segments.js:434
+#: lib/models/segments.js:524
+msgid "Missing Rule ID"
+msgstr ""
+
+#: lib/models/segments.js:374
+msgid "Specified rule not found"
+msgstr ""
+
+#: lib/models/segments.js:385
+msgid "Specified segment not found"
+msgstr ""
+
+#: lib/models/segments.js:445
+msgid "Selected rule not found"
+msgstr ""
+
+#: lib/models/subscriptions.js:257 lib/models/subscriptions.js:287
+#: lib/models/subscriptions.js:394
+msgid "Missing Subscription ID"
+msgstr ""
+
+#: lib/models/subscriptions.js:315
+msgid "Missing Subscription email address"
+msgstr ""
+
+#: lib/models/subscriptions.js:570 lib/models/subscriptions.js:820
+msgid "Missing subscription ID"
+msgstr ""
+
+#: lib/models/subscriptions.js:661 lib/models/subscriptions.js:714
+#: lib/models/subscriptions.js:750
+msgid "Missing Import ID"
+msgstr ""
+
+#: lib/models/subscriptions.js:842
+msgid "Unknown subscription ID"
+msgstr ""
+
+#: lib/models/subscriptions.js:847 routes/subscription.js:639
+msgid "Nothing seems to be changed"
+msgstr ""
+
+#: lib/models/subscriptions.js:913 routes/subscription.js:473
+#: routes/subscription.js:545 routes/subscription.js:581
+#: routes/subscription.js:697 routes/subscription.js:772
+msgid "Subscription not found in this list"
+msgstr ""
+
+#: lib/models/templates.js:26 lib/models/templates.js:102
+#: lib/models/templates.js:157
+msgid "Missing Template ID"
+msgstr ""
+
+#: lib/models/templates.js:55 lib/models/templates.js:106
+msgid "Template Name must be set"
+msgstr ""
+
+#: lib/models/templates.js:147
+msgid "Template does not exist"
+msgstr ""
+
+#: lib/models/triggers.js:29
+msgid "Has Opened"
+msgstr ""
+
+#: lib/models/triggers.js:32
+msgid "Has Clicked"
+msgstr ""
+
+#: lib/models/triggers.js:35
+msgid "Not Opened"
+msgstr ""
+
+#: lib/models/triggers.js:38
+msgid "Not Clicked"
+msgstr ""
+
+#: lib/models/triggers.js:178 lib/models/triggers.js:215
+msgid "Missing or invalid list ID"
+msgstr ""
+
+#: lib/models/triggers.js:182 lib/models/triggers.js:267
+msgid "Days in the past are not allowed"
+msgstr ""
+
+#: lib/models/triggers.js:186 lib/models/triggers.js:207
+#: lib/models/triggers.js:271 lib/models/triggers.js:292
+msgid "Missing or invalid trigger rule"
+msgstr ""
+
+#: lib/models/triggers.js:193 lib/models/triggers.js:278
+msgid "Invalid subscription configuration"
+msgstr ""
+
+#: lib/models/triggers.js:200 lib/models/triggers.js:285
+msgid "Invalid campaign configuration"
+msgstr ""
+
+#: lib/models/triggers.js:203 lib/models/triggers.js:288
+msgid "A campaing can not be a target for itself"
+msgstr ""
+
+#: lib/models/triggers.js:236
+msgid "Could not store trigger row"
+msgstr ""
+
+#: lib/models/triggers.js:253
+msgid "Missing or invalid Trigger ID"
+msgstr ""
+
+#: lib/models/triggers.js:320
+msgid "Missing Trigger ID"
+msgstr ""
+
+#: lib/models/users.js:103
+msgid "Could not store user row"
+msgstr ""
+
+#: lib/models/users.js:173
+msgid "Email Address must be set"
+msgstr ""
+
+#: lib/models/users.js:184
+msgid "Failed to check user data"
+msgstr ""
+
+#: lib/models/users.js:195
+msgid ""
+"Can't change email as another user with the same email address already exists"
+msgstr ""
+
+#: lib/models/users.js:212
+msgid "Incorrect current password"
+msgstr ""
+
+#: lib/models/users.js:216
+msgid "New password not set"
+msgstr ""
+
+#: lib/models/users.js:220
+msgid "Passwords do not match"
+msgstr ""
+
+#: lib/models/users.js:258
+msgid "User ID not set"
+msgstr ""
+
+#: lib/models/users.js:286
+msgid "Username must be set"
+msgstr ""
+
+#: lib/models/users.js:323
+msgid "Mailer password change request"
+msgstr ""
+
+#: lib/models/users.js:347 lib/models/users.js:367
+msgid "Missing username or reset token"
+msgstr ""
+
+#: lib/models/users.js:371
+msgid "Invalid new password"
+msgstr "Érvénytelen új jelszó"
+
+#: lib/passport.js:49
+msgid "%s  logged out"
+msgstr "%s kijelentkezett"
+
+#: lib/passport.js:64
+msgid "Failed to authenticate user"
+msgstr "Felhasználó azonosítása nem sikerült"
+
+#: lib/passport.js:80
+msgid "Logged in as %s"
+msgstr "Bejelenetezve, mint %s"
+
+#: lib/passport.js:180
+msgid "Incorrect username or password"
+msgstr "Helytelen felhasználónév vagy jelszó"
+
+#: lib/subscription-mail-helpers.js:28
+msgid "%s: Subscription Confirmed"
+msgstr "%s: Feliratkozás megerősítve"
+
+#: lib/subscription-mail-helpers.js:39
+msgid "%s: Email Address Already Registered"
+msgstr "%s: Emailcím már regisztrálva van"
+
+#: lib/subscription-mail-helpers.js:49
+msgid "%s: Please Confirm Email Change in Subscription"
+msgstr "%s: Kérjük erősítse meg email címének megváltoztatását"
+
+#: lib/subscription-mail-helpers.js:59
+msgid "%s: Please Confirm Subscription"
+msgstr "%s: Kérjük erősítse meg a feliratkozást"
+
+#: lib/subscription-mail-helpers.js:69
+msgid "%s: Please Confirm Unsubscription"
+msgstr "%s: Kérjük erősítse meg a leiratkozást"
+
+#: lib/subscription-mail-helpers.js:76
+msgid "%s: Unsubscription Confirmed"
+msgstr "%s: Leiratkozás megerősítve"
+
+#: lib/tools.js:154
+msgid "Blocked email address \"%s\""
+msgstr "Blokkolt email cím \"%s\""
+
+#: lib/tools.js:163
+msgid "Invalid email address \"%s\"."
+msgstr "Érvénytelen email cím \"%s\""
+
+#: lib/tools.js:166
+msgid "MX record not found for domain"
+msgstr "MX rekord nem található a domain-hez"
+
+#: lib/tools.js:169
+msgid "Address domain not found"
+msgstr ""
+
+#: lib/tools.js:172
+msgid "Address domain name is required"
+msgstr ""
+
+#: routes/archive.js:31 routes/archive.js:43 routes/archive.js:55 app.js:230
+msgid "Not Found"
+msgstr "Nem található"
+
+#: routes/archive.js:121 services/sender.js:454
+msgid "Received status code %s from %s"
+msgstr ""
+
+#: routes/archive.js:153 routes/campaigns.js:894
+msgid "Attachment not found"
+msgstr "Csatolmány nem található"
+
+#: routes/blacklist.js:13 routes/campaigns.js:26 routes/editorapi.js:32
+#: routes/fields.js:13 routes/forms.js:16 routes/grapejs.js:15
+#: routes/lists.js:50 routes/mosaico.js:14 routes/report-templates.js:20
+#: routes/reports.js:22 routes/segments.js:13 routes/settings.js:23
+#: routes/templates.js:18 routes/triggers.js:18 routes/users.js:75
+#: routes/users.js:120
+msgid "Need to be logged in to access restricted content"
+msgstr ""
+
+#: routes/campaigns.js:117
+msgid "Could not create campaign"
+msgstr ""
+
+#: routes/campaigns.js:120
+msgid "Campaign “%s” created"
+msgstr ""
+
+#: routes/campaigns.js:209
+msgid "Campaign settings updated"
+msgstr ""
+
+#: routes/campaigns.js:211
+msgid "Campaign settings not updated"
+msgstr ""
+
+#: routes/campaigns.js:227 routes/campaigns.js:744
+msgid "Campaign deleted"
+msgstr "Kampány törölve"
+
+#: routes/campaigns.js:229 routes/campaigns.js:746
+msgid "Could not delete specified campaign"
+msgstr "Kampány törlése nem sikerült"
+
+#: routes/campaigns.js:248
+msgid "Idling"
+msgstr ""
+
+#: routes/campaigns.js:251
+msgid "Scheduled"
+msgstr "Időzítve"
+
+#: routes/campaigns.js:257
+msgid "Paused"
+msgstr ""
+
+#: routes/campaigns.js:259
+msgid "Inactive"
+msgstr "Inaktív"
+
+#: routes/campaigns.js:261
+msgid "Active"
+msgstr "Aktív"
+
+#: routes/campaigns.js:263
+msgid "Other"
+msgstr ""
+
+#: routes/campaigns.js:421
+msgid "Unknown status selector"
+msgstr ""
+
+#: routes/campaigns.js:762
+msgid "Scheduled sending"
+msgstr ""
+
+#: routes/campaigns.js:764
+msgid "Could not schedule sending"
+msgstr ""
+
+#: routes/campaigns.js:776
+msgid "Sending resumed"
+msgstr ""
+
+#: routes/campaigns.js:778
+msgid "Could not resume sending"
+msgstr ""
+
+#: routes/campaigns.js:790
+msgid "Sending reset"
+msgstr ""
+
+#: routes/campaigns.js:792
+msgid "Could not reset sending"
+msgstr ""
+
+#: routes/campaigns.js:804 routes/campaigns.js:832
+msgid "Sending paused"
+msgstr ""
+
+#: routes/campaigns.js:806 routes/campaigns.js:834
+msgid "Could not pause sending"
+msgstr ""
+
+#: routes/campaigns.js:818
+msgid "Sending activated"
+msgstr ""
+
+#: routes/campaigns.js:820
+msgid "Could not activate sending"
+msgstr ""
+
+#: routes/campaigns.js:855
+msgid "Attachment uploaded"
+msgstr ""
+
+#: routes/campaigns.js:857
+msgid "Could not store attachment"
+msgstr ""
+
+#: routes/campaigns.js:874
+msgid "Attachment deleted"
+msgstr ""
+
+#: routes/campaigns.js:876
+msgid "Could not delete attachment"
+msgstr ""
+
+#: routes/editorapi.js:38
+msgid "Invalid editor name"
+msgstr ""
+
+#: routes/editorapi.js:146
+msgid "Method not supported"
+msgstr ""
+
+#: routes/editorapi.js:381
+msgid "Invalid resource type or ID"
+msgstr ""
+
+#: routes/fields.js:28 routes/fields.js:64 routes/fields.js:118
+#: routes/forms.js:31 routes/forms.js:63 routes/forms.js:94
+#: routes/segments.js:28 routes/segments.js:59 routes/segments.js:102
+#: routes/segments.js:151 routes/segments.js:223 routes/segments.js:255
+#: routes/segments.js:289 routes/segments.js:336 routes/segments.js:359
+msgid "Selected list ID not found"
+msgstr ""
+
+#: routes/fields.js:102
+msgid "Could not create custom field"
+msgstr ""
+
+#: routes/fields.js:129
+msgid "Selected field not found"
+msgstr ""
+
+#: routes/fields.js:165
+msgid "Field settings updated"
+msgstr ""
+
+#: routes/fields.js:167
+msgid "Field settings not updated"
+msgstr ""
+
+#: routes/fields.js:183
+msgid "Custom field deleted"
+msgstr ""
+
+#: routes/fields.js:185
+msgid "Could not delete specified field"
+msgstr ""
+
+#: routes/forms.js:78
+msgid "Could not create custom form"
+msgstr ""
+
+#: routes/forms.js:105
+msgid "Selected form not found"
+msgstr ""
+
+#: routes/forms.js:136
+msgid "The plaintext version for this email"
+msgstr ""
+
+#: routes/forms.js:137
+msgid "Custom forms use MJML for formatting"
+msgstr ""
+
+#: routes/forms.js:138
+msgid "See the MJML documentation <a class=\"mjml-documentation\">here</a>"
+msgstr ""
+
+#: routes/forms.js:146
+msgid "Layout"
+msgstr ""
+
+#: routes/forms.js:152
+msgid "Form Input Style"
+msgstr ""
+
+#: routes/forms.js:154
+msgid ""
+"This CSS stylesheet defines the appearance of form input elements and alerts"
+msgstr ""
+
+#: routes/forms.js:160
+msgid "Web - Subscribe"
+msgstr ""
+
+#: routes/forms.js:165
+msgid "Web - Confirm Subscription Notice"
+msgstr ""
+
+#: routes/forms.js:170
+msgid "Mail - Confirm Subscription (MJML)"
+msgstr ""
+
+#: routes/forms.js:175
+msgid "Mail - Confirm Subscription (Text)"
+msgstr ""
+
+#: routes/forms.js:180
+msgid "Mail - Already Subscribed (MJML)"
+msgstr ""
+
+#: routes/forms.js:185
+msgid "Mail - Already Subscribed (Text)"
+msgstr ""
+
+#: routes/forms.js:190
+msgid "Web - Subscribed Notice"
+msgstr ""
+
+#: routes/forms.js:195
+msgid "Mail - Subscription Confirmed (MJML)"
+msgstr ""
+
+#: routes/forms.js:200
+msgid "Mail - Subscription Confirmed (Text)"
+msgstr ""
+
+#: routes/forms.js:208
+msgid "Web - Manage Preferences"
+msgstr ""
+
+#: routes/forms.js:213
+msgid "Web - Manage Address"
+msgstr ""
+
+#: routes/forms.js:218
+msgid "Web - Updated Notice"
+msgstr ""
+
+#: routes/forms.js:226
+msgid "Web - Unsubscribe"
+msgstr ""
+
+#: routes/forms.js:231
+msgid "Web - Confirm Unsubscription Notice"
+msgstr ""
+
+#: routes/forms.js:236
+msgid "Mail - Confirm Unsubscription (MJML)"
+msgstr ""
+
+#: routes/forms.js:241
+msgid "Mail - Confirm Unsubscription (Text)"
+msgstr ""
+
+#: routes/forms.js:246
+msgid "Mail - Confirm Address Change (MJML)"
+msgstr ""
+
+#: routes/forms.js:251
+msgid "Mail - Confirm Address Change (Text)"
+msgstr ""
+
+#: routes/forms.js:256
+msgid "Web - Unsubscribed Notice"
+msgstr ""
+
+#: routes/forms.js:261
+msgid "Mail - Unsubscription Confirmed (MJML)"
+msgstr ""
+
+#: routes/forms.js:266
+msgid "Mail - Unsubscription Confirmed (Text)"
+msgstr ""
+
+#: routes/forms.js:271
+msgid "Web - Manual Unsubscribe Notice"
+msgstr ""
+
+#: routes/forms.js:309
+msgid "Form settings updated"
+msgstr ""
+
+#: routes/forms.js:311
+msgid "Form settings not updated"
+msgstr ""
+
+#: routes/forms.js:327
+msgid "Custom form deleted"
+msgstr ""
+
+#: routes/forms.js:329
+msgid "Could not delete specified form"
+msgstr ""
+
+#: routes/index.js:11
+msgid "Self Hosted Newsletter App"
+msgstr ""
+
+#: routes/links.js:39
+msgid "Oops, we couldn't find a link for the URL you clicked"
+msgstr ""
+
+#: routes/lists.js:82
+msgid "Could not create list"
+msgstr ""
+
+#: routes/lists.js:85
+msgid "List created"
+msgstr "Lista létrehozva"
+
+#: routes/lists.js:93 routes/lists.js:271 routes/lists.js:336
+#: routes/lists.js:375 routes/lists.js:444 routes/lists.js:469
+#: routes/lists.js:514 routes/lists.js:536 routes/lists.js:565
+#: routes/lists.js:657 routes/lists.js:714 routes/lists.js:741
+msgid "Could not find list with specified ID"
+msgstr ""
+
+#: routes/lists.js:122
+msgid "List settings updated"
+msgstr ""
+
+#: routes/lists.js:124
+msgid "List settings not updated"
+msgstr ""
+
+#: routes/lists.js:142
+msgid "List deleted"
+msgstr "Lista törölve"
+
+#: routes/lists.js:144
+msgid "Could not delete specified list"
+msgstr ""
+
+#: routes/lists.js:206
+msgid "Unknown"
+msgstr ""
+
+#: routes/lists.js:206
+msgid "Complained"
+msgstr ""
+
+#: routes/lists.js:237
+msgid "Invalid key"
+msgstr ""
+
+#: routes/lists.js:239
+msgid "Expired key"
+msgstr ""
+
+#: routes/lists.js:241
+msgid "Revoked key"
+msgstr ""
+
+#: routes/lists.js:288
+msgid "Force Subscribe"
+msgstr ""
+
+#: routes/lists.js:291
+msgid "Initializing"
+msgstr ""
+
+#: routes/lists.js:294
+msgid "Initialized"
+msgstr ""
+
+#: routes/lists.js:297
+msgid "Importing"
+msgstr ""
+
+#: routes/lists.js:303
+msgid "Errored"
+msgstr ""
+
+#: routes/lists.js:381 routes/lists.js:450 routes/lists.js:475
+msgid "Could not find subscriber with specified ID"
+msgstr ""
+
+#: routes/lists.js:427
+msgid "Could not add subscription"
+msgstr ""
+
+#: routes/lists.js:432
+msgid "%s was successfully added to your list"
+msgstr ""
+
+#: routes/lists.js:434
+msgid "%s was not added to your list"
+msgstr ""
+
+#: routes/lists.js:456
+msgid "Could not unsubscribe user"
+msgstr ""
+
+#: routes/lists.js:459
+msgid "%s was successfully unsubscribed from your list"
+msgstr ""
+
+#: routes/lists.js:479
+msgid "%s was successfully removed from your list"
+msgstr ""
+
+#: routes/lists.js:491
+msgid "Another subscriber with email address %s already exists"
+msgstr ""
+
+#: routes/lists.js:498
+msgid "Subscription settings updated"
+msgstr ""
+
+#: routes/lists.js:500
+msgid "Subscription settings not updated"
+msgstr ""
+
+#: routes/lists.js:542 routes/lists.js:663 routes/lists.js:699
+#: routes/lists.js:727 routes/lists.js:747
+msgid "Could not find import data with specified ID"
+msgstr ""
+
+#: routes/lists.js:573
+msgid "Could not process CSV"
+msgstr ""
+
+#: routes/lists.js:589
+msgid "Could not create importer"
+msgstr ""
+
+#: routes/lists.js:643
+msgid "Empty file"
+msgstr ""
+
+#: routes/lists.js:646
+msgid "Too few rows"
+msgstr ""
+
+#: routes/lists.js:703
+msgid "Import started"
+msgstr ""
+
+#: routes/lists.js:731
+msgid "Import restarted"
+msgstr ""
+
+#: routes/lists.js:797
+msgid "One-step (i.e. no email with confirmation link)"
+msgstr ""
+
+#: routes/lists.js:803
+msgid ""
+"One-step with unsubscription form (i.e. no email with confirmation link)"
+msgstr ""
+
+#: routes/lists.js:809
+msgid "Two-step (i.e. an email with confirmation link will be sent)"
+msgstr ""
+
+#: routes/lists.js:815
+msgid ""
+"Two-step with unsubscription form (i.e. an email with confirmation link will "
+"be sent)"
+msgstr ""
+
+#: routes/lists.js:821
+msgid ""
+"Manual (i.e. unsubscription has to be performed by the list administrator)"
+msgstr ""
+
+#: routes/report-templates.js:246
+msgid "Could not create report template"
+msgstr ""
+
+#: routes/report-templates.js:249
+msgid "Report template “%s” created"
+msgstr ""
+
+#: routes/report-templates.js:257
+msgid "Could not find report template with specified ID"
+msgstr ""
+
+#: routes/report-templates.js:280
+msgid "Report template updated"
+msgstr ""
+
+#: routes/report-templates.js:282
+msgid "Report template not updated"
+msgstr ""
+
+#: routes/report-templates.js:298
+msgid "Report template deleted"
+msgstr ""
+
+#: routes/report-templates.js:300
+msgid "Could not delete specified report template"
+msgstr ""
+
+#: routes/reports.js:124 routes/reports.js:130
+msgid "Could not create report"
+msgstr ""
+
+#: routes/reports.js:135
+msgid "Report “%s” created"
+msgstr ""
+
+#: routes/reports.js:146 routes/reports.js:224 routes/reports.js:239
+#: routes/reports.js:265 routes/reports.js:275
+msgid "Could not find report with specified ID"
+msgstr ""
+
+#: routes/reports.js:188 routes/reports.js:194
+msgid "Could not update report"
+msgstr ""
+
+#: routes/reports.js:197
+msgid "Report updated"
+msgstr ""
+
+#: routes/reports.js:199
+msgid "Report not updated"
+msgstr ""
+
+#: routes/reports.js:212
+msgid "Report deleted"
+msgstr ""
+
+#: routes/reports.js:214
+msgid "Could not delete specified report"
+msgstr ""
+
+#: routes/reports.js:230
+msgid "Could not find report template"
+msgstr ""
+
+#: routes/reports.js:260
+msgid "Unknown type of template"
+msgstr ""
+
+#: routes/segments.js:86
+msgid "Could not create segment"
+msgstr ""
+
+#: routes/segments.js:89
+msgid "Segment created"
+msgstr ""
+
+#: routes/segments.js:113
+msgid "Selected segment ID not found"
+msgstr ""
+
+#: routes/segments.js:188
+msgid "Segment settings updated"
+msgstr ""
+
+#: routes/segments.js:190
+msgid "Segment settings not updated"
+msgstr ""
+
+#: routes/segments.js:206
+msgid "Segment deleted"
+msgstr ""
+
+#: routes/segments.js:208
+msgid "Could not delete specified segment"
+msgstr ""
+
+#: routes/segments.js:342
+msgid "Could not create rule"
+msgstr ""
+
+#: routes/segments.js:345
+msgid "Rule created"
+msgstr ""
+
+#: routes/segments.js:410
+msgid "Rule settings updated"
+msgstr ""
+
+#: routes/segments.js:412
+msgid "Rule settings not updated"
+msgstr ""
+
+#: routes/segments.js:428
+msgid "Rule deleted"
+msgstr ""
+
+#: routes/segments.js:430
+msgid "Could not delete specified rule"
+msgstr ""
+
+#: routes/settings.js:39
+msgid "Use TLS"
+msgstr ""
+
+#: routes/settings.js:40
+msgid "usually selected for port 465"
+msgstr ""
+
+#: routes/settings.js:44
+msgid "Use STARTTLS"
+msgstr ""
+
+#: routes/settings.js:45
+msgid "usually selected for port 587 and 25"
+msgstr ""
+
+#: routes/settings.js:49
+msgid "Do not use encryption"
+msgstr ""
+
+#: routes/settings.js:115
+msgid "Settings updated"
+msgstr ""
+
+#: routes/settings.js:173
+msgid "Invalid mail transport type"
+msgstr ""
+
+#: routes/settings.js:184
+msgid "Invalid Access Key"
+msgstr ""
+
+#: routes/settings.js:187
+msgid "Invalid AWS credentials"
+msgstr ""
+
+#: routes/settings.js:190
+msgid "Connection refused, check hostname and port."
+msgstr ""
+
+#: routes/settings.js:195
+msgid ""
+"Did not receive greeting message from server. This might happen when "
+"connecting to a TLS port without using TLS."
+msgstr ""
+
+#: routes/settings.js:197
+msgid "Did not receive greeting message from server."
+msgstr ""
+
+#: routes/settings.js:200
+msgid ""
+"Connection timed out. Check your firewall settings, destination port is "
+"probably blocked."
+msgstr ""
+
+#: routes/settings.js:205
+msgid "Authentication not accepted, server expects STARTTLS to be used."
+msgstr ""
+
+#: routes/settings.js:207
+msgid "Authentication failed, check username and password."
+msgstr ""
+
+#: routes/settings.js:217
+msgid "Failed Mailer verification."
+msgstr ""
+
+#: routes/settings.js:217
+msgid "Server responded with: \"%s\""
+msgstr ""
+
+#: routes/settings.js:221
+msgid "Mailer settings verified, ready to send some mail!"
+msgstr ""
+
+#: routes/subscription.js:33
+msgid "Not allowed by CORS"
+msgstr ""
+
+#: routes/subscription.js:61 routes/subscription.js:176
+#: routes/subscription.js:286 routes/subscription.js:382
+#: routes/subscription.js:459 routes/subscription.js:535
+#: routes/subscription.js:566 routes/subscription.js:626
+#: routes/subscription.js:682 routes/subscription.js:760
+#: routes/subscription.js:897
+msgid "Selected list not found"
+msgstr "Lista nem található"
+
+#: routes/subscription.js:93
+msgid "Could not save subscription"
+msgstr "Feliratkozás mentése nem sikerült"
+
+#: routes/subscription.js:118
+msgid "Subscriber info corrupted or missing"
+msgstr ""
+
+#: routes/subscription.js:136
+msgid "Email address changed"
+msgstr "Email cím megváltoztatva."
+
+#: routes/subscription.js:179 routes/subscription.js:385
+msgid "The list does not allow public subscriptions."
+msgstr "A lista nem fogad nyilvános feliratkozásokat."
+
+#: routes/subscription.js:355 routes/subscription.js:357
+msgid "Email address not set"
+msgstr "Email cím nincs megadva."
+
+#: routes/subscription.js:653
+msgid ""
+"An email with further instructions has been sent to the provided address"
+msgstr "A további teendőket tartalmazó levelet kiküldtük a megadott címre. "
+
+#: routes/subscription.js:861 routes/subscription.js:877
+msgid "Public key is not set"
+msgstr "Publikus kulcs nincs megadva."
+
+#: routes/templates.js:84
+msgid "Could not create template"
+msgstr "Sablon létrehozása nem sikerült"
+
+#: routes/templates.js:87
+msgid "Template created"
+msgstr "Sablon létrehozva."
+
+#: routes/templates.js:126
+msgid "Template settings updated"
+msgstr "Sablon beállításai frissítve"
+
+#: routes/templates.js:128
+msgid "Template settings not updated"
+msgstr ""
+
+#: routes/templates.js:144
+msgid "Template duplicated"
+msgstr ""
+
+#: routes/templates.js:146
+msgid "Could not duplicate specified template"
+msgstr ""
+
+#: routes/templates.js:157
+msgid "Template deleted"
+msgstr "Sablon törölve."
+
+#: routes/templates.js:159
+msgid "Could not delete specified template"
+msgstr ""
+
+#: routes/triggers.js:62 routes/triggers.js:79 routes/triggers.js:154
+msgid "Could not find selected list"
+msgstr ""
+
+#: routes/triggers.js:131
+msgid "Could not create trigger"
+msgstr ""
+
+#: routes/triggers.js:138
+msgid "Trigger “%s” created"
+msgstr ""
+
+#: routes/triggers.js:214
+msgid "Trigger settings updated"
+msgstr ""
+
+#: routes/triggers.js:216
+msgid "Trigger settings not updated"
+msgstr ""
+
+#: routes/triggers.js:228
+msgid "Trigger deleted"
+msgstr ""
+
+#: routes/triggers.js:230
+msgid "Could not delete specified trigger"
+msgstr ""
+
+#: routes/triggers.js:242
+msgid "Could not find trigger with specified ID"
+msgstr ""
+
+#: routes/triggers.js:255
+msgid "Trigger not found"
+msgstr ""
+
+#: routes/users.js:32
+msgid ""
+"An email with password reset instructions has been sent to your email "
+"address, if it exists on our system."
+msgstr ""
+
+#: routes/users.js:46 routes/users.js:64
+msgid "Unknown or expired reset token"
+msgstr ""
+
+#: routes/users.js:66
+msgid "Your password has been changed successfully"
+msgstr "A jelszava sikeresen megváltoztatva."
+
+#: routes/users.js:87
+msgid "User data not found"
+msgstr ""
+
+#: routes/users.js:110
+msgid "Access token updated"
+msgstr ""
+
+#: routes/users.js:112
+msgid "Access token not updated"
+msgstr ""
+
+#: routes/users.js:139
+msgid "Account information updated"
+msgstr ""
+
+#: routes/users.js:141
+msgid "Account information not updated"
+msgstr ""
+
+#: services/feedcheck.js:51
+msgid "Feed error: %s"
+msgstr ""
+
+#: services/feedcheck.js:54
+msgid "Found %s new campaign messages from feed"
+msgstr ""
+
+#: services/feedcheck.js:56
+msgid "Found nothing new from the feed"
+msgstr ""
+
+#: services/feedcheck.js:146
+msgid "RSS entry %s"
+msgstr "RSS bejegyzés %s"
+
+#: services/importer.js:249
+msgid "Could not access import file"
+msgstr "Import file nem érhető el"
+
+#: services/triggers.js:51
+msgid "Unknown trigger type %s"
+msgstr ""
