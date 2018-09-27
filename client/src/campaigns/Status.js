@@ -119,19 +119,18 @@ class SendControls extends Component {
         state.setIn(['date', 'error'], null);
         state.setIn(['time', 'error'], null);
 
-        if (!state.getIn(['sendLater', 'value'])) {
-            const dateValue = state.getIn(['date', 'value']);
+        if (state.getIn(['sendLater', 'value'])) {
+            const dateValue = state.getIn(['date', 'value']).trim();
             if (!dateValue) {
                 state.setIn(['date', 'error'], t('Date must not be empty'));
-            } else if (!moment.utc(dateValue, 'YYYY-MM-DD').isValid()) {
+            } else if (!moment(dateValue, 'YYYY-MM-DD', true).isValid()) {
                 state.setIn(['date', 'error'], t('Date is invalid'));
             }
 
-            const timeValue = state.getIn(['time', 'value']);
-            const time = moment.utc(timeValue, 'HH:mm').isValid();
+            const timeValue = state.getIn(['time', 'value']).trim();
             if (!timeValue) {
                 state.setIn(['time', 'error'], t('Time must not be empty'));
-            } else if (!time) {
+            } else if (!moment(timeValue, 'HH:mm', true).isValid()) {
                 state.setIn(['time', 'error'], t('Time is invalid'));
             }
         }
@@ -144,8 +143,8 @@ class SendControls extends Component {
             const date = moment(entity.scheduled);
             this.populateFormValues({
                 sendLater: true,
-                date: date.utc().format('YYYY-MM-DD'),
-                time: date.utc().format('HH:mm')
+                date: date.format('YYYY-MM-DD'),
+                time: date.format('HH:mm')
             });
 
         } else {
@@ -176,15 +175,15 @@ class SendControls extends Component {
     async scheduleAsync() {
         if (this.isFormWithoutErrors()) {
             const data = this.getFormValues();
-            const date = moment.utc(data.date);
-            const time = moment.utc(date.time);
+            const date = moment(data.date, 'YYYY-MM-DD');
+            const time = moment(data.time, 'HH:mm');
 
             date.hour(time.hour());
             date.minute(time.minute());
             date.second(0);
             date.millisecond(0);
 
-            await this.postAndMaskStateError(`rest/campaign-start-at/${this.props.entity.id}/${date.toDate()}`);
+            await this.postAndMaskStateError(`rest/campaign-start-at/${this.props.entity.id}/${date.valueOf()}`);
 
         } else {
             this.showFormValidation();
@@ -214,7 +213,7 @@ class SendControls extends Component {
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
-            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsTotal} ${t('subscribers')})`;
+            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers')})`;
 
             return (
                 <div>
@@ -223,7 +222,7 @@ class SendControls extends Component {
                     </AlignedRow>
 
                     <Form stateOwner={this}>
-                        <CheckBox id="sendLater" label={t('Send later')} text={t('Schedule deliver at particular date/time')}/>
+                        <CheckBox id="sendLater" label={t('Send later')} text={t('Schedule delivery at a particular date/time')}/>
                         {this.getFormValue('sendLater') &&
                             <div>
                                 <DatePicker id="date" label={t('Date')} />
@@ -254,13 +253,15 @@ class SendControls extends Component {
             );
 
         } else if (entity.status === CampaignStatus.FINISHED) {
+            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers')})`;
+
             return (
                 <div>
                     <AlignedRow label={t('Send status')}>
                         {t('All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers.')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="play" label={t('Continue')} onClickAsync={::this.startAsync}/>
+                        <Button className="btn-primary" icon="play" label={t('Continue') + subscrInfo} onClickAsync={::this.startAsync}/>
                         <Button className="btn-primary" icon="refresh" label={t('Reset')} onClickAsync={::this.resetAsync}/>
                     </ButtonRow>
                 </div>

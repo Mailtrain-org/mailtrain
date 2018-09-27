@@ -96,6 +96,10 @@ fieldTypes.json = {
     parsePostValue: (field, value) => value,
     render: (field, value) => {
         try {
+            if (value === null || value.trim() === '') {
+                return '';
+            }
+
             let parsed = JSON.parse(value);
             if (Array.isArray(parsed)) {
                 parsed = {
@@ -224,7 +228,7 @@ fieldTypes['date'] = {
     getHbsType: field => 'typeDate' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
     forHbs: (field, value) => formatDate(field.settings.dateFormat, value),
     parsePostValue: (field, value) => parseDate(field.settings.dateFormat, value),
-    render: (field, value) => formatDate(field.settings.dateFormat, value)
+    render: (field, value) => value !== null && value.trim() !== '' ? formatDate(field.settings.dateFormat, value) : ''
 };
 
 fieldTypes['birthday'] = {
@@ -239,7 +243,7 @@ fieldTypes['birthday'] = {
     getHbsType: field => 'typeBirthday' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
     forHbs: (field, value) => formatBirthday(field.settings.dateFormat, value),
     parsePostValue: (field, value) => parseBirthday(field.settings.dateFormat, value),
-    render: (field, value) => formatBirthday(field.settings.dateFormat, value)
+    render: (field, value) => value !== null && value.trim() !== '' ? formatBirthday(field.settings.dateFormat, value) : ''
 };
 
 const groupedTypes = Object.keys(fieldTypes).filter(key => fieldTypes[key].grouped);

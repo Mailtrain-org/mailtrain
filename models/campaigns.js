@@ -198,7 +198,7 @@ async function rawGetByTx(tx, key, id) {
         .select([
             'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
             'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject_override',
-            'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url',
+            'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
             knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
         ])
         .first();
@@ -682,6 +682,8 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);
         }
 
+        console.log(scheduled);
+
         await tx('campaigns').where('id', campaignId).update({
             status: newState,
             scheduled
@@ -693,7 +695,7 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 
 
 async function start(context, campaignId, startAt) {
-    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
 }
 
 async function stop(context, campaignId) {

@@ -6,7 +6,7 @@ const { enforce } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const entitySettings = require('../lib/entity-settings');
 const interoperableErrors = require('../shared/interoperable-errors');
-const log = require('../lib/log');
+const log = require('npmlog');
 const {getGlobalNamespaceId} = require('../shared/namespaces');
 const {getAdminId} = require('../shared/users');
 

@@ -69,7 +69,7 @@ router.postAsync('/campaign-start/:campaignId', passport.loggedIn, passport.csrf
 });
 
 router.postAsync('/campaign-start-at/:campaignId/:dateTime', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await campaigns.start(req.context, req.params.campaignId, new Date(req.params.dateTime)));
+    return res.json(await campaigns.start(req.context, req.params.campaignId, new Date(Number.parseInt(req.params.dateTime))));
 });
 
 
