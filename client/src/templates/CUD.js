@@ -165,7 +165,7 @@ export default class CUD extends Component {
 
         this.disableForm();
 
-        const response = await axios.post(getUrl('rest/html-to-text', { html }));
+        const response = await axios.post(getUrl('rest/html-to-text'), { html });
 
         this.updateFormValue('text', response.data.text);
 

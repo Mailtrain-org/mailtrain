@@ -14,9 +14,9 @@ router.getAsync('/:campaign/:list/:subscription', async (req, res) => {
         'Content-Length': trackImg.length
     });
 
-    await links.countLink(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, links.LinkId.OPEN);
-
     res.end(trackImg);
+
+    await links.countLink(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, links.LinkId.OPEN);
 });
 
 
@@ -24,10 +24,10 @@ router.getAsync('/:campaign/:list/:subscription/:link', async (req, res) => {
     const link = await links.resolve(req.params.link);
 
     if (link) {
-        await links.countLink(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, link.id);
-
         // In Mailtrain v1 we would do the URL expansion here based on merge tags. We don't do it here anymore. Instead, the URLs are expanded when message is sent out (in links.updateLinks)
-        return res.redirect(url);
+        res.redirect(url);
+
+        await links.countLink(req.ip, req.headers['user-agent'], req.params.campaign, req.params.list, req.params.subscription, link.id);
     } else {
         log.error('Redirect', 'Unresolved URL: <%s>', req.url);
         throw new interoperableErrors.NotFoundError('Oops, we couldn\'t find a link for the URL you clicked');

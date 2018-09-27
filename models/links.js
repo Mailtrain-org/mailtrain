@@ -12,7 +12,7 @@ const geoip = require('geoip-ultralight');
 const uaParser = require('device');
 const he = require('he');
 const { enforce } = require('../lib/helpers');
-const { getTrustedUrl } = require('../lib/urls');
+const { getPublicUrl } = require('../lib/urls');
 const tools = require('../lib/tools');
 
 const LinkId = {
@@ -28,7 +28,7 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
     await knex.transaction(async tx => {
         const list = await lists.getByCidTx(tx, contextHelpers.getAdminContext(), listCid);
         const campaign = await campaigns.getTrackingSettingsByCidTx(tx, campaignCid);
-        const subscription = await subscriptions.getByCidTx(tx, contextHelpers.getAdminContext(), subscriptionCid);
+        const subscription = await subscriptions.getByCidTx(tx, contextHelpers.getAdminContext(), list.id, subscriptionCid);
 
         const country = geoip.lookupCountry(remoteIp) || null;
         const device = uaParser(userAgent, { unknownUserAgentDeviceType: 'desktop', emptyUserAgentDeviceType: 'desktop' });
@@ -134,7 +134,7 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
     // insert tracking image
     if (!campaign.open_tracking_disabled) {
         let inserted = false;
-        const imgUrl = getTrustedUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}`);
+        const imgUrl = getPublicUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}`);
         const img = '<img src="' + imgUrl + '" width="1" height="1" alt="mt">';
         message = message.replace(/<\/body\b/i, match => {
             inserted = true;
@@ -150,7 +150,7 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
 
         const urlsToBeReplaced = new Set();
 
-        message.replace(re, (match, prefix, encodedUrl) => {
+        message = message.replace(re, (match, prefix, encodedUrl) => {
             const url = he.decode(encodedUrl, {isAttributeValue: true});
             urlsToBeReplaced.add(url);
         });
@@ -163,12 +163,14 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
             urls.set(url, link);
         }
 
-        message.replace(re, (match, prefix, encodedUrl) => {
+        message = message.replace(re, (match, prefix, encodedUrl) => {
             const url = he.decode(encodedUrl, {isAttributeValue: true});
             const link = urls.get(url);
-            return getTrustedUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}/${link.cid}`);
+            return getPublicUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}/${link.cid}`);
         });
     }
+
+    return message;
 }
 
 module.exports.LinkId = LinkId;

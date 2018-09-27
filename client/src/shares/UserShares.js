@@ -34,7 +34,7 @@ export default class UserShares extends Component {
             userId: this.props.user.id
         };
 
-        await axios.put(getUrl('rest/shares', data));
+        await axios.put(getUrl('rest/shares'), data);
         for (const key in this.sharesTables) {
             this.sharesTables[key].refresh();
         }

@@ -64,7 +64,7 @@ async function listDTAjax(context, params) {
         params,
         builder => builder.from('campaigns')
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace'),
-        ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -76,7 +76,7 @@ async function listWithContentDTAjax(context, params) {
         builder => builder.from('campaigns')
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
             .whereIn('campaigns.source', [CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.CUSTOM_FROM_CAMPAIGN]),
-        ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -89,7 +89,7 @@ async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listId
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
             .whereNot('campaigns.id', campaignId)
             .whereNotExists(qry => qry.from('campaign_lists').whereRaw('campaign_lists.campaign = campaigns.id').whereNotIn('campaign_lists.list', listIds)),
-        ['campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -191,7 +191,7 @@ async function rawGetByTx(tx, key, id) {
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
         .select([
-            'campaigns.id', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
+            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
             'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject_override',
             'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url',
             knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
@@ -428,11 +428,13 @@ async function updateWithConsistencyCheck(context, entity, content) {
             };
         }
 
+        if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM) {
+            await tx('campaign_lists').where('campaign', entity.id).del();
+            await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: entity.id, ...x})));
+        }
+
         filteredEntity.data = JSON.stringify(filteredEntity.data);
         await tx('campaigns').where('id', entity.id).update(filteredEntity);
-
-        await tx('campaign_lists').where('campaign', entity.id).del();
-        await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: entity.id, ...x})));
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: entity.id });
     });

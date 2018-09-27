@@ -13,6 +13,7 @@ const segments = require('./segments');
 const { formatDate, formatBirthday, parseDate, parseBirthday } = require('../shared/date');
 const { getFieldColumn } = require('../shared/lists');
 const { cleanupFromPost } = require('../lib/helpers');
+const Handlebars = require('handlebars');
 
 
 const allowedKeysCreate = new Set(['name', 'key', 'default_value', 'type', 'group', 'settings']);
@@ -26,6 +27,11 @@ const Cardinality = {
     MULTIPLE: 1
 };
 
+function render(template, options) {
+    const renderer = Handlebars.compile(template || '');
+    return renderer(options);
+}
+
 fieldTypes.text = {
     validate: field => {},
     addColumn: (table, name) => table.string(name),
@@ -35,7 +41,8 @@ fieldTypes.text = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeText',
     forHbs: (field, value) => value,
-    parsePostValue: (field, value) => value
+    parsePostValue: (field, value) => value,
+    render: (field, value) => value
 };
 
 fieldTypes.website = {
@@ -47,7 +54,8 @@ fieldTypes.website = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeWebsite',
     forHbs: (field, value) => value,
-    parsePostValue: (field, value) => value
+    parsePostValue: (field, value) => value,
+    render: (field, value) => value
 };
 
 fieldTypes.longtext = {
@@ -59,7 +67,8 @@ fieldTypes.longtext = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeLongtext',
     forHbs: (field, value) => value,
-    parsePostValue: (field, value) => value
+    parsePostValue: (field, value) => value,
+    render: (field, value) => value
 };
 
 fieldTypes.gpg = {
@@ -71,7 +80,8 @@ fieldTypes.gpg = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeGpg',
     forHbs: (field, value) => value,
-    parsePostValue: (field, value) => value
+    parsePostValue: (field, value) => value,
+    render: (field, value) => value
 };
 
 fieldTypes.json = {
@@ -83,7 +93,20 @@ fieldTypes.json = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeJson',
     forHbs: (field, value) => value,
-    parsePostValue: (field, value) => value
+    parsePostValue: (field, value) => value,
+    render: (field, value) => {
+        try {
+            let parsed = JSON.parse(value);
+            if (Array.isArray(parsed)) {
+                parsed = {
+                    values: parsed
+                };
+            }
+            return render(field.settings.renderTemplate, parsed);
+        } catch (err) {
+            return err.message;
+        }
+    }
 };
 
 fieldTypes.number = {
@@ -95,7 +118,8 @@ fieldTypes.number = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeNumber',
     forHbs: (field, value) => value,
-    parsePostValue: (field, value) => Number(value)
+    parsePostValue: (field, value) => Number(value),
+    render: (field, value) => value
 };
 
 fieldTypes['checkbox-grouped'] = {
@@ -104,7 +128,18 @@ fieldTypes['checkbox-grouped'] = {
     grouped: true,
     enumerated: false,
     cardinality: Cardinality.MULTIPLE,
-    getHbsType: field => 'typeCheckboxGrouped'
+    getHbsType: field => 'typeCheckboxGrouped',
+    render: (field, value) => {
+        const subItems = value.map(col => field.groupedOptions[col].name);
+
+        if (field.settings.groupTemplate) {
+            return render(field.settings.groupTemplate, {
+                values: subItems
+            });
+        } else {
+            return subItems.join(', ');
+        }
+    }
 };
 
 fieldTypes['radio-grouped'] = {
@@ -113,7 +148,8 @@ fieldTypes['radio-grouped'] = {
     grouped: true,
     enumerated: false,
     cardinality: Cardinality.SINGLE,
-    getHbsType: field => 'typeRadioGrouped'
+    getHbsType: field => 'typeRadioGrouped',
+    render: (field, value) => field.groupedOptions[value].name
 };
 
 fieldTypes['dropdown-grouped'] = {
@@ -122,7 +158,8 @@ fieldTypes['dropdown-grouped'] = {
     grouped: true,
     enumerated: false,
     cardinality: Cardinality.SINGLE,
-    getHbsType: field => 'typeDropdownGrouped'
+    getHbsType: field => 'typeDropdownGrouped',
+    render: (field, value) => field.groupedOptions[value].name
 };
 
 fieldTypes['radio-enum'] = {
@@ -135,7 +172,8 @@ fieldTypes['radio-enum'] = {
     grouped: false,
     enumerated: true,
     cardinality: Cardinality.SINGLE,
-    getHbsType: field => 'typeRadioEnum'
+    getHbsType: field => 'typeRadioEnum',
+    render: (field, value) => field.groupedOptions[value].name
 };
 
 fieldTypes['dropdown-enum'] = {
@@ -148,7 +186,8 @@ fieldTypes['dropdown-enum'] = {
     grouped: false,
     enumerated: true,
     cardinality: Cardinality.SINGLE,
-    getHbsType: field => 'typeDropdownEnum'
+    getHbsType: field => 'typeDropdownEnum',
+    render: (field, value) => field.groupedOptions[value].name
 };
 
 fieldTypes.option = {
@@ -172,7 +211,8 @@ fieldTypes['date'] = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeDate' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
     forHbs: (field, value) => formatDate(field.settings.dateFormat, value),
-    parsePostValue: (field, value) => parseDate(field.settings.dateFormat, value)
+    parsePostValue: (field, value) => parseDate(field.settings.dateFormat, value),
+    render: (field, value) => formatDate(field.settings.dateFormat, value)
 };
 
 fieldTypes['birthday'] = {
@@ -186,7 +226,8 @@ fieldTypes['birthday'] = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeBirthday' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
     forHbs: (field, value) => formatBirthday(field.settings.dateFormat, value),
-    parsePostValue: (field, value) => parseBirthday(field.settings.dateFormat, value)
+    parsePostValue: (field, value) => parseBirthday(field.settings.dateFormat, value),
+    render: (field, value) => formatBirthday(field.settings.dateFormat, value)
 };
 
 const groupedTypes = Object.keys(fieldTypes).filter(key => fieldTypes[key].grouped);
@@ -627,7 +668,6 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
     }
 
     return customFields;
-
 }
 
 // Returns an array that can be used for rendering by Handlebars
@@ -635,6 +675,22 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
     const flds = await listGrouped(context, listId);
     return forHbsWithFieldsGrouped(flds, subscription);
 }
+
+function getMergeTags(fieldsGrouped, subscription) { // assumes grouped subscription
+    const mergeTags = {
+        'EMAIL': subscription.email
+    };
+
+    for (const fld of fieldsGrouped) {
+        const type = fieldTypes[fld.type];
+        const fldCol = getFieldColumn(fld);
+
+        mergeTags[fld.key] = type.render(fld, subscription[fldCol]);
+    }
+
+    return mergeTags;
+}
+
 
 // Converts subscription data received via (1) POST request from subscription form, (2) via subscribe request to API v1 to subscription structure supported by subscriptions model,
 // or (3) from import.
@@ -749,3 +805,4 @@ module.exports.forHbsWithFieldsGrouped = forHbsWithFieldsGrouped;
 module.exports.fromPost = fromPost;
 module.exports.fromAPI = fromAPI;
 module.exports.fromImport = fromImport;
+module.exports.getMergeTags = getMergeTags;

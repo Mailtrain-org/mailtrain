@@ -316,7 +316,6 @@ function createApp(appType) {
                 return next();
             }
 
-            console.log(err);
             if (req.needsRESTJSONResponse) {
                 const resp = {
                     message: err.message,

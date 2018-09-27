@@ -39,7 +39,7 @@ export default class Share extends Component {
             userId
         };
 
-        await axios.put(getUrl('rest/shares', data));
+        await axios.put(getUrl('rest/shares'), data);
         this.sharesTable.refresh();
         this.usersTableSelect.refresh();
     }

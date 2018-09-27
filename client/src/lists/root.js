@@ -132,7 +132,7 @@ function getMenus(t) {
                             }
                         },
                         imports: {
-                            title: t('Imports & Tasks'),
+                            title: t('Imports'),
                             link: params => `/lists/${params.listId}/imports/`,
                             visible: resolved => resolved.list.permissions.includes('viewImports'),
                             panelRender: props => <ImportsList list={props.resolved.list} />,

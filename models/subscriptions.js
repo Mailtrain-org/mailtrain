@@ -311,6 +311,7 @@ async function listDTAjax(context, listId, segmentId, params) {
                 query.where(function() {
                     addSegmentQuery(this);
                 });
+
                 return query;
             },
             columns,

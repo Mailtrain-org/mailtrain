@@ -20,6 +20,7 @@ import {
     Form,
     FormSendMethod,
     InputField,
+    StaticField,
     TextArea,
     withForm
 } from '../lib/form';
@@ -36,6 +37,8 @@ import {
     getSystemSendConfigurationId,
     MailerType
 } from "../../../shared/send-configurations";
+
+import styles from "../lib/styles.scss";
 
 import mailtrainConfig from 'mailtrainConfig';
 
@@ -189,6 +192,13 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
 
                     <InputField id="name" label={t('Name')}/>
+
+                    {isEdit &&
+                    <StaticField id="cid" className={styles.formDisabled} label={t('ID')}>
+                        {this.getFormValue('cid')}
+                    </StaticField>
+                    }
+
                     <TextArea id="description" label={t('Description')}/>
                     <NamespaceSelect/>
 
@@ -220,6 +230,8 @@ export default class CUD extends Component {
                             <Trans><p>VERP bounce handling server is not enabled. Modify your server configuration file and restart server to enable it.</p></Trans>
                         }
                     </Fieldset>
+
+                    <hr/>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>

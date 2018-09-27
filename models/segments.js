@@ -8,6 +8,7 @@ const { enforce, filterObject } = require('../lib/helpers');
 const hasher = require('node-object-hash')();
 const moment = require('moment');
 const fields = require('./fields');
+const subscriptions = require('./subscriptions');
 
 const { parseDate, parseBirthday, DateFormat } = require('../shared/date');
 
@@ -89,7 +90,7 @@ function stringValueSettings(sqlOperator, allowEmpty) {
             enforce(typeof rule.value === 'string', 'Invalid value type in rule');
             enforce(allowEmpty || rule.value, 'Value in rule must not be empty');
         },
-        addQuery: (query, rule) => query.where(rule.column, sqlOperator, rule.value)
+        addQuery: (subsTableName, query, rule) => query.where(subsTableName + '. ' + rule.column, sqlOperator, rule.value)
     };
 }
 
@@ -98,7 +99,7 @@ function numberValueSettings(sqlOperator) {
         validate: rule => {
             enforce(typeof rule.value === 'number', 'Invalid value type in rule');
         },
-        addQuery: (query, rule) => query.where(rule.column, sqlOperator, rule.value)
+        addQuery: (subsTableName, query, rule) => query.where(subsTableName + '. ' + rule.column, sqlOperator, rule.value)
     };
 }
 
@@ -108,16 +109,16 @@ function dateValueSettings(thisDaySqlOperator, nextDaySqlOperator) {
             const date = moment.utc(rule.value);
             enforce(date.isValid(), 'Invalid date value');
         },
-        addQuery: (query, rule) => {
+        addQuery: (subsTableName, query, rule) => {
             const thisDay = moment.utc(rule.value).startOf('day');
             const nextDay = moment(thisDay).add(1, 'days');
 
             if (thisDaySqlOperator) {
-                query.where(rule.column, thisDaySqlOperator, thisDay.toDate())
+                query.where(subsTableName + '. ' + rule.column, thisDaySqlOperator, thisDay.toDate())
             }
 
             if (nextDaySqlOperator) {
-                query.where(rule.column, nextDaySqlOperator, nextDay.toDate());
+                query.where(subsTableName + '. ' + rule.column, nextDaySqlOperator, nextDay.toDate());
             }
         }
     };
@@ -128,16 +129,16 @@ function dateRelativeValueSettings(todaySqlOperator, tomorrowSqlOperator) {
         validate: rule => {
             enforce(typeof rule.value === 'number', 'Invalid value type in rule');
         },
-        addQuery: (query, rule) => {
+        addQuery: (subsTableName, query, rule) => {
             const todayWithOffset = moment.utc().startOf('day').add(rule.value, 'days');
             const tomorrowWithOffset = moment(todayWithOffset).add(1, 'days');
 
             if (todaySqlOperator) {
-                query.where(rule.column, todaySqlOperator, todayWithOffset.toDate())
+                query.where(subsTableName + '. ' + rule.column, todaySqlOperator, todayWithOffset.toDate())
             }
 
             if (tomorrowSqlOperator) {
-                query.where(rule.column, tomorrowSqlOperator, tomorrowWithOffset.toDate());
+                query.where(subsTableName + '. ' + rule.column, tomorrowSqlOperator, tomorrowWithOffset.toDate());
             }
         }
     };
@@ -146,7 +147,7 @@ function dateRelativeValueSettings(todaySqlOperator, tomorrowSqlOperator) {
 function optionValueSettings(value) {
     return {
         validate: rule => {},
-        addQuery: (query, rule) => query.where(rule.column, value)
+        addQuery: (subsTableName, query, rule) => query.where(subsTableName + '. ' + rule.column, value)
     };
 }
 
@@ -393,6 +394,8 @@ async function getQueryGeneratorTx(tx, listId, id) {
     const entity = await tx('segments').where({id, list: listId}).first();
     const settings = JSON.parse(entity.settings);
 
+    const subsTableName = subscriptions.getSubscriptionTableName(listId);
+
     function processRule(query, rule) {
         if (rule.type in compositeRuleTypes) {
             compositeRuleTypes[rule.type].addQuery(query, rule.rules, (subQuery, childRule) => {
@@ -400,7 +403,7 @@ async function getQueryGeneratorTx(tx, listId, id) {
             });
         } else {
             const colType = fieldsByColumn[rule.column].type;
-            primitiveRuleTypes[colType][rule.type].addQuery(query, rule);
+            primitiveRuleTypes[colType][rule.type].addQuery(subsTableName, query, rule);
         }
     }
 

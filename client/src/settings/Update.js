@@ -89,6 +89,7 @@ export default class Update extends Component {
                         <TextArea id="pgpPrivateKey" label={t('GPG private key')} placeholder={t('Begins with \'-----BEGIN PGP PRIVATE KEY BLOCK-----\'')} help={t('This value is optional. If you do not provide a private key GPG encrypted messages are sent without signing.')}/>
                     </Fieldset>
 
+                    <hr/>
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
                     </ButtonRow>

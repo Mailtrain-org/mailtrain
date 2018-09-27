@@ -628,10 +628,11 @@ export default class CUD extends Component {
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
                 { data: 1, title: t('Name') },
-                { data: 2, title: t('Description') },
-                { data: 3, title: t('Type'), render: data => this.campaignTypeLabels[data] },
-                { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
-                { data: 5, title: t('Namespace') }
+                { data: 2, title: t('ID'), render: data => <code>{data}</code> },
+                { data: 3, title: t('Description') },
+                { data: 4, title: t('Type'), render: data => this.campaignTypeLabels[data] },
+                { data: 5, title: t('Created'), render: data => moment(data).fromNow() },
+                { data: 6, title: t('Namespace') }
             ];
 
             templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('Campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('Content of the selected campaign will be copied into this campaign.')}/>;
@@ -688,6 +689,13 @@ export default class CUD extends Component {
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>
+
+                    {isEdit &&
+                    <StaticField id="cid" className={styles.formDisabled} label={t('ID')} help={t('This is the campaign ID displayed to the subscribers')}>
+                        {this.getFormValue('cid')}
+                    </StaticField>
+                    }
+
                     <TextArea id="description" label={t('Description')}/>
 
                     {extraSettings}

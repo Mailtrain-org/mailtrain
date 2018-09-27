@@ -136,7 +136,7 @@ export default class CustomContent extends Component {
 
         this.disableForm();
 
-        const response = await axios.post(getUrl('rest/html-to-text', { html }));
+        const response = await axios.post(getUrl('rest/html-to-text'), { html });
 
         this.updateFormValue('data_sourceCustom_text', response.data.text);
 
@@ -175,7 +175,7 @@ export default class CustomContent extends Component {
 
                     {customTemplateTypeKey && getTypeForm(this, customTemplateTypeKey, true)}
 
-                    {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey)}
+                    {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>

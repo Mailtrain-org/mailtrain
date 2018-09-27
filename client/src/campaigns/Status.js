@@ -83,7 +83,7 @@ class TestUser extends Component {
 
         const testUsersColumns = [
             { data: 1, title: t('Email') },
-            { data: 4, title: t('List ID') },
+            { data: 4, title: t('List ID'), render: data => <code>{data}</code> },
             { data: 5, title: t('List') },
             { data: 6, title: t('Segment') },
             { data: 7, title: t('List namespace') }

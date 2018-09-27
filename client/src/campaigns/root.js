@@ -61,7 +61,7 @@ function getMenus(t) {
                             title: t('Attachments'),
                             link: params => `/campaigns/${params.campaignId}/attachments`,
                             visible: resolved => resolved.campaign.permissions.includes('viewAttachments'),
-                            panelRender: props => <Files title={t('Attachments')} help={t('These files will be attached to the campaign emails as proper attachments. This means they count towards to resulting eventual size of the email.')} entity={props.resolved.campaign} entityTypeId="campaign" entitySubTypeId="attachment" managePermission="manageAttachments"/>
+                            panelRender: props => <Files title={t('Attachments')} help={t('These files will be attached to the campaign emails as proper attachments. This means they count towards to the eventual size of the email.')} entity={props.resolved.campaign} entityTypeId="campaign" entitySubTypeId="attachment" managePermission="manageAttachments"/>
                         },
                         triggers: {
                             title: t('Triggers'),

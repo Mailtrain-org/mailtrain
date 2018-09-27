@@ -404,7 +404,7 @@ export default class CUD extends Component {
                         deletedMsg={t('Field deleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Import/Task') : t('Create Import/Task')}</Title>
+                <Title>{isEdit ? t('Edit Import') : t('Create Import')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('Name')}/>

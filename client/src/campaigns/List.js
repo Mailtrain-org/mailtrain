@@ -68,14 +68,15 @@ export default class List extends Component {
 
         const columns = [
             { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Type'), render: data => this.campaignTypeLabels[data] },
+            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
+            { data: 3, title: t('Description') },
+            { data: 4, title: t('Type'), render: data => this.campaignTypeLabels[data] },
             {
-                data: 4,
+                data: 5,
                 title: t('Status'),
                 render: (data, display, rowData) => {
                     if (data === CampaignStatus.SCHEDULED) {
-                        const scheduled = rowData[5];
+                        const scheduled = rowData[6];
                         if (scheduled && new Date(scheduled) > new Date()) {
                             return t('Sending scheduled');
                         } else {
@@ -86,14 +87,14 @@ export default class List extends Component {
                     }
                 }
             },
-            { data: 7, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 8, title: t('Namespace') },
+            { data: 8, title: t('Created'), render: data => moment(data).fromNow() },
+            { data: 9, title: t('Namespace') },
             {
                 actions: data => {
                     const actions = [];
-                    const perms = data[9];
-                    const campaignType = data[3];
-                    const campaignSource = data[6];
+                    const perms = data[10];
+                    const campaignType = data[4];
+                    const campaignSource = data[7];
 
                     if (perms.includes('viewStats')) {
                         actions.push({
