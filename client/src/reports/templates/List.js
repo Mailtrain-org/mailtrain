@@ -10,6 +10,11 @@ import axios from '../../lib/axios';
 import moment from 'moment';
 import mailtrainConfig from 'mailtrainConfig';
 import {checkPermissions} from "../../lib/permissions";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -20,6 +25,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -68,6 +74,8 @@ export default class List extends Component {
                         });
                     }
 
+                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+
                     return actions;
                 }
             }
@@ -75,6 +83,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/reports/templates`, t('Deleting report template ...'), t('Report template deleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('Create Report Template')}>
@@ -88,7 +97,7 @@ export default class List extends Component {
 
                 <Title>{t('Report Templates')}</Title>
 
-                <Table withHeader dataUrl="rest/report-templates-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/report-templates-table" columns={columns} />
             </div>
         );
     }

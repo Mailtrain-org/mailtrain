@@ -19,6 +19,11 @@ import axios from '../lib/axios';
 import moment from 'moment';
 import {getMailerTypes} from './helpers';
 import {checkPermissions} from "../lib/permissions";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../lib/modals";
 
 
 @translate()
@@ -32,6 +37,7 @@ export default class List extends Component {
         this.mailerTypes = getMailerTypes(props.t);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -82,6 +88,8 @@ export default class List extends Component {
                         });
                     }
 
+                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+
                     return actions;
                 }
             }
@@ -89,6 +97,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/send-configurations`, t('Deleting send configuration ...'), t('Send configuration deleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <NavButton linkTo="/send-configurations/create" className="btn-primary" icon="plus" label={t('Create Send Configuration')}/>
@@ -97,7 +106,7 @@ export default class List extends Component {
 
                 <Title>{t('Send Configurations')}</Title>
 
-                <Table withHeader dataUrl="rest/send-configurations-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/send-configurations-table" columns={columns} />
             </div>
         );
     }

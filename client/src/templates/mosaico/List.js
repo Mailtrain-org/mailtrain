@@ -10,6 +10,11 @@ import axios from '../../lib/axios';
 import moment from 'moment';
 import { getTemplateTypes } from './helpers';
 import {checkPermissions} from "../../lib/permissions";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 
 @translate()
@@ -23,6 +28,7 @@ export default class List extends Component {
         this.templateTypes = getTemplateTypes(props.t);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -86,6 +92,8 @@ export default class List extends Component {
                         });
                     }
 
+                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+
                     return actions;
                 }
             }
@@ -93,6 +101,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/mosaico-templates`, t('Deleting Mosaico template ...'), t('Mosaico template deleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('Create Mosaico Template')}>
@@ -104,7 +113,7 @@ export default class List extends Component {
 
                 <Title>{t('Mosaico Templates')}</Title>
 
-                <Table withHeader dataUrl="rest/mosaico-templates-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/mosaico-templates-table" columns={columns} />
             </div>
         );
     }

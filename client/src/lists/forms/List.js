@@ -8,6 +8,11 @@ import { Table } from '../../lib/table';
 import axios from '../../lib/axios';
 import {Icon} from "../../lib/bootstrap-components";
 import {checkPermissions} from "../../lib/permissions";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -18,6 +23,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -64,6 +70,8 @@ export default class List extends Component {
                         });
                     }
 
+                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+
                     return actions;
                 }
             }
@@ -71,6 +79,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/forms`, t('Deleting form ...'), t('Form deleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <NavButton linkTo="/lists/forms/create" className="btn-primary" icon="plus" label={t('Create Custom Form')}/>
@@ -79,7 +88,7 @@ export default class List extends Component {
 
                 <Title>{t('Forms')}</Title>
 
-                <Table withHeader dataUrl="rest/forms-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} />
             </div>
         );
     }

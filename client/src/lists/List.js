@@ -9,6 +9,11 @@ import axios from '../lib/axios';
 import {Link} from "react-router-dom";
 import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -19,6 +24,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -115,6 +121,8 @@ export default class List extends Component {
                         });
                     }
 
+                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+
                     return actions;
                 }
             }
@@ -122,6 +130,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/lists`, t('Deleting list ...'), t('List deleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <NavButton linkTo="/lists/create" className="btn-primary" icon="plus" label={t('Create List')}/>
@@ -131,7 +140,7 @@ export default class List extends Component {
 
                 <Title>{t('Lists')}</Title>
 
-                <Table withHeader dataUrl="rest/lists-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />
             </div>
         );
     }

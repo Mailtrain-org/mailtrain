@@ -16,6 +16,11 @@ import {Icon, Button} from "../../lib/bootstrap-components";
 import axios from '../../lib/axios';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
 import {getUrl, getPublicUrl} from "../../lib/urls";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withForm
@@ -29,6 +34,7 @@ export default class List extends Component {
         const t = props.t;
 
         this.state = {};
+        tableDeleteDialogInit(this);
 
         this.subscriptionStatusLabels = getSubscriptionStatusLabels(t);
         this.fieldTypes = getFieldTypes(t);
@@ -63,21 +69,15 @@ export default class List extends Component {
     }
 
     @withAsyncErrorHandler
-    async deleteSubscription(id) {
-        await axios.delete(getUrl(`rest/subscriptions/${this.props.list.id}/${id}`));
-        this.blacklistTable.refresh();
-    }
-
-    @withAsyncErrorHandler
     async unsubscribeSubscription(id) {
         await axios.post(getUrl(`rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`));
-        this.blacklistTable.refresh();
+        this.table.refresh();
     }
 
     @withAsyncErrorHandler
     async blacklistSubscription(email) {
         await axios.post(getUrl('rest/blacklist'), { email });
-        this.blacklistTable.refresh();
+        this.table.refresh();
     }
 
     render() {
@@ -132,10 +132,7 @@ export default class List extends Component {
                         });
                     }
 
-                    actions.push({
-                        label: <Icon icon="remove" title={t('Remove')}/>,
-                        action: () => this.deleteSubscription(data[0])
-                    });
+                    tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[2]);
 
                     return actions;
                 }
@@ -157,6 +154,7 @@ export default class List extends Component {
         // FIXME - presents segments in a data table as in campaign edit
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/subscriptions/${this.props.list.id}`, t('Deleting subscription ...'), t('Subscription deleted'))}
                 <Toolbar>
                     <a href={getPublicUrl(`subscription/${this.props.list.cid}`)} className="btn-default"><Button label={t('Subscription Form')} className="btn-default"/></a>
                     <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('Add Subscriber')}/>
@@ -175,7 +173,7 @@ export default class List extends Component {
                 </div>
 
 
-                <Table ref={node => this.blacklistTable = node} withHeader dataUrl={dataUrl} columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl={dataUrl} columns={columns} />
             </div>
         );
     }

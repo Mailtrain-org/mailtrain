@@ -13,6 +13,11 @@ import {Table} from '../lib/table';
 import {getTriggerTypes} from '../campaigns/triggers/helpers';
 import {Icon} from "../lib/bootstrap-components";
 import mailtrainConfig from 'mailtrainConfig';
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -27,6 +32,7 @@ export default class List extends Component {
         this.eventLabels = eventLabels;
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     static propTypes = {
@@ -60,6 +66,10 @@ export default class List extends Component {
                         });
                     }
 
+                    if (perms.includes('manageTriggers')) {
+                        tableDeleteDialogAddDeleteButton(actions, this, null, campaignId + '/' + data[0], data[1]);
+                    }
+
                     return actions;
                 }
             }
@@ -67,9 +77,10 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/triggers`, t('Deleting trigger ...'), t('Trigger deleted'))}
                 <Title>{t('Triggers')}</Title>
 
-                <Table withHeader dataUrl={`rest/triggers-by-list-table/${this.props.list.id}`} columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl={`rest/triggers-by-list-table/${this.props.list.id}`} columns={columns} />
             </div>
         );
     }

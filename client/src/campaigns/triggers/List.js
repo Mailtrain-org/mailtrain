@@ -15,6 +15,11 @@ import {Table} from '../../lib/table';
 import {getTriggerTypes} from './helpers';
 import {Icon} from "../../lib/bootstrap-components";
 import mailtrainConfig from 'mailtrainConfig';
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -29,6 +34,7 @@ export default class List extends Component {
         this.eventLabels = eventLabels;
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     static propTypes = {
@@ -59,6 +65,10 @@ export default class List extends Component {
                         });
                     }
 
+                    if (perms.includes('manageTriggers')) {
+                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                    }
+
                     return actions;
                 }
             }
@@ -66,6 +76,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/triggers/${this.props.campaign.id}`, t('Deleting trigger ...'), t('Trigger deleted'))}
                 {mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.campaign.permissions.includes('manageTriggers') &&
                     <Toolbar>
                         <NavButton linkTo={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('Create Trigger')}/>
@@ -74,7 +85,7 @@ export default class List extends Component {
 
                 <Title>{t('Triggers')}</Title>
 
-                <Table withHeader dataUrl={`rest/triggers-by-campaign-table/${this.props.campaign.id}`} columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl={`rest/triggers-by-campaign-table/${this.props.campaign.id}`} columns={columns} />
             </div>
         );
     }

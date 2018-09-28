@@ -7,6 +7,11 @@ import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} f
 import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
 import {Icon} from "../../lib/bootstrap-components";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -17,6 +22,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     static propTypes = {
@@ -40,6 +46,8 @@ export default class List extends Component {
                             label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/lists/${this.props.list.id}/segments/${data[0]}/edit`
                         });
+
+                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
                     }
 
                     return actions;
@@ -49,6 +57,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/segments/${this.props.list.id}`, t('Deleting segment ...'), t('Segment deleted'))}
                 {this.props.list.permissions.includes('manageSegments') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('Create Segment')}/>
@@ -57,7 +66,7 @@ export default class List extends Component {
 
                 <Title>{t('Segment')}</Title>
 
-                <Table withHeader dataUrl={`rest/segments-table/${this.props.list.id}`} columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl={`rest/segments-table/${this.props.list.id}`} columns={columns} />
             </div>
         );
     }

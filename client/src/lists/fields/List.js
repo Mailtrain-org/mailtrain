@@ -8,6 +8,11 @@ import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
 import { getFieldTypes } from './helpers';
 import {Icon} from "../../lib/bootstrap-components";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -18,6 +23,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
 
         this.fieldTypes = getFieldTypes(props.t);
     }
@@ -48,6 +54,8 @@ export default class List extends Component {
                             label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/lists/${this.props.list.id}/fields/${data[0]}/edit`
                         });
+
+                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
                     }
 
                     return actions;
@@ -57,6 +65,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/fields/${this.props.list.id}`, t('Deleting field ...'), t('Field deleted'))}
                 {this.props.list.permissions.includes('manageFields') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('Create Field')}/>
@@ -65,7 +74,7 @@ export default class List extends Component {
 
                 <Title>{t('Fields')}</Title>
 
-                <Table withHeader dataUrl={`rest/fields-table/${this.props.list.id}`} columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl={`rest/fields-table/${this.props.list.id}`} columns={columns} />
             </div>
         );
     }

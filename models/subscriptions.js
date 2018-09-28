@@ -578,7 +578,7 @@ async function _removeAndGetTx(tx, context, listId, existing) {
         throw new interoperableErrors.NotFoundError();
     }
 
-    await tx(getSubscriptionTableName(listId)).where('id', id).del();
+    await tx(getSubscriptionTableName(listId)).where('id', existing.id).del();
 
     if (existing.status === SubscriptionStatus.SUBSCRIBED) {
         await tx('lists').where('id', listId).decrement('subscribers', 1);

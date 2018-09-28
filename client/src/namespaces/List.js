@@ -8,6 +8,11 @@ import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling'
 import axios from '../lib/axios';
 import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../lib/modals";
 
 @translate()
 @withErrorHandling
@@ -18,6 +23,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -44,6 +50,7 @@ export default class List extends Component {
 
         const actions = node => {
             const actions = [];
+            console.log(node);
 
             if (node.data.permissions.includes('edit')) {
                 actions.push({
@@ -59,11 +66,14 @@ export default class List extends Component {
                 });
             }
 
+            tableDeleteDialogAddDeleteButton(actions, this, node.data.permissions, node.key, node.key);
+
             return actions;
         };
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/namespaces`, t('Deleting namespace ...'), t('Namespace deleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <NavButton linkTo="/namespaces/create" className="btn-primary" icon="plus" label={t('Create Namespace')}/>
@@ -72,7 +82,7 @@ export default class List extends Component {
 
                 <Title>{t('Namespaces')}</Title>
 
-                <TreeTable withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} />
+                <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} />
             </div>
         );
     }

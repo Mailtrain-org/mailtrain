@@ -17,6 +17,11 @@ import {Icon} from "../../lib/bootstrap-components";
 import mailtrainConfig from 'mailtrainConfig';
 import moment from "moment";
 import {inProgress} from '../../../../shared/imports';
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -27,6 +32,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
+        tableDeleteDialogInit(this);
 
         const {importSourceLabels, importStatusLabels} = getImportLabels(props.t);
         this.importSourceLabels = importSourceLabels;
@@ -72,6 +78,10 @@ export default class List extends Component {
                         link: `/lists/${this.props.list.id}/imports/${data[0]}/status`
                     });
 
+                    if (this.props.list.permissions.includes('manageImports')) {
+                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                    }
+
                     return { refreshTimeout, actions };
                 }
             }
@@ -79,6 +89,7 @@ export default class List extends Component {
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/imports/${this.props.list.id}`, t('Deleting import ...'), t('Import deleted'))}
                 {mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.list.permissions.includes('manageImports') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('Create Import')}/>
@@ -87,7 +98,7 @@ export default class List extends Component {
 
                 <Title>{t('Imports')}</Title>
 
-                <Table withHeader dataUrl={`rest/imports-table/${this.props.list.id}`} columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl={`rest/imports-table/${this.props.list.id}`} columns={columns} />
             </div>
         );
     }

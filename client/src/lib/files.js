@@ -10,8 +10,7 @@ import {
 import {withErrorHandling} from "./error-handling";
 import {Table} from "./table";
 import Dropzone from "react-dropzone";
-import {ModalDialog} from "./modals";
-import {Icon} from "./bootstrap-components";
+import {Icon, ModalDialog} from "./bootstrap-components";
 import axios from './axios';
 import styles from "./styles.scss";
 import {withPageHelpers} from "./page";

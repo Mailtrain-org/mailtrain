@@ -401,7 +401,7 @@ export default class CUD extends Component {
                         backUrl={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/edit`}
                         successUrl={`/lists/${this.props.list.id}/imports`}
                         deletingMsg={t('Deleting import ...')}
-                        deletedMsg={t('Field deleted')}/>
+                        deletedMsg={t('Import deleted')}/>
                 }
 
                 <Title>{isEdit ? t('Edit Import') : t('Create Import')}</Title>

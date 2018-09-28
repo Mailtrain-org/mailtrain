@@ -16,6 +16,7 @@ import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import styles from "./styles.scss";
 import {getUrl} from "./urls";
+import {Table} from "./table";
 
 const TreeSelectMode = {
     NONE: 0,
@@ -23,7 +24,7 @@ const TreeSelectMode = {
     MULTI: 2
 };
 
-@translate()
+@translate(null, { withRef: true })
 @withPageHelpers
 @withErrorHandling
 class TreeTable extends Component {
@@ -44,6 +45,13 @@ class TreeTable extends Component {
 
     static defaultProps = {
         selectMode: TreeSelectMode.NONE 
+    }
+
+    refresh() {
+        if (this.tree) {
+            this.tree.reload(this.sanitizeTreeData(this.state.treeData));
+            this.updateSelection();
+        }
     }
 
     @withAsyncErrorHandler
@@ -322,6 +330,15 @@ class TreeTable extends Component {
 
     }
 }
+
+/*
+  Refreshes the table. This method is provided to allow programmatic refresh from a handler outside the table.
+  The reference to the table can be obtained by ref.
+ */
+TreeTable.prototype.refresh = function() {
+    this.getWrappedInstance().refresh();
+};
+
 
 export {
     TreeTable,

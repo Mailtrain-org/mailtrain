@@ -6,6 +6,11 @@ import {NavButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} f
 import {Table} from "../lib/table";
 import mailtrainConfig from "mailtrainConfig";
 import {Icon} from "../lib/bootstrap-components";
+import {
+    tableDeleteDialogAddDeleteButton,
+    tableDeleteDialogInit,
+    tableDeleteDialogRender
+} from "../lib/modals";
 
 @translate()
 @withPageHelpers
@@ -13,6 +18,9 @@ import {Icon} from "../lib/bootstrap-components";
 export default class List extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {};
+        tableDeleteDialogInit(this);
     }
 
     render() {
@@ -33,27 +41,35 @@ export default class List extends Component {
         columns.push({ data: 4, title: "Role" });
 
         columns.push({
-            actions: data => [
-                {
+            actions: data => {
+                const actions = [];
+
+                actions.push({
                     label: <Icon icon="edit" title={t('Edit')}/>,
                     link: `/users/${data[0]}/edit`
-                },
-                {
+                });
+
+                actions.push({
                     label: <Icon icon="share" title={t('Share')}/>,
                     link: `/users/${data[0]}/shares`
-                }
-            ]
+                });
+
+                tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+
+                return actions;
+            }
         });
 
         return (
             <div>
+                {tableDeleteDialogRender(this, `rest/users`, t('Deleting user ...'), t('User deleted'))}
                 <Toolbar>
                     <NavButton linkTo="/users/create" className="btn-primary" icon="plus" label={t('Create User')}/>
                 </Toolbar>
 
                 <Title>{t('Users')}</Title>
 
-                <Table withHeader dataUrl="rest/users-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/users-table" columns={columns} />
             </div>
         );
     }
