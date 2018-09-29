@@ -140,7 +140,7 @@ async function rebuildPermissionsTx(tx, restriction) {
             [restriction.entityTypeId]: entityType
         };
     } else {
-        restrictedEntityTypes = entitySettings.getEntityTypes();
+        restrictedEntityTypes = entitySettings.getEntityTypesWithPermissions();
     }
 
 
@@ -375,7 +375,7 @@ async function regenerateRoleNamesTable() {
     await knex.transaction(async tx => {
         await tx('generated_role_names').del();
 
-        const entityTypeIds = ['global', ...Object.keys(entitySettings.getEntityTypes())];
+        const entityTypeIds = ['global', ...Object.keys(entitySettings.getEntityTypesWithPermissions())];
 
         for (const entityTypeId of entityTypeIds) {
             const roles = config.roles[entityTypeId];
@@ -539,6 +539,14 @@ async function checkEntityPermission(context, entityTypeId, entityId, requiredOp
     });
 }
 
+async function checkEntityPermissionTx(tx, context, entityTypeId, entityId, requiredOperations) {
+    if (!entityId) {
+        return false;
+    }
+
+    return await _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations);
+}
+
 async function checkTypePermission(context, entityTypeId, requiredOperations) {
     return await knex.transaction(async tx => {
         return await _checkPermissionTx(tx, context, entityTypeId, null, requiredOperations);
@@ -626,6 +634,7 @@ module.exports.enforceEntityPermission = enforceEntityPermission;
 module.exports.enforceEntityPermissionTx = enforceEntityPermissionTx;
 module.exports.enforceTypePermission = enforceTypePermission;
 module.exports.enforceTypePermissionTx = enforceTypePermissionTx;
+module.exports.checkEntityPermissionTx = checkEntityPermissionTx;
 module.exports.checkEntityPermission = checkEntityPermission;
 module.exports.checkTypePermission = checkTypePermission;
 module.exports.enforceGlobalPermission = enforceGlobalPermission;

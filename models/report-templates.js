@@ -8,6 +8,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
 const reports = require('./reports');
+const dependencyHelpers = require('../lib/dependency-helpers');
 
 const allowedKeys = new Set(['name', 'description', 'mime_type', 'user_fields', 'js', 'hbs', 'namespace']);
 
@@ -77,7 +78,9 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'reportTemplate', id, 'delete');
 
-        await reports.removeAllByReportTemplateIdTx(tx, context, id);
+        await dependencyHelpers.ensureNoDependencies(tx, context, id, [
+            { entityTypeId: 'report', column: 'report_template' }
+        ]);
 
         await tx('report_templates').where('id', id).del();
     });

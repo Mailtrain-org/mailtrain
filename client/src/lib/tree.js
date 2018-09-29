@@ -104,6 +104,7 @@ class TreeTable extends Component {
         const data = [];
         for (const unsafeEntry of unsafeData) {
             const entry = Object.assign({}, unsafeEntry);
+            entry.unsanitizedTitle = entry.title;
             entry.title = ReactDOMServer.renderToStaticMarkup(<div>{entry.title}</div>);
             entry.description = ReactDOMServer.renderToStaticMarkup(<div>{entry.description}</div>);
             if (entry.children) {
@@ -137,15 +138,32 @@ class TreeTable extends Component {
                 const linksContainer = jQuery(`<span class="${styles.actionLinks}"/>`);
 
                 const actions = this.props.actions(node);
-                for (const {label, link} of actions) {
-                    const lnkHtml = ReactDOMServer.renderToStaticMarkup(<a href={link}>{label}</a>);
-                    const lnk = jQuery(lnkHtml);
-                    lnk.click((evt) => {
-                        evt.preventDefault();
-                        this.navigateTo(link)
-                    });
-                    linksContainer.append(lnk);
+
+                for (const action of actions) {
+                    if (action.action) {
+                        const html = ReactDOMServer.renderToStaticMarkup(<a href="">{action.label}</a>);
+                        const elem = jQuery(html);
+                        elem.click((evt) => { evt.preventDefault(); action.action(this) });
+                        linksContainer.append(elem);
+
+                    } else if (action.link) {
+                        const html = ReactDOMServer.renderToStaticMarkup(<a href={action.link}>{action.label}</a>);
+                        const elem = jQuery(html);
+                        elem.click((evt) => { evt.preventDefault(); this.navigateTo(action.link) });
+                        linksContainer.append(elem);
+
+                    } else if (action.href) {
+                        const html = ReactDOMServer.renderToStaticMarkup(<a href={action.href}>{action.label}</a>);
+                        const elem = jQuery(html);
+                        linksContainer.append(elem);
+
+                    } else {
+                        const html = ReactDOMServer.renderToStaticMarkup(<span>{action.label}</span>);
+                        const elem = jQuery(html);
+                        linksContainer.append(elem);
+                    }
                 }
+
                 tdList.eq(tdIdx).html(linksContainer);
                 tdIdx += 1;
             }

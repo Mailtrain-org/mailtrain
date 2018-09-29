@@ -7,6 +7,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const entitySettings = require('../lib/entity-settings');
 const namespaceHelpers = require('../lib/namespace-helpers');
+const dependencyHelpers = require('../lib/dependency-helpers');
 
 
 const allowedKeys = new Set(['name', 'description', 'namespace']);
@@ -176,12 +177,8 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'delete');
 
-        const childNs = await tx('namespaces').where('namespace', id).first();
-        if (childNs) {
-            throw new interoperableErrors.ChildDetectedError();
-        }
-
-        // FIXME - Remove all contained entities first
+        const entityTypesWithNamespace = Object.keys(entitySettings.getEntityTypes());
+        await dependencyHelpers.ensureNoDependencies(tx, context, id, entityTypesWithNamespace.map(entityTypeId => ({ entityTypeId: entityTypeId, column: 'namespace' })));
 
         await tx('namespaces').where('id', id).del();
     });

@@ -25,7 +25,6 @@ export default class CUD extends Component {
         this.state = {};
 
         this.initForm();
-        this.hasChildren = false;
     }
 
     static propTypes = {
@@ -42,10 +41,6 @@ export default class CUD extends Component {
             const entry = data[idx];
 
             if (entry.key === this.props.entity.id) {
-                if (entry.children.length > 0) {
-                    this.hasChildren = true;
-                }
-
                 data.splice(idx, 1);
                 return true;
             }
@@ -158,25 +153,10 @@ export default class CUD extends Component {
         }
     }
 
-    async onDeleteError(error) {
-        if (error instanceof interoperableErrors.ChildDetectedError) {
-            this.disableForm();
-            this.setFormStatusMessage('danger',
-                <span>
-                    <strong>{t('The namespace cannot be deleted.')}</strong>{' '}
-                    {t('There has been a child namespace found. This is most likely because someone else has changed the parent of some namespace in the meantime. Refresh your page to start anew with fresh data.')}
-                </span>
-            );
-            return;
-        }
-
-        throw error;
-    }
-
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
-        const canDelete = isEdit && !this.isEditGlobal() && !this.hasChildren && this.props.entity.permissions.includes('delete');
+        const canDelete = isEdit && !this.isEditGlobal() && this.props.entity.permissions.includes('delete');
 
         return (
             <div>
@@ -188,8 +168,7 @@ export default class CUD extends Component {
                         backUrl={`/namespaces/${this.props.entity.id}/edit`}
                         successUrl="/namespaces"
                         deletingMsg={t('Deleting namespace ...')}
-                        deletedMsg={t('Namespace deleted')}
-                        onErrorAsync={::this.onDeleteError}/>
+                        deletedMsg={t('Namespace deleted')} />
                 }
 
                 <Title>{isEdit ? t('Edit Namespace') : t('Create Namespace')}</Title>

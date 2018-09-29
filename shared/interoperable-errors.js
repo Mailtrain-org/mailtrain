@@ -33,12 +33,6 @@ class LoopDetectedError extends InteroperableError {
     }
 }
 
-class ChildDetectedError extends InteroperableError {
-    constructor(msg, data) {
-        super('ChildDetectedError', msg, data);
-    }
-}
-
 class DuplicitNameError extends InteroperableError {
     constructor(msg, data) {
         super('DuplicitNameError', msg, data);
@@ -106,8 +100,6 @@ class InvalidConfirmationForUnsubscriptionError extends InteroperableError {
     }
 }
 
-const defaultNoOfDependenciesReported = 20;
-
 class DependencyPresentError extends InteroperableError {
     constructor(msg, data) {
         super('DependencyPresentError', msg, data);
@@ -127,7 +119,6 @@ const errorTypes = {
     ChangedError,
     NotFoundError,
     LoopDetectedError,
-    ChildDetectedError,
     DuplicitNameError,
     DuplicitEmailError,
     DuplicitKeyError,
@@ -156,6 +147,5 @@ function deserialize(errorObj) {
 }
 
 module.exports = Object.assign({}, errorTypes, {
-    defaultNoOfDependenciesReported,
     deserialize
 });

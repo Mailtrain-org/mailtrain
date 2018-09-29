@@ -10,7 +10,9 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const fields = require('./fields');
 const segments = require('./segments');
+const imports = require('./imports');
 const entitySettings = require('../lib/entity-settings');
+const dependencyHelpers = require('../lib/dependency-helpers');
 
 const UnsubscriptionMode = require('../shared/lists').UnsubscriptionMode;
 
@@ -176,20 +178,20 @@ async function remove(context, id) {
 
         await fields.removeAllByListIdTx(tx, context, id);
         await segments.removeAllByListIdTx(tx, context, id);
+        await imports.removeAllByListIdTx(tx, context, id);
+
+        await dependencyHelpers.ensureNoDependencies(tx, context, id, [
+            {
+                entityTypeId: 'campaign',
+                query: tx => tx('campaign_lists')
+                    .where('campaign_lists.list', id)
+                    .innerJoin('campaigns', 'campaign_lists.campaign', 'campaigns.id')
+                    .select(['campaigns.id', 'campaigns.name'])
+            }
+        ]);
 
         await tx('lists').where('id', id).del();
         await knex.schema.dropTableIfExists('subscription__' + id);
-    });
-}
-
-async function removeFormFromAllTx(tx, context, formId) {
-    await knex.transaction(async tx => {
-        const entities = tx('lists').where('default_form', formId).select(['id']);
-
-        for (const entity of entities) {
-            await shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'edit');
-            await tx('lists').where('id', entity.id).update({default_form: null});
-        }
     });
 }
 
@@ -224,5 +226,4 @@ module.exports.getByCid = getByCid;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
-module.exports.removeFormFromAllTx = removeFormFromAllTx;
 module.exports.getMergeTags = getMergeTags;

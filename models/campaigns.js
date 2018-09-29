@@ -467,7 +467,12 @@ async function remove(context, id) {
             return new interoperableErrors.InvalidStateError;
         }
 
-        // FIXME - deal with deletion of dependent entities (files)
+        await files.removeAllTx(tx, context, 'campaign', 'file', id);
+        await files.removeAllTx(tx, context, 'campaign', 'attachment', id);
+
+        await tx('campaign_lists').where('campaign', id).del();
+        await tx('campaign_messages').where('campaign', id).del();
+        await tx('campaign_links').where('campaign', id).del();
 
         await triggers.removeAllByCampaignIdTx(tx, context, id);
 

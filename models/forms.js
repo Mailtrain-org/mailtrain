@@ -13,6 +13,7 @@ const path = require('path');
 const mjml = require('mjml');
 const _ = require('../lib/translate')._;
 const lists = require('./lists');
+const dependencyHelpers = require('../lib/dependency-helpers');
 
 const formAllowedKeys = new Set([
     'name',
@@ -173,7 +174,9 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'delete');
 
-        await lists.removeFormFromAllTx(tx, context, id);
+        await dependencyHelpers.ensureNoDependencies(tx, context, id, [
+            { entityTypeId: 'list', column: 'default_form' }
+        ]);
 
         await tx('custom_forms_data').where('form', id).del();
         await tx('custom_forms').where('id', id).del();

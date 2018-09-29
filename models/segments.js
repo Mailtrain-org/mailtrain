@@ -9,6 +9,7 @@ const hasher = require('node-object-hash')();
 const moment = require('moment');
 const fields = require('./fields');
 const subscriptions = require('./subscriptions');
+const dependencyHelpers = require('../lib/dependency-helpers');
 
 const { parseDate, parseBirthday, DateFormat } = require('../shared/date');
 
@@ -331,7 +332,15 @@ async function updateWithConsistencyCheck(context, listId, entity) {
 async function removeTx(tx, context, listId, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSegments');
 
-    // FIXME - check dependencies: campaigns
+    await dependencyHelpers.ensureNoDependencies(tx, context, id, [
+        {
+            entityTypeId: 'campaign',
+            query: tx => tx('campaign_lists')
+                .where('campaign_lists.segment', id)
+                .innerJoin('campaigns', 'campaign_lists.campaign', 'campaigns.id')
+                .select(['campaigns.id', 'campaigns.name'])
+        }
+    ]);
 
     // The listId "where" is here to prevent deleting segment of a list for which a user does not have permission
     await tx('segments').where({list: listId, id}).del();

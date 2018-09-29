@@ -105,8 +105,15 @@ export class DeleteModalDialog extends Component {
         const t = props.t;
 
         this.entityTypeLabels = {
+            'namespace': t('Namespace'),
+            'list': t('List'),
+            'customForm': t('Custom forms'),
             'campaign': t('Campaign'),
-            'template': t('Template')
+            'template': t('Template'),
+            'sendConfiguration': t('Send configuration'),
+            'report': t('Report'),
+            'reportTemplate': t('Report template'),
+            'mosaicoTemplate': t('Mosaico template')
         };
     }
 
@@ -141,8 +148,12 @@ export class DeleteModalDialog extends Component {
                     <p>{t('Cannote delete "{{name}}" due to the following dependencies:', {name, nsSeparator: '|'})}</p>
                     <ul className={styles.dependenciesList}>
                     {err.data.dependencies.map(dep =>
-                        <li key={dep.link}><Link to={dep.link}>{this.entityTypeLabels[dep.entityTypeId]}: {dep.name}</Link></li>
+                        dep.link ?
+                            <li key={dep.link}><Link to={dep.link}>{this.entityTypeLabels[dep.entityTypeId]}: {dep.name}</Link></li>
+                        : // if no dep.link is present, it means the user has no permission to view the entity, thus only id without the link is shown
+                            <li key={dep.id}>{this.entityTypeLabels[dep.entityTypeId]}: [{dep.id}]</li>
                     )}
+                    {err.data.andMore && <li>{t('... and more')}</li>}
                     </ul>
                 </div>
             );

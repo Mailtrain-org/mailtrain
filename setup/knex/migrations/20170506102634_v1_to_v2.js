@@ -4,13 +4,14 @@ const contextHelpers = require('../../../lib/context-helpers');
 const mosaicoTemplates = require('../../../shared/mosaico-templates');
 const {getGlobalNamespaceId} = require('../../../shared/namespaces');
 const {getAdminId} = require('../../../shared/users');
-const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
-const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
 const { MailerType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../shared/send-configurations');
 const { enforce } = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../shared/triggers');
 const { SubscriptionSource } = require('../../../shared/lists');
 const crypto = require('crypto');
+
+const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
+const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
 
 const entityTypesWithFiles = {
     campaign: {
@@ -895,9 +896,9 @@ async function migrateCampaigns(knex) {
 
     await knex.schema.createTable('campaign_lists', table => {
         table.increments('id').primary();
-        table.integer('campaign').unsigned().notNullable().references('campaigns.id').onDelete('CASCADE');
-        table.integer('list').unsigned().notNullable().references('lists.id').onDelete('CASCADE');
-        table.integer('segment').unsigned().references('segments.id').onDelete('CASCADE');
+        table.integer('campaign').unsigned().notNullable().references('campaigns.id');
+        table.integer('list').unsigned().notNullable().references('lists.id');
+        table.integer('segment').unsigned().references('segments.id');
     });
 
     await knex.schema.createTable('template_dep_campaigns', table => {

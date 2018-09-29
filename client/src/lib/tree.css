@@ -26,7 +26,8 @@
 
 .mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-title,
 .mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-expander,
-.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title {
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container>tbody>tr.fancytree-active>td {
     outline: 0px none;
     color: #333333;
 }

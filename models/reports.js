@@ -8,6 +8,8 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const fields = require('./fields');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
+const reportHelpers = require('../lib/report-helpers');
+const fs = require('fs-extra-promise');
 
 const ReportState = require('../shared/reports').ReportState;
 
@@ -114,9 +116,12 @@ async function updateWithConsistencyCheck(context, entity) {
 async function removeTx(tx, context, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'delete');
 
-    await tx('reports').where('id', id).del();
+    const report = tx('reports').where('id', id).first();
 
-    // FIXME: Remove generated files
+    await fs.removeAsync(reportHelpers.getReportContentFile(report));
+    await fs.removeAsync(reportHelpers.getReportOutputFile(report));
+
+    await tx('reports').where('id', id).del();
 }
 
 async function remove(context, id) {
@@ -124,14 +129,6 @@ async function remove(context, id) {
         await removeTx(tx, context, id);
     });
 }
-
-async function removeAllByReportTemplateIdTx(tx, context, templateId) {
-    const entities = await tx('reports').where('report_template', templateId).select(['id']);
-    for (const entity of entities) {
-        await removeTx(tx, context, entity.id);
-    }
-}
-
 
 async function updateFields(id, fields) {
     return await knex('reports').where('id', id).update(fields);
@@ -203,7 +200,6 @@ module.exports.listDTAjax = listDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
-module.exports.removeAllByReportTemplateIdTx = removeAllByReportTemplateIdTx;
 module.exports.updateFields = updateFields;
 module.exports.listByState = listByState;
 module.exports.bulkChangeState = bulkChangeState;

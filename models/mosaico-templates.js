@@ -7,6 +7,8 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
+const files = require('./files');
+const dependencyHelpers = require('../lib/dependency-helpers');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'data', 'namespace']);
 
@@ -84,21 +86,33 @@ async function updateWithConsistencyCheck(context, entity) {
 async function remove(context, id) {
     await knex.transaction(async tx => {
         const deps = [];
-        const tmpls = await tx('templates').where('type', 'mosaico').select(['id', 'name', 'data']);
-        for (const row of tmpls) {
-            const data = JSON.parse(row.data);
-            if (data.mosaicoTemplate === id) {
-                deps.push({ entityTypeId: 'template', name: row.name, link: `templates/${row.id}` });
-            }
-        }
-
-        if (deps.length > 0) {
-            throw new interoperableErrors.DependencyPresentError('', {
-                dependencies: deps
-            });
-        }
 
         await shares.enforceEntityPermissionTx(tx, context, 'mosaicoTemplate', id, 'delete');
+
+        await dependencyHelpers.ensureNoDependencies(tx, context, id, [
+            {
+                entityTypeId: 'template',
+                rows: async (tx, limit) => {
+                    const result = [];
+
+                    const tmpls = await tx('templates').where('type', 'mosaico').select(['id', 'name', 'data']);
+                    for (const tmpl of tmpls) {
+                        const data = JSON.parse(tmpl.data);
+                        if (data.mosaicoTemplate === id) {
+                            result.push(tmpl);
+                        }
+
+                        limit -= 1;
+                        if (limit <= 0) break;
+                    }
+
+                    return result;
+                }
+            }
+        ]);
+
+        await files.removeAllTx(tx, context, 'mosaicoTemplate', 'file', id);
+        await files.removeAllTx(tx, context, 'mosaicoTemplate', 'block', id);
 
         await tx('mosaico_templates').where('id', id).del();
     });

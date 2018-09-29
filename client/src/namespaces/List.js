@@ -13,6 +13,7 @@ import {
     tableDeleteDialogInit,
     tableDeleteDialogRender
 } from "../lib/modals";
+import {getGlobalNamespaceId} from "../../../shared/namespaces";
 
 @translate()
 @withErrorHandling
@@ -50,7 +51,6 @@ export default class List extends Component {
 
         const actions = node => {
             const actions = [];
-            console.log(node);
 
             if (node.data.permissions.includes('edit')) {
                 actions.push({
@@ -66,7 +66,9 @@ export default class List extends Component {
                 });
             }
 
-            tableDeleteDialogAddDeleteButton(actions, this, node.data.permissions, node.key, node.key);
+            if (Number.parseInt(node.key) !== getGlobalNamespaceId()) {
+                tableDeleteDialogAddDeleteButton(actions, this, node.data.permissions, node.key, node.data.unsanitizedTitle);
+            }
 
             return actions;
         };
