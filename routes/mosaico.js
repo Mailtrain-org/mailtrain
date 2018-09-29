@@ -23,7 +23,7 @@ const mosaicoTemplates = require('../models/mosaico-templates');
 const contextHelpers = require('../lib/context-helpers');
 const interoperableErrors = require('../shared/interoperable-errors');
 
-const { getTrustedUrl, getSandboxUrl } = require('../lib/urls');
+const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 const { base } = require('../shared/templates');
 const { AppType } = require('../shared/app');
 
@@ -134,7 +134,7 @@ function getRouter(appType) {
             const tmpl = await mosaicoTemplates.getById(req.context, castToInteger(req.params.mosaicoTemplateId));
 
             res.set('Content-Type', 'text/html');
-            res.send(base(tmpl.data.html, getTrustedUrl(), getSandboxUrl('', req.context)));
+            res.send(base(tmpl.data.html, getTrustedUrl(), getSandboxUrl('', req.context), getPublicUrl()));
         });
 
         // Mosaico looks for block thumbnails in edres folder relative to index.html of the template. We respond to such requests here.
@@ -153,7 +153,7 @@ function getRouter(appType) {
         });
 
         // This is a fallback to versafix-1 if the block thumbnail is not defined by the template
-        router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', 'client', 'public', 'mosaico', 'templates', 'versafix-1', 'edres')));
+        router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
 
 
         fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file');
@@ -185,7 +185,7 @@ function getRouter(appType) {
             if (config.language && config.language !== 'en') {
                 const lang = config.language.split('_')[0];
                 try {
-                    const file = path.join(__dirname, '..', 'client', 'public', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
+                    const file = path.join(__dirname, '..', 'client', 'static', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
                     languageStrings = await fsReadFile(file, 'utf8');
                 } catch (err) {
                 }
@@ -205,7 +205,8 @@ function getRouter(appType) {
             });
         });
 
-    } else {
+    } else if (appType === AppType.TRUSTED || appType === AppType.PUBLIC) { // Mosaico editor loads the images from TRUSTED endpoint. This is hard to change because the index.html has to come from TRUSTED.
+                                                                            // So we serve /mosaico/img under both endpoints. There is no harm in it.
         router.getAsync('/img', async (req, res) => {
             const method = req.query.method;
             const params = req.query.params;
@@ -214,6 +215,7 @@ function getRouter(appType) {
 
 
             // FIXME - cache the generated files !!!
+
             if (method === 'placeholder') {
                 width = sanitizeSize(width, 1, 2048, 600, false);
                 height = sanitizeSize(height, 1, 2048, 300, false);
@@ -228,7 +230,7 @@ function getRouter(appType) {
 
                 const mosaicoLegacyUrlPrefix = getTrustedUrl(`mosaico/uploads/`);
                 if (url.startsWith(mosaicoLegacyUrlPrefix)) {
-                    filePath = path.join(__dirname, '..', 'client', 'public' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
+                    filePath = path.join(__dirname, '..', 'client', 'static' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
                 } else {
                     const file = await files.getFileByUrl(contextHelpers.getAdminContext(), url);
                     filePath = file.path;

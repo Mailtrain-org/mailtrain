@@ -1,14 +1,14 @@
 ### Front page
 - Some dashboard
 
-### Deletion
-- Check/delete dependencies
-
 ### Templates
 - Add MJML template editor
 - Include GrapeJS with MJML support
 - CKEditor to sandbox
 - Add Files support to CKEditor
+
+### Message delivery
+- Better integration with ZoneMTA to allow multiple send configurations (with different DKIM) against one ZoneMTA instance via different HTTP configuration of ZoneMTA. This may need an extension of ZoneMTA to provide some header entry that identifies the campaign.
 
 ### Campaigns
 - Statistics for a sent campaign

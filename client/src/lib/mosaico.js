@@ -8,6 +8,7 @@ import styles from "./mosaico.scss";
 import {UntrustedContentHost, parentRPC} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {
+    getPublicUrl,
     getSandboxUrl,
     getTrustedUrl
 } from "./urls";
@@ -105,12 +106,13 @@ export class MosaicoSandbox extends Component {
     }
 
     async exportState(method, params) {
-        const sandboxUrlBase = getSandboxUrl();
         const trustedUrlBase = getTrustedUrl();
+        const sandboxUrlBase = getSandboxUrl();
+        const publicUrlBase = getPublicUrl();
         return {
-            html: unbase(this.viewModel.exportHTML(), trustedUrlBase, sandboxUrlBase, true),
-            model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase),
-            metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase)
+            html: unbase(this.viewModel.exportHTML(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
+            model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase, publicUrlBase),
+            metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase, publicUrlBase)
         };
     }
 
@@ -155,10 +157,11 @@ export class MosaicoSandbox extends Component {
             strings: window.mosaicoLanguageStrings
         };
 
-        const sandboxUrlBase = getSandboxUrl();
         const trustedUrlBase = getTrustedUrl();
-        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, trustedUrlBase, sandboxUrlBase));
-        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, trustedUrlBase, sandboxUrlBase));
+        const sandboxUrlBase = getSandboxUrl();
+        const publicUrlBase = getPublicUrl();
+        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, trustedUrlBase, sandboxUrlBase, publicUrlBase));
+        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, trustedUrlBase, sandboxUrlBase, publicUrlBase));
         const template = this.props.templateId ? getSandboxUrl(`mosaico/templates/${this.props.templateId}/index.html`) : this.props.templatePath;
 
         const allPlugins = plugins.concat(window.mosaicoPlugins);

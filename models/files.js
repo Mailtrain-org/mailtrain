@@ -8,7 +8,7 @@ const fs = require('fs-extra-promise');
 const path = require('path');
 const interoperableErrors = require('../shared/interoperable-errors');
 const entitySettings = require('../lib/entity-settings');
-const {getTrustedUrl} = require('../lib/urls');
+const {getPublicUrl} = require('../lib/urls');
 
 const crypto = require('crypto');
 const bluebird = require('bluebird');
@@ -29,7 +29,7 @@ function getFilePath(type, subType, entityId, filename) {
 }
 
 function getFileUrl(context, type, subType, entityId, filename) {
-    return getTrustedUrl(`files/${type}/${subType}/${entityId}/${filename}`, context)
+    return getPublicUrl(`files/${type}/${subType}/${entityId}/${filename}`, context)
 }
 
 function getFilesTable(type, subType) {
@@ -109,7 +109,7 @@ async function getFileByFilename(context, type, subType, entityId, name) {
 }
 
 async function getFileByUrl(context, url) {
-    const urlPrefix = getTrustedUrl('files/', context);
+    const urlPrefix = getPublicUrl('files/', context);
     if (url.startsWith(urlPrefix)) {
         const path = url.substring(urlPrefix.length);
         const pathElem = path.split('/');

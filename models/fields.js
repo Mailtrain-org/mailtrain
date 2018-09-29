@@ -14,6 +14,8 @@ const { formatDate, formatBirthday, parseDate, parseBirthday } = require('../sha
 const { getFieldColumn } = require('../shared/lists');
 const { cleanupFromPost } = require('../lib/helpers');
 const Handlebars = require('handlebars');
+const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
+const { getMergeTagsForBases } = require('../shared/templates');
 
 
 const allowedKeysCreate = new Set(['name', 'key', 'default_value', 'type', 'group', 'settings']);
@@ -228,7 +230,7 @@ fieldTypes['date'] = {
     getHbsType: field => 'typeDate' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
     forHbs: (field, value) => formatDate(field.settings.dateFormat, value),
     parsePostValue: (field, value) => parseDate(field.settings.dateFormat, value),
-    render: (field, value) => value !== null && value.trim() !== '' ? formatDate(field.settings.dateFormat, value) : ''
+    render: (field, value) => value !== null ? formatDate(field.settings.dateFormat, value) : ''
 };
 
 fieldTypes['birthday'] = {
@@ -243,7 +245,7 @@ fieldTypes['birthday'] = {
     getHbsType: field => 'typeBirthday' + field.settings.dateFormat.charAt(0).toUpperCase() + field.settings.dateFormat.slice(1),
     forHbs: (field, value) => formatBirthday(field.settings.dateFormat, value),
     parsePostValue: (field, value) => parseBirthday(field.settings.dateFormat, value),
-    render: (field, value) => value !== null && value.trim() !== '' ? formatBirthday(field.settings.dateFormat, value) : ''
+    render: (field, value) => value !== null ? formatBirthday(field.settings.dateFormat, value) : ''
 };
 
 const groupedTypes = Object.keys(fieldTypes).filter(key => fieldTypes[key].grouped);
@@ -694,7 +696,8 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
 
 function getMergeTags(fieldsGrouped, subscription) { // assumes grouped subscription
     const mergeTags = {
-        'EMAIL': subscription.email
+        'EMAIL': subscription.email,
+        ...getMergeTagsForBases(getTrustedUrl(), getSandboxUrl(), getPublicUrl())
     };
 
     for (const fld of fieldsGrouped) {

@@ -1,6 +1,6 @@
 'use strict';
 
-const anonymousRestrictedAccessToken = 'public';
+const anonymousRestrictedAccessToken = 'anonymous';
 
 module.exports = {
     anonymousRestrictedAccessToken

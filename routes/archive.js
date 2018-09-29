@@ -15,16 +15,14 @@ router.get('/:campaign/:list/:subscription', (req, res, next) => {
                 res.render('partials/tracking-scripts', {
                     layout: 'archive/layout-raw'
                 }, (err, scripts) => {
-                    console.log(scripts);
-                    console.log(err);
                     if (err) {
                         return next(err);
                     }
-                    html = scripts ? html.replace(/<\/body\b/i, match => scripts + match) : html;
+                    const htmlWithScripts = scripts ? html.replace(/<\/body\b/i, match => scripts + match) : html;
 
                     res.render('archive/view', {
                         layout: 'archive/layout-raw',
-                        message: html
+                        message: htmlWithScripts
                     });
                 });
 

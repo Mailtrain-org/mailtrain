@@ -218,13 +218,12 @@ function createApp(appType) {
         useWith404Fallback('/subscription', subscription);
         useWith404Fallback('/links', links);
         useWith404Fallback('/archive', archive);
+        useWith404Fallback('/files', files);
     }
 
-    if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
-        // Regular endpoints
-        useWith404Fallback('/files', files);
-        useWith404Fallback('/mosaico', mosaico.getRouter(appType));
+    useWith404Fallback('/mosaico', mosaico.getRouter(appType));
 
+    if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
         if (config.reports && config.reports.enabled === true) {
             useWith404Fallback('/reports', reports);
         }
@@ -266,7 +265,7 @@ function createApp(appType) {
     app.use('/', index.getRouter(appType));
 
     // Error handlers
-    if (app.get('env') === 'development') {
+    if (app.get('env') === 'development' || app.get('env') === 'test') {
         // development error handler
         // will print stacktrace
         app.use((err, req, res, next) => {
