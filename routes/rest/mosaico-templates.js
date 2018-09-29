@@ -2,12 +2,12 @@
 
 const passport = require('../../lib/passport');
 const mosaicoTemplates = require('../../models/mosaico-templates');
-
 const router = require('../../lib/router-async').create();
+const {castToInteger} = require('../../lib/helpers');
 
 
 router.getAsync('/mosaico-templates/:mosaicoTemplateId', passport.loggedIn, async (req, res) => {
-    const mosaicoTemplate = await mosaicoTemplates.getById(req.context, req.params.mosaicoTemplateId);
+    const mosaicoTemplate = await mosaicoTemplates.getById(req.context, castToInteger(req.params.mosaicoTemplateId));
     mosaicoTemplate.hash = mosaicoTemplates.hash(mosaicoTemplate);
     return res.json(mosaicoTemplate);
 });
@@ -18,14 +18,14 @@ router.postAsync('/mosaico-templates', passport.loggedIn, passport.csrfProtectio
 
 router.putAsync('/mosaico-templates/:mosaicoTemplateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const mosaicoTemplate = req.body;
-    mosaicoTemplate.id = parseInt(req.params.mosaicoTemplateId);
+    mosaicoTemplate.id = castToInteger(req.params.mosaicoTemplateId);
 
     await mosaicoTemplates.updateWithConsistencyCheck(req.context, mosaicoTemplate);
     return res.json();
 });
 
 router.deleteAsync('/mosaico-templates/:mosaicoTemplateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await mosaicoTemplates.remove(req.context, req.params.mosaicoTemplateId);
+    await mosaicoTemplates.remove(req.context, castToInteger(req.params.mosaicoTemplateId));
     return res.json();
 });
 

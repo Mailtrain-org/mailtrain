@@ -8,6 +8,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
 const reports = require('./reports');
+const files = require('./files');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
 
@@ -96,7 +97,19 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'delete');
 
-        // FIXME - deal with deletion of dependent entities (files, etc.)
+        const depCampaigns = await tx('template_dep_campaigns')
+            .where('template_dep_campaigns.template', id)
+            .innerJoin('campaigns', 'template_dep_campaigns.campaign', 'campaigns.id')
+            .limit(interoperableErrors.defaultNoOfDependenciesReported)
+            .select(['campaigns.id', 'campaigns.name']);
+
+        if (depCampaigns.length > 0) {
+            throw new interoperableErrors.DependencyPresentError('', {
+                dependencies: depCampaigns.map(row => ({ entityTypeId: 'campaign', name: row.name, link: `campaigns/${row.id}` }))
+            });
+        }
+
+        await files.removeAllTx(tx, context, 'template', 'file', id);
 
         await tx('templates').where('id', id).del();
     });

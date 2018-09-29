@@ -305,6 +305,19 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
     }
 }
 
+async function removeAllTx(tx, context, type, subType, entityId) {
+    enforceTypePermitted(type, subType);
+    await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'manage'));
+
+    const rows = await tx(getFilesTable(type, subType)).where({entity: entityId});
+    for (const row of rows) {
+        const filePath = getFilePath(type, subType, entityId, row.filename);
+        await fs.removeAsync(filePath);
+    }
+
+    await tx(getFilesTable(type, subType)).where('entity', entityId).del();
+}
+
 
 module.exports.filesDir = filesDir;
 module.exports.listDTAjax = listDTAjax;
@@ -319,4 +332,5 @@ module.exports.removeFile = removeFile;
 module.exports.getFileUrl = getFileUrl;
 module.exports.getFilePath = getFilePath;
 module.exports.copyAllTx = copyAllTx;
+module.exports.removeAllTx = removeAllTx;
 module.exports.ReplacementBehavior = ReplacementBehavior;

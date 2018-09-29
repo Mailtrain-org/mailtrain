@@ -7,10 +7,11 @@ const users = require('../../models/users');
 const shares = require('../../models/shares');
 
 const router = require('../../lib/router-async').create();
+const {castToInteger} = require('../../lib/helpers');
 
 
 router.getAsync('/users/:userId', passport.loggedIn, async (req, res) => {
-    const user = await users.getById(req.context, req.params.userId);
+    const user = await users.getById(req.context, castToInteger(req.params.userId));
     user.hash = users.hash(user);
     return res.json(user);
 });
@@ -21,14 +22,14 @@ router.postAsync('/users', passport.loggedIn, passport.csrfProtection, async (re
 
 router.putAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const user = req.body;
-    user.id = parseInt(req.params.userId);
+    user.id = castToInteger(req.params.userId);
 
     await users.updateWithConsistencyCheck(req.context, user);
     return res.json();
 });
 
 router.deleteAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await users.remove(req.context, req.params.userId);
+    await users.remove(req.context, castToInteger(req.params.userId));
     return res.json();
 });
 

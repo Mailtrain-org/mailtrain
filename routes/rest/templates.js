@@ -4,10 +4,11 @@ const passport = require('../../lib/passport');
 const templates = require('../../models/templates');
 
 const router = require('../../lib/router-async').create();
+const {castToInteger} = require('../../lib/helpers');
 
 
 router.getAsync('/templates/:templateId', passport.loggedIn, async (req, res) => {
-    const template = await templates.getById(req.context, req.params.templateId);
+    const template = await templates.getById(req.context, castToInteger(req.params.templateId));
     template.hash = templates.hash(template);
     return res.json(template);
 });
@@ -18,14 +19,14 @@ router.postAsync('/templates', passport.loggedIn, passport.csrfProtection, async
 
 router.putAsync('/templates/:templateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const template = req.body;
-    template.id = parseInt(req.params.templateId);
+    template.id = castToInteger(req.params.templateId);
 
     await templates.updateWithConsistencyCheck(req.context, template);
     return res.json();
 });
 
 router.deleteAsync('/templates/:templateId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await templates.remove(req.context, req.params.templateId);
+    await templates.remove(req.context, castToInteger(req.params.templateId));
     return res.json();
 });
 

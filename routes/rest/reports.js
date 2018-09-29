@@ -9,10 +9,11 @@ const shares = require('../../models/shares');
 const contextHelpers = require('../../lib/context-helpers');
 
 const router = require('../../lib/router-async').create();
+const {castToInteger} = require('../../lib/helpers');
 
 
 router.getAsync('/reports/:reportId', passport.loggedIn, async (req, res) => {
-    const report = await reports.getByIdWithTemplate(req.context, req.params.reportId);
+    const report = await reports.getByIdWithTemplate(req.context, castToInteger(req.params.reportId));
     report.hash = reports.hash(report);
     return res.json(report);
 });
@@ -23,14 +24,14 @@ router.postAsync('/reports', passport.loggedIn, passport.csrfProtection, async (
 
 router.putAsync('/reports/:reportId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const report = req.body;
-    report.id = parseInt(req.params.reportId);
+    report.id = castToInteger(req.params.reportId);
 
     await reports.updateWithConsistencyCheck(req.context, report);
     return res.json();
 });
 
 router.deleteAsync('/reports/:reportId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await reports.remove(req.context, req.params.reportId);
+    await reports.remove(req.context, castToInteger(req.params.reportId));
     return res.json();
 });
 
@@ -39,36 +40,44 @@ router.postAsync('/reports-table', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'execute');
+    const id = castToInteger(req.params.id);
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
+    await shares.enforceEntityPermission(req.context, 'report', id, 'execute');
+
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
     await shares.enforceEntityPermission(req.context, 'reportTemplate', report.report_template, 'execute');
 
-    await reportProcessor.start(req.params.id);
+    await reportProcessor.start(id);
     res.json();
 });
 
 router.postAsync('/report-stop/:id', async (req, res) => {
-    await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'execute');
+    const id = castToInteger(req.params.id);
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
+    await shares.enforceEntityPermission(req.context, 'report', id, 'execute');
+
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
     await shares.enforceEntityPermission(req.context, 'reportTemplate', report.report_template, 'execute');
 
-    await reportProcessor.stop(req.params.id);
+    await reportProcessor.stop(id);
     res.json();
 });
 
 router.getAsync('/report-content/:id', async (req, res) => {
-    await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
+    const id = castToInteger(req.params.id);
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
+    await shares.enforceEntityPermission(req.context, 'report', id, 'viewContent');
+
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
     res.sendFile(reportHelpers.getReportContentFile(report));
 });
 
 router.getAsync('/report-output/:id', async (req, res) => {
-    await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewOutput');
+    const id = castToInteger(req.params.id);
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
+    await shares.enforceEntityPermission(req.context, 'report', id, 'viewOutput');
+
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
     res.sendFile(reportHelpers.getReportOutputFile(report));
 });
 

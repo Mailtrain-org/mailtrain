@@ -462,8 +462,8 @@ function requiresAuthenticatedUser(target) {
     const comp1 = withPageHelpers(target);
 
     function comp2(props, context) {
-        comp1.call(this, props, context);
         context.sectionContent.ensureAuthenticated();
+        comp1.call(this, props, context);
     }
 
     comp2.prototype = comp1.prototype;

@@ -378,6 +378,13 @@ async function _createTx(tx, context, entity, content) {
 
         await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: id, ...x})));
 
+        if (entity.source === CampaignSource.TEMPLATE) {
+            await tx('template_dep_campaigns').insert({
+               campaign: id,
+               template: entity.data.sourceTemplate
+            });
+        }
+
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
 
         if (copyFilesFrom) {
@@ -436,6 +443,12 @@ async function updateWithConsistencyCheck(context, entity, content) {
         if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM) {
             await tx('campaign_lists').where('campaign', entity.id).del();
             await tx('campaign_lists').insert(entity.lists.map(x => ({campaign: entity.id, ...x})));
+
+            if (existing.source === CampaignSource.TEMPLATE) {
+                await tx('template_dep_campaigns')
+                    .where('campaign', entity.id)
+                    .update('template', entity.data.sourceTemplate);
+            }
         }
 
         filteredEntity.data = JSON.stringify(filteredEntity.data);
@@ -457,6 +470,10 @@ async function remove(context, id) {
         // FIXME - deal with deletion of dependent entities (files)
 
         await triggers.removeAllByCampaignIdTx(tx, context, id);
+
+        await tx('template_dep_campaigns')
+            .where('campaign', entity.id)
+            .del();
 
         await tx('campaigns').where('id', id).del();
     });

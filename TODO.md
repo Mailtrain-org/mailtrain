@@ -2,7 +2,6 @@
 - Some dashboard
 
 ### Deletion
-- Delete button in Lists
 - Check/delete dependencies
 
 ### Templates
@@ -13,7 +12,7 @@
 
 ### Campaigns
 - Statistics for a sent campaign
-- List of sent RSS campaigns
+- List of sent RSS campaigns (?)
 
 ### Pull requests
 - Support ldaps://  - 5325f2ea7864ce5f42a9a6df3408af7ffbd32591

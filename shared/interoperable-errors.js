@@ -106,6 +106,8 @@ class InvalidConfirmationForUnsubscriptionError extends InteroperableError {
     }
 }
 
+const defaultNoOfDependenciesReported = 20;
+
 class DependencyPresentError extends InteroperableError {
     constructor(msg, data) {
         super('DependencyPresentError', msg, data);
@@ -154,5 +156,6 @@ function deserialize(errorObj) {
 }
 
 module.exports = Object.assign({}, errorTypes, {
+    defaultNoOfDependenciesReported,
     deserialize
 });

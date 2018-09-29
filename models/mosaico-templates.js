@@ -83,12 +83,19 @@ async function updateWithConsistencyCheck(context, entity) {
 
 async function remove(context, id) {
     await knex.transaction(async tx => {
-        const rows = await tx('templates').where('type', 'mosaico').select(['data']);
-        for (const row of rows) {
+        const deps = [];
+        const tmpls = await tx('templates').where('type', 'mosaico').select(['id', 'name', 'data']);
+        for (const row of tmpls) {
             const data = JSON.parse(row.data);
-            if (data.template === id) {
-                throw new interoperableErrors.DependencyPresentError();
+            if (data.mosaicoTemplate === id) {
+                deps.push({ entityTypeId: 'template', name: row.name, link: `templates/${row.id}` });
             }
+        }
+
+        if (deps.length > 0) {
+            throw new interoperableErrors.DependencyPresentError('', {
+                dependencies: deps
+            });
         }
 
         await shares.enforceEntityPermissionTx(tx, context, 'mosaicoTemplate', id, 'delete');

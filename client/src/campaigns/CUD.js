@@ -407,7 +407,7 @@ export default class CUD extends Component {
             } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
                 this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/content`, 'success', t('Campaign saved'));
             } else {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/edit`, 'success', t('Campaign saved'));
+                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/status`, 'success', t('Campaign saved'));
             }
         } else {
             this.enableForm();
@@ -661,7 +661,7 @@ export default class CUD extends Component {
         } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             saveButtonLabel = t('Save and edit content');
         } else {
-            saveButtonLabel = t('Save and edit campaign');
+            saveButtonLabel = t('Save campaign and go to status');
         }
 
 

@@ -11,6 +11,8 @@ import {
 import {getUrl} from "./urls";
 import {withPageHelpers} from "./page";
 import styles from './styles.scss';
+import interoperableErrors from '../../../shared/interoperable-errors';
+import {Link} from "react-router-dom";
 
 @translate()
 @withPageHelpers
@@ -22,13 +24,17 @@ export class RestActionModalDialog extends Component {
         visible: PropTypes.bool.isRequired,
         actionMethod: PropTypes.func.isRequired,
         actionUrl: PropTypes.string.isRequired,
+
         backUrl: PropTypes.string,
         successUrl: PropTypes.string,
+
         onBack: PropTypes.func,
-        onSuccess: PropTypes.func,
         onPerformingAction: PropTypes.func,
+        onSuccess: PropTypes.func,
+
         actionInProgressMsg:  PropTypes.string.isRequired,
         actionDoneMsg:  PropTypes.string.isRequired,
+
         onErrorAsync: PropTypes.func
     }
 
@@ -90,21 +96,71 @@ export class RestActionModalDialog extends Component {
     }
 }
 
+
 @translate()
+@withPageHelpers
 export class DeleteModalDialog extends Component {
+    constructor(props) {
+        super(props);
+        const t = props.t;
+
+        this.entityTypeLabels = {
+            'campaign': t('Campaign'),
+            'template': t('Template')
+        };
+    }
+
     static propTypes = {
-        stateOwner: PropTypes.object,
         visible: PropTypes.bool.isRequired,
+
+        stateOwner: PropTypes.object,
+        name: PropTypes.string,
         deleteUrl: PropTypes.string.isRequired,
+
         backUrl: PropTypes.string,
         successUrl: PropTypes.string,
-        name: PropTypes.string,
+
         onBack: PropTypes.func,
-        onSuccess: PropTypes.func,
         onPerformingAction: PropTypes.func,
+        onSuccess: PropTypes.func,
+        onFail: PropTypes.func,
+
         deletingMsg:  PropTypes.string.isRequired,
-        deletedMsg:  PropTypes.string.isRequired,
-        onErrorAsync: PropTypes.func
+        deletedMsg:  PropTypes.string.isRequired
+    }
+
+    async onErrorAsync(err) {
+        const t = this.props.t;
+
+        if (err instanceof interoperableErrors.DependencyPresentError) {
+            const owner = this.props.stateOwner;
+
+            const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
+            this.setFlashMessage('danger',
+                <div>
+                    <p>{t('Cannote delete "{{name}}" due to the following dependencies:', {name, nsSeparator: '|'})}</p>
+                    <ul className={styles.dependenciesList}>
+                    {err.data.dependencies.map(dep =>
+                        <li key={dep.link}><Link to={dep.link}>{this.entityTypeLabels[dep.entityTypeId]}: {dep.name}</Link></li>
+                    )}
+                    </ul>
+                </div>
+            );
+
+            window.scrollTo(0, 0); // This is to scroll up because the flash message appears on top and it's quite misleading if the delete fails and the message is not in the viewport
+
+            if (this.props.onFail) {
+                this.props.onFail();
+            }
+
+            if (owner) {
+                owner.enableForm();
+                owner.clearFormStatusMessage();
+            }
+
+        } else {
+            throw err;
+        }
     }
 
     render() {
@@ -122,11 +178,11 @@ export class DeleteModalDialog extends Component {
             backUrl={this.props.backUrl}
             successUrl={this.props.successUrl}
             onBack={this.props.onBack}
-            onSuccess={this.props.onSuccess}
             onPerformingAction={this.props.onPerformingAction}
+            onSuccess={this.props.onSuccess}
             actionInProgressMsg={this.props.deletingMsg}
             actionDoneMsg={this.props.deletedMsg}
-            onErrorAsync={this.props.onErrorAsync}
+            onErrorAsync={::this.onErrorAsync}
         />
     }
 }
@@ -174,6 +230,7 @@ export function tableDeleteDialogRender(owner, deleteUrlBase, deletingMsg, delet
             onBack={hide}
             onPerformingAction={() => owner.setState({ deleteDialogShown: false })}
             onSuccess={hide}
+            onFail={hide}
             deletingMsg={deletingMsg}
             deletedMsg={deletedMsg}
         />

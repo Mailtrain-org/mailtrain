@@ -27,6 +27,8 @@ const { getTrustedUrl, getSandboxUrl } = require('../lib/urls');
 const { base } = require('../shared/templates');
 const { AppType } = require('../shared/app');
 
+const {castToInteger} = require('../lib/helpers');
+
 
 users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entityId}) => {
     if (entityTypeId === 'template') {
@@ -129,7 +131,7 @@ function getRouter(appType) {
     
     if (appType === AppType.SANDBOXED) {
         router.getAsync('/templates/:mosaicoTemplateId/index.html', passport.loggedIn, async (req, res) => {
-            const tmpl = await mosaicoTemplates.getById(req.context, req.params.mosaicoTemplateId);
+            const tmpl = await mosaicoTemplates.getById(req.context, castToInteger(req.params.mosaicoTemplateId));
 
             res.set('Content-Type', 'text/html');
             res.send(base(tmpl.data.html, getTrustedUrl(), getSandboxUrl('', req.context)));
@@ -138,7 +140,7 @@ function getRouter(appType) {
         // Mosaico looks for block thumbnails in edres folder relative to index.html of the template. We respond to such requests here.
         router.getAsync('/templates/:mosaicoTemplateId/edres/:fileName', async (req, res, next) => {
             try {
-                const file = await files.getFileByOriginalName(contextHelpers.getAdminContext(), 'mosaicoTemplate', 'block', req.params.mosaicoTemplateId, req.params.fileName);
+                const file = await files.getFileByOriginalName(contextHelpers.getAdminContext(), 'mosaicoTemplate', 'block', castToInteger(req.params.mosaicoTemplateId), req.params.fileName);
                 res.type(file.mimetype);
                 return res.download(file.path, file.name);
             } catch (err) {
@@ -157,15 +159,17 @@ function getRouter(appType) {
         fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file');
 
         router.getAsync('/upload/:type/:entityId', passport.loggedIn, async (req, res) => {
-            const entries = await files.list(req.context, req.params.type, 'file', req.params.entityId);
+            const id = castToInteger(req.params.entityId);
+
+            const entries = await files.list(req.context, req.params.type, 'file', id);
 
             const filesOut = [];
             for (const entry of entries) {
                 filesOut.push({
                     name: entry.originalname,
-                    url: files.getFileUrl(req.context, req.params.type, 'file', req.params.entityId, entry.filename),
+                    url: files.getFileUrl(req.context, req.params.type, 'file', id, entry.filename),
                     size: entry.size,
-                    thumbnailUrl: files.getFileUrl(req.context, req.params.type, 'file', req.params.entityId, entry.filename) // TODO - use smaller thumbnails
+                    thumbnailUrl: files.getFileUrl(req.context, req.params.type, 'file', id, entry.filename) // TODO - use smaller thumbnails
                 })
             }
 

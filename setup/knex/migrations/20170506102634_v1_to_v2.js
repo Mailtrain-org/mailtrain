@@ -900,6 +900,11 @@ async function migrateCampaigns(knex) {
         table.integer('segment').unsigned().references('segments.id').onDelete('CASCADE');
     });
 
+    await knex.schema.createTable('template_dep_campaigns', table => {
+        table.integer('template').unsigned().notNullable().references('templates.id');
+        table.integer('campaign').unsigned().notNullable().references('campaigns.id').primary();
+    });
+
     await knex.schema.raw('CREATE TABLE `campaign_messages` (\n' +
         '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
         '  `campaign` int(10) unsigned NOT NULL,\n' +
