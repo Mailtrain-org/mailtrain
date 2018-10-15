@@ -254,11 +254,11 @@ msgstr "Abonnés ayant cliqué sur ce lien :"
 
 #: views/campaigns/clicked.hbs:13 views/campaigns/opened.hbs:7
 msgid "Stats by country"
-msgstr "Stats par pays"
+msgstr "Statistiques par pays"
 
 #: views/campaigns/clicked.hbs:14 views/campaigns/opened.hbs:8
 msgid "Stats by device type"
-msgstr "Statits par type d'équipement"
+msgstr "Statistiques par type d'équipement"
 
 #: views/campaigns/clicked.hbs:18
 msgid "First click time"
@@ -371,7 +371,7 @@ msgstr "Nom de l'émetteur du message"
 #: views/campaigns/edit-triggered.hbs:17 views/campaigns/edit.hbs:18
 #: views/settings.hbs:25
 msgid "This is the name your emails will come from"
-msgstr "Il s'agit du nom d'émetteur utilisés pour les messages de la liste"
+msgstr "Il s'agit du nom d'émetteur utilisé pour les messages de la liste"
 
 #: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:20
 #: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
@@ -450,7 +450,7 @@ msgid ""
 "This is the address people will send replies to unless reply-to address is "
 "set"
 msgstr ""
-"L'adresse à laquelle les utilisateurs enverront leurs réponses, sauf si "
+"L'adresse à laquelle les utilisateurs enverront leurs réponses, sauf si une "
 "autre adresse Reply-to a été précisée"
 
 #: views/campaigns/create.hbs:22 views/campaigns/edit.hbs:21
@@ -2869,7 +2869,7 @@ msgstr "Mettre à jour votre adresse mail"
 
 #: views/subscription/web-manage.mjml.hbs:1
 msgid "Update Your Preferences"
-msgstr "Mettre à jour vos préférence"
+msgstr "Mettre à jour vos préférences"
 
 #: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:1
 msgid "Online Unsubscription Is Not Possible"
