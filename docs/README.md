@@ -221,11 +221,11 @@ Mailtrain uses [node-config](https://github.com/lorenwest/node-config) for confi
 
 ### Running Behind Nginx Proxy
 
-Edit [mailtrain.nginx](setup/mailtrain-nginx.conf) (update `server_name` directive) and copy it to `/etc/nginx/sites-enabled`
+Edit [mailtrain.nginx](../setup/mailtrain-nginx.conf) (update `server_name` directive) and copy it to `/etc/nginx/sites-enabled`
 
 ### Running as an Upstart Service in Ubuntu 14.04
 
-Edit [mailtrain.conf](setup/mailtrain.conf) (update application folder) and copy it to `/etc/init`
+Edit [mailtrain.conf](../setup/mailtrain.conf) (update application folder) and copy it to `/etc/init`
 
 ## Subscription Widget
 
