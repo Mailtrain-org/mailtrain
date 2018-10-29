@@ -419,6 +419,7 @@ router.post('/field/:listId', (req, res) => {
 
         let field = {
             name: (input.NAME || '').toString().trim(),
+            description: (input.DESCRIPTION || '').toString().trim(),
             defaultValue: (input.DEFAULT || '').toString().trim() || null,
             type: (input.TYPE || '').toString().toLowerCase().trim(),
             group: Number(input.GROUP) || null,
