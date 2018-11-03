@@ -21,12 +21,12 @@ import mailtrainConfig from 'mailtrainConfig';
 import {
     getEditForm,
     getTemplateTypes,
-    getTypeForm
+    getTypeForm,
+    ResourceType
 } from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
-import {ResourceType} from "../lib/mosaico";
 
 
 @translate()

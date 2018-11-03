@@ -1,8 +1,8 @@
 'use strict';
 
 const config = require('config');
-const express = require('express');
 const path = require('path');
+const express = require('express');
 const routerFactory = require('../lib/router-async');
 const passport = require('../lib/passport');
 const clientHelpers = require('../lib/client-helpers');
@@ -201,7 +201,7 @@ function getRouter(appType) {
                     getSandboxUrl('mailtrain/common.js'),
                     getSandboxUrl('mailtrain/mosaico.js')
                 ],
-                mosaicoPublicPath: getSandboxUrl('static/mosaico')
+                publicPath: getSandboxUrl()
             });
         });
 

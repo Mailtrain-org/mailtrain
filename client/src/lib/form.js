@@ -17,7 +17,7 @@ import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 
-import CKEditorRaw from "react-ckeditor-component";
+import CKEditorRaw from './ckeditor';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
@@ -892,11 +892,11 @@ class CKEditor extends Component {
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <CKEditorRaw
-                events={{
-                    "change": evt => owner.updateFormValue(id, evt.editor.getData())
-                }}
-                content={owner.getFormValue(id)}
-                config={{width: '100%', height: props.height}}
+                onChange={(event, editor) => owner.updateFormValue(id, editor.getData())}
+                onInit={ editor => {
+                    editor.ui.view.editable.editableElement.style.height = props.height;
+                } }
+                data={owner.getFormValue(id)}
             />
         );
     }

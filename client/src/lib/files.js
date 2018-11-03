@@ -160,7 +160,7 @@ export default class Files extends Component {
 
                 {
                     this.props.entity.permissions.includes(this.props.managePermission) &&
-                    <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName="dropZoneActive">
+                    <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName={styles.dropZoneActive}>
                         {state => state.isDragActive ? t('Drop {{count}} file(s)', {count:state.draggedFiles.length}) : t('Drop files here')}
                     </Dropzone>
                 }

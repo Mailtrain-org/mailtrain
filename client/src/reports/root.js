@@ -76,7 +76,7 @@ function getMenus(t) {
                                 ':action(edit|delete)': {
                                     title: t('Edit'),
                                     link: params => `/reports/templates/${params.templateId}/edit`,
-                                    visible: resolved => mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess') && resolved.template.permissions.includes('edit'),
+                                    visible: resolved => mailtrainConfig.globalPermissions.createJavascriptWithROAccess && resolved.template.permissions.includes('edit'),
                                     panelRender: props => <ReportTemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
                                 },
                                 share: {

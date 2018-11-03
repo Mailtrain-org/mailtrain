@@ -12,10 +12,8 @@ import {
 import 'brace/mode/text';
 import 'brace/mode/html';
 
-import {
-    MosaicoEditor,
-    ResourceType
-} from "../lib/mosaico";
+import { MosaicoEditorHost } from "../lib/sandboxed-mosaico";
+import { CKEditorHost } from "../lib/sandboxed-ckeditor";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
 import {getSandboxUrl} from "../lib/urls";
@@ -28,6 +26,10 @@ import {Trans} from "react-i18next";
 
 import styles from "../lib/styles.scss";
 
+export const ResourceType = {
+    TEMPLATE: 'template',
+    CAMPAIGN: 'campaign'
+}
 
 export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEMPLATE) {
     // The prefix is used to to enable use within other forms (i.e. campaign form)
@@ -67,7 +69,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             <TableSelect id={prefix + 'mosaicoTemplate'} label={t('Mosaico template')} withHeader dropdown dataUrl='rest/mosaico-templates-table' columns={mosaicoTemplatesColumns} selectionLabelIndex={1} disabled={isEdit} />,
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
-                <MosaicoEditor
+                <MosaicoEditorHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
@@ -129,7 +131,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
-                <MosaicoEditor
+                <MosaicoEditorHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
@@ -172,7 +174,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
-    templateTypes.grapejs = { // TODO
+    templateTypes.grapejs = { // FIXME
         typeName: t('GrapeJS'),
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner => null,
@@ -186,10 +188,34 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
+    templateTypes.xckeditor = {
+        typeName: t('CKEditor'),
+        getTypeForm: (owner, isEdit) => null,
+        getHTMLEditor: owner =>
+            <AlignedRow label={t('Template content (HTML)')}>
+                <CKEditorHost
+                    ref={node => owner.editorNode = node}
+                    entity={owner.props.entity}
+                    initialHtml={owner.getFormValue(prefix + 'html')}
+                    entityTypeId={entityTypeId}/>
+            </AlignedRow>,
+        exportHTMLEditorData: async owner => {
+            const {html} = await owner.editorNode.exportState();
+            owner.updateFormValue(prefix + 'html', html);
+        },
+        initData: () => ({}),
+        afterLoad: data => {},
+        beforeSave: data => {
+            clearBeforeSave(data);
+        },
+        afterTypeChange: mutState => {},
+        validate: state => {}
+    };
+
     templateTypes.ckeditor = {
         typeName: t('CKEditor'),
         getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" label={t('Template content (HTML)')}/>,
+        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content (HTML)')}/>,
         exportHTMLEditorData: async owner => {},
         initData: () => ({}),
         afterLoad: data => {},
@@ -214,7 +240,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
-    templateTypes.mjml = { // TODO
+    templateTypes.mjml = { // FIXME
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner => null,
         exportHTMLEditorData: async owner => {},

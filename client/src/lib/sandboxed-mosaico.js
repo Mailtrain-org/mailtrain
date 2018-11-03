@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {translate} from 'react-i18next';
 import PropTypes from "prop-types";
-import styles from "./mosaico.scss";
+import styles from "./sandboxed-mosaico.scss";
 
 import {UntrustedContentHost, parentRPC} from './untrusted';
 import {Icon} from "./bootstrap-components";
@@ -18,13 +18,8 @@ import {
 } from "../../../shared/templates";
 
 
-export const ResourceType = {
-    TEMPLATE: 'template',
-    CAMPAIGN: 'campaign'
-}
-
 @translate(null, { withRef: true })
-export class MosaicoEditor extends Component {
+export class MosaicoEditorHost extends Component {
     constructor(props) {
         super(props);
 
@@ -59,13 +54,18 @@ export class MosaicoEditor extends Component {
     render() {
         const t = this.props.t;
 
-        const mosaicoData = {
+        const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
             templateId: this.props.templateId,
             templatePath: this.props.templatePath,
             initialModel: this.props.initialModel,
             initialMetadata: this.props.initialMetadata
+        };
+
+        const tokenData = {
+            entityTypeId: this.props.entityTypeId,
+            entityId: this.props.entity.id
         };
 
         return (
@@ -75,13 +75,13 @@ export class MosaicoEditor extends Component {
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
                 </div>
-                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={mosaicoData} contentSrc="mosaico/editor" tokenMethod="mosaico" tokenParams={mosaicoData}/>
+                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="mosaico/editor" tokenMethod="mosaico" tokenParams={tokenData}/>
             </div>
         );
     }
 }
 
-MosaicoEditor.prototype.exportState = async function() {
+MosaicoEditorHost.prototype.exportState = async function() {
     return await this.getWrappedInstance().exportState();
 };
 

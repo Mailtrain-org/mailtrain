@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {I18nextProvider,} from 'react-i18next';
 import i18n from './i18n';
-import {MosaicoSandbox} from './mosaico';
+import {MosaicoSandbox} from './sandboxed-mosaico';
 import {UntrustedContentRoot, parentRPC} from './untrusted';
 
 export default function() {

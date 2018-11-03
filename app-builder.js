@@ -22,7 +22,8 @@ const api = require('./routes/api');
 // These are routes for the new React-based client
 const reports = require('./routes/reports');
 const subscription = require('./routes/subscription');
-const mosaico = require('./routes/mosaico');
+const sandboxedMosaico = require('./routes/sandboxed-mosaico');
+const sandboxedCKEditor = require('./routes/sandboxed-ckeditor');
 const files = require('./routes/files');
 const links = require('./routes/links');
 const archive = require('./routes/archive');
@@ -221,7 +222,8 @@ function createApp(appType) {
         useWith404Fallback('/files', files);
     }
 
-    useWith404Fallback('/mosaico', mosaico.getRouter(appType));
+    useWith404Fallback('/mosaico', sandboxedMosaico.getRouter(appType));
+    useWith404Fallback('/ckeditor', sandboxedCKEditor.getRouter(appType));
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
         if (config.reports && config.reports.enabled === true) {

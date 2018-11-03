@@ -38,7 +38,7 @@ export default class List extends Component {
         });
 
         this.setState({
-            createPermitted: result.data.createReportTemplate && mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess')
+            createPermitted: result.data.createReportTemplate && mailtrainConfig.globalPermissions.createJavascriptWithROAccess
         });
     }
 
@@ -60,7 +60,7 @@ export default class List extends Component {
                     const actions = [];
                     const perms = data[5];
 
-                    if (mailtrainConfig.globalPermissions.includes('createJavascriptWithROAccess') && perms.includes('edit')) {
+                    if (mailtrainConfig.globalPermissions.createJavascriptWithROAccess && perms.includes('edit')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/reports/templates/${data[0]}/edit`

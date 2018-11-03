@@ -10,6 +10,9 @@
 ### Message delivery
 - Better integration with ZoneMTA to allow multiple send configurations (with different DKIM) against one ZoneMTA instance via different HTTP configuration of ZoneMTA. This may need an extension of ZoneMTA to provide some header entry that identifies the campaign.
 
+### Lists
+- CSV Export
+
 ### Campaigns
 - Statistics for a sent campaign
 - List of sent RSS campaigns (?)

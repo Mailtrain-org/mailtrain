@@ -1,0 +1,10 @@
+.editor {
+  .host {
+  }
+}
+
+.sandbox {
+  :global .ck-editor__editable {
+    height: 500px;
+  }
+}

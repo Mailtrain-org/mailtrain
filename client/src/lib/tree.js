@@ -16,7 +16,6 @@ import { withPageHelpers } from './page'
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 import styles from "./styles.scss";
 import {getUrl} from "./urls";
-import {Table} from "./table";
 
 const TreeSelectMode = {
     NONE: 0,

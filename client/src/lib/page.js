@@ -345,7 +345,7 @@ class SectionContent extends Component {
     async closeFlashMessage() {
         this.setState({
             flashMessageText: ''
-        })
+        });
     }
 
     renderRoute(route) {
@@ -462,8 +462,12 @@ function requiresAuthenticatedUser(target) {
     const comp1 = withPageHelpers(target);
 
     function comp2(props, context) {
+        if (!new.target) {
+            throw new TypeError();
+        }
+
         context.sectionContent.ensureAuthenticated();
-        comp1.call(this, props, context);
+        return Reflect.construct(comp1, [props, context], new.target);
     }
 
     comp2.prototype = comp1.prototype;

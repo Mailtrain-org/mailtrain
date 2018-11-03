@@ -40,7 +40,7 @@ export class RestActionModalDialog extends Component {
 
     async hideModal(isBack) {
         if (this.props.backUrl) {
-            this.props.stateOwner.navigateTo(this.props.backUrl);
+            this.navigateTo(this.props.backUrl);
         } else {
             if (isBack) {
                 this.props.onBack();
@@ -68,7 +68,7 @@ export class RestActionModalDialog extends Component {
             await axios.method(props.actionMethod, getUrl(props.actionUrl));
 
             if (props.successUrl) {
-                owner.navigateToWithFlashMessage(props.successUrl, 'success', props.actionDoneMsg);
+                this.navigateToWithFlashMessage(props.successUrl, 'success', props.actionDoneMsg);
             } else {
                 props.onSuccess();
                 this.setFlashMessage('success', props.actionDoneMsg);

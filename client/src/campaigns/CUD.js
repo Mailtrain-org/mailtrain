@@ -36,7 +36,8 @@ import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {
     getTemplateTypes,
-    getTypeForm
+    getTypeForm,
+    ResourceType
 } from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
@@ -50,7 +51,6 @@ import {
 } from "../../../shared/campaigns";
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
-import {ResourceType} from "../lib/mosaico";
 import {getCampaignLabels} from "./helpers";
 
 @translate()

@@ -66,7 +66,7 @@ export default class List extends Component {
                         refreshTimeout = 1000;
                     }
 
-                    if (mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.list.permissions.includes('manageImports')) {
+                    if (mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('Edit')}/>,
                             link: `/lists/${this.props.list.id}/imports/${data[0]}/edit`
@@ -90,7 +90,7 @@ export default class List extends Component {
         return (
             <div>
                 {tableDeleteDialogRender(this, `rest/imports/${this.props.list.id}`, t('Deleting import ...'), t('Import deleted'))}
-                {mailtrainConfig.globalPermissions.includes('setupAutomation') && this.props.list.permissions.includes('manageImports') &&
+                {mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('Create Import')}/>
                     </Toolbar>

@@ -4,27 +4,27 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=1024, initial-scale=1">
 
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="{{publicPath}}favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="{{publicPath}}favicon.ico" type="image/x-icon" />
 
     <title>Mailtrain</title>
 
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery-migrate.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/knockout.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery-ui.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.ui.touch-punch.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/load-image.all.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/canvas-to-blob.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.iframe-transport.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload-process.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload-image.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/jquery.fileupload-validate.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/knockout-jqueryui.min.js"></script>
-    <script src="{{mosaicoPublicPath}}/vendor/tinymce.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery-migrate.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/knockout.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery-ui.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.ui.touch-punch.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/load-image.all.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/canvas-to-blob.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.iframe-transport.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.fileupload.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.fileupload-process.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.fileupload-image.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/jquery.fileupload-validate.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/knockout-jqueryui.min.js"></script>
+    <script src="{{publicPath}}static/mosaico/vendor/tinymce.min.js"></script>
 
-    <script src="{{mosaicoPublicPath}}/mosaico.min.js?v=0.16"></script>
+    <script src="{{publicPath}}static/mosaico/mosaico.min.js?v=0.16"></script>
 
     {{#if languageStrings}}<script> window.mosaicoLanguageStrings = {{{languageStrings}}}; </script>{{/if}}
     <script> window.mosaicoPlugins = []; </script>
@@ -45,13 +45,11 @@
         <script src="{{this}}"></script>
     {{/each}}
 
-    <link rel="stylesheet" href="{{mosaicoPublicPath}}/mosaico-material.min.css?v=0.10" />
-    <link rel="stylesheet" href="{{mosaicoPublicPath}}/vendor/notoregular/stylesheet.css" />
+    <link rel="stylesheet" href="{{publicPath}}static/mosaico/mosaico-material.min.css?v=0.10" />
+    <link rel="stylesheet" href="{{publicPath}}static/mosaico/vendor/notoregular/stylesheet.css" />
 </head>
 <body class="mo-standalone">
 {{{body}}}
-
-{{> tracking_scripts}}
 </body>
 </html>
 
