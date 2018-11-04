@@ -17,7 +17,7 @@ import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 
-import CKEditorRaw from './ckeditor';
+import CKEditorRaw from './ckeditor5';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';

@@ -3,7 +3,7 @@
 
 ### Templates
 - Add MJML template editor
-- Include GrapeJS with MJML support
+- Include Grapesjs with MJML support
 - CKEditor to sandbox
 - Add Files support to CKEditor
 

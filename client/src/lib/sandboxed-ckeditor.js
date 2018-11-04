@@ -16,24 +16,64 @@ import {
     base,
     unbase
 } from "../../../shared/templates";
-import CKEditor from './ckeditor';
+import CKEditor from "react-ckeditor-component";
+
+const initialHeight = 600;
+const navbarHeight = 34; // Sync this with navbarheight in sandboxed-ckeditor.scss
 
 @translate(null, { withRef: true })
 export class CKEditorHost extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {}
+        this.state = {
+            fullscreen: false
+        }
+
+        this.onWindowResizeHandler = ::this.onWindowResize;
     }
 
     static propTypes = {
         entityTypeId: PropTypes.string,
         entity: PropTypes.object,
-        initialHtml: PropTypes.string
+        initialHtml: PropTypes.string,
+        title: PropTypes.string,
+        onFullscreenAsync: PropTypes.func
+    }
+
+    async toggleFullscreenAsync() {
+        const fullscreen = !this.state.fullscreen;
+        this.setState({
+            fullscreen
+        });
+        await this.props.onFullscreenAsync(fullscreen);
+
+        let newHeight;
+        if (fullscreen) {
+            newHeight = window.innerHeight - navbarHeight;
+        } else {
+            newHeight = initialHeight;
+        }
+        await this.contentNode.ask('setHeight', newHeight);
     }
 
     async exportState() {
         return await this.contentNode.ask('exportState');
+    }
+
+    onWindowResize() {
+        if (this.state.fullscreen) {
+            const newHeight = window.innerHeight - navbarHeight;
+            this.contentNode.ask('setHeight', newHeight);
+        }
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.onWindowResizeHandler, false);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.onWindowResizeHandler, false);
     }
 
     render() {
@@ -51,7 +91,12 @@ export class CKEditorHost extends Component {
         };
 
         return (
-            <div className={styles.editor}>
+            <div className={this.state.fullscreen ? styles.editorFullscreen : styles.editor}>
+                <div className={styles.navbar}>
+                    {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
+                    <div className={styles.title}>{this.props.title}</div>
+                    <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
+                </div>
                 <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="ckeditor/editor" tokenMethod="ckeditor" tokenParams={editorData}/>
             </div>
         );
@@ -93,16 +138,30 @@ export class CKEditorSandbox extends Component {
         };
     }
 
+    async setHeight(methods, params) {
+        this.node.editorInstance.resize('100%', params);
+    }
+
     componentDidMount() {
         parentRPC.setMethodHandler('exportState', ::this.exportState);
+        parentRPC.setMethodHandler('setHeight', ::this.setHeight);
     }
 
     render() {
+        const config = {
+            removeButtons: 'Underline,Subscript,Superscript,Maximize',
+            resize_enabled: false,
+            height: initialHeight
+        };
+
         return (
             <div className={styles.sandbox}>
-                <CKEditor
-                    onChange={(event, editor) => this.setState({html: editor.getData()})}
-                    data={this.state.html}
+                <CKEditor ref={node => this.node = node}
+                    content={this.state.html}
+                    events={{
+                        change: evt => this.setState({html: evt.editor.getData()}),
+                    }}
+                    config={config}
                 />
             </div>
         );

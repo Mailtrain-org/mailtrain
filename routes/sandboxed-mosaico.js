@@ -199,7 +199,7 @@ function getRouter(appType) {
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
                     getSandboxUrl('mailtrain/common.js'),
-                    getSandboxUrl('mailtrain/mosaico.js')
+                    getSandboxUrl('mailtrain/mosaico-root.js')
                 ],
                 publicPath: getSandboxUrl()
             });

@@ -5,7 +5,7 @@ The migration should happen almost automatically. There are however the followin
 1. Structure of config files (under `config`) has changed at many places. Revisit the default config (`config/default.toml`)
    and update your configs accordingly.
 
-2. Images uploaded in a template editor (Mosaico, GrapeJS, etc.) need to be manually moved to a new destination (under `client`).
+2. Images uploaded in a template editor (Mosaico, Grapesjs, etc.) need to be manually moved to a new destination (under `client`).
    For Mosaico, this means to move folders named by a number from `public/mosaico` to `client/static/mosaico`.
 
 3. Directory for custom Mosaico templates has changed from `public/mosaico/templates` to `client/static/mosaico/templates`.

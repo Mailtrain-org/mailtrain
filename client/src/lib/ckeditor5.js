@@ -17,7 +17,7 @@ import ImagePlugin from '@ckeditor/ckeditor5-image/src/image';
 import ImageCaptionPlugin from '@ckeditor/ckeditor5-image/src/imagecaption';
 import ImageStylePlugin from '@ckeditor/ckeditor5-image/src/imagestyle';
 import ImageToolbarPlugin from '@ckeditor/ckeditor5-image/src/imagetoolbar';
-import ImageUploadPlugin from '@ckeditor/ckeditor5-image/src/imageupload';
+//import ImageUploadPlugin from '@ckeditor/ckeditor5-image/src/imageupload';
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
 import ListPlugin from '@ckeditor/ckeditor5-list/src/list';
 import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
@@ -75,6 +75,8 @@ class InsertImage extends Plugin {
     }
 }
 
+/*
+Upload through CKEditor is disable because files can be managed by Files tab
 
 class UploadAdapter {
     constructor(loader, url, t) {
@@ -105,6 +107,7 @@ class MailtrainUploadAdapter extends Plugin {
         this.editor.plugins.get(FileRepository).createUploadAdapter = loader => new UploadAdapter(loader, this.editor.t);
     }
 }
+ */
 
 
 
@@ -123,14 +126,14 @@ ClassicEditor.builtinPlugins = [
     ImageCaptionPlugin,
     ImageStylePlugin,
     ImageToolbarPlugin,
-    ImageUploadPlugin,
+    //ImageUploadPlugin,
     LinkPlugin,
     ListPlugin,
     ParagraphPlugin,
     AlignmentPlugin,
     TablePlugin,
     TableToolbarPlugin,
-    MailtrainUploadAdapter,
+    //MailtrainUploadAdapter,
     InsertImage
 ];
 
@@ -152,7 +155,7 @@ ClassicEditor.defaultConfig = {
             'numberedList',
             '|',
             'insertImage',
-            'imageUpload',
+            // 'imageUpload',
             'blockQuote',
             '|',
             'insertTable',

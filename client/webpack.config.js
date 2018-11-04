@@ -13,9 +13,9 @@ module.exports = {
         } )
     ],
     entry: {
-        root: ['babel-polyfill', './src/root.js'],
-        mosaico: ['babel-polyfill', './src/lib/sandboxed-mosaico-root.js'],
-        ckeditor: ['babel-polyfill', './src/lib/sandboxed-ckeditor-root.js'],
+        "root": ['babel-polyfill', './src/root.js'],
+        "mosaico-root": ['babel-polyfill', './src/lib/sandboxed-mosaico-root.js'],
+        "ckeditor-root": ['babel-polyfill', './src/lib/sandboxed-ckeditor-root.js'],
     },
     output: {
         library: 'MailtrainReactBody',
@@ -46,8 +46,6 @@ module.exports = {
                         }
                     }
                 ]
-                // exclude: /(disposables|react-dnd-touch-backend|attr-accept)/ /* https://github.com/react-dnd/react-dnd/issues/407 */,
-                // use: [ 'babel-loader' ]
             },
             {
                 test: /\.css$/,
@@ -69,7 +67,7 @@ module.exports = {
                             },
                             minify: false
                         } )
-                    },
+                    }
                 ]
             },
             {
@@ -84,10 +82,7 @@ module.exports = {
                 ] 
             },
             {
-                // Or /ckeditor5-[^/]+\/theme\/icons\/[^/]+\.svg$/ if you want to limit this loader
-                // to CKEditor 5 icons only.
                 test: /\.svg$/,
-
                 use: [ 'raw-loader' ]
             },
             {
@@ -105,8 +100,8 @@ module.exports = {
                     'sass-loader' ]
             },
             {
-                test: /\.(woff|ttf|eot)$/,
-                use: [ 'url-loader' ]
+                test: /\.(otf|woff2|woff|ttf|eot)$/,
+                use: [ 'raw-loader' ]
             }
         ]
     },

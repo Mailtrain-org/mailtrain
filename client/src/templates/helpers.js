@@ -14,6 +14,7 @@ import 'brace/mode/html';
 
 import { MosaicoEditorHost } from "../lib/sandboxed-mosaico";
 import { CKEditorHost } from "../lib/sandboxed-ckeditor";
+import GrapesJS from "../lib/grapesjs";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
 import {getSandboxUrl} from "../lib/urls";
@@ -174,7 +175,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
-    templateTypes.grapejs = { // FIXME
+    templateTypes.xgrapesjs = { // FIXME
         typeName: t('GrapeJS'),
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner => null,
@@ -188,12 +189,12 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
-    templateTypes.xckeditor = {
-        typeName: t('CKEditor'),
+    templateTypes.grapesjs = {
+        typeName: t('GrapeJS (fake)'),
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
-                <CKEditorHost
+                <GrapesJS
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
                     initialHtml={owner.getFormValue(prefix + 'html')}
@@ -212,10 +213,37 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
-    templateTypes.ckeditor = {
-        typeName: t('CKEditor'),
+    templateTypes.ckeditor4 = {
+        typeName: t('CKEditor 4'),
         getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content (HTML)')}/>,
+        getHTMLEditor: owner =>
+            <AlignedRow label={t('Template content')}>
+                <CKEditorHost
+                    ref={node => owner.editorNode = node}
+                    entity={owner.props.entity}
+                    initialHtml={owner.getFormValue(prefix + 'html')}
+                    entityTypeId={entityTypeId}
+                    title={t('CKEditor 4 Template Designer')}
+                    onFullscreenAsync={::owner.setElementInFullscreen}
+                />
+            </AlignedRow>,
+        exportHTMLEditorData: async owner => {
+            const {html} = await owner.editorNode.exportState();
+            owner.updateFormValue(prefix + 'html', html);
+        },
+        initData: () => ({}),
+        afterLoad: data => {},
+        beforeSave: data => {
+            clearBeforeSave(data);
+        },
+        afterTypeChange: mutState => {},
+        validate: state => {}
+    };
+
+    templateTypes.ckeditor5 = {
+        typeName: t('CKEditor 5'),
+        getTypeForm: (owner, isEdit) => null,
+        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content')}/>,
         exportHTMLEditorData: async owner => {},
         initData: () => ({}),
         afterLoad: data => {},

@@ -974,11 +974,11 @@ msgstr "Vorlagen Editoren"
 
 #: views/index.hbs:21
 msgid ""
-"Mailtrain ships with GrapeJS and Mosaico built in, two advanced template "
+"Mailtrain ships with Grapesjs and Mosaico built in, two advanced template "
 "editors. Mailtrain also offers a code editor if you prefer to handcraft the "
 "HTML yourself."
 msgstr ""
-"Mailtrain beinhaltet GrapeJS und Mosaico, zwei Programme zum Bearbeiten der "
+"Mailtrain beinhaltet Grapesjs und Mosaico, zwei Programme zum Bearbeiten der "
 "E-Mail-Vorlagen. Natürlich bietet Mailtrain auch einen Code-Editor, sofern "
 "Sie den HTML Code selber erstellen möchten."
 
@@ -1913,8 +1913,8 @@ msgid "CLOSE"
 msgstr "SCHLIESSEN"
 
 #: views/partials/grapejs.hbs:2
-msgid "Open GrapeJS"
-msgstr "GrapeJS öffnen"
+msgid "Open Grapesjs"
+msgstr "Grapesjs öffnen"
 
 #: views/partials/html-preview.hbs:1
 msgid "Toggle HTML preview"
@@ -3699,7 +3699,7 @@ msgid "Attachment not found"
 msgstr "Anhangs-Datei nicht gefunden"
 
 #: routes/blacklist.js:13 routes/campaigns.js:26 routes/editorapi.js:35
-#: routes/fields.js:13 routes/forms.js:16 routes/grapejs.js:13
+#: routes/fields.js:13 routes/forms.js:16 routes/grapesjs.js:13
 #: routes/lists.js:50 routes/mosaico.js:14 routes/report-templates.js:20
 #: routes/reports.js:22 routes/segments.js:13 routes/settings.js:23
 #: routes/templates.js:18 routes/triggers.js:18 routes/users.js:75

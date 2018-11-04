@@ -16,10 +16,12 @@ title: mailtrain
 
 # Enabled HTML editors
 editors:
-- ckeditor
+- ckeditor4
+- ckeditor5
 - codeeditor
 - mosaico
 - mosaicoWithFsTemplate
+- grapesjs
 
 # Default language to use
 language: en
@@ -149,7 +151,7 @@ mosaico:
   # customscripts:
   # - /mosaico/custom/my-mosaico-plugin.js
 
-grapejs:
+grapesjs:
 # Installed templates
   templates:
     - key: demo

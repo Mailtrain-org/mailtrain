@@ -48,7 +48,7 @@ function getRouter(appType) {
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
                     getSandboxUrl('mailtrain/common.js'),
-                    getSandboxUrl('mailtrain/ckeditor.js')
+                    getSandboxUrl('mailtrain/ckeditor-root.js')
                 ],
                 publicPath: getSandboxUrl()
             });
