@@ -16,11 +16,11 @@ const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 const { AppType } = require('../shared/app');
 
 
-users.registerRestrictedAccessTokenMethod('ckeditor', async ({entityTypeId, entityId}) => {
+users.registerRestrictedAccessTokenMethod('grapesjs', async ({entityTypeId, entityId}) => {
     if (entityTypeId === 'template') {
         const tmpl = await templates.getById(contextHelpers.getAdminContext(), entityId, false);
 
-        if (tmpl.type === 'ckeditor') {
+        if (tmpl.type === 'grapesjs') {
             return {
                 permissions: {
                     'template': {
@@ -35,18 +35,18 @@ users.registerRestrictedAccessTokenMethod('ckeditor', async ({entityTypeId, enti
 
 function getRouter(appType) {
     const router = routerFactory.create();
-
+    
     if (appType === AppType.SANDBOXED) {
         router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
             const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
 
-            res.render('ckeditor/root', {
-                layout: 'ckeditor/layout',
+            res.render('grapesjs/root', {
+                layout: 'grapesjs/layout',
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
                     getSandboxUrl('mailtrain/common.js'),
-                    getSandboxUrl('mailtrain/ckeditor-root.js')
+                    getSandboxUrl('mailtrain/grapesjs-root.js')
                 ],
                 publicPath: getSandboxUrl()
             });

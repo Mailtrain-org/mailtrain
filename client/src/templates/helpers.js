@@ -12,9 +12,9 @@ import {
 import 'brace/mode/text';
 import 'brace/mode/html';
 
-import { MosaicoEditorHost } from "../lib/sandboxed-mosaico";
+import { MosaicoHost } from "../lib/sandboxed-mosaico";
 import { CKEditorHost } from "../lib/sandboxed-ckeditor";
-import GrapesJS from "../lib/grapesjs";
+import { GrapesJSHost } from "../lib/sandboxed-grapesjs";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
 import {getSandboxUrl} from "../lib/urls";
@@ -70,7 +70,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             <TableSelect id={prefix + 'mosaicoTemplate'} label={t('Mosaico template')} withHeader dropdown dataUrl='rest/mosaico-templates-table' columns={mosaicoTemplatesColumns} selectionLabelIndex={1} disabled={isEdit} />,
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
-                <MosaicoEditorHost
+                <MosaicoHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
@@ -132,7 +132,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
-                <MosaicoEditorHost
+                <MosaicoHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
@@ -175,38 +175,33 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
-    templateTypes.xgrapesjs = { // FIXME
-        typeName: t('GrapeJS'),
-        getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => null,
-        exportHTMLEditorData: async owner => {},
-        initData: () => ({}),
-        afterLoad: data => {},
-        beforeSave: data => {
-            clearBeforeSave(data);
-        },
-        afterTypeChange: mutState => {},
-        validate: state => {}
-    };
-
     templateTypes.grapesjs = {
-        typeName: t('GrapeJS (fake)'),
+        typeName: t('GrapeJS'),
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
-                <GrapesJS
+                <GrapesJSHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
-                    initialHtml={owner.getFormValue(prefix + 'html')}
-                    entityTypeId={entityTypeId}/>
+                    initialModel={owner.getFormValue(prefix + 'grapesJSData')}
+                    entityTypeId={entityTypeId}
+                    title={t('GrapesJS Template Designer')}
+                    onFullscreenAsync={::owner.setElementInFullscreen}
+                />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html} = await owner.editorNode.exportState();
+            const {html, model} = await owner.editorNode.exportState();
             owner.updateFormValue(prefix + 'html', html);
+            owner.updateFormValue(prefix + 'grapesJSData', model);
         },
-        initData: () => ({}),
-        afterLoad: data => {},
+        initData: () => ({
+            [prefix + 'grapesJSData']: {}
+        }),
+        afterLoad: data => {
+            data[prefix + 'grapesJSData'] = data[prefix + 'data'];
+        },
         beforeSave: data => {
+            data[prefix + 'data'] = data[prefix + 'grapesJSData'];
             clearBeforeSave(data);
         },
         afterTypeChange: mutState => {},
@@ -217,7 +212,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         typeName: t('CKEditor 4'),
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner =>
-            <AlignedRow label={t('Template content')}>
+            <AlignedRow label={t('Template content (HTML)')}>
                 <CKEditorHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
@@ -243,7 +238,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
     templateTypes.ckeditor5 = {
         typeName: t('CKEditor 5'),
         getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content')}/>,
+        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content (HTML)')}/>,
         exportHTMLEditorData: async owner => {},
         initData: () => ({}),
         afterLoad: data => {},

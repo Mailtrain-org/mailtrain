@@ -2,4 +2,4 @@
 
 import {getUrl} from "./urls";
 
-__webpack_public_path__ = getUrl();
+__webpack_public_path__ = getUrl('mailtrain/');

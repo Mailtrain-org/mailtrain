@@ -5,31 +5,26 @@ import {translate} from 'react-i18next';
 import PropTypes
     from "prop-types";
 import styles
-    from "./sandboxed-ckeditor.scss";
+    from "./sandboxed-grapesjs.scss";
 
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 
-import { initialHeight } from "./sandboxed-ckeditor-shared";
-const navbarHeight = 34; // Sync this with navbarheight in sandboxed-ckeditor.scss
-
 @translate(null, { withRef: true })
-export class CKEditorHost extends Component {
+export class GrapesJSHost extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             fullscreen: false
         }
-
-        this.onWindowResizeHandler = ::this.onWindowResize;
     }
 
     static propTypes = {
         entityTypeId: PropTypes.string,
         entity: PropTypes.object,
-        initialHtml: PropTypes.string,
+        initialModel: PropTypes.object,
         title: PropTypes.string,
         onFullscreenAsync: PropTypes.func
     }
@@ -40,33 +35,10 @@ export class CKEditorHost extends Component {
             fullscreen
         });
         await this.props.onFullscreenAsync(fullscreen);
-
-        let newHeight;
-        if (fullscreen) {
-            newHeight = window.innerHeight - navbarHeight;
-        } else {
-            newHeight = initialHeight;
-        }
-        await this.contentNode.ask('setHeight', newHeight);
     }
 
     async exportState() {
         return await this.contentNode.ask('exportState');
-    }
-
-    onWindowResize() {
-        if (this.state.fullscreen) {
-            const newHeight = window.innerHeight - navbarHeight;
-            this.contentNode.ask('setHeight', newHeight);
-        }
-    }
-
-    componentDidMount() {
-        window.addEventListener('resize', this.onWindowResizeHandler, false);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.onWindowResizeHandler, false);
     }
 
     render() {
@@ -75,7 +47,7 @@ export class CKEditorHost extends Component {
         const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
-            initialHtml: this.props.initialHtml
+            initialModel: this.props.initialModel
         };
 
         const tokenData = {
@@ -90,14 +62,12 @@ export class CKEditorHost extends Component {
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
                 </div>
-                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="ckeditor/editor" tokenMethod="ckeditor" tokenParams={editorData}/>
+                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="grapesjs/editor" tokenMethod="grapesjs" tokenParams={tokenData}/>
             </div>
         );
     }
 }
 
-CKEditorHost.prototype.exportState = async function() {
+GrapesJSHost.prototype.exportState = async function() {
     return await this.getWrappedInstance().exportState();
 };
-
-

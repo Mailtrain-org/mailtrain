@@ -16,6 +16,7 @@ module.exports = {
         "root": ['babel-polyfill', './src/root.js'],
         "mosaico-root": ['babel-polyfill', './src/lib/sandboxed-mosaico-root.js'],
         "ckeditor-root": ['babel-polyfill', './src/lib/sandboxed-ckeditor-root.js'],
+        "grapesjs-root": ['babel-polyfill', './src/lib/sandboxed-grapesjs-root.js'],
     },
     output: {
         library: 'MailtrainReactBody',
@@ -51,21 +52,23 @@ module.exports = {
                 test: /\.css$/,
                 use: [
                     {
-                        loader: 'style-loader',
-                        options: {
-                            singleton: true
-                        }
+                        loader: 'style-loader'
                     },
                     {
                         loader: 'css-loader'
-                    },
+                    }
+                ]
+            },
+            {
+                test: /ckeditor5-[^/]+\/theme\/[\w-/]+\.css$/,
+                use: [
                     {
                         loader: 'postcss-loader',
                         options: styles.getPostCssConfig( {
                             themeImporter: {
                                 themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
                             },
-                            minify: false
+                            minify: true
                         } )
                     }
                 ]
@@ -82,10 +85,6 @@ module.exports = {
                 ] 
             },
             {
-                test: /\.svg$/,
-                use: [ 'raw-loader' ]
-            },
-            {
                 test: /\.scss$/,
                 exclude: path.join(__dirname, 'node_modules'),
                 use: [
@@ -97,11 +96,21 @@ module.exports = {
                             localIdentName: '[path][name]__[local]--[hash:base64:5]'
                         }
                     },
-                    'sass-loader' ]
+                    'sass-loader'
+                ]
             },
             {
-                test: /\.(otf|woff2|woff|ttf|eot)$/,
-                use: [ 'raw-loader' ]
+                test: /ckeditor5-[^/]+\/theme\/icons\/[^/]+\.svg|ckeditor-insert-image\.svg$/,
+                use: [
+                    'raw-loader'
+                ]
+            },
+            {
+                test: /\.(svg|otf|woff2|woff|ttf|eot)$/,
+                exclude: /ckeditor5-[^/]+\/theme\/icons\/[^/]+\.svg|ckeditor-insert-image\.svg$/,
+                use: [
+                    'url-loader'
+                ]
             }
         ]
     },
@@ -116,6 +125,6 @@ module.exports = {
     ],
     watchOptions: {
         ignored: 'node_modules/',
-        poll: 1000
+        poll: 2000
     }
 };
