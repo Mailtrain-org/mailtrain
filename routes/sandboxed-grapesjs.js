@@ -24,7 +24,7 @@ users.registerRestrictedAccessTokenMethod('grapesjs', async ({entityTypeId, enti
             return {
                 permissions: {
                     'template': {
-                        [entityId]: new Set(['manageFiles', 'view'])
+                        [entityId]: new Set(['viewFiles', 'manageFiles', 'view'])
                     }
                 }
             };
@@ -51,6 +51,13 @@ function getRouter(appType) {
                 publicPath: getSandboxUrl()
             });
         });
+
+        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
+            return {
+                data: resp.files.map( f => ({type: 'image', src: f.url}) )
+            };
+        });
+
     }
 
     return router;

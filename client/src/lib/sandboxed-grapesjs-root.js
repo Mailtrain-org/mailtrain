@@ -27,8 +27,7 @@ import {
     base,
     unbase
 } from "../../../shared/templates";
-import mjml2html from "../../mjml/dist/mjml";
-console.log(mjml2html);
+import mjml2html from "mjml4-in-browser";
 
 import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
@@ -36,9 +35,12 @@ import "grapesjs-mjml";
 
 import "./sandboxed-grapesjs.scss";
 
+import axios from './axios';
+
 grapesjs.plugins.add('mailtrain', (editor, opts = {}) => {
     const panelManager = editor.Panels;
-    panelManager.removeButton('options','fullscreen')
+    panelManager.removeButton('options','fullscreen');
+    panelManager.removeButton('options','export-template');
 });
 
 
@@ -47,7 +49,10 @@ export class GrapesJSSandbox extends Component {
     constructor(props) {
         super(props);
 
+        this.initialized = false;
+
         this.state = {
+            assets: null
         };
     }
 
@@ -64,11 +69,9 @@ export class GrapesJSSandbox extends Component {
         // If exportState comes during text editing (via RichTextEditor), we need to cancel the editing, so that the
         // text being edited is stored in the model
         const sel = editor.getSelected();
-        if (sel) {
+        if (sel && sel.view && sel.disableEditing) {
             sel.view.disableEditing();
         }
-
-        editor.select(null);
 
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
@@ -82,13 +85,8 @@ export class GrapesJSSandbox extends Component {
         const preMjml = '<mjml><mj-head></mj-head><mj-body>';
         const postMjml = '</mj-body></mjml>';
         const mjml = preMjml + source + postMjml;
-        console.log(mjml);
 
         const mjmlRes = mjml2html(mjml);
-        console.log(mjmlRes);
-        console.log(mjmlRes.html);
-        console.log(mjmlRes.errors);
-        console.log(mjmlRes.errors[0]);
 
         return {
             html,
@@ -97,7 +95,27 @@ export class GrapesJSSandbox extends Component {
         };
     }
 
+    async fetchAssets() {
+        const props = this.props;
+        const resp = await axios.get(getSandboxUrl(`rest/files-list/${props.entityTypeId}/file/${props.entityId}`));
+        this.setState({
+            assets: resp.data.map( f => ({type: 'image', src: getPublicUrl(`files/${props.entityTypeId}/file/${props.entityId}/${f.filename}`)}) )
+        });
+    }
+
     componentDidMount() {
+        // noinspection JSIgnoredPromiseFromCall
+        this.fetchAssets();
+    }
+
+    componentDidUpdate() {
+        if (!this.initialized && this.state.assets !== null) {
+            this.initGrapesJs();
+            this.initialized = true;
+        }
+    }
+
+    initGrapesJs() {
         const props = this.props;
 
         parentRPC.setMethodHandler('exportState', ::this.exportState);
@@ -127,12 +145,13 @@ export class GrapesJSSandbox extends Component {
                 type: 'none'
             },
             assetManager: {
-                assets: [],
-                upload: '/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{editor.name}}',
+                assets: this.state.assets,
+                upload: getSandboxUrl(`grapesjs/upload/${this.props.entityTypeId}/${this.props.entityId}`),
                 uploadText: 'Drop images here or click to upload',
                 headers: {
                     'X-CSRF-TOKEN': '{{csrfToken}}',
                 },
+                autoAdd: true
             },
             styleManager: {
                 clearProperties: true,

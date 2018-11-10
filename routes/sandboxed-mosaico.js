@@ -38,7 +38,7 @@ users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entit
             return {
                 permissions: {
                     'template': {
-                        [entityId]: new Set(['manageFiles', 'view'])
+                        [entityId]: new Set(['viewFiles', 'manageFiles', 'view'])
                     },
                     'mosaicoTemplate': {
                         [tmpl.data.mosaicoTemplate]: new Set(['view'])
@@ -156,7 +156,11 @@ function getRouter(appType) {
         router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
 
 
-        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file');
+        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
+            return {
+                files: resp.files.map(f => ({name: f.name, url: f.url, size: f.size, thumbnailUrl: f.thumbnailUrl}))
+            };
+        });
 
         router.getAsync('/upload/:type/:entityId', passport.loggedIn, async (req, res) => {
             const id = castToInteger(req.params.entityId);
