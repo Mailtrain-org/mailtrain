@@ -20,12 +20,15 @@ import PropTypes
 import {
     getPublicUrl,
     getSandboxUrl,
-    getTrustedUrl
+    getTrustedUrl,
+    getUrl
 } from "./urls";
 import {
     base,
     unbase
 } from "../../../shared/templates";
+import mjml2html from "../../mjml/dist/mjml";
+console.log(mjml2html);
 
 import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
@@ -51,56 +54,72 @@ export class GrapesJSSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
-        initialModel: PropTypes.object
+        initialSource: PropTypes.string,
+        initialStyle: PropTypes.string
     }
 
     async exportState(method, params) {
         const editor = this.editor;
 
+        // If exportState comes during text editing (via RichTextEditor), we need to cancel the editing, so that the
+        // text being edited is stored in the model
+        const sel = editor.getSelected();
+        if (sel) {
+            sel.view.disableEditing();
+        }
+
+        editor.select(null);
+
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
 
+        const source = unbase(editor.getHtml(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+        const style = unbase(editor.getCss(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+
         let html;
-        html = unbase(editor.getHtml(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
 
-        const model = {
-            css: editor.getCss(),
-            source: editor.getHtml(),
-        };
+        const preMjml = '<mjml><mj-head></mj-head><mj-body>';
+        const postMjml = '</mj-body></mjml>';
+        const mjml = preMjml + source + postMjml;
+        console.log(mjml);
 
-        console.log(model.css);
-        console.log(model.source);
+        const mjmlRes = mjml2html(mjml);
+        console.log(mjmlRes);
+        console.log(mjmlRes.html);
+        console.log(mjmlRes.errors);
+        console.log(mjmlRes.errors[0]);
 
         return {
             html,
-            model
+            style: style,
+            source: source
         };
     }
 
     componentDidMount() {
+        const props = this.props;
+
         parentRPC.setMethodHandler('exportState', ::this.exportState);
 
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
 
-        const model = this.props.initialModel || {}
+        const source = props.initialSource ?
+            base(props.initialSource, trustedUrlBase, sandboxUrlBase, publicUrlBase) :
+            '      <mj-container>\n' +
+            '        <mj-section>\n' +
+            '          <mj-column>\n' +
+            '            <mj-text>My Company</mj-text>\n' +
+            '          </mj-column>\n' +
+            '        </mj-section>\n' +
+            '      </mj-container>';
 
-        const source = model.source && base(model.source, trustedUrlBase, sandboxUrlBase, publicUrlBase);
-        const css = model.css && base(model.css, trustedUrlBase, sandboxUrlBase, publicUrlBase);
-
-        /*
-        '  <mj-container>\n' +
-        '        <mj-section>\n' +
-        '          <mj-column>\n' +
-        '            <mj-text>My Company</mj-text>\n' +
-        '          </mj-column>\n' +
-        '        </mj-section>\n' +
-        '  <mj-container>',
-        */
+        const css = props.initialStyle && base(props.initialStyle, trustedUrlBase, sandboxUrlBase, publicUrlBase);
 
         this.editor = grapesjs.init({
+            noticeOnUnload: false,
             container: this.canvasNode,
             height: '100%',
             width: '100%',
@@ -126,10 +145,12 @@ export class GrapesJSSandbox extends Component {
                 'gjs-mjml'
             ],
             pluginsOpts: {
-                'gjs-mjml': {}
+                'gjs-mjml': {
+                    preMjml: '<mjml><mj-head></mj-head><mj-body>',
+                    postMjml: '</mj-body></mjml>'
+                }
             }
         });
-
     }
 
     render() {

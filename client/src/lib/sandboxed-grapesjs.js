@@ -24,7 +24,8 @@ export class GrapesJSHost extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entity: PropTypes.object,
-        initialModel: PropTypes.object,
+        initialSource: PropTypes.string,
+        initialStyle: PropTypes.string,
         title: PropTypes.string,
         onFullscreenAsync: PropTypes.func
     }
@@ -47,7 +48,8 @@ export class GrapesJSHost extends Component {
         const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
-            initialModel: this.props.initialModel
+            initialSource: this.props.initialSource,
+            initialStyle: this.props.initialStyle
         };
 
         const tokenData = {

@@ -1,0 +1,3 @@
+[submodule "client/mjml/mjml-git"]
+	path = client/mjml/mjml-git
+	url = git@github.com:mjmlio/mjml.git

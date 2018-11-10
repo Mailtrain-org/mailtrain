@@ -183,28 +183,40 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 <GrapesJSHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
-                    initialModel={owner.getFormValue(prefix + 'grapesJSData')}
                     entityTypeId={entityTypeId}
+                    initialSource={owner.getFormValue(prefix + 'grapesJSData').source}
+                    initialStyle={owner.getFormValue(prefix + 'grapesJSData').style}
                     title={t('GrapesJS Template Designer')}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html, model} = await owner.editorNode.exportState();
+            const {html, source, style} = await owner.editorNode.exportState();
             owner.updateFormValue(prefix + 'html', html);
-            owner.updateFormValue(prefix + 'grapesJSData', model);
+            owner.updateFormValue(prefix + 'grapesJSData', {
+                source,
+                style
+            });
         },
         initData: () => ({
             [prefix + 'grapesJSData']: {}
         }),
         afterLoad: data => {
-            data[prefix + 'grapesJSData'] = data[prefix + 'data'];
+            data[prefix + 'grapesJSData'] = {
+                source: data[prefix + 'data'].source,
+                style: data[prefix + 'data'].style
+            };
         },
         beforeSave: data => {
-            data[prefix + 'data'] = data[prefix + 'grapesJSData'];
+            data[prefix + 'data'] = {
+                source: data[prefix + 'grapesJSData'].source,
+                style: data[prefix + 'grapesJSData'].style
+            };
             clearBeforeSave(data);
         },
-        afterTypeChange: mutState => {},
+        afterTypeChange: mutState => {
+            initFieldsIfMissing(mutState, 'grapesjs');
+        },
         validate: state => {}
     };
 

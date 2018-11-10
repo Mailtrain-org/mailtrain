@@ -67,7 +67,6 @@ class Breadcrumb extends Component {
 
 class SecondaryNavBar extends Component {
     static propTypes = {
-        route: PropTypes.object.isRequired,
         params: PropTypes.object.isRequired,
         resolved: PropTypes.object.isRequired,
         className: PropTypes.string
