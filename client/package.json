@@ -39,6 +39,7 @@
     "datatables.net-bs": "^1.10.15",
     "grapesjs": "^0.14.40",
     "grapesjs-mjml": "0.0.27",
+    "grapesjs-preset-newsletter": "^0.2.20",
     "i18next": "^8.4.3",
     "i18next-xhr-backend": "^1.4.2",
     "immutable": "^3.8.1",

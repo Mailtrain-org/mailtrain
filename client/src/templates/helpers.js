@@ -26,6 +26,7 @@ import {
 import {Trans} from "react-i18next";
 
 import styles from "../lib/styles.scss";
+import {GrapesJSSourceType} from "../lib/sandboxed-grapesjs-shared";
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -175,9 +176,26 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
+
+    const grapesJSSourceTypes = [
+        {key: GrapesJSSourceType.MJML, label: t('MJML')},
+        {key: GrapesJSSourceType.HTML, label: t('HTML')}
+    ];
+
+    const grapesJSSourceTypeLabels = {};
+    for ({key, label} of grapesJSSourceTypes) {
+        grapesJSSourceTypeLabels[key] = label;
+    }
+
     templateTypes.grapesjs = {
         typeName: t('GrapeJS'),
-        getTypeForm: (owner, isEdit) => null,
+        getTypeForm: (owner, isEdit) => {
+            if (isEdit) {
+                return <StaticField id={prefix + 'grapesJSSourceType'} className={styles.formDisabled} label={t('Type')}>{grapesJSSourceTypeLabels[(owner.getFormValue(prefix + 'grapesJSSourceType'))]}</StaticField>;
+            } else {
+                return <Dropdown id={prefix + 'grapesJSSourceType'} label={t('Type')} options={grapesJSSourceTypes}/>;
+            }
+        },
         getHTMLEditor: owner =>
             <AlignedRow label={t('Template content (HTML)')}>
                 <GrapesJSHost
@@ -186,6 +204,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     entityTypeId={entityTypeId}
                     initialSource={owner.getFormValue(prefix + 'grapesJSData').source}
                     initialStyle={owner.getFormValue(prefix + 'grapesJSData').style}
+                    sourceType={owner.getFormValue(prefix + 'grapesJSSourceType')}
                     title={t('GrapesJS Template Designer')}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
@@ -199,9 +218,11 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             });
         },
         initData: () => ({
+            [prefix + 'grapesJSSourceType']: GrapesJSSourceType.MJML,
             [prefix + 'grapesJSData']: {}
         }),
         afterLoad: data => {
+            data[prefix + 'grapesJSSourceType'] = data[prefix + 'data'].sourceType;
             data[prefix + 'grapesJSData'] = {
                 source: data[prefix + 'data'].source,
                 style: data[prefix + 'data'].style
@@ -209,6 +230,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         beforeSave: data => {
             data[prefix + 'data'] = {
+                sourceType: data[prefix + 'grapesJSSourceType'],
                 source: data[prefix + 'grapesJSData'].source,
                 style: data[prefix + 'grapesJSData'].style
             };

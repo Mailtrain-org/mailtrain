@@ -10,6 +10,7 @@ import styles
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
+import {GrapesJSSourceType} from "./sandboxed-grapesjs-shared";
 
 @translate(null, { withRef: true })
 export class GrapesJSHost extends Component {
@@ -26,6 +27,7 @@ export class GrapesJSHost extends Component {
         entity: PropTypes.object,
         initialSource: PropTypes.string,
         initialStyle: PropTypes.string,
+        sourceType: PropTypes.string,
         title: PropTypes.string,
         onFullscreenAsync: PropTypes.func
     }
@@ -49,7 +51,8 @@ export class GrapesJSHost extends Component {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
             initialSource: this.props.initialSource,
-            initialStyle: this.props.initialStyle
+            initialStyle: this.props.initialStyle,
+            sourceType: this.props.sourceType
         };
 
         const tokenData = {
