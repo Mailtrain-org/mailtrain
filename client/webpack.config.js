@@ -17,6 +17,7 @@ module.exports = {
         "mosaico-root": ['babel-polyfill', './src/lib/sandboxed-mosaico-root.js'],
         "ckeditor-root": ['babel-polyfill', './src/lib/sandboxed-ckeditor-root.js'],
         "grapesjs-root": ['babel-polyfill', './src/lib/sandboxed-grapesjs-root.js'],
+        "codeeditor-root": ['babel-polyfill', './src/lib/sandboxed-codeeditor-root.js'],
     },
     output: {
         library: 'MailtrainReactBody',

@@ -16,11 +16,11 @@ const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 const { AppType } = require('../shared/app');
 
 
-users.registerRestrictedAccessTokenMethod('ckeditor', async ({entityTypeId, entityId}) => {
+users.registerRestrictedAccessTokenMethod('codeeditor', async ({entityTypeId, entityId}) => {
     if (entityTypeId === 'template') {
         const tmpl = await templates.getById(contextHelpers.getAdminContext(), entityId, false);
 
-        if (tmpl.type === 'ckeditor4') {
+        if (tmpl.type === 'codeeditor') {
             return {
                 permissions: {
                     'template': {
@@ -46,7 +46,7 @@ function getRouter(appType) {
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
                     getSandboxUrl('mailtrain/common.js'),
-                    getSandboxUrl('mailtrain/ckeditor-root.js')
+                    getSandboxUrl('mailtrain/codeeditor-root.js')
                 ],
                 publicPath: getSandboxUrl()
             });

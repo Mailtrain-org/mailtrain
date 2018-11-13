@@ -5,19 +5,20 @@ import {translate} from 'react-i18next';
 import PropTypes
     from "prop-types";
 import styles
-    from "./sandboxed-grapesjs.scss";
+    from "./sandboxed-codeeditor.scss";
 
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 
 @translate(null, { withRef: true })
-export class GrapesJSHost extends Component {
+export class CodeEditorHost extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            fullscreen: false
+            fullscreen: false,
+            preview: true
         }
     }
 
@@ -25,7 +26,6 @@ export class GrapesJSHost extends Component {
         entityTypeId: PropTypes.string,
         entity: PropTypes.object,
         initialSource: PropTypes.string,
-        initialStyle: PropTypes.string,
         sourceType: PropTypes.string,
         title: PropTypes.string,
         onFullscreenAsync: PropTypes.func
@@ -39,6 +39,14 @@ export class GrapesJSHost extends Component {
         await this.props.onFullscreenAsync(fullscreen);
     }
 
+    async togglePreviewAsync() {
+        const preview = !this.state.preview;
+        this.setState({
+            preview
+        });
+
+        await this.contentNode.ask('setPreview', preview);
+    }
     async exportState() {
         return await this.contentNode.ask('exportState');
     }
@@ -50,8 +58,8 @@ export class GrapesJSHost extends Component {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
             initialSource: this.props.initialSource,
-            initialStyle: this.props.initialStyle,
-            sourceType: this.props.sourceType
+            sourceType: this.props.sourceType,
+            initialPreview: this.state.preview
         };
 
         const tokenData = {
@@ -65,13 +73,14 @@ export class GrapesJSHost extends Component {
                     {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
+                    <a className={styles.btn} onClick={::this.togglePreviewAsync}><Icon icon={this.state.preview ? 'eye-close': 'eye-open'}/></a>
                 </div>
-                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="grapesjs/editor" tokenMethod="grapesjs" tokenParams={tokenData}/>
+                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="codeeditor/editor" tokenMethod="codeeditor" tokenParams={tokenData}/>
             </div>
         );
     }
 }
 
-GrapesJSHost.prototype.exportState = async function() {
+CodeEditorHost.prototype.exportState = async function() {
     return await this.getWrappedInstance().exportState();
 };

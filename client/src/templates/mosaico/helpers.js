@@ -6,7 +6,7 @@ import 'brace/mode/html'
 import 'brace/mode/xml'
 
 export function getTemplateTypesOrder() {
-    return ['mjml', 'html'];
+    return [/* 'mjml' , */ 'html'];
 }
 
 export function getTemplateTypes(t) {

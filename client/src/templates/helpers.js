@@ -4,6 +4,7 @@ import React from "react";
 import {
     ACEEditor,
     AlignedRow,
+    CheckBox,
     CKEditor,
     Dropdown,
     StaticField,
@@ -15,6 +16,17 @@ import 'brace/mode/html';
 import { MosaicoHost } from "../lib/sandboxed-mosaico";
 import { CKEditorHost } from "../lib/sandboxed-ckeditor";
 import { GrapesJSHost } from "../lib/sandboxed-grapesjs";
+import { CodeEditorHost } from "../lib/sandboxed-codeeditor";
+
+import {
+    getGrapesJSSourceTypeOptions,
+    GrapesJSSourceType
+} from "../lib/sandboxed-grapesjs-shared";
+
+import {
+    getCodeEditorSourceTypeOptions,
+    CodeEditorSourceType
+} from "../lib/sandboxed-codeeditor-shared";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
 import {getSandboxUrl} from "../lib/urls";
@@ -26,7 +38,6 @@ import {
 import {Trans} from "react-i18next";
 
 import styles from "../lib/styles.scss";
-import {GrapesJSSourceType} from "../lib/sandboxed-grapesjs-shared";
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -177,21 +188,17 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
     };
 
 
-    const grapesJSSourceTypes = [
-        {key: GrapesJSSourceType.MJML, label: t('MJML')},
-        {key: GrapesJSSourceType.HTML, label: t('HTML')}
-    ];
-
+    const grapesJSSourceTypes = getGrapesJSSourceTypeOptions(t);
     const grapesJSSourceTypeLabels = {};
     for ({key, label} of grapesJSSourceTypes) {
         grapesJSSourceTypeLabels[key] = label;
     }
 
     templateTypes.grapesjs = {
-        typeName: t('GrapeJS'),
+        typeName: t('GrapesJS'),
         getTypeForm: (owner, isEdit) => {
             if (isEdit) {
-                return <StaticField id={prefix + 'grapesJSSourceType'} className={styles.formDisabled} label={t('Type')}>{grapesJSSourceTypeLabels[(owner.getFormValue(prefix + 'grapesJSSourceType'))]}</StaticField>;
+                return <StaticField id={prefix + 'grapesJSSourceType'} className={styles.formDisabled} label={t('Type')}>{grapesJSSourceTypeLabels[owner.getFormValue(prefix + 'grapesJSSourceType')]}</StaticField>;
             } else {
                 return <Dropdown id={prefix + 'grapesJSSourceType'} label={t('Type')} options={grapesJSSourceTypes}/>;
             }
@@ -283,30 +290,62 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         validate: state => {}
     };
 
+    const codeEditorSourceTypes = getCodeEditorSourceTypeOptions(t);
+    const codeEditorSourceTypeLabels = {};
+    for ({key, label} of codeEditorSourceTypes) {
+        codeEditorSourceTypeLabels[key] = label;
+    }
+
     templateTypes.codeeditor = {
         typeName: t('Code Editor'),
-        getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => <ACEEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content (HTML)')}/>,
-        exportHTMLEditorData: async owner => {},
-        initData: () => ({}),
-        afterLoad: data => {},
-        beforeSave: data => {
-            clearBeforeSave(data);
+        getTypeForm: (owner, isEdit) => {
+            const sourceType = owner.getFormValue(prefix + 'codeEditorSourceType');
+            if (isEdit) {
+                return <StaticField id={prefix + 'codeEditorSourceType'} className={styles.formDisabled} label={t('Type')}>{codeEditorSourceTypeLabels[sourceType]}</StaticField>;
+            } else {
+                return <Dropdown id={prefix + 'codeEditorSourceType'} label={t('Type')} options={codeEditorSourceTypes}/>;
+            }
         },
-        afterTypeChange: mutState => {},
-        validate: state => {}
-    };
+        getHTMLEditor: owner =>
+            <AlignedRow label={t('Template content (HTML)')}>
+                <CodeEditorHost
+                    ref={node => owner.editorNode = node}
+                    entity={owner.props.entity}
+                    entityTypeId={entityTypeId}
+                    initialSource={owner.getFormValue(prefix + 'codeEditorData').source}
+                    sourceType={owner.getFormValue(prefix + 'codeEditorSourceType')}
+                    title={t('Code Editor Template Designer')}
+                    onFullscreenAsync={::owner.setElementInFullscreen}
+                />
+            </AlignedRow>,
+        exportHTMLEditorData: async owner => {
+            const {html, source} = await owner.editorNode.exportState();
+            owner.updateFormValue(prefix + 'html', html);
+            owner.updateFormValue(prefix + 'codeEditorData', {
+                source
+            });
+        },
+        initData: () => ({
+            [prefix + 'codeEditorSourceType']: CodeEditorSourceType.HTML,
+            [prefix + 'codeEditorData']: {}
+        }),
+        afterLoad: data => {
+            data[prefix + 'codeEditorSourceType'] = data[prefix + 'data'].sourceType;
+            data[prefix + 'codeEditorData'] = {
+                source: data[prefix + 'data'].source
+            };
+        },
+        beforeSave: data => {
+            data[prefix + 'data'] = {
+                sourceType: data[prefix + 'codeEditorSourceType'],
+                source: data[prefix + 'codeEditorData'].source
+            };
 
-    templateTypes.mjml = { // FIXME
-        getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => null,
-        exportHTMLEditorData: async owner => {},
-        initData: () => ({}),
-        afterLoad: data => {},
-        beforeSave: data => {
             clearBeforeSave(data);
         },
-        afterTypeChange: mutState => {},
+        afterTypeChange: mutState => {
+            initFieldsIfMissing(mutState, 'codeeditor');
+        },
         validate: state => {}
     };
 

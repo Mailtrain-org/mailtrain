@@ -1,0 +1,22 @@
+# Process title visible in monitoring logs and process listing
+title: mailtrain
+
+# Default language to use
+language: en
+
+log:
+  # silly|verbose|info|http|warn|error|silent
+  level: verbose
+
+mysql:
+  host: localhost
+  user: mailtrain
+  password: mailtrain
+  database: mailtrain
+  # Some installations, eg. MAMP can use a different port (8889)
+  # MAMP users should also turn on Allow network access to MySQL otherwise MySQL might not be accessible
+  port: 3306
+  charset: utf8mb4
+  # The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
+  timezone: local
+

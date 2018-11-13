@@ -25,6 +25,7 @@ const subscription = require('./routes/subscription');
 const sandboxedMosaico = require('./routes/sandboxed-mosaico');
 const sandboxedCKEditor = require('./routes/sandboxed-ckeditor');
 const sandboxedGrapesJS = require('./routes/sandboxed-grapesjs');
+const sandboxedCodeEditor = require('./routes/sandboxed-codeeditor');
 const files = require('./routes/files');
 const links = require('./routes/links');
 const archive = require('./routes/archive');
@@ -226,6 +227,7 @@ function createApp(appType) {
     useWith404Fallback('/mosaico', sandboxedMosaico.getRouter(appType));
     useWith404Fallback('/ckeditor', sandboxedCKEditor.getRouter(appType));
     useWith404Fallback('/grapesjs', sandboxedGrapesJS.getRouter(appType));
+    useWith404Fallback('/codeeditor', sandboxedCodeEditor.getRouter(appType));
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
         if (config.reports && config.reports.enabled === true) {

@@ -16,12 +16,12 @@ title: mailtrain
 
 # Enabled HTML editors
 editors:
-- ckeditor4
-- ckeditor5
-- codeeditor
+- grapesjs
 - mosaico
 - mosaicoWithFsTemplate
-- grapesjs
+- ckeditor5
+- ckeditor4
+- codeeditor
 
 # Default language to use
 language: en

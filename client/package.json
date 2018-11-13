@@ -43,6 +43,7 @@
     "i18next": "^8.4.3",
     "i18next-xhr-backend": "^1.4.2",
     "immutable": "^3.8.1",
+    "juice": "^5.0.1",
     "mjml4-in-browser": "^1.0.1",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
