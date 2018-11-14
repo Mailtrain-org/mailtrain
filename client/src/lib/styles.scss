@@ -146,3 +146,15 @@
 .dependenciesList {
   margin-bottom: 0px;
 }
+
+
+:global .modal-dialog {
+  @media (min-width: 768px) {
+    width: 700px;
+  }
+
+  @media (min-width: 1000px) {
+    width: 900px;
+  }
+}
+

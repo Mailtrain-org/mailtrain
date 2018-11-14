@@ -29,8 +29,9 @@ export class CKEditorHost extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entity: PropTypes.object,
-        initialHtml: PropTypes.string,
+        initialSource: PropTypes.string,
         title: PropTypes.string,
+        onTestSend: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 
@@ -75,7 +76,7 @@ export class CKEditorHost extends Component {
         const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
-            initialHtml: this.props.initialHtml
+            initialSource: this.props.initialSource
         };
 
         const tokenData = {
@@ -89,6 +90,7 @@ export class CKEditorHost extends Component {
                     {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
+                    <a className={styles.btn} onClick={this.props.onTestSend}><Icon icon="send"/></a>
                 </div>
                 <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="ckeditor/editor" tokenMethod="ckeditor" tokenParams={editorData}/>
             </div>

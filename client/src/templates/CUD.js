@@ -35,6 +35,7 @@ import {
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
+import {TestSendModalDialog} from "./TestSendModalDialog";
 
 
 @translate()
@@ -50,7 +51,8 @@ export default class CUD extends Component {
 
         this.state = {
             showMergeTagReference: false,
-            elementInFullscreen: false
+            elementInFullscreen: false,
+            showTestSendModal: false
         };
 
         this.initForm({
@@ -58,6 +60,8 @@ export default class CUD extends Component {
                 type: ::this.onTypeChanged
             }
         });
+
+        this.sendModalGetDataHandler = ::this.sendModalGetData;
     }
 
     static propTypes = {
@@ -117,9 +121,10 @@ export default class CUD extends Component {
     async submitHandler() {
         const t = this.props.t;
 
+        let exportedData = {};
         if (this.props.entity) {
             const typeKey = this.getFormValue('type');
-            await this.templateTypes[typeKey].exportHTMLEditorData(this);
+            exportedData = await this.templateTypes[typeKey].exportHTMLEditorData(this);
         }
 
         let sendMethod, url;
@@ -135,6 +140,7 @@ export default class CUD extends Component {
         this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            Object.assign(data, exportedData);
             this.templateTypes[data.type].beforeSave(data);
         });
 
@@ -152,9 +158,9 @@ export default class CUD extends Component {
 
     async extractPlainText() {
         const typeKey = this.getFormValue('type');
-        await this.templateTypes[typeKey].exportHTMLEditorData(this);
+        const exportedData = await this.templateTypes[typeKey].exportHTMLEditorData(this);
 
-        const html = this.getFormValue('html');
+        const html = exportedData.html;
         if (!html) {
             return;
         }
@@ -184,6 +190,22 @@ export default class CUD extends Component {
         });
     }
 
+    showTestSendModal() {
+        this.setState({
+            showTestSendModal: true
+        });
+    }
+
+    async sendModalGetData() {
+        const typeKey = this.getFormValue('type');
+        const exportedData = await this.templateTypes[typeKey].exportHTMLEditorData(this);
+
+        return {
+            html: exportedData.html,
+            text: this.getFormValue('text')
+        };
+    }
+
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
@@ -193,8 +215,6 @@ export default class CUD extends Component {
         for (const key of mailtrainConfig.editors) {
             typeOptions.push({key, label: this.templateTypes[key].typeName});
         }
-
-        // TODO: Toggle HTML preview
 
         const typeKey = this.getFormValue('type');
 
@@ -211,6 +231,12 @@ export default class CUD extends Component {
 
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
+                {isEdit &&
+                    <TestSendModalDialog
+                        visible={this.state.showTestSendModal}
+                        onHide={() => this.setState({showTestSendModal: false})}
+                        getDataAsync={this.sendModalGetDataHandler}/>
+                }
                 {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
@@ -246,6 +272,7 @@ export default class CUD extends Component {
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={isEdit ? t('Save') : t('Save and edit template')}/>
                         {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/templates/${this.props.entity.id}/delete`}/> }
+                        {isEdit && <Button className="btn-danger" icon="send" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>
                 </Form>
             </div>

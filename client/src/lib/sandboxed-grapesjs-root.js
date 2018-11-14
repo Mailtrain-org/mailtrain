@@ -107,7 +107,11 @@ export class GrapesJSSandbox extends Component {
             const commandManager = editor.Commands;
 
             const cmdGetCode = commandManager.get('gjs-get-inlined-html');
-            html = cmdGetCode.run(editor);
+            const htmlBody = cmdGetCode.run(editor);
+
+            const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
+            const postHtml = '</body></html>';
+            html = preHtml + unbase(htmlBody, trustedUrlBase, sandboxUrlBase, publicUrlBase, true) + postHtml;
         }
 
 

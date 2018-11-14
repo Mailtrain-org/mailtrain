@@ -27,6 +27,7 @@ import {
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
+import {TestSendModalDialog} from "./TestSendModalDialog";
 
 
 @translate()
@@ -49,10 +50,13 @@ export default class CustomContent extends Component {
 
         this.state = {
             showMergeTagReference: false,
-            elementInFullscreen: false
+            elementInFullscreen: false,
+            showTestSendModal: false
         };
 
         this.initForm();
+
+        this.sendModalGetDataHandler = ::this.sendModalGetData;
     }
 
     static propTypes = {
@@ -84,7 +88,7 @@ export default class CustomContent extends Component {
         const t = this.props.t;
 
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
-        await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
+        const exportedData = await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
 
         const sendMethod = FormSendMethod.PUT;
         const url = `rest/campaigns-content/${this.props.entity.id}`;
@@ -93,6 +97,7 @@ export default class CustomContent extends Component {
         this.setFormStatusMessage('info', t('Saving ...'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            Object.assign(data, exportedData);
             this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
 
             data.data.sourceCustom = {
@@ -123,9 +128,10 @@ export default class CustomContent extends Component {
 
     async extractPlainText() {
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
-        await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
+        const exportedData = await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
 
-        const html = this.getFormValue('data_sourceCustom_html');
+        const html = exportedData.data_sourceCustom_html;
+
         if (!html) {
             return;
         }
@@ -155,6 +161,22 @@ export default class CustomContent extends Component {
         });
     }
 
+    showTestSendModal() {
+        this.setState({
+            showTestSendModal: true
+        });
+    }
+
+    async sendModalGetData() {
+        const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
+        const exportedData = await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
+
+        return {
+            html: exportedData.data_sourceCustom_html,
+            text: this.getFormValue('data_sourceCustom_text')
+        };
+    }
+
     render() {
         const t = this.props.t;
 
@@ -166,6 +188,13 @@ export default class CustomContent extends Component {
 
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
+                <TestSendModalDialog
+                    visible={this.state.showTestSendModal}
+                    onHide={() => this.setState({showTestSendModal: false})}
+                    getDataAsync={this.sendModalGetDataHandler}
+                    entity={this.props.entity}
+                />
+
                 <Title>{t('Edit Custom Content')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>

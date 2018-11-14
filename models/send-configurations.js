@@ -34,6 +34,18 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listWithSendPermissionDTAjax(context, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'sendConfiguration', requiredOperations: ['sendWithoutOverrides', 'sendWithAllowedOverrides', 'sendWithAnyOverrides'] }],
+        params,
+        builder => builder
+            .from('send_configurations')
+            .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace'),
+        ['send_configurations.id', 'send_configurations.name', 'send_configurations.cid', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
+    );
+}
+
 async function _getByTx(tx, context, key, id, withPermissions, withPrivateData) {
     let entity;
 
@@ -164,6 +176,7 @@ async function getSystemSendConfiguration() {
 module.exports.MailerType = MailerType;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listWithSendPermissionDTAjax = listWithSendPermissionDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.getByCid = getByCid;

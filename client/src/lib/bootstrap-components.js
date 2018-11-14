@@ -210,7 +210,8 @@ class ModalDialog extends Component {
         onCloseAsync: PropTypes.func,
         onButtonClickAsync: PropTypes.func,
         buttons: PropTypes.array,
-        hidden: PropTypes.bool
+        hidden: PropTypes.bool,
+        className: PropTypes.string
     }
 
     /*
@@ -281,7 +282,11 @@ class ModalDialog extends Component {
         }
 
         return (
-            <div ref={(domElem) => { this.domModal = domElem; }} className="modal fade" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div
+                ref={(domElem) => { this.domModal = domElem; }}
+                className={'modal fade' + (props.className ? ' ' + props.className : '')}
+                tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">

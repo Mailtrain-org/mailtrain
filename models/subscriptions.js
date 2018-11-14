@@ -14,6 +14,7 @@ const moment = require('moment');
 const { formatDate, formatBirthday } = require('../shared/date');
 const crypto = require('crypto');
 const campaigns = require('./campaigns');
+const lists = require('./lists');
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
 
@@ -336,6 +337,33 @@ async function listDTAjax(context, listId, segmentId, params) {
 
                 extraColumns
             }
+        );
+    });
+}
+
+async function listTestUsersDTAjax(context, listCid, params) {
+    return await knex.transaction(async tx => {
+        const list = await lists.getByCidTx(tx, context, listCid);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
+
+        const listTable = getSubscriptionTableName(list.id);
+
+        const columns = [
+            listTable + '.id',
+            listTable + '.cid',
+            listTable + '.email',
+            listTable + '.status',
+            listTable + '.created'
+        ];
+
+        return await dtHelpers.ajaxListTx(
+            tx,
+            params,
+            builder => builder
+                .from(listTable)
+                .where('is_test', true),
+            columns,
+            {}
         );
     });
 }
@@ -714,10 +742,10 @@ async function getListsWithEmail(context, email) {
     // FIXME - this methods is rather suboptimal if there are many lists. It quite needs permission caching in shares.js
 
     return await knex.transaction(async tx => {
-        const lists = await tx('lists').select(['id', 'name']);
+        const lsts = await tx('lists').select(['id', 'name']);
         const result = [];
 
-        for (const list of lists) {
+        for (const list of lsts) {
             await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
             const entity = await tx(getSubscriptionTableName(list.id)).where('email', email).first();
             if (entity) {
@@ -737,6 +765,7 @@ module.exports.getByCid = getByCid;
 module.exports.getByEmail = getByEmail;
 module.exports.list = list;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
 module.exports.serverValidate = serverValidate;
 module.exports.create = create;
 module.exports.getGroupedFieldsMap = getGroupedFieldsMap;

@@ -28,6 +28,7 @@ export class CodeEditorHost extends Component {
         initialSource: PropTypes.string,
         sourceType: PropTypes.string,
         title: PropTypes.string,
+        onTestSend: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 
@@ -47,6 +48,7 @@ export class CodeEditorHost extends Component {
 
         await this.contentNode.ask('setPreview', preview);
     }
+
     async exportState() {
         return await this.contentNode.ask('exportState');
     }
@@ -73,6 +75,7 @@ export class CodeEditorHost extends Component {
                     {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
+                    <a className={styles.btn} onClick={this.props.onTestSend}><Icon icon="send"/></a>
                     <a className={styles.btn} onClick={::this.togglePreviewAsync}><Icon icon={this.state.preview ? 'eye-close': 'eye-open'}/></a>
                 </div>
                 <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="codeeditor/editor" tokenMethod="codeeditor" tokenParams={tokenData}/>

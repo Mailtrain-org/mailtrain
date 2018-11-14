@@ -43,25 +43,32 @@ class CKEditorSandbox extends Component {
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
-        const html = this.props.initialHtml && base(this.props.initialHtml, trustedUrlBase, sandboxUrlBase, publicUrlBase);
+        const source = this.props.initialSource && base(this.props.initialSource, trustedUrlBase, sandboxUrlBase, publicUrlBase);
 
         this.state = {
-            html
+            source
         };
     }
 
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
-        initialHtml: PropTypes.string
+        initialSource: PropTypes.string
     }
 
     async exportState(method, params) {
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
+
+        const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
+        const postHtml = '</body></html>';
+
+        const unbasedSource = unbase(this.state.source, trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+
         return {
-            html: unbase(this.state.html, trustedUrlBase, sandboxUrlBase, publicUrlBase, true)
+            source: unbasedSource,
+            html: preHtml + unbasedSource + postHtml
         };
     }
 
@@ -119,9 +126,9 @@ class CKEditorSandbox extends Component {
         return (
             <div className={styles.sandbox}>
                 <CKEditor ref={node => this.node = node}
-                          content={this.state.html}
+                          content={this.state.source}
                           events={{
-                              change: evt => this.setState({html: evt.editor.getData()}),
+                              change: evt => this.setState({source: evt.editor.getData()}),
                           }}
                           config={config}
                 />

@@ -29,7 +29,11 @@ import {
 } from "../lib/sandboxed-codeeditor-shared";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
-import {getSandboxUrl} from "../lib/urls";
+import {
+    getPublicUrl,
+    getSandboxUrl,
+    getTrustedUrl
+} from "../lib/urls";
 import mailtrainConfig from 'mailtrainConfig';
 import {
     ActionLink,
@@ -38,6 +42,10 @@ import {
 import {Trans} from "react-i18next";
 
 import styles from "../lib/styles.scss";
+import {
+    base,
+    unbase
+} from "../../../shared/templates";
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -90,15 +98,19 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     templateId={owner.getFormValue(prefix + 'mosaicoTemplate')}
                     entityTypeId={entityTypeId}
                     title={t('Mosaico Template Designer')}
-                    onFullscreenAsync={::owner.setElementInFullscreen}/>
+                    onTestSend={::owner.showTestSendModal}
+                    onFullscreenAsync={::owner.setElementInFullscreen}
+                />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
             const {html, metadata, model} = await owner.editorNode.exportState();
-            owner.updateFormValue(prefix + 'html', html);
-            owner.updateFormValue(prefix + 'mosaicoData', {
-                metadata,
-                model
-            });
+            return {
+                [prefix + 'html']: html,
+                [prefix + 'mosaicoData']: {
+                    metadata,
+                    model
+                }
+            };
         },
         initData: () => ({
             [prefix + 'mosaicoTemplate']: '',
@@ -152,15 +164,19 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     templatePath={getSandboxUrl(`static/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/index.html`)}
                     entityTypeId={entityTypeId}
                     title={t('Mosaico Template Designer')}
-                    onFullscreenAsync={::owner.setElementInFullscreen}/>
+                    onTestSend={::owner.showTestSendModal}
+                    onFullscreenAsync={::owner.setElementInFullscreen}
+                />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
             const {html, metadata, model} = await owner.editorNode.exportState();
-            owner.updateFormValue(prefix + 'html', html);
-            owner.updateFormValue(prefix + 'mosaicoData', {
-                metadata,
-                model
-            });
+            return {
+                [prefix + 'html']: html,
+                [prefix + 'mosaicoData']: {
+                    metadata,
+                    model
+                }
+            };
         },
         initData: () => ({
             [prefix + 'mosaicoFsTemplate']: mailtrainConfig.mosaico.fsTemplates[0].key,
@@ -213,16 +229,19 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     initialStyle={owner.getFormValue(prefix + 'grapesJSData').style}
                     sourceType={owner.getFormValue(prefix + 'grapesJSSourceType')}
                     title={t('GrapesJS Template Designer')}
+                    onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
             const {html, source, style} = await owner.editorNode.exportState();
-            owner.updateFormValue(prefix + 'html', html);
-            owner.updateFormValue(prefix + 'grapesJSData', {
-                source,
-                style
-            });
+            return {
+                [prefix + 'html']: html,
+                [prefix + 'grapesJSData']: {
+                    source,
+                    style
+                }
+            };
         },
         initData: () => ({
             [prefix + 'grapesJSSourceType']: GrapesJSSourceType.MJML,
@@ -257,36 +276,82 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 <CKEditorHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
-                    initialHtml={owner.getFormValue(prefix + 'html')}
+                    initialSource={owner.getFormValue(prefix + 'ckeditor4Data').source}
                     entityTypeId={entityTypeId}
                     title={t('CKEditor 4 Template Designer')}
+                    onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html} = await owner.editorNode.exportState();
-            owner.updateFormValue(prefix + 'html', html);
+            const {html, source} = await owner.editorNode.exportState();
+            return {
+                [prefix + 'html']: html,
+                [prefix + 'ckeditor4Data']: {
+                    source
+                }
+            };
         },
-        initData: () => ({}),
-        afterLoad: data => {},
+        initData: () => ({
+            [prefix + 'ckeditor4Data']: {}
+        }),
+        afterLoad: data => {
+            data[prefix + 'ckeditor4Data'] = {
+                source: data[prefix + 'data'].source
+            };
+        },
         beforeSave: data => {
+            data[prefix + 'data'] = {
+                source: data[prefix + 'ckeditor4Data'].source,
+            };
             clearBeforeSave(data);
         },
-        afterTypeChange: mutState => {},
+        afterTypeChange: mutState => {
+            initFieldsIfMissing(mutState, 'ckeditor4');
+        },
         validate: state => {}
     };
 
     templateTypes.ckeditor5 = {
         typeName: t('CKEditor 5'),
         getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => <CKEditor id={prefix + 'html'} height="600px" mode="html" label={t('Template content (HTML)')}/>,
-        exportHTMLEditorData: async owner => {},
-        initData: () => ({}),
-        afterLoad: data => {},
+        getHTMLEditor: owner => <CKEditor id={prefix + 'ckeditor5Source'} height="600px" mode="html" label={t('Template content (HTML)')}/>,
+        exportHTMLEditorData: async owner => {
+            const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
+            const postHtml = '</body></html>';
+
+            const trustedUrlBase = getTrustedUrl();
+            const sandboxUrlBase = getSandboxUrl();
+            const publicUrlBase = getPublicUrl();
+
+            const unbasedSource = unbase(owner.getFormValue(prefix + 'ckeditor5Source'), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+            const html = preHtml + unbasedSource + postHtml
+
+            return {
+                [prefix + 'ckeditor5Source']: unbasedSource,
+                [prefix + 'html']: html
+            }
+        },
+        initData: () => ({
+            [prefix + 'ckeditor5Source']: ''
+        }),
+        afterLoad: data => {
+            const trustedUrlBase = getTrustedUrl();
+            const sandboxUrlBase = getSandboxUrl();
+            const publicUrlBase = getPublicUrl();
+            const source = base(data[prefix + 'data'].source, trustedUrlBase, sandboxUrlBase, publicUrlBase);
+
+            data[prefix + 'ckeditor5Source'] = source;
+        },
         beforeSave: data => {
+            data[prefix + 'data'] = {
+                source: data[prefix + 'ckeditor5Source'],
+            };
             clearBeforeSave(data);
         },
-        afterTypeChange: mutState => {},
+        afterTypeChange: mutState => {
+            initFieldsIfMissing(mutState, 'ckeditor5');
+        },
         validate: state => {}
     };
 
@@ -315,15 +380,18 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     initialSource={owner.getFormValue(prefix + 'codeEditorData').source}
                     sourceType={owner.getFormValue(prefix + 'codeEditorSourceType')}
                     title={t('Code Editor Template Designer')}
+                    onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
             const {html, source} = await owner.editorNode.exportState();
-            owner.updateFormValue(prefix + 'html', html);
-            owner.updateFormValue(prefix + 'codeEditorData', {
-                source
-            });
+            return {
+                [prefix + 'html']: html,
+                [prefix + 'codeEditorData']: {
+                    source
+                }
+            };
         },
         initData: () => ({
             [prefix + 'codeEditorSourceType']: CodeEditorSourceType.HTML,

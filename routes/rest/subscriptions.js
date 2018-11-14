@@ -12,6 +12,10 @@ router.postAsync('/subscriptions-table/:listId/:segmentId?', passport.loggedIn, 
     return res.json(await subscriptions.listDTAjax(req.context, castToInteger(req.params.listId), req.params.segmentId ? castToInteger(req.params.segmentId) : null, req.body));
 });
 
+router.postAsync('/subscriptions-test-user-table/:listCid', passport.loggedIn, async (req, res) => {
+    return res.json(await subscriptions.listTestUsersDTAjax(req.context, req.params.listCid, req.body));
+});
+
 router.getAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, async (req, res) => {
     const entity = await subscriptions.getById(req.context, castToInteger(req.params.listId), castToInteger(req.params.subscriptionId));
     entity.hash = await subscriptions.hashByList(castToInteger(req.params.listId), entity);

@@ -254,6 +254,7 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
     } else if (content === Content.ONLY_SOURCE_CUSTOM) {
         entity = {
             id: entity.id,
+            send_configuration: entity.send_configuration,
 
             data: {
                 sourceCustom: entity.data.sourceCustom
@@ -502,13 +503,13 @@ function getMessageCid(campaignCid, listCid, subscriptionCid) {
 }
 
 async function getMessageByCid(messageCid) {
-    const messageCid = messageCid.split('.');
+    const messageCidElems = messageCid.split('.');
 
-    if (messageCid.length !== 3) {
+    if (messageCidElems.length !== 3) {
         return null;
     }
 
-    const [campaignCid, listCid, subscriptionCid] = messageCid;
+    const [campaignCid, listCid, subscriptionCid] = messageCidElems;
 
     await knex.transaction(async tx => {
         const list = await tx('lists').where('cid', listCid).select('id');

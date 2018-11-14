@@ -39,6 +39,8 @@ import {CodeEditorSourceType} from "./sandboxed-codeeditor-shared";
 import mjml2html from "mjml4-in-browser";
 import juice from "juice";
 
+const refreshTimeout = 1000;
+
 @translate(null, { withRef: true })
 class CodeEditorSandbox extends Component {
     constructor(props) {
@@ -85,6 +87,12 @@ class CodeEditorSandbox extends Component {
             source,
             preview: props.initialPreview
         };
+        this.state.previewContents = this.getHtml();
+
+        this.onCodeChangedHandler = ::this.onCodeChanged;
+
+        this.refreshHandler = ::this.refresh;
+        this.refreshTimeoutId = null;
     }
 
     static propTypes = {
@@ -100,6 +108,7 @@ class CodeEditorSandbox extends Component {
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
         return {
+            html: unbase(this.getHtml(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
             source: unbase(this.state.source, trustedUrlBase, sandboxUrlBase, publicUrlBase, true)
         };
     }
@@ -115,9 +124,12 @@ class CodeEditorSandbox extends Component {
         parentRPC.setMethodHandler('setPreview', ::this.setPreview);
     }
 
-    render() {
-        let previewContents;
+    componentWillUnmount() {
+        clearTimeout(this.refreshTimeoutId);
+    }
 
+    getHtml() {
+        let previewContents;
         if (this.props.sourceType === CodeEditorSourceType.MJML) {
             const res = mjml2html(this.state.source);
             previewContents = res.html;
@@ -125,6 +137,28 @@ class CodeEditorSandbox extends Component {
             previewContents = juice(this.state.source);
         }
 
+        return previewContents;
+    }
+
+    onCodeChanged(data) {
+        this.setState({
+            source: data
+        });
+
+        if (!this.refreshTimeoutId) {
+            this.refreshTimeoutId = setTimeout(() => this.refresh(), refreshTimeout);
+        }
+    }
+
+    refresh() {
+        this.refreshTimeoutId = null;
+
+        this.setState({
+            previewContents: this.getHtml()
+        });
+    }
+
+    render() {
         return (
             <div className={styles.sandbox}>
                 <div className={this.state.preview ? styles.aceEditorWithPreview : styles.aceEditorWithoutPreview}>
@@ -133,7 +167,7 @@ class CodeEditorSandbox extends Component {
                         theme="github"
                         width="100%"
                         height="100%"
-                        onChange={data => this.setState({source: data})}
+                        onChange={this.onCodeChangedHandler}
                         fontSize={12}
                         showPrintMargin={false}
                         value={this.state.source}
@@ -144,7 +178,7 @@ class CodeEditorSandbox extends Component {
                 {
                     this.state.preview &&
                     <div className={styles.preview}>
-                        <iframe src={"data:text/html;charset=utf-8," + escape(previewContents)}></iframe>
+                        <iframe src={"data:text/html;charset=utf-8," + escape(this.state.previewContents)}></iframe>
                     </div>
                 }
             </div>

@@ -28,6 +28,7 @@ export class GrapesJSHost extends Component {
         initialStyle: PropTypes.string,
         sourceType: PropTypes.string,
         title: PropTypes.string,
+        onTestSend: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 
@@ -65,6 +66,7 @@ export class GrapesJSHost extends Component {
                     {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
+                    <a className={styles.btn} onClick={this.props.onTestSend}><Icon icon="send"/></a>
                 </div>
                 <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="grapesjs/editor" tokenMethod="grapesjs" tokenParams={tokenData}/>
             </div>

@@ -334,7 +334,7 @@ async function listGroupedTx(tx, listId) {
 
 async function listGrouped(context, listId) {
     return await knex.transaction(async tx => {
-        // It may seem odd why there is not 'manageFields' here. But it's just a result of strictly apply the "need-to-know" principle. Simply, at this point this function is needed only in managing subscriptions.
+        // It may seem odd why there is not 'viewFields' here. Simply, at this point this function is needed only in managing subscriptions.
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['manageSubscriptions']);
         return await listGroupedTx(tx, listId);
     });
