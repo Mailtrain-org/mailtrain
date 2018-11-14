@@ -146,11 +146,11 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
     }
 
     if (!campaign.click_tracking_disabled) {
-        const re = /(<a[^>]* href\s*=[\s"']*)(http[^"'>\s]+)/gi;
+        const re = /(<a[^>]* href\s*=\s*["']\s*)(http[^"'>\s]+)/gi;
 
         const urlsToBeReplaced = new Set();
 
-        message = message.replace(re, (match, prefix, encodedUrl) => {
+        message.replace(re, (match, prefix, encodedUrl) => {
             const url = he.decode(encodedUrl, {isAttributeValue: true});
             urlsToBeReplaced.add(url);
         });
@@ -166,7 +166,7 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
         message = message.replace(re, (match, prefix, encodedUrl) => {
             const url = he.decode(encodedUrl, {isAttributeValue: true});
             const link = urls.get(url);
-            return getPublicUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}/${link.cid}`);
+            return prefix + (link ? getPublicUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}/${link.cid}`) : url);
         });
     }
 

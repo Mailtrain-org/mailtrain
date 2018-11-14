@@ -286,7 +286,11 @@ export default class CUD extends Component {
         }
     }
 
-    onFileSelected() {
+    onFileSelected(evt, x) {
+        if (!this.getFormValue('name') && this.csvFile.files.length > 0) {
+            this.updateFormValue('name', this.csvFile.files[0].name);
+        }
+
         this.scheduleFormRevalidate();
     }
 

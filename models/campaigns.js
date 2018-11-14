@@ -478,7 +478,7 @@ async function remove(context, id) {
         await triggers.removeAllByCampaignIdTx(tx, context, id);
 
         await tx('template_dep_campaigns')
-            .where('campaign', entity.id)
+            .where('campaign', id)
             .del();
 
         await tx('campaigns').where('id', id).del();

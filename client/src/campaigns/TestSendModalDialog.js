@@ -74,7 +74,7 @@ export class TestSendModalDialog extends Component {
                 data.sendConfigurationId = props.entity.send_configuration;
                 data.campaignId = props.entity.id;
 
-                console.log(await axios.post(getUrl('rest/template-test-send'), data));
+                await axios.post(getUrl('rest/template-test-send'), data);
 
                 this.clearFormStatusMessage();
 

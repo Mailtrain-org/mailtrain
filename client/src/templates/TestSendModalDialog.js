@@ -71,7 +71,7 @@ export class TestSendModalDialog extends Component {
                 data.subscriptionCid = this.getFormValue('testUser');
                 data.sendConfigurationId = this.getFormValue('sendConfiguration');
 
-                console.log(await axios.post(getUrl('rest/template-test-send'), data));
+                await axios.post(getUrl('rest/template-test-send'), data);
 
                 this.clearFormStatusMessage();
 
