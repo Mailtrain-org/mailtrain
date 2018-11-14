@@ -208,6 +208,7 @@ export default class CustomContent extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                        <Button className="btn-danger" icon="send" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
             </div>
