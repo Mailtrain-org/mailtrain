@@ -443,12 +443,14 @@ export default class Status extends Component {
                     <Table withHeader dataUrl={`rest/lists-with-segment-by-campaign-table/${this.props.entity.id}`} columns={listsColumns} />
                 </AlignedRow>
 
+                {(entity.type === CampaignType.REGULAR || entity.type === CampaignType.TRIGGERED) &&
+                    <div>
+                        <hr/>
+                        <TestUser entity={entity}/>
+                    </div>
+                }
+
                 <hr/>
-
-                <TestUser entity={entity}/>
-
-                <hr/>
-
                 <SendControls entity={entity} refreshEntity={::this.refreshEntity}/>
 
                 {entity.type === CampaignType.RSS &&
