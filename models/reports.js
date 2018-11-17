@@ -20,7 +20,7 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function getByIdWithTemplate(context, id) {
+async function getByIdWithTemplate(context, id, withPermissions = true) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'view');
 
@@ -33,7 +33,9 @@ async function getByIdWithTemplate(context, id) {
         entity.user_fields = JSON.parse(entity.user_fields);
         entity.params = JSON.parse(entity.params);
 
-        entity.permissions = await shares.getPermissionsTx(tx, context, 'report', id);
+        if (withPermissions) {
+            entity.permissions = await shares.getPermissionsTx(tx, context, 'report', id);
+        }
 
         return entity;
     });

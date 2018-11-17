@@ -10,7 +10,7 @@ const contextHelpers = require('../../lib/context-helpers');
 
 const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
-
+const fs = require('fs-extra');
 
 router.getAsync('/reports/:reportId', passport.loggedIn, async (req, res) => {
     const report = await reports.getByIdWithTemplate(req.context, castToInteger(req.params.reportId));
@@ -44,7 +44,7 @@ router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection
 
     await shares.enforceEntityPermission(req.context, 'report', id, 'execute');
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id, false);
     await shares.enforceEntityPermission(req.context, 'reportTemplate', report.report_template, 'execute');
 
     await reportProcessor.start(id);
@@ -56,7 +56,7 @@ router.postAsync('/report-stop/:id', async (req, res) => {
 
     await shares.enforceEntityPermission(req.context, 'report', id, 'execute');
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id, false);
     await shares.enforceEntityPermission(req.context, 'reportTemplate', report.report_template, 'execute');
 
     await reportProcessor.stop(id);
@@ -68,8 +68,14 @@ router.getAsync('/report-content/:id', async (req, res) => {
 
     await shares.enforceEntityPermission(req.context, 'report', id, 'viewContent');
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
-    res.sendFile(reportHelpers.getReportContentFile(report));
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id, false);
+    const file = reportHelpers.getReportContentFile(report);
+
+    if (await fs.pathExists(file)) {
+        res.sendFile(file);
+    } else {
+        res.send('');
+    }
 });
 
 router.getAsync('/report-output/:id', async (req, res) => {
@@ -77,8 +83,14 @@ router.getAsync('/report-output/:id', async (req, res) => {
 
     await shares.enforceEntityPermission(req.context, 'report', id, 'viewOutput');
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id);
-    res.sendFile(reportHelpers.getReportOutputFile(report));
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), id, false);
+    const file = reportHelpers.getReportOutputFile(report);
+
+    if (await fs.pathExists(file)) {
+        res.sendFile(file);
+    } else {
+        res.send('');
+    }
 });
 
 

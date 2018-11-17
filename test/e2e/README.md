@@ -26,7 +26,7 @@ By default e2e tests use `phantomjs`. If you want to use a different browser you
 Then adjust your config:
 
 ```
-[seleniumwebdriver]
+[seleniumWebDriver]
 browser="firefox"
 ```
 

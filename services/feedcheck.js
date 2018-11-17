@@ -60,7 +60,7 @@ async function run() {
         .select('id')
         .first()) {
 
-        const rssCampaign = campaigns.getById(contextHelpers.getAdminContext(), rssCampaignIdRow.id);
+        const rssCampaign = await campaigns.getById(contextHelpers.getAdminContext(), rssCampaignIdRow.id, false);
 
         let checkStatus = null;
 
@@ -92,6 +92,7 @@ async function run() {
                         campaignData.rssEntry = entry;
 
                         const campaign = {
+                            parent: rssCampaign.id,
                             type: CampaignType.RSS_ENTRY,
                             source,
                             name: entry.title || `RSS entry ${entry.guid.substr(0, 67)}`,
@@ -103,7 +104,7 @@ async function run() {
                             from_email_override: rssCampaign.from_email_override,
                             reply_to_override: rssCampaign.reply_to_override,
                             subject_override: rssCampaign.subject_override,
-                            data: JSON.stringify(campaignData),
+                            data: campaignData,
 
                             click_tracking_disabled: rssCampaign.click_tracking_disabled,
                             open_tracking_disabled: rssCampaign.open_tracking_disabled,
@@ -126,8 +127,12 @@ async function run() {
             }
 
             if (added > 0) {
-                checkStatus = util.format(_('Found %s new campaign messages from feed'), added);
-                log.verbose('Feed', `Added ${added} new campaigns for ${rssCampaign.id}`);
+                checkStatus = util.format(_('Found %s new campaign messages from feed %s'), added, rssCampaign.id);
+                log.verbose('Feed', `Found ${added} new campaigns messages from feed ${rssCampaign.id}`);
+
+                process.send({
+                    type: 'entries-added'
+                });
             } else {
                 checkStatus = _('Found nothing new from the feed');
             }

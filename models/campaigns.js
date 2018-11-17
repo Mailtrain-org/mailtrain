@@ -22,6 +22,7 @@ const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
+const allowedKeysCreateRssEntry = new Set(['type', 'source', 'parent', ...allowedKeysCommon]);
 const allowedKeysUpdate = new Set([...allowedKeysCommon]);
 
 const Content = {
@@ -31,7 +32,6 @@ const Content = {
     RSS_ENTRY: 3,
     SETTINGS_WITH_STATS: 4
 };
-
 
 function hash(entity, content) {
     let filteredEntity;
@@ -63,10 +63,24 @@ async function listDTAjax(context, params) {
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
         params,
         builder => builder.from('campaigns')
-            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace'),
+            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+            .whereNull('campaigns.parent'),
         ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
 }
+
+async function listChildrenDTAjax(context, campaignId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('campaigns')
+            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+            .where('campaigns.parent', campaignId),
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+    );
+}
+
 
 async function listWithContentDTAjax(context, params) {
     return await dtHelpers.ajaxListWithPermissions(
@@ -368,12 +382,21 @@ async function _createTx(tx, context, entity, content) {
 
         await _validateAndPreprocess(tx, context, entity, true, content);
 
-        const filteredEntity = filterObject(entity, allowedKeysCreate);
+        const filteredEntity = filterObject(entity, entity.type === CampaignType.RSS_ENTRY ? allowedKeysCreateRssEntry : allowedKeysCreate);
         filteredEntity.cid = shortid.generate();
 
         const data = filteredEntity.data;
 
         filteredEntity.data = JSON.stringify(filteredEntity.data);
+
+        if (filteredEntity.type === CampaignType.RSS || filteredEntity.type === CampaignType.TRIGGERED) {
+            filteredEntity.status = CampaignStatus.ACTIVE;
+        } else if (filteredEntity.type === CampaignType.RSS_ENTRY) {
+            filteredEntity.status = CampaignStatus.SCHEDULED;
+        } else {
+            filteredEntity.status = CampaignStatus.IDLE;
+        }
+
         const ids = await tx('campaigns').insert(filteredEntity);
         const id = ids[0];
 
@@ -386,7 +409,11 @@ async function _createTx(tx, context, entity, content) {
             });
         }
 
-        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
+        if (filteredEntity.parent) {
+            await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id, parentId: filteredEntity.parent });
+        } else {
+            await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
+        }
 
         if (copyFilesFrom) {
             await files.copyAllTx(tx, context, copyFilesFrom.entityType, 'file', copyFilesFrom.entityId, 'campaign', 'file', id);
@@ -459,29 +486,44 @@ async function updateWithConsistencyCheck(context, entity, content) {
     });
 }
 
+async function _removeTx(tx, context, id, existing = null) {
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
+
+    if (!existing) {
+        existing = await tx('campaigns').where('id', id).select(['id', 'status', 'type']).first();
+    }
+
+    if (existing.status === CampaignStatus.SENDING) {
+        return new interoperableErrors.InvalidStateError;
+    }
+
+    enforce(existing.type === CampaignType.REGULAR || existing.type === CampaignType.RSS || existing.type === CampaignType.TRIGGERED, 'This campaign cannot be removed by user.');
+
+    const childCampaigns = await tx('campaigns').where('parent', id).select(['id', 'status', 'type']);
+    for (const childCampaign of childCampaigns) {
+        await _removeTx(tx, contect, childCampaign.id, childCampaign);
+    }
+
+    await files.removeAllTx(tx, context, 'campaign', 'file', id);
+    await files.removeAllTx(tx, context, 'campaign', 'attachment', id);
+
+    await tx('campaign_lists').where('campaign', id).del();
+    await tx('campaign_messages').where('campaign', id).del();
+    await tx('campaign_links').where('campaign', id).del();
+
+    await triggers.removeAllByCampaignIdTx(tx, context, id);
+
+    await tx('template_dep_campaigns')
+        .where('campaign', id)
+        .del();
+
+    await tx('campaigns').where('id', id).del();
+}
+
+
 async function remove(context, id) {
     await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
-
-        const existing = tx('campaigns').where('id', id);
-        if (existing.status === CampaignStatus.SENDING) {
-            return new interoperableErrors.InvalidStateError;
-        }
-
-        await files.removeAllTx(tx, context, 'campaign', 'file', id);
-        await files.removeAllTx(tx, context, 'campaign', 'attachment', id);
-
-        await tx('campaign_lists').where('campaign', id).del();
-        await tx('campaign_messages').where('campaign', id).del();
-        await tx('campaign_links').where('campaign', id).del();
-
-        await triggers.removeAllByCampaignIdTx(tx, context, id);
-
-        await tx('template_dep_campaigns')
-            .where('campaign', id)
-            .del();
-
-        await tx('campaigns').where('id', id).del();
+        await _removeTx(tx, context, id);
     });
 }
 
@@ -705,8 +747,6 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);
         }
 
-        console.log(scheduled);
-
         await tx('campaigns').where('id', campaignId).update({
             status: newState,
             scheduled
@@ -747,9 +787,20 @@ async function reset(context, campaignId) {
     });
 }
 
+async function enable(context, campaignId) {
+    await _changeStatus(context, campaignId, [CampaignStatus.INACTIVE], CampaignStatus.ACTIVE, 'Cannot enable campaign unless it is in INACTIVE state');
+}
+
+async function disable(context, campaignId) {
+    await _changeStatus(context, campaignId, [CampaignStatus.ACTIVE], CampaignStatus.INACTIVE, 'Cannot disable campaign unless it is in ACTIVE state');
+}
+
+
+
 module.exports.Content = Content;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;
 module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
@@ -774,6 +825,8 @@ module.exports.getSubscribersQueryGeneratorTx = getSubscribersQueryGeneratorTx;
 module.exports.start = start;
 module.exports.stop = stop;
 module.exports.reset = reset;
+module.exports.enable = enable;
+module.exports.disable = disable;
 
 module.exports.rawGetByTx = rawGetByTx;
 module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;

@@ -509,6 +509,69 @@ export function getEditForm(owner, typeKey, prefix = '') {
                     </tr>
                     </tbody>
                 </table>
+                <Trans><p>For RSS campaigns, the following further tags can be used.</p></Trans>
+                <table className="table table-bordered table-condensed table-striped">
+                    <thead>
+                    <tr>
+                        <th>
+                            <Trans>Merge tag</Trans>
+                        </th>
+                        <th>
+                            <Trans>Description</Trans>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            [RSS_ENTRY_TITLE]
+                        </th>
+                        <td>
+                            <Trans>RSS entry title</Trans>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            [RSS_ENTRY_DATE]
+                        </th>
+                        <td>
+                            <Trans>RSS entry date</Trans>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            [RSS_ENTRY_LINK]
+                        </th>
+                        <td>
+                            <Trans>RSS entry link</Trans>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            [RSS_ENTRY_CONTENT]
+                        </th>
+                        <td>
+                            <Trans>Content of an RSS entry</Trans>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            [RSS_ENTRY_SUMMARY]
+                        </th>
+                        <td>
+                            <Trans>RSS entry summary</Trans>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            [RSS_ENTRY_IMAGE_URL]
+                        </th>
+                        <td>
+                            <Trans>RSS entry image URL</Trans>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>}
         </AlignedRow>
 

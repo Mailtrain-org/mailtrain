@@ -39,7 +39,7 @@ const mailstore = {
 const server = new SMTPServer({
 
     // log to console
-    logger: config.testserver.logger,
+    logger: config.testServer.logger,
 
     // not required but nice-to-have
     banner: 'Welcome to My Awesome SMTP Server',
@@ -55,8 +55,8 @@ const server = new SMTPServer({
 
     // Setup authentication
     onAuth: (auth, session, callback) => {
-        let username = config.testserver.username;
-        let password = config.testserver.password;
+        let username = config.testServer.username;
+        let password = config.testServer.password;
 
         // check username and password
         if (auth.username === username && auth.password === password) {
@@ -169,9 +169,9 @@ mailBoxServer.on('error', err => {
 });
 
 module.exports = callback => {
-    if (config.testserver.enabled) {
-        server.listen(config.testserver.port, config.testserver.host, () => {
-            log.info('Test SMTP', 'Server listening on port %s', config.testserver.port);
+    if (config.testServer.enabled) {
+        server.listen(config.testServer.port, config.testServer.host, () => {
+            log.info('Test SMTP', 'Server listening on port %s', config.testServer.port);
 
             setInterval(() => {
                 if (received) {
@@ -186,8 +186,8 @@ module.exports = callback => {
                 }
             }, 60 * 1000);
 
-            mailBoxServer.listen(config.testserver.mailboxserverport, config.testserver.host, () => {
-                log.info('Test SMTP', 'Mail Box Server listening on port %s', config.testserver.mailboxserverport);
+            mailBoxServer.listen(config.testServer.mailboxServerPort, config.testServer.host, () => {
+                log.info('Test SMTP', 'Mail Box Server listening on port %s', config.testServer.mailboxServerPort);
                 setImmediate(callback);
             });
         });

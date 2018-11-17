@@ -14,7 +14,7 @@ import {Icon, ModalDialog} from "./bootstrap-components";
 import axios from './axios';
 import styles from "./styles.scss";
 import {withPageHelpers} from "./page";
-import {getUrl} from "./urls";
+import {getUrl, getPublicUrl} from "./urls";
 
 @translate()
 @withErrorHandling
@@ -119,9 +119,9 @@ export default class Files extends Component {
 
                     let downloadUrl;
                     if (this.props.usePublicDownloadUrls) {
-                        downloadUrl =`/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${this.props.entity.id}/${data[2]}`;
+                        downloadUrl = getPublicUrl(`files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${this.props.entity.id}/${data[2]}`);
                     } else {
-                        downloadUrl =`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${data[0]}`;
+                        downloadUrl = getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${data[0]}`);
                     }
 
                     actions.push({

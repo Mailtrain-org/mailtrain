@@ -9,6 +9,8 @@ const { enforce } = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../shared/triggers');
 const { SubscriptionSource } = require('../../../shared/lists');
 const crypto = require('crypto');
+const {DOMParser, XMLSerializer} = require('xmldom');
+const log = require('../../../lib/log');
 
 const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
 const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
@@ -250,18 +252,27 @@ async function migrateSubscriptions(knex) {
             }
         }
 
-        const subscriptionsStream = knex('subscription__' + list.id).stream();
-        let subscription;
-        while ((subscription = subscriptionsStream.read()) != null) {
-            subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
-            subscription.source_email = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
-            for (const field of fields) {
-                if (field.column != null) {
-                    subscription['source_' + field.column] = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
-                }
-            }
+        let lastId = 0;
+        while (true) {
+            const rows = await knex('subscription__' + list.id).where('id', '>', lastId).orderBy('id', 'asc').limit(1000);
 
-            await knex('subscription__' + list.id).where('id', subscription.id).update(subscription);
+            if (rows.length > 0) {
+                for await (const subscription of rows) {
+                    subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
+                    subscription.source_email = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
+                    for (const field of fields) {
+                        if (field.column != null) {
+                            subscription['source_' + field.column] = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
+                        }
+                    }
+
+                    await knex('subscription__' + list.id).where('id', subscription.id).update(subscription);
+                }
+
+                lastId = rows[rows.length - 1].id;
+            } else {
+                break;
+            }
         }
 
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` MODIFY `hash_email` varchar(255) CHARACTER SET ascii NOT NULL');
@@ -269,6 +280,8 @@ async function migrateSubscriptions(knex) {
         await knex.schema.table('subscription__' + list.id, table => {
             table.dropColumn('imported');
         });
+
+        log.verbose('Migration', 'Subscriptions for list ' + list.cid + ' complete');
     }
 }
 
@@ -504,8 +517,8 @@ async function migrateSegments(knex) {
                     if (oldSettings.range) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'lt', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start });
+                                rules.push({ type: 'lt', column: oldRule.column, value: oldSettings.end });
                             } else {
                                 rules.push({
                                     type: 'all',
@@ -516,87 +529,91 @@ async function migrateSegments(knex) {
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start  });
+                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'lt', column: oldRule.column, value: oldSettings.end  });
+                            rules.push({ type: 'lt', column: oldRule.column, value: oldSettings.end });
                         }
                     } else {
-                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
+                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value });
                     }
                     break;
                 case 'birthday':
                     if (oldSettings.range) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start });
+                                rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end });
                             } else {
                                 rules.push({
                                     type: 'all',
                                     rules: [
-                                        { type: 'ge', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'le', column: oldRule.column, value: oldSettings.end}
+                                        { type: 'ge', column: oldRule.column, value: oldSettings.start },
+                                        { type: 'le', column: oldRule.column, value: oldSettings.end }
                                     ]
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start  });
+                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end  });
+                            rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end });
                         }
                     } else {
-                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
+                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value });
                     }
                     break;
                 case 'date':
                     if (oldSettings.relativeRange) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.start });
+                                rules.push({ type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.end });
                             } else {
                                 rules.push({
                                     type: 'all',
                                     rules: [
-                                        { type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.end}
+                                        { type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.start },
+                                        { type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.end }
                                     ]
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.startDirection ? oldSettings.start : -oldSettings.start  });
+                            rules.push({ type: 'geTodayPlusDays', column: oldRule.column, value: oldSettings.startDirection ? oldSettings.start : -oldSettings.start });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.endDirection ? oldSettings.end : -oldSettings.end  });
+                            rules.push({ type: 'leTodayPlusDays', column: oldRule.column, value: oldSettings.endDirection ? oldSettings.end : -oldSettings.end });
                         }
                     } else if (oldSettings.range) {
                         if (oldSettings.start && oldSettings.end) {
                             if (type === 'all') {
-                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start});
-                                rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end});
+                                rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start });
+                                rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end });
                             } else {
                                 rules.push({
                                     type: 'all',
                                     rules: [
-                                        { type: 'ge', column: oldRule.column, value: oldSettings.start},
-                                        { type: 'le', column: oldRule.column, value: oldSettings.end}
+                                        { type: 'ge', column: oldRule.column, value: oldSettings.start },
+                                        { type: 'le', column: oldRule.column, value: oldSettings.end }
                                     ]
                                 });
                             }
                         } else if (oldSettings.start) {
-                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start  });
+                            rules.push({ type: 'ge', column: oldRule.column, value: oldSettings.start });
                         }
                         if (oldSettings.end) {
-                            rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end  });
+                            rules.push({ type: 'le', column: oldRule.column, value: oldSettings.end });
                         }
                     } else {
-                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
+                        rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value });
                     }
                     break;
                 case 'option':
-                    rules.push({ type: 'eq', column: oldRule.column, value: oldSettings.value  });
+                    if (oldSettings.value) {
+                        rules.push({ type: 'isTrue', column: oldRule.column });
+                    } else {
+                        rules.push({ type: 'isFalse', column: oldRule.column });
+                    }
                     break;
                 default:
                     throw new Error(`Unknown rule for column ${oldRule.column} with field type ${fieldType}`);
@@ -780,6 +797,51 @@ async function addFiles(knex) {
     }
 }
 
+async function convertTemplateContent(type, html, data) {
+    if (type == 'summernote') {
+        type = 'ckeditor4';
+        data.source = html;
+    }
+
+    if (type == 'mosaico') {
+        type = 'mosaicoWithFsTemplate';
+        data.mosaicoFsTemplate = data.template;
+        delete data.template;
+    }
+
+    if (type == 'grapejs') {
+        type = 'grapesjs';
+
+        if (data.mjml) {
+            data.sourceType = 'mjml';
+
+            const serializer = new XMLSerializer();
+            const mjmlDoc = new DOMParser().parseFromString(data.mjml, 'text/xml');
+
+            const container = mjmlDoc.getElementsByTagName('mj-container')[0];
+            data.source = mjContainer = container ? serializer.serializeToString(container) : '<mj-container></mj-container>';
+
+            data.style = '';
+            delete data.mjml;
+
+        } else {
+            data.sourceType = 'html';
+            data.source = data.html || html || '';
+            data.style = data.css;
+            delete data.css;
+        }
+
+        delete data.template;
+    }
+
+    if (type == 'codeeditor') {
+        data.sourceType = 'html';
+        data.source = html || '';
+    }
+
+    return type;
+}
+
 async function migrateTemplates(knex) {
     await knex.schema.table('templates', table => {
         table.text('data', 'longtext');
@@ -789,20 +851,16 @@ async function migrateTemplates(knex) {
     const templates = await knex('templates');
 
     for (const template of templates) {
-        let type = template.editor_name;
         const data = JSON.parse(template.editor_data || '{}');
 
-        if (type == 'summernote') {
-            type = 'ckeditor';
-        }
+        const type = await convertTemplateContent(template.editor_name, template.html, data);
 
-        if (type == 'mosaico') {
-            type = 'mosaicoWithFsTemplate';
-            data.mosaicoFsTemplate = data.template;
-            delete data.template;
-        }
-
-        await knex('templates').where('id', template.id).update({type, data: JSON.stringify(data)});
+        await knex('templates').where('id', template.id).update({
+            type,
+            text: template.text || '',
+            html: template.html || '',
+            data: JSON.stringify(data)
+        });
     }
 
     await knex.schema.table('templates', table => {
@@ -953,8 +1011,10 @@ async function migrateCampaigns(knex) {
     for (const campaign of campaigns) {
         const data = {};
 
-        await knex.raw('INSERT INTO `campaign_messages` (`id`, `campaign`, `list`, `subscription`, `send_configuration`, `status`, `response`, `response_id`, `updated`, `created`) ' +
-            'SELECT `id`, ' + campaign.id + ', `list`, `subscription`, ' + getSystemSendConfigurationId() + ', `status`, `response`, `response_id`, `updated`, `created` FROM `campaign__' + campaign.id + '`;');
+        // IGNORE is here because the original table had a key based also on segment. We droped the distinction based on segmention in mailtrain v2,
+        // which means we can get some duplicates. Hopefully it's not such a big harm to ignore the duplicates.
+        await knex.raw('INSERT IGNORE INTO `campaign_messages` (`campaign`, `list`, `subscription`, `send_configuration`, `status`, `response`, `response_id`, `updated`, `created`) ' +
+            'SELECT ' + campaign.id + ', `list`, `subscription`, ' + getSystemSendConfigurationId() + ', `status`, `response`, `response_id`, `updated`, `created` FROM `campaign__' + campaign.id + '`;');
 
         await knex.raw('INSERT INTO `campaign_links` (`campaign`, `list`, `subscription`, `link`, `ip`, `device_type`, `country`, `count`, `created`) ' +
             'SELECT ' + campaign.id + ', `list`, `subscriber`, `link`, `ip`, `device_type`, `country`, `count`, `created` FROM `campaign_tracker__' + campaign.id + '`;');
@@ -964,31 +1024,22 @@ async function migrateCampaigns(knex) {
 
         if (campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.RSS || campaign.type === CampaignType.RSS_ENTRY || campaign.type === CampaignType.TRIGGERED) {
             if (campaign.template) {
-                let editorType = campaign.editor_name;
                 const editorData = JSON.parse(campaign.editor_data || '{}');
-
-                if (editorType === 'summernote') {
-                    editorType = 'ckeditor';
-                }
-
-                if (editorType === 'mosaico') {
-                    editorType = 'mosaicoWithFsTemplate';
-                    editorData.mosaicoFsTemplate = editorData.template;
-                    delete editorData.template;
-                }
+                const editorType = await convertTemplateContent(campaign.editor_name, campaign.html, editorData);
 
                 campaign.source = CampaignSource.CUSTOM_FROM_TEMPLATE;
                 data.sourceCustom = {
                     type: editorType,
                     data: editorData,
-                    html: campaign.html,
-                    text: campaign.text,
+                    html: campaign.html_prepared || campaign.html || '',
+                    text: campaign.text || '',
                 };
 
                 data.sourceTemplate = campaign.template;
 
                 // For source === CampaignSource.TEMPLATE, the data is as follows:
                 // data.sourceTemplate = <template id>
+
             } else {
                 campaign.source = CampaignSource.URL;
                 data.sourceUrl = campaign.source_url;
@@ -1155,28 +1206,58 @@ async function migrateImporter(knex) {
 
 exports.up = (knex, Promise) => (async() => {
     await migrateBase(knex);
+    log.verbose('Migration', 'Base complete')
     await addNamespaces(knex);
+    log.verbose('Migration', 'Namespaces complete')
 
     await migrateUsers(knex);
+    log.verbose('Migration', 'Users complete')
+
     await migrateCustomForms(knex);
+    log.verbose('Migration', 'Custom forms complete')
+
     await migrateCustomFields(knex);
+    log.verbose('Migration', 'Custom fields complete')
+
     await migrateSubscriptions(knex);
+
     await migrateSegments(knex);
+    log.verbose('Migration', 'Segments complete')
+
     await migrateReports(knex);
+    log.verbose('Migration', 'Reports complete')
+
     await migrateSettings(knex);
+    log.verbose('Migration', 'Settings complete')
+
     await migrateTemplates(knex);
+    log.verbose('Migration', 'Templates complete')
+
 
     await addMosaicoTemplates(knex);
+    log.verbose('Migration', 'Mosaico templates complete')
+
     await migrateCampaigns(knex);
+    log.verbose('Migration', 'Campaigns complete')
+
 
     await addPermissions(knex);
+    log.verbose('Migration', 'Permissions complete')
+
     await addFiles(knex);
+    log.verbose('Migration', 'Files complete')
+
 
     await migrateAttachments(knex);
+    log.verbose('Migration', 'Attachments complete')
+
 
     await migrateTriggers(knex);
+    log.verbose('Migration', 'Trigger complete')
+
 
     await migrateImporter(knex);
+    log.verbose('Migration', 'Importer complete')
 })();
 
 exports.down = (knex, Promise) => (async() => {

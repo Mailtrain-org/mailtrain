@@ -22,7 +22,7 @@ export default class Output extends Component {
 
     @withAsyncErrorHandler
     async loadOutput() {
-        const id = parseInt(this.props.match.params.id);
+        const id = parseInt(this.props.match.params.reportId);
         const outputRespPromise = axios.get(getUrl(`rest/report-output/${id}`));
         const reportRespPromise = axios.get(getUrl(`rest/reports/${id}`));
         const [outputResp, reportResp] = await Promise.all([outputRespPromise, reportRespPromise]);

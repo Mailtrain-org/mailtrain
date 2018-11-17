@@ -156,7 +156,8 @@ export default class List extends Component {
             <div>
                 {tableDeleteDialogRender(this, `rest/subscriptions/${this.props.list.id}`, t('Deleting subscription ...'), t('Subscription deleted'))}
                 <Toolbar>
-                    <a href={getPublicUrl(`subscription/${this.props.list.cid}`)} className="btn-default"><Button label={t('Subscription Form')} className="btn-default"/></a>
+                    <a href={getPublicUrl(`subscription/${this.props.list.cid}`)}><Button label={t('Subscription Form')} className="btn-default"/></a>
+                    <a href={getUrl(`subscriptions/export/${this.props.list.id}/`+ (this.props.segmentId || 0))}><Button label={t('Export as CSV')} className="btn-primary"/></a>
                     <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('Add Subscriber')}/>
                 </Toolbar>
 

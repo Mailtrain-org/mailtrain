@@ -37,7 +37,8 @@ import {
 } from '../../../../shared/imports';
 import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import styles from "../styles.scss";
+import listStyles from "../styles.scss";
+import styles from "../../lib/styles.scss";
 
 
 function truncate(str, len, ending = '...') {
@@ -372,7 +373,7 @@ export default class CUD extends Component {
                     mappingSettings = (
                         <div>
                             {settingsRows}
-                            <Fieldset label={t('Mapping')} className={styles.mapping}>
+                            <Fieldset label={t('Mapping')} className={listStyles.mapping}>
                                 {mappingRows}
                             </Fieldset>
                         </div>

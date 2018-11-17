@@ -100,7 +100,14 @@ async function assign(context, entityTypeId, entityId, userId, role) {
         await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
 
         enforce(await tx('users').where('id', userId).select('id').first(), 'Invalid user id');
-        enforce(await tx(entityType.entitiesTable).where('id', entityId).select('id').first(), 'Invalid entity id');
+
+        const extraColumns = entityType.dependentPermissions ? entityType.dependentPermissions.extraColumns : [];
+        const entity = await tx(entityType.entitiesTable).where('id', entityId).select(['id', ...extraColumns]).first();
+        enforce(entity, 'Invalid entity id');
+
+        if (entityType.dependentPermissions) {
+            enforce(!entityType.dependentPermissions.getParent(entity), 'Cannot share/unshare a dependent entity');
+        }
 
         const entry = await tx(entityType.sharesTable).where({user: userId, entity: entityId}).select('role').first();
 
@@ -310,13 +317,51 @@ async function rebuildPermissionsTx(tx, restriction) {
         }
         await expungeQuery;
 
-        const entitiesQuery = tx(entityType.entitiesTable).select(['id', 'namespace']);
+        const extraColumns = entityType.dependentPermissions ? entityType.dependentPermissions.extraColumns : [];
+        const entitiesQuery = tx(entityType.entitiesTable).select(['id', 'namespace', ...extraColumns]);
+
+
+        const notToBeInserted = new Set();
         if (restriction.entityId) {
-            entitiesQuery.where('id', restriction.entityId);
+            if (restriction.parentId) {
+                notToBeInserted.add(restriction.parentId);
+                entitiesQuery.whereIn('id', [restriction.entityId, restriction.parentId]);
+            } else {
+                entitiesQuery.where('id', restriction.entityId);
+            }
         }
         const entities = await entitiesQuery;
 
-        for (const entity of entities) {
+        // TODO - process restriction.parentId
+
+        const parentEntities = new Map();
+        let nonChildEntities;
+        if (entityType.dependentPermissions) {
+            nonChildEntities = [];
+
+            for (const entity of entities) {
+                const parent = entityType.dependentPermissions.getParent(entity);
+
+                if (parent) {
+                    let childEntities;
+                    if (parentEntities.has(parent)) {
+                        childEntities = parentEntities.get(parent);
+                    } else {
+                        childEntities = [];
+                        parentEntities.set(parent, childEntities);
+                    }
+
+                    childEntities.push(entity.id);
+                } else {
+                    nonChildEntities.push(entity);
+                }
+            }
+        } else {
+            nonChildEntities = entities;
+        }
+
+
+        for (const entity of nonChildEntities) {
             const permsPerUser = new Map();
 
             if (entity.namespace) { // The root namespace has not parent namespace, thus the test
@@ -350,15 +395,37 @@ async function rebuildPermissionsTx(tx, restriction) {
                 }
             }
 
-            for (const userPermsPair of permsPerUser.entries()) {
-                const data = [];
+            if (!notToBeInserted.has(entity.id)) {
+                for (const userPermsPair of permsPerUser.entries()) {
+                    const data = [];
 
-                for (const operation of userPermsPair[1]) {
-                    data.push({user: userPermsPair[0], entity: entity.id, operation});
+                    for (const operation of userPermsPair[1]) {
+                        data.push({user: userPermsPair[0], entity: entity.id, operation});
+                    }
+
+                    if (data.length > 0) {
+                        await tx(entityType.permissionsTable).insert(data);
+                    }
                 }
+            }
 
-                if (data.length > 0) {
-                    await tx(entityType.permissionsTable).insert(data);
+            if (parentEntities.has(entity.id)) {
+                const childEntities = parentEntities.get(entity.id);
+
+                for (const childId of childEntities) {
+                    for (const userPermsPair of permsPerUser.entries()) {
+                        const data = [];
+
+                        for (const operation of userPermsPair[1]) {
+                            if (operation !== 'share') {
+                                data.push({user: userPermsPair[0], entity: childId, operation});
+                            }
+                        }
+
+                        if (data.length > 0) {
+                            await tx(entityType.permissionsTable).insert(data);
+                        }
+                    }
                 }
             }
         }

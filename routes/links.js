@@ -6,7 +6,7 @@ const router = require('../lib/router-async').create();
 const links = require('../models/links');
 const interoperableErrors = require('../shared/interoperable-errors');
 
-const trackImg = new Buffer('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+const trackImg = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 
 router.getAsync('/:campaign/:list/:subscription', async (req, res) => {
     res.writeHead(200, {

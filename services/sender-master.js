@@ -107,58 +107,63 @@ async function processCampaign(campaignId) {
     const msgQueue = [];
     messageQueue.set(campaignId, msgQueue);
 
-    while (true) {
-        const cpg = await knex('campaigns').where('id', campaignId).first();
+    try {
+        while (true) {
+            const cpg = await knex('campaigns').where('id', campaignId).first();
 
-        if (cpg.status === CampaignStatus.PAUSED) {
-            await finish();
-            return;
-        }
-
-        let qryGen;
-        await knex.transaction(async tx => {
-            qryGen = await campaigns.getSubscribersQueryGeneratorTx(tx, campaignId, true);
-        });
-
-        if (qryGen) {
-            let subscribersInProcessing = [...msgQueue];
-            for (const wa of workAssignment.values()) {
-                if (wa.campaignId === campaignId) {
-                    subscribersInProcessing = subscribersInProcessing.concat(wa.subscribers);
-                }
-            }
-
-            const qry = qryGen(knex)
-                .whereNotIn('pending_subscriptions.email', subscribersInProcessing.map(x => x.email))
-                .select(['pending_subscriptions.email', 'campaign_lists.list'])
-                .limit(retrieveBatchSize);
-            const subs = await qry;
-
-            if (subs.length === 0) {
-                await finish();
+            if (cpg.status === CampaignStatus.PAUSED) {
+                messageQueue.delete(campaignId);
                 return;
             }
 
-            for (const sub of subs) {
-                msgQueue.push({
-                    listId: sub.list,
-                    email: sub.email
-                });
-            }
-
-            const nextBatchNeeded = new Promise(resolve => {
-                messageQueueCont.set(campaignId, resolve);
+            let qryGen;
+            await knex.transaction(async tx => {
+                qryGen = await campaigns.getSubscribersQueryGeneratorTx(tx, campaignId, true);
             });
 
-            // noinspection JSIgnoredPromiseFromCall
-            setImmediate(scheduleWorkers);
+            if (qryGen) {
+                let subscribersInProcessing = [...msgQueue];
+                for (const wa of workAssignment.values()) {
+                    if (wa.campaignId === campaignId) {
+                        subscribersInProcessing = subscribersInProcessing.concat(wa.subscribers);
+                    }
+                }
 
-            await nextBatchNeeded;
+                const qry = qryGen(knex)
+                    .whereNotIn('pending_subscriptions.email', subscribersInProcessing.map(x => x.email))
+                    .select(['pending_subscriptions.email', 'campaign_lists.list'])
+                    .limit(retrieveBatchSize);
+                const subs = await qry;
 
-        } else {
-            await finish();
-            return;
+                if (subs.length === 0) {
+                    await finish();
+                    return;
+                }
+
+                for (const sub of subs) {
+                    msgQueue.push({
+                        listId: sub.list,
+                        email: sub.email
+                    });
+                }
+
+                const nextBatchNeeded = new Promise(resolve => {
+                    messageQueueCont.set(campaignId, resolve);
+                });
+
+                // noinspection JSIgnoredPromiseFromCall
+                setImmediate(scheduleWorkers);
+
+                await nextBatchNeeded;
+
+            } else {
+                await finish();
+                return;
+            }
         }
+    } catch (err) {
+        log.error('Senders', `Sending campaign ${campaignId} failed with error: ${err.message}`)
+        log.verbose(err);
     }
 }
 

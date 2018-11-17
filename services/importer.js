@@ -177,7 +177,7 @@ async function _execImportRun(impt, handlers) {
                     lastId = rows[rows.length - 1].id;
 
                     await knex.transaction(async tx => {
-                        const groupedFieldsMap = await subscriptions.getGroupedFieldsMap(tx, impt.list);
+                        const groupedFieldsMap = await subscriptions.getGroupedFieldsMapTx(tx, impt.list);
 
                         let newRows = 0;
 

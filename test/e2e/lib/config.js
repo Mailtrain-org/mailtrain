@@ -4,8 +4,8 @@ const config = require('config');
 
 module.exports = {
     app: config,
-    baseUrl: 'http://localhost:' + config.www.port,
-    mailUrl: 'http://localhost:' + config.testserver.mailboxserverport,
+    baseUrl: 'http://localhost:' + config.www.publicPort,
+    mailUrl: 'http://localhost:' + config.testServer.mailboxServerPort,
     users: {
         admin: {
             username: 'admin',
@@ -74,10 +74,10 @@ module.exports = {
         'service-url': 'http://localhost:' + config.www.publicPort + '/',
         'admin-email': 'keep.admin@mailtrain.org',
         'default-homepage': 'https://mailtrain.org',
-        'smtp-hostname': config.testserver.host,
-        'smtp-port': config.testserver.port,
+        'smtp-hostname': config.testServer.host,
+        'smtp-port': config.testServer.port,
         'smtp-encryption': 'NONE',
-        'smtp-user': config.testserver.username,
-        'smtp-pass': config.testserver.password
+        'smtp-user': config.testServer.username,
+        'smtp-pass': config.testServer.password
     }
 };

@@ -24,13 +24,21 @@ import {
 } from '../lib/error-handling';
 import {getCampaignLabels} from './helpers';
 import {Table} from "../lib/table";
-import {Button} from "../lib/bootstrap-components";
+import {
+    Button,
+    Icon
+} from "../lib/bootstrap-components";
 import axios from "../lib/axios";
 import {getUrl, getPublicUrl} from "../lib/urls";
 import interoperableErrors from '../../../shared/interoperable-errors';
-import {CampaignStatus} from "../../../shared/campaigns";
+import {
+    CampaignSource,
+    CampaignStatus,
+    CampaignType
+} from "../../../shared/campaigns";
 import moment from 'moment';
 import campaignsStyles from "./styles.scss";
+import {tableDeleteDialogAddDeleteButton} from "../lib/modals";
 
 
 @translate()
@@ -207,10 +215,21 @@ class SendControls extends Component {
         await this.refreshEntity();
     }
 
+    async enableAsync() {
+        await this.postAndMaskStateError(`rest/campaign-enable/${this.props.entity.id}`);
+        await this.refreshEntity();
+    }
+
+    async disableAsync() {
+        await this.postAndMaskStateError(`rest/campaign-disable/${this.props.entity.id}`);
+        await this.refreshEntity();
+    }
+
     render() {
         const t = this.props.t;
         const entity = this.props.entity;
 
+        console.log(entity);
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
             const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers')})`;
@@ -263,6 +282,30 @@ class SendControls extends Component {
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('Continue') + subscrInfo} onClickAsync={::this.startAsync}/>
                         <Button className="btn-primary" icon="refresh" label={t('Reset')} onClickAsync={::this.resetAsync}/>
+                    </ButtonRow>
+                </div>
+            );
+
+        } else if (entity.status === CampaignStatus.INACTIVE) {
+            return (
+                <div>
+                    <AlignedRow label={t('Send status')}>
+                        {t('Your campaign is currently disabled. Click Enable button to start enable it.')}
+                    </AlignedRow>
+                    <ButtonRow>
+                        <Button className="btn-primary" icon="play" label={t('Enable')} onClickAsync={::this.enableAsync}/>
+                    </ButtonRow>
+                </div>
+            );
+
+        } else if (entity.status === CampaignStatus.ACTIVE) {
+            return (
+                <div>
+                    <AlignedRow label={t('Send status')}>
+                        {t('Your campaign is enabled and sending messages.')}
+                    </AlignedRow>
+                    <ButtonRow>
+                        <Button className="btn-primary" icon="stop" label={t('Disable')} onClickAsync={::this.disableAsync}/>
                     </ButtonRow>
                 </div>
             );
@@ -362,6 +405,30 @@ export default class Status extends Component {
             { data: 3, title: t('List namespace') }
         ];
 
+        const campaignsChildrenColumns = [
+            { data: 1, title: t('Name') },
+            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
+            { data: 5, title: t('Status'), render: (data, display, rowData) => this.campaignStatusLabels[data] },
+            { data: 8, title: t('Created'), render: data => moment(data).fromNow() },
+            {
+                actions: data => {
+                    const actions = [];
+                    const perms = data[10];
+                    const campaignType = data[4];
+                    const campaignSource = data[7];
+
+                    if (perms.includes('viewStats')) {
+                        actions.push({
+                            label: <Icon icon="send" title={t('Status')}/>,
+                            link: `/campaigns/${data[0]}/status`
+                        });
+                    }
+
+                    return actions;
+                }
+            }
+        ];
+
         return (
             <div>
                 <Title>{t('Campaign Status')}</Title>
@@ -383,6 +450,15 @@ export default class Status extends Component {
                 <hr/>
 
                 <SendControls entity={entity} refreshEntity={::this.refreshEntity}/>
+
+                {entity.type === CampaignType.RSS &&
+                    <div>
+                        <hr/>
+                        <h3>RSS Entries</h3>
+                        <p>{t('If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here')}</p>
+                        <Table withHeader dataUrl={`rest/campaigns-children/${this.props.entity.id}`} columns={campaignsChildrenColumns} />
+                    </div>
+                }
             </div>
         );
     }

@@ -21,6 +21,7 @@ const api = require('./routes/api');
 
 // These are routes for the new React-based client
 const reports = require('./routes/reports');
+const subscriptions = require('./routes/subscriptions');
 const subscription = require('./routes/subscription');
 const sandboxedMosaico = require('./routes/sandboxed-mosaico');
 const sandboxedCKEditor = require('./routes/sandboxed-ckeditor');
@@ -234,6 +235,7 @@ function createApp(appType) {
             useWith404Fallback('/reports', reports);
         }
 
+        useWith404Fallback('/subscriptions', subscriptions);
         useWith404Fallback('/webhooks', webhooks);
 
         // API endpoints

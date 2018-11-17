@@ -27,9 +27,9 @@ port=3000
 user="mailtrain_test"
 password="$MYSQL_PASSWORD"
 database="mailtrain_test"
-[testserver]
+[testServer]
 enabled=true
-[seleniumwebdriver]
+[seleniumWebDriver]
 browser="phantomjs"
 EOT
 

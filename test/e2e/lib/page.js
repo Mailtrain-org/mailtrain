@@ -104,7 +104,7 @@ module.exports = (...extras) => Object.assign({
 
     async saveScreenshot(destPath) {
         const pngData = await driver.takeScreenshot();
-        const buf = new Buffer(pngData, 'base64');
+        const buf = Buffer.from(pngData, 'base64');
         await fs.writeFile(destPath, buf);
     },
 

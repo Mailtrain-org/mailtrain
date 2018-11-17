@@ -81,7 +81,7 @@ function getSubscriptionTableName(listId) {
     return `subscription__${listId}`;
 }
 
-async function getGroupedFieldsMap(tx, listId) {
+async function getGroupedFieldsMapTx(tx, listId) {
     const groupedFields = await fields.listGroupedTx(tx, listId);
     const result = {};
     for (const fld of groupedFields) {
@@ -189,7 +189,7 @@ function hashByAllowedKeys(allowedKeys, entity) {
 
 async function hashByList(listId, entity) {
     return await knex.transaction(async tx => {
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
         const allowedKeys = getAllowedKeys(groupedFieldsMap);
         return hashByAllowedKeys(allowedKeys, entity);
     });
@@ -204,7 +204,7 @@ async function _getByTx(tx, context, listId, key, value, grouped) {
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
 
-    const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+    const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
 
     if (grouped) {
         groupSubscription(groupedFieldsMap, entity);
@@ -248,7 +248,7 @@ async function listDTAjax(context, listId, segmentId, params) {
         // to group the fields. Then we copy relevant values form grouped subscription to ajaxList's data which then get
         // returned to the client. During the copy, we also render the values.
 
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
         const listFlds = await fields.listByOrderListTx(tx, listId, ['column', 'id']);
 
         const columns = [
@@ -387,7 +387,7 @@ async function list(context, listId, grouped = true, offset, limit) {
         const entities = await entitiesQry;
 
         if (grouped) {
-            const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+            const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
 
             for (const entity of entities) {
                 groupSubscription(groupedFieldsMap, entity);
@@ -399,6 +399,48 @@ async function list(context, listId, grouped = true, offset, limit) {
             total: count
         };
     });
+}
+
+// Note that this does not do all the work in the transaction. Thus it is prone to fail if the list is deleted in during the run of the function
+async function* listIterator(context, listId, segmentId, grouped = true) {
+    let groupedFieldsMap;
+    let addSegmentQuery;
+
+    await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+
+        if (grouped) {
+            groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
+        }
+
+        addSegmentQuery = segmentId ? await segments.getQueryGeneratorTx(tx, listId, segmentId) : () => {};
+    });
+
+    let lastId = 0;
+
+    while (true) {
+        const entities = await knex(getSubscriptionTableName(listId))
+            .orderBy('id', 'asc')
+            .where('id', '>', lastId)
+            .where(function() {
+                addSegmentQuery(this);
+            })
+            .limit(500);
+
+        if (entities.length > 0) {
+            for (const entity of entities) {
+                if (grouped) {
+                    groupSubscription(groupedFieldsMap, entity);
+                }
+
+                yield entity;
+            }
+
+            lastId = entities[entities.length - 1].id;
+        } else {
+            break;
+        }
+    }
 }
 
 async function serverValidate(context, listId, data) {
@@ -563,7 +605,7 @@ async function createTxWithGroupedFieldsMap(tx, context, listId, groupedFieldsMa
 
 async function create(context, listId, entity, source, meta) {
     return await knex.transaction(async tx => {
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
         return await createTxWithGroupedFieldsMap(tx, context, listId, groupedFieldsMap, entity, source, meta);
     });
 }
@@ -577,7 +619,7 @@ async function updateWithConsistencyCheck(context, listId, entity, source) {
             throw new interoperableErrors.NotFoundError();
         }
 
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
         const allowedKeys = getAllowedKeys(groupedFieldsMap);
 
         groupSubscription(groupedFieldsMap, existing);
@@ -718,7 +760,7 @@ async function updateManaged(context, listId, cid, entity) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-        const groupedFieldsMap = await getGroupedFieldsMap(tx, listId);
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
 
         const update = {};
         for (const key in groupedFieldsMap) {
@@ -764,11 +806,12 @@ module.exports.getByCidTx = getByCidTx;
 module.exports.getByCid = getByCid;
 module.exports.getByEmail = getByEmail;
 module.exports.list = list;
+module.exports.listIterator = listIterator;
 module.exports.listDTAjax = listDTAjax;
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
 module.exports.serverValidate = serverValidate;
 module.exports.create = create;
-module.exports.getGroupedFieldsMap = getGroupedFieldsMap;
+module.exports.getGroupedFieldsMapTx = getGroupedFieldsMapTx;
 module.exports.createTxWithGroupedFieldsMap = createTxWithGroupedFieldsMap;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

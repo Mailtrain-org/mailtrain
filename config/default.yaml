@@ -174,18 +174,18 @@ reports:
   # then it's safer to switch off the reporting functionality below.
   enabled: false
 
-testserver:
+testServer:
   # Starts a vanity server that redirects all mail to /dev/null
   # Mostly needed for local development
   enabled: false
   port: 5587
-  mailboxserverport: 3001
+  mailboxServerPort: 3001
   host: 0.0.0.0
   username: testuser
   password: testpass
   logger: false
 
-seleniumwebdriver:
+seleniumWebDriver:
   browser: phantomjs
 
 

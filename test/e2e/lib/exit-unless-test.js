@@ -10,8 +10,8 @@ if (process.env.NODE_ENV !== 'test' || !fs.existsSync(path.join(__dirname, '..',
     process.exit(1);
 }
 
-if (config.app.testserver.enabled !== true) {
-    log.error('e2e', 'This script only runs if the testserver is enabled. Check config/test.toml');
+if (config.app.testServer.enabled !== true) {
+    log.error('e2e', 'This script only runs if the testServer is enabled. Check config/test.toml');
     process.exit(1);
 }
 

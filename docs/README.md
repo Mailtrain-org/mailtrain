@@ -273,7 +273,7 @@ If using VERP with iRedMail, see [this post](http://www.iredmail.org/forum/post4
 
 ## Testing
 
-There is a built in /dev/null server in Mailtrain that you can use to load test your installation. Check the `[testserver]` section in the configuration file for details. By default the test server is disabled. The server uses only cleartext connections, so select "Do not use encryption" in the encryption settings when setting up the server data in Mailtrain.
+There is a built in /dev/null server in Mailtrain that you can use to load test your installation. Check the `[testServer]` section in the configuration file for details. By default the test server is disabled. The server uses only cleartext connections, so select "Do not use encryption" in the encryption settings when setting up the server data in Mailtrain.
 
 Additionally you can generate CSV import files with fake subscriber data:
 

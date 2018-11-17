@@ -694,10 +694,11 @@ async function forHbs(context, listId, subscription) { // assumes grouped subscr
     return forHbsWithFieldsGrouped(flds, subscription);
 }
 
-function getMergeTags(fieldsGrouped, subscription) { // assumes grouped subscription
+function getMergeTags(fieldsGrouped, subscription, extraTags = {}) { // assumes grouped subscription
     const mergeTags = {
         'EMAIL': subscription.email,
-        ...getMergeTagsForBases(getTrustedUrl(), getSandboxUrl(), getPublicUrl())
+        ...getMergeTagsForBases(getTrustedUrl(), getSandboxUrl(), getPublicUrl()),
+        ...extraTags
     };
 
     for (const fld of fieldsGrouped) {

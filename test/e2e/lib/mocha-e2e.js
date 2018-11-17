@@ -10,7 +10,7 @@ const config = require('./config');
 const webdriver = require('selenium-webdriver');
 
 const driver = new webdriver.Builder()
-    .forBrowser(config.app.seleniumwebdriver.browser || 'phantomjs')
+    .forBrowser(config.app.seleniumWebDriver.browser || 'phantomjs')
     .build();
 
 const failHandlerRunning = new WorkerCounter();
@@ -96,7 +96,7 @@ function UseCaseReporter(runner) {
             const info = `URL: ${currentUrl}`;
             await fs.writeFile('last-failed-e2e-test.info', info);
             await fs.writeFile('last-failed-e2e-test.html', await driver.getPageSource());
-            await fs.writeFile('last-failed-e2e-test.png', new Buffer(await driver.takeScreenshot(), 'base64'));
+            await fs.writeFile('last-failed-e2e-test.png', Buffer.from(await driver.takeScreenshot(), 'base64'));
             failHandlerRunning.exit();
         })();
 
