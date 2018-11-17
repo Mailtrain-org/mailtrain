@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('config');
 const lists = require('../models/lists');
 const tools = require('../lib/tools');
 const blacklist = require('../models/blacklist');
@@ -61,7 +62,7 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
         };
 
         const confirmCid = await confirmations.addConfirmation(list.id, 'subscribe', req.ip, data);
-        await mailHelpers.sendConfirmSubscription(list, input.EMAIL, confirmCid, subscription);
+        await mailHelpers.sendConfirmSubscription(config.language, list, input.EMAIL, confirmCid, subscription);
 
         res.status(200);
         res.json({

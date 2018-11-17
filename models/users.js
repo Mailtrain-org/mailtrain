@@ -11,7 +11,7 @@ const tools = require('../lib/tools');
 const crypto = require('crypto');
 const settings = require('./settings');
 const {getTrustedUrl} = require('../lib/urls');
-const _ = require('../lib/translate')._;
+const { tUI } = require('../lib/translate');
 
 const bluebird = require('bluebird');
 
@@ -286,7 +286,7 @@ async function resetAccessToken(userId) {
     return token;
 }
 
-async function sendPasswordReset(usernameOrEmail) {
+async function sendPasswordReset(language, usernameOrEmail) {
     enforce(passport.isAuthMethodLocal, 'Local user management is required');
 
     await knex.transaction(async tx => {
@@ -310,7 +310,7 @@ async function sendPasswordReset(usernameOrEmail) {
                 to: {
                     address: user.email
                 },
-                subject: _('Mailer password change request')
+                subject: tUI(language, 'account.passwordChangeRequest')
             }, {
                 html: 'emails/password-reset-html.hbs',
                 text: 'emails/password-reset-text.hbs',

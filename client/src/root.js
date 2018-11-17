@@ -6,7 +6,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {
     I18nextProvider,
-    translate
+    withNamespaces
 } from 'react-i18next';
 import i18n from './lib/i18n';
 
@@ -38,7 +38,7 @@ import axios from './lib/axios';
 import {getUrl} from "./lib/urls";
 
 
-@translate()
+@withNamespaces()
 class Root extends Component {
     constructor(props) {
         super(props);
@@ -58,7 +58,7 @@ class Root extends Component {
                     const link = entry.link || entry.externalLink;
 
                     if (link && path.startsWith(link)) {
-                        topLevelMenu.push(<MenuLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('(current)')}</span></MenuLink>);
+                        topLevelMenu.push(<MenuLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('root.current')}</span></MenuLink>);
                     } else {
                         topLevelMenu.push(<MenuLink key={entryKey} to={link}>{entry.title}</MenuLink>);
                     }
@@ -69,7 +69,7 @@ class Root extends Component {
                         <div className="container-fluid">
                             <div className="navbar-header">
                                 <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                    <span className="sr-only">{t('Toggle navigation')}</span>
+                                    <span className="sr-only">{t('root.toggleNavigation')}</span>
                                     <span className="icon-bar"></span>
                                     <span className="icon-bar"></span>
                                     <span className="icon-bar"></span>
@@ -81,22 +81,22 @@ class Root extends Component {
                             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                                 <ul className="nav navbar-nav">
                                     {topLevelMenu}
-                                    <DropdownMenuItem label={t('Administration')}>
-                                        <MenuLink to="/users"><Icon icon='cog'/> {t('Users')}</MenuLink>
-                                        <MenuLink to="/namespaces"><Icon icon='cog'/> {t('Namespaces')}</MenuLink>
-                                        {mailtrainConfig.globalPermissions.manageSettings && <MenuLink to="/settings"><Icon icon='cog'/> {t('Global Settings')}</MenuLink>}
-                                        <MenuLink to="/send-configurations"><Icon icon='cog'/> {t('Send Configurations')}</MenuLink>
-                                        {mailtrainConfig.globalPermissions.manageBlacklist && <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('Blacklist')}</MenuLink>}
-                                        <MenuLink to="/account/api"><Icon icon='retweet'/> {t('API')}</MenuLink>
+                                    <DropdownMenuItem label={t('root.administration')}>
+                                        <MenuLink to="/users"><Icon icon='cog'/> {t('user_plural')}</MenuLink>
+                                        <MenuLink to="/namespaces"><Icon icon='cog'/> {t('namespace_plural')}</MenuLink>
+                                        {mailtrainConfig.globalPermissions.manageSettings && <MenuLink to="/settings"><Icon icon='cog'/> {t('globalSetting_plural')}</MenuLink>}
+                                        <MenuLink to="/send-configurations"><Icon icon='cog'/> {t('sendConfiguration_plural')}</MenuLink>
+                                        {mailtrainConfig.globalPermissions.manageBlacklist && <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('blacklist')}</MenuLink>}
+                                        <MenuLink to="/account/api"><Icon icon='retweet'/> {t('api')}</MenuLink>
                                     </DropdownMenuItem>
                                 </ul>
 
 
                                 <ul className="nav navbar-nav navbar-right">
                                     <DropdownMenuItem label={mailtrainConfig.user.username} icon="user">
-                                        <MenuLink to="/account"><Icon icon='user'/> {t('Account')}</MenuLink>
+                                        <MenuLink to="/account"><Icon icon='user'/> {t('root.account')}</MenuLink>
                                         <li>
-                                            <ActionLink onClickAsync={::self.logout}><Icon icon='log-out'/> {t('Log out')}</ActionLink>
+                                            <ActionLink onClickAsync={::self.logout}><Icon icon='log-out'/> {t('logout')}</ActionLink>
                                         </li>
                                     </DropdownMenuItem>
                                 </ul>
@@ -145,7 +145,7 @@ class Root extends Component {
 
                 <footer className="footer">
                     <div className="container-fluid">
-                        <p className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('Source on GitHub')}</a></p>
+                        <p className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGithub')}</a></p>
                     </div>
                 </footer>
             </div>

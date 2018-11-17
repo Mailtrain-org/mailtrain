@@ -77,7 +77,7 @@ export class UntrustedContentHost extends Component {
     }
 
     sendMessage(type, data) {
-        if (this.contentNodeIsLoaded) { // This is to avoid errors "common.js:45744 Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('http://localhost:8081') does not match the recipient window's origin ('http://localhost:3000')"
+        if (this.contentNodeIsLoaded) { // This is to avoid errors: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('http://localhost:8081') does not match the recipient window's origin ('http://localhost:3000')"
             this.contentNode.contentWindow.postMessage({type, data}, getSandboxUrl());
         }
     }

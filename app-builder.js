@@ -4,6 +4,7 @@ const config = require('config');
 const log = require('./lib/log');
 
 const express = require('express');
+const expressLocale = require('express-locale');
 const bodyParser = require('body-parser');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -12,7 +13,6 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
 const hbs = require('hbs');
-const handlebarsHelpers = require('./lib/handlebars-helpers');
 const compression = require('compression');
 const passport = require('./lib/passport');
 const contextHelpers = require('./lib/context-helpers');
@@ -109,8 +109,6 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
     );
 });
 
-handlebarsHelpers.registerHelpers(hbs.handlebars);
-
 
 
 function createApp(appType) {
@@ -130,7 +128,6 @@ function createApp(appType) {
         app.use(url, route);
         install404Fallback(url);
     }
-
 
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
@@ -163,6 +160,14 @@ function createApp(appType) {
         secret: config.www.secret,
         saveUninitialized: false,
         resave: false
+    }));
+
+    app.use(expressLocale({
+        priority: ['query', 'accept-language', 'default'],
+        query: {
+            name: 'language'
+        },
+        default: 'en_US'
     }));
 
     app.use(flash());

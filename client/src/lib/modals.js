@@ -87,8 +87,8 @@ export class RestActionModalDialog extends Component {
 
         return (
             <ModalDialog hidden={!this.props.visible} title={this.props.title} onCloseAsync={() => this.hideModal(true)} buttons={[
-                { label: t('No'), className: 'btn-primary', onClickAsync: () => this.hideModal(true) },
-                { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performAction }
+                { label: t('no'), className: 'btn-primary', onClickAsync: () => this.hideModal(true) },
+                { label: t('yes'), className: 'btn-danger', onClickAsync: ::this.performAction }
             ]}>
                 {this.props.message}
             </ModalDialog>
@@ -105,15 +105,15 @@ export class DeleteModalDialog extends Component {
         const t = props.t;
 
         this.entityTypeLabels = {
-            'namespace': t('Namespace'),
-            'list': t('List'),
-            'customForm': t('Custom forms'),
-            'campaign': t('Campaign'),
-            'template': t('Template'),
-            'sendConfiguration': t('Send configuration'),
-            'report': t('Report'),
-            'reportTemplate': t('Report template'),
-            'mosaicoTemplate': t('Mosaico template')
+            'namespace': t('namespace'),
+            'list': t('list'),
+            'customForm': t('customForms'),
+            'campaign': t('campaign'),
+            'template': t('template'),
+            'sendConfiguration': t('sendConfiguration'),
+            'report': t('report'),
+            'reportTemplate': t('reportTemplate'),
+            'mosaicoTemplate': t('mosaicoTemplate')
         };
     }
 
@@ -145,7 +145,7 @@ export class DeleteModalDialog extends Component {
             const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
             this.setFlashMessage('danger',
                 <div>
-                    <p>{t('Cannote delete "{{name}}" due to the following dependencies:', {name, nsSeparator: '|'})}</p>
+                    <p>{t('deleteDialog.cannotDeleteDueToDependencies', {name})}</p>
                     <ul className={styles.dependenciesList}>
                     {err.data.dependencies.map(dep =>
                         dep.link ?
@@ -153,7 +153,7 @@ export class DeleteModalDialog extends Component {
                         : // if no dep.link is present, it means the user has no permission to view the entity, thus only id without the link is shown
                             <li key={dep.id}>{this.entityTypeLabels[dep.entityTypeId]}: [{dep.id}]</li>
                     )}
-                    {err.data.andMore && <li>{t('... and more')}</li>}
+                    {err.data.andMore && <li>{t('deleteDialog.andMore')}</li>}
                     </ul>
                 </div>
             );
@@ -180,8 +180,8 @@ export class DeleteModalDialog extends Component {
         const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
 
         return <RestActionModalDialog
-            title={t('Confirm deletion')}
-            message={t('Are you sure you want to delete "{{name}}"?', {name})}
+            title={t('deleteDialog.confirmDeletion')}
+            message={t('deleteDialog.areYouSureToDelete', {name})}
             stateOwner={this.props.stateOwner}
             visible={this.props.visible}
             actionMethod={HTTPMethod.DELETE}
@@ -209,11 +209,11 @@ export function tableDeleteDialogAddDeleteButton(actions, owner, perms, id, name
     if (!perms || perms.includes('delete')) {
         if (owner.deleteDialogData.id) {
             actions.push({
-                label: <Icon className={styles.iconDisabled} icon="remove" title={t('Delete')}/>
+                label: <Icon className={styles.iconDisabled} icon="remove" title={t('delete')}/>
             });
         } else {
             actions.push({
-                label: <Icon icon="remove" title={t('Delete')}/>,
+                label: <Icon icon="remove" title={t('delete')}/>,
                 action: () => {
                     owner.deleteDialogData = {name, id};
                     owner.setState({

@@ -8,7 +8,7 @@ const util = require('util');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
 
-const _ = require('../lib/translate')._;
+const { tLog } = require('../lib/translate');
 
 const feedCheckInterval = 10 * 60 * 1000;
 
@@ -127,14 +127,14 @@ async function run() {
             }
 
             if (added > 0) {
-                checkStatus = util.format(_('Found %s new campaign messages from feed %s'), added, rssCampaign.id);
+                checkStatus = tLog('feedCheck.campaignsAdded', {addedMessages: added, campaignId: rssCampaign.id});
                 log.verbose('Feed', `Found ${added} new campaigns messages from feed ${rssCampaign.id}`);
 
                 process.send({
                     type: 'entries-added'
                 });
             } else {
-                checkStatus = _('Found nothing new from the feed');
+                checkStatus = tLog('feedCheck.nothingNew');
             }
 
             rssCampaign.data.checkStatus = checkStatus;

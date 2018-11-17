@@ -260,7 +260,7 @@ class RouteContent extends Component {
                     <div>
                         {primaryMenuComponent}
                         <div className="container-fluid">
-                            {t('Loading...')}
+                            {t('loading')}
                         </div>
                     </div>
                 );

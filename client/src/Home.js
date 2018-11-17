@@ -1,10 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withNamespaces } from 'react-i18next';
 import { requiresAuthenticatedUser } from './lib/page';
 
-@translate()
+@withNamespaces()
 @requiresAuthenticatedUser
 export default class List extends Component {
     constructor(props) {
@@ -16,7 +16,7 @@ export default class List extends Component {
 
         return (
             <div>
-                <h2>{t('Welcome to Mailtrain...')}</h2>
+                <h2>{t('home.welcome')}</h2>
                 <div>TODO: some dashboard</div>
             </div>
         );

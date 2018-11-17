@@ -25,7 +25,7 @@ class DismissibleAlert extends Component {
 
         return (
             <div className={`alert alert-${this.props.severity} alert-dismissible`} role="alert">
-                <button type="button" className="close" aria-label={t('Close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
+                <button type="button" className="close" aria-label={t('close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
                 {this.props.children}
             </div>
         )
@@ -201,7 +201,7 @@ class ModalDialog extends Component {
         const t = props.t;
 
         this.state = {
-            buttons: this.props.buttons || [ { label: t('Close'), className: 'btn-default', onClickAsync: null } ]
+            buttons: this.props.buttons || [ { label: t('close'), className: 'btn-default', onClickAsync: null } ]
         };
     }
 
@@ -290,7 +290,7 @@ class ModalDialog extends Component {
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" className="close" aria-label={t('Close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
+                            <button type="button" className="close" aria-label={t('close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
                             <h4 className="modal-title">{this.props.title}</h4>
                         </div>
                         <div className="modal-body">{this.props.children}</div>

@@ -11,14 +11,14 @@ class NamespaceSelect extends Component {
         const t = this.props.t;
 
         return (
-            <TreeTableSelect id="namespace" label={t('Namespace')} dataUrl="rest/namespaces-tree"/>
+            <TreeTableSelect id="namespace" label={t('namespace')} dataUrl="rest/namespaces-tree"/>
         );
     }
 }
 
 function validateNamespace(t, state) {
     if (!state.getIn(['namespace', 'value'])) {
-        state.setIn(['namespace', 'error'], t('Namespace must be selected'));
+        state.setIn(['namespace', 'error'], t('namespace.mustBeSelected'));
     } else {
         state.setIn(['namespace', 'error'], null);
     }

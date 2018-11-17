@@ -229,7 +229,6 @@ class SendControls extends Component {
         const t = this.props.t;
         const entity = this.props.entity;
 
-        console.log(entity);
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
             const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers')})`;

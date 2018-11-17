@@ -8,7 +8,7 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const bluebird = require('bluebird');
-const fsReadFile = bluebird.promisify(require('fs').readFile);
+const fs = require('fs-extra');
 const path = require('path');
 const mjml = require('mjml');
 const _ = require('../lib/translate')._;
@@ -184,13 +184,13 @@ async function remove(context, id) {
 }
 
 
+// FIXME - add the ability of having multiple language variant of the same custom form
 async function getDefaultCustomFormValues() {
     const basePath = path.join(__dirname, '..');
 
     async function getContents(fileName) {
         try {
-            const template = await fsReadFile(path.join(basePath, fileName), 'utf8');
-            return template.replace(/\{\{#translate\}\}(.*?)\{\{\/translate\}\}/g, (m, s) => _(s));
+            const template = await fs.readFile(path.join(basePath, fileName), 'utf8');
         } catch (err) {
             return false;
         }

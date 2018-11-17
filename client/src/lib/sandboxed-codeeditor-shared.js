@@ -6,6 +6,6 @@ export const CodeEditorSourceType = {
 };
 
 export const getCodeEditorSourceTypeOptions = t => [
-    {key: CodeEditorSourceType.MJML, label: t('MJML')},
-    {key: CodeEditorSourceType.HTML, label: t('HTML')}
+    {key: CodeEditorSourceType.MJML, label: t('mjml')},
+    {key: CodeEditorSourceType.HTML, label: t('html')}
 ];

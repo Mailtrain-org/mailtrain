@@ -36,7 +36,7 @@ async function main() {
         for (const spec of report.user_fields) {
             const getter = userFieldGetters[spec.type];
             if (!getter) {
-                throw new Error(_('Unknown user field type "' + spec.type + '".'));
+                throw new Error('Unknown user field type "' + spec.type + '".');
             }
 
             const entities = [];

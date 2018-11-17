@@ -6,6 +6,6 @@ export const GrapesJSSourceType = {
 };
 
 export const getGrapesJSSourceTypeOptions = t => [
-    {key: GrapesJSSourceType.MJML, label: t('MJML')},
-    {key: GrapesJSSourceType.HTML, label: t('HTML')}
+    {key: GrapesJSSourceType.MJML, label: t('mjml')},
+    {key: GrapesJSSourceType.HTML, label: t('html')}
 ];

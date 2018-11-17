@@ -50,22 +50,22 @@ export default class Files extends Component {
         const t = this.props.t;
         const details = [];
         if (response.data.added) {
-            details.push(t('{{count}} file(s) added', {count: response.data.added}));
+            details.push(t('files.filesAdded', {count: response.data.added}));
         }
         if (response.data.replaced) {
-            details.push(t('{{count}} file(s) replaced', {count: response.data.replaced}));
+            details.push(t('files.filesReplaced', {count: response.data.replaced}));
         }
         if (response.data.ignored) {
-            details.push(t('{{count}} file(s) ignored', {count: response.data.ignored}));
+            details.push(t('files.filesIgnored', {count: response.data.ignored}));
         }
         const detailsMessage = details ? ' (' + details.join(', ') + ')' : '';
-        return t('{{count}} file(s) uploaded', {count: response.data.uploaded}) + detailsMessage;
+        return t('files.filesUploaded', {count: response.data.uploaded}) + detailsMessage;
     }
 
     onDrop(files){
         const t = this.props.t;
         if (files.length > 0) {
-            this.setFlashMessage('info', t('Uploading {{count}} file(s)', files.length));
+            this.setFlashMessage('info', t('files.uploadingFiles', {count: files.length}));
             const data = new FormData();
             for (const file of files) {
                 data.append('files[]', file)
@@ -76,10 +76,10 @@ export default class Files extends Component {
                 const message = this.getFilesUploadedMessage(res);
                 this.setFlashMessage('info', message);
             })
-            .catch(res => this.setFlashMessage('danger', t('File upload failed: ') + res.message));
+            .catch(res => this.setFlashMessage('danger', t('files.fileUploadFailed') + ' ' + res.message));
         }
         else{
-            this.setFlashMessage('info', t('No files to upload'));
+            this.setFlashMessage('info', t('files.noFilesToUpload'));
         }
     }
 
@@ -97,13 +97,13 @@ export default class Files extends Component {
         await this.hideDeleteFile();
 
         try {
-            this.setFlashMessage('info', t('Deleting file ...'));
+            this.setFlashMessage('info', t('files.deletingFile'));
             await axios.delete(getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${fileToDeleteId}`));
             this.filesTable.refresh();
-            this.setFlashMessage('info', t('File deleted'));
+            this.setFlashMessage('info', t('files.fileDeleted'));
         } catch (err) {
             this.filesTable.refresh();
-            this.setFlashMessage('danger', t('Delete file failed: ') + err.message);
+            this.setFlashMessage('danger', t('files.deleteFileFailed') + ' ' + err.message);
         }
     }
 
@@ -111,8 +111,8 @@ export default class Files extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: "Name" },
-            { data: 3, title: "Size" },
+            { data: 1, title: t('name') },
+            { data: 3, title: t('size') },
             {
                 actions: data => {
                     const actions = [];
@@ -125,13 +125,13 @@ export default class Files extends Component {
                     }
 
                     actions.push({
-                        label: <Icon icon="download" title={t('Download')}/>,
+                        label: <Icon icon="download" title={t('download')}/>,
                         href: downloadUrl
                     });
 
                     if (this.props.entity.permissions.includes(this.props.managePermission)) {
                         actions.push({
-                            label: <Icon icon="remove" title={t('Delete')}/>,
+                            label: <Icon icon="remove" title={t('delete')}/>,
                             action: () => this.deleteFile(data[0], data[1])
                         });
                     }
@@ -145,13 +145,13 @@ export default class Files extends Component {
             <div>
                 <ModalDialog
                     hidden={this.state.fileToDeleteId === null}
-                    title={t('Confirm file deletion')}
+                    title={t('files.confirmFileDeletion')}
                     onCloseAsync={::this.hideDeleteFile}
                     buttons={[
-                        { label: t('No'), className: 'btn-primary', onClickAsync: ::this.hideDeleteFile },
-                        { label: t('Yes'), className: 'btn-danger', onClickAsync: ::this.performDeleteFile }
+                        { label: t('no'), className: 'btn-primary', onClickAsync: ::this.hideDeleteFile },
+                        { label: t('yes'), className: 'btn-danger', onClickAsync: ::this.performDeleteFile }
                     ]}>
-                    {t('Are you sure you want to delete file "{{name}}"?', {name: this.state.fileToDeleteName})}
+                    {t('files:areYouSureToDeleteFile', {name: this.state.fileToDeleteName})}
                 </ModalDialog>
 
                 {this.props.title && <Title>{this.props.title}</Title>}
@@ -161,7 +161,7 @@ export default class Files extends Component {
                 {
                     this.props.entity.permissions.includes(this.props.managePermission) &&
                     <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName={styles.dropZoneActive}>
-                        {state => state.isDragActive ? t('Drop {{count}} file(s)', {count:state.draggedFiles.length}) : t('Drop files here')}
+                        {state => state.isDragActive ? t('files.dropFiles', {count: state.draggedFiles.length}) : t('files.dropFilesHere')}
                     </Dropzone>
                 }
 

@@ -86,7 +86,7 @@ class Form extends Component {
 
         if (!owner.isFormReady()) {
             if (owner.isFormWithLoadingNotice()) {
-                return <p className={`alert alert-info ${styles.formStatus}`} role="alert">{t('Loading ...')}</p>
+                return <p className={`alert alert-info ${styles.formStatus}`} role="alert">{t('loading')}</p>
             } else {
                 return <div></div>;
             }
@@ -568,7 +568,7 @@ class DatePicker extends Component {
             <div>
                 <div className="input-group">
                     <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
-                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><Icon icon="calendar" title={t('Open calendar')}/></span>
+                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><Icon icon="calendar" title={t('form.openCalendar')}/></span>
                 </div>
                 {this.state.opened &&
                 <div className={styles.dayPickerWrapper}>
@@ -803,7 +803,7 @@ class TableSelect extends Component {
                         <input type="text" className="form-control" value={this.state.selectedLabel} onClick={::this.toggleOpen} readOnly={!props.disabled} disabled={props.disabled}/>
                         {!props.disabled &&
                         <span className="input-group-btn">
-                            <Button label={t('Select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
+                            <Button label={t('form.select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
                         </span>
                         }
                     </div>
@@ -1305,8 +1305,8 @@ function withForm(target) {
                 this.disableForm();
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('Someone else has introduced modification in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                        <strong>{t('form.yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('form.modificationsInTheMeantime')}
                     </span>
                 );
                 return;
@@ -1316,8 +1316,8 @@ function withForm(target) {
                 this.disableForm();
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that someone else has deleted the target namespace in the meantime. Refresh your page to start anew with fresh data. Please note that your changes will be lost.')}
+                        <strong>{t('form.yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('form.namespaceDeletedInTheMeantime')}
                     </span>
                 );
                 return;
@@ -1327,8 +1327,8 @@ function withForm(target) {
                 this.disableForm();
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that someone else has deleted the entity in the meantime.')}
+                        <strong>{t('form.yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('form.deletionInTheMeantime')}
                     </span>
                 );
                 return;

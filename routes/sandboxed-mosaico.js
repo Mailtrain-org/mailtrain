@@ -11,8 +11,7 @@ const gm = require('gm').subClass({
 });
 const users = require('../models/users');
 
-const bluebird = require('bluebird');
-const fsReadFile = bluebird.promisify(require('fs').readFile);
+const fs = require('fs-extra')
 
 const files = require('../models/files');
 const fileHelpers = require('../lib/file-helpers');
@@ -190,7 +189,7 @@ function getRouter(appType) {
                 const lang = config.language.split('_')[0];
                 try {
                     const file = path.join(__dirname, '..', 'client', 'static', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
-                    languageStrings = await fsReadFile(file, 'utf8');
+                    languageStrings = await fs.readFile(file, 'utf8');
                 } catch (err) {
                 }
             }
@@ -202,7 +201,6 @@ function getRouter(appType) {
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
-                    getSandboxUrl('mailtrain/common.js'),
                     getSandboxUrl('mailtrain/mosaico-root.js')
                 ],
                 publicPath: getSandboxUrl()

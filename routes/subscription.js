@@ -9,7 +9,7 @@ const lists = require('../models/lists');
 const fields = require('../models/fields');
 const shares = require('../models/shares');
 const settings = require('../models/settings');
-const _ = require('../lib/translate')._;
+const { tUI } = require('../lib/translate');
 const contextHelpers = require('../lib/context-helpers');
 const forms = require('../models/forms');
 const {getTrustedUrl} = require('../lib/urls');
@@ -40,7 +40,7 @@ const corsOptions = {
         if (originWhitelist.includes(origin)) {
             callback(null, true);
         } else {
-            const err = new Error(_('Not allowed by CORS'));
+            const err = new Error('Not allowed by CORS');
             err.status = 403;
             callback(err);
         }
@@ -126,7 +126,7 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
 
     const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
     subscription.cid = meta.cid;
-    await mailHelpers.sendSubscriptionConfirmed(list, subscription.email, subscription);
+    await mailHelpers.sendSubscriptionConfirmed(req.language, list, subscription.email, subscription);
 
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/subscribed-notice');
 });
@@ -139,9 +139,9 @@ router.getAsync('/confirm/change-address/:cid', async (req, res) => {
 
     const subscription = await subscriptions.updateAddressAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionId, data.emailNew);
 
-    await mailHelpers.sendSubscriptionConfirmed(list, data.emailNew, subscription);
+    await mailHelpers.sendSubscriptionConfirmed(req.language, list, data.emailNew, subscription);
 
-    req.flash('info', _('Email address changed'));
+    req.flash('info', tUI(req.language, 'subscription.emailChanged'));
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/manage/' + subscription.cid);
 });
 
@@ -153,7 +153,7 @@ router.getAsync('/confirm/unsubscribe/:cid', async (req, res) => {
 
     const subscription = await subscriptions.unsubscribeByCidAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionCid, data.campaignCid);
 
-    await mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription);
+    await mailHelpers.sendUnsubscriptionConfirmed(req.language, list, subscription.email, subscription);
 
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribed-notice');
 });
@@ -244,7 +244,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
             throw new Error('Email address not set');
         }
 
-        req.flash('danger', _('Email address not set'));
+        req.flash('danger', tUI(req.language, 'subscription.addressNotSet'));
         return await _renderSubscribe(req, res, list, subscriptionData);
     }
 
@@ -281,7 +281,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     }
 
     if (existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED) {
-        await mailHelpers.sendAlreadySubscribed(list, email, existingSubscription);
+        await mailHelpers.sendAlreadySubscribed(req.language, list, email, existingSubscription);
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
     } else {
@@ -295,12 +295,12 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         if (!testsPass) {
             log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
         } else {
-            await mailHelpers.sendConfirmSubscription(list, email, confirmCid, subscriptionData);
+            await mailHelpers.sendConfirmSubscription(req.language, list, email, confirmCid, subscriptionData);
         }
 
         if (req.xhr) {
             return res.status(200).json({
-                msg: _('Please Confirm Subscription')
+                msg: tUI(req.language, 'subscription.confirmSubscription')
             });
         }
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
@@ -457,7 +457,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
     }
 
     if (subscription.email === emailNew) {
-        req.flash('info', _('Nothing seems to be changed'));
+        req.flash('info', tUI(req.language, 'subscription.nothingChanged'));
 
     } else {
         const emailErr = await tools.validateEmail(emailNew);
@@ -478,7 +478,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
             }
 
             if (newSubscription && newSubscription.status === SubscriptionStatus.SUBSCRIBED) {
-                await mailHelpers.sendAlreadySubscribed(list, emailNew, subscription);
+                await mailHelpers.sendAlreadySubscribed(req.language, list, emailNew, subscription);
             } else {
                 const data = {
                     subscriptionId: subscription.id,
@@ -486,10 +486,10 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
                 };
 
                 const confirmCid = await confirmations.addConfirmation(list.id, 'change-address', req.ip, data);
-                await mailHelpers.sendConfirmAddressChange(list, emailNew, confirmCid, subscription);
+                await mailHelpers.sendConfirmAddressChange(req.language, list, emailNew, confirmCid, subscription);
             }
 
-            req.flash('info', _('An email with further instructions has been sent to the provided address'));
+            req.flash('info', tUI(req.language, 'subscription.furtherInstructionsSent'));
         }
     }
 
@@ -505,7 +505,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
     const autoUnsubscribe = req.query.auto === 'yes';
 
     if (autoUnsubscribe) {
-        await handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, res);
+        await handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, req, res);
 
     } else if (req.query.formTest ||
         list.unsubscription_mode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM ||
@@ -544,7 +544,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
         res.send(htmlRenderer(data));
 
     } else { // UnsubscriptionMode.ONE_STEP || UnsubscriptionMode.TWO_STEP || UnsubscriptionMode.MANUAL
-        await handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, res);
+        await handleUnsubscribe(list, req.params.ucid, autoUnsubscribe, req.query.c, req.ip, req, res);
     }
 });
 
@@ -554,18 +554,18 @@ router.postAsync('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtecti
 
     const campaignCid = cleanupFromPost(req.body.campaign);
 
-    await handleUnsubscribe(list, req.body.ucid, false, campaignCid, req.ip, res);
+    await handleUnsubscribe(list, req.body.ucid, false, campaignCid, req.ip, req, res);
 });
 
 
-async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaignCid, ip, res) {
+async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaignCid, ip, req, res) {
     if ((list.unsubscription_mode === lists.UnsubscriptionMode.ONE_STEP || list.unsubscription_mode === lists.UnsubscriptionMode.ONE_STEP_WITH_FORM) ||
         (autoUnsubscribe && (list.unsubscription_mode === lists.UnsubscriptionMode.TWO_STEP || list.unsubscription_mode === lists.UnsubscriptionMode.TWO_STEP_WITH_FORM)) ) {
 
         try {
             const subscription = await subscriptions.unsubscribeByCidAndGet(contextHelpers.getAdminContext(), list.id, subscriptionCid, campaignCid);
 
-            await mailHelpers.sendUnsubscriptionConfirmed(list, subscription.email, subscription);
+            await mailHelpers.sendUnsubscriptionConfirmed(req.language, list, subscription.email, subscription);
 
             res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribed-notice');
 
@@ -590,7 +590,7 @@ async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaig
             };
 
             const confirmCid = await confirmations.addConfirmation(list.id, 'unsubscribe', ip, data);
-            await mailHelpers.sendConfirmUnsubscription(list, subscription.email, confirmCid, subscription);
+            await mailHelpers.sendConfirmUnsubscription(req.language, list, subscription.email, confirmCid, subscription);
 
             res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/confirm-unsubscription-notice');
 
@@ -629,7 +629,7 @@ router.postAsync('/publickey', passport.parseForm, async (req, res) => {
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPassphrase', 'pgpPrivateKey']);
 
     if (!configItems.pgpPrivateKey) {
-        const err = new Error(_('Public key is not set'));
+        const err = new Error('Public key is not set');
         err.status = 404;
         throw err;
     }
@@ -645,7 +645,7 @@ router.postAsync('/publickey', passport.parseForm, async (req, res) => {
     }
 
     if (!privKey) {
-        const err = new Error(_('Public key is not set'));
+        const err = new Error('Public key is not set');
         err.status = 404;
         throw err;
     }

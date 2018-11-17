@@ -6,6 +6,7 @@ const CKEditorWebpackPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' 
 const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
 
 module.exports = {
+    mode: 'development',
     plugins: [
         new CKEditorWebpackPlugin( {
             // See https://ckeditor.com/docs/ckeditor5/latest/features/ui-language.html
@@ -13,11 +14,11 @@ module.exports = {
         } )
     ],
     entry: {
-        "root": ['babel-polyfill', './src/root.js'],
-        "mosaico-root": ['babel-polyfill', './src/lib/sandboxed-mosaico-root.js'],
-        "ckeditor-root": ['babel-polyfill', './src/lib/sandboxed-ckeditor-root.js'],
-        "grapesjs-root": ['babel-polyfill', './src/lib/sandboxed-grapesjs-root.js'],
-        "codeeditor-root": ['babel-polyfill', './src/lib/sandboxed-codeeditor-root.js'],
+        "root": ['./src/root.js'],
+        "mosaico-root": ['./src/lib/sandboxed-mosaico-root.js'],
+        "ckeditor-root": ['./src/lib/sandboxed-ckeditor-root.js'],
+        "grapesjs-root": ['./src/lib/sandboxed-grapesjs-root.js'],
+        "codeeditor-root": ['./src/lib/sandboxed-codeeditor-root.js'],
     },
     output: {
         library: 'MailtrainReactBody',
@@ -34,7 +35,7 @@ module.exports = {
                         loader: 'babel-loader',
                         options: {
                             presets: [
-                                ['env', {
+                                ['@babel/preset-env', {
                                     targets: {
                                         "chrome": "58",
                                         "edge": "15",
@@ -42,9 +43,13 @@ module.exports = {
                                         "ios": "10"
                                     }
                                 }],
-                                'stage-1'
+                                '@babel/preset-react'
                             ],
-                            plugins: ['transform-react-jsx', 'transform-decorators-legacy', 'transform-function-bind']
+                            plugins: [
+                                ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                                ["@babel/plugin-proposal-class-properties", { "loose" : true }],
+                                "@babel/plugin-proposal-function-bind"
+                            ]
                         }
                     }
                 ]
@@ -122,7 +127,6 @@ module.exports = {
     },
     plugins: [
 //        new webpack.optimize.UglifyJsPlugin(),
-        new webpack.optimize.CommonsChunkPlugin('common')
     ],
     watchOptions: {
         ignored: 'node_modules/',

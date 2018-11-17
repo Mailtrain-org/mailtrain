@@ -13,7 +13,7 @@ const { cleanupFromPost, enforce } = require('../lib/helpers');
 const contextHelpers = require('../lib/context-helpers');
 const tools = require('../lib/tools');
 const shares = require('../models/shares');
-const _ = require('../lib/translate')._;
+const { tLog } = require('../lib/translate');
 
 
 const csvparse = require('csv-parse');
@@ -252,7 +252,7 @@ async function _execImportRun(impt, handlers) {
                     finished: new Date()
                 });
 
-                throw new Error(_('Last run failed'));
+                throw new Error('Last run failed');
             }
         }
 
@@ -292,7 +292,7 @@ async function basicSubscribe(impt) {
             let errorMsg;
 
             if (!email) {
-                errorMsg = _('Missing email');
+                errorMsg = tLog('importer.missingEmail');
             }
 
             if (mappingSettings.checkEmails) {
@@ -329,7 +329,7 @@ async function basicUnsubscribe(impt) {
             let errorMsg;
 
             if (!email) {
-                errorMsg = _('Missing email');
+                errorMsg = tLog('importer.missingEmail');
             }
 
             if (!errorMsg) {
