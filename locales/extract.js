@@ -233,8 +233,12 @@ function processFile(file) {
                 source = source.split(fragment).join(replacement);
                 setInDict(resDict, key, value);
 
-                if (originalKey) {
+                if (originalKey !== key) {
                     renamedKeys.set(originalKey, key);
+                }
+
+                if (originalKey !== key || originalValue !== value) {
+                    anyUpdates = true;
                 }
             }
         }
@@ -249,7 +253,7 @@ function processFile(file) {
     const fragments = source.match(new RegExp(transMatcher, 'g'));
     update(fragments, parseTrans);
 
-    if (false) {
+    if (anyUpdates) {
         console.log(`Updating ${file}`);
         fs.writeFileSync(file, source);
 
@@ -270,7 +274,7 @@ function run() {
     }
 */
 
-    processFile('../client/src/templates/helpers.js');
+    processFile('../client/src/Home.js');
 
     if (anyUpdatesToResDict) {
         console.log(`Updating ${localeFile}`);
@@ -278,14 +282,14 @@ function run() {
     }
 }
 
+run();
+
+/*
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-run();
-
-/*
 console.log('This script does modifications in the source tree. You should first commit all your files in git before proceeding.');
 rl.question('To proceed type YES: ', (answer) => {
     if (answer === 'YES') {
