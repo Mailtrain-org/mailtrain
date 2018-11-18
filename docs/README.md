@@ -1,10 +1,11 @@
-# Mailtrain
+# Mailtrain v2
 
-[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v7+) and MySQL (v5.5+ or MariaDB).
+[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).
 
 ![](http://mailtrain.org/mailtrain.png)
 
-> Mailtrain requires at least **Node.js v7**. If you want to use an older version of Node.js then you should use version v1.24 of Mailtrain. You can either download it [here](https://github.com/Mailtrain-org/mailtrain/archive/v1.24.0.zip) or if using git then run `git checkout v1.24.0` before starting it
+FIXME: The info below needs to be updated !!!
+
 
 ## Features
 

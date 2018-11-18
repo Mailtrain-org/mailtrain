@@ -95,58 +95,6 @@
   "namespace": {
     "mustBeSelected": "Namespace must be selected"
   },
-  "": {
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": ""
-  },
-  "": {
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": ""
-  },
-  "": {
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": ""
-  },
-  "": {
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": "",
-    "": ""
-  },
 
   "close": "Close",
   "name": "Name",
@@ -158,7 +106,6 @@
   "loading": "Loading ...",
   "email": "Email",
   "update": "Update",
-  "": "",
 
   "namespace": "Namespace",
   "namespace_plural": "Namespaces",
@@ -190,17 +137,7 @@
   "validationInProgress": "Validation is in progress...",
   "errorsInForm": "There are errors in the form. Please fix them and submit again.",
   "updatesCannotBeSaved": "Your updates cannot be saved.",
-  "": "",
-  "": "",
-  "": "",
-  "": "",
-  "": "",
-  "": "",
-  "": "",
 
   "mjml": "MJML",
-  "html": "HTML",
-  "": "",
-  "": "",
-  "": ""
+  "html": "HTML"
 }

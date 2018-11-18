@@ -1,6 +1,6 @@
 # Mailtrain
 
-[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v7+) and MySQL (v5.5+ or MariaDB).
+[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).
 
 ![](http://mailtrain.org/mailtrain.png)
 
@@ -9,14 +9,16 @@
 * Subscriber list management
 * List segmentation
 * Custom fields
-* Email templates
+* Email templates (including MJML-based templates)
 * Large CSV list import files
-
-Subscribe to Mailtrain Newsletter [here](https://mailtrain.org/subscription/S18sew2wM) (uses Mailtrain obviously)
+* Custom reports
+* Automation (triggered and RSS campaigns)
+* Multiple users with granular user permissions and flexible sharing
+* Hierarchical namespaces for enterprise-level situations
 
 ## Hardware Requirements
 * 1 vCPU
-* 1024 MB RAM
+* 2048 MB RAM
 
 ## Quick Start - Deploy with Docker
 #### Requirements:
@@ -39,7 +41,7 @@ Depending on how you have configured your system and Docker you may need to prep
 ## Quick Start - Manual Install (any OS that supports Node.js)
 
 ### Requirements: 
- * Mailtrain requires at least **Node.js v7**. If you want to use an older version of Node.js then you should use version v1.24 of Mailtrain. You can either download it [here](https://github.com/Mailtrain-org/mailtrain/archive/v1.24.0.zip) or if using git then run `git checkout v1.24.0` before starting it
+ * Mailtrain requires at least **Node.js v10**.
 
   1. Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
   2. Run `npm install --production` in the Mailtrain folder to install required dependencies
@@ -56,7 +58,4 @@ For more information, please [read the docs](http://docs.mailtrain.org/).
 
 ## License
 
-  * Versions 1.22.0 and up **GPL-V3.0**
-  * Versions 1.21.0 and up: **EUPL-1.1**
-  * Versions 1.19.0 and up: **MIT**
-  * Up to versions 1.18.0 **GPL-V3.0**
+  **GPL-V3.0**

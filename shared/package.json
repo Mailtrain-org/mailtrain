@@ -1,36 +1,41 @@
 {
   "name": "mailtrain-shared",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Self hosted email newsletter app - shared lib",
   "repository": {
     "type": "git",
     "url": "git://github.com/Mailtrain-org/mailtrain.git"
   },
-  "author": "",
   "license": "GPL-3.0",
   "homepage": "https://mailtrain.org/",
   "engines": {
-    "node": ">=5.0.0"
+    "node": ">=10.0.0"
   },
   "dependencies": {
-    "moment": "^2.18.1",
-    "moment-timezone": "^0.5.13",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.23",
     "owasp-password-strength-test": "github:bures/owasp-password-strength-test"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-loader": "^7.1.1",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-plugin-transform-function-bind": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-1": "^6.24.1",
-    "css-loader": "^0.28.4",
-    "i18next-conv": "^3.0.3",
-    "node-sass": "^4.5.3",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.18.2",
-    "url-loader": "^0.5.9",
-    "webpack": "^2.6.1"
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-decorators": "^7.0.0",
+    "@babel/plugin-proposal-function-bind": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "@ckeditor/ckeditor5-dev-utils": "^11.0.1",
+    "@ckeditor/ckeditor5-dev-webpack-plugin": "^7.0.1",
+    "babel-loader": "^8.0.4",
+    "css-loader": "^1.0.1",
+    "file-loader": "^2.0.0",
+    "node-sass": "^4.10.0",
+    "postcss-loader": "^3.0.0",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "url-loader": "^1.1.2",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
   }
 }

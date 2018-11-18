@@ -1,6 +1,6 @@
 {
   "name": "mailtrain-client",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Self hosted email newsletter app - client components",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,6 @@
     "type": "git",
     "url": "git://github.com/Mailtrain-org/mailtrain.git"
   },
-  "author": "",
   "license": "GPL-3.0",
   "homepage": "https://mailtrain.org/",
   "dependencies": {
