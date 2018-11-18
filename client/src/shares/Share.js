@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import {
@@ -13,7 +13,7 @@ import axios from '../lib/axios';
 import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -61,13 +61,13 @@ export default class Share extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['userId', 'value'])) {
-            state.setIn(['userId', 'error'], t('User must not be empty'));
+            state.setIn(['userId', 'error'], t('userMustNotBeEmpty'));
         } else {
             state.setIn(['userId', 'error'], null);
         }
 
         if (!state.getIn(['role', 'value'])) {
-            state.setIn(['role', 'error'], t('Role must be selected'));
+            state.setIn(['role', 'error'], t('roleMustBeSelected'));
         } else {
             state.setIn(['role', 'error'], null);
         }
@@ -77,7 +77,7 @@ export default class Share extends Component {
         const t = this.props.t;
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.PUT, 'rest/shares');
 
@@ -92,7 +92,7 @@ export default class Share extends Component {
 
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and try again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd-1'));
         }
     }
 
@@ -100,11 +100,11 @@ export default class Share extends Component {
         const t = this.props.t;
 
         const sharesColumns = [];
-        sharesColumns.push({ data: 0, title: t('Username') });
+        sharesColumns.push({ data: 0, title: t('username') });
         if (mailtrainConfig.isAuthMethodLocal) {
-            sharesColumns.push({ data: 1, title: t('Name') });
+            sharesColumns.push({ data: 1, title: t('name') });
         }
-        sharesColumns.push({ data: 2, title: t('Role') });
+        sharesColumns.push({ data: 2, title: t('role') });
 
         sharesColumns.push({
             actions: data => {
@@ -144,18 +144,18 @@ export default class Share extends Component {
             <div>
                 <Title>{this.props.title}</Title>
 
-                <h3 className="legend">{t('Add User')}</h3>
+                <h3 className="legend">{t('addUser')}</h3>
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('User')} withHeader dropdown dataUrl={`rest/shares-unassigned-users-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
-                    <TableSelect id="role" label={t('Role')} withHeader dropdown dataUrl={`rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
+                    <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('user')} withHeader dropdown dataUrl={`rest/shares-unassigned-users-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
+                    <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={`rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Share')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('share')}/>
                     </ButtonRow>
                 </Form>
 
                 <hr/>
-                <h3 className="legend">{t('Existing Users')}</h3>
+                <h3 className="legend">{t('existingUsers')}</h3>
 
                 <Table ref={node => this.sharesTable = node} withHeader dataUrl={`rest/shares-table-by-entity/${this.props.entityTypeId}/${this.props.entity.id}`} columns={sharesColumns} />
             </div>

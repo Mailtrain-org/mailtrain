@@ -127,14 +127,14 @@ async function run() {
             }
 
             if (added > 0) {
-                checkStatus = tLog('feedCheck.campaignsAdded', {addedMessages: added, campaignId: rssCampaign.id});
+                checkStatus = tLog('foundAddedMessagesNewCampaignMessages', {addedMessages: added, campaignId: rssCampaign.id});
                 log.verbose('Feed', `Found ${added} new campaigns messages from feed ${rssCampaign.id}`);
 
                 process.send({
                     type: 'entries-added'
                 });
             } else {
-                checkStatus = tLog('feedCheck.nothingNew');
+                checkStatus = tLog('foundNothingNewFromTheFeed');
             }
 
             rssCampaign.data.checkStatus = checkStatus;

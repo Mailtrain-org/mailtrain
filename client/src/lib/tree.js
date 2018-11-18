@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { translate } from 'react-i18next';
+import { withTranslation } from './i18n';
 import PropTypes from 'prop-types';
 
 import jQuery from 'jquery';
@@ -23,7 +23,7 @@ const TreeSelectMode = {
     MULTI: 2
 };
 
-@translate(null, { withRef: true })
+@withTranslation({delegateFuns: ['refresh']})
 @withPageHelpers
 @withErrorHandling
 class TreeTable extends Component {
@@ -327,8 +327,8 @@ class TreeTable extends Component {
                         {props.withHeader &&
                         <thead>
                         <tr>
-                            <th className="mt-treetable-title">{t('Name')}</th>
-                            {withDescription && <th>{t('Description')}</th>}
+                            <th className="mt-treetable-title">{t('name')}</th>
+                            {withDescription && <th>{t('description')}</th>}
                             {actions && <th></th>}
                         </tr>
                         </thead>
@@ -347,14 +347,6 @@ class TreeTable extends Component {
 
     }
 }
-
-/*
-  Refreshes the table. This method is provided to allow programmatic refresh from a handler outside the table.
-  The reference to the table can be obtained by ref.
- */
-TreeTable.prototype.refresh = function() {
-    this.getWrappedInstance().refresh();
-};
 
 
 export {

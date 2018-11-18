@@ -1,62 +1,43 @@
-import i18n from 'i18next';
-import { reactI18nextModule } from "react-i18next";
-import LanguageDetector from 'i18next-browser-languagedetector';
-import mailtrainConfig from 'mailtrainConfig';
-import {getUrl} from "./urls";
+'use strict';
 
-import commonEn from "../../../locales/common/en";
+import React, {Component} from 'react';
+import i18n
+    from 'i18next';
+import {withNamespaces} from "react-i18next";
+import LanguageDetector
+    from 'i18next-browser-languagedetector';
+import mailtrainConfig
+    from 'mailtrainConfig';
 
-function convertToFake(dict) {
-    function convertValueToFakeLang(str) {
-        let from = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+\\|`~[{]};:'\",<.>/?";
-        let to = "ɐqɔpǝɟƃɥıɾʞʅɯuodbɹsʇnʌʍxʎz∀ԐↃᗡƎℲ⅁HIſӼ⅂WNOԀÒᴚS⊥∩ɅＭX⅄Z0123456789¡@#$%ᵥ⅋⁎()-_=+\\|,~[{]};:,„´<.>/¿";
+import hoistStatics
+    from 'hoist-non-react-statics';
 
-        return str.replace(/(\{\{[^\}]+\}\}|%s)/g, '\x00\x04$1\x00').split('\x00').map(c => {
-            if (c.charAt(0) === '\x04') {
-                return c;
-            }
-            let r = '';
-            for (let i = 0, len = c.length; i < len; i++) {
-                let pos = from.indexOf(c.charAt(i));
-                if (pos < 0) {
-                    r += c.charAt(i);
-                } else {
-                    r += to.charAt(pos);
-                }
-            }
-            return r;
-        }).join('\x00').replace(/[\x00\x04]/g, '');
-    }
+import {convertToFake, langCodes} from '../../../shared/langs';
 
-    function _convertToFake(dict) {
-        for (const key in dict) {
-            const val = dict[key];
+import commonEn from "../../../locales/en/common";
+import commonEs from "../../../locales/es/common";
 
-            if (typeof val === 'string') {
-                dict[key] = convertValueToFakeLang(val);
-            } else {
-                _convertToFake(val);
-            }
-        }
-    }
+const resourcesCommon = {
+    en: commonEn,
+    es: commonEs,
+    fake: convertToFake(commonEn)
+};
 
-    return _convertToFake(dict);
+const resources = {};
+for (const lng of mailtrainConfig.enabledLanguages) {
+    const shortCode = langCodes[lng].shortCode;
+    resources[shortCode] = {
+        common: resourcesCommon[shortCode]
+    };
 }
+
 
 i18n
     .use(LanguageDetector)
     .init({
-        lng: mailtrainConfig.language,
-        resources: {
-            en: {
-                common: commonEn
-            },
-            en_fake: {
-                common: convertToFake(commonEn)
-            }
-        },
+        resources,
 
-        fallbackLng: "en",
+        fallbackLng: mailtrainConfig.defaultLanguage,
         defaultNS: 'common',
 
         interpolation: {
@@ -80,3 +61,34 @@ i18n
 
 
 export default i18n;
+
+
+export function withTranslation(opts) {
+    if (opts && opts.delegateFuns) {
+        return function (WrappedComponent) {
+            class Wrapper extends Component {
+                constructor(props) {
+                    super(props);
+
+                    this.WrappedComponentWithNamespaces = withNamespaces(null, {innerRef: ref => this.wrappedComponent = ref})(WrappedComponent);
+                }
+
+                render() {
+                    const WrappedComponentWithNamespaces = this.WrappedComponentWithNamespaces;
+                    return <WrappedComponentWithNamespaces {...this.props}/>;
+                }
+            }
+
+            for (const fun of opts.delegateFuns) {
+                Wrapper.prototype[fun] = function (...args) {
+                    return this.wrappedComponent[fun](...args);
+                }
+            }
+
+            return hoistStatics(Wrapper, WrappedComponent);
+        }
+    } else {
+        return withNamespaces();
+    }
+}
+

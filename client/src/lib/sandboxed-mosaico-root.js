@@ -5,12 +5,8 @@ import './public-path';
 import React, {Component} from 'react';
 import ReactDOM
     from 'react-dom';
-import {
-    I18nextProvider,
-    translate,
-} from 'react-i18next';
-import i18n
-    from './i18n';
+import {I18nextProvider} from 'react-i18next';
+import i18n, {withTranslation} from './i18n';
 import {
     parentRPC,
     UntrustedContentRoot
@@ -28,7 +24,7 @@ import {
 } from "../../../shared/templates";
 
 
-@translate(null, { withRef: true })
+@withTranslation()
 class MosaicoSandbox extends Component {
     constructor(props) {
         super(props);

@@ -1,14 +1,14 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { withPageHelpers, Title } from '../lib/page'
 import {
     withForm, Form, FormSendMethod, InputField, ButtonRow, Button
 } from '../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -32,7 +32,7 @@ export default class Forget extends Component {
 
         const username = state.getIn(['usernameOrEmail', 'value']);
         if (!username) {
-            state.setIn(['usernameOrEmail', 'error'], t('Username or email must not be empty'));
+            state.setIn(['usernameOrEmail', 'error'], t('usernameOrEmailMustNotBeEmpty'));
         } else {
             state.setIn(['usernameOrEmail', 'error'], null);
         }
@@ -42,15 +42,15 @@ export default class Forget extends Component {
         const t = this.props.t;
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Processing ...'));
+        this.setFormStatusMessage('info', t('processing'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/password-reset-send');
 
         if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/account/login', 'success', t('If the username / email exists in the system, password reset link will be sent to the registered email.'));
+            this.navigateToWithFlashMessage('/account/login', 'success', t('ifTheUsernameEmailExistsInTheSystem'));
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('Please enter your username / email and try again.'));
+            this.setFormStatusMessage('warning', t('pleaseEnterYourUsernameEmailAndTryAgain'));
         }
     }
 
@@ -59,17 +59,17 @@ export default class Forget extends Component {
 
         return (
             <div>
-                <Title>{t('Password Reset')}</Title>
+                <Title>{t('passwordReset')}</Title>
 
-                <p>{t('Please provide the username or email address that is registered with your Mailtrain account.')}</p>
+                <p>{t('pleaseProvideTheUsernameOrEmailAddress')}</p>
 
-                <p>{t('We will send you an email that will allow you to reset your password.')}</p>
+                <p>{t('weWillSendYouAnEmailThatWillAllowYouTo')}</p>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="usernameOrEmail" label={t('Username or email')}/>
+                    <InputField id="usernameOrEmail" label={t('usernameOrEmail')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Send email')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('sendEmail')}/>
                     </ButtonRow>
                 </Form>
             </div>

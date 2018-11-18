@@ -7,7 +7,6 @@ const subscriptions = require('../../models/subscriptions');
 const campaigns = require('../../models/campaigns');
 const handlebars = require('handlebars');
 const handlebarsHelpers = require('../../lib/handlebars-helpers');
-const _ = require('../../lib/translate')._;
 const hbs = require('hbs');
 const vm = require('vm');
 const log = require('../../lib/log');

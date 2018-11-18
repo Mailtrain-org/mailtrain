@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withTranslation } from './i18n';
 import PropTypes
     from "prop-types";
 import styles
@@ -14,7 +14,7 @@ import {getTrustedUrl} from "./urls";
 import { initialHeight } from "./sandboxed-ckeditor-shared";
 const navbarHeight = 34; // Sync this with navbarheight in sandboxed-ckeditor.scss
 
-@translate(null, { withRef: true })
+@withTranslation({delegateFuns: ['exportState']})
 export class CKEditorHost extends Component {
     constructor(props) {
         super(props);
@@ -97,9 +97,3 @@ export class CKEditorHost extends Component {
         );
     }
 }
-
-CKEditorHost.prototype.exportState = async function() {
-    return await this.getWrappedInstance().exportState();
-};
-
-

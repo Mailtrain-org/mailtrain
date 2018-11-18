@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import PropTypes
     from 'prop-types';
 import {ModalDialog} from "../lib/bootstrap-components";
@@ -21,7 +21,7 @@ import {} from '../lib/urls';
 import {getUrl} from "../lib/urls";
 
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -62,7 +62,7 @@ export class TestSendModalDialog extends Component {
             try {
                 this.hideFormValidation();
                 this.disableForm();
-                this.setFormStatusMessage('info', t('Sending test email'));
+                this.setFormStatusMessage('info', t('sendingTestEmail'));
 
                 const data = await this.props.getDataAsync();
 
@@ -93,7 +93,7 @@ export class TestSendModalDialog extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['testUser', 'value'])) {
-            state.setIn(['testUser', 'error'], t('Subscription has to be selected.'))
+            state.setIn(['testUser', 'error'], t('subscriptionHasToBeSelected'))
         } else {
             state.setIn(['testUser', 'error'], null);
         }
@@ -103,20 +103,20 @@ export class TestSendModalDialog extends Component {
         const t = this.props.t;
 
         const testUsersColumns = [
-            { data: 1, title: t('Email') },
-            { data: 2, title: t('Subscription ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('List ID'), render: data => <code>{data}</code> },
-            { data: 4, title: t('List') },
-            { data: 5, title: t('List namespace') }
+            { data: 1, title: t('email') },
+            { data: 2, title: t('subscriptionId'), render: data => <code>{data}</code> },
+            { data: 3, title: t('listId'), render: data => <code>{data}</code> },
+            { data: 4, title: t('list') },
+            { data: 5, title: t('listNamespace') }
         ];
 
         return (
-            <ModalDialog hidden={!this.props.visible} title={t('Send Test Email')} onCloseAsync={() => this.hideModal()} buttons={[
-                { label: t('Send'), className: 'btn-danger', onClickAsync: ::this.performAction },
-                { label: t('Cancel'), className: 'btn-primary', onClickAsync: ::this.hideModal }
+            <ModalDialog hidden={!this.props.visible} title={t('sendTestEmail')} onCloseAsync={() => this.hideModal()} buttons={[
+                { label: t('send'), className: 'btn-danger', onClickAsync: ::this.performAction },
+                { label: t('cancel'), className: 'btn-primary', onClickAsync: ::this.hideModal }
             ]}>
                 <Form stateOwner={this} format="wide">
-                    <TableSelect id="testUser" format="wide" label={t('Subscription')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
+                    <TableSelect id="testUser" format="wide" label={t('subscription')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
                 </Form>
             </ModalDialog>
         );

@@ -11,7 +11,6 @@ const bluebird = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
 const mjml = require('mjml');
-const _ = require('../lib/translate')._;
 const lists = require('./lists');
 const dependencyHelpers = require('../lib/dependency-helpers');
 

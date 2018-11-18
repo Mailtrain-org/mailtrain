@@ -1,30 +1,43 @@
 'use strict';
 
 const config = require('config');
-
 const i18n = require("i18next");
-const Backend = require("i18next-node-fs-backend");
-
+const fs = require('fs');
 const path = require('path');
+const {convertToFake, langCodes} = require('../../shared/langs');
+
+const resourcesCommon = {};
+
+function loadLanguage(shortCode) {
+    resourcesCommon[shortCode] = {
+        common: JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'locales', shortCode, 'common.json')))
+    };
+}
+
+loadLanguage('en');
+loadLanguage('es');
+resourcesCommon.fake = convertToFake(resourcesCommon.en);
+
+const resources = {};
+for (const lng of config.enabledLanguages) {
+    const shortCode = langCodes[lng].shortCode;
+    resources[shortCode] = {
+        common: resourcesCommon[shortCode]
+    };
+}
 
 i18n
-    .use(Backend)
-    // .use(Cache)
     .init({
-        lng: config.language,
-
+        resources,
         wait: true, // globally set to wait for loaded translations in translate hoc
 
-        // have a common namespace used around the full app
-        ns: ['common'],
+        fallbackLng: config.defaultLanguage,
         defaultNS: 'common',
 
-        debug: true,
-
-        backend: {
-            loadPath: path.join(__dirname, 'locales/{{lng}}/{{ns}}.json')
-        }
+        debug: false
     })
+
+
 
 function tLog(key, args) {
     if (!args) {

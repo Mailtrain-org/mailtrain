@@ -1,7 +1,6 @@
 'use strict';
 
 const passport = require('../../lib/passport');
-const _ = require('../../lib/translate')._;
 const reports = require('../../models/reports');
 const reportProcessor = require('../../lib/report-processor');
 const reportHelpers = require('../../lib/report-helpers');

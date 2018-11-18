@@ -1,9 +1,9 @@
 'use strict';
 
 import React, { Component } from 'react';
+import { withTranslation } from './i18n';
 import axios, {HTTPMethod} from './axios';
 import Immutable from 'immutable';
-import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import { withPageHelpers } from './page'
@@ -36,7 +36,7 @@ const FormState = {
 
 const FormSendMethod = HTTPMethod;
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 class Form extends Component {
@@ -462,7 +462,7 @@ class TextArea extends Component {
 }
 
 
-@translate()
+@withTranslation()
 class DatePicker extends Component {
     constructor(props) {
         super(props);
@@ -568,7 +568,7 @@ class DatePicker extends Component {
             <div>
                 <div className="input-group">
                     <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
-                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><Icon icon="calendar" title={t('form.openCalendar')}/></span>
+                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><Icon icon="calendar" title={t('openCalendar')}/></span>
                 </div>
                 {this.state.opened &&
                 <div className={styles.dayPickerWrapper}>
@@ -712,7 +712,7 @@ class TreeTableSelect extends Component {
     }
 }
 
-@translate(null, { withRef: true })
+@withTranslation({delegateFuns: ['refresh']})
 class TableSelect extends Component {
     constructor(props) {
         super(props);
@@ -803,7 +803,7 @@ class TableSelect extends Component {
                         <input type="text" className="form-control" value={this.state.selectedLabel} onClick={::this.toggleOpen} readOnly={!props.disabled} disabled={props.disabled}/>
                         {!props.disabled &&
                         <span className="input-group-btn">
-                            <Button label={t('form.select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
+                            <Button label={t('select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
                         </span>
                         }
                     </div>
@@ -823,14 +823,6 @@ class TableSelect extends Component {
         }
     }
 }
-
-/*
- Refreshes the table. This method is provided to allow programmatic refresh from a handler outside the table.
- The reference to the table can be obtained by ref.
- */
-TableSelect.prototype.refresh = function() {
-    this.getWrappedInstance().refresh()
-};
 
 
 class ACEEditor extends Component {
@@ -1305,8 +1297,8 @@ function withForm(target) {
                 this.disableForm();
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('form.yourUpdatesCannotBeSaved')}</strong>{' '}
-                        {t('form.modificationsInTheMeantime')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('someoneElseHasIntroducedModificationIn')}
                     </span>
                 );
                 return;
@@ -1316,8 +1308,8 @@ function withForm(target) {
                 this.disableForm();
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('form.yourUpdatesCannotBeSaved')}</strong>{' '}
-                        {t('form.namespaceDeletedInTheMeantime')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('itSeemsThatSomeoneElseHasDeletedThe')}
                     </span>
                 );
                 return;
@@ -1327,8 +1319,8 @@ function withForm(target) {
                 this.disableForm();
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('form.yourUpdatesCannotBeSaved')}</strong>{' '}
-                        {t('form.deletionInTheMeantime')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('itSeemsThatSomeoneElseHasDeletedThe-1')}
                     </span>
                 );
                 return;

@@ -18,8 +18,8 @@ export function getTemplateTypes(t) {
     }
 
     templateTypes.html = {
-        typeName: t('HTML'),
-        getForm: owner => <ACEEditor id="html" height="700px" mode="html" label={t('Template content')}/>,
+        typeName: t('html'),
+        getForm: owner => <ACEEditor id="html" height="700px" mode="html" label={t('templateContent')}/>,
         afterLoad: data => {
             data.html = data.data.html;
         },
@@ -33,8 +33,8 @@ export function getTemplateTypes(t) {
     };
 
     templateTypes.mjml = {
-        typeName: t('MJML'),
-        getForm: owner => <ACEEditor id="html" height="700px" mode="xml" label={t('Template content')}/>,
+        typeName: t('mjml'),
+        getForm: owner => <ACEEditor id="html" height="700px" mode="xml" label={t('templateContent')}/>,
         afterLoad: data => {
             data.mjml = data.data.mjml;
         },

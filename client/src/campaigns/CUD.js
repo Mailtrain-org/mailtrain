@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -53,7 +53,7 @@ import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels} from "./helpers";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -71,23 +71,23 @@ export default class CUD extends Component {
         this.campaignTypeLabels = campaignTypeLabels;
 
         this.createTitles = {
-            [CampaignType.REGULAR]: t('Create Regular Campaign'),
-            [CampaignType.RSS]: t('Create RSS Campaign'),
-            [CampaignType.TRIGGERED]: t('Create Triggered Campaign'),
+            [CampaignType.REGULAR]: t('createRegularCampaign'),
+            [CampaignType.RSS]: t('createRssCampaign'),
+            [CampaignType.TRIGGERED]: t('createTriggeredCampaign'),
         };
 
         this.editTitles = {
-            [CampaignType.REGULAR]: t('Edit Regular Campaign'),
-            [CampaignType.RSS]: t('Edit RSS Campaign'),
-            [CampaignType.TRIGGERED]: t('Edit Triggered Campaign'),
+            [CampaignType.REGULAR]: t('editRegularCampaign'),
+            [CampaignType.RSS]: t('editRssCampaign'),
+            [CampaignType.TRIGGERED]: t('editTriggeredCampaign'),
         };
 
         this.sourceLabels = {
-            [CampaignSource.TEMPLATE]: t('Template'),
-            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('Custom content cloned from template'),
-            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('Custom content cloned from another campaign'),
-            [CampaignSource.CUSTOM]: t('Custom content'),
-            [CampaignSource.URL]: t('URL')
+            [CampaignSource.TEMPLATE]: t('template'),
+            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate'),
+            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
+            [CampaignSource.CUSTOM]: t('customContent'),
+            [CampaignSource.URL]: t('url')
         };
 
         this.sourceOptions = [];
@@ -260,15 +260,15 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
-            state.setIn(['send_configuration', 'error'], t('Send configuration must be selected'));
+            state.setIn(['send_configuration', 'error'], t('sendConfigurationMustBeSelected'));
         }
 
         if (state.getIn(['from_email_overriden', 'value']) && !state.getIn(['from_email_override', 'value'])) {
-            state.setIn(['from_email_override', 'error'], t('"From" email must not be empty'));
+            state.setIn(['from_email_override', 'error'], t('fromEmailMustNotBeEmpty'));
         }
 
 
@@ -278,19 +278,19 @@ export default class CUD extends Component {
 
         if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
             if (!state.getIn(['data_sourceTemplate', 'value'])) {
-                state.setIn(['data_sourceTemplate', 'error'], t('Template must be selected'));
+                state.setIn(['data_sourceTemplate', 'error'], t('templateMustBeSelected'));
             }
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             if (!state.getIn(['data_sourceCampaign', 'value'])) {
-                state.setIn(['data_sourceCampaign', 'error'], t('Campaign must be selected'));
+                state.setIn(['data_sourceCampaign', 'error'], t('campaignMustBeSelected'));
             }
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             // The type is used only in create form. In case of CUSTOM_FROM_TEMPLATE or CUSTOM_FROM_CAMPAIGN, it is determined by the source template, so no need to check it here
             const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
             if (!customTemplateTypeKey) {
-                state.setIn(['data_sourceCustom_type', 'error'], t('Type must be selected'));
+                state.setIn(['data_sourceCustom_type', 'error'], t('typeMustBeSelected'));
             }
 
             if (customTemplateTypeKey) {
@@ -299,13 +299,13 @@ export default class CUD extends Component {
 
         } else if (sourceTypeKey === CampaignSource.URL) {
             if (!state.getIn(['data_sourceUrl', 'value'])) {
-                state.setIn(['data_sourceUrl', 'error'], t('URL must not be empty'));
+                state.setIn(['data_sourceUrl', 'error'], t('urlMustNotBeEmpty'));
             }
         }
 
         if (campaignTypeKey === CampaignType.RSS) {
             if (!state.getIn(['data_feedUrl', 'value'])) {
-                state.setIn(['data_feedUrl', 'error'], t('RSS feed URL must be given'));
+                state.setIn(['data_feedUrl', 'error'], t('rssFeedUrlMustBeGiven'));
             }
         }
 
@@ -313,12 +313,12 @@ export default class CUD extends Component {
             const prefix = 'lists_' + lstUid + '_';
 
             if (!state.getIn([prefix + 'list', 'value'])) {
-                state.setIn([prefix + 'list', 'error'], t('List must be selected'));
+                state.setIn([prefix + 'list', 'error'], t('listMustBeSelected'));
             }
 
             if (campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) {
                 if (state.getIn([prefix + 'useSegmentation', 'value']) && !state.getIn([prefix + 'segment', 'value'])) {
-                    state.setIn([prefix + 'segment', 'error'], t('Segment must be selected'));
+                    state.setIn([prefix + 'segment', 'error'], t('segmentMustBeSelected'));
                 }
             }
         }
@@ -340,7 +340,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             data.source = Number.parseInt(data.source);
@@ -403,15 +403,15 @@ export default class CUD extends Component {
         if (submitResponse) {
             const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
             if (this.props.entity) {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign saved'));
+                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignSaved'));
             } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/content`, 'success', t('Campaign saved'));
+                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/content`, 'success', t('campaignSaved'));
             } else {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/status`, 'success', t('Campaign saved'));
+                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/status`, 'success', t('campaignSaved'));
             }
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -467,19 +467,19 @@ export default class CUD extends Component {
         const campaignTypeKey = this.getFormValue('type');
 
         if (campaignTypeKey === CampaignType.RSS) {
-            extraSettings = <InputField id="data_feedUrl" label={t('RSS Feed Url')}/>
+            extraSettings = <InputField id="data_feedUrl" label={t('rssFeedUrl')}/>
         }
 
         const listsColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Subscribers') },
-            { data: 4, title: t('Description') },
-            { data: 5, title: t('Namespace') }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('subscribers') },
+            { data: 4, title: t('description') },
+            { data: 5, title: t('namespace') }
         ];
 
         const segmentsColumns = [
-            { data: 1, title: t('Name') }
+            { data: 1, title: t('name') }
         ];
 
         const lstsEditEntries = [];
@@ -498,21 +498,21 @@ export default class CUD extends Component {
                         <Button
                             className="btn-default"
                             icon="remove"
-                            title={t('Remove')}
+                            title={t('remove')}
                             onClickAsync={() => this.onRemoveListEntry(lstUid)}
                         />
                         }
                         <Button
                             className="btn-default"
                             icon="plus"
-                            title={t('Insert new entry before this one')}
+                            title={t('insertNewEntryBeforeThisOne')}
                             onClickAsync={() => this.onAddListEntry(lstOrderIdxClosure)}
                         />
                         {lstOrderIdx > 0 &&
                         <Button
                             className="btn-default"
                             icon="chevron-up"
-                            title={t('Move up')}
+                            title={t('moveUp')}
                             onClickAsync={() => this.onListEntryMoveUp(lstOrderIdxClosure)}
                         />
                         }
@@ -520,17 +520,17 @@ export default class CUD extends Component {
                         <Button
                             className="btn-default"
                             icon="chevron-down"
-                            title={t('Move down')}
+                            title={t('moveDown')}
                             onClickAsync={() => this.onListEntryMoveDown(lstOrderIdxClosure)}
                         />
                         }
                     </div>
                     <div className={campaignsStyles.entryContent}>
-                        <TableSelect id={prefix + 'list'} label={t('List')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
 
                         {(campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) &&
                             <div>
-                                <CheckBox id={prefix + 'useSegmentation'} label={t('Segment')} text={t('Use a particular segment')}/>
+                                <CheckBox id={prefix + 'useSegmentation'} label={t('segment')} text={t('useAParticularSegment')}/>
                                 {selectedList && this.getFormValue(prefix + 'useSegmentation') &&
                                     <TableSelect id={prefix + 'segment'} withHeader dropdown dataUrl={`rest/segments-table/${selectedList}`} columns={segmentsColumns} selectionLabelIndex={1} />
                                 }
@@ -544,13 +544,13 @@ export default class CUD extends Component {
         }
 
         const lstsEdit =
-            <Fieldset label={t('Lists')}>
+            <Fieldset label={t('lists')}>
                 {lstsEditEntries}
                 <div key="newEntry" className={campaignsStyles.newEntry}>
                     <Button
                         className="btn-default"
                         icon="plus"
-                        label={t('Add list')}
+                        label={t('addList')}
                         onClickAsync={() => this.onAddListEntry(lsts.length)}
                     />
                 </div>
@@ -558,12 +558,12 @@ export default class CUD extends Component {
 
 
         const sendConfigurationsColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Description') },
-            { data: 4, title: t('Type'), render: data => this.mailerTypes[data].typeName },
-            { data: 5, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 6, title: t('Namespace') }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('description') },
+            { data: 4, title: t('type'), render: data => this.mailerTypes[data].typeName },
+            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('namespace') }
         ];
 
         let sendSettings;
@@ -572,7 +572,7 @@ export default class CUD extends Component {
                 sendSettings = [];
 
                 const addOverridable = (id, label) => {
-                    sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} label={label} text={t('Override')}/>);
+                    sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} label={label} text={t('override')}/>);
 
                     if (this.getFormValue(id + '_overriden')) {
                         sendSettings.push(<InputField key={id + '_override'} id={id + '_override'}/>);
@@ -585,12 +585,12 @@ export default class CUD extends Component {
                     }
                 };
 
-                addOverridable('from_name', t('"From" name'));
-                addOverridable('from_email', t('"From" email address'));
-                addOverridable('reply_to', t('"Reply-to" email address'));
-                addOverridable('subject', t('"Subject" line'));
+                addOverridable('from_name', t('fromName'));
+                addOverridable('from_email', t('fromEmailAddress'));
+                addOverridable('reply_to', t('replytoEmailAddress'));
+                addOverridable('subject', t('subjectLine'));
             } else {
-                sendSettings =  <AlignedRow>{t('Loading send configuration ...')}</AlignedRow>
+                sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
             }
         } else {
             sendSettings = null;
@@ -600,42 +600,42 @@ export default class CUD extends Component {
         let sourceEdit = null;
         if (isEdit) {
             if (!(sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
-                sourceEdit = <StaticField id="source" className={styles.formDisabled} label={t('Content source')}>{this.sourceLabels[sourceTypeKey]}</StaticField>;
+                sourceEdit = <StaticField id="source" className={styles.formDisabled} label={t('contentSource')}>{this.sourceLabels[sourceTypeKey]}</StaticField>;
             }
         } else {
-            sourceEdit = <Dropdown id="source" label={t('Content source')} options={this.sourceOptions}/>
+            sourceEdit = <Dropdown id="source" label={t('contentSource')} options={this.sourceOptions}/>
         }
 
         let templateEdit = null;
         if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
             const templatesColumns = [
-                { data: 1, title: t('Name') },
-                { data: 2, title: t('Description') },
-                { data: 3, title: t('Type'), render: data => this.templateTypes[data].typeName },
-                { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
-                { data: 5, title: t('Namespace') },
+                { data: 1, title: t('name') },
+                { data: 2, title: t('description') },
+                { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
+                { data: 4, title: t('created'), render: data => moment(data).fromNow() },
+                { data: 5, title: t('namespace') },
             ];
 
             let help = null;
             if (sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                help = t('Selecting a template creates a campaign specific copy from it.');
+                help = t('selectingATemplateCreatesACampaign');
             }
 
             // The "key" property here and in the TableSelect below is to tell React that these tables are different and should be rendered by different instances. Otherwise, React will use
             // only one instance, which fails because Table does not handle updates in "columns" property
-            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('Template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
-                { data: 1, title: t('Name') },
-                { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-                { data: 3, title: t('Description') },
-                { data: 4, title: t('Type'), render: data => this.campaignTypeLabels[data] },
-                { data: 5, title: t('Created'), render: data => moment(data).fromNow() },
-                { data: 6, title: t('Namespace') }
+                { data: 1, title: t('name') },
+                { data: 2, title: t('id'), render: data => <code>{data}</code> },
+                { data: 3, title: t('description') },
+                { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
+                { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+                { data: 6, title: t('namespace') }
             ];
 
-            templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('Campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('Content of the selected campaign will be copied into this campaign.')}/>;
+            templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
@@ -647,21 +647,21 @@ export default class CUD extends Component {
             }
 
             templateEdit = <div>
-                <Dropdown id="data_sourceCustom_type" label={t('Type')} options={this.customTemplateTypeOptions}/>
+                <Dropdown id="data_sourceCustom_type" label={t('type')} options={this.customTemplateTypeOptions}/>
                 {customTemplateTypeForm}
             </div>;
 
         } else if (sourceTypeKey === CampaignSource.URL) {
-            templateEdit = <InputField id="data_sourceUrl" label={t('Render URL')} help={t('If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself.')}/>
+            templateEdit = <InputField id="data_sourceUrl" label={t('renderUrl')} help={t('ifAMessageIsSentThenThisUrlWillBePosTed')}/>
         }
 
         let saveButtonLabel;
         if (isEdit) {
-            saveButtonLabel = t('Save');
+            saveButtonLabel = t('save');
         } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-            saveButtonLabel = t('Save and edit content');
+            saveButtonLabel = t('saveAndEditContent');
         } else {
-            saveButtonLabel = t('Save campaign and go to status');
+            saveButtonLabel = t('saveCampaignAndGoToStatus');
         }
 
 
@@ -675,28 +675,28 @@ export default class CUD extends Component {
                         deleteUrl={`rest/campaigns/${this.props.entity.id}`}
                         backUrl={`/campaigns/${this.props.entity.id}/edit`}
                         successUrl="/campaigns"
-                        deletingMsg={t('Deleting campaign ...')}
-                        deletedMsg={t('Campaign deleted')}/>
+                        deletingMsg={t('deletingCampaign')}
+                        deletedMsg={t('campaignDeleted')}/>
                 }
 
                 <Title>{isEdit ? this.editTitles[this.getFormValue('type')] : this.createTitles[this.getFormValue('type')]}</Title>
 
                 {isEdit && this.props.entity.status === CampaignStatus.SENDING &&
                     <div className={`alert alert-info`} role="alert">
-                        {t('Form cannot be edited because the campaign is currently being sent out. Wait till the sending is finished and refresh.')}
+                        {t('formCannotBeEditedBecauseTheCampaignIs')}
                     </div>
                 }
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
+                    <InputField id="name" label={t('name')}/>
 
                     {isEdit &&
-                    <StaticField id="cid" className={styles.formDisabled} label={t('ID')} help={t('This is the campaign ID displayed to the subscribers')}>
+                    <StaticField id="cid" className={styles.formDisabled} label={t('id')} help={t('thisIsTheCampaignIdDisplayedToThe')}>
                         {this.getFormValue('cid')}
                     </StaticField>
                     }
 
-                    <TextArea id="description" label={t('Description')}/>
+                    <TextArea id="description" label={t('description')}/>
 
                     {extraSettings}
 
@@ -708,16 +708,16 @@ export default class CUD extends Component {
 
                     <hr/>
 
-                    <TableSelect id="send_configuration" label={t('Send configuration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
                     {sendSettings}
 
-                    <InputField id="unsubscribe_url" label={t('Custom unsubscribe URL')}/>
+                    <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
 
                     <hr/>
 
-                    <CheckBox id="open_trackings_disabled" text={t('Disable opened tracking')}/>
-                    <CheckBox id="click_tracking_disabled" text={t('Disable clicked tracking')}/>
+                    <CheckBox id="open_trackings_disabled" text={t('disableOpenedTracking')}/>
+                    <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
 
                     {sourceEdit && <hr/> }
 
@@ -727,7 +727,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={saveButtonLabel}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/campaigns/${this.props.entity.id}/delete`}/> }
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/campaigns/${this.props.entity.id}/delete`}/> }
                     </ButtonRow>
                 </Form>
             </div>

@@ -12,12 +12,12 @@ import mailtrainConfig from 'mailtrainConfig';
 function getMenus(t) {
     const subPaths = {
         login: {
-            title: t('Sign in'),
+            title: t('signIn'),
             link: '/account/login',
             panelComponent: Login,
         },
         api: {
-            title: t('API'),
+            title: t('api'),
             link: '/account/api',
             panelComponent: API
         }
@@ -25,14 +25,14 @@ function getMenus(t) {
 
     if (mailtrainConfig.isAuthMethodLocal) {
         subPaths.forgot = {
-            title: t('Password reset'),
+            title: t('passwordReset-1'),
             extraParams: [':username?'],
             link: '/account/forgot',
             panelComponent: Reset
         };
 
         subPaths.reset = {
-            title: t('Password reset'),
+            title: t('passwordReset-1'),
             extraParams: [':username', ':resetToken'],
             link: '/account/reset',
             panelComponent: ResetLink
@@ -41,7 +41,7 @@ function getMenus(t) {
 
     return {
         'account': {
-            title: t('Account'),
+            title: t('account'),
             link: '/account',
             panelComponent: Account,
 

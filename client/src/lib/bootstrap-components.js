@@ -1,11 +1,11 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from './i18n';
 import PropTypes from 'prop-types';
 import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
 
-@translate()
+@withTranslation()
 @withErrorHandling
 class DismissibleAlert extends Component {
     static propTypes = {
@@ -192,7 +192,7 @@ class ActionLink extends Component {
 }
 
 
-@translate()
+@withTranslation()
 @withErrorHandling
 class ModalDialog extends Component {
     constructor(props) {

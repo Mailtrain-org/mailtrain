@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withTranslation } from './i18n';
 import PropTypes
     from "prop-types";
 import styles
@@ -11,7 +11,7 @@ import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 
-@translate(null, { withRef: true })
+@withTranslation({delegateFuns: ['exportState']})
 export class CodeEditorHost extends Component {
     constructor(props) {
         super(props);
@@ -83,7 +83,3 @@ export class CodeEditorHost extends Component {
         );
     }
 }
-
-CodeEditorHost.prototype.exportState = async function() {
-    return await this.getWrappedInstance().exportState();
-};

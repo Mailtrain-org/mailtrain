@@ -5,12 +5,8 @@ import './public-path';
 import React, {Component} from 'react';
 import ReactDOM
     from 'react-dom';
-import {
-    I18nextProvider,
-    translate,
-} from 'react-i18next';
-import i18n
-    from './i18n';
+import {I18nextProvider} from 'react-i18next';
+import i18n, {withTranslation} from './i18n';
 import {
     parentRPC,
     UntrustedContentRoot
@@ -32,10 +28,10 @@ import {
 import CKEditor
     from "react-ckeditor-component";
 
-import { initialHeight } from "./sandboxed-ckeditor-shared";
+import {initialHeight} from "./sandboxed-ckeditor-shared";
 
 
-@translate(null, { withRef: true })
+@withTranslation()
 class CKEditorSandbox extends Component {
     constructor(props) {
         super(props);

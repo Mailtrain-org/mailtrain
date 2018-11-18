@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -21,7 +21,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -48,19 +48,19 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Entity'), render: data => this.entityLabels[data], searchable: false },
-            { data: 4, title: t('Event'), render: (data, cmd, rowData) => this.eventLabels[rowData[3]][data], searchable: false },
-            { data: 5, title: t('Days after'), render: data => Math.round(data / (3600 * 24)) },
-            { data: 6, title: t('Enabled'), render: data => data ? t('Yes') : t('No'), searchable: false},
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('entity'), render: data => this.entityLabels[data], searchable: false },
+            { data: 4, title: t('event'), render: (data, cmd, rowData) => this.eventLabels[rowData[3]][data], searchable: false },
+            { data: 5, title: t('daysAfter'), render: data => Math.round(data / (3600 * 24)) },
+            { data: 6, title: t('enabled'), render: data => data ? t('yes') : t('no'), searchable: false},
             {
                 actions: data => {
                     const actions = [];
 
                     if (mailtrainConfig.globalPermissions.setupAutomation && this.props.campaign.permissions.includes('manageTriggers')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/campaigns/${this.props.campaign.id}/triggers/${data[0]}/edit`
                         });
                     }
@@ -76,14 +76,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/triggers/${this.props.campaign.id}`, t('Deleting trigger ...'), t('Trigger deleted'))}
+                {tableDeleteDialogRender(this, `rest/triggers/${this.props.campaign.id}`, t('deletingTrigger'), t('triggerDeleted'))}
                 {mailtrainConfig.globalPermissions.setupAutomation && this.props.campaign.permissions.includes('manageTriggers') &&
                     <Toolbar>
-                        <NavButton linkTo={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('Create Trigger')}/>
+                        <NavButton linkTo={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('createTrigger')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Triggers')}</Title>
+                <Title>{t('triggers')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/triggers-by-campaign-table/${this.props.campaign.id}`} columns={columns} />
             </div>

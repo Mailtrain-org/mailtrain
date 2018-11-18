@@ -101,11 +101,11 @@ function validateEmailGetMessage(result, address, language) {
     if (result !== 0) {
         switch (result) {
             case 5:
-                return t('addressCheck.mxNotFound', {email: address});
+                return t('invalidEmailAddressEmailMxRecordNotFound', {email: address});
             case 6:
-                return t('addressCheck.domainNotFound', {email: address});
+                return t('invalidEmailAddressEmailAddressDomainNot', {email: address});
             case 12:
-                return t('addressCheck.domainRequired', {email: address});
+                return t('invalidEmailAddressEmailAddressDomain', {email: address});
             default:
                 return t('invalidEmailGeneric', {email: address});
         }

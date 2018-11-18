@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
 import { Table } from '../lib/table';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
@@ -17,7 +17,7 @@ import {
     tableDeleteDialogRender
 } from "../lib/modals";
 
-@translate()
+@withTranslation()
 @withErrorHandling
 @withPageHelpers
 @requiresAuthenticatedUser
@@ -77,11 +77,11 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Template') },
-            { data: 3, title: t('Description') },
-            { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' },
-            { data: 5, title: t('Namespace') },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('template') },
+            { data: 3, title: t('description') },
+            { data: 4, title: t('created'), render: data => data ? moment(data).fromNow() : '' },
+            { data: 5, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -96,11 +96,11 @@ export default class List extends Component {
 
                     if (state === ReportState.PROCESSING || state === ReportState.SCHEDULED) {
                         viewContent = {
-                            label: <Icon icon="hourglass" title={t('Processing')}/>,
+                            label: <Icon icon="hourglass" title={t('processing-1')}/>,
                         };
 
                         startStop = {
-                            label: <Icon icon="stop" title={t('Stop')}/>,
+                            label: <Icon icon="stop" title={t('stop')}/>,
                             action: (table) => this.stop(table, id)
                         };
 
@@ -108,28 +108,28 @@ export default class List extends Component {
                     } else if (state === ReportState.FINISHED) {
                         if (mimeType === 'text/html') {
                             viewContent = {
-                                label: <Icon icon="eye-open" title={t('View')}/>,
+                                label: <Icon icon="eye-open" title={t('view')}/>,
                                 link: `/reports/${id}/view`
                             };
                         } else if (mimeType === 'text/csv') {
                             viewContent = {
-                                label: <Icon icon="download-alt" title={t('Download')}/>,
+                                label: <Icon icon="download-alt" title={t('download')}/>,
                                 href: `/reports/${id}/download`
                             };
                         }
 
                         startStop = {
-                            label: <Icon icon="repeat" title={t('Refresh report')}/>,
+                            label: <Icon icon="repeat" title={t('refreshReport')}/>,
                             action: (table) => this.start(table, id)
                         };
 
                     } else if (state === ReportState.FAILED) {
                         viewContent = {
-                            label: <Icon icon="thumbs-down" title={t('Report generation failed')}/>,
+                            label: <Icon icon="thumbs-down" title={t('reportGenerationFailed')}/>,
                         };
 
                         startStop = {
-                            label: <Icon icon="repeat" title={t('Regenerate report')}/>,
+                            label: <Icon icon="repeat" title={t('regenerateReport')}/>,
                             action: (table) => this.start(table, id)
                         };
                     }
@@ -141,7 +141,7 @@ export default class List extends Component {
                     if (perms.includes('viewOutput')) {
                         actions.push(
                             {
-                                label: <Icon icon="modal-window" title={t('View console output')}/>,
+                                label: <Icon icon="modal-window" title={t('viewConsoleOutput')}/>,
                                 link: `/reports/${id}/output`
                             }
                         );
@@ -153,14 +153,14 @@ export default class List extends Component {
 
                     if (perms.includes('edit') && permsReportTemplate.includes('execute')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/reports/${id}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/reports/${id}/share`
                         });
                     }
@@ -175,17 +175,17 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/reports`, t('Deleting report ...'), t('Report deleted'))}
+                {tableDeleteDialogRender(this, `rest/reports`, t('deletingReport'), t('reportDeleted'))}
                 <Toolbar>
                     {this.state.createPermitted &&
-                        <NavButton linkTo="/reports/create" className="btn-primary" icon="plus" label={t('Create Report')}/>
+                        <NavButton linkTo="/reports/create" className="btn-primary" icon="plus" label={t('createReport')}/>
                     }
                     {this.state.templatesPermitted &&
-                        <NavButton linkTo="/reports/templates" className="btn-primary" label={t('Report Templates')}/>
+                        <NavButton linkTo="/reports/templates" className="btn-primary" label={t('reportTemplates')}/>
                     }
                 </Toolbar>
 
-                <Title>{t('Reports')}</Title>
+                <Title>{t('reports')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/reports-table" columns={columns} />
             </div>

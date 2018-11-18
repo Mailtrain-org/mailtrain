@@ -8,33 +8,33 @@ import Share from '../shares/Share';
 function getMenus(t) {
     return {
         namespaces: {
-            title: t('Namespaces'),
+            title: t('namespaces'),
             link: '/namespaces',
             panelComponent: List,
             children: {
                 ':namespaceId([0-9]+)': {
-                    title: resolved => t('Namespace "{{name}}"', {name: resolved.namespace.name}),
+                    title: resolved => t('namespaceName', {name: resolved.namespace.name}),
                     resolve: {
                         namespace: params => `rest/namespaces/${params.namespaceId}`
                     },
                     link: params => `/namespaces/${params.namespaceId}/edit`,
                     navs: {
                         ':action(edit|delete)': {
-                            title: t('Edit'),
+                            title: t('edit'),
                             link: params => `/namespaces/${params.namespaceId}/edit`,
                             visible: resolved => resolved.namespace.permissions.includes('edit'),
                             panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.namespace} />
                         },
                         share: {
-                            title: t('Share'),
+                            title: t('share'),
                             link: params => `/namespaces/${params.namespaceId}/share`,
                             visible: resolved => resolved.namespace.permissions.includes('share'),
-                            panelRender: props => <Share title={t('Share')} entity={props.resolved.namespace} entityTypeId="namespace" />
+                            panelRender: props => <Share title={t('share')} entity={props.resolved.namespace} entityTypeId="namespace" />
                         }
                     }
                 },
                 create: {
-                    title: t('Create'),
+                    title: t('create'),
                     panelRender: props => <CUD action="create" />
                 },
             }

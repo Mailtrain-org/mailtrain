@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { withPageHelpers, Title } from '../lib/page'
 import { Link } from 'react-router-dom'
 import {
@@ -19,7 +19,7 @@ const ResetTokenValidationState = {
     INVALID: 2
 };
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -82,7 +82,7 @@ export default class Account extends Component {
         }
 
         state.setIn(['password', 'error'], passwordMsgs.length > 0 ? passwordMsgs : null);
-        state.setIn(['password2', 'error'], password !== password2 ? t('Passwords must match') : null);
+        state.setIn(['password2', 'error'], password !== password2 ? t('passwordsMustMatch') : null);
     }
 
     async submitHandler() {
@@ -90,24 +90,24 @@ export default class Account extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Resetting password ...'));
+            this.setFormStatusMessage('info', t('resettingPassword'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/password-reset', data => {
                 delete data.password2;
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage('/account/login', 'success', t('Password reset'));
+                this.navigateToWithFlashMessage('/account/login', 'success', t('passwordReset-1'));
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             if (error instanceof interoperableErrors.InvalidTokenError) {
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your password cannot be reset.')}</strong>{' '}
-                        {t('The password reset token has expired.')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Click here to request a new password reset link.')}</Link>
+                        <strong>{t('yourPasswordCannotBeReset')}</strong>{' '}
+                        {t('thePasswordResetTokenHasExpired')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('clickHereToRequestANewPasswordResetLink')}</Link>
                     </span>
                 );
                 return;
@@ -122,29 +122,29 @@ export default class Account extends Component {
 
         if (this.state.resetTokenValidationState === ResetTokenValidationState.PENDING) {
             return (
-                <p>{t('Validating password reset token ...')}</p>
+                <p>{t('validatingPasswordResetToken')}</p>
             );
 
         } else if (this.state.resetTokenValidationState === ResetTokenValidationState.INVALID) {
             return (
                 <div>
-                    <Title>{t('The password cannot be reset')}</Title>
+                    <Title>{t('thePasswordCannotBeReset')}</Title>
 
-                    <p>{t('The password reset token has expired.')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Click here to request a new password reset link.')}</Link></p>
+                    <p>{t('thePasswordResetTokenHasExpired')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('clickHereToRequestANewPasswordResetLink')}</Link></p>
                 </div>
             );
 
         } else {
             return (
                 <div>
-                    <Title>{t('Set new password for') + ' ' + this.getFormValue('username')}</Title>
+                    <Title>{t('setNewPasswordFor') + ' ' + this.getFormValue('username')}</Title>
 
                     <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                        <InputField id="password" label={t('New Password')} type="password"/>
-                        <InputField id="password2" label={t('Confirm Password')} type="password"/>
+                        <InputField id="password" label={t('newPassword')} type="password"/>
+                        <InputField id="password2" label={t('confirmPassword')} type="password"/>
 
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Reset password')}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('resetPassword')}/>
                         </ButtonRow>
                     </Form>
                 </div>

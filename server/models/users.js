@@ -310,7 +310,7 @@ async function sendPasswordReset(language, usernameOrEmail) {
                 to: {
                     address: user.email
                 },
-                subject: tUI('account.passwordChangeRequest', language)
+                subject: tUI('mailerPasswordChangeRequest', language)
             }, {
                 html: 'emails/password-reset-html.hbs',
                 text: 'emails/password-reset-text.hbs',

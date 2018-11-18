@@ -1,19 +1,40 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {Trans} from 'react-i18next';
+import {withTranslation} from '../../lib/i18n';
 import {
-    withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, ButtonRow, Button,
-    Fieldset, Dropdown, AlignedRow, ACEEditor
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../../lib/page';
+import {
+    ACEEditor,
+    AlignedRow,
+    Button,
+    ButtonRow,
+    Dropdown,
+    Fieldset,
+    Form,
+    FormSendMethod,
+    InputField,
+    TableSelect,
+    TextArea,
+    withForm
 } from '../../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { validateNamespace, NamespaceSelect } from '../../lib/namespace';
+import {withErrorHandling} from '../../lib/error-handling';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
-import mailtrainConfig from 'mailtrainConfig';
+import mailtrainConfig
+    from 'mailtrainConfig';
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -60,128 +81,128 @@ export default class CUD extends Component {
 
         const t = props.t;
 
-        const helpEmailText = t('The plaintext version for this email');
-        const helpMjmlGeneral = <Trans>Custom forms use MJML for formatting. See the MJML documentation <a className="mjml-documentation">here</a></Trans>;
+        const helpEmailText = t('thePlaintextVersionForThisEmail');
+        const helpMjmlGeneral = <Trans i18nKey="customFormsUseMjmlForFormattingSeeThe">Custom forms use MJML for formatting. See the MJML documentation <a className="mjml-documentation">here</a></Trans>;
 
         this.templateSettings = {
             layout: {
-                label: t('Layout'),
+                label: t('layout'),
                 mode: 'html',
                 help: helpMjmlGeneral,
                 isLayout: true
             },
             form_input_style: {
-                label: t('Form Input Style'),
+                label: t('formInputStyle'),
                 mode: 'css',
-                help: t('This CSS stylesheet defines the appearance of form input elements and alerts')
+                help: t('thisCssStylesheetDefinesTheAppearanceOf')
             },
             web_subscribe: {
-                label: t('Web - Subscribe'),
+                label: t('webSubscribe'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             web_confirm_subscription_notice: {
-                label: t('Web - Confirm Subscription Notice'),
+                label: t('webConfirmSubscriptionNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_confirm_subscription_html: {
-                label: t('Mail - Confirm Subscription (MJML)'),
+                label: t('mailConfirmSubscriptionMjml'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_confirm_subscription_text: {
-                label: t('Mail - Confirm Subscription (Text)'),
+                label: t('mailConfirmSubscriptionText'),
                 mode: 'text',
                 help: helpEmailText
             },
             mail_already_subscribed_html: {
-                label: t('Mail - Already Subscribed (MJML)'),
+                label: t('mailAlreadySubscribedMjml'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_already_subscribed_text: {
-                label: t('Mail - Already Subscribed (Text)'),
+                label: t('mailAlreadySubscribedText'),
                 mode: 'text',
                 help: helpEmailText
             },
             web_subscribed_notice: {
-                label: t('Web - Subscribed Notice'),
+                label: t('webSubscribedNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_subscription_confirmed_html: {
-                label: t('Mail - Subscription Confirmed (MJML)'),
+                label: t('mailSubscriptionConfirmedMjml'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_subscription_confirmed_text: {
-                label: t('Mail - Subscription Confirmed (Text)'),
+                label: t('mailSubscriptionConfirmedText'),
                 mode: 'text',
                 help: helpEmailText
             },
             web_manage: {
-                label: t('Web - Manage Preferences'),
+                label: t('webManagePreferences'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             web_manage_address: {
-                label: t('Web - Manage Address'),
+                label: t('webManageAddress'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_confirm_address_change_html: {
-                label: t('Mail - Confirm Address Change (MJML)'),
+                label: t('mailConfirmAddressChangeMjml'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_confirm_address_change_text: {
-                label: t('Mail - Confirm Address Change (Text)'),
+                label: t('mailConfirmAddressChangeText'),
                 mode: 'text',
                 help: helpEmailText
             },
             web_updated_notice: {
-                label: t('Web - Updated Notice'),
+                label: t('webUpdatedNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             web_unsubscribe: {
-                label: t('Web - Unsubscribe'),
+                label: t('webUnsubscribe'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             web_confirm_unsubscription_notice: {
-                label: t('Web - Confirm Unsubscription Notice'),
+                label: t('webConfirmUnsubscriptionNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_confirm_unsubscription_html: {
-                label: t('Mail - Confirm Unsubscription (MJML)'),
+                label: t('mailConfirmUnsubscriptionMjml'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_confirm_unsubscription_text: {
-                label: t('Mail - Confirm Unsubscription (Text)'),
+                label: t('mailConfirmUnsubscriptionText'),
                 mode: 'text',
                 help: helpEmailText
             },
             web_unsubscribed_notice: {
-                label: t('Web - Unsubscribed Notice'),
+                label: t('webUnsubscribedNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_unsubscription_confirmed_html: {
-                label: t('Mail - Unsubscription Confirmed (MJML)'),
+                label: t('mailUnsubscriptionConfirmedMjml'),
                 mode: 'html',
                 help: helpMjmlGeneral
             },
             mail_unsubscription_confirmed_text: {
-                label: t('Mail - Unsubscription Confirmed (Text)'),
+                label: t('mailUnsubscriptionConfirmedText'),
                 mode: 'text',
                 help: helpEmailText
             },
             web_manual_unsubscribe_notice: {
-                label: t('Web - Manual Unsubscribe Notice'),
+                label: t('webManualUnsubscribeNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
             }
@@ -189,14 +210,14 @@ export default class CUD extends Component {
 
         this.templateGroups = {
             general: {
-                label: t('General'),
+                label: t('general'),
                 options: [
                     'layout',
                     'form_input_style'
                 ]
             },
             subscribe: {
-                label: t('Subscribe'),
+                label: t('subscribe'),
                 options: [
                     'web_subscribe',
                     'web_confirm_subscription_notice',
@@ -210,7 +231,7 @@ export default class CUD extends Component {
                 ]
             },
             manage: {
-                label: t('Manage'),
+                label: t('manage'),
                 options: [
                     'web_manage', 
                     'web_manage_address',
@@ -220,7 +241,7 @@ export default class CUD extends Component {
                 ]
             },
             unsubscribe: {
-                label: t('Unsubscribe'),
+                label: t('unsubscribe'),
                 options: [
                     'web_unsubscribe',
                     'web_confirm_unsubscription_notice',
@@ -274,7 +295,7 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
@@ -295,12 +316,12 @@ export default class CUD extends Component {
         }
 
         if (!formsErrors.length && formsServerValidationRunning) {
-            formsErrors.push(t('Validation is in progress...'));
+            formsErrors.push(t('validationIsInProgress'));
         }
 
         if (formsErrors.length) {
             state.setIn(['selectedTemplate', 'error'],
-                <div><strong>{t('List of errors in templates') + ':'}</strong>
+                <div><strong>{t('listOfErrorsInTemplates') + ':'}</strong>
                     <ul>
                         {formsErrors.map((msg, idx) => <li key={idx}>{msg}</li>)}
                     </ul>
@@ -323,7 +344,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             delete data.selectedTemplate;
@@ -331,10 +352,10 @@ export default class CUD extends Component {
         });
 
         if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/lists/forms', 'success', t('Forms saved'));
+            this.navigateToWithFlashMessage('/lists/forms', 'success', t('formsSaved'));
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -360,9 +381,9 @@ export default class CUD extends Component {
 
         const listsColumns = [
             { data: 0, title: "#" },
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => `<code>${data}</code>` },
-            { data: 5, title: t('Namespace') }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => `<code>${data}</code>` },
+            { data: 5, title: t('namespace') }
         ];
 
         const previewListId = this.getFormValue('previewList');
@@ -377,21 +398,21 @@ export default class CUD extends Component {
                         deleteUrl={`rest/forms/${this.props.entity.id}`}
                         backUrl={`/lists/forms/${this.props.entity.id}/edit`}
                         successUrl="/lists/forms"
-                        deletingMsg={t('Deleting form ...')}
-                        deletedMsg={t('Form deleted')}/>
+                        deletingMsg={t('deletingForm')}
+                        deletedMsg={t('formDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Custom Forms') : t('Create Custom Forms')}</Title>
+                <Title>{isEdit ? t('editCustomForms') : t('createCustomForms')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
+                    <InputField id="name" label={t('name')}/>
 
-                    <TextArea id="description" label={t('Description')}/>
+                    <TextArea id="description" label={t('description')}/>
 
                     <NamespaceSelect/>
 
-                    <Fieldset label={t('Forms Preview')}>
-                        <TableSelect id="previewList" label={t('List To Preview On')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('Select list whose fields will be used to preview the forms.')}/>
+                    <Fieldset label={t('formsPreview')}>
+                        <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
 
                         { previewListId &&
                             <AlignedRow>
@@ -426,15 +447,15 @@ export default class CUD extends Component {
                     </Fieldset>
 
                     { selectedTemplate &&
-                        <Fieldset label={t('Templates')}>
-                            <Dropdown id="selectedTemplate" label={t('Edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
+                        <Fieldset label={t('templates')}>
+                            <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
                             <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
                         </Fieldset>
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/forms/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

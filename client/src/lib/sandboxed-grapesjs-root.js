@@ -5,12 +5,8 @@ import './public-path';
 import React, {Component} from 'react';
 import ReactDOM
     from 'react-dom';
-import {
-    I18nextProvider,
-    translate,
-} from 'react-i18next';
-import i18n
-    from './i18n';
+import {I18nextProvider} from 'react-i18next';
+import i18n, {withTranslation} from './i18n';
 import {
     parentRPC,
     UntrustedContentRoot
@@ -20,17 +16,18 @@ import PropTypes
 import {
     getPublicUrl,
     getSandboxUrl,
-    getTrustedUrl,
-    getUrl
+    getTrustedUrl
 } from "./urls";
 import {
     base,
     unbase
 } from "../../../shared/templates";
-import mjml2html from "mjml4-in-browser";
+import mjml2html
+    from "mjml4-in-browser";
 
 import 'grapesjs/dist/css/grapes.min.css';
-import grapesjs from 'grapesjs';
+import grapesjs
+    from 'grapesjs';
 
 import 'grapesjs-mjml';
 
@@ -39,7 +36,8 @@ import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 
 import "./sandboxed-grapesjs.scss";
 
-import axios from './axios';
+import axios
+    from './axios';
 import {GrapesJSSourceType} from "./sandboxed-grapesjs-shared";
 
 
@@ -54,7 +52,7 @@ grapesjs.plugins.add('mailtrain-remove-buttons', (editor, opts = {}) => {
 });
 
 
-@translate(null, { withRef: true })
+@withTranslation()
 export class GrapesJSSandbox extends Component {
     constructor(props) {
         super(props);

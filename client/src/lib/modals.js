@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import axios, { HTTPMethod } from './axios';
-import { translate } from 'react-i18next';
+import { withTranslation } from './i18n';
 import PropTypes from 'prop-types';
 import {
     Icon,
@@ -14,7 +14,7 @@ import styles from './styles.scss';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {Link} from "react-router-dom";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 export class RestActionModalDialog extends Component {
     static propTypes = {
@@ -97,7 +97,7 @@ export class RestActionModalDialog extends Component {
 }
 
 
-@translate()
+@withTranslation()
 @withPageHelpers
 export class DeleteModalDialog extends Component {
     constructor(props) {
@@ -145,7 +145,7 @@ export class DeleteModalDialog extends Component {
             const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
             this.setFlashMessage('danger',
                 <div>
-                    <p>{t('deleteDialog.cannotDeleteDueToDependencies', {name})}</p>
+                    <p>{t('cannoteDeleteNameDueToTheFollowing', {name})}</p>
                     <ul className={styles.dependenciesList}>
                     {err.data.dependencies.map(dep =>
                         dep.link ?
@@ -153,7 +153,7 @@ export class DeleteModalDialog extends Component {
                         : // if no dep.link is present, it means the user has no permission to view the entity, thus only id without the link is shown
                             <li key={dep.id}>{this.entityTypeLabels[dep.entityTypeId]}: [{dep.id}]</li>
                     )}
-                    {err.data.andMore && <li>{t('deleteDialog.andMore')}</li>}
+                    {err.data.andMore && <li>{t('andMore')}</li>}
                     </ul>
                 </div>
             );
@@ -180,8 +180,8 @@ export class DeleteModalDialog extends Component {
         const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
 
         return <RestActionModalDialog
-            title={t('deleteDialog.confirmDeletion')}
-            message={t('deleteDialog.areYouSureToDelete', {name})}
+            title={t('confirmDeletion')}
+            message={t('areYouSureYouWantToDeleteName?', {name})}
             stateOwner={this.props.stateOwner}
             visible={this.props.visible}
             actionMethod={HTTPMethod.DELETE}

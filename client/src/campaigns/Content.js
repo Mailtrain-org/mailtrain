@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -30,7 +30,7 @@ import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -94,7 +94,7 @@ export default class CustomContent extends Component {
         const url = `rest/campaigns-content/${this.props.entity.id}`;
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             Object.assign(data, exportedData);
@@ -116,13 +116,13 @@ export default class CustomContent extends Component {
 
         if (submitResponse) {
             if (this.props.entity) {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign saved'));
+                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignSaved'));
             } else {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/edit`, 'success', t('Campaign saved'));
+                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/edit`, 'success', t('campaignSaved'));
             }
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -195,10 +195,10 @@ export default class CustomContent extends Component {
                     entity={this.props.entity}
                 />
 
-                <Title>{t('Edit Custom Content')}</Title>
+                <Title>{t('editCustomContent')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <StaticField id="data_sourceCustom_type" className={styles.formDisabled} label={t('Custom template editor')}>
+                    <StaticField id="data_sourceCustom_type" className={styles.formDisabled} label={t('customTemplateEditor')}>
                         {customTemplateTypeKey && this.templateTypes[customTemplateTypeKey].typeName}
                     </StaticField>
 
@@ -207,8 +207,8 @@ export default class CustomContent extends Component {
                     {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        <Button className="btn-danger" icon="send" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        <Button className="btn-danger" icon="send" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
             </div>

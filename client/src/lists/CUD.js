@@ -1,22 +1,43 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {Trans} from 'react-i18next';
+import {withTranslation} from '../lib/i18n';
 import {
-    withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, ButtonRow, Button,
-    Dropdown, StaticField, CheckBox
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page';
+import {
+    Button,
+    ButtonRow,
+    CheckBox,
+    Dropdown,
+    Form,
+    FormSendMethod,
+    InputField,
+    StaticField,
+    TableSelect,
+    TextArea,
+    withForm
 } from '../lib/form';
-import { withErrorHandling } from '../lib/error-handling';
-import { DeleteModalDialog } from '../lib/modals';
-import { validateNamespace, NamespaceSelect } from '../lib/namespace';
-import { UnsubscriptionMode } from '../../../shared/lists';
-import styles from "../lib/styles.scss";
-import mailtrainConfig from 'mailtrainConfig';
+import {withErrorHandling} from '../lib/error-handling';
+import {DeleteModalDialog} from '../lib/modals';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../lib/namespace';
+import {UnsubscriptionMode} from '../../../shared/lists';
+import styles
+    from "../lib/styles.scss";
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {getMailerTypes} from "../send-configurations/helpers";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -64,13 +85,13 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         if (state.getIn(['form', 'value']) === 'custom' && !state.getIn(['default_form', 'value'])) {
-            state.setIn(['default_form', 'error'], t('Custom form must be selected'));
+            state.setIn(['default_form', 'error'], t('customFormMustBeSelected'));
         } else {
             state.setIn(['default_form', 'error'], null);
         }
@@ -91,7 +112,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             if (data.form === 'default') {
@@ -101,10 +122,10 @@ export default class CUD extends Component {
         });
 
         if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/lists', 'success', t('List saved'));
+            this.navigateToWithFlashMessage('/lists', 'success', t('listSaved'));
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -116,50 +137,50 @@ export default class CUD extends Component {
         const unsubcriptionModeOptions = [
             {
                 key: UnsubscriptionMode.ONE_STEP,
-                label: t('One-step (i.e. no email with confirmation link)')
+                label: t('onestepIeNoEmailWithConfirmationLink')
             },
             {
                 key: UnsubscriptionMode.ONE_STEP_WITH_FORM,
-                label: t('One-step with unsubscription form (i.e. no email with confirmation link)')
+                label: t('onestepWithUnsubscriptionFormIeNoEmail')
             },
             {
                 key: UnsubscriptionMode.TWO_STEP,
-                label: t('Two-step (i.e. an email with confirmation link will be sent)')
+                label: t('twostepIeAnEmailWithConfirmationLinkWill')
             },
             {
                 key: UnsubscriptionMode.TWO_STEP_WITH_FORM,
-                label: t('Two-step with unsubscription form (i.e. an email with confirmation link will be sent)')
+                label: t('twostepWithUnsubscriptionFormIeAnEmail')
             },
             {
                 key: UnsubscriptionMode.MANUAL,
-                label: t('Manual (i.e. unsubscription has to be performed by the list administrator)')
+                label: t('manualIeUnsubscriptionHasToBePerformedBy')
             }
         ];
 
         const formsOptions = [
             {
                 key: 'default',
-                label: t('Default Mailtrain Forms')
+                label: t('defaultMailtrainForms')
             },
             {
                 key: 'custom',
-                label: t('Custom Forms (select form below)')
+                label: t('customFormsSelectFormBelow')
             }
         ];
 
         const customFormsColumns = [
             {data: 0, title: "#"},
-            {data: 1, title: t('Name')},
-            {data: 2, title: t('Description')},
-            {data: 3, title: t('Namespace')}
+            {data: 1, title: t('name')},
+            {data: 2, title: t('description')},
+            {data: 3, title: t('namespace')}
         ];
 
         const sendConfigurationsColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Description') },
-            { data: 4, title: t('Type'), render: data => this.mailerTypes[data].typeName },
-            { data: 6, title: t('Namespace') }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('description') },
+            { data: 4, title: t('type'), render: data => this.mailerTypes[data].typeName },
+            { data: 6, title: t('namespace') }
         ];
 
         return (
@@ -171,45 +192,45 @@ export default class CUD extends Component {
                         deleteUrl={`rest/lists/${this.props.entity.id}`}
                         backUrl={`/lists/${this.props.entity.id}/edit`}
                         successUrl="/lists"
-                        deletingMsg={t('Deleting list ...')}
-                        deletedMsg={t('List deleted')}/>
+                        deletingMsg={t('deletingList')}
+                        deletedMsg={t('listDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit List') : t('Create List')}</Title>
+                <Title>{isEdit ? t('editList') : t('createList')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
+                    <InputField id="name" label={t('name')}/>
 
                     {isEdit &&
-                        <StaticField id="cid" className={styles.formDisabled} label={t('ID')} help={t('This is the list ID displayed to the subscribers')}>
+                        <StaticField id="cid" className={styles.formDisabled} label={t('id')} help={t('thisIsTheListIdDisplayedToTheSubscribers')}>
                             {this.getFormValue('cid')}
                         </StaticField>
                     }
 
-                    <TextArea id="description" label={t('Description')}/>
+                    <TextArea id="description" label={t('description')}/>
 
-                    <InputField id="contact_email" label={t('Contact email')} help={t('Contact email used in subscription forms and emails that are sent out. If not filled in, the admin email from the global settings will be used.')}/>
-                    <InputField id="homepage" label={t('Homepage')} help={t('Homepage URL used in subscription forms and emails that are sent out. If not filled in, the default homepage from global settings will be used.')}/>
-                    <InputField id="to_name" label={t('Recipients name template')} help={t('Specify using merge tags of this list how to construct full name of the recipient. This full name is used as "To" header when sending emails.')}/>
-                    <TableSelect id="send_configuration" label={t('Send configuration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('Send configuration that will be used for sending out subscription-related emails.')}/>
+                    <InputField id="contact_email" label={t('contactEmail')} help={t('contactEmailUsedInSubscriptionFormsAnd')}/>
+                    <InputField id="homepage" label={t('homepage')} help={t('homepageUrlUsedInSubscriptionFormsAnd')}/>
+                    <InputField id="to_name" label={t('recipientsNameTemplate')} help={t('specifyUsingMergeTagsOfThisListHowTo')}/>
+                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
 
                     <NamespaceSelect/>
 
-                    <Dropdown id="form" label={t('Forms')} options={formsOptions} help={t('Web and email forms and templates used in subscription management process.')}/>
+                    <Dropdown id="form" label={t('forms')} options={formsOptions} help={t('webAndEmailFormsAndTemplatesUsedIn')}/>
 
                     {this.getFormValue('form') === 'custom' &&
-                        <TableSelect id="default_form" label={t('Custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans>The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.props.entity.id}`}>here</a>.</Trans>}/>
+                        <TableSelect id="default_form" label={t('customForms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans i18nKey="theCustomFormUsedForThisListYouCanCreate">The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.props.entity.id}`}>here</a>.</Trans>}/>
                     }
 
-                    <CheckBox id="public_subscribe" label={t('Subscription')} text={t('Allow public users to subscribe themselves')}/>
+                    <CheckBox id="public_subscribe" label={t('subscription')} text={t('allowPublicUsersToSubscribeThemselves')}/>
 
-                    <Dropdown id="unsubscription_mode" label={t('Unsubscription')} options={unsubcriptionModeOptions} help={t('Select how an unsuscription request by subscriber is handled.')}/>
+                    <Dropdown id="unsubscription_mode" label={t('unsubscription')} options={unsubcriptionModeOptions} help={t('selectHowAnUnsuscriptionRequestBy')}/>
 
-                    <CheckBox id="listunsubscribe_disabled" label={t('Unsubscribe header')} text={t('Do not send List-Unsubscribe headers')}/>
+                    <CheckBox id="listunsubscribe_disabled" label={t('unsubscribeHeader')} text={t('doNotSendListUnsubscribeHeaders')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

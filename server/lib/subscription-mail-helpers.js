@@ -26,7 +26,7 @@ async function sendSubscriptionConfirmed(lang, list, email, subscription) {
         unsubscribeUrl: '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid
     };
 
-    await _sendMail(list, email, 'subscription_confirmed', lang, tMark('subscription.confirmed'), relativeUrls, subscription);
+    await _sendMail(list, email, 'subscription_confirmed', lang, tMark('subscriptionconfirmed'), relativeUrls, subscription);
 }
 
 async function sendAlreadySubscribed(lang, list, email, subscription) {
@@ -34,35 +34,35 @@ async function sendAlreadySubscribed(lang, list, email, subscription) {
         preferencesUrl: '/subscription/' + list.cid + '/manage/' + subscription.cid,
         unsubscribeUrl: '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid
     };
-    await _sendMail(list, email, 'already_subscribed', lang, tMark('subscription.alreadyRegistered'), relativeUrls, subscription);
+    await _sendMail(list, email, 'already_subscribed', lang, tMark('listEmailAddressAlreadyRegistered'), relativeUrls, subscription);
 }
 
 async function sendConfirmAddressChange(lang, list, email, cid, subscription) {
     const relativeUrls = {
         confirmUrl: '/subscription/confirm/change-address/' + cid
     };
-    await _sendMail(list, email, 'confirm_address_change', lang, tMark('subscription.confirmEmailChange'), relativeUrls, subscription);
+    await _sendMail(list, email, 'confirm_address_change', lang, tMark('listPleaseConfirmEmailChangeIn'), relativeUrls, subscription);
 }
 
 async function sendConfirmSubscription(lang, list, email, cid, subscription) {
     const relativeUrls = {
         confirmUrl: '/subscription/confirm/subscribe/' + cid
     };
-    await _sendMail(list, email, 'confirm_subscription', lang, tMark('subscription.confirmSubscription'), relativeUrls, subscription);
+    await _sendMail(list, email, 'confirm_subscription', lang, tMark('pleaseConfirmSubscription'), relativeUrls, subscription);
 }
 
 async function sendConfirmUnsubscription(lang, list, email, cid, subscription) {
     const relativeUrls = {
         confirmUrl: '/subscription/confirm/unsubscribe/' + cid
     };
-    await _sendMail(list, email, 'confirm_unsubscription', lang, tMark('subscription.confirmUnsubscription'), relativeUrls, subscription);
+    await _sendMail(list, email, 'confirm_unsubscription', lang, tMark('listPleaseConfirmUnsubscription'), relativeUrls, subscription);
 }
 
 async function sendUnsubscriptionConfirmed(lang, list, email, subscription) {
     const relativeUrls = {
         subscribeUrl: '/subscription/' + list.cid + '?cid=' + subscription.cid
     };
-    await _sendMail(list, email, 'unsubscription_confirmed', lang, tMark('subscription.unsubscriptionConfirmed'), relativeUrls, subscription);
+    await _sendMail(list, email, 'unsubscription_confirmed', lang, tMark('listUnsubscriptionConfirmed'), relativeUrls, subscription);
 }
 
 function getDisplayName(flds, subscription) {

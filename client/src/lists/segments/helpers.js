@@ -11,16 +11,16 @@ export function getRuleHelpers(t, fields) {
 
     ruleHelpers.compositeRuleTypes = {
         all: {
-            dropdownLabel: t('All rules must match'),
-            treeLabel: rule => t('All rules must match')
+            dropdownLabel: t('allRulesMustMatch'),
+            treeLabel: rule => t('allRulesMustMatch')
         },
         some: {
-            dropdownLabel: t('At least one rule must match'),
-            treeLabel: rule => t('At least one rule must match')
+            dropdownLabel: t('atLeastOneRuleMustMatch'),
+            treeLabel: rule => t('atLeastOneRuleMustMatch')
         },
         none: {
-            dropdownLabel: t('No rule may match'),
-            treeLabel: rule => t('No rule may match')
+            dropdownLabel: t('noRuleMayMatch'),
+            treeLabel: rule => t('noRuleMayMatch')
         }
     };
 
@@ -28,195 +28,195 @@ export function getRuleHelpers(t, fields) {
 
     ruleHelpers.primitiveRuleTypes.text = {
         eq: {
-            dropdownLabel: t('Equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('equalTo'),
+            treeLabel: rule => t('valueInColumnColNameIsEqualToValue', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         like: {
-            dropdownLabel: t('Match (with SQL LIKE)'),
-            treeLabel: rule => t('Value in column "{{colName}}" matches (with SQL LIKE) "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('matchWithSqlLike'),
+            treeLabel: rule => t('valueInColumnColNameMatchesWithSqlLike', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         re: {
-            dropdownLabel: t('Match (with regular expressions)'),
-            treeLabel: rule => t('Value in column "{{colName}}" matches (with regular expressions) "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('matchWithRegularExpressions'),
+            treeLabel: rule => t('valueInColumnColNameMatchesWithRegular', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         lt: {
-            dropdownLabel: t('Alphabetically before'),
-            treeLabel: rule => t('Value in column "{{colName}}" is alphabetically before "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('alphabeticallyBefore'),
+            treeLabel: rule => t('valueInColumnColNameIsAlphabetically', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         le: {
-            dropdownLabel: t('Alphabetically before or equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is alphabetically before or equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('alphabeticallyBeforeOrEqualTo'),
+            treeLabel: rule => t('valueInColumnColNameIsAlphabetically-1', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         gt: {
-            dropdownLabel: t('Alphabetically after'),
-            treeLabel: rule => t('Value in column "{{colName}}" is alphabetically after "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('alphabeticallyAfter'),
+            treeLabel: rule => t('valueInColumnColNameIsAlphabetically-2', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         ge: {
-            dropdownLabel: t('Alphabetically after or equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is alphabetically after or equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('alphabeticallyAfterOrEqualTo'),
+            treeLabel: rule => t('valueInColumnColNameIsAlphabetically-3', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         }
     };
 
     ruleHelpers.primitiveRuleTypes.website = {
         eq: {
-            dropdownLabel: t('Equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('equalTo'),
+            treeLabel: rule => t('valueInColumnColNameIsEqualToValue', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         like: {
-            dropdownLabel: t('Match (with SQL LIKE)'),
-            treeLabel: rule => t('Value in column "{{colName}}" matches (with SQL LIKE) "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('matchWithSqlLike'),
+            treeLabel: rule => t('valueInColumnColNameMatchesWithSqlLike', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         re: {
-            dropdownLabel: t('Match (with regular expressions)'),
-            treeLabel: rule => t('Value in column "{{colName}}" matches (with regular expressions) "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('matchWithRegularExpressions'),
+            treeLabel: rule => t('valueInColumnColNameMatchesWithRegular', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         }
     };
 
     ruleHelpers.primitiveRuleTypes.number = {
         eq: {
-            dropdownLabel: t('Equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is equal to {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('equalTo'),
+            treeLabel: rule => t('valueInColumnColNameIsEqualToValue-1', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         lt: {
-            dropdownLabel: t('Less than'),
-            treeLabel: rule => t('Value in column "{{colName}}" is less than {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('lessThan'),
+            treeLabel: rule => t('valueInColumnColNameIsLessThanValue', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         le: {
-            dropdownLabel: t('Less than or equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is less than or equal to {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('lessThanOrEqualTo'),
+            treeLabel: rule => t('valueInColumnColNameIsLessThanOrEqualTo', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         gt: {
-            dropdownLabel: t('Greater than'),
-            treeLabel: rule => t('Value in column "{{colName}}" is greater than {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('greaterThan'),
+            treeLabel: rule => t('valueInColumnColNameIsGreaterThanValue', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         ge: {
-            dropdownLabel: t('Greater than or equal to'),
-            treeLabel: rule => t('Value in column "{{colName}}" is greater than or equal to {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('greaterThanOrEqualTo'),
+            treeLabel: rule => t('valueInColumnColNameIsGreaterThanOrEqual', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         }
     };
 
     // TODO: This generates strings that cannot be statically detected. It will require dynamic discovery of translatable strings.
     function getRelativeDateTreeLabel(rule, textFragment) {
         if (rule.value === 0) {
-            return t('Date in column "{{colName}}" ' + textFragment + ' the current date', {colName: ruleHelpers.getColumnName(rule.column)})
+            return t('dateInColumnColName' + textFragment + ' the current date', {colName: ruleHelpers.getColumnName(rule.column)})
         } else if (rule.value > 0) {
-            return t('Date in column "{{colName}}" ' + textFragment + ' {{value}}-th day after the current date', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
+            return t('dateInColumnColName' + textFragment + ' {{value}}-th day after the current date', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
         } else {
-            return t('Date in column "{{colName}}" ' + textFragment + ' {{value}}-th day before the current date', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
+            return t('dateInColumnColName' + textFragment + ' {{value}}-th day before the current date', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
         }
     }
 
     ruleHelpers.primitiveRuleTypes.date = {
         eq: {
-            dropdownLabel: t('On'),
-            treeLabel: rule => t('Date in column "{{colName}}" is {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('on'),
+            treeLabel: rule => t('dateInColumnColNameIsValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         lt: {
-            dropdownLabel: t('Before'),
-            treeLabel: rule => t('Date in column "{{colName}}" is before {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('before'),
+            treeLabel: rule => t('dateInColumnColNameIsBeforeValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         le: {
-            dropdownLabel: t('Before or on'),
-            treeLabel: rule => t('Date in column "{{colName}}" is before or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('beforeOrOn'),
+            treeLabel: rule => t('dateInColumnColNameIsBeforeOrOnValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         gt: {
-            dropdownLabel: t('After'),
-            treeLabel: rule => t('Date in column "{{colName}}" is after {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('after'),
+            treeLabel: rule => t('dateInColumnColNameIsAfterValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         ge: {
-            dropdownLabel: t('After or on'),
-            treeLabel: rule => t('Date in column "{{colName}}" is after or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('afterOrOn'),
+            treeLabel: rule => t('dateInColumnColNameIsAfterOrOnValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
         eqTodayPlusDays: {
-            dropdownLabel: t('On x-th day before/after current date'),
+            dropdownLabel: t('onXthDayBeforeafterCurrentDate'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is'),
         },
         ltTodayPlusDays: {
-            dropdownLabel: t('Before x-th day before/after current date'),
+            dropdownLabel: t('beforeXthDayBeforeafterCurrentDate'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is before'),
         },
         leTodayPlusDays: {
-            dropdownLabel: t('Before or on x-th day before/after current date'),
+            dropdownLabel: t('beforeOrOnXthDayBeforeafterCurrentDate'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is before or on'),
         },
         gtTodayPlusDays: {
-            dropdownLabel: t('After x-th day before/after current date'),
+            dropdownLabel: t('afterXthDayBeforeafterCurrentDate'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is after'),
         },
         geTodayPlusDays: {
-            dropdownLabel: t('After or on x-th day before/after current date'),
+            dropdownLabel: t('afterOrOnXthDayBeforeafterCurrentDate'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is after or on'),
         }
     };
 
     ruleHelpers.primitiveRuleTypes.birthday = {
         eq: {
-            dropdownLabel: t('On'),
-            treeLabel: rule => t('Date in column "{{colName}}" is {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('on'),
+            treeLabel: rule => t('dateInColumnColNameIsValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
         },
         lt: {
-            dropdownLabel: t('Before'),
-            treeLabel: rule => t('Date in column "{{colName}}" is before {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('before'),
+            treeLabel: rule => t('dateInColumnColNameIsBeforeValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
         },
         le: {
-            dropdownLabel: t('Before or on'),
-            treeLabel: rule => t('Date in column "{{colName}}" is before or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('beforeOrOn'),
+            treeLabel: rule => t('dateInColumnColNameIsBeforeOrOnValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
         },
         gt: {
-            dropdownLabel: t('After'),
-            treeLabel: rule => t('Date in column "{{colName}}" is after {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('after'),
+            treeLabel: rule => t('dateInColumnColNameIsAfterValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
         },
         ge: {
-            dropdownLabel: t('After or on'),
-            treeLabel: rule => t('Date in column "{{colName}}" is after or on {{value}}', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
+            dropdownLabel: t('afterOrOn'),
+            treeLabel: rule => t('dateInColumnColNameIsAfterOrOnValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatBirthday(DateFormat.INTL, rule.value)}),
         }
     };
 
     ruleHelpers.primitiveRuleTypes.option = {
         isTrue: {
-            dropdownLabel: t('Is selected'),
-            treeLabel: rule => t('Value in column "{{colName}}" is selected', {colName: ruleHelpers.getColumnName(rule.column)}),
+            dropdownLabel: t('isSelected'),
+            treeLabel: rule => t('valueInColumnColNameIsSelected', {colName: ruleHelpers.getColumnName(rule.column)}),
         },
         isFalse: {
-            dropdownLabel: t('Is not selected'),
-            treeLabel: rule => t('Value in column "{{colName}}" is not selected', {colName: ruleHelpers.getColumnName(rule.column)}),
+            dropdownLabel: t('isNotSelected'),
+            treeLabel: rule => t('valueInColumnColNameIsNotSelected', {colName: ruleHelpers.getColumnName(rule.column)}),
         }
     };
 
     ruleHelpers.primitiveRuleTypes['dropdown-enum'] = ruleHelpers.primitiveRuleTypes['radio-enum'] = {
         eq: {
-            dropdownLabel: t('Key equal to'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" is equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyEqualTo'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameIsEqualTo', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         like: {
-            dropdownLabel: t('Key match (with SQL LIKE)'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" matches (with SQL LIKE) "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyMatchWithSqlLike'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameMatchesWith', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         re: {
-            dropdownLabel: t('Key match (with regular expressions)'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" matches (with regular expressions) "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyMatchWithRegularExpressions'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameMatchesWith-1', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         lt: {
-            dropdownLabel: t('Key alphabetically before'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" is alphabetically before "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyAlphabeticallyBefore'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameIs', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         le: {
-            dropdownLabel: t('Key alphabetically before or equal to'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" is alphabetically before or equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyAlphabeticallyBeforeOrEqualTo'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameIs-1', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         gt: {
-            dropdownLabel: t('Key alphabetically after'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" is alphabetically after "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyAlphabeticallyAfter'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameIs-2', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         },
         ge: {
-            dropdownLabel: t('Key alphabetically after or equal to'),
-            treeLabel: rule => t('The selected key in column "{{colName}}" is alphabetically after or equal to "{{value}}"', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+            dropdownLabel: t('keyAlphabeticallyAfterOrEqualTo'),
+            treeLabel: rule => t('theSelectedKeyInColumnColNameIs-3', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
         }
     };
 
 
     const stringValueSettings = allowEmpty => ({
-        form: <InputField id="value" label={t('Value')} />,
+        form: <InputField id="value" label={t('value')} />,
         getFormData: rule => ({
             value: rule.value
         }),
@@ -225,7 +225,7 @@ export function getRuleHelpers(t, fields) {
         },
         validate: state => {
             if (!allowEmpty && !state.getIn(['value', 'value'])) {
-                state.setIn(['value', 'error'], t('Value must not be empty'));
+                state.setIn(['value', 'error'], t('valueMustNotBeEmpty'));
             } else {
                 state.setIn(['value', 'error'], null);
             }
@@ -233,7 +233,7 @@ export function getRuleHelpers(t, fields) {
     });
 
     const numberValueSettings = {
-        form: <InputField id="value" label={t('Value')} />,
+        form: <InputField id="value" label={t('value')} />,
         getFormData: rule => ({
             value: rule.value.toString()
         }),
@@ -243,9 +243,9 @@ export function getRuleHelpers(t, fields) {
         validate: state => {
             const value = state.getIn(['value', 'value']).trim();
             if (value === '') {
-                state.setIn(['value', 'error'], t('Value must not be empty'));
+                state.setIn(['value', 'error'], t('valueMustNotBeEmpty'));
             } else if (isNaN(value)) {
-                state.setIn(['value', 'error'], t('Value must be a number'));
+                state.setIn(['value', 'error'], t('valueMustBeANumber'));
             } else {
                 state.setIn(['value', 'error'], null);
             }
@@ -253,7 +253,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const birthdayValueSettings = {
-        form: <DatePicker id="birthday" label={t('Date')} birthday />,
+        form: <DatePicker id="birthday" label={t('date')} birthday />,
         getFormData: rule => ({
             birthday: formatBirthday(DateFormat.INTL, rule.value)
         }),
@@ -264,9 +264,9 @@ export function getRuleHelpers(t, fields) {
             const value = state.getIn(['birthday', 'value']);
             const date = parseBirthday(DateFormat.INTL, value);
             if (!value) {
-                state.setIn(['birthday', 'error'], t('Date must not be empty'));
+                state.setIn(['birthday', 'error'], t('dateMustNotBeEmpty'));
             } else if (!date) {
-                state.setIn(['birthday', 'error'], t('Date is invalid'));
+                state.setIn(['birthday', 'error'], t('dateIsInvalid'));
             } else {
                 state.setIn(['birthday', 'error'], null);
             }
@@ -274,7 +274,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const dateValueSettings = {
-        form: <DatePicker id="date" label={t('Date')} />,
+        form: <DatePicker id="date" label={t('date')} />,
         getFormData: rule => ({
             date: formatDate(DateFormat.INTL, rule.value)
         }),
@@ -285,9 +285,9 @@ export function getRuleHelpers(t, fields) {
             const value = state.getIn(['date', 'value']);
             const date = parseDate(DateFormat.INTL, value);
             if (!value) {
-                state.setIn(['date', 'error'], t('Date must not be empty'));
+                state.setIn(['date', 'error'], t('dateMustNotBeEmpty'));
             } else if (!date) {
-                state.setIn(['date', 'error'], t('Date is invalid'));
+                state.setIn(['date', 'error'], t('dateIsInvalid'));
             } else {
                 state.setIn(['date', 'error'], null);
             }
@@ -297,10 +297,10 @@ export function getRuleHelpers(t, fields) {
     const dateRelativeValueSettings = {
         form:
             <div>
-                <InputField id="daysValue" label={t('Number of days')}/>
-                <Dropdown id="direction" label={t('Before/After')} options={[
-                    { key: 'before', label: t('Before current date') },
-                    { key: 'after', label: t('After current date') }
+                <InputField id="daysValue" label={t('numberOfDays')}/>
+                <Dropdown id="direction" label={t('beforeAfter')} options={[
+                    { key: 'before', label: t('beforeCurrentDate') },
+                    { key: 'after', label: t('afterCurrentDate') }
                 ]}/>
             </div>,
         getFormData: rule => ({
@@ -314,9 +314,9 @@ export function getRuleHelpers(t, fields) {
         validate: state => {
             const value = state.getIn(['daysValue', 'value']);
             if (!value) {
-                state.setIn(['daysValue', 'error'], t('Number of days must not be empty'));
+                state.setIn(['daysValue', 'error'], t('numberOfDaysMustNotBeEmpty'));
             } else if (isNaN(value)) {
-                state.setIn(['daysValue', 'error'], t('Number of days must be a number'));
+                state.setIn(['daysValue', 'error'], t('numberOfDaysMustBeANumber'));
             } else {
                 state.setIn(['daysValue', 'error'], null);
             }
@@ -383,28 +383,28 @@ export function getRuleHelpers(t, fields) {
     const predefColumns = [
         {
             column: 'email',
-            name: t('Email address'),
+            name: t('emailAddress-1'),
             type: 'text',
             key: 'EMAIL'
         },
         {
             column: 'opt_in_country',
-            name: t('Signup country'),
+            name: t('signupCountry'),
             type: 'text'
         },
         {
             column: 'created',
-            name: t('Sign up date'),
+            name: t('signUpDate'),
             type: 'date'
         },
         {
             column: 'latest_open',
-            name: t('Latest open'),
+            name: t('latestOpen'),
             type: 'date'
         },
         {
             column: 'latest_click',
-            name: t('Latest click'),
+            name: t('latestClick'),
             type: 'date'
         }
     ];

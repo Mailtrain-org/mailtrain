@@ -1,14 +1,14 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
 import { ReportState } from '../../../shared/reports';
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -46,16 +46,16 @@ export default class View extends Component {
             if (this.state.report.state === ReportState.FINISHED) {
                 return (
                     <div>
-                        <Title>{t('Report {{name}}', { name: this.state.report.name })}</Title>
+                        <Title>{t('reportName', { name: this.state.report.name })}</Title>
 
                         <div dangerouslySetInnerHTML={{ __html: this.state.content }}/>
                     </div>
                 );
             } else {
-                return <div className="alert alert-danger" role="alert">{t('Report not generated')}</div>;
+                return <div className="alert alert-danger" role="alert">{t('reportNotGenerated')}</div>;
             }
         } else {
-            return <div>{t('Loading report ...')}</div>;
+            return <div>{t('loadingReport')}</div>;
         }
     }
 }

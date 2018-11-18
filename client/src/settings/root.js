@@ -6,7 +6,7 @@ import Update from "./Update";
 function getMenus(t) {
     return {
         'settings': {
-            title: t('Global Settings'),
+            title: t('globalSettings'),
             link: '/settings',
             resolve: {
                 configItems: params => `rest/settings`

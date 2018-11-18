@@ -2,10 +2,9 @@
 
 const config = require('config');
 const log = require('./log');
-const _ = require('./translate')._;
 const util = require('util');
 
-const passport = require('server/lib/passport');
+const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 const csrf = require('csurf');

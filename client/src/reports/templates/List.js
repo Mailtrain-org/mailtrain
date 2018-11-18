@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
 import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, MenuLink } from '../../lib/page';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
@@ -16,7 +16,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -51,10 +51,10 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 4, title: t('Namespace') },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 4, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -62,14 +62,14 @@ export default class List extends Component {
 
                     if (mailtrainConfig.globalPermissions.createJavascriptWithROAccess && perms.includes('edit')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/reports/templates/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/reports/templates/${data[0]}/share`
                         });
                     }
@@ -83,19 +83,19 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/reports/templates`, t('Deleting report template ...'), t('Report template deleted'))}
+                {tableDeleteDialogRender(this, `rest/reports/templates`, t('deletingReportTemplate'), t('reportTemplateDeleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <DropdownMenu className="btn-primary" label={t('Create Report Template')}>
-                            <MenuLink to="/reports/templates/create">{t('Blank')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/subscribers-all">{t('All Subscribers')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/subscribers-grouped">{t('Grouped Subscribers')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/export-list-csv">{t('Export List as CSV')}</MenuLink>
+                        <DropdownMenu className="btn-primary" label={t('createReportTemplate')}>
+                            <MenuLink to="/reports/templates/create">{t('blank')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/subscribers-all">{t('allSubscribers')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/subscribers-grouped">{t('groupedSubscribers')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/export-list-csv">{t('exportListAsCsv')}</MenuLink>
                         </DropdownMenu>
                     </Toolbar>
                 }
 
-                <Title>{t('Report Templates')}</Title>
+                <Title>{t('reportTemplates')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/report-templates-table" columns={columns} />
             </div>

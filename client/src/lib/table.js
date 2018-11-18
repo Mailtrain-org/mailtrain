@@ -2,8 +2,8 @@
 
 import React, { Component } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { translate } from 'react-i18next';
 import PropTypes from 'prop-types';
+import { withTranslation } from './i18n';
 
 import jQuery from 'jquery';
 
@@ -28,8 +28,7 @@ const TableSelectMode = {
     MULTI: 2
 };
 
-
-@translate(null, { withRef: true })
+@withTranslation({delegateFuns: ['refresh']})
 @withPageHelpers
 @withErrorHandling
 class Table extends Component {
@@ -111,7 +110,7 @@ class Table extends Component {
 
         const count = this.selectionMap.size;
         if (this.selectionMap.size > 0) {
-            const jqInfo = jQuery('<span>' + t('{{ count }} entries selected.', { count }) + ' </span>');
+            const jqInfo = jQuery('<span>' + t('countEntriesSelected', { count }) + ' </span>');
             const jqDeselectLink = jQuery('<a href="">Deselect all.</a>').on('click', ::this.deselectAll);
 
             this.jqSelectInfo.empty().append(jqInfo).append(jqDeselectLink);
@@ -403,14 +402,6 @@ class Table extends Component {
         );
     }
 }
-
-/*
-  Refreshes the table. This method is provided to allow programmatic refresh from a handler outside the table.
-  The reference to the table can be obtained by ref.
- */
-Table.prototype.refresh = function() {
-    this.getWrappedInstance().refresh();
-};
 
 export {
     Table,

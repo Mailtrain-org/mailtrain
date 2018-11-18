@@ -10,10 +10,10 @@ import 'brace/mode/json';
 export function getSubscriptionStatusLabels(t) {
 
     const subscriptionStatusLabels = {
-        [SubscriptionStatus.SUBSCRIBED]: t('Subscribed'),
-        [SubscriptionStatus.UNSUBSCRIBED]: t('Unubscribed'),
-        [SubscriptionStatus.BOUNCED]: t('Bounced'),
-        [SubscriptionStatus.COMPLAINED]: t('Complained'),
+        [SubscriptionStatus.SUBSCRIBED]: t('subscribed'),
+        [SubscriptionStatus.UNSUBSCRIBED]: t('unubscribed'),
+        [SubscriptionStatus.BOUNCED]: t('bounced'),
+        [SubscriptionStatus.COMPLAINED]: t('complained'),
     };
 
     return subscriptionStatusLabels;
@@ -52,7 +52,7 @@ export function getFieldTypes(t) {
         validate: (groupedField, state) => {
             const value = state.getIn([getFieldColumn(groupedField), 'value']).trim();
             if (value !== '' && isNaN(value)) {
-                state.setIn([getFieldColumn(groupedField), 'error'], t('Value must be a number'));
+                state.setIn([getFieldColumn(groupedField), 'error'], t('valueMustBeANumber'));
             } else {
                 state.setIn([getFieldColumn(groupedField), 'error'], null);
             }
@@ -77,7 +77,7 @@ export function getFieldTypes(t) {
             const value = state.getIn([getFieldColumn(groupedField), 'value']);
             const date = parseDate(groupedField.settings.dateFormat, value);
             if (value !== '' && !date) {
-                state.setIn([getFieldColumn(groupedField), 'error'], t('Date is invalid'));
+                state.setIn([getFieldColumn(groupedField), 'error'], t('dateIsInvalid'));
             } else {
                 state.setIn([getFieldColumn(groupedField), 'error'], null);
             }
@@ -102,7 +102,7 @@ export function getFieldTypes(t) {
             const value = state.getIn([getFieldColumn(groupedField), 'value']);
             const date = parseBirthday(groupedField.settings.dateFormat, value);
             if (value !== '' && !date) {
-                state.setIn([getFieldColumn(groupedField), 'error'], t('Date is invalid'));
+                state.setIn([getFieldColumn(groupedField), 'error'], t('dateIsInvalid'));
             } else {
                 state.setIn([getFieldColumn(groupedField), 'error'], null);
             }

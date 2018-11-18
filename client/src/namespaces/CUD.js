@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button, TreeTableSelect } from '../lib/form';
 import axios from '../lib/axios';
@@ -13,7 +13,7 @@ import mailtrainConfig from 'mailtrainConfig';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -89,14 +89,14 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value']).trim()) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         if (!this.isEditGlobal()) {
             if (!state.getIn(['namespace', 'value'])) {
-                state.setIn(['namespace', 'error'], t('Parent Namespace must be selected'));
+                state.setIn(['namespace', 'error'], t('parentNamespaceMustBeSelected'));
             } else {
                 state.setIn(['namespace', 'error'], null);
             }
@@ -117,23 +117,23 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace saved'));
+                this.navigateToWithFlashMessage('/namespaces', 'success', t('namespaceSaved'));
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
 
         } catch (error) {
             if (error instanceof interoperableErrors.LoopDetectedError) {
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('There has been a loop detected in the assignment of the parent namespace. This is most likely because someone else has changed the parent of some namespace in the meantime. Refresh your page to start anew. Please note that your changes will be lost.')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('thereHasBeenALoopDetectedInTheAssignment')}
                     </span>
                 );
                 return;
@@ -142,8 +142,8 @@ export default class CUD extends Component {
             if (error instanceof interoperableErrors.DependencyNotFoundError) {
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that the parent namespace has been deleted in the meantime. Refresh your page to start anew. Please note that your changes will be lost.')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('itSeemsThatTheParentNamespaceHasBeen')}
                     </span>
                 );
                 return;
@@ -167,22 +167,22 @@ export default class CUD extends Component {
                         deleteUrl={`rest/namespaces/${this.props.entity.id}`}
                         backUrl={`/namespaces/${this.props.entity.id}/edit`}
                         successUrl="/namespaces"
-                        deletingMsg={t('Deleting namespace ...')}
-                        deletedMsg={t('Namespace deleted')} />
+                        deletingMsg={t('deletingNamespace')}
+                        deletedMsg={t('namespaceDeleted')} />
                 }
 
-                <Title>{isEdit ? t('Edit Namespace') : t('Create Namespace')}</Title>
+                <Title>{isEdit ? t('editNamespace') : t('createNamespace')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
 
                     {!this.isEditGlobal() &&
-                    <TreeTableSelect id="namespace" label={t('Parent Namespace')} data={this.state.treeData}/>}
+                    <TreeTableSelect id="namespace" label={t('parentNamespace')} data={this.state.treeData}/>}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/namespaces/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/namespaces/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

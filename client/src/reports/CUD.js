@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import {
     withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, TableSelectMode, ButtonRow, Button,
@@ -16,7 +16,7 @@ import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -79,13 +79,13 @@ export default class CUD extends Component {
         const edit = this.props.entity;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         if (!state.getIn(['report_template', 'value'])) {
-            state.setIn(['report_template', 'error'], t('Report template must be selected'));
+            state.setIn(['report_template', 'error'], t('reportTemplateMustBeSelected'));
         } else {
             state.setIn(['report_template', 'error'], null);
         }
@@ -104,13 +104,13 @@ export default class CUD extends Component {
 
                 if (spec.maxOccurences === 1) {
                     if (spec.minOccurences === 1 && (selection === null || selection === undefined)) { // FIXME - this does not seem to correspond with selectionAsArray
-                        state.setIn([fldId, 'error'], t('Exactly one item has to be selected'));
+                        state.setIn([fldId, 'error'], t('exactlyOneItemHasToBeSelected'));
                     }
                 } else {
                     if (selection.length < spec.minOccurences) {
-                        state.setIn([fldId, 'error'], t('At least {{ count }} item(s) have to be selected', { count: spec.minOccurences }));
+                        state.setIn([fldId, 'error'], t('atLeastCountItemsHaveToBeSelected', { count: spec.minOccurences }));
                     } else if (selection.length > spec.maxOccurences) {
-                        state.setIn([fldId, 'error'], t('At most {{ count }} item(s) can to be selected', { count: spec.maxOccurences }));
+                        state.setIn([fldId, 'error'], t('atMostCountItemsCanToBeSelected', { count: spec.maxOccurences }));
                     }
                 }
             }
@@ -123,7 +123,7 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (this.getFormValue('report_template') && !this.getFormValue('user_fields')) {
-            this.setFormStatusMessage('warning', t('Report parameters are not selected. Wait for them to get displayed and then fill them in.'));
+            this.setFormStatusMessage('warning', t('reportParametersAreNotSelectedWaitFor'));
             return;
         }
 
@@ -137,7 +137,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             const params = {};
@@ -153,10 +153,10 @@ export default class CUD extends Component {
         });
 
         if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/reports', 'success', t('Report saved'));
+            this.navigateToWithFlashMessage('/reports', 'success', t('reportSaved'));
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -166,9 +166,9 @@ export default class CUD extends Component {
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const reportTemplateColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Created'), render: data => moment(data).fromNow() }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('created'), render: data => moment(data).fromNow() }
         ];
 
         const userFieldsSpec = this.getFormValue('user_fields');
@@ -195,21 +195,21 @@ export default class CUD extends Component {
                 if (spec.type === 'campaign') {
                     addUserFieldTableSelect(spec, 'rest/campaigns-table', 1,[
                         {data: 0, title: "#"},
-                        {data: 1, title: t('Name')},
-                        {data: 2, title: t('Description')},
-                        {data: 3, title: t('Status')},
-                        {data: 4, title: t('Created'), render: data => moment(data).fromNow()}
+                        {data: 1, title: t('name')},
+                        {data: 2, title: t('description')},
+                        {data: 3, title: t('status')},
+                        {data: 4, title: t('created'), render: data => moment(data).fromNow()}
                     ]);
                 } else if (spec.type === 'list') {
                     addUserFieldTableSelect(spec, 'rest/lists-table', 1,[
                         {data: 0, title: "#"},
-                        {data: 1, title: t('Name')},
-                        {data: 2, title: t('ID')},
-                        {data: 3, title: t('Subscribers')},
-                        {data: 4, title: t('Description')}
+                        {data: 1, title: t('name')},
+                        {data: 2, title: t('id')},
+                        {data: 3, title: t('subscribers')},
+                        {data: 4, title: t('description')}
                     ]);
                 } else {
-                    userFields.push(<div className="alert alert-danger" role="alert">{t('Unknown field type "{{type}}"', { type: spec.type })}</div>)
+                    userFields.push(<div className="alert alert-danger" role="alert">{t('unknownFieldTypeType', { type: spec.type })}</div>)
                 }
             }
         }
@@ -223,34 +223,34 @@ export default class CUD extends Component {
                         deleteUrl={`rest/reports/${this.props.entity.id}`}
                         backUrl={`/reports/${this.props.entity.id}/edit`}
                         successUrl="/reports"
-                        deletingMsg={t('Deleting report ...')}
-                        deletedMsg={t('Report deleted')}/>
+                        deletingMsg={t('deletingReport')}
+                        deletedMsg={t('reportDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Report') : t('Create Report')}</Title>
+                <Title>{isEdit ? t('editReport') : t('createReport')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
 
-                    <TableSelect id="report_template" label={t('Report Template')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
+                    <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
 
                     <NamespaceSelect/>
 
                     {userFieldsSpec ?
                         userFields.length > 0 &&
-                            <Fieldset label={t('Report parameters')}>
+                            <Fieldset label={t('reportParameters')}>
                                 {userFields}
                             </Fieldset>
                     :
                         this.getFormValue('report_template') &&
-                            <div className="alert alert-info" role="alert">{t('Loading report template...')}</div>
+                            <div className="alert alert-info" role="alert">{t('loadingReportTemplate')}</div>
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
                         {canDelete &&
-                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>
+                            <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>
                         }
                     </ButtonRow>
                 </Form>

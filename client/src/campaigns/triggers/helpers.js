@@ -5,8 +5,8 @@ import {Entity, Event} from '../../../../shared/triggers';
 export function getTriggerTypes(t) {
 
     const entityLabels = {
-        [Entity.SUBSCRIPTION]: t('Subscription'),
-        [Entity.CAMPAIGN]: t('Campaign')
+        [Entity.SUBSCRIPTION]: t('subscription'),
+        [Entity.CAMPAIGN]: t('campaign')
     };
 
     const SubscriptionEvent = Event[Entity.SUBSCRIPTION];
@@ -14,16 +14,16 @@ export function getTriggerTypes(t) {
 
     const eventLabels = {
         [Entity.SUBSCRIPTION]: {
-            [SubscriptionEvent.CREATED]: t('Created'),
-            [SubscriptionEvent.LATEST_OPEN]: t('Latest open'),
-            [SubscriptionEvent.LATEST_CLICK]: t('Latest click')
+            [SubscriptionEvent.CREATED]: t('created'),
+            [SubscriptionEvent.LATEST_OPEN]: t('latestOpen'),
+            [SubscriptionEvent.LATEST_CLICK]: t('latestClick')
         },
         [Entity.CAMPAIGN]: {
-            [CampaignEvent.DELIVERED]: t('Delivered'),
-            [CampaignEvent.OPENED]: t('Opened'),
-            [CampaignEvent.CLICKED]: t('Clicked'),
-            [CampaignEvent.NOT_OPENED]: t('Not opened'),
-            [CampaignEvent.NOT_CLICKED]: t('Not clicked')
+            [CampaignEvent.DELIVERED]: t('delivered'),
+            [CampaignEvent.OPENED]: t('opened'),
+            [CampaignEvent.CLICKED]: t('clicked'),
+            [CampaignEvent.NOT_OPENED]: t('notOpened'),
+            [CampaignEvent.NOT_CLICKED]: t('notClicked')
         }
     };
 

@@ -1,7 +1,8 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate, Trans } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
+import { Trans } from 'react-i18next';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import {
     withForm, Form, Fieldset, FormSendMethod, InputField, ButtonRow, Button
@@ -11,7 +12,7 @@ import passwordValidator from '../../../shared/password-validator';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -57,9 +58,9 @@ export default class Account extends Component {
         } else if (emailServerValidation && emailServerValidation.invalid) {
             state.setIn(['email', 'error'], t('invalidEmailAddress'));
         } else if (emailServerValidation && emailServerValidation.exists) {
-            state.setIn(['email', 'error'], t('account.emailAlreadyRegistered'));
+            state.setIn(['email', 'error'], t('theEmailIsAlreadyAssociatedWithAnother'));
         } else if (!emailServerValidation) {
-            state.setIn(['email', 'error'], t('validationInProgress'));
+            state.setIn(['email', 'error'], t('validationIsInProgress'));
         } else {
             state.setIn(['email', 'error'], null);
         }
@@ -68,7 +69,7 @@ export default class Account extends Component {
         const name = state.getIn(['name', 'value']);
 
         if (!name) {
-            state.setIn(['name', 'error'], t('account.fullNameMustNotBeEmpty'));
+            state.setIn(['name', 'error'], t('fullNameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
@@ -88,11 +89,11 @@ export default class Account extends Component {
             const currentPasswordServerValidation = state.getIn(['currentPassword', 'serverValidation']);
 
             if (!currentPassword) {
-                state.setIn(['currentPassword', 'error'], t('account.currentPasswordMustNotBeEmpty'));
+                state.setIn(['currentPassword', 'error'], t('currentPasswordMustNotBeEmpty'));
             } else if (currentPasswordServerValidation && currentPasswordServerValidation.incorrect) {
-                state.setIn(['currentPassword', 'error'], t('account.incorrectPassword'));
+                state.setIn(['currentPassword', 'error'], t('incorrectPassword'));
             } else if (!currentPasswordServerValidation) {
-                state.setIn(['email', 'error'], t('validationInProgress'));
+                state.setIn(['email', 'error'], t('validationIsInProgress'));
             } else {
                 state.setIn(['currentPassword', 'error'], null);
             }
@@ -104,7 +105,7 @@ export default class Account extends Component {
         }
 
         state.setIn(['password', 'error'], passwordMsgs.length > 0 ? passwordMsgs : null);
-        state.setIn(['password2', 'error'], password !== password2 ? t('account.passwordsMustMatch') : null);
+        state.setIn(['password2', 'error'], password !== password2 ? t('passwordsMustMatch') : null);
     }
 
     async submitHandler() {
@@ -112,14 +113,14 @@ export default class Account extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('account.updatingUserProfile'));
+            this.setFormStatusMessage('info', t('updatingUserProfile'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/account', data => {
                 delete data.password2;
             });
 
             if (submitSuccessful) {
-                this.setFlashMessage('success', t('account.userProfileUpdated'));
+                this.setFlashMessage('success', t('userProfileUpdated'));
                 this.hideFormValidation();
                 this.updateFormValue('password', '');
                 this.updateFormValue('password2', '');
@@ -130,7 +131,7 @@ export default class Account extends Component {
 
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('errorsInForm'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             if (error instanceof interoperableErrors.IncorrectPasswordError) {
@@ -138,8 +139,8 @@ export default class Account extends Component {
 
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('updatesCannotBeSaved')}</strong>{' '}
-                        {t('account.passwordPossiblyChanged')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('thePasswordIsIncorrectPossiblyJust')}
                     </span>
                 );
 
@@ -152,8 +153,8 @@ export default class Account extends Component {
 
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('updatesCannotBeSaved')}</strong>{' '}
-                        {t('account.emailAlreadyRegisteredTryAgain')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('theEmailIsAlreadyAssignedToAnotherUser')}
                     </span>
                 );
 
@@ -171,19 +172,19 @@ export default class Account extends Component {
         if (mailtrainConfig.isAuthMethodLocal) {
             return (
                 <div>
-                    <Title>{t('root.account')}</Title>
+                    <Title>{t('account')}</Title>
 
                     <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                        <Fieldset label={t('account.generalSettings')}>
-                            <InputField id="name" label={t('account.fullName')}/>
-                            <InputField id="email" label={t('email')} help={t('account.addressUsedForAccountRecovery')}/>
+                        <Fieldset label={t('generalSettings')}>
+                            <InputField id="name" label={t('fullName')}/>
+                            <InputField id="email" label={t('email')} help={t('thisAddressIsUsedForAccountRecoveryIn')}/>
                         </Fieldset>
 
-                        <Fieldset label={t('account.passwordChange')}>
-                            <p>{t('account.fillOnlyForPasswordChange')}</p>
-                            <InputField id="currentPassword" label={t('account.currentPassword')} type="password" />
-                            <InputField id="password" label={t('account.newPassword')} type="password" />
-                            <InputField id="password2" label={t('account.confirmPassword')} type="password" />
+                        <Fieldset label={t('passwordChange')}>
+                            <p>{t('youOnlyNeedToFillOutThisFormIfYouWantTo')}</p>
+                            <InputField id="currentPassword" label={t('currentPassword')} type="password" />
+                            <InputField id="password" label={t('newPassword')} type="password" />
+                            <InputField id="password2" label={t('confirmPassword')} type="password" />
                         </Fieldset>
 
                         <ButtonRow>
@@ -195,11 +196,11 @@ export default class Account extends Component {
         } else {
             return (
                 <div>
-                    <Title>{t('root.account')}</Title>
+                    <Title>{t('account')}</Title>
 
-                    <p>{t('account.accountManagementNotPossible')}</p>
+                    <p>{t('accountManagementIsNotPossibleBecause')}</p>
 
-                    {mailtrainConfig.externalPasswordResetLink && <p><Trans i18nKey="useThisLinkToChangePassword">If you want to change the password, use <a href={mailtrainConfig.externalPasswordResetLink}>this link</a>.</Trans></p>}
+                    {mailtrainConfig.externalPasswordResetLink && <p><Trans i18nKey="ifYouWantToChangeThePasswordUseThisLink">If you want to change the password, use <a href={mailtrainConfig.externalPasswordResetLink}>this link</a>.</Trans></p>}
                 </div>
             );
         }

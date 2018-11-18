@@ -1,25 +1,47 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {Trans} from 'react-i18next';
+import {withTranslation} from '../../lib/i18n';
 import {
-    withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, ButtonRow, Button,
-    Fieldset, Dropdown, AlignedRow, ACEEditor, StaticField
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../../lib/page';
+import {
+    ACEEditor,
+    Button,
+    ButtonRow,
+    Dropdown,
+    Fieldset,
+    Form,
+    FormSendMethod,
+    InputField,
+    StaticField,
+    TableSelect,
+    withForm
 } from '../../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
+import {withErrorHandling} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
-import { getFieldTypes } from './helpers';
-import interoperableErrors from '../../../../shared/interoperable-errors';
-import validators from '../../../../shared/validators';
-import slugify from 'slugify';
-import { parseDate, parseBirthday, DateFormat } from '../../../../shared/date';
-import styles from "../../lib/styles.scss";
+import {getFieldTypes} from './helpers';
+import validators
+    from '../../../../shared/validators';
+import slugify
+    from 'slugify';
+import {
+    DateFormat,
+    parseBirthday,
+    parseDate
+} from '../../../../shared/date';
+import styles
+    from "../../lib/styles.scss";
 import 'brace/mode/json';
 import 'brace/mode/handlebars';
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -124,18 +146,18 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         const keyServerValidation = state.getIn(['key', 'serverValidation']);
         if (!validators.mergeTagValid(state.getIn(['key', 'value']))) {
-            state.setIn(['key', 'error'], t('Merge tag is invalid. May must be uppercase and contain only characters A-Z, 0-9, _. It must start with a letter.'));
+            state.setIn(['key', 'error'], t('mergeTagIsInvalidMayMustBeUppercaseAnd'));
         } else if (!keyServerValidation) {
-            state.setIn(['key', 'error'], t('Validation is in progress...'));
+            state.setIn(['key', 'error'], t('validationIsInProgress'));
         } else if (keyServerValidation.exists) {
-            state.setIn(['key', 'error'], t('Another field with the same merge tag exists. Please choose another merge tag.'));
+            state.setIn(['key', 'error'], t('anotherFieldWithTheSameMergeTagExists'));
         } else {
             state.setIn(['key', 'error'], null);
         }
@@ -144,7 +166,7 @@ export default class CUD extends Component {
 
         const group = state.getIn(['group', 'value']);
         if (type === 'option' && !group) {
-            state.setIn(['group', 'error'], t('Group has to be selected'));
+            state.setIn(['group', 'error'], t('groupHasToBeSelected'));
         } else {
             state.setIn(['group', 'error'], null);
         }
@@ -153,11 +175,11 @@ export default class CUD extends Component {
         if (defaultValue === '') {
             state.setIn(['default_value', 'error'], null);
         } else if (type === 'number' && !/^[0-9]*$/.test(defaultValue.trim())) {
-            state.setIn(['default_value', 'error'], t('Default value is not integer number'));
+            state.setIn(['default_value', 'error'], t('defaultValueIsNotIntegerNumber'));
         } else if (type === 'date' && !parseDate(state.getIn(['dateFormat', 'value']), defaultValue)) {
-            state.setIn(['default_value', 'error'], t('Default value is not a properly formatted date'));
+            state.setIn(['default_value', 'error'], t('defaultValueIsNotAProperlyFormattedDate'));
         } else if (type === 'birthday' && !parseBirthday(state.getIn(['dateFormat', 'value']), defaultValue)) {
-            state.setIn(['default_value', 'error'], t('Default value is not a properly formatted birthday date'));
+            state.setIn(['default_value', 'error'], t('defaultValueIsNotAProperlyFormatted'));
         } else {
             state.setIn(['default_value', 'error'], null);
         }
@@ -170,7 +192,7 @@ export default class CUD extends Component {
                 state.setIn(['enumOptions', 'error'], null);
 
                 if (defaultValue !== '' && !(enumOptions.options.find(x => x.key === defaultValue))) {
-                    state.setIn(['default_value', 'error'], t('Default value is not one of the allowed options'));
+                    state.setIn(['default_value', 'error'], t('defaultValueIsNotOneOfTheAllowedOptions'));
                 }
             }
         } else {
@@ -194,7 +216,7 @@ export default class CUD extends Component {
                     const label = matches[2].trim();
                     options.push({ key, label });
                 } else {
-                    errors.push(t('Errror on line {{ line }}', { line: lineIdx + 1}));
+                    errors.push(t('errrorOnLineLine', { line: lineIdx + 1}));
                 }
             }
         }
@@ -229,7 +251,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 if (data.default_value.trim() === '') {
@@ -275,10 +297,10 @@ export default class CUD extends Component {
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field saved'));
+                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('fieldSaved'));
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             throw error;
@@ -292,9 +314,9 @@ export default class CUD extends Component {
 
         const getOrderOptions = fld => {
             return [
-                {key: 'none', label: t('Not visible')},
+                {key: 'none', label: t('notVisible')},
                 ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.type !== 'option').sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
-                {key: 'end', label: t('End of list')}
+                {key: 'end', label: t('endOfList')}
             ];
         };
 
@@ -311,8 +333,8 @@ export default class CUD extends Component {
             case 'gpg':
             case 'number':
                 fieldSettings =
-                    <Fieldset label={t('Field settings')}>
-                        <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
+                    <Fieldset label={t('fieldSettings')}>
+                        <InputField id="default_value" label={t('defaultValue')} help={t('defaultValueUsedWhenTheFieldIsEmpty')}/>
                     </Fieldset>;
                 break;
 
@@ -320,13 +342,13 @@ export default class CUD extends Component {
             case 'radio-grouped':
             case 'dropdown-grouped':
                 fieldSettings =
-                    <Fieldset label={t('Field settings')}>
+                    <Fieldset label={t('fieldSettings')}>
                         <ACEEditor
                             id="renderTemplate"
-                            label={t('Template')}
+                            label={t('template')}
                             height="250px"
                             mode="handlebars"
-                            help={<Trans>You can control the appearance of the merge tag with this template. The template
+                            help={<Trans i18nKey="youCanControlTheAppearanceOfTheMergeTag">You can control the appearance of the merge tag with this template. The template
                                 uses handlebars syntax and you can find all values from <code>{'{{values}}'}</code> array, for
                                 example <code>{'{{#each values}} {{this}} {{/each}}'}</code>. If template is not defined then
                                 multiple values are joined with commas.</Trans>}
@@ -337,22 +359,22 @@ export default class CUD extends Component {
             case 'radio-enum':
             case 'dropdown-enum':
                 fieldSettings =
-                    <Fieldset label={t('Field settings')}>
+                    <Fieldset label={t('fieldSettings')}>
                         <ACEEditor
                             id="enumOptions"
-                            label={t('Options')}
+                            label={t('options')}
                             height="250px"
                             mode="text"
-                            help={<Trans><div>Specify the options to select from in the following format:<code>key|label</code>. For example:</div>
+                            help={<Trans i18nKey="specifyTheOptionsToSelectFromInThe"><div>Specify the options to select from in the following format:<code>key|label</code>. For example:</div>
                                 <div><code>au|Australia</code></div><div><code>at|Austria</code></div></Trans>}
                         />
-                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default key (e.g. <code>au</code> used when the field is empty.')</Trans>}/>
+                        <InputField id="default_value" label={t('defaultValue')} help={<Trans i18nKey="defaultKeyEgAuUsedWhenTheFieldIsEmpty">Default key (e.g. <code>au</code> used when the field is empty.')</Trans>}/>
                         <ACEEditor
                             id="renderTemplate"
-                            label={t('Template')}
+                            label={t('template')}
                             height="250px"
                             mode="handlebars"
-                            help={<Trans>You can control the appearance of the merge tag with this template. The template
+                            help={<Trans i18nKey="youCanControlTheAppearanceOfTheMergeTag-1">You can control the appearance of the merge tag with this template. The template
                                 uses handlebars syntax and you can find all values from <code>{'{{values}}'}</code> array.
                                 Each entry in the array is an object with attributes <code>key</code> and <code>label</code>.
                                 For example <code>{'{{#each values}} {{this.value}} {{/each}}'}</code>. If template is not defined then
@@ -363,39 +385,39 @@ export default class CUD extends Component {
 
             case 'date':
                 fieldSettings =
-                    <Fieldset label={t('Field settings')}>
-                        <Dropdown id="dateFormat" label={t('Date format')}
+                    <Fieldset label={t('fieldSettings')}>
+                        <Dropdown id="dateFormat" label={t('dateFormat')}
                             options={[
-                                {key: DateFormat.US, label: t('MM/DD/YYYY')},
-                                {key: DateFormat.EU, label: t('DD/MM/YYYY')}
+                                {key: DateFormat.US, label: t('mmddyyyy')},
+                                {key: DateFormat.EU, label: t('ddmmyyyy')}
                             ]}
                         />
-                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.</Trans>}/>
+                        <InputField id="default_value" label={t('defaultValue')} help={<Trans i18nKey="defaultValueUsedWhenTheFieldIsEmpty">Default value used when the field is empty.</Trans>}/>
                     </Fieldset>;
                 break;
 
             case 'birthday':
                 fieldSettings =
-                    <Fieldset label={t('Field settings')}>
-                        <Dropdown id="dateFormat" label={t('Date format')}
+                    <Fieldset label={t('fieldSettings')}>
+                        <Dropdown id="dateFormat" label={t('dateFormat')}
                             options={[
-                                {key: DateFormat.US, label: t('MM/DD')},
-                                {key: DateFormat.EU, label: t('DD/MM')}
+                                {key: DateFormat.US, label: t('mmdd')},
+                                {key: DateFormat.EU, label: t('ddmm')}
                             ]}
                         />
-                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default value used when the field is empty.</Trans>}/>
+                        <InputField id="default_value" label={t('defaultValue')} help={<Trans i18nKey="defaultValueUsedWhenTheFieldIsEmpty">Default value used when the field is empty.</Trans>}/>
                     </Fieldset>;
                 break;
 
             case 'json':
-                fieldSettings = <Fieldset label={t('Field settings')}>
-                        <InputField id="default_value" label={t('Default value')} help={<Trans>Default key (e.g. <code>au</code> used when the field is empty.')</Trans>}/>
+                fieldSettings = <Fieldset label={t('fieldSettings')}>
+                        <InputField id="default_value" label={t('defaultValue')} help={<Trans i18nKey="defaultKeyEgAuUsedWhenTheFieldIsEmpty">Default key (e.g. <code>au</code> used when the field is empty.')</Trans>}/>
                         <ACEEditor
                             id="renderTemplate"
-                            label={t('Template')}
+                            label={t('template')}
                             height="250px"
                             mode="json"
-                            help={<Trans>You can use this template to render JSON values (if the JSON is an array then the array is
+                            help={<Trans i18nKey="youCanUseThisTemplateToRenderJsonValues">You can use this template to render JSON values (if the JSON is an array then the array is
                                 exposed as <code>values</code>, otherwise you can access the JSON keys directly).</Trans>}
                         />
                     </Fieldset>;
@@ -404,15 +426,15 @@ export default class CUD extends Component {
             case 'option':
                 const fieldsGroupedColumns = [
                     { data: 4, title: "#" },
-                    { data: 1, title: t('Name') },
-                    { data: 2, title: t('Type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
-                    { data: 3, title: t('Merge Tag') }
+                    { data: 1, title: t('name') },
+                    { data: 2, title: t('type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
+                    { data: 3, title: t('mergeTag') }
                 ];
 
                 fieldSettings =
-                    <Fieldset label={t('Field settings')}>
-                        <TableSelect id="group" label={t('Group')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('Select group to which the options should belong.')}/>
-                        <InputField id="default_value" label={t('Default value')} help={t('Default value used when the field is empty.')}/>
+                    <Fieldset label={t('fieldSettings')}>
+                        <TableSelect id="group" label={t('group')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('selectGroupToWhichTheOptionsShouldBelong')}/>
+                        <InputField id="default_value" label={t('defaultValue')} help={t('defaultValueUsedWhenTheFieldIsEmpty')}/>
                     </Fieldset>;
                 break;
         }
@@ -427,36 +449,36 @@ export default class CUD extends Component {
                         deleteUrl={`rest/fields/${this.props.list.id}/${this.props.entity.id}`}
                         backUrl={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/edit`}
                         successUrl={`/lists/${this.props.list.id}/fields`}
-                        deletingMsg={t('Deleting field ...')}
-                        deletedMsg={t('Field deleted')}/>
+                        deletingMsg={t('deletingField')}
+                        deletedMsg={t('fieldDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Field') : t('Create Field')}</Title>
+                <Title>{isEdit ? t('editField') : t('createField')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
+                    <InputField id="name" label={t('name')}/>
 
                     {isEdit ?
-                        <StaticField id="type" className={styles.formDisabled} label={t('Type')}>{(this.fieldTypes[this.getFormValue('type')] || {}).label}</StaticField>
+                        <StaticField id="type" className={styles.formDisabled} label={t('type')}>{(this.fieldTypes[this.getFormValue('type')] || {}).label}</StaticField>
                     :
-                        <Dropdown id="type" label={t('Type')} options={typeOptions}/>
+                        <Dropdown id="type" label={t('type')} options={typeOptions}/>
                     }
 
-                    <InputField id="key" label={t('Merge tag')}/>
+                    <InputField id="key" label={t('mergeTag-1')}/>
 
                     {fieldSettings}
 
                     {type !== 'option' &&
-                        <Fieldset label={t('Field order')}>
-                            <Dropdown id="orderListBefore" label={t('Listings (before)')} options={getOrderOptions('order_list')} help={t('Select the field before which this field should appear in listings. To exclude the field from listings, select "Not visible".')}/>
-                            <Dropdown id="orderSubscribeBefore" label={t('Subscription form (before)')} options={getOrderOptions('order_subscribe')} help={t('Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select "Not visible".')}/>
-                            <Dropdown id="orderManageBefore" label={t('Management form (before)')} options={getOrderOptions('order_manage')} help={t('Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select "Not visible".')}/>
+                        <Fieldset label={t('fieldOrder')}>
+                            <Dropdown id="orderListBefore" label={t('listingsBefore')} options={getOrderOptions('order_list')} help={t('selectTheFieldBeforeWhichThisFieldShould')}/>
+                            <Dropdown id="orderSubscribeBefore" label={t('subscriptionFormBefore')} options={getOrderOptions('order_subscribe')} help={t('selectTheFieldBeforeWhichThisFieldShould-1')}/>
+                            <Dropdown id="orderManageBefore" label={t('managementFormBefore')} options={getOrderOptions('order_manage')} help={t('selectTheFieldBeforeWhichThisFieldShould-2')}/>
                         </Fieldset>
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

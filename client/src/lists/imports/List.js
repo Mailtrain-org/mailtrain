@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -23,7 +23,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -50,11 +50,11 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Source'), render: data => this.importSourceLabels[data], sortable: false, searchable: false },
-            { data: 4, title: t('Status'), render: data => this.importStatusLabels[data], sortable: false, searchable: false },
-            { data: 5, title: t('Last run'), render: data => moment(data).fromNow() },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('source'), render: data => this.importSourceLabels[data], sortable: false, searchable: false },
+            { data: 4, title: t('status'), render: data => this.importStatusLabels[data], sortable: false, searchable: false },
+            { data: 5, title: t('lastRun'), render: data => moment(data).fromNow() },
             {
                 actions: data => {
                     const actions = [];
@@ -68,13 +68,13 @@ export default class List extends Component {
 
                     if (mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/lists/${this.props.list.id}/imports/${data[0]}/edit`
                         });
                     }
 
                     actions.push({
-                        label: <Icon icon="eye-open" title={t('Detailed status')}/>,
+                        label: <Icon icon="eye-open" title={t('detailedStatus')}/>,
                         link: `/lists/${this.props.list.id}/imports/${data[0]}/status`
                     });
 
@@ -89,14 +89,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/imports/${this.props.list.id}`, t('Deleting import ...'), t('Import deleted'))}
+                {tableDeleteDialogRender(this, `rest/imports/${this.props.list.id}`, t('deletingImport'), t('importDeleted'))}
                 {mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports') &&
                     <Toolbar>
-                        <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('Create Import')}/>
+                        <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('createImport')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Imports')}</Title>
+                <Title>{t('imports')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/imports-table/${this.props.list.id}`} columns={columns} />
             </div>

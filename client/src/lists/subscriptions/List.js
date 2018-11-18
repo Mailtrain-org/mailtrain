@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
 import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
 import { Table } from '../../lib/table';
@@ -22,7 +22,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -86,10 +86,10 @@ export default class List extends Component {
         const segments = this.props.segments;
 
         const columns = [
-            { data: 1, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 2, title: t('Email') },
-            { data: 3, title: t('Status'), render: (data, display, rowData) => this.subscriptionStatusLabels[data] + (rowData[5] ? ', ' + t('Blacklisted') : '') },
-            { data: 4, title: t('Created'), render: data => data ? moment(data).fromNow() : '' }
+            { data: 1, title: t('id'), render: data => <code>{data}</code> },
+            { data: 2, title: t('email') },
+            { data: 3, title: t('status'), render: (data, display, rowData) => this.subscriptionStatusLabels[data] + (rowData[5] ? ', ' + t('blacklisted') : '') },
+            { data: 4, title: t('created'), render: data => data ? moment(data).fromNow() : '' }
         ];
 
         let colIdx = 6;
@@ -114,20 +114,20 @@ export default class List extends Component {
                     const actions = [];
 
                     actions.push({
-                        label: <Icon icon="edit" title={t('Edit')}/>,
+                        label: <Icon icon="edit" title={t('edit')}/>,
                         link: `/lists/${this.props.list.id}/subscriptions/${data[0]}/edit`
                     });
 
                     if (data[3] === SubscriptionStatus.SUBSCRIBED) {
                         actions.push({
-                            label: <Icon icon="off" title={t('Unsubscribe')}/>,
+                            label: <Icon icon="off" title={t('unsubscribe')}/>,
                             action: () => this.unsubscribeSubscription(data[0])
                         });
                     }
 
                     if (!data[5]) {
                         actions.push({
-                            label: <Icon icon="ban-circle" title={t('Blacklist')}/>,
+                            label: <Icon icon="ban-circle" title={t('blacklist')}/>,
                             action: () => this.blacklistSubscription(data[2])
                         });
                     }
@@ -140,7 +140,7 @@ export default class List extends Component {
         }
 
         const segmentOptions = [
-            {key: '', label: t('All subscriptions')},
+            {key: '', label: t('allSubscriptions')},
             ...segments.map(x => ({ key: x.id.toString(), label: x.name}))
         ];
 
@@ -154,14 +154,14 @@ export default class List extends Component {
         // FIXME - presents segments in a data table as in campaign edit
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/subscriptions/${this.props.list.id}`, t('Deleting subscription ...'), t('Subscription deleted'))}
+                {tableDeleteDialogRender(this, `rest/subscriptions/${this.props.list.id}`, t('deletingSubscription'), t('subscriptionDeleted'))}
                 <Toolbar>
-                    <a href={getPublicUrl(`subscription/${this.props.list.cid}`)}><Button label={t('Subscription Form')} className="btn-default"/></a>
-                    <a href={getUrl(`subscriptions/export/${this.props.list.id}/`+ (this.props.segmentId || 0))}><Button label={t('Export as CSV')} className="btn-primary"/></a>
-                    <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('Add Subscriber')}/>
+                    <a href={getPublicUrl(`subscription/${this.props.list.cid}`)}><Button label={t('subscriptionForm')} className="btn-default"/></a>
+                    <a href={getUrl(`subscriptions/export/${this.props.list.id}/`+ (this.props.segmentId || 0))}><Button label={t('exportAsCsv')} className="btn-primary"/></a>
+                    <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('addSubscriber')}/>
                 </Toolbar>
 
-                <Title>{t('Subscribers')}</Title>
+                <Title>{t('subscribers')}</Title>
 
                 {list.description &&
                     <div className="well well-sm">{list.description}</div>
@@ -169,7 +169,7 @@ export default class List extends Component {
 
                 <div className="well well-sm">
                     <Form format="inline" stateOwner={this}>
-                        <Dropdown format="inline" className="input-sm" id="segment" label={t('Segment')} options={segmentOptions}/>
+                        <Dropdown format="inline" className="input-sm" id="segment" label={t('segment')} options={segmentOptions}/>
                     </Form>
                 </div>
 

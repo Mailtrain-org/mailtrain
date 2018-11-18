@@ -15,16 +15,16 @@ function passwordValidator(t) {
     if (t) {
         config.translate = {
             minLength: function (minLength) {
-                return t('The password must be at least {{ minLength }} characters long', { minLength });
+                return t('thePasswordMustBeAtLeastMinLength', { minLength });
             },
             maxLength: function (maxLength) {
-                return t('The password must be fewer than {{ maxLength }} characters', { maxLength });
+                return t('thePasswordMustBeFewerThanMaxLength', { maxLength });
             },
-            repeat: t('The password may not contain sequences of three or more repeated characters'),
-            lowercase: t('The password must contain at least one lowercase letter'),
-            uppercase: t('The password must contain at least one uppercase letter'),
-            number: t('The password must contain at least one number'),
-            special: t('The password must contain at least one special character')
+            repeat: t('thePasswordMayNotContainSequencesOfThree'),
+            lowercase: t('thePasswordMustContainAtLeastOne'),
+            uppercase: t('thePasswordMustContainAtLeastOne-1'),
+            number: t('thePasswordMustContainAtLeastOneNumber'),
+            special: t('thePasswordMustContainAtLeastOneSpecial')
         }
     }
 

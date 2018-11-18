@@ -142,7 +142,7 @@ function createApp(appType) {
     app.disable('x-powered-by');
 
     app.use(compression());
-    app.use(favicon(path.join(__dirname, 'client', 'static', 'favicon.ico')));
+    app.use(favicon(path.join(__dirname, '..', 'client', 'static', 'favicon.ico')));
 
     app.use(logger(config.www.log, {
         stream: {
@@ -167,7 +167,7 @@ function createApp(appType) {
         query: {
             name: 'language'
         },
-        default: 'en_US'
+        default: config.defaultLanguage
     }));
 
     app.use(flash());
@@ -191,9 +191,9 @@ function createApp(appType) {
         app.use(passport.tryAuthByRestrictedAccessToken);
     }
 
-    useWith404Fallback('/static', express.static(path.join(__dirname, 'client', 'static')));
-    useWith404Fallback('/mailtrain', express.static(path.join(__dirname, 'client', 'dist')));
-    useWith404Fallback('/locales', express.static(path.join(__dirname, 'client', 'locales')));
+    useWith404Fallback('/static', express.static(path.join(__dirname, '..', 'client', 'static')));
+    useWith404Fallback('/mailtrain', express.static(path.join(__dirname, '..', 'client', 'dist')));
+    useWith404Fallback('/locales', express.static(path.join(__dirname, '..', 'client', 'locales')));
 
 
     // Make sure flash messages are available

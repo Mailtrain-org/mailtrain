@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
 import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TableSelect } from '../lib/form';
 import { withErrorHandling } from '../lib/error-handling';
@@ -12,7 +12,7 @@ import mailtrainConfig from 'mailtrainConfig';
 import { validateNamespace, NamespaceSelect } from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -65,11 +65,11 @@ export default class CUD extends Component {
         const usernameServerValidation = state.getIn(['username', 'serverValidation']);
 
         if (!username) {
-            state.setIn(['username', 'error'], t('User name must not be empty'));
+            state.setIn(['username', 'error'], t('userNameMustNotBeEmpty'));
         } else if (usernameServerValidation && usernameServerValidation.exists) {
-            state.setIn(['username', 'error'], t('The user name already exists in the system.'));
+            state.setIn(['username', 'error'], t('theUserNameAlreadyExistsInTheSystem'));
         } else if (!usernameServerValidation) {
-            state.setIn(['email', 'error'], t('Validation is in progress...'));
+            state.setIn(['email', 'error'], t('validationIsInProgress'));
         } else {
             state.setIn(['username', 'error'], null);
         }
@@ -80,13 +80,13 @@ export default class CUD extends Component {
             const emailServerValidation = state.getIn(['email', 'serverValidation']);
 
             if (!email) {
-                state.setIn(['email', 'error'], t('Email must not be empty'));
+                state.setIn(['email', 'error'], t('emailMustNotBeEmpty-1'));
             } else if (emailServerValidation && emailServerValidation.invalid) {
-                state.setIn(['email', 'error'], t('Invalid email address.'));
+                state.setIn(['email', 'error'], t('invalidEmailAddress'));
             } else if (emailServerValidation && emailServerValidation.exists) {
-                state.setIn(['email', 'error'], t('The email is already associated with another user in the system.'));
+                state.setIn(['email', 'error'], t('theEmailIsAlreadyAssociatedWithAnother'));
             } else if (!emailServerValidation) {
-                state.setIn(['email', 'error'], t('Validation is in progress...'));
+                state.setIn(['email', 'error'], t('validationIsInProgress'));
             } else {
                 state.setIn(['email', 'error'], null);
             }
@@ -95,7 +95,7 @@ export default class CUD extends Component {
             const name = state.getIn(['name', 'value']);
 
             if (!name) {
-                state.setIn(['name', 'error'], t('Full name must not be empty'));
+                state.setIn(['name', 'error'], t('fullNameMustNotBeEmpty'));
             } else {
                 state.setIn(['name', 'error'], null);
             }
@@ -109,7 +109,7 @@ export default class CUD extends Component {
             let passwordMsgs = [];
 
             if (!isEdit && !password) {
-                passwordMsgs.push(t('Password must not be empty'));
+                passwordMsgs.push(t('passwordMustNotBeEmpty'));
             }
 
             if (password) {
@@ -121,7 +121,7 @@ export default class CUD extends Component {
             }
 
             state.setIn(['password', 'error'], passwordMsgs.length > 0 ? passwordMsgs : null);
-            state.setIn(['password2', 'error'], password !== password2 ? t('Passwords must match') : null);
+            state.setIn(['password2', 'error'], password !== password2 ? t('passwordsMustMatch') : null);
         }
 
         validateNamespace(t, state);
@@ -141,24 +141,24 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 delete data.password2;
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage('/users', 'success', t('User saved'));
+                this.navigateToWithFlashMessage('/users', 'success', t('userSaved'));
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             if (error instanceof interoperableErrors.DuplicitNameError) {
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('The username is already assigned to another user.')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('theUsernameIsAlreadyAssignedToAnother')}
                     </span>
                 );
                 return;
@@ -167,8 +167,8 @@ export default class CUD extends Component {
             if (error instanceof interoperableErrors.DuplicitEmailError) {
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('The email is already assigned to another user.')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('theEmailIsAlreadyAssignedToAnotherUser-1')}
                     </span>
                 );
                 return;
@@ -199,28 +199,28 @@ export default class CUD extends Component {
                         deleteUrl={`rest/users/${this.props.entity.id}`}
                         backUrl={`/users/${this.props.entity.id}/edit`}
                         successUrl="/users"
-                        deletingMsg={t('Deleting user ...')}
-                        deletedMsg={t('User deleted')}/>
+                        deletingMsg={t('deletingUser')}
+                        deletedMsg={t('userDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit User') : t('Create User')}</Title>
+                <Title>{isEdit ? t('editUser') : t('createUser')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="username" label={t('User Name')}/>
+                    <InputField id="username" label={t('userName')}/>
                     {mailtrainConfig.isAuthMethodLocal &&
                         <div>
-                            <InputField id="name" label={t('Full Name')}/>
-                            <InputField id="email" label={t('Email')}/>
-                            <InputField id="password" label={t('Password')} type="password"/>
-                            <InputField id="password2" label={t('Repeat Password')} type="password"/>
+                            <InputField id="name" label={t('fullName')}/>
+                            <InputField id="email" label={t('email')}/>
+                            <InputField id="password" label={t('password')} type="password"/>
+                            <InputField id="password2" label={t('repeatPassword')} type="password"/>
                         </div>
                     }
-                    <TableSelect id="role" label={t('Role')} withHeader dropdown dataUrl={'rest/shares-roles-table/global'} columns={rolesColumns} selectionLabelIndex={1}/>
+                    <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={'rest/shares-roles-table/global'} columns={rolesColumns} selectionLabelIndex={1}/>
                     <NamespaceSelect/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete User')} linkTo={`/users/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('deleteUser')} linkTo={`/users/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

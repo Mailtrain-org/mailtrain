@@ -75,7 +75,6 @@
     "html-to-text": "^4.0.0",
     "humanize": "0.0.9",
     "i18next": "^12.0.0",
-    "i18next-node-fs-backend": "^2.1.0",
     "isemail": "^3.2.0",
     "jsdom": "^13.0.0",
     "juice": "^5.0.1",

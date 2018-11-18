@@ -2,7 +2,7 @@
 
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {translate} from "react-i18next";
+import { withTranslation } from './i18n';
 import {
     requiresAuthenticatedUser,
     Title
@@ -16,7 +16,7 @@ import styles from "./styles.scss";
 import {withPageHelpers} from "./page";
 import {getUrl, getPublicUrl} from "./urls";
 
-@translate()
+@withTranslation()
 @withErrorHandling
 @withPageHelpers
 @requiresAuthenticatedUser
@@ -50,22 +50,22 @@ export default class Files extends Component {
         const t = this.props.t;
         const details = [];
         if (response.data.added) {
-            details.push(t('files.filesAdded', {count: response.data.added}));
+            details.push(t('countFileAdded', {count: response.data.added}));
         }
         if (response.data.replaced) {
-            details.push(t('files.filesReplaced', {count: response.data.replaced}));
+            details.push(t('countFileReplaced', {count: response.data.replaced}));
         }
         if (response.data.ignored) {
-            details.push(t('files.filesIgnored', {count: response.data.ignored}));
+            details.push(t('countFileIgnored', {count: response.data.ignored}));
         }
         const detailsMessage = details ? ' (' + details.join(', ') + ')' : '';
-        return t('files.filesUploaded', {count: response.data.uploaded}) + detailsMessage;
+        return t('countFileUploaded', {count: response.data.uploaded}) + detailsMessage;
     }
 
     onDrop(files){
         const t = this.props.t;
         if (files.length > 0) {
-            this.setFlashMessage('info', t('files.uploadingFiles', {count: files.length}));
+            this.setFlashMessage('info', t('uploadingCountFile', {count: files.length}));
             const data = new FormData();
             for (const file of files) {
                 data.append('files[]', file)
@@ -76,10 +76,10 @@ export default class Files extends Component {
                 const message = this.getFilesUploadedMessage(res);
                 this.setFlashMessage('info', message);
             })
-            .catch(res => this.setFlashMessage('danger', t('files.fileUploadFailed') + ' ' + res.message));
+            .catch(res => this.setFlashMessage('danger', t('fileUploadFailed') + ' ' + res.message));
         }
         else{
-            this.setFlashMessage('info', t('files.noFilesToUpload'));
+            this.setFlashMessage('info', t('noFilesToUpload'));
         }
     }
 
@@ -97,13 +97,13 @@ export default class Files extends Component {
         await this.hideDeleteFile();
 
         try {
-            this.setFlashMessage('info', t('files.deletingFile'));
+            this.setFlashMessage('info', t('deletingFile'));
             await axios.delete(getUrl(`rest/files/${this.props.entityTypeId}/${this.props.entitySubTypeId}/${fileToDeleteId}`));
             this.filesTable.refresh();
-            this.setFlashMessage('info', t('files.fileDeleted'));
+            this.setFlashMessage('info', t('fileDeleted'));
         } catch (err) {
             this.filesTable.refresh();
-            this.setFlashMessage('danger', t('files.deleteFileFailed') + ' ' + err.message);
+            this.setFlashMessage('danger', t('deleteFileFailed') + ' ' + err.message);
         }
     }
 
@@ -145,13 +145,13 @@ export default class Files extends Component {
             <div>
                 <ModalDialog
                     hidden={this.state.fileToDeleteId === null}
-                    title={t('files.confirmFileDeletion')}
+                    title={t('confirmFileDeletion')}
                     onCloseAsync={::this.hideDeleteFile}
                     buttons={[
                         { label: t('no'), className: 'btn-primary', onClickAsync: ::this.hideDeleteFile },
                         { label: t('yes'), className: 'btn-danger', onClickAsync: ::this.performDeleteFile }
                     ]}>
-                    {t('files:areYouSureToDeleteFile', {name: this.state.fileToDeleteName})}
+                    {t('filesareYouSureToDeleteFile', {name: this.state.fileToDeleteName})}
                 </ModalDialog>
 
                 {this.props.title && <Title>{this.props.title}</Title>}
@@ -161,7 +161,7 @@ export default class Files extends Component {
                 {
                     this.props.entity.permissions.includes(this.props.managePermission) &&
                     <Dropzone onDrop={::this.onDrop} className={styles.dropZone} activeClassName={styles.dropZoneActive}>
-                        {state => state.isDragActive ? t('files.dropFiles', {count: state.draggedFiles.length}) : t('files.dropFilesHere')}
+                        {state => state.isDragActive ? t('dropCountFile', {count: state.draggedFiles.length}) : t('dropFilesHere')}
                     </Dropzone>
                 }
 

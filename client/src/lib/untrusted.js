@@ -2,7 +2,7 @@
 
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {translate} from "react-i18next";
+import { withTranslation } from './i18n';
 import {
     requiresAuthenticatedUser,
     withPageHelpers
@@ -170,7 +170,7 @@ export class UntrustedContentHost extends Component {
 }
 
 
-@translate()
+@withTranslation()
 export class UntrustedContentRoot extends Component {
     constructor(props) {
         super(props);
@@ -243,7 +243,7 @@ export class UntrustedContentRoot extends Component {
         } else {
             return (
                 <div>
-                    {t('Loading...')}
+                    {t('loading-1')}
                 </div>
             );
         }

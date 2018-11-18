@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from "react";
-import {translate} from "react-i18next";
+import { withTranslation } from '../lib/i18n';
 import {NavButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../lib/page";
 import {Table} from "../lib/table";
 import mailtrainConfig from "mailtrainConfig";
@@ -12,7 +12,7 @@ import {
     tableDeleteDialogRender
 } from "../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @requiresAuthenticatedUser
 export default class List extends Component {
@@ -45,12 +45,12 @@ export default class List extends Component {
                 const actions = [];
 
                 actions.push({
-                    label: <Icon icon="edit" title={t('Edit')}/>,
+                    label: <Icon icon="edit" title={t('edit')}/>,
                     link: `/users/${data[0]}/edit`
                 });
 
                 actions.push({
-                    label: <Icon icon="share" title={t('Share')}/>,
+                    label: <Icon icon="share" title={t('share')}/>,
                     link: `/users/${data[0]}/shares`
                 });
 
@@ -62,12 +62,12 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/users`, t('Deleting user ...'), t('User deleted'))}
+                {tableDeleteDialogRender(this, `rest/users`, t('deletingUser'), t('userDeleted'))}
                 <Toolbar>
-                    <NavButton linkTo="/users/create" className="btn-primary" icon="plus" label={t('Create User')}/>
+                    <NavButton linkTo="/users/create" className="btn-primary" icon="plus" label={t('createUser')}/>
                 </Toolbar>
 
-                <Title>{t('Users')}</Title>
+                <Title>{t('users')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/users-table" columns={columns} />
             </div>

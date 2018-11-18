@@ -22,19 +22,19 @@ import TriggersList from './TriggersList';
 function getMenus(t) {
     return {
         'lists': {
-            title: t('Lists'),
+            title: t('lists'),
             link: '/lists',
             panelComponent: ListsList,
             children: {
                 ':listId([0-9]+)': {
-                    title: resolved => t('List "{{name}}"', {name: resolved.list.name}),
+                    title: resolved => t('listName', {name: resolved.list.name}),
                     resolve: {
                         list: params => `rest/lists/${params.listId}`
                     },
                     link: params => `/lists/${params.listId}/subscriptions`,
                     navs: {
                         subscriptions: {
-                            title: t('Subscribers'),
+                            title: t('subscribers'),
                             resolve: {
                                 segments: params => `rest/segments/${params.listId}`,
                             },
@@ -51,14 +51,14 @@ function getMenus(t) {
                                     link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
                                     navs: {
                                         ':action(edit|delete)': {
-                                            title: t('Edit'),
+                                            title: t('edit'),
                                             link: params => `/lists/${params.listId}/subscriptions/${params.subscriptionId}/edit`,
                                             panelRender: props => <SubscriptionsCUD action={props.match.params.action} entity={props.resolved.subscription} list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped} />
                                         }
                                     }
                                 },
                                 create: {
-                                    title: t('Create'),
+                                    title: t('create'),
                                     resolve: {
                                         fieldsGrouped: params => `rest/fields-grouped/${params.listId}`
                                     },
@@ -66,19 +66,19 @@ function getMenus(t) {
                                 }
                             }                                },
                         ':action(edit|delete)': {
-                            title: t('Edit'),
+                            title: t('edit'),
                             link: params => `/lists/${params.listId}/edit`,
                             visible: resolved => resolved.list.permissions.includes('edit'),
                             panelRender: props => <ListsCUD action={props.match.params.action} entity={props.resolved.list} />
                         },
                         fields: {
-                            title: t('Fields'),
+                            title: t('fields'),
                             link: params => `/lists/${params.listId}/fields/`,
                             visible: resolved => resolved.list.permissions.includes('viewFields'),
                             panelRender: props => <FieldsList list={props.resolved.list} />,
                             children: {
                                 ':fieldId([0-9]+)': {
-                                    title: resolved => t('Field "{{name}}"', {name: resolved.field.name}),
+                                    title: resolved => t('fieldName-1', {name: resolved.field.name}),
                                     resolve: {
                                         field: params => `rest/fields/${params.listId}/${params.fieldId}`,
                                         fields: params => `rest/fields/${params.listId}`
@@ -86,14 +86,14 @@ function getMenus(t) {
                                     link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
                                     navs: {
                                         ':action(edit|delete)': {
-                                            title: t('Edit'),
+                                            title: t('edit'),
                                             link: params => `/lists/${params.listId}/fields/${params.fieldId}/edit`,
                                             panelRender: props => <FieldsCUD action={props.match.params.action} entity={props.resolved.field} list={props.resolved.list} fields={props.resolved.fields} />
                                         }
                                     }
                                 },
                                 create: {
-                                    title: t('Create'),
+                                    title: t('create'),
                                     resolve: {
                                         fields: params => `rest/fields/${params.listId}`
                                     },
@@ -102,13 +102,13 @@ function getMenus(t) {
                             }
                         },
                         segments: {
-                            title: t('Segments'),
+                            title: t('segments'),
                             link: params => `/lists/${params.listId}/segments`,
                             visible: resolved => resolved.list.permissions.includes('viewSegments'),
                             panelRender: props => <SegmentsList list={props.resolved.list} />,
                             children: {
                                 ':segmentId([0-9]+)': {
-                                    title: resolved => t('Segment "{{name}}"', {name: resolved.segment.name}),
+                                    title: resolved => t('segmentName', {name: resolved.segment.name}),
                                     resolve: {
                                         segment: params => `rest/segments/${params.listId}/${params.segmentId}`,
                                         fields: params => `rest/fields/${params.listId}`
@@ -116,14 +116,14 @@ function getMenus(t) {
                                     link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
                                     navs: {
                                         ':action(edit|delete)': {
-                                            title: t('Edit'),
+                                            title: t('edit'),
                                             link: params => `/lists/${params.listId}/segments/${params.segmentId}/edit`,
                                             panelRender: props => <SegmentsCUD action={props.match.params.action} entity={props.resolved.segment} list={props.resolved.list} fields={props.resolved.fields} />
                                         }
                                     }
                                 },
                                 create: {
-                                    title: t('Create'),
+                                    title: t('create'),
                                     resolve: {
                                         fields: params => `rest/fields/${params.listId}`
                                     },
@@ -132,20 +132,20 @@ function getMenus(t) {
                             }
                         },
                         imports: {
-                            title: t('Imports'),
+                            title: t('imports'),
                             link: params => `/lists/${params.listId}/imports/`,
                             visible: resolved => resolved.list.permissions.includes('viewImports'),
                             panelRender: props => <ImportsList list={props.resolved.list} />,
                             children: {
                                 ':importId([0-9]+)': {
-                                    title: resolved => t('Import "{{name}}"', {name: resolved.import.name}),
+                                    title: resolved => t('importName-1', {name: resolved.import.name}),
                                     resolve: {
                                         import: params => `rest/imports/${params.listId}/${params.importId}`,
                                     },
                                     link: params => `/lists/${params.listId}/imports/${params.importId}/status`,
                                     navs: {
                                         ':action(edit|delete)': {
-                                            title: t('Edit'),
+                                            title: t('edit'),
                                             resolve: {
                                                 fieldsGrouped: params => `rest/fields-grouped/${params.listId}`
                                             },
@@ -153,12 +153,12 @@ function getMenus(t) {
                                             panelRender: props => <ImportsCUD action={props.match.params.action} entity={props.resolved.import} list={props.resolved.list} fieldsGrouped={props.resolved.fieldsGrouped}/>
                                         },
                                         'status': {
-                                            title: t('Status'),
+                                            title: t('status'),
                                             link: params => `/lists/${params.listId}/imports/${params.importId}/status`,
                                             panelRender: props => <ImportsStatus entity={props.resolved.import} list={props.resolved.list} />,
                                             children: {
                                                 ':importRunId([0-9]+)': {
-                                                    title: resolved => t('Run'),
+                                                    title: resolved => t('run'),
                                                     resolve: {
                                                         importRun: params => `rest/import-runs/${params.listId}/${params.importId}/${params.importRunId}`,
                                                     },
@@ -170,56 +170,56 @@ function getMenus(t) {
                                     }
                                 },
                                 create: {
-                                    title: t('Create'),
+                                    title: t('create'),
                                     panelRender: props => <ImportsCUD action="create" list={props.resolved.list} />
                                 }
                             }
                         },
                         triggers: {
-                            title: t('Triggers'),
+                            title: t('triggers'),
                             link: params => `/lists/${params.listId}/triggers`,
                             panelRender: props => <TriggersList list={props.resolved.list} />
                         },
                         share: {
-                            title: t('Share'),
+                            title: t('share'),
                             link: params => `/lists/${params.listId}/share`,
                             visible: resolved => resolved.list.permissions.includes('share'),
-                            panelRender: props => <Share title={t('Share')} entity={props.resolved.list} entityTypeId="list" />
+                            panelRender: props => <Share title={t('share')} entity={props.resolved.list} entityTypeId="list" />
                         }
                     }
                 },
                 create: {
-                    title: t('Create'),
+                    title: t('create'),
                     panelRender: props => <ListsCUD action="create" />
                 },
                 forms: {
-                    title: t('Custom Forms'),
+                    title: t('customForms-1'),
                     link: '/lists/forms',
                     panelComponent: FormsList,
                     children: {
                         ':formsId([0-9]+)': {
-                            title: resolved => t('Custom Forms "{{name}}"', {name: resolved.forms.name}),
+                            title: resolved => t('customFormsName', {name: resolved.forms.name}),
                             resolve: {
                                 forms: params => `rest/forms/${params.formsId}`
                             },
                             link: params => `/lists/forms/${params.formsId}/edit`,
                             navs: {
                                 ':action(edit|delete)': {
-                                    title: t('Edit'),
+                                    title: t('edit'),
                                     link: params => `/lists/forms/${params.formsId}/edit`,
                                     visible: resolved => resolved.forms.permissions.includes('edit'),
                                     panelRender: props => <FormsCUD action={props.match.params.action} entity={props.resolved.forms} />
                                 },
                                 share: {
-                                    title: t('Share'),
+                                    title: t('share'),
                                     link: params => `/lists/forms/${params.formsId}/share`,
                                     visible: resolved => resolved.forms.permissions.includes('share'),
-                                    panelRender: props => <Share title={t('Share')} entity={props.resolved.forms} entityTypeId="customForm" />
+                                    panelRender: props => <Share title={t('share')} entity={props.resolved.forms} entityTypeId="customForm" />
                                 }
                             }
                         },
                         create: {
-                            title: t('Create'),
+                            title: t('create'),
                             panelRender: props => <FormsCUD action="create" />
                         }
                     }

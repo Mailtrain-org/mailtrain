@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-const knex = require('server/lib/knex')({
+const knex = require('knex')({
     client: 'mysql2',
     connection: config.mysql,
     migrations: {

@@ -2,7 +2,7 @@
 
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {translate} from "react-i18next";
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -39,7 +39,7 @@ import RuleSettingsPane from "./RuleSettingsPane";
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
 
 @DragDropContext(isTouchDevice ? TouchBackend : HTML5Backend)
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -135,7 +135,7 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
@@ -159,7 +159,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 const keep = ['name', 'settings', 'originalHash'];
@@ -181,13 +181,13 @@ export default class CUD extends Component {
                         });
                     });
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Segment saved'));
+                    this.setFormStatusMessage('success', t('segmentSaved'));
                 } else {
-                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment saved'));
+                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('segmentSaved'));
                 }
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             throw error;
@@ -335,30 +335,30 @@ export default class CUD extends Component {
                         deleteUrl={`rest/segments/${this.props.list.id}/${this.props.entity.id}`}
                         backUrl={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/edit`}
                         successUrl={`/lists/${this.props.list.id}/segments`}
-                        deletingMsg={t('Deleting segment ...')}
-                        deletedMsg={t('Segment deleted')}/>
+                        deletingMsg={t('deletingSegment')}
+                        deletedMsg={t('segmentDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Segment') : t('Create Segment')}</Title>
+                <Title>{isEdit ? t('editSegment') : t('createSegment')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     {isEdit ?
                         <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
-                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
+                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
+                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('saveAndLeave')}/>
 
-                            <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
+                            <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
                         </ButtonRow>
                     :
                         <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('save')}/>
                         </ButtonRow>
                     }
 
-                    <h3>{t('Segment Options')}</h3>
+                    <h3>{t('segmentOptions')}</h3>
 
-                    <InputField id="name" label={t('Name')} />
-                    <Dropdown id="rootRuleType" label={t('Toplevel match type')} options={ruleHelpers.getCompositeRuleTypeOptions()} />
+                    <InputField id="name" label={t('name')} />
+                    <Dropdown id="rootRuleType" label={t('toplevelMatchType')} options={ruleHelpers.getCompositeRuleTypeOptions()} />
                 </Form>
 
                 <hr />
@@ -367,11 +367,11 @@ export default class CUD extends Component {
                     <div className={styles.leftPane}>
                         <div className={styles.leftPaneInner}>
                             <Toolbar>
-                                <Button className="btn-primary" label={t('Add Composite Rule')} onClickAsync={::this.addCompositeRule}/>
-                                <Button className="btn-primary" label={t('Add Rule')} onClickAsync={::this.addPrimitiveRule}/>
+                                <Button className="btn-primary" label={t('addCompositeRule')} onClickAsync={::this.addCompositeRule}/>
+                                <Button className="btn-primary" label={t('addRule')} onClickAsync={::this.addPrimitiveRule}/>
                             </Toolbar>
 
-                            <h3>{t('Rules')}</h3>
+                            <h3>{t('rules')}</h3>
 
                             <div className="clearfix"/>
 
@@ -383,8 +383,8 @@ export default class CUD extends Component {
                                     canDrop={ data => !data.nextParent || (ruleHelpers.isCompositeRuleType(data.nextParent.rule.type)) }
                                     generateNodeProps={data => ({
                                         buttons: [
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon icon="edit" title={t('Edit')}/></ActionLink>,
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="remove" title={t('Delete')}/></ActionLink>
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon icon="edit" title={t('edit')}/></ActionLink>,
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="remove" title={t('delete')}/></ActionLink>
                                         ]
                                     })}
                                 />

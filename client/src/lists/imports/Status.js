@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -34,7 +34,7 @@ import {getUrl} from "../../lib/urls";
 import moment from "moment";
 import interoperableErrors from '../../../../shared/interoperable-errors';
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -127,12 +127,12 @@ export default class Status extends Component {
         const entity = this.state.entity;
 
         const columns = [
-            { data: 1, title: t('Started'), render: data => moment(data).fromNow() },
-            { data: 2, title: t('Finished'), render: data => data ? moment(data).fromNow() : '' },
-            { data: 3, title: t('Status'), render: data => this.runStatusLabels[data], sortable: false, searchable: false },
-            { data: 4, title: t('Processed') },
-            { data: 5, title: t('New') },
-            { data: 6, title: t('Failed') },
+            { data: 1, title: t('started'), render: data => moment(data).fromNow() },
+            { data: 2, title: t('finished'), render: data => data ? moment(data).fromNow() : '' },
+            { data: 3, title: t('status'), render: data => this.runStatusLabels[data], sortable: false, searchable: false },
+            { data: 4, title: t('processed') },
+            { data: 5, title: t('new') },
+            { data: 6, title: t('failed') },
             {
                 actions: data => {
                     const actions = [];
@@ -145,7 +145,7 @@ export default class Status extends Component {
                     }
 
                     actions.push({
-                        label: <Icon icon="eye-open" title={t('Run status')}/>,
+                        label: <Icon icon="eye-open" title={t('runStatus')}/>,
                         link: `/lists/${this.props.list.id}/imports/${this.props.entity.id}/status/${data[0]}`
                     });
 
@@ -156,20 +156,20 @@ export default class Status extends Component {
 
         return (
             <div>
-                <Title>{t('Import Status')}</Title>
+                <Title>{t('importStatus')}</Title>
 
-                <AlignedRow label={t('Name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('Source')}>{this.importSourceLabels[entity.source]}</AlignedRow>
-                <AlignedRow label={t('Status')}>{this.importStatusLabels[entity.status]}</AlignedRow>
-                {entity.error && <AlignedRow label={t('Error')}><pre>{entity.error}</pre></AlignedRow>}
+                <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
+                <AlignedRow label={t('source')}>{this.importSourceLabels[entity.source]}</AlignedRow>
+                <AlignedRow label={t('status')}>{this.importStatusLabels[entity.status]}</AlignedRow>
+                {entity.error && <AlignedRow label={t('error')}><pre>{entity.error}</pre></AlignedRow>}
 
-                <ButtonRow label={t('Actions')}>
-                    {prepFinishedAndNotInProgress(entity.status) && <Button className="btn-primary" icon="play" label={t('Start')} onClickAsync={::this.startRunAsync}/>}
-                    {runInProgress(entity.status) && <Button className="btn-primary" icon="stop" label={t('Stop')} onClickAsync={::this.stopRunAsync}/>}
+                <ButtonRow label={t('actions')}>
+                    {prepFinishedAndNotInProgress(entity.status) && <Button className="btn-primary" icon="play" label={t('start')} onClickAsync={::this.startRunAsync}/>}
+                    {runInProgress(entity.status) && <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopRunAsync}/>}
                 </ButtonRow>
 
                 <hr/>
-                <h3>{t('Import Runs')}</h3>
+                <h3>{t('importRuns')}</h3>
                 <Table ref={node => this.runsTableNode = node} withHeader dataUrl={`rest/import-runs-table/${this.props.list.id}/${this.props.entity.id}`} columns={columns} />
             </div>
         );

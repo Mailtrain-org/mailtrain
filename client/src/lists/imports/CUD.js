@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -52,7 +52,7 @@ function truncate(str, len, ending = '...') {
 }
 
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -160,17 +160,17 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         }
 
         if (!isEdit) {
             if (source === ImportSource.CSV_FILE) {
                 if (!this.csvFile || this.csvFile.files.length === 0) {
-                    state.setIn(['csvFileName', 'error'], t('File must be selected'));
+                    state.setIn(['csvFileName', 'error'], t('fileMustBeSelected'));
                 }
 
                 if (!state.getIn(['csvDelimiter', 'value']).trim()) {
-                    state.setIn(['csvDelimiter', 'error'], t('CSV delimiter must not be empty'));
+                    state.setIn(['csvDelimiter', 'error'], t('csvDelimiterMustNotBeEmpty'));
                 }
             }
         } else  {
@@ -178,7 +178,7 @@ export default class CUD extends Component {
 
             if (mappingType === MappingType.BASIC_SUBSCRIBE || mappingType === MappingType.BASIC_UNSUBSCRIBE) {
                 if (!state.getIn(['mapping_fields_email_column', 'value'])) {
-                    state.setIn(['mapping_fields_email_column', 'error'], t('Email mapping has to be provided'));
+                    state.setIn(['mapping_fields_email_column', 'error'], t('emailMappingHasToBeProvided'));
                 }
             }
         }
@@ -200,7 +200,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 data.source = Number.parseInt(data.source);
@@ -275,12 +275,12 @@ export default class CUD extends Component {
                 if (!isEdit) {
                     this.navigateTo(`/lists/${this.props.list.id}/imports/${submitResponse}/edit`);
                 } else {
-                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/imports/${this.props.entity.id}/status`, 'success', t('Import saved'));
+                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/imports/${this.props.entity.id}/status`, 'success', t('importSaved'));
                 }
 
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             throw error;
@@ -308,14 +308,14 @@ export default class CUD extends Component {
             if (isEdit) {
                 settingsEdit =
                     <div>
-                        <StaticField id="csvFileName" className={styles.formDisabled} label={t('File')}>{this.getFormValue('csvFileName')}</StaticField>
-                        <StaticField id="csvDelimiter" className={styles.formDisabled} label={t('Delimiter')}>{this.getFormValue('csvDelimiter')}</StaticField>
+                        <StaticField id="csvFileName" className={styles.formDisabled} label={t('file')}>{this.getFormValue('csvFileName')}</StaticField>
+                        <StaticField id="csvDelimiter" className={styles.formDisabled} label={t('delimiter')}>{this.getFormValue('csvDelimiter')}</StaticField>
                     </div>;
             } else {
                 settingsEdit =
                     <div>
-                        <StaticField withValidation id="csvFileName" label={t('File')}><input ref={node => this.csvFile = node} type="file" onChange={::this.onFileSelected}/></StaticField>
-                        <InputField id="csvDelimiter" label={t('Delimiter')}/>
+                        <StaticField withValidation id="csvFileName" label={t('file')}><input ref={node => this.csvFile = node} type="file" onChange={::this.onFileSelected}/></StaticField>
+                        <InputField id="csvDelimiter" label={t('delimiter')}/>
                     </div>;
             }
         }
@@ -324,7 +324,7 @@ export default class CUD extends Component {
         if (isEdit) {
             if (prepInProgress(status)) {
                 mappingEdit = (
-                    <div>{t('Preparation in progress. Please wait till it is done or visit this page later.')}</div>
+                    <div>{t('preparationInProgressPleaseWaitTillItIs')}</div>
                 );
 
             } else {
@@ -334,12 +334,12 @@ export default class CUD extends Component {
                 if (mappingType === MappingType.BASIC_SUBSCRIBE || mappingType === MappingType.BASIC_UNSUBSCRIBE) {
                     const sampleRow = this.getFormValue('sampleRow');
                     const sourceOpts = [];
-                    sourceOpts.push({key: '', label: t('–– Select ––')});
+                    sourceOpts.push({key: '', label: t('––Select ––')});
                     if (source === ImportSource.CSV_FILE) {
                         for (const csvCol of settings.csv.columns) {
                             let help = '';
                             if (sampleRow) {
-                                help = ' (' + t('e.g.:', {keySeparator: '>', nsSeparator: '|'}) + ' ' + truncate(sampleRow[csvCol.column], 50) + ')';
+                                help = ' (' + t('eg', {keySeparator: '>', nsSeparator: '|'}) + ' ' + truncate(sampleRow[csvCol.column], 50) + ')';
                             }
 
                             sourceOpts.push({key: csvCol.column, label: csvCol.name + help});
@@ -348,11 +348,11 @@ export default class CUD extends Component {
 
                     const settingsRows = [];
                     const mappingRows = [
-                        <Dropdown key="email" id="mapping_fields_email_column" label={t('Email')} options={sourceOpts}/>
+                        <Dropdown key="email" id="mapping_fields_email_column" label={t('email')} options={sourceOpts}/>
                     ];
 
                     if (mappingType === MappingType.BASIC_SUBSCRIBE) {
-                        settingsRows.push(<CheckBox key="checkEmails" id="mapping_settings_checkEmails" text={t('Check imported emails')}/>)
+                        settingsRows.push(<CheckBox key="checkEmails" id="mapping_settings_checkEmails" text={t('checkImportedEmails')}/>)
 
                         for (const field of this.props.fieldsGrouped) {
                             if (field.column) {
@@ -373,7 +373,7 @@ export default class CUD extends Component {
                     mappingSettings = (
                         <div>
                             {settingsRows}
-                            <Fieldset label={t('Mapping')} className={listStyles.mapping}>
+                            <Fieldset label={t('mapping')} className={listStyles.mapping}>
                                 {mappingRows}
                             </Fieldset>
                         </div>
@@ -382,7 +382,7 @@ export default class CUD extends Component {
 
                 mappingEdit = (
                     <div>
-                        <Dropdown id="mapping_type" label={t('Type')} options={this.mappingOptions}/>
+                        <Dropdown id="mapping_type" label={t('type')} options={this.mappingOptions}/>
                         {mappingSettings}
                     </div>
                 );
@@ -391,9 +391,9 @@ export default class CUD extends Component {
 
         let saveButtonLabel;
         if (!isEdit) {
-            saveButtonLabel = t('Save and edit settings');
+            saveButtonLabel = t('saveAndEditSettings');
         } else {
-            saveButtonLabel = t('Save');
+            saveButtonLabel = t('save');
         }
 
         return (
@@ -405,20 +405,20 @@ export default class CUD extends Component {
                         deleteUrl={`rest/imports/${this.props.list.id}/${this.props.entity.id}`}
                         backUrl={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/edit`}
                         successUrl={`/lists/${this.props.list.id}/imports`}
-                        deletingMsg={t('Deleting import ...')}
-                        deletedMsg={t('Import deleted')}/>
+                        deletingMsg={t('deletingImport')}
+                        deletedMsg={t('importDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Import') : t('Create Import')}</Title>
+                <Title>{isEdit ? t('editImport') : t('createImport')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
 
                     {isEdit ?
-                        <StaticField id="source" className={styles.formDisabled} label={t('Source')}>{this.importSourceLabels[this.getFormValue('source')]}</StaticField>
+                        <StaticField id="source" className={styles.formDisabled} label={t('source')}>{this.importSourceLabels[this.getFormValue('source')]}</StaticField>
                     :
-                        <Dropdown id="source" label={t('Source')} options={this.importSourceOptions}/>
+                        <Dropdown id="source" label={t('source')} options={this.importSourceOptions}/>
                     }
 
                     {settingsEdit}
@@ -428,7 +428,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="ok" label={saveButtonLabel}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

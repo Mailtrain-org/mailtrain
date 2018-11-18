@@ -292,7 +292,7 @@ async function basicSubscribe(impt) {
             let errorMsg;
 
             if (!email) {
-                errorMsg = tLog('importer.missingEmail');
+                errorMsg = tLog('missingEmail');
             }
 
             if (mappingSettings.checkEmails) {
@@ -329,7 +329,7 @@ async function basicUnsubscribe(impt) {
             let errorMsg;
 
             if (!email) {
-                errorMsg = tLog('importer.missingEmail');
+                errorMsg = tLog('missingEmail');
             }
 
             if (!errorMsg) {

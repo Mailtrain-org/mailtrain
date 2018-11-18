@@ -1,7 +1,6 @@
 'use strict';
 
 const passport = require('../lib/passport');
-const _ = require('../lib/translate')._;
 const clientHelpers = require('../lib/client-helpers');
 const { getTrustedUrl } = require('../lib/urls');
 const { AppType } = require('../../shared/app');

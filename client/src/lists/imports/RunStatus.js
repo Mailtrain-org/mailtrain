@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -20,7 +20,7 @@ import moment from "moment";
 import {runStatusInProgress} from "../../../../shared/imports";
 import {Table} from "../../lib/table";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -84,27 +84,27 @@ export default class Status extends Component {
         const imprt = this.props.imprt;
 
         const columns = [
-            { data: 1, title: t('Row') },
-            { data: 2, title: t('Email') },
-            { data: 3, title: t('Reason') }
+            { data: 1, title: t('row') },
+            { data: 2, title: t('email') },
+            { data: 3, title: t('reason') }
         ];
 
         return (
             <div>
-                <Title>{t('Import Run Status')}</Title>
+                <Title>{t('importRunStatus')}</Title>
 
-                <AlignedRow label={t('Import name')}>{imprt.name}</AlignedRow>
-                <AlignedRow label={t('Import source')}>{this.importSourceLabels[imprt.source]}</AlignedRow>
-                <AlignedRow label={t('Run started')}>{moment(entity.created).fromNow()}</AlignedRow>
-                {entity.finished && <AlignedRow label={t('Run finished')}>{moment(entity.finished).fromNow()}</AlignedRow>}
-                <AlignedRow label={t('Run status')}>{this.runStatusLabels[entity.status]}</AlignedRow>
-                <AlignedRow label={t('Processed entries')}>{entity.processed}</AlignedRow>
-                <AlignedRow label={t('New entries')}>{entity.new}</AlignedRow>
-                <AlignedRow label={t('Failed entries')}>{entity.failed}</AlignedRow>
-                {entity.error && <AlignedRow label={t('Error')}><pre>{entity.error}</pre></AlignedRow>}
+                <AlignedRow label={t('importName')}>{imprt.name}</AlignedRow>
+                <AlignedRow label={t('importSource')}>{this.importSourceLabels[imprt.source]}</AlignedRow>
+                <AlignedRow label={t('runStarted')}>{moment(entity.created).fromNow()}</AlignedRow>
+                {entity.finished && <AlignedRow label={t('runFinished')}>{moment(entity.finished).fromNow()}</AlignedRow>}
+                <AlignedRow label={t('runStatus')}>{this.runStatusLabels[entity.status]}</AlignedRow>
+                <AlignedRow label={t('processedEntries')}>{entity.processed}</AlignedRow>
+                <AlignedRow label={t('newEntries')}>{entity.new}</AlignedRow>
+                <AlignedRow label={t('failedEntries')}>{entity.failed}</AlignedRow>
+                {entity.error && <AlignedRow label={t('error')}><pre>{entity.error}</pre></AlignedRow>}
 
                 <hr/>
-                <h3>{t('Failed Rows')}</h3>
+                <h3>{t('failedRows')}</h3>
                 <Table ref={node => this.failedTableNode = node} withHeader dataUrl={`rest/import-run-failed-table/${this.props.list.id}/${this.props.imprt.id}/${this.props.entity.id}`} columns={columns} />
 
             </div>

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton } from '../lib/page';
 import { TreeTable } from '../lib/tree';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
@@ -15,7 +15,7 @@ import {
 } from "../lib/modals";
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 
-@translate()
+@withTranslation()
 @withErrorHandling
 @withPageHelpers
 @requiresAuthenticatedUser
@@ -54,14 +54,14 @@ export default class List extends Component {
 
             if (node.data.permissions.includes('edit')) {
                 actions.push({
-                    label: <Icon icon="edit" title={t('Edit')}/>,
+                    label: <Icon icon="edit" title={t('edit')}/>,
                     link: `/namespaces/${node.key}/edit`
                 });
             }
 
             if (node.data.permissions.includes('share')) {
                 actions.push({
-                    label: <Icon icon="share-alt" title={t('Share')}/>,
+                    label: <Icon icon="share-alt" title={t('share')}/>,
                     link: `/namespaces/${node.key}/share`
                 });
             }
@@ -75,14 +75,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/namespaces`, t('Deleting namespace ...'), t('Namespace deleted'))}
+                {tableDeleteDialogRender(this, `rest/namespaces`, t('deletingNamespace'), t('namespaceDeleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/namespaces/create" className="btn-primary" icon="plus" label={t('Create Namespace')}/>
+                        <NavButton linkTo="/namespaces/create" className="btn-primary" icon="plus" label={t('createNamespace')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Namespaces')}</Title>
+                <Title>{t('namespaces')}</Title>
 
                 <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} />
             </div>

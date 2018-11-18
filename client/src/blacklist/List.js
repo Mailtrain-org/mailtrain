@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from "react";
-import {translate} from "react-i18next";
+import { withTranslation } from '../lib/i18n';
 import {requiresAuthenticatedUser, Title, withPageHelpers} from "../lib/page";
 import {withAsyncErrorHandler, withErrorHandling} from "../lib/error-handling";
 import {Table} from "../lib/table";
@@ -10,7 +10,7 @@ import {Button, Icon} from "../lib/bootstrap-components";
 import axios from "../lib/axios";
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -47,13 +47,13 @@ export default class List extends Component {
         const emailServerValidation = state.getIn(['email', 'serverValidation']);
 
         if (!email) {
-            state.setIn(['email', 'error'], t('Email must not be empty'));
+            state.setIn(['email', 'error'], t('emailMustNotBeEmpty-1'));
         } else if (emailServerValidation && emailServerValidation.invalid) {
-            state.setIn(['email', 'error'], t('Invalid email address.'));
+            state.setIn(['email', 'error'], t('invalidEmailAddress'));
         } else if (emailServerValidation && emailServerValidation.exists) {
-            state.setIn(['email', 'error'], t('The email is already on blacklist.'));
+            state.setIn(['email', 'error'], t('theEmailIsAlreadyOnBlacklist'));
         } else if (!emailServerValidation) {
-            state.setIn(['email', 'error'], t('Validation is in progress...'));
+            state.setIn(['email', 'error'], t('validationIsInProgress'));
         } else {
             state.setIn(['email', 'error'], null);
         }
@@ -63,7 +63,7 @@ export default class List extends Component {
         const t = this.props.t;
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/blacklist');
 
@@ -77,7 +77,7 @@ export default class List extends Component {
 
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and try again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd-1'));
         }
     }
 
@@ -95,11 +95,11 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 0, title: t('Email') },
+            { data: 0, title: t('email') },
             {
                 actions: data => [
                     {
-                        label: <Icon icon="remove" title={t('Remove from blacklist')}/>,
+                        label: <Icon icon="remove" title={t('removeFromBlacklist')}/>,
                         action: () => this.deleteBlacklisted(data[0])
                     }
                 ]
@@ -108,20 +108,20 @@ export default class List extends Component {
 
         return (
             <div>
-                <Title>{t('Blacklist')}</Title>
+                <Title>{t('blacklist')}</Title>
 
-                <h3 className="legend">{t('Add Email to Blacklist')}</h3>
+                <h3 className="legend">{t('addEmailToBlacklist-1')}</h3>
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="email" label={t('Email')}/>
+                    <InputField id="email" label={t('email')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Add to Blacklist')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('addToBlacklist')}/>
                     </ButtonRow>
                 </Form>
 
                 <hr/>
 
-                <h3 className="legend">{t('Blacklisted Emails')}</h3>
+                <h3 className="legend">{t('blacklistedEmails')}</h3>
 
                 <Table ref={node => this.blacklistTable = node} withHeader dataUrl="rest/blacklist-table" columns={columns} />
             </div>

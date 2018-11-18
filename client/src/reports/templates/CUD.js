@@ -3,9 +3,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
-    Trans,
-    translate
+    Trans
 } from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -34,7 +34,7 @@ import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/handlebars';
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -225,13 +225,13 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         if (!state.getIn(['mime_type', 'value'])) {
-            state.setIn(['mime_type', 'error'], t('MIME Type must be selected'));
+            state.setIn(['mime_type', 'error'], t('mimeTypeMustBeSelected'));
         } else {
             state.setIn(['mime_type', 'error'], null);
         }
@@ -241,7 +241,7 @@ export default class CUD extends Component {
             state.setIn(['user_fields', 'error'], null);
         } catch (err) {
             if (err instanceof SyntaxError) {
-                state.setIn(['user_fields', 'error'], t('Syntax error in the user fields specification'));
+                state.setIn(['user_fields', 'error'], t('syntaxErrorInTheUserFieldsSpecification'));
             }
         }
 
@@ -269,7 +269,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
@@ -277,13 +277,13 @@ export default class CUD extends Component {
             if (stay) {
                 await this.getFormValuesFromURL(`rest/report-templates/${this.props.entity.id}`);
                 this.enableForm();
-                this.setFormStatusMessage('success', t('Report template saved'));
+                this.setFormStatusMessage('success', t('reportTemplateSaved'));
             } else {
-                this.navigateToWithFlashMessage('/reports/templates', 'success', t('Report template saved'));
+                this.navigateToWithFlashMessage('/reports/templates', 'success', t('reportTemplateSaved'));
             }
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -301,32 +301,32 @@ export default class CUD extends Component {
                         deleteUrl={`rest/reports/templates/${this.props.entity.id}`}
                         backUrl={`/reports/templates/${this.props.entity.id}/edit`}
                         successUrl="/reports/templates"
-                        deletingMsg={t('Deleting report template ...')}
-                        deletedMsg={t('Report template deleted')}/>
+                        deletingMsg={t('deletingReportTemplate')}
+                        deletedMsg={t('reportTemplateDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Report Template') : t('Create Report Template')}</Title>
+                <Title>{isEdit ? t('editReportTemplate') : t('createReportTemplate')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
-                    <Dropdown id="mime_type" label={t('Type')} options={[{key: 'text/html', label: t('HTML')}, {key: 'text/csv', label: t('CSV')}]}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
+                    <Dropdown id="mime_type" label={t('type')} options={[{key: 'text/html', label: t('html')}, {key: 'text/csv', label: t('csv')}]}/>
                     <NamespaceSelect/>
-                    <ACEEditor id="user_fields" height="250px" mode="json" label={t('User selectable fields')} help={t('JSON specification of user selectable fields.')}/>
-                    <ACEEditor id="js" height="700px" mode="javascript" label={t('Data processing code')} help={<Trans>Write the body of the JavaScript function with signature <code>function(inputs, callback)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
-                    <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('Rendering template')} help={<Trans>Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>
+                    <ACEEditor id="user_fields" height="250px" mode="json" label={t('userSelectableFields')} help={t('jsonSpecificationOfUserSelectableFields')}/>
+                    <ACEEditor id="js" height="700px" mode="javascript" label={t('dataProcessingCode')} help={<Trans i18nKey="writeTheBodyOfTheJavaScriptFunctionWith">Write the body of the JavaScript function with signature <code>function(inputs, callback)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
+                    <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('renderingTemplate')} help={<Trans i18nKey="useHtmlWithHandlebarsSyntaxSee">Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>
 
                     {isEdit ?
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('saveAndLeave')}/>
                             {canDelete &&
-                                <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
+                                <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
                             }
                         </ButtonRow>
                     :
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
                         </ButtonRow>
                     }
                 </Form>

@@ -6,34 +6,34 @@ import {ImportSource, MappingType, ImportStatus, RunStatus} from '../../../../sh
 export function getImportLabels(t) {
 
     const importSourceLabels = {
-        [ImportSource.CSV_FILE]: t('CSV file'),
-        [ImportSource.LIST]: t('List'),
+        [ImportSource.CSV_FILE]: t('csvFile'),
+        [ImportSource.LIST]: t('list'),
     };
 
     const importStatusLabels = {
-        [ImportStatus.PREP_SCHEDULED]: t('Created'),
-        [ImportStatus.PREP_RUNNING]: t('Preparing'),
-        [ImportStatus.PREP_STOPPING]: t('Stopping'),
-        [ImportStatus.PREP_FINISHED]: t('Ready'),
-        [ImportStatus.PREP_FAILED]: t('Preparation failed'),
-        [ImportStatus.RUN_SCHEDULED]: t('Scheduled'),
-        [ImportStatus.RUN_RUNNING]: t('Running'),
-        [ImportStatus.RUN_STOPPING]: t('Stopping'),
-        [ImportStatus.RUN_FINISHED]: t('Finished'),
-        [ImportStatus.RUN_FAILED]: t('Failed')
+        [ImportStatus.PREP_SCHEDULED]: t('created'),
+        [ImportStatus.PREP_RUNNING]: t('preparing'),
+        [ImportStatus.PREP_STOPPING]: t('stopping'),
+        [ImportStatus.PREP_FINISHED]: t('ready'),
+        [ImportStatus.PREP_FAILED]: t('preparationFailed'),
+        [ImportStatus.RUN_SCHEDULED]: t('scheduled'),
+        [ImportStatus.RUN_RUNNING]: t('running'),
+        [ImportStatus.RUN_STOPPING]: t('stopping'),
+        [ImportStatus.RUN_FINISHED]: t('finished'),
+        [ImportStatus.RUN_FAILED]: t('failed')
     };
 
     const runStatusLabels = {
-        [RunStatus.SCHEDULED]: t('Starting'),
-        [RunStatus.RUNNING]: t('Running'),
-        [RunStatus.STOPPING]: t('Stopping'),
-        [RunStatus.FINISHED]: t('Finished'),
-        [RunStatus.FAILED]: t('Failed')
+        [RunStatus.SCHEDULED]: t('starting'),
+        [RunStatus.RUNNING]: t('running'),
+        [RunStatus.STOPPING]: t('stopping'),
+        [RunStatus.FINISHED]: t('finished'),
+        [RunStatus.FAILED]: t('failed')
     };
 
     const mappingTypeLabels = {
-        [MappingType.BASIC_SUBSCRIBE]: t('Basic import of subscribers'),
-        [MappingType.BASIC_UNSUBSCRIBE]: t('Unsubscribe emails'),
+        [MappingType.BASIC_SUBSCRIBE]: t('basicImportOfSubscribers'),
+        [MappingType.BASIC_UNSUBSCRIBE]: t('unsubscribeEmails'),
     }
 
     return {

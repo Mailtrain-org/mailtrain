@@ -1,11 +1,11 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from './i18n';
 import { TreeTableSelect } from './form';
 
 
-@translate()
+@withTranslation()
 class NamespaceSelect extends Component {
     render() {
         const t = this.props.t;
@@ -18,7 +18,7 @@ class NamespaceSelect extends Component {
 
 function validateNamespace(t, state) {
     if (!state.getIn(['namespace', 'value'])) {
-        state.setIn(['namespace', 'error'], t('namespace.mustBeSelected'));
+        state.setIn(['namespace', 'error'], t('namespacemustBeSelected'));
     } else {
         state.setIn(['namespace', 'error'], null);
     }

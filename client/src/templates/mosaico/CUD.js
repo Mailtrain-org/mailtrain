@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -32,7 +32,7 @@ import {
     getTemplateTypesOrder
 } from "./helpers";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -96,13 +96,13 @@ export default class CUD extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         if (!state.getIn(['type', 'value'])) {
-            state.setIn(['type', 'error'], t('Type must be selected'));
+            state.setIn(['type', 'error'], t('typeMustBeSelected'));
         } else {
             state.setIn(['type', 'error'], null);
         }
@@ -131,7 +131,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             this.templateTypes[data.type].beforeSave(data);
@@ -143,13 +143,13 @@ export default class CUD extends Component {
                     this.templateTypes[data.type].afterLoad(data);
                 });
                 this.enableForm();
-                this.setFormStatusMessage('success', t('Mosaico template saved'));
+                this.setFormStatusMessage('success', t('mosaicoTemplateSaved'));
             } else {
-                this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('Mosaico template saved'));
+                this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('mosaicoTemplateSaved'));
             }
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -173,31 +173,31 @@ export default class CUD extends Component {
                         deleteUrl={`rest/mosaico-templates/${this.props.entity.id}`}
                         backUrl={`/templates/mosaico/${this.props.entity.id}/edit`}
                         successUrl="/templates/mosaico"
-                        deletingMsg={t('Deleting Mosaico template ...')}
-                        deletedMsg={t('Mosaico template deleted')}/>
+                        deletingMsg={t('deletingMosaicoTemplate')}
+                        deletedMsg={t('mosaicoTemplateDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Mosaico Template') : t('Create Mosaico Template')}</Title>
+                <Title>{isEdit ? t('editMosaicoTemplate') : t('createMosaicoTemplate')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
-                    <Dropdown id="type" label={t('Type')} options={this.typeOptions}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
+                    <Dropdown id="type" label={t('type')} options={this.typeOptions}/>
                     <NamespaceSelect/>
 
                     {form}
 
                     {isEdit ?
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Stay')} onClickAsync={::this.submitAndStay}/>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Save and Leave')}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('saveAndLeave')}/>
                             {canDelete &&
-                                <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/templates/mosaico/${this.props.entity.id}/delete`}/>
+                                <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/templates/mosaico/${this.props.entity.id}/delete`}/>
                             }
                         </ButtonRow>
                     :
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
+                            <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
                         </ButtonRow>
                     }
                 </Form>

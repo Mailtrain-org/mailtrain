@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from "react";
-import {translate} from "react-i18next";
+import { withTranslation } from './i18n';
 import PropTypes from "prop-types";
 import {withRouter} from "react-router";
 import {BrowserRouter as Router, Link, Redirect, Route, Switch} from "react-router-dom";
@@ -14,6 +14,10 @@ import {getRoutes, needsResolve, resolve, withPageHelpers} from "./page-common";
 import {getBaseDir} from "./urls";
 
 class Breadcrumb extends Component {
+    constructor(props) {
+        super(props);
+    }
+
     static propTypes = {
         route: PropTypes.object.isRequired,
         params: PropTypes.object.isRequired,
@@ -67,6 +71,7 @@ class Breadcrumb extends Component {
 
 class SecondaryNavBar extends Component {
     static propTypes = {
+        route: PropTypes.object.isRequired,
         params: PropTypes.object.isRequired,
         resolved: PropTypes.object.isRequired,
         className: PropTypes.string
@@ -144,7 +149,7 @@ class SecondaryNavBar extends Component {
     }
 }
 
-@translate()
+@withTranslation()
 @withErrorHandling
 class RouteContent extends Component {
     constructor(props) {
@@ -367,17 +372,10 @@ class SectionContent extends Component {
     }
 }
 
-@translate()
+@withTranslation()
 class Section extends Component {
     constructor(props) {
         super(props);
-
-        let structure = props.structure;
-        if (typeof structure === 'function') {
-            structure = structure(props.t);
-        }
-
-        this.structure = structure;
     }
 
     static propTypes = {
@@ -386,9 +384,14 @@ class Section extends Component {
     }
 
     render() {
+        let structure = this.props.structure;
+        if (typeof structure === 'function') {
+            structure = structure(this.props.t);
+        }
+
         return (
             <Router basename={getBaseDir()}>
-                <SectionContent root={this.props.root} structure={this.structure} />
+                <SectionContent root={this.props.root} structure={structure} />
             </Router>
         );
     }

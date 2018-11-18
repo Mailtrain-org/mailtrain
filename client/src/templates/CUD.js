@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -38,7 +38,7 @@ import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -103,12 +103,12 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         }
 
         const typeKey = state.getIn(['type', 'value']);
         if (!typeKey) {
-            state.setIn(['type', 'error'], t('Type must be selected'));
+            state.setIn(['type', 'error'], t('typeMustBeSelected'));
         }
 
         validateNamespace(t, state);
@@ -137,7 +137,7 @@ export default class CUD extends Component {
         }
 
         this.disableForm();
-        this.setFormStatusMessage('info', t('Saving ...'));
+        this.setFormStatusMessage('info', t('saving'));
 
         const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             Object.assign(data, exportedData);
@@ -146,13 +146,13 @@ export default class CUD extends Component {
 
         if (submitResponse) {
             if (this.props.entity) {
-                this.navigateToWithFlashMessage('/templates', 'success', t('Template saved'));
+                this.navigateToWithFlashMessage('/templates', 'success', t('templateSaved'));
             } else {
-                this.navigateToWithFlashMessage(`/templates/${submitResponse}/edit`, 'success', t('Template saved'));
+                this.navigateToWithFlashMessage(`/templates/${submitResponse}/edit`, 'success', t('templateSaved'));
             }
         } else {
             this.enableForm();
-            this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+            this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
     }
 
@@ -244,23 +244,23 @@ export default class CUD extends Component {
                         deleteUrl={`rest/templates/${this.props.entity.id}`}
                         backUrl={`/templates/${this.props.entity.id}/edit`}
                         successUrl="/templates"
-                        deletingMsg={t('Deleting template ...')}
-                        deletedMsg={t('Template deleted')}/>
+                        deletingMsg={t('deletingTemplate')}
+                        deletedMsg={t('templateDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Template') : t('Create Template')}</Title>
+                <Title>{isEdit ? t('editTemplate') : t('createTemplate')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
 
                     {isEdit
                     ?
-                        <StaticField id="type" className={styles.formDisabled} label={t('Type')}>
+                        <StaticField id="type" className={styles.formDisabled} label={t('type')}>
                             {typeKey && this.templateTypes[typeKey].typeName}
                         </StaticField>
                     :
-                        <Dropdown id="type" label={t('Type')} options={typeOptions}/>
+                        <Dropdown id="type" label={t('type')} options={typeOptions}/>
                     }
 
                     {typeForm}
@@ -270,9 +270,9 @@ export default class CUD extends Component {
                     {editForm}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={isEdit ? t('Save') : t('Save and edit template')}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/templates/${this.props.entity.id}/delete`}/> }
-                        {isEdit && <Button className="btn-danger" icon="send" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
+                        <Button type="submit" className="btn-primary" icon="ok" label={isEdit ? t('save') : t('saveAndEditTemplate')}/>
+                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/templates/${this.props.entity.id}/delete`}/> }
+                        {isEdit && <Button className="btn-danger" icon="send" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>
                 </Form>
             </div>

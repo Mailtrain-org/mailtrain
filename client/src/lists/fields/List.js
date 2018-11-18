@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
 import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
@@ -14,7 +14,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -40,18 +40,18 @@ export default class List extends Component {
 
         const columns = [
             { data: 4, title: "#" },
-            { data: 1, title: t('Name'),
+            { data: 1, title: t('name'),
                 render: (data, cmd, rowData) => rowData[2] === 'option' ? <span><Icon icon="record"/> {data}</span> : data
             },
-            { data: 2, title: t('Type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
-            { data: 3, title: t('Merge Tag') },
+            { data: 2, title: t('type'), render: data => this.fieldTypes[data].label, sortable: false, searchable: false },
+            { data: 3, title: t('mergeTag') },
             {
                 actions: data => {
                     const actions = [];
 
                     if (this.props.list.permissions.includes('manageFields')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/lists/${this.props.list.id}/fields/${data[0]}/edit`
                         });
 
@@ -65,14 +65,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/fields/${this.props.list.id}`, t('Deleting field ...'), t('Field deleted'))}
+                {tableDeleteDialogRender(this, `rest/fields/${this.props.list.id}`, t('deletingField'), t('fieldDeleted'))}
                 {this.props.list.permissions.includes('manageFields') &&
                     <Toolbar>
-                        <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('Create Field')}/>
+                        <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('createField')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Fields')}</Title>
+                <Title>{t('fields')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/fields-table/${this.props.list.id}`} columns={columns} />
             </div>

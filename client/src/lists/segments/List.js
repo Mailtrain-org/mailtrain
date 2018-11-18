@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
 import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
@@ -13,7 +13,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -36,14 +36,14 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
+            { data: 1, title: t('name') },
             {
                 actions: data => {
                     const actions = [];
 
                     if (this.props.list.permissions.includes('manageSegments')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/lists/${this.props.list.id}/segments/${data[0]}/edit`
                         });
 
@@ -57,14 +57,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/segments/${this.props.list.id}`, t('Deleting segment ...'), t('Segment deleted'))}
+                {tableDeleteDialogRender(this, `rest/segments/${this.props.list.id}`, t('deletingSegment'), t('segmentDeleted'))}
                 {this.props.list.permissions.includes('manageSegments') &&
                     <Toolbar>
-                        <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('Create Segment')}/>
+                        <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('createSegment')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Segment')}</Title>
+                <Title>{t('segment')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/segments-table/${this.props.list.id}`} columns={columns} />
             </div>

@@ -152,7 +152,7 @@ function getRouter(appType) {
         });
 
         // This is a fallback to versafix-1 if the block thumbnail is not defined by the template
-        router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
+        router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
 
 
         fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
@@ -185,10 +185,10 @@ function getRouter(appType) {
             const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
 
             let languageStrings = null;
-            if (config.language && config.language !== 'en') {
-                const lang = config.language.split('_')[0];
+            const lang = req.language;
+            if (lang && lang !== 'en') {
                 try {
-                    const file = path.join(__dirname, '..', 'client', 'static', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
+                    const file = path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
                     languageStrings = await fs.readFile(file, 'utf8');
                 } catch (err) {
                 }
@@ -232,7 +232,7 @@ function getRouter(appType) {
 
                 const mosaicoLegacyUrlPrefix = getTrustedUrl(`mosaico/uploads/`);
                 if (url.startsWith(mosaicoLegacyUrlPrefix)) {
-                    filePath = path.join(__dirname, '..', 'client', 'static' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
+                    filePath = path.join(__dirname, '..', '..', 'client', 'static' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
                 } else {
                     const file = await files.getFileByUrl(contextHelpers.getAdminContext(), url);
                     filePath = file.path;

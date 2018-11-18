@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {Icon} from '../lib/bootstrap-components';
 import {
     NavButton,
@@ -26,7 +26,7 @@ import {
 } from "../lib/modals";
 
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -63,12 +63,12 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Description') },
-            { data: 4, title: t('Type'), render: data => this.mailerTypes[data].typeName },
-            { data: 5, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 6, title: t('Namespace') },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('description') },
+            { data: 4, title: t('type'), render: data => this.mailerTypes[data].typeName },
+            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -76,14 +76,14 @@ export default class List extends Component {
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/send-configurations/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/send-configurations/${data[0]}/share`
                         });
                     }
@@ -97,14 +97,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/send-configurations`, t('Deleting send configuration ...'), t('Send configuration deleted'))}
+                {tableDeleteDialogRender(this, `rest/send-configurations`, t('deletingSendConfiguration'), t('sendConfigurationDeleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/send-configurations/create" className="btn-primary" icon="plus" label={t('Create Send Configuration')}/>
+                        <NavButton linkTo="/send-configurations/create" className="btn-primary" icon="plus" label={t('createSendConfiguration')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Send Configurations')}</Title>
+                <Title>{t('sendConfigurations-1')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/send-configurations-table" columns={columns} />
             </div>

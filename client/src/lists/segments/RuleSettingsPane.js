@@ -2,7 +2,7 @@
 
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {translate} from "react-i18next";
+import { withTranslation } from '../../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers} from "../../lib/page";
 import {Button, ButtonRow, Dropdown, Form, TableSelect, withForm} from "../../lib/form";
 import {withErrorHandling} from "../../lib/error-handling";
@@ -11,7 +11,7 @@ import {getFieldTypes} from "../fields/helpers";
 
 import styles from "./CUD.scss";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -100,10 +100,10 @@ export default class CUD extends Component {
                     const settings = ruleHelpers.primitiveRuleTypes[colType][ruleType];
                     settings.validate(state);
                 } else {
-                    state.setIn(['type', 'error'], t('Type must be selected'));
+                    state.setIn(['type', 'error'], t('typeMustBeSelected'));
                 }
             } else {
-                state.setIn(['column', 'error'], t('Field must be selected'));
+                state.setIn(['column', 'error'], t('fieldMustBeSelected'));
             }
         }
     }
@@ -170,18 +170,18 @@ export default class CUD extends Component {
 
         let ruleOptions = null;
         if (ruleHelpers.isCompositeRuleType(rule.type)) {
-            ruleOptions = <Dropdown id="type" label={t('Type')} options={ruleHelpers.getCompositeRuleTypeOptions()} />
+            ruleOptions = <Dropdown id="type" label={t('type')} options={ruleHelpers.getCompositeRuleTypeOptions()} />
 
         } else {
             const ruleColumnOptionsColumns = [
-                { data: 1, title: t('Name') },
-                { data: 2, title: t('Type') },
-                { data: 3, title: t('Merge Tag') }
+                { data: 1, title: t('name') },
+                { data: 2, title: t('type') },
+                { data: 3, title: t('mergeTag') }
             ];
 
             const ruleColumnOptions = ruleHelpers.fields.map(fld => [ fld.column, fld.name, this.fieldTypes[fld.type].label, fld.key || '' ]);
 
-            const ruleColumnSelect = <TableSelect id="column" label={t('Field')} data={ruleColumnOptions} columns={ruleColumnOptionsColumns} dropdown withHeader selectionLabelIndex={1} />;
+            const ruleColumnSelect = <TableSelect id="column" label={t('field')} data={ruleColumnOptions} columns={ruleColumnOptionsColumns} dropdown withHeader selectionLabelIndex={1} />;
             let ruleTypeSelect = null;
             let ruleSettings = null;
 
@@ -190,10 +190,10 @@ export default class CUD extends Component {
                 const colType = ruleHelpers.getColumnType(ruleColumn);
                 if (colType) {
                     const ruleTypeOptions = ruleHelpers.getPrimitiveRuleTypeOptions(colType);
-                    ruleTypeOptions.unshift({ key: '', label: t('-- Select --')});
+                    ruleTypeOptions.unshift({ key: '', label: t('select-1')});
 
                     if (ruleTypeOptions) {
-                        ruleTypeSelect = <Dropdown id="type" label={t('Type')} options={ruleTypeOptions} />
+                        ruleTypeSelect = <Dropdown id="type" label={t('type')} options={ruleTypeOptions} />
 
                         const ruleType = this.getFormValue('type');
                         if (ruleType) {
@@ -215,15 +215,15 @@ export default class CUD extends Component {
 
         return (
             <div className={styles.ruleOptions}>
-                <h3>{t('Rule Options')}</h3>
+                <h3>{t('ruleOptions')}</h3>
 
                 <Form stateOwner={this} onSubmitAsync={::this.closeForm}>
 
                     {ruleOptions}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="chevron-left" label={t('OK')}/>
-                        <Button className="btn-primary" icon="remove" label={t('Delete')} onClickAsync={::this.deleteRule}/>
+                        <Button type="submit" className="btn-primary" icon="chevron-left" label={t('ok')}/>
+                        <Button className="btn-primary" icon="remove" label={t('delete')} onClickAsync={::this.deleteRule}/>
                     </ButtonRow>
                 </Form>
 

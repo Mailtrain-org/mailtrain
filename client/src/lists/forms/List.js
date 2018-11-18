@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
 import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
@@ -14,7 +14,7 @@ import {
     tableDeleteDialogRender
 } from "../../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -49,9 +49,9 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Namespace') },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -59,13 +59,13 @@ export default class List extends Component {
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/lists/forms/${data[0]}/edit`
                         });
                     }
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/lists/forms/${data[0]}/share`
                         });
                     }
@@ -79,14 +79,14 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/forms`, t('Deleting form ...'), t('Form deleted'))}
+                {tableDeleteDialogRender(this, `rest/forms`, t('deletingForm'), t('formDeleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/lists/forms/create" className="btn-primary" icon="plus" label={t('Create Custom Form')}/>
+                        <NavButton linkTo="/lists/forms/create" className="btn-primary" icon="plus" label={t('createCustomForm')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Forms')}</Title>
+                <Title>{t('forms')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} />
             </div>

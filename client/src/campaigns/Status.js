@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -41,7 +41,7 @@ import campaignsStyles from "./styles.scss";
 import {tableDeleteDialogAddDeleteButton} from "../lib/modals";
 
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -60,7 +60,7 @@ class TestUser extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['testUser', 'value'])) {
-            state.setIn(['testUser', 'error'], t('Subscription has to be selected to show the campaign for a test user.'))
+            state.setIn(['testUser', 'error'], t('subscriptionHasToBeSelectedToShowThe'))
         } else {
             state.setIn(['testUser', 'error'], null);
         }
@@ -87,25 +87,25 @@ class TestUser extends Component {
         const t = this.props.t;
 
         const testUsersColumns = [
-            { data: 1, title: t('Email') },
-            { data: 2, title: t('Subscription ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('List ID'), render: data => <code>{data}</code> },
-            { data: 4, title: t('List') },
-            { data: 5, title: t('List namespace') }
+            { data: 1, title: t('email') },
+            { data: 2, title: t('subscriptionId'), render: data => <code>{data}</code> },
+            { data: 3, title: t('listId'), render: data => <code>{data}</code> },
+            { data: 4, title: t('list') },
+            { data: 5, title: t('listNamespace') }
         ];
 
         return (
             <Form stateOwner={this}>
-                <TableSelect id="testUser" label={t('Preview campaign as')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
+                <TableSelect id="testUser" label={t('previewCampaignAs')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
                 <ButtonRow>
-                    <Button className="btn-primary" label={t('Preview')} onClickAsync={::this.previewAsync}/>
+                    <Button className="btn-primary" label={t('preview')} onClickAsync={::this.previewAsync}/>
                 </ButtonRow>
             </Form>
         );
     }
 }
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -130,16 +130,16 @@ class SendControls extends Component {
         if (state.getIn(['sendLater', 'value'])) {
             const dateValue = state.getIn(['date', 'value']).trim();
             if (!dateValue) {
-                state.setIn(['date', 'error'], t('Date must not be empty'));
+                state.setIn(['date', 'error'], t('dateMustNotBeEmpty'));
             } else if (!moment(dateValue, 'YYYY-MM-DD', true).isValid()) {
-                state.setIn(['date', 'error'], t('Date is invalid'));
+                state.setIn(['date', 'error'], t('dateIsInvalid'));
             }
 
             const timeValue = state.getIn(['time', 'value']).trim();
             if (!timeValue) {
-                state.setIn(['time', 'error'], t('Time must not be empty'));
+                state.setIn(['time', 'error'], t('timeMustNotBeEmpty'));
             } else if (!moment(timeValue, 'HH:mm', true).isValid()) {
-                state.setIn(['time', 'error'], t('Time is invalid'));
+                state.setIn(['time', 'error'], t('timeIsInvalid'));
             }
         }
     }
@@ -231,28 +231,28 @@ class SendControls extends Component {
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
-            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers')})`;
+            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
                 <div>
-                    <AlignedRow label={t('Send status')}>
-                        {entity.scheduled ? t('Campaign is scheduled for delivery.') : t('Campaign is ready to be sent out.')}
+                    <AlignedRow label={t('sendStatus')}>
+                        {entity.scheduled ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
                     </AlignedRow>
 
                     <Form stateOwner={this}>
-                        <CheckBox id="sendLater" label={t('Send later')} text={t('Schedule delivery at a particular date/time')}/>
+                        <CheckBox id="sendLater" label={t('sendLater')} text={t('scheduleDeliveryAtAParticularDatetime')}/>
                         {this.getFormValue('sendLater') &&
                             <div>
-                                <DatePicker id="date" label={t('Date')} />
-                                <InputField id="time" label={t('Time')} help={t('Enter 24-hour time in format HH:MM (e.g. 13:48)')}/>
+                                <DatePicker id="date" label={t('date')} />
+                                <InputField id="time" label={t('time')} help={t('enter24hourTimeInFormatHhmmEg1348')}/>
                             </div>
                         }
                     </Form>
                     <ButtonRow className={campaignsStyles.sendButtonRow}>
                         {this.getFormValue('sendLater') ?
-                            <Button className="btn-primary" icon="send" label={(entity.scheduled ? t('Reschedule send') : t('Schedule send')) + subscrInfo} onClickAsync={::this.scheduleAsync}/>
+                            <Button className="btn-primary" icon="send" label={(entity.scheduled ? t('rescheduleSend') : t('scheduleSend')) + subscrInfo} onClickAsync={::this.scheduleAsync}/>
                             :
-                            <Button className="btn-primary" icon="send" label={t('Send') + subscrInfo} onClickAsync={::this.startAsync}/>
+                            <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.startAsync}/>
                         }
                     </ButtonRow>
                 </div>
@@ -261,26 +261,26 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
             return (
                 <div>
-                    <AlignedRow label={t('Send status')}>
-                        {t('Campaign is being sent out.')}
+                    <AlignedRow label={t('sendStatus')}>
+                        {t('campaignIsBeingSentOut')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="stop" label={t('Stop')} onClickAsync={::this.stopAsync}/>
+                        <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.FINISHED) {
-            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers')})`;
+            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
                 <div>
-                    <AlignedRow label={t('Send status')}>
-                        {t('All messages sent! Hit "Continue" if you you want to send this campaign to new subscribers.')}
+                    <AlignedRow label={t('sendStatus')}>
+                        {t('allMessagesSent!HitContinueIfYouYouWant')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="play" label={t('Continue') + subscrInfo} onClickAsync={::this.startAsync}/>
-                        <Button className="btn-primary" icon="refresh" label={t('Reset')} onClickAsync={::this.resetAsync}/>
+                        <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.startAsync}/>
+                        <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
                     </ButtonRow>
                 </div>
             );
@@ -288,11 +288,11 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.INACTIVE) {
             return (
                 <div>
-                    <AlignedRow label={t('Send status')}>
-                        {t('Your campaign is currently disabled. Click Enable button to start enable it.')}
+                    <AlignedRow label={t('sendStatus')}>
+                        {t('yourCampaignIsCurrentlyDisabledClick')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="play" label={t('Enable')} onClickAsync={::this.enableAsync}/>
+                        <Button className="btn-primary" icon="play" label={t('enable')} onClickAsync={::this.enableAsync}/>
                     </ButtonRow>
                 </div>
             );
@@ -300,11 +300,11 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.ACTIVE) {
             return (
                 <div>
-                    <AlignedRow label={t('Send status')}>
-                        {t('Your campaign is enabled and sending messages.')}
+                    <AlignedRow label={t('sendStatus')}>
+                        {t('yourCampaignIsEnabledAndSendingMessages')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="stop" label={t('Disable')} onClickAsync={::this.disableAsync}/>
+                        <Button className="btn-primary" icon="stop" label={t('disable')} onClickAsync={::this.disableAsync}/>
                     </ButtonRow>
                 </div>
             );
@@ -315,7 +315,7 @@ class SendControls extends Component {
     }
 }
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -389,26 +389,26 @@ export default class Status extends Component {
                 sendSettings.push(<AlignedRow key={id} label={label}>{entity[id + '_override'] === null ? this.state.sendConfiguration[id] : entity[id + '_override']}</AlignedRow>);
             };
 
-            addOverridable('from_name', t('"From" name'));
-            addOverridable('from_email', t('"From" email address'));
-            addOverridable('reply_to', t('"Reply-to" email address'));
-            addOverridable('subject', t('"Subject" line'));
+            addOverridable('from_name', t('fromName'));
+            addOverridable('from_email', t('fromEmailAddress'));
+            addOverridable('reply_to', t('replytoEmailAddress'));
+            addOverridable('subject', t('subjectLine'));
         } else {
-            sendSettings =  <AlignedRow>{t('Loading send configuration ...')}</AlignedRow>
+            sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
         }
 
         const listsColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 4, title: t('Segment') },
-            { data: 3, title: t('List namespace') }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 4, title: t('segment') },
+            { data: 3, title: t('listNamespace') }
         ];
 
         const campaignsChildrenColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 5, title: t('Status'), render: (data, display, rowData) => this.campaignStatusLabels[data] },
-            { data: 8, title: t('Created'), render: data => moment(data).fromNow() },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 5, title: t('status'), render: (data, display, rowData) => this.campaignStatusLabels[data] },
+            { data: 8, title: t('created'), render: data => moment(data).fromNow() },
             {
                 actions: data => {
                     const actions = [];
@@ -418,7 +418,7 @@ export default class Status extends Component {
 
                     if (perms.includes('viewStats')) {
                         actions.push({
-                            label: <Icon icon="send" title={t('Status')}/>,
+                            label: <Icon icon="send" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`
                         });
                     }
@@ -430,15 +430,15 @@ export default class Status extends Component {
 
         return (
             <div>
-                <Title>{t('Campaign Status')}</Title>
+                <Title>{t('campaignStatus')}</Title>
 
-                <AlignedRow label={t('Name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('Subscribers')}>{entity.subscriptionsTotal === undefined ? t('computing ...') : entity.subscriptionsTotal}</AlignedRow>
-                <AlignedRow label={t('Status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
+                <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
+                <AlignedRow label={t('subscribers')}>{entity.subscriptionsTotal === undefined ? t('computing') : entity.subscriptionsTotal}</AlignedRow>
+                <AlignedRow label={t('status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
 
                 {sendSettings}
 
-                <AlignedRow label={t('Target lists/segments')}>
+                <AlignedRow label={t('targetListssegments')}>
                     <Table withHeader dataUrl={`rest/lists-with-segment-by-campaign-table/${this.props.entity.id}`} columns={listsColumns} />
                 </AlignedRow>
 
@@ -456,7 +456,7 @@ export default class Status extends Component {
                     <div>
                         <hr/>
                         <h3>RSS Entries</h3>
-                        <p>{t('If a new entry is found from campaign feed a new subcampaign is created of that entry and it will be listed here')}</p>
+                        <p>{t('ifANewEntryIsFoundFromCampaignFeedANew')}</p>
                         <Table withHeader dataUrl={`rest/campaigns-children/${this.props.entity.id}`} columns={campaignsChildrenColumns} />
                     </div>
                 }

@@ -10,33 +10,33 @@ import Share from '../shares/Share';
 function getMenus(t) {
     return {
         'send-configurations': {
-            title: t('Send Configurations'),
+            title: t('sendConfigurations-1'),
             link: '/send-configurations',
             panelComponent: List,
             children: {
                 ':sendConfigurationId([0-9]+)': {
-                    title: resolved => t('Template "{{name}}"', {name: resolved.sendConfiguration.name}),
+                    title: resolved => t('templateName', {name: resolved.sendConfiguration.name}),
                     resolve: {
                         sendConfiguration: params => `rest/send-configurations-private/${params.sendConfigurationId}`
                     },
                     link: params => `/send-configurations/${params.sendConfigurationId}/edit`,
                     navs: {
                         ':action(edit|delete)': {
-                            title: t('Edit'),
+                            title: t('edit'),
                             link: params => `/send-configurations/${params.sendConfigurationId}/edit`,
                             visible: resolved => resolved.sendConfiguration.permissions.includes('edit'),
                             panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.sendConfiguration} />
                         },
                         share: {
-                            title: t('Share'),
+                            title: t('share'),
                             link: params => `/send-configurations/${params.sendConfigurationId}/share`,
                             visible: resolved => resolved.sendConfiguration.permissions.includes('share'),
-                            panelRender: props => <Share title={t('Share')} entity={props.resolved.sendConfiguration} entityTypeId="sendConfiguration" />
+                            panelRender: props => <Share title={t('share')} entity={props.resolved.sendConfiguration} entityTypeId="sendConfiguration" />
                         }
                     }
                 },
                 create: {
-                    title: t('Create'),
+                    title: t('create'),
                     panelRender: props => <CUD action="create" />
                 }
             }

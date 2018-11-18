@@ -5,12 +5,8 @@ import './public-path';
 import React, {Component} from 'react';
 import ReactDOM
     from 'react-dom';
-import {
-    I18nextProvider,
-    translate,
-} from 'react-i18next';
-import i18n
-    from './i18n';
+import {I18nextProvider} from 'react-i18next';
+import i18n, {withTranslation} from './i18n';
 import {
     parentRPC,
     UntrustedContentRoot
@@ -28,20 +24,21 @@ import {
     base,
     unbase
 } from "../../../shared/templates";
-
-import brace from 'brace';
-import ACEEditorRaw from 'react-ace';
+import ACEEditorRaw
+    from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 import 'brace/mode/html';
 import {CodeEditorSourceType} from "./sandboxed-codeeditor-shared";
 
-import mjml2html from "mjml4-in-browser";
-import juice from "juice";
+import mjml2html
+    from "mjml4-in-browser";
+import juice
+    from "juice";
 
 const refreshTimeout = 1000;
 
-@translate(null, { withRef: true })
+@withTranslation()
 class CodeEditorSandbox extends Component {
     constructor(props) {
         super(props);

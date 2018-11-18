@@ -6,7 +6,7 @@ import List from "./List";
 function getMenus(t) {
     return {
         'blacklist': {
-            title: t('Blacklist'),
+            title: t('blacklist'),
             link: '/blacklist',
             panelComponent: List,
         }

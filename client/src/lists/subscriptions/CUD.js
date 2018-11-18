@@ -1,24 +1,40 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
 import {HTTPMethod} from '../../lib/axios';
-import { translate, Trans } from 'react-i18next';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../../lib/page';
+import {withTranslation} from '../../lib/i18n';
 import {
-    withForm, Form, FormSendMethod, InputField, TextArea, TableSelect, ButtonRow, Button,
-    Fieldset, Dropdown, AlignedRow, ACEEditor, StaticField, CheckBox
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../../lib/page';
+import {
+    AlignedRow,
+    Button,
+    ButtonRow,
+    CheckBox,
+    Dropdown,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm
 } from '../../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import {DeleteModalDialog, RestActionModalDialog} from "../../lib/modals";
-import interoperableErrors from '../../../../shared/interoperable-errors';
-import validators from '../../../../shared/validators';
-import { parseDate, parseBirthday, DateFormat } from '../../../../shared/date';
-import { SubscriptionStatus } from '../../../../shared/lists';
-import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
-import moment from 'moment-timezone';
+import {withErrorHandling} from '../../lib/error-handling';
+import {RestActionModalDialog} from "../../lib/modals";
+import interoperableErrors
+    from '../../../../shared/interoperable-errors';
+import {SubscriptionStatus} from '../../../../shared/lists';
+import {
+    getFieldTypes,
+    getSubscriptionStatusLabels
+} from './helpers';
+import moment
+    from 'moment-timezone';
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -82,11 +98,11 @@ export default class CUD extends Component {
 
         const emailServerValidation = state.getIn(['email', 'serverValidation']);
         if (!state.getIn(['email', 'value'])) {
-            state.setIn(['email', 'error'], t('Email must not be empty'));
+            state.setIn(['email', 'error'], t('emailMustNotBeEmpty-1'));
         } else if (!emailServerValidation) {
-            state.setIn(['email', 'error'], t('Validation is in progress...'));
+            state.setIn(['email', 'error'], t('validationIsInProgress'));
         } else if (emailServerValidation.exists) {
-            state.setIn(['email', 'error'], t('Another subscription with the same email already exists.'));
+            state.setIn(['email', 'error'], t('anotherSubscriptionWithTheSameEmail'));
         } else {
             state.setIn(['email', 'error'], null);
         }
@@ -110,7 +126,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 data.status = parseInt(data.status);
@@ -122,17 +138,17 @@ export default class CUD extends Component {
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/subscriptions`, 'success', t('Susbscription saved'));
+                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/subscriptions`, 'success', t('susbscriptionSaved'));
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             if (error instanceof interoperableErrors.DuplicitEmailError) {
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Your updates cannot be saved.')}</strong>{' '}
-                        {t('It seems that another subscription with the same email has been created in the meantime. Refresh your page to start anew. Please note that your changes will be lost.')}
+                        <strong>{t('yourUpdatesCannotBeSaved')}</strong>{' '}
+                        {t('itSeemsThatAnotherSubscriptionWithThe')}
                     </span>
                 );
                 return;
@@ -152,7 +168,7 @@ export default class CUD extends Component {
             .map(key => ({key, label: this.subscriptionStatusLabels[key]}));
 
         const tzOptions = [
-            { key: '', label: t('Not selected') },
+            { key: '', label: t('notSelected') },
             ...moment.tz.names().map(tz => ({ key: tz.toLowerCase(), label: tz }))
         ];
 
@@ -166,33 +182,33 @@ export default class CUD extends Component {
                 {isEdit &&
                     <div>
                         <RestActionModalDialog
-                            title={t('Confirm deletion')}
-                            message={t('Are you sure you want to delete subscription for "{{email}}"?', {name: this.getFormValue('email')})}
+                            title={t('confirmDeletion')}
+                            message={t('areYouSureYouWantToDeleteSubscriptionFor', {email: this.getFormValue('email') || ''})}
                             stateOwner={this}
                             visible={this.props.action === 'delete'}
                             actionMethod={HTTPMethod.DELETE}
                             actionUrl={`rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`}
                             backUrl={`/lists/${this.props.list.id}/subscriptions/${this.props.entity.id}/edit`}
                             successUrl={`/lists/${this.props.list.id}/subscriptions`}
-                            actionInProgressMsg={t('Deleting subscription ...')}
-                            actionDoneMsg={t('Subscription deleted')}/>
+                            actionInProgressMsg={t('deletingSubscription')}
+                            actionDoneMsg={t('subscriptionDeleted')}/>
                     </div>
                 }
 
-                <Title>{isEdit ? t('Edit Subscription') : t('Create Subscription')}</Title>
+                <Title>{isEdit ? t('editSubscription') : t('createSubscription')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="email" label={t('Email')}/>
+                    <InputField id="email" label={t('email')}/>
 
                     {customFields}
 
                     <hr />
 
-                    <Dropdown id="tz" label={t('Timezone')} options={tzOptions}/>
+                    <Dropdown id="tz" label={t('timezone')} options={tzOptions}/>
 
-                    <Dropdown id="status" label={t('Subscription status')} options={statusOptions}/>
+                    <Dropdown id="status" label={t('subscriptionStatus')} options={statusOptions}/>
 
-                    <CheckBox id="is_test" text={t('Test user?')} help={t('If checked then this subscription can be used for previewing campaign messages')}/>
+                    <CheckBox id="is_test" text={t('testUser?')} help={t('ifCheckedThenThisSubscriptionCanBeUsed')}/>
 
                     {!isEdit &&
                         <AlignedRow>
@@ -203,8 +219,8 @@ export default class CUD extends Component {
                         </AlignedRow>
                     }
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/lists/${this.props.list.id}/subscriptions/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/subscriptions/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

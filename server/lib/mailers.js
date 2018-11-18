@@ -17,8 +17,6 @@ const htmlToText = require('html-to-text');
 
 const bluebird = require('bluebird');
 
-const _ = require('./translate')._;
-
 const transports = new Map();
 
 async function getOrCreateMailer(sendConfigurationId) {

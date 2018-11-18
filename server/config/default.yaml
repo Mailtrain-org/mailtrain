@@ -24,7 +24,12 @@ editors:
 - codeeditor
 
 # Default language to use
-language: en
+defaultLanguage: en_US
+
+# Enabled languages
+enabledLanguages:
+- en_US
+- es
 
 # Inject custom scripts in subscription/layout.mjml.hbs
 # customSubscriptionScripts: [/custom/hello-world.js]

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {Icon} from '../lib/bootstrap-components';
 import {
     NavButton,
@@ -24,7 +24,7 @@ import {
     tableDeleteDialogRender
 } from "../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -70,11 +70,11 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('Description') },
-            { data: 3, title: t('Type'), render: data => this.templateTypes[data].typeName },
-            { data: 4, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 5, title: t('Namespace') },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
+            { data: 4, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 5, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -82,21 +82,21 @@ export default class List extends Component {
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/templates/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('viewFiles')) {
                         actions.push({
-                            label: <Icon icon="hdd" title={t('Files')}/>,
+                            label: <Icon icon="hdd" title={t('files')}/>,
                             link: `/templates/${data[0]}/files`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/templates/${data[0]}/share`
                         });
                     }
@@ -110,17 +110,17 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/templates`, t('Deleting template ...'), t('Template deleted'))}
+                {tableDeleteDialogRender(this, `rest/templates`, t('deletingTemplate'), t('templateDeleted'))}
                 <Toolbar>
                     {this.state.createPermitted &&
-                       <NavButton linkTo="/templates/create" className="btn-primary" icon="plus" label={t('Create Template')}/>
+                       <NavButton linkTo="/templates/create" className="btn-primary" icon="plus" label={t('createTemplate')}/>
                     }
                     {this.state.mosaicoTemplatesPermitted &&
-                        <NavButton linkTo="/templates/mosaico" className="btn-primary" label={t('Mosaico Templates')}/>
+                        <NavButton linkTo="/templates/mosaico" className="btn-primary" label={t('mosaicoTemplates')}/>
                     }
                 </Toolbar>
 
-                <Title>{t('Templates')}</Title>
+                <Title>{t('templates')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/templates-table" columns={columns} />
             </div>

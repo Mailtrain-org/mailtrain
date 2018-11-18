@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../lib/page';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import { Table } from '../lib/table';
@@ -15,7 +15,7 @@ import {
     tableDeleteDialogRender
 } from "../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -52,7 +52,7 @@ export default class List extends Component {
         const columns = [
             {
                 data: 1,
-                title: t('Name'),
+                title: t('name'),
                 actions: data => {
                     const perms = data[7];
                     if (perms.includes('viewSubscriptions')) {
@@ -62,10 +62,10 @@ export default class List extends Component {
                     }
                 }
             },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Subscribers') },
-            { data: 4, title: t('Description') },
-            { data: 5, title: t('Namespace') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('subscribers') },
+            { data: 4, title: t('description') },
+            { data: 5, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -81,42 +81,42 @@ export default class List extends Component {
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/lists/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('viewFields')) {
                         actions.push({
-                            label: <Icon icon="th-list" title={t('Fields')}/>,
+                            label: <Icon icon="th-list" title={t('fields')}/>,
                             link: `/lists/${data[0]}/fields`
                         });
                     }
 
                     if (perms.includes('viewSegments')) {
                         actions.push({
-                            label: <Icon icon="tag" title={t('Segments')}/>,
+                            label: <Icon icon="tag" title={t('segments')}/>,
                             link: `/lists/${data[0]}/segments`
                         });
                     }
 
                     if (perms.includes('viewImports')) {
                         actions.push({
-                            label: <Icon icon="sort" title={t('Imports')}/>,
+                            label: <Icon icon="sort" title={t('imports')}/>,
                             link: `/lists/${data[0]}/imports`
                         });
                     }
 
                     if (triggersCount > 0) {
                         actions.push({
-                            label: <Icon icon="flash" title={t('Triggers')}/>,
+                            label: <Icon icon="flash" title={t('triggers')}/>,
                             link: `/lists/${data[0]}/triggers`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/lists/${data[0]}/share`
                         });
                     }
@@ -130,15 +130,15 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/lists`, t('Deleting list ...'), t('List deleted'))}
+                {tableDeleteDialogRender(this, `rest/lists`, t('deletingList'), t('listDeleted'))}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/lists/create" className="btn-primary" icon="plus" label={t('Create List')}/>
-                        <NavButton linkTo="/lists/forms" className="btn-primary" label={t('Custom Forms')}/>
+                        <NavButton linkTo="/lists/create" className="btn-primary" icon="plus" label={t('createList')}/>
+                        <NavButton linkTo="/lists/forms" className="btn-primary" label={t('customForms-1')}/>
                     </Toolbar>
                 }
 
-                <Title>{t('Lists')}</Title>
+                <Title>{t('lists')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />
             </div>

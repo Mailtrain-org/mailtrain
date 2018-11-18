@@ -141,7 +141,7 @@ router.getAsync('/confirm/change-address/:cid', async (req, res) => {
 
     await mailHelpers.sendSubscriptionConfirmed(req.language, list, data.emailNew, subscription);
 
-    req.flash('info', tUI('subscription.emailChanged', req.language));
+    req.flash('info', tUI('emailAddressChanged', req.language));
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/manage/' + subscription.cid);
 });
 
@@ -244,7 +244,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
             throw new Error('Email address not set');
         }
 
-        req.flash('danger', tUI('subscription.addressNotSet', req.language));
+        req.flash('danger', tUI('emailAddressNotSet', req.language));
         return await _renderSubscribe(req, res, list, subscriptionData);
     }
 
@@ -300,7 +300,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
 
         if (req.xhr) {
             return res.status(200).json({
-                msg: tUI('subscription.confirmSubscription', req.language)
+                msg: tUI('pleaseConfirmSubscription', req.language)
             });
         }
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
@@ -457,7 +457,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
     }
 
     if (subscription.email === emailNew) {
-        req.flash('info', tUI('subscription.nothingChanged', req.language));
+        req.flash('info', tUI('nothingSeemsToBeChanged', req.language));
 
     } else {
         const emailErr = await tools.validateEmail(emailNew);
@@ -489,7 +489,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
                 await mailHelpers.sendConfirmAddressChange(req.language, list, emailNew, confirmCid, subscription);
             }
 
-            req.flash('info', tUI('subscription.furtherInstructionsSent', req.language));
+            req.flash('info', tUI('anEmailWithFurtherInstructionsHasBeen', req.language));
         }
     }
 

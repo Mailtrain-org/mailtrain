@@ -8,20 +8,20 @@ import {
 export function getCampaignLabels(t) {
 
     const campaignTypeLabels = {
-        [CampaignType.REGULAR]: t('Regular'),
-        [CampaignType.TRIGGERED]: t('Triggered'),
-        [CampaignType.RSS]: t('RSS')
+        [CampaignType.REGULAR]: t('regular'),
+        [CampaignType.TRIGGERED]: t('triggered'),
+        [CampaignType.RSS]: t('rss')
     };
 
     const campaignStatusLabels = {
-        [CampaignStatus.IDLE]: t('Idle'),
-        [CampaignStatus.SCHEDULED]: t('Scheduled'),
-        [CampaignStatus.PAUSED]: t('Paused'),
-        [CampaignStatus.FINISHED]: t('Finished'),
-        [CampaignStatus.PAUSED]: t('Paused'),
-        [CampaignStatus.INACTIVE]: t('Inactive'),
-        [CampaignStatus.ACTIVE]: t('Active'),
-        [CampaignStatus.SENDING]: t('Sending')
+        [CampaignStatus.IDLE]: t('idle'),
+        [CampaignStatus.SCHEDULED]: t('scheduled'),
+        [CampaignStatus.PAUSED]: t('paused'),
+        [CampaignStatus.FINISHED]: t('finished'),
+        [CampaignStatus.PAUSED]: t('paused'),
+        [CampaignStatus.INACTIVE]: t('inactive'),
+        [CampaignStatus.ACTIVE]: t('active'),
+        [CampaignStatus.SENDING]: t('sending')
     };
 
 

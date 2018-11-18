@@ -7,46 +7,46 @@ export function getFieldTypes(t) {
 
     const fieldTypes = {
         text: {
-            label: t('Text'),
+            label: t('text'),
         },
         website: {
-            label: t('Website'),
+            label: t('website'),
         },
         longtext: {
-            label: t('Multi-line text'),
+            label: t('multilineText'),
         },
         gpg: {
-            label: t('GPG Public Key'),
+            label: t('gpgPublicKey'),
         },
         number: {
-            label: t('Number'),
+            label: t('number'),
         },
         'checkbox-grouped': {
-            label: t('Checkboxes (from option fields)'),
+            label: t('checkboxesFromOptionFields'),
         },
         'radio-grouped': {
-            label: t('Radio Buttons (from option fields)')
+            label: t('radioButtonsFromOptionFields')
         },
         'dropdown-grouped': {
-            label: t('Drop Down (from option fields)')
+            label: t('dropDownFromOptionFields')
         },
         'radio-enum': {
-            label: t('Radio Buttons (enumerated)')
+            label: t('radioButtonsEnumerated')
         },
         'dropdown-enum': {
-            label: t('Drop Down (enumerated)')
+            label: t('dropDownEnumerated')
         },
         'date': {
-            label: t('Date')
+            label: t('date')
         },
         'birthday': {
-            label: t('Birthday')
+            label: t('birthday')
         },
         json: {
-            label: t('JSON value for custom rendering')
+            label: t('jsonValueForCustomRendering')
         },
         option: {
-            label: t('Option')
+            label: t('option')
         }
     };
 

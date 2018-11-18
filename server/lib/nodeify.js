@@ -1,6 +1,6 @@
 'use strict';
 
-const nodeify = require('server/lib/nodeify');
+const nodeify = require('nodeify');
 
 module.exports.nodeifyPromise = nodeify;
 

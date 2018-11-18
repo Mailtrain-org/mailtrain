@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { withPageHelpers, Title } from '../lib/page'
 import { Link } from 'react-router-dom'
 import {
@@ -13,7 +13,7 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -39,14 +39,14 @@ export default class Login extends Component {
 
         const username = state.getIn(['username', 'value']);
         if (!username) {
-            state.setIn(['username', 'error'], t('User name must not be empty'));
+            state.setIn(['username', 'error'], t('userNameMustNotBeEmpty'));
         } else {
             state.setIn(['username', 'error'], null);
         }
 
         const password = state.getIn(['password', 'value']);
         if (!username) {
-            state.setIn(['password', 'error'], t('Password must not be empty'));
+            state.setIn(['password', 'error'], t('passwordMustNotBeEmpty'));
         } else {
             state.setIn(['password', 'error'], null);
         }
@@ -57,7 +57,7 @@ export default class Login extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Verifying credentials ...'));
+            this.setFormStatusMessage('info', t('verifyingCredentials'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/login');
 
@@ -67,7 +67,7 @@ export default class Login extends Component {
                 /* This ensures we get config for the authenticated user */
                 window.location = nextUrl;
             } else {
-                this.setFormStatusMessage('warning', t('Please enter your credentials and try again.'));
+                this.setFormStatusMessage('warning', t('pleaseEnterYourCredentialsAndTryAgain'));
             }
         } catch (error) {
             if (error instanceof interoperableErrors.IncorrectPasswordError) {
@@ -75,7 +75,7 @@ export default class Login extends Component {
 
                 this.setFormStatusMessage('danger',
                     <span>
-                        <strong>{t('Invalid username or password.')}</strong>
+                        <strong>{t('invalidUsernameOrPassword')}</strong>
                     </span>
                 );
 
@@ -91,22 +91,22 @@ export default class Login extends Component {
 
         let passwordResetLink;
         if (mailtrainConfig.isAuthMethodLocal) {
-            passwordResetLink = <Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('Forgot your password?')}</Link>;
+            passwordResetLink = <Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('forgotYourPassword?')}</Link>;
         } else if (mailtrainConfig.externalPasswordResetLink) {
-            passwordResetLink = <a href={mailtrainConfig.externalPasswordResetLink}>{t('Forgot your password?')}</a>;
+            passwordResetLink = <a href={mailtrainConfig.externalPasswordResetLink}>{t('forgotYourPassword?')}</a>;
         }
 
         return (
             <div>
-                <Title>{t('Sign in')}</Title>
+                <Title>{t('signIn')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="username" label={t('Username')}/>
-                    <InputField id="password" label={t('Password')} type="password" />
-                    <CheckBox id="remember" text={t('Remember me')}/>
+                    <InputField id="username" label={t('username')}/>
+                    <InputField id="password" label={t('password')} type="password" />
+                    <CheckBox id="remember" text={t('rememberMe')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Sign in')}/>
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('signIn')}/>
                         {passwordResetLink}
                     </ButtonRow>
                 </Form>

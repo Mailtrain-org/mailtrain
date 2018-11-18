@@ -1,13 +1,13 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
 import axios from '../lib/axios';
 import {getUrl} from "../lib/urls";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -44,13 +44,13 @@ export default class Output extends Component {
         if (this.state.report) {
             return (
                 <div>
-                    <Title>{t('Output for report {{name}}', { name: this.state.report.name })}</Title>
+                    <Title>{t('outputForReportName', { name: this.state.report.name })}</Title>
 
                     <pre>{this.state.output}</pre>
                 </div>
             );
         } else {
-            return <div>{t('Loading report output ...')}</div>;
+            return <div>{t('loadingReportOutput')}</div>;
         }
 
     }

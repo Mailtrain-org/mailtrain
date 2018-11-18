@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../lib/i18n';
 import {
     DropdownMenu,
     Icon
@@ -32,7 +32,7 @@ import {
     tableDeleteDialogRender
 } from "../lib/modals";
 
-@translate()
+@withTranslation()
 @withPageHelpers
 @withErrorHandling
 @requiresAuthenticatedUser
@@ -73,28 +73,28 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Description') },
-            { data: 4, title: t('Type'), render: data => this.campaignTypeLabels[data] },
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('description') },
+            { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
             {
                 data: 5,
-                title: t('Status'),
+                title: t('status'),
                 render: (data, display, rowData) => {
                     if (data === CampaignStatus.SCHEDULED) {
                         const scheduled = rowData[6];
                         if (scheduled && new Date(scheduled) > new Date()) {
-                            return t('Sending scheduled');
+                            return t('sendingScheduled');
                         } else {
-                            return t('Sending');
+                            return t('sending');
                         }
                     } else {
                         return this.campaignStatusLabels[data];
                     }
                 }
             },
-            { data: 8, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 9, title: t('Namespace') },
+            { data: 8, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 9, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
@@ -104,49 +104,49 @@ export default class List extends Component {
 
                     if (perms.includes('viewStats')) {
                         actions.push({
-                            label: <Icon icon="send" title={t('Status')}/>,
+                            label: <Icon icon="send" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`
                         });
                     }
 
                     if (perms.includes('edit')) {
                         actions.push({
-                            label: <Icon icon="edit" title={t('Edit')}/>,
+                            label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/campaigns/${data[0]}/edit`
                         });
                     }
 
                     if (perms.includes('edit') && (campaignSource === CampaignSource.CUSTOM || campaignSource === CampaignSource.CUSTOM_FROM_TEMPLATE || campaignSource === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
                         actions.push({
-                            label: <Icon icon="align-center" title={t('Content')}/>,
+                            label: <Icon icon="align-center" title={t('content')}/>,
                             link: `/campaigns/${data[0]}/content`
                         });
                     }
 
                     if (perms.includes('viewFiles') && (campaignSource === CampaignSource.CUSTOM || campaignSource === CampaignSource.CUSTOM_FROM_TEMPLATE || campaignSource === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
                         actions.push({
-                            label: <Icon icon="hdd" title={t('Files')}/>,
+                            label: <Icon icon="hdd" title={t('files')}/>,
                             link: `/campaigns/${data[0]}/files`
                         });
                     }
 
                     if (perms.includes('viewAttachments')) {
                         actions.push({
-                            label: <Icon icon="paperclip" title={t('Attachments')}/>,
+                            label: <Icon icon="paperclip" title={t('attachments')}/>,
                             link: `/campaigns/${data[0]}/attachments`
                         });
                     }
 
                     if (campaignType === CampaignType.TRIGGERED && perms.includes('viewTriggers')) {
                         actions.push({
-                            label: <Icon icon="flash" title={t('Triggers')}/>,
+                            label: <Icon icon="flash" title={t('triggers')}/>,
                             link: `/campaigns/${data[0]}/triggers`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('Share')}/>,
+                            label: <Icon icon="share-alt" title={t('share')}/>,
                             link: `/campaigns/${data[0]}/share`
                         });
                     }
@@ -160,18 +160,18 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/campaigns`, t('Deleting campaign ...'), t('Campaign deleted'))}
+                {tableDeleteDialogRender(this, `rest/campaigns`, t('deletingCampaign'), t('campaignDeleted'))}
                 <Toolbar>
                     {this.state.createPermitted &&
-                    <DropdownMenu className="btn-primary" label={t('Create Campaign')}>
-                        <MenuLink to="/campaigns/create-regular">{t('Regular')}</MenuLink>
-                        <MenuLink to="/campaigns/create-rss">{t('RSS')}</MenuLink>
-                        <MenuLink to="/campaigns/create-triggered">{t('Triggered')}</MenuLink>
+                    <DropdownMenu className="btn-primary" label={t('createCampaign')}>
+                        <MenuLink to="/campaigns/create-regular">{t('regular')}</MenuLink>
+                        <MenuLink to="/campaigns/create-rss">{t('rss')}</MenuLink>
+                        <MenuLink to="/campaigns/create-triggered">{t('triggered')}</MenuLink>
                     </DropdownMenu>
                     }
                 </Toolbar>
 
-                <Title>{t('Campaigns')}</Title>
+                <Title>{t('campaigns')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} />
             </div>

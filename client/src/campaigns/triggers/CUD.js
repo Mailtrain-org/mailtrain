@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {translate} from 'react-i18next';
+import { withTranslation } from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -33,7 +33,7 @@ import moment from 'moment';
 import {getCampaignLabels} from "../helpers";
 
 
-@translate()
+@withTranslation()
 @withForm
 @withPageHelpers
 @withErrorHandling
@@ -119,22 +119,22 @@ export default class CUD extends Component {
         const entityKey = state.getIn(['entity', 'value']);
 
         if (!state.getIn(['name', 'value'])) {
-            state.setIn(['name', 'error'], t('Name must not be empty'));
+            state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
         }
 
         const daysAfter = state.getIn(['daysAfter', 'value']).trim();
         if (daysAfter === '') {
-            state.setIn(['daysAfter', 'error'], t('Values must not be empty'));
+            state.setIn(['daysAfter', 'error'], t('valuesMustNotBeEmpty'));
         } else if (isNaN(daysAfter) || Number.parseInt(daysAfter) < 0) {
-            state.setIn(['daysAfter', 'error'], t('Value must be a non-negative number'));
+            state.setIn(['daysAfter', 'error'], t('valueMustBeANonnegativeNumber'));
         } else {
             state.setIn(['daysAfter', 'error'], null);
         }
 
         if (entityKey === Entity.CAMPAIGN && !state.getIn(['source_campaign', 'value'])) {
-            state.setIn(['source_campaign', 'error'], t('Source campaign must not be empty'));
+            state.setIn(['source_campaign', 'error'], t('sourceCampaignMustNotBeEmpty'));
         } else {
             state.setIn(['source_campaign', 'error'], null);
         }
@@ -154,7 +154,7 @@ export default class CUD extends Component {
 
         try {
             this.disableForm();
-            this.setFormStatusMessage('info', t('Saving ...'));
+            this.setFormStatusMessage('info', t('saving'));
 
             const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 data.seconds = Number.parseInt(data.daysAfter) * 3600 * 24;
@@ -167,10 +167,10 @@ export default class CUD extends Component {
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('Trigger saved'));
+                this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('triggerSaved'));
             } else {
                 this.enableForm();
-                this.setFormStatusMessage('warning', t('There are errors in the form. Please fix them and submit again.'));
+                this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
             throw error;
@@ -184,12 +184,12 @@ export default class CUD extends Component {
         const entityKey = this.getFormValue('entity');
 
         const campaignsColumns = [
-            { data: 1, title: t('Name') },
-            { data: 2, title: t('ID'), render: data => <code>{data}</code> },
-            { data: 3, title: t('Description') },
-            { data: 4, title: t('Type'), render: data => this.campaignTypeLabels[data] },
-            { data: 5, title: t('Created'), render: data => moment(data).fromNow() },
-            { data: 6, title: t('Namespace') }
+            { data: 1, title: t('name') },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 3, title: t('description') },
+            { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
+            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('namespace') }
         ];
 
         const campaignLists = this.props.campaign.lists.map(x => x.list).join(';');
@@ -203,35 +203,35 @@ export default class CUD extends Component {
                         deleteUrl={`rest/triggers/${this.props.campaign.id}/${this.props.entity.id}`}
                         backUrl={`/campaigns/${this.props.campaign.id}/triggers/${this.props.entity.id}/edit`}
                         successUrl={`/campaigns/${this.props.campaign.id}/triggers`}
-                        deletingMsg={t('Deleting trigger ...')}
-                        deletedMsg={t('Trigger deleted')}/>
+                        deletingMsg={t('deletingTrigger')}
+                        deletedMsg={t('triggerDeleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Trigger') : t('Create Trigger')}</Title>
+                <Title>{isEdit ? t('editTrigger') : t('createTrigger')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <InputField id="name" label={t('Name')}/>
-                    <TextArea id="description" label={t('Description')}/>
+                    <InputField id="name" label={t('name')}/>
+                    <TextArea id="description" label={t('description')}/>
 
-                    <Dropdown id="entity" label={t('Entity')} options={this.entityOptions} help={t('Select the type of the trigger rule.')}/>
+                    <Dropdown id="entity" label={t('entity')} options={this.entityOptions} help={t('selectTheTypeOfTheTriggerRule')}/>
 
-                    <InputField id="daysAfter" label={t('Trigger fires')}/>
+                    <InputField id="daysAfter" label={t('triggerFires')}/>
 
                     <AlignedRow>days after:</AlignedRow>
 
-                    {entityKey === Entity.SUBSCRIPTION && <Dropdown id="subscriptionEvent" label={t('Event')} options={this.eventOptions[Entity.SUBSCRIPTION]} help={t('Select the event that triggers sending the campaign.')}/>}
+                    {entityKey === Entity.SUBSCRIPTION && <Dropdown id="subscriptionEvent" label={t('event')} options={this.eventOptions[Entity.SUBSCRIPTION]} help={t('selectTheEventThatTriggersSendingThe')}/>}
 
-                    {entityKey === Entity.CAMPAIGN && <Dropdown id="campaignEvent" label={t('Event')} options={this.eventOptions[Entity.CAMPAIGN]} help={t('Select the event that triggers sending the campaign.')}/>}
+                    {entityKey === Entity.CAMPAIGN && <Dropdown id="campaignEvent" label={t('event')} options={this.eventOptions[Entity.CAMPAIGN]} help={t('selectTheEventThatTriggersSendingThe')}/>}
 
                     {entityKey === Entity.CAMPAIGN &&
-                        <TableSelect id="source_campaign" label={t('Campaign')} withHeader dropdown dataUrl={`rest/campaigns-others-by-list-table/${this.props.campaign.id}/${campaignLists}`} columns={campaignsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="source_campaign" label={t('campaign')} withHeader dropdown dataUrl={`rest/campaigns-others-by-list-table/${this.props.campaign.id}/${campaignLists}`} columns={campaignsColumns} selectionLabelIndex={1} />
                     }
 
-                    <CheckBox id="enabled" text={t('Enabled')}/>
+                    <CheckBox id="enabled" text={t('enabled')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('Save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('Delete')} linkTo={`/campaigns/${this.props.campaign.id}/triggers/${this.props.entity.id}/delete`}/>}
+                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/campaigns/${this.props.campaign.id}/triggers/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>
