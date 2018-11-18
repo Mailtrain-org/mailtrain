@@ -14,7 +14,7 @@ const camelCase = require('camelcase');
 const slugify = require('slugify');
 const readline = require('readline');
 
-const localeFile = 'common/en.json';
+const localeFile = 'en/common.json';
 const searchDirs = [
     '../client/src',
     '../server',

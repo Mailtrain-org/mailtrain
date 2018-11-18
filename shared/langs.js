@@ -41,20 +41,20 @@ function convertToFake(dict) {
 
 const langCodes = {
     en_US: {
-        getShortLabel: t => t('EN'),
-        getLabel: t => t('English'),
+        getShortLabel: t => t('en'),
+        getLabel: t => t('english'),
         shortCode: 'en',
         longCode: 'en_US'
     },
     es: {
-        getShortLabel: t => t('ES'),
-        getLabel: t => t('Spanish'),
+        getShortLabel: t => t('es'),
+        getLabel: t => t('spanish'),
         shortCode: 'es',
         longCode: 'es'
     },
     fake: {
-        getShortLabel: t => t('FAKE'),
-        getLabel: t => t('Fake'),
+        getShortLabel: t => t('fake'),
+        getLabel: t => t('fake-1'),
         shortCode: 'fake',
         longCode: 'fake'
     }
