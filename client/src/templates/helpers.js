@@ -578,9 +578,6 @@ export function getEditForm(owner, typeKey, prefix = '') {
         {owner.templateTypes[typeKey].getHTMLEditor(owner)}
 
         <ACEEditor id={prefix + 'text'} height="400px" mode="text" label={t('Template content (plain text)')} help={<Trans>To extract the text from HTML click <ActionLink onClickAsync={::owner.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}/>
-        /*prefix:helpers*/<Trans i18nKey="userMessagesUnread" count={count}>
-            Hello <strong title={t('nameTitle')}>{{name}}</strong>, you have {{count}} unread message. <Link to="/msgs">Go to messages</Link>.
-        </Trans>
     </div>;
 }
 

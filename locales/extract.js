@@ -118,7 +118,7 @@ function parseSpec(specStr) {
 }
 
 // see http://blog.stevenlevithan.com/archives/match-quoted-string
-const tMatcher = /(^|[ {+(=])((?:tUI|tLog|t|tMark)\s*\(\s*(?:\/\*(.*?)\*\/)?\s*)(["'])((?:(?!\1)[^\\]|\\.)*)(\4)/;
+const tMatcher = /(^|[ {+(=])((?:tUI|tLog|t|tMark)\s*\(\s*(?:\/\*(.*?)\*\/)?\s*)(["'])((?:(?!\4)[^\\]|\\.)*)(\4)/;
 const transMatcher = /(\/\*(.*?)\*\/\s*)?(\<Trans[ >][\s\S]*?\<\/Trans\>)/;
 
 const jsxParser = acorn.Parser.extend(acornJsx());
@@ -277,6 +277,7 @@ function run() {
         fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
     }
 }
+processFile('../client/src/templates/helpers.js');
 
 const rl = readline.createInterface({
     input: process.stdin,
