@@ -16,6 +16,7 @@ import {
     AlignedRow,
     Button,
     ButtonRow,
+    CheckBox,
     Dropdown,
     Fieldset,
     Form,
@@ -33,6 +34,7 @@ import {
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig
     from 'mailtrainConfig';
+import {langCodes} from "../../../../shared/langs";
 
 @withTranslation()
 @withForm
@@ -82,7 +84,7 @@ export default class CUD extends Component {
         const t = props.t;
 
         const helpEmailText = t('thePlaintextVersionForThisEmail');
-        const helpMjmlGeneral = <Trans i18nKey="customFormsUseMjmlForFormattingSeeThe">Custom forms use MJML for formatting. See the MJML documentation <a className="mjml-documentation">here</a></Trans>;
+        const helpMjmlGeneral = <Trans i18nKey="customFormsUseMjmlForFormattingSeeThe">Custom forms use MJML for formatting. See the MJML documentation <a className="mjml-documentation" href="https://mjml.io/documentation/">here</a></Trans>;
 
         this.templateSettings = {
             layout: {
@@ -283,6 +285,7 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 selectedTemplate: 'layout',
+                selectedLanguage: '',
                 namespace: mailtrainConfig.user.namespace
             };
             supplyDefaults(data);
@@ -378,6 +381,11 @@ export default class CUD extends Component {
             });
         }
 
+        const langOptions = [{key: '', label: t('Default')}];
+        for (const lng of mailtrainConfig.enabledLanguages) {
+            langOptions.push({key: lng, label: langCodes[lng].getLabel(t)});
+        }
+
 
         const listsColumns = [
             { data: 0, title: "#" },
@@ -388,6 +396,7 @@ export default class CUD extends Component {
 
         const previewListId = this.getFormValue('previewList');
         const selectedTemplate = this.getFormValue('selectedTemplate');
+        const selectedLanguage = this.getFormValue('selectedLanguage');
 
         return (
             <div>
@@ -448,8 +457,10 @@ export default class CUD extends Component {
 
                     { selectedTemplate &&
                         <Fieldset label={t('templates')}>
+                            <Dropdown id="selectedLanguage" label={t('Language')} options={langOptions}/>
+                            <CheckBox id={'languageEnabled_' + selectedLanguage} text={t('Enabled')}/>
                             <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
-                            <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
+                            <ACEEditor id={(selectedLanguage ? selectedLanguage + ':' : '') + selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
                         </Fieldset>
                     }
 

@@ -7,7 +7,6 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
-const bluebird = require('bluebird');
 const fs = require('fs-extra');
 const path = require('path');
 const mjml = require('mjml');
@@ -189,7 +188,7 @@ async function getDefaultCustomFormValues() {
 
     async function getContents(fileName) {
         try {
-            const template = await fs.readFile(path.join(basePath, fileName), 'utf8');
+            return await fs.readFile(path.join(basePath, fileName), 'utf8');
         } catch (err) {
             return false;
         }
@@ -205,12 +204,13 @@ async function getDefaultCustomFormValues() {
     }
 
     form.layout = await getContents('views/subscription/layout.mjml.hbs') || '';
-    form.form_input_style = await getContents('static/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
+    form.form_input_style = await getContents('../client/static/subscription/form-input-style.css') || '@import url(/subscription/form-input-style.css);';
 
     return form;
 }
 
 
+// TODO - this could run in the browser too - move to shared
 function checkForMjmlErrors(form) {
     let testLayout = '<mjml><mj-body><mj-container>{{{body}}}</mj-container></mj-body></mjml>';
 
@@ -234,9 +234,15 @@ function checkForMjmlErrors(form) {
             const template = form[key];
             const errs = hasMjmlError(template);
 
-            const msgs = errs.map(x => x.formattedMessage);
+            let msgs;
+            if (Array.isArray(errs)) {
+                msgs = errs.map(x => x.formattedMessage)
+            } else {
+                msgs = [ errs.message ];
+            }
+
             if (key === 'mail_confirm_html' && !template.includes('{{confirmUrl}}')) {
-                msgs.push('Missing {{confirmUrl}}');
+                msgs.push('Missing {{confirmUrl}}'); // TODO - add localization support
             }
 
             if (msgs.length) {
@@ -255,7 +261,7 @@ function checkForMjmlErrors(form) {
             }
 
             if (!layout.includes('{{{body}}}')) {
-                msgs.push(`{{{body}}} not found`);
+                msgs.push(`{{{body}}} not found`); // TODO - add localization support
             }
 
             if (msgs.length) {

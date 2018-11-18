@@ -45,7 +45,8 @@ i18n
         },
 
         react: {
-            wait: true
+            wait: true,
+            defaultTransParent: 'span' // This is because we use React < v16
         },
 
         detection: {
