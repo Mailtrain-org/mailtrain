@@ -274,7 +274,7 @@ function run() {
 
     if (anyUpdatesToResDict) {
         console.log(`Updating ${localeFile}`);
-        fs.writeFileSync(localeFile, JSON.stringify(resDict));
+        fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
     }
 }
 
