@@ -21,44 +21,72 @@ const searchDirs = [
     '../shared'
 ];
 
+function findAllVariantsByPrefixInDict(dict, keyPrefix) {
+    const keyElems = keyPrefix.split('.');
+
+    for (const keyElem of keyElems.slice(0, -1)) {
+        if (dict[keyElem]) {
+            if (typeof dict[keyElem] === 'string') {
+                return [];
+            } else {
+                dict = dict[keyElem];
+            }
+        } else {
+            return [];
+        }
+    }
+
+    const prefix = keyElems[keyElems.length - 1];
+    const res = [];
+    for (const key in dict) {
+        if (key.startsWith(prefix)) {
+            res.push(key.substring(prefix.length));
+        }
+    }
+
+    return res;
+}
+
 function findInDict(dict, key) {
     const keyElems = key.split('.');
 
-    let val = dict;
-    for (const keyElem of keyElems) {
-        if (val) {
-            val = val[keyElem];
+    for (const keyElem of keyElems.slice(0, -1)) {
+        if (dict[keyElem]) {
+            if (typeof dict[keyElem] === 'string') {
+                return undefined;
+            } else {
+                dict = dict[keyElem];
+            }
         } else {
             return undefined;
         }
     }
 
-    return val;
+    return dict[keyElems[keyElems.length - 1]];
 }
 
 function setInDict(dict, key, value) {
     const keyElems = key.split('.');
 
-    let val = dict;
     for (const keyElem of keyElems.slice(0, -1)) {
-        if (val[keyElem]) {
-            if (typeof val[keyElem] === 'string') {
+        if (dict[keyElem]) {
+            if (typeof dict[keyElem] === 'string') {
                 throw new Error(`Overlapping key ${key}`);
             }
         } else {
-            val[keyElem] = {}
+            dict[keyElem] = {}
         }
 
-        val = val[keyElem];
+        dict = dict[keyElem];
     }
 
-    val[keyElems[keyElems.length - 1]] = value;
+    dict[keyElems[keyElems.length - 1]] = value;
 }
 
 const assignedKeys = new Map();
 function getKeyFromValue(spec, value) {
     let key = value.replace(/<\/?[0-9]+>/g, ''); // Remove Trans markup
-    key = slugify(key, { replacement: ' ', remove: /[()"':.,;\[\]\{\}*+-]/g, lower: false });
+    key = slugify(key, { replacement: ' ', remove: /[\\()"':.,;\/\[\]\{\}*+-]/g, lower: false });
     key = camelCase(key);
     key = ellipsize(key, 40, {
         chars: [...Array(26)].map((_, i) => String.fromCharCode('A'.charCodeAt(0) + i)) /* This is an array of characters A-Z */,
@@ -74,11 +102,10 @@ function getKeyFromValue(spec, value) {
         const keyExt = key + (idx ? '-' + idx : '')
         if (assignedKeys.has(keyExt)) {
             if (assignedKeys.get(keyExt) === value) {
-                assignedKeys.set(key, value);
                 return keyExt;
             }
         } else {
-            assignedKeys.set(key, value);
+            assignedKeys.set(keyExt, value);
             return keyExt;
         }
 
@@ -233,8 +260,17 @@ function processFile(file) {
                 source = source.split(fragment).join(replacement);
                 setInDict(resDict, key, value);
 
+                const variants = originalKey ? findAllVariantsByPrefixInDict(originalResDict, originalKey + '_') : [];
+                for (const variant of variants) {
+                    setInDict(resDict, key + '_' + variant, findInDict(originalResDict, originalKey + '_' + variant));
+                }
+
                 if (originalKey !== key) {
                     renamedKeys.set(originalKey, key);
+
+                    for (const variant of variants) {
+                        renamedKeys.set(originalKey + '_' + variant, key + '_' + variant);
+                    }
                 }
 
                 if (originalKey !== key || originalValue !== value) {
@@ -254,8 +290,8 @@ function processFile(file) {
     update(fragments, parseTrans);
 
     if (anyUpdates) {
-        console.log(`Updating ${file}`);
-        fs.writeFileSync(file, source);
+//        console.log(`Updating ${file}`);
+//        fs.writeFileSync(file, source);
 
         anyUpdatesToResDict = true;
     }
@@ -273,12 +309,14 @@ function run() {
     }
 
     if (anyUpdatesToResDict) {
-        console.log(`Updating ${localeFile}`);
-        fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
+//        console.log(`Updating ${localeFile}`);
+//        fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
+        console.log(JSON.stringify(resDict, null, 2));
     }
 }
 processFile('../client/src/templates/helpers.js');
 
+/*
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -292,3 +330,5 @@ rl.question('To proceed type YES: ', (answer) => {
 
     rl.close();
 });
+*/
+run();
