@@ -228,7 +228,7 @@ function processFile(file) {
         if (fragments) {
             for (const fragment of fragments) {
                 const {key, originalKey, value, originalValue, replacement} = parseFun(fragment);
-                console.log(`${key} <- ${originalKey} | ${value} <- ${originalValue} | ${fragment} -> ${replacement}`);
+                // console.log(`${key} <- ${originalKey} | ${value} <- ${originalValue} | ${fragment} -> ${replacement}`);
 
                 source = source.split(fragment).join(replacement);
                 setInDict(resDict, key, value);
@@ -264,7 +264,6 @@ function processFile(file) {
 const originalResDict = JSON.parse(fs.readFileSync(localeFile));
 
 function run() {
-/*
     for (const dir of searchDirs) {
         const files = klawSync(dir, { nodir: true, filter: allowedDirOrFile })
 
@@ -272,9 +271,6 @@ function run() {
             processFile(file.path);
         }
     }
-*/
-
-    processFile('../client/src/Home.js');
 
     if (anyUpdatesToResDict) {
         console.log(`Updating ${localeFile}`);
@@ -282,9 +278,6 @@ function run() {
     }
 }
 
-run();
-
-/*
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -298,4 +291,3 @@ rl.question('To proceed type YES: ', (answer) => {
 
     rl.close();
 });
-*/
