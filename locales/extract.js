@@ -1,6 +1,6 @@
 'use strict';
 
-// Example:
+// Processes statements like these:
 // tUI(/*prefix:account*/'account.passwordChangeRequest', language)
 // /*prefix:helpers*/<Trans i18nKey="userMessagesUnread" count={count}>Hello <strong title={t('nameTitle')}>{{name}}</strong>, you have {{count}} unread message. <Link to="/msgs">Go to messages</Link>.</Trans>
 
@@ -290,8 +290,8 @@ function processFile(file) {
     update(fragments, parseTrans);
 
     if (anyUpdates) {
-//        console.log(`Updating ${file}`);
-//        fs.writeFileSync(file, source);
+        console.log(`Updating ${file}`);
+        fs.writeFileSync(file, source);
 
         anyUpdatesToResDict = true;
     }
@@ -309,14 +309,11 @@ function run() {
     }
 
     if (anyUpdatesToResDict) {
-//        console.log(`Updating ${localeFile}`);
-//        fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
-        console.log(JSON.stringify(resDict, null, 2));
+        console.log(`Updating ${localeFile}`);
+        fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
     }
 }
-processFile('../client/src/templates/helpers.js');
 
-/*
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -330,5 +327,3 @@ rl.question('To proceed type YES: ', (answer) => {
 
     rl.close();
 });
-*/
-run();
