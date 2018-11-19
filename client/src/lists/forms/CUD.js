@@ -34,7 +34,6 @@ import {
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig
     from 'mailtrainConfig';
-import {langCodes} from "../../../../shared/langs";
 
 @withTranslation()
 @withForm
@@ -285,7 +284,6 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 selectedTemplate: 'layout',
-                selectedLanguage: '',
                 namespace: mailtrainConfig.user.namespace
             };
             supplyDefaults(data);
@@ -381,12 +379,6 @@ export default class CUD extends Component {
             });
         }
 
-        const langOptions = [{key: '', label: t('Default')}];
-        for (const lng of mailtrainConfig.enabledLanguages) {
-            langOptions.push({key: lng, label: langCodes[lng].getLabel(t)});
-        }
-
-
         const listsColumns = [
             { data: 0, title: "#" },
             { data: 1, title: t('name') },
@@ -396,7 +388,6 @@ export default class CUD extends Component {
 
         const previewListId = this.getFormValue('previewList');
         const selectedTemplate = this.getFormValue('selectedTemplate');
-        const selectedLanguage = this.getFormValue('selectedLanguage');
 
         return (
             <div>
@@ -457,10 +448,8 @@ export default class CUD extends Component {
 
                     { selectedTemplate &&
                         <Fieldset label={t('templates')}>
-                            <Dropdown id="selectedLanguage" label={t('Language')} options={langOptions}/>
-                            <CheckBox id={'languageEnabled_' + selectedLanguage} text={t('Enabled')}/>
                             <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
-                            <ACEEditor id={(selectedLanguage ? selectedLanguage + ':' : '') + selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
+                            <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
                         </Fieldset>
                     }
 
