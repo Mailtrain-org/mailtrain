@@ -4,6 +4,7 @@ const config = require('config');
 const log = require('../lib/log');
 const mailers = require('../lib/mailers');
 const CampaignSender = require('../lib/campaign-sender');
+const {enforce} = require('../lib/helpers');
 
 const workerId = Number.parseInt(process.argv[2]);
 let running = false;
@@ -21,8 +22,17 @@ async function processMessages(campaignId, subscribers) {
 
     for (const subData of subscribers) {
         try {
-            await cs.sendMessage(subData.listId, subData.email);
-            log.verbose('Senders', 'Message sent and status updated for %s:%s', subData.listId, subData.email);
+            if (subData.email) {
+                await cs.sendMessageByEmail(subData.listId, subData.email);
+
+            } else if (subData.subscriptionId) {
+                await cs.sendMessageBySubscriptionId(subData.listId, subData.subscriptionId);
+
+            } else {
+                enforce(false);
+            }
+
+            log.verbose('Senders', 'Message sent and status updated for %s:%s', subData.listId, subData.email || subData.subscriptionId);
         } catch (err) {
             log.error('Senders', `Sending message to ${subData.listId}:${subData.email} failed with error: ${err.message}`)
             log.verbose(err);

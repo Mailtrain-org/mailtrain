@@ -59,7 +59,7 @@ fieldTypes.date = {
     afterJSON: (groupedField, entity) => {
         const key = getFieldColumn(groupedField);
         if (key in entity) {
-            entity[key] = entity[key] ? moment(entity[key]).toDate() : null;
+            entity[key] = entity[key] ? moment(entity[key]).toISOString() : null;
         }
     },
     listRender: (groupedField, value) => formatDate(groupedField.settings.dateFormat, value)
@@ -69,7 +69,7 @@ fieldTypes.birthday = {
     afterJSON: (groupedField, entity) => {
         const key = getFieldColumn(groupedField);
         if (key in entity) {
-            entity[key] = entity[key] ? moment(entity[key]).toDate() : null;
+            entity[key] = entity[key] ? moment(entity[key]).toISOString() : null;
         }
     },
     listRender: (groupedField, value) => formatBirthday(groupedField.settings.dateFormat, value)
@@ -539,6 +539,7 @@ async function _update(tx, listId, existing, filteredEntity) {
         }
     }
 
+    console.log(filteredEntity);
     await tx(getSubscriptionTableName(listId)).where('id', existing.id).update(filteredEntity);
 
     if ('status' in filteredEntity) {

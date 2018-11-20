@@ -246,9 +246,19 @@ async function migrateSubscriptions(knex) {
 
 
         const fields = await knex('custom_fields').where('list', list.id);
+        const info = await knex('subscription__' + list.id).columnInfo();
         for (const field of fields) {
             if (field.column != null) {
                 await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_' + field.column +'` int(11) DEFAULT NULL');
+            }
+
+            if (field.type === 'date' || field.type === 'birthday') {
+                // Fix the problem that commit bc73a0df0cab9943d726bd12fc1c6f2ff1279aa7 did not introduce migration that would convert TIMESTAMP columns to DATE
+                if (info[field.column].type === 'timestamp') {
+                    await knex.schema.table('subscription__' + list.id, table => {
+                        table.dateTime(field.column).alter();
+                    });
+                }
             }
         }
 
@@ -644,6 +654,7 @@ async function migrateReports(knex) {
     await knex.schema.table('reports', table => {
         table.dropForeign('report_template', 'report_template_ibfk_1');
         table.foreign('report_template').references('report_templates.id');
+        table.timestamp('last_run').nullable().defaultTo(null).alter();
     });
 }
 
@@ -1114,6 +1125,11 @@ async function migrateAttachments(knex) {
 
 async function migrateTriggers(knex) {
     await knex.schema.table('queued', table => {
+        table.dropPrimary();
+    });
+
+    await knex.schema.table('queued', table => {
+        table.increments('id').first().primary();
         table.renameColumn('subscriber', 'subscription');
         table.renameColumn('source', 'trigger');
     });
@@ -1174,7 +1190,7 @@ async function migrateImporter(knex) {
         table.text('settings', 'longtext');
         table.integer('mapping_type').unsigned().notNullable();
         table.text('mapping', 'longtext');
-        table.dateTime('last_run');
+        table.timestamp('last_run').nullable().defaultTo(null);
         table.text('error');
         table.timestamp('created').defaultTo(knex.fn.now());
     });
@@ -1190,7 +1206,7 @@ async function migrateImporter(knex) {
         table.integer('processed').defaultTo(0);
         table.text('error');
         table.timestamp('created').defaultTo(knex.fn.now());
-        table.dateTime('finished');
+        table.timestamp('finished').nullable().defaultTo(null);
     });
 
     await knex.schema.createTable('import_failed', table => {

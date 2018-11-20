@@ -137,6 +137,8 @@ function parseSpec(specStr) {
             const elems = entry.match(entryMatcher);
             if (elems) {
                 spec[elems[1]] = elems[2];
+            } else {
+                spec[entry] = true;
             }
         }
     }
@@ -224,6 +226,10 @@ function parseT(fragment) {
     const originalKey = match[5];
     const spec = parseSpec(match[3]);
 
+    if (spec.ignore) {
+        return null;
+    }
+
     // console.log(`${file}: ${line}`);
     // console.log(`    |${match[1]}|${match[2]}|${match[4]}|${match[5]}|${match[6]}|  -  ${JSON.stringify(spec)}`);
 
@@ -254,27 +260,30 @@ function processFile(file) {
     function update(fragments, parseFun) {
         if (fragments) {
             for (const fragment of fragments) {
-                const {key, originalKey, value, originalValue, replacement} = parseFun(fragment);
-                // console.log(`${key} <- ${originalKey} | ${value} <- ${originalValue} | ${fragment} -> ${replacement}`);
+                const parseStruct = parseFun(fragment);
+                if (parseStruct) {
+                    const {key, originalKey, value, originalValue, replacement} = parseStruct;
+                    // console.log(`${key} <- ${originalKey} | ${value} <- ${originalValue} | ${fragment} -> ${replacement}`);
 
-                source = source.split(fragment).join(replacement);
-                setInDict(resDict, key, value);
+                    source = source.split(fragment).join(replacement);
+                    setInDict(resDict, key, value);
 
-                const variants = originalKey ? findAllVariantsByPrefixInDict(originalResDict, originalKey + '_') : [];
-                for (const variant of variants) {
-                    setInDict(resDict, key + '_' + variant, findInDict(originalResDict, originalKey + '_' + variant));
-                }
-
-                if (originalKey !== key) {
-                    renamedKeys.set(originalKey, key);
-
+                    const variants = originalKey ? findAllVariantsByPrefixInDict(originalResDict, originalKey + '_') : [];
                     for (const variant of variants) {
-                        renamedKeys.set(originalKey + '_' + variant, key + '_' + variant);
+                        setInDict(resDict, key + '_' + variant, findInDict(originalResDict, originalKey + '_' + variant));
                     }
-                }
 
-                if (originalKey !== key || originalValue !== value) {
-                    anyUpdates = true;
+                    if (originalKey !== key) {
+                        renamedKeys.set(originalKey, key);
+
+                        for (const variant of variants) {
+                            renamedKeys.set(originalKey + '_' + variant, key + '_' + variant);
+                        }
+                    }
+
+                    if (originalKey !== key || originalValue !== value) {
+                        anyUpdates = true;
+                    }
                 }
             }
         }

@@ -15,17 +15,21 @@ const triggerCheckPeriod = 15 * 1000;
 const triggerFirePeriod = 60 * 1000;
 
 
-async function start() {
+async function run() {
     while (true) {
         const fired = await knex.transaction(async tx => {
-            const currentTs = new Date();
+            const currentTs = Date.now();
 
-            const trigger = await tx('triggers').where('enabled', true).andWhere('last_check', '<', currentTs - triggerFirePeriod).orderBy('last_check', 'asc').first();
+            const trigger = await tx('triggers')
+                .where('enabled', true)
+                .where(qry => qry.whereNull('last_check').orWhere('last_check', '<', new Date(currentTs - triggerFirePeriod)))
+                .orderBy('last_check', 'asc')
+                .first();
             if (!trigger) {
                 return false;
             }
 
-            const campaign = campaigns.getByIdTx(tx, contextHelpers.getAdminContext(), trigger.campaign, false);
+            const campaign = await campaigns.getByIdTx(tx, contextHelpers.getAdminContext(), trigger.campaign, false);
 
             for (const cpgList of campaign.lists) {
                 const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {
@@ -36,8 +40,10 @@ async function start() {
                     .leftJoin(
                         function () {
                             return this.from('trigger_messages')
-                                .where('trigger_messages.campaign', campaign.id)
+                                .innerJoin('triggers', 'trigger_messages.trigger', 'triggers.id')
+                                .where('triggers.campaign', campaign.id)
                                 .where('trigger_messages.list', cpgList.list)
+                                .select(['id', 'subscription'])
                                 .as('related_trigger_messages');
                         },
                         'related_trigger_messages.subscription', subsTable + '.id'
@@ -45,7 +51,7 @@ async function start() {
                     .where(function () {
                         addSegmentQuery(this);
                     })
-                    .whereNotNull('related_trigger_messages.id') // This means only those where the trigger has not fired yet somewhen in the past
+                    .whereNull('related_trigger_messages.id') // This means only those where the trigger has not fired yet somewhen in the past
                     .select(subsTable + '.id');
 
                 let column;
@@ -129,20 +135,18 @@ async function start() {
 
                         column = 'campaign_messages.created';
                     }
-
-
-                    sqlQry = sqlQry.where(column, '<=', currentTs - trigger.seconds);
-
-                    if (trigger.last_check !== null) {
-                        sqlQry = sqlQry.where(column, '>', trigger.last_check);
-                    }
                 }
 
+                sqlQry = sqlQry.where(column, '<=', new Date(currentTs - trigger.seconds));
+
+                if (trigger.last_check !== null) {
+                    sqlQry = sqlQry.where(column, '>', trigger.last_check);
+                }
 
                 const subscribers = await sqlQry;
                 for (const subscriber of subscribers) {
                     await tx('trigger_messages').insert({
-                        campaign: campaign.id,
+                        trigger: trigger.id,
                         list: cpgList.list,
                         subscription: subscriber.id
                     });
@@ -161,7 +165,7 @@ async function start() {
             }
 
 
-            await tx('triggers').update('last_check', currentTs).where('id', trigger.id);
+            await tx('triggers').update('last_check', new Date(currentTs)).where('id', trigger.id);
 
             return true;
         });
@@ -175,6 +179,13 @@ async function start() {
             await nextCycle;
         }
     }
+}
+
+function start() {
+    log.info('Triggers', 'Starting trigger check service');
+    run().catch(err => {
+        log.error('Triggers', err);
+    });
 }
 
 module.exports.start = start;

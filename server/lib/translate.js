@@ -52,7 +52,7 @@ function tUI(key, lang, args) {
         args = {};
     }
 
-    return i18n.t(key, { ...args, defaultValue, lng: lang });
+    return i18n.t(key, { ...args, lng: lang });
 }
 
 function tMark(key) {

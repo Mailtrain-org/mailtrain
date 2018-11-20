@@ -65,7 +65,7 @@ export default class List extends Component {
                         });
                     }
 
-                    if (perms.includes('manageTriggers')) {
+                    if (this.props.campaign.permissions.includes('manageTriggers')) {
                         tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
                     }
 

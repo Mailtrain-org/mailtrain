@@ -235,6 +235,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         shares.throwPermissionDenied();
     }
 
+    // TODO: Validate date/birthady formats here. Now if the value is wrong, it gets simply ignored
     const subscriptionData = await fields.fromPost(contextHelpers.getAdminContext(), list.id, req.body);
 
     const email = cleanupFromPost(req.body.EMAIL);

@@ -279,14 +279,25 @@ class CampaignSender {
         return await this._getMessage(campaign, list, subscriptionGrouped, mergeTags, false);
     }
 
-    async sendMessage(listId, email) {
+    async sendMessageByEmail(listId, email) {
+        const subscriptionGrouped = await subscriptions.getByEmail(contextHelpers.getAdminContext(), listId, email);
+        await this._sendMessage(listId, subscriptionGrouped);
+    }
+
+    async sendMessageBySubscriptionId(listId, subscriptionId) {
+        const subscriptionGrouped = await subscriptions.getById(contextHelpers.getAdminContext(), listId, subscriptionId);
+        await this._sendMessage(listId, subscriptionGrouped);
+    }
+
+    async _sendMessage(listId, subscriptionGrouped) {
+        const email = subscriptionGrouped.email;
+
         if (await blacklist.isBlacklisted(email)) {
             return;
         }
 
         const list = this.listsById.get(listId);
-        const subscriptionGrouped = await subscriptions.getByEmail(contextHelpers.getAdminContext(), list.id, email);
-        const flds = this.listsFieldsGrouped.get(listId);
+        const flds = this.listsFieldsGrouped.get(list.id);
         const campaign = this.campaign;
 
         const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
@@ -391,16 +402,28 @@ class CampaignSender {
         const responseId = response.split(/\s+/).pop();
 
         const now = new Date();
-        await knex('campaign_messages').insert({
-            campaign: this.campaign.id,
-            list: listId,
-            subscription: subscriptionGrouped.id,
-            send_configuration: sendConfiguration.id,
-            status,
-            response,
-            response_id: responseId,
-            updated: now
-        });
+
+        if (campaign.type === CampaignType.REGULAR || campaign.type === CampaignType.RSS_ENTRY) {
+            await knex('campaign_messages').insert({
+                campaign: this.campaign.id,
+                list: list.id,
+                subscription: subscriptionGrouped.id,
+                send_configuration: sendConfiguration.id,
+                status,
+                response,
+                response_id: responseId,
+                updated: now
+            });
+
+        } else if (campaign.type = CampaignType.TRIGGERED) {
+            await knex('queued')
+                .where({
+                    campaign: this.campaign.id,
+                    list: list.id,
+                    subscription: subscriptionGrouped.id
+                })
+                .del();
+        }
     }
 }
 

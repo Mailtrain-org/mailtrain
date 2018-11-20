@@ -39,22 +39,23 @@ function convertToFake(dict) {
     return _convertToFake(dict, {});
 }
 
+// The langugage labels below are intentionally not localized so that they are always native in the langugae of their speaker (regardless of the currently selected language)
 const langCodes = {
     en_US: {
-        getShortLabel: t => t('en'),
-        getLabel: t => t('english'),
+        getShortLabel: t => 'EN',
+        getLabel: t => 'English',
         shortCode: 'en',
         longCode: 'en_US'
     },
     es: {
-        getShortLabel: t => t('es'),
-        getLabel: t => t('spanish'),
+        getShortLabel: t => 'ES',
+        getLabel: t => 'Español',
         shortCode: 'es',
         longCode: 'es'
     },
     fake: {
-        getShortLabel: t => t('fake'),
-        getLabel: t => t('fake-1'),
+        getShortLabel: t => 'FAKE',
+        getLabel: t => 'Fake',
         shortCode: 'fake',
         longCode: 'fake'
     }

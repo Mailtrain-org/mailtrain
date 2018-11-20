@@ -14,3 +14,8 @@ The migration should happen almost automatically. There are however the followin
 
 5. Zone MTA configuration endpoint (webhooks/zone-mta/sender-config) has changed. The send-configuration CID has to be
    part of the URL - e.g. webhooks/zone-mta/sender-config/system.
+
+6. If there are lists that contain birthday or date fields that were created before
+   commit `bc73a0df0cab9943d726bd12fc1c6f2ff1279aa7` (on Jan 3, 2018), they still have TIMESTAMP data type in DB instead
+   of DATETIME. The problem was that that commit did not introduce migration from TIMESTAMP to DATETIME.
+   Mailtrain v2 does this migration, however in some corner cases, this may shift the date by a day back or forth.

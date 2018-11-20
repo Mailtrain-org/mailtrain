@@ -87,10 +87,10 @@ export default class CUD extends Component {
                         '  <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="1,1" data-paging="false">\n' +
                         '    <thead>\n' +
                         '    <th>\n' +
-                        '      {{#translate}}Email{{/translate}}\n' +
+                        '      Email\n' +
                         '    </th>\n' +
                         '    <th>\n' +
-                        '      {{#translate}}Tracker Count{{/translate}}\n' +
+                        '      Tracker Count\n' +
                         '    </th>\n' +
                         '    </thead>\n' +
                         '    {{#if results}}\n' +
@@ -146,16 +146,16 @@ export default class CUD extends Component {
                         '  <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="1,1,1,1" data-paging="false">\n' +
                         '    <thead>\n' +
                         '      <th>\n' +
-                        '        {{#translate}}Country{{/translate}}\n' +
+                        '        Country\n' +
                         '      </th>\n' +
                         '      <th>\n' +
-                        '        {{#translate}}Opened{{/translate}}\n' +
+                        '        Opened\n' +
                         '      </th>\n' +
                         '      <th>\n' +
-                        '        {{#translate}}All{{/translate}}\n' +
+                        '        All\n' +
                         '      </th>\n' +
                         '      <th>\n' +
-                        '        {{#translate}}Percentage{{/translate}}\n' +
+                        '        Percentage\n' +
                         '      </th>\n' +
                         '    </thead>\n' +
                         '    {{#if results}}\n' +

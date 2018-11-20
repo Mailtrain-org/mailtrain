@@ -15,6 +15,7 @@ const workerProcesses = new Map();
 const idleWorkers = [];
 
 let campaignSchedulerRunning = false;
+let queuedSchedulerRunning = false;
 let workerSchedulerRunning = false;
 
 const campaignsCheckPeriod = 5 * 1000;
@@ -27,6 +28,7 @@ const messageQueueCont = new Map(); // campaignId -> next batch callback
 const workAssignment = new Map(); // workerId -> { campaignId, subscribers: [{listId, email}] }
 
 let workerSchedulerCont = null;
+let queuedLastId = 0;
 
 
 function messagesProcessed(workerId) {
@@ -151,7 +153,6 @@ async function processCampaign(campaignId) {
                     messageQueueCont.set(campaignId, resolve);
                 });
 
-                // noinspection JSIgnoredPromiseFromCall
                 setImmediate(scheduleWorkers);
 
                 await nextBatchNeeded;
@@ -175,33 +176,83 @@ async function scheduleCampaigns() {
 
     campaignSchedulerRunning = true;
 
-    while (true) {
-        let campaignId = 0;
+    try {
+        while (true) {
+            let campaignId = 0;
 
-        await knex.transaction(async tx => {
-            const scheduledCampaign = await tx('campaigns')
-                .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
-                .where('campaigns.status', CampaignStatus.SCHEDULED)
-                .where(qry => qry.whereNull('campaigns.scheduled').orWhere('campaigns.scheduled', '<=', new Date()))
-                .select(['id'])
-                .first();
+            await knex.transaction(async tx => {
+                const scheduledCampaign = await tx('campaigns')
+                    .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
+                    .where('campaigns.status', CampaignStatus.SCHEDULED)
+                    .where(qry => qry.whereNull('campaigns.scheduled').orWhere('campaigns.scheduled', '<=', new Date()))
+                    .select(['id'])
+                    .first();
 
-            if (scheduledCampaign) {
-                await tx('campaigns').where('id', scheduledCampaign.id).update({status: CampaignStatus.SENDING});
-                campaignId = scheduledCampaign.id;
+                if (scheduledCampaign) {
+                    await tx('campaigns').where('id', scheduledCampaign.id).update({status: CampaignStatus.SENDING});
+                    campaignId = scheduledCampaign.id;
+                }
+            });
+
+            if (campaignId) {
+                // noinspection JSIgnoredPromiseFromCall
+                processCampaign(campaignId);
+
+            } else {
+                break;
             }
-        });
-
-        if (campaignId) {
-            // noinspection JSIgnoredPromiseFromCall
-            processCampaign(campaignId);
-
-        } else {
-            break;
         }
+    } catch (err) {
+        log.error('Senders', `Scheduling campaigns failed with error: ${err.message}`)
+        log.verbose(err);
     }
 
+
     campaignSchedulerRunning = false;
+}
+
+
+async function processQueued() {
+    if (queuedSchedulerRunning) {
+        return;
+    }
+
+    queuedSchedulerRunning = true;
+
+    try {
+        while (true) {
+            const rows = await knex('queued')
+                .orderBy('id', 'asc')
+                .where('id', '>', queuedLastId)
+                .limit(retrieveBatchSize);
+
+            if (rows.length === 0) {
+                break;
+            }
+
+            for (const row of rows) {
+                let msgQueue = messageQueue.get(row.campaign);
+                if (!msgQueue) {
+                    msgQueue = [];
+                    messageQueue.set(row.campaign, msgQueue);
+                }
+
+                msgQueue.push({
+                    listId: row.list,
+                    subscriptionId: row.subscription
+                });
+            }
+
+            queuedLastId = rows[rows.length - 1].id;
+
+            setImmediate(scheduleWorkers);
+        }
+    } catch (err) {
+        log.error('Senders', `Processing queued messages failed with error: ${err.message}`)
+        log.verbose(err);
+    }
+
+    queuedSchedulerRunning = false;
 }
 
 
@@ -251,6 +302,9 @@ function periodicCampaignsCheck() {
     // noinspection JSIgnoredPromiseFromCall
     scheduleCampaigns();
 
+    // noinspection JSIgnoredPromiseFromCall
+    processQueued();
+
     setTimeout(periodicCampaignsCheck, campaignsCheckPeriod);
 }
 
@@ -286,5 +340,6 @@ async function init() {
     periodicCampaignsCheck();
 }
 
+// noinspection JSIgnoredPromiseFromCall
 init();
 

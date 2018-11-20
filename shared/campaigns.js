@@ -58,7 +58,7 @@ function getSendConfigurationPermissionRequiredForSend(campaign, sendConfigurati
         }
     }
 
-    let requiredPermission = 'send';
+    let requiredPermission = 'sendWithoutOverrides';
     if (allowedOverride) {
         requiredPermission = 'sendWithAllowedOverrides';
     }

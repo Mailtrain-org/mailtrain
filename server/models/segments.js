@@ -11,8 +11,6 @@ const fields = require('./fields');
 const subscriptions = require('./subscriptions');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
-const { parseDate, parseBirthday, DateFormat } = require('../../shared/date');
-
 const allowedKeys = new Set(['name', 'settings']);
 
 

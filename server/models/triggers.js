@@ -77,6 +77,7 @@ async function create(context, campaignId, entity) {
 
         const filteredEntity = filterObject(entity, allowedKeys);
         filteredEntity.campaign = campaignId;
+        filteredEntity.last_check = new Date(); // This is to prevent processing subscriptions that predate this trigger.
 
         const ids = await tx('triggers').insert(filteredEntity);
         const id = ids[0];

@@ -190,6 +190,8 @@ class SendControls extends Component {
             date.minute(time.minute());
             date.second(0);
             date.millisecond(0);
+            date.utcOffset(0, true); // TODO, process offset from user settings
+
 
             await this.postAndMaskStateError(`rest/campaign-start-at/${this.props.entity.id}/${date.valueOf()}`);
 
@@ -245,6 +247,7 @@ class SendControls extends Component {
                             <div>
                                 <DatePicker id="date" label={t('date')} />
                                 <InputField id="time" label={t('time')} help={t('enter24hourTimeInFormatHhmmEg1348')}/>
+                                {/* TODO: Timezone selector */}
                             </div>
                         }
                     </Form>

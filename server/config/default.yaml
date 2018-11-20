@@ -89,6 +89,7 @@ mysql:
   port: 3306
   charset: utf8mb4
   # The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
+  # If the MySQL server runs on the same server as Mailtrain, use 'local'
   timezone: local
 
 verp:

@@ -314,11 +314,11 @@ let str2 = util.format( _('My name is "%s"'), 'Mailtrain');
 
 ### Translating Handlebars Files
 
-Enclose translatable strings to `{{#translate}}` tags
+Enclose translatable strings to `` tags
 
 ```handlebars
 <p>
-    Mailtrain – {{#translate}}the best newsletter app{{/translate}}
+    Mailtrain – the best newsletter app
 </p>
 ```
 
