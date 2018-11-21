@@ -127,6 +127,7 @@ export function getRuleHelpers(t, fields) {
             dropdownLabel: t('afterOrOn'),
             treeLabel: rule => t('dateInColumnColNameIsAfterOrOnValue', {colName: ruleHelpers.getColumnName(rule.column), value: formatDate(DateFormat.INTL, rule.value)}),
         },
+        // FIXME - the localization for the following 5 entries is broken
         eqTodayPlusDays: {
             dropdownLabel: t('onXthDayBeforeafterCurrentDate'),
             treeLabel: rule => getRelativeDateTreeLabel(rule, 'is', [tMark('dateInColumnIsTheCurrentDate'), tMark('dateInColumnIsValuethDayAfterTheCurrent'), tMark('dateInColumnIsValuethDayBeforeTheCurrent')]),
