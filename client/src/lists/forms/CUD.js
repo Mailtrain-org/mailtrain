@@ -209,7 +209,7 @@ export default class CUD extends Component {
                 help: helpMjmlGeneral
             },
             web_privacy_policy_notice: {
-                label: t('Privacy policy'),
+                label: t('privacyPolicy'),
                 mode: 'html',
                 help: helpMjmlGeneral
             }
@@ -261,7 +261,7 @@ export default class CUD extends Component {
                 ]
             },
             gdpr: {
-                label: t('Data protection'),
+                label: t('dataProtection'),
                 options: [
                     'web_privacy_policy_notice'
                 ]

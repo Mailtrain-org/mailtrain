@@ -3,7 +3,7 @@
 import React from 'react';
 import {DatePicker, Dropdown, InputField} from "../../lib/form";
 import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birthdayYear, getDateFormatString, getBirthdayFormatString } from '../../../../shared/date';
-
+import { tMark } from "../../lib/i18n";
 
 export function getRuleHelpers(t, fields) {
 
@@ -102,7 +102,7 @@ export function getRuleHelpers(t, fields) {
         } else if (rule.value > 0) {
             return t(variants[1], {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
         } else {
-            return t(variants[2], {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
+            return t(variants[2], {colName: ruleHelpers.getColumnName(rule.column), value: -rule.value});
         }
     }
 

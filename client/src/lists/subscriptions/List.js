@@ -91,7 +91,7 @@ export default class List extends Component {
 
         const columns = [
             { data: 1, title: t('id'), render: data => <code>{data}</code> },
-            { data: 2, title: t('email'), render: data => data === null ? <span className={listStyles.erased}>{t('[ERASED]')}</span> : data },
+            { data: 2, title: t('email'), render: data => data === null ? <span className={listStyles.erased}>{t('erased')}</span> : data },
             { data: 3, title: t('status'), render: (data, display, rowData) => this.subscriptionStatusLabels[data] + (rowData[5] ? ', ' + t('blacklisted') : '') },
             { data: 4, title: t('created'), render: data => data ? moment(data).fromNow() : '' }
         ];

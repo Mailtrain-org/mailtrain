@@ -93,3 +93,6 @@ export function withTranslation(opts) {
     }
 }
 
+export function tMark(key) {
+    return key;
+}
