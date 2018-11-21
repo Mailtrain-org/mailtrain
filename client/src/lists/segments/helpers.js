@@ -96,13 +96,13 @@ export function getRuleHelpers(t, fields) {
     };
 
     // FXIME - the localization here is still wrong
-    function getRelativeDateTreeLabel(rule, textFragment) {
+    function getRelativeDateTreeLabel(rule, variants) {
         if (rule.value === 0) {
-            return t(/*ignore*/'Date in column ' + textFragment + ' the current date', {colName: ruleHelpers.getColumnName(rule.column)})
+            return t(variants[0], {colName: ruleHelpers.getColumnName(rule.column)})
         } else if (rule.value > 0) {
-            return t(/*ignore*/'Date in column ' + textFragment + ' {{value}}-th day after the current date', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
+            return t(variants[1], {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
         } else {
-            return t(/*ignore*/'Date in column ' + textFragment + ' {{value}}-th day before the current date', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
+            return t(variants[2], {colName: ruleHelpers.getColumnName(rule.column), value: rule.value});
         }
     }
 
@@ -129,48 +129,23 @@ export function getRuleHelpers(t, fields) {
         },
         eqTodayPlusDays: {
             dropdownLabel: t('onXthDayBeforeafterCurrentDate'),
-            /*
-            tMark('dateInColumnIsTheCurrentDate')
-            tMark('dateInColumnIsValuethDayAfterTheCurrent')
-            tMark('dateInColumnIsValuethDayBeforeTheCurrent')
-             */
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is'),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is', [tMark('dateInColumnIsTheCurrentDate'), tMark('dateInColumnIsValuethDayAfterTheCurrent'), tMark('dateInColumnIsValuethDayBeforeTheCurrent')]),
         },
         ltTodayPlusDays: {
             dropdownLabel: t('beforeXthDayBeforeafterCurrentDate'),
-            /*
-            tMark('dateInColumnIsBeforeTheCurrentDate')
-            tMark('dateInColumnIsBeforeValuethDayAfterThe')
-            tMark('dateInColumnIsBeforeValuethDayBeforeThe')
-             */
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is before'),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnIsBeforeTheCurrentDate'), tMark('dateInColumnIsBeforeValuethDayAfterThe'), tMark('dateInColumnIsBeforeValuethDayBeforeThe')]),
         },
         leTodayPlusDays: {
             dropdownLabel: t('beforeOrOnXthDayBeforeafterCurrentDate'),
-            /*
-            tMark('dateInColumnIsBeforeOrOnTheCurrentDate')
-            tMark('dateInColumnIsBeforeOrOnValuethDayAfter')
-            tMark('dateInColumnIsBeforeOrOnValuethDayBefore')
-             */
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is before or on'),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnIsBeforeOrOnTheCurrentDate'), tMark('dateInColumnIsBeforeOrOnValuethDayAfter'), tMark('dateInColumnIsBeforeOrOnValuethDayBefore')]),
         },
         gtTodayPlusDays: {
             dropdownLabel: t('afterXthDayBeforeafterCurrentDate'),
-            /*
-            tMark('dateInColumnIsAfterTheCurrentDate')
-            tMark('dateInColumnIsAfterValuethDayAfterThe')
-            tMark('dateInColumnIsAfterValuethDayAfterThe')
-             */
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is after'),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnIsAfterTheCurrentDate'), tMark('dateInColumnIsAfterValuethDayAfterThe'), tMark('dateInColumnIsAfterValuethDayAfterThe')]),
         },
         geTodayPlusDays: {
             dropdownLabel: t('afterOrOnXthDayBeforeafterCurrentDate'),
-            /*
-            tMark('dateInColumnIsAfterOrOnTheCurrentDate')
-            tMark('dateInColumnIsAfterOrOnValuethDayAfter')
-            tMark('dateInColumnIsAfterOrOnValuethDayAfter')
-             */
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is after or on'),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnIsAfterOrOnTheCurrentDate'), tMark('dateInColumnIsAfterOrOnValuethDayAfter'), tMark('dateInColumnIsAfterOrOnValuethDayAfter')]),
         }
     };
 

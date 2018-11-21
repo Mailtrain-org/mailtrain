@@ -11,8 +11,8 @@ const { SubscriptionStatus } = require('../../shared/lists');
 const links = require('../models/links');
 const contextHelpers = require('../lib/context-helpers');
 
-const triggerCheckPeriod = 15 * 1000;
-const triggerFirePeriod = 60 * 1000;
+const triggerCheckPeriod = 30 * 1000;
+const triggerFirePeriod = 120 * 1000;
 
 
 async function run() {

@@ -14,6 +14,20 @@
 # Process title visible in monitoring logs and process listing
 title: mailtrain
 
+# GDPR related settings (https://en.wikipedia.org/wiki/General_Data_Protection_Regulation)
+gdpr:
+  # If enabled, after a user unsubscribes or complains, his/her data are removed from the subscription.
+  # Only hashed email remains to prevent resubscription via import
+  deleteDataAfterUnsubscribe:
+    enabled: true
+    secondsAfterUnsubscribe: 86400 # 1 day
+
+  # If enabled, after the time below, an entry of a subscriber that unsubscribed or complained
+  # is completely removed from the subscribers list (including the hashed email)
+  deleteSubscriptionAfterUnsubscribe:
+    enabled: true
+    secondsAfterUnsubscribe: 2592000 # 30 days
+
 # Enabled HTML editors
 editors:
 - grapesjs
@@ -178,7 +192,7 @@ reports:
   # performing network operations and in generating XSS attacks as part of the report.
   # The bottom line is that if people who are creating report templates or have write access to the DB cannot be trusted,
   # then it's safer to switch off the reporting functionality below.
-  enabled: false
+  enabled: true
 
 testServer:
   # Starts a vanity server that redirects all mail to /dev/null

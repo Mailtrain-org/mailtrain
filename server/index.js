@@ -6,6 +6,7 @@ const appBuilder = require('./app-builder');
 const translate = require('./lib/translate');
 const http = require('http');
 const triggers = require('./services/triggers');
+const gdprCleanup = require('./services/gdpr-cleanup');
 const importer = require('./lib/importer');
 const feedcheck = require('./lib/feedcheck');
 const verpServer = require('./services/verp-server');
@@ -105,6 +106,7 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                                     feedcheck.spawn(() => {
                                         senders.spawn(() => {
                                             triggers.start();
+                                            gdprCleanup.start();
 
                                             postfixBounceServer(async () => {
                                                 (async () => {

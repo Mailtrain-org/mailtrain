@@ -121,7 +121,7 @@ async function create(context, entity) {
         await knex.schema.raw('CREATE TABLE `subscription__' + id + '` (\n' +
             '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
             '  `cid` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
-            '  `email` varchar(255) CHARACTER SET utf8 NOT NULL,\n' +
+            '  `email` varchar(255) CHARACTER SET utf8 DEFAULT NULL,\n' +
             '  `hash_email` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
             '  `source_email` int(10) unsigned,\n' + // This references imports if the source is an import, 0 means some import in version 1, NULL if the source is via subscription or edit of the subscription
             '  `opt_in_ip` varchar(100) DEFAULT NULL,\n' +
@@ -134,8 +134,9 @@ async function create(context, entity) {
             '  `latest_click` timestamp NULL DEFAULT NULL,\n' +
             '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
             '  PRIMARY KEY (`id`),\n' +
-            '  UNIQUE KEY `email` (`email`),\n' +
+            '  UNIQUE KEY `hash_email` (`hash_email`),\n' +
             '  UNIQUE KEY `cid` (`cid`),\n' +
+            '  KEY `email` (`email`),\n' +
             '  KEY `status` (`status`),\n' +
             '  KEY `subscriber_tz` (`tz`),\n' +
             '  KEY `is_test` (`is_test`),\n' +

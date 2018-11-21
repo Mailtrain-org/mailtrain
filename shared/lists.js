@@ -28,7 +28,8 @@ const SubscriptionSource = {
     SUBSCRIPTION_FORM: -2,
     API: -3,
     NOT_IMPORTED_V1: -4,
-    IMPORTED_V1: -5
+    IMPORTED_V1: -5,
+    ERASED: -6
 };
 
 function getFieldColumn(field) {

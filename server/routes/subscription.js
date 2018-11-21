@@ -82,7 +82,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
         return;
     }
 
-    const form = await forms.getById(contextHelpers.getAdminContext(), customFormId);
+    const form = await forms.getById(contextHelpers.getAdminContext(), customFormId, false);
 
     data.template.template = form[viewKey] || data.template.template;
     data.template.layout = form.layout || data.template.layout;
@@ -539,7 +539,6 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
 
         data.isWeb = true;
         data.needsJsWarning = true;
-        data.isManagePreferences = true;
         data.flashMessages = await captureFlashMessages(res);
 
         res.send(htmlRenderer(data));
@@ -626,6 +625,11 @@ router.getAsync('/:cid/manual-unsubscribe-notice', async (req, res) => {
     await webNotice('manual-unsubscribe', req, res);
 });
 
+router.getAsync('/:cid/privacy-policy', async (req, res) => {
+    await webNotice('privacy-policy', req, res);
+});
+
+
 router.postAsync('/publickey', passport.parseForm, async (req, res) => {
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPassphrase', 'pgpPrivateKey']);
 
@@ -683,8 +687,6 @@ async function webNotice(type, req, res) {
     const htmlRenderer = await tools.getTemplate(data.template);
 
     data.isWeb = true;
-    data.isConfirmNotice = true; // FIXME: Not sure what this does. Check it in a browser with disabled JS
-    data.isManagePreferences = true;
     data.flashMessages = await captureFlashMessages(res);
 
     res.send(htmlRenderer(data));

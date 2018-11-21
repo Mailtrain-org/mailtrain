@@ -241,6 +241,7 @@ async function migrateSubscriptions(knex) {
 
     const lists = await knex('lists');
     for (const list of lists) {
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `unsubscribed` timestamp NULL DEFAULT NULL');
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_email` int(10) unsigned DEFAULT NULL');
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `hash_email` varchar(255) CHARACTER SET ascii');
 
@@ -286,6 +287,10 @@ async function migrateSubscriptions(knex) {
         }
 
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` MODIFY `hash_email` varchar(255) CHARACTER SET ascii NOT NULL');
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` DROP KEY `email`');
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` MODIFY `email` varchar(255) CHARACTER SET utf8 DEFAULT NULL');
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD UNIQUE KEY `hash_email` (`hash_email`)');
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD KEY `email` (`email`)');
 
         await knex.schema.table('subscription__' + list.id, table => {
             table.dropColumn('imported');
@@ -1128,8 +1133,10 @@ async function migrateTriggers(knex) {
         table.dropPrimary();
     });
 
+    // For some reason, .first() from Knex didn't work. So add the column directly via SQL to be able to specify that it should be the first in the table.
+    await knex.schema.raw('ALTER TABLE `queued` ADD `id` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST');
+
     await knex.schema.table('queued', table => {
-        table.increments('id').first().primary();
         table.renameColumn('subscriber', 'subscription');
         table.renameColumn('source', 'trigger');
     });

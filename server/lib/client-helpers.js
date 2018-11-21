@@ -41,7 +41,8 @@ async function getAuthenticatedConfig(context) {
         globalPermissions,
         editors: config.editors,
         mosaico: config.mosaico,
-        verpEnabled: config.verp.enabled
+        verpEnabled: config.verp.enabled,
+        reportsEnabled: config.reports.enabled
     }
 }
 

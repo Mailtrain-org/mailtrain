@@ -69,7 +69,8 @@ export default class CUD extends Component {
             'web_unsubscribed_notice',
             'mail_unsubscription_confirmed_html',
             'mail_unsubscription_confirmed_text',
-            'web_manual_unsubscribe_notice'
+            'web_manual_unsubscribe_notice',
+            'web_privacy_policy_notice'
         ];
 
         this.initForm({
@@ -206,6 +207,11 @@ export default class CUD extends Component {
                 label: t('webManualUnsubscribeNotice'),
                 mode: 'html',
                 help: helpMjmlGeneral
+            },
+            web_privacy_policy_notice: {
+                label: t('Privacy policy'),
+                mode: 'html',
+                help: helpMjmlGeneral
             }
         };
 
@@ -252,6 +258,12 @@ export default class CUD extends Component {
                     'mail_unsubscription_confirmed_html',
                     'mail_unsubscription_confirmed_text',
                     'web_manual_unsubscribe_notice'
+                ]
+            },
+            gdpr: {
+                label: t('Data protection'),
+                options: [
+                    'web_privacy_policy_notice'
                 ]
             },
         };

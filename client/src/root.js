@@ -49,7 +49,11 @@ import axios
 import {getUrl} from "./lib/urls";
 import {langCodes} from "../../shared/langs";
 
-const topLevelMenuKeys = ['lists', 'templates', 'campaigns', 'reports'];
+const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
+
+if (mailtrainConfig.reportsEnabmed) {
+    topLevelMenuKeys.push('reports');
+}
 
 @withTranslation()
 class Root extends Component {

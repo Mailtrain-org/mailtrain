@@ -34,6 +34,8 @@ async function search(context, offset, limit, search) {
 }
 
 async function add(context, email) {
+    enforce(email, 'Email has to be set');
+
     return await knex.transaction(async tx => {
         shares.enforceGlobalPermission(context, 'manageBlacklist');
 
@@ -45,11 +47,15 @@ async function add(context, email) {
 }
 
 async function remove(context, email) {
+    enforce(email, 'Email has to be set');
+
     shares.enforceGlobalPermission(context, 'manageBlacklist');
     await knex('blacklist').where('email', email).del();
 }
 
 async function isBlacklisted(email) {
+    enforce(email, 'Email has to be set');
+
     const existing = await knex('blacklist').where('email', email).first();
     return !!existing;
 }

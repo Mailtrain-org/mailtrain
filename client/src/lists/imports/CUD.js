@@ -39,6 +39,8 @@ import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
 import listStyles from "../styles.scss";
 import styles from "../../lib/styles.scss";
+import interoperableErrors
+    from "../../../../shared/interoperable-errors";
 
 
 function truncate(str, len, ending = '...') {
@@ -185,6 +187,10 @@ export default class CUD extends Component {
     }
 
     async submitHandler() {
+        await this.save();
+    }
+
+    async save(runAfterSave) {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
 
@@ -275,6 +281,16 @@ export default class CUD extends Component {
                 if (!isEdit) {
                     this.navigateTo(`/lists/${this.props.list.id}/imports/${submitResponse}/edit`);
                 } else {
+                    try {
+                        await axios.post(getUrl(`rest/import-start/${this.props.list.id}/${this.props.entity.id}`));
+                    } catch (err) {
+                        if (err instanceof interoperableErrors.InvalidStateError) {
+                            // Just mask the fact that it's not possible to start anything and refresh instead.
+                        } else {
+                            throw err;
+                        }
+                    }
+
                     this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/imports/${this.props.entity.id}/status`, 'success', t('importSaved'));
                 }
 
@@ -389,11 +405,12 @@ export default class CUD extends Component {
             }
         }
 
-        let saveButtonLabel;
+        const saveButtons = []
         if (!isEdit) {
-            saveButtonLabel = t('saveAndEditSettings');
+            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="ok" label={t('saveAndEditSettings')}/>);
         } else {
-            saveButtonLabel = t('save');
+            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="ok" label={t('save')}/>);
+            saveButtons.push(<Button key="saveAndRun" className="btn-primary" icon="ok" label={t('Save and Run')} onClickAsync={async () => await this.save(true)}/>);
         }
 
         return (
@@ -427,7 +444,7 @@ export default class CUD extends Component {
 
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={saveButtonLabel}/>
+                        {saveButtons}
                         {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

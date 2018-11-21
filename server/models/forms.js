@@ -9,7 +9,10 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const fs = require('fs-extra');
 const path = require('path');
+
 const mjml = require('mjml');
+const mjml2html = mjml.default;
+
 const lists = require('./lists');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
@@ -43,7 +46,8 @@ const allowedFormKeys = new Set([
     'web_unsubscribed_notice',
     'mail_unsubscription_confirmed_html',
     'mail_unsubscription_confirmed_text',
-    'web_manual_unsubscribe_notice'
+    'web_manual_unsubscribe_notice',
+    'web_privacy_policy_notice'
 ]);
 
 const hashKeys = new Set([...formAllowedKeys, ...allowedFormKeys]);
@@ -84,11 +88,15 @@ async function _getById(tx, id) {
 }
 
 
-async function getById(context, id) {
+async function getById(context, id, withPermissions = true) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
         const entity = await _getById(tx, id);
-        entity.permissions = await shares.getPermissionsTx(tx, context, 'customForm', id);
+
+        if (withPermissions) {
+            entity.permissions = await shares.getPermissionsTx(tx, context, 'customForm', id);
+        }
+
         return entity;
     });
 }
@@ -219,7 +227,7 @@ function checkForMjmlErrors(form) {
         let compiled;
 
         try {
-            compiled = mjml(source);
+            compiled = mjml2html(source);
         } catch (err) {
             return err;
         }
@@ -230,7 +238,7 @@ function checkForMjmlErrors(form) {
 
     const errors = {};
     for (const key in form) {
-        if (key.startsWith('mail_') || key.startsWith('web_')) {
+        if ((key.startsWith('mail_') && key.endsWith('_html')) || key.startsWith('web_')) {
             const template = form[key];
             const errs = hasMjmlError(template);
 

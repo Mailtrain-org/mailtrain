@@ -23,7 +23,7 @@ router.getAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, asy
 });
 
 router.postAsync('/subscriptions/:listId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await subscriptions.create(req.context, castToInteger(req.params.listId), req.body, SubscriptionSource.ADMIN_FORM));
+    return res.json(await subscriptions.create(req.context, castToInteger(req.params.listId), req.body, SubscriptionSource.ADMIN_FORM, {}));
 });
 
 router.putAsync('/subscriptions/:listId/:subscriptionId', passport.loggedIn, passport.csrfProtection, async (req, res) => {

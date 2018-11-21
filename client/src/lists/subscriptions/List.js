@@ -13,14 +13,18 @@ import {
     withForm
 } from '../../lib/form';
 import {Icon, Button} from "../../lib/bootstrap-components";
-import axios from '../../lib/axios';
+import axios, {HTTPMethod} from '../../lib/axios';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
 import {getUrl, getPublicUrl} from "../../lib/urls";
 import {
+    DeleteModalDialog,
+    RestActionModalDialog,
     tableDeleteDialogAddDeleteButton,
     tableDeleteDialogInit,
     tableDeleteDialogRender
 } from "../../lib/modals";
+import listStyles from "../styles.scss";
+import styles from '../../lib/styles.scss';
 
 @withTranslation()
 @withForm
@@ -87,7 +91,7 @@ export default class List extends Component {
 
         const columns = [
             { data: 1, title: t('id'), render: data => <code>{data}</code> },
-            { data: 2, title: t('email') },
+            { data: 2, title: t('email'), render: data => data === null ? <span className={listStyles.erased}>{t('[ERASED]')}</span> : data },
             { data: 3, title: t('status'), render: (data, display, rowData) => this.subscriptionStatusLabels[data] + (rowData[5] ? ', ' + t('blacklisted') : '') },
             { data: 4, title: t('created'), render: data => data ? moment(data).fromNow() : '' }
         ];
@@ -112,27 +116,30 @@ export default class List extends Component {
             columns.push({
                 actions: data => {
                     const actions = [];
+                    const id = data[0];
+                    const email = data[2];
+                    const status = data[3];
 
                     actions.push({
                         label: <Icon icon="edit" title={t('edit')}/>,
-                        link: `/lists/${this.props.list.id}/subscriptions/${data[0]}/edit`
+                        link: `/lists/${this.props.list.id}/subscriptions/${id}/edit`
                     });
 
-                    if (data[3] === SubscriptionStatus.SUBSCRIBED) {
+                    if (email && status === SubscriptionStatus.SUBSCRIBED) {
                         actions.push({
                             label: <Icon icon="off" title={t('unsubscribe')}/>,
-                            action: () => this.unsubscribeSubscription(data[0])
+                            action: () => this.unsubscribeSubscription(id)
                         });
                     }
 
-                    if (!data[5]) {
+                    if (email && !data[5]) {
                         actions.push({
                             label: <Icon icon="ban-circle" title={t('blacklist')}/>,
-                            action: () => this.blacklistSubscription(data[2])
+                            action: () => this.blacklistSubscription(email)
                         });
                     }
 
-                    tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[2]);
+                    tableDeleteDialogAddDeleteButton(actions, this, null, id, email);
 
                     return actions;
                 }

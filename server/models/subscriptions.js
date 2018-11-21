@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('config');
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
 const shortid = require('shortid');
@@ -7,7 +8,7 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');
 const fields = require('./fields');
-const { SubscriptionStatus, getFieldColumn } = require('../../shared/lists');
+const { SubscriptionSource, SubscriptionStatus, getFieldColumn } = require('../../shared/lists');
 const segments = require('./segments');
 const { enforce, filterObject } = require('../lib/helpers');
 const moment = require('moment');
@@ -475,7 +476,7 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
     }
     const existingWithKey = await existingWithKeyQuery.first();
     if (existingWithKey) {
-        if (meta && (meta.updateAllowed || (meta.updateOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED))) {
+        if (existingWithKey.email === null || meta.updateAllowed || (meta.updateOfUnsubscribedAllowed && existingWithKey.status === SubscriptionStatus.UNSUBSCRIBED)) {
             meta.update = true;
             meta.existing = existingWithKey;
         } else {
@@ -486,12 +487,12 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
         // The same for import where we need to subscribed only those (existing and new) that have not been unsubscribed already.
         // In the case, the subscription is existing, we should not change the status. If it does not exist, we are fine with changing the status to SUBSCRIBED
 
-        if (meta && meta.subscribeIfNoExisting && !entity.status) {
+        if (meta.subscribeIfNoExisting && !entity.status) {
             entity.status = SubscriptionStatus.SUBSCRIBED;
         }
     }
 
-    if ((isCreate && !(meta && meta.update)) || 'status' in entity) {
+    if ((isCreate && !meta.update) || 'status' in entity) {
         enforce(entity.status >= SubscriptionStatus.MIN && entity.status <= SubscriptionStatus.MAX, 'Invalid status');
     }
 
@@ -532,26 +533,69 @@ function updateSourcesAndHashEmail(subscription, source, groupedFieldsMap) {
     }
 }
 
-async function _update(tx, listId, existing, filteredEntity) {
+
+
+function purgeSensitiveData(subscription, groupedFieldsMap) {
+    subscription.email = null;
+
+    for (const fldCol in groupedFieldsMap) {
+        const fld = groupedFieldsMap[fldCol];
+
+        const fieldType = fields.getFieldType(fld.type);
+        if (fieldType.grouped) {
+            for (const optionKey in fld.groupedOptions) {
+                const option = fld.groupedOptions[optionKey];
+                subscription[option.column] = null;
+                subscription['source_' + option.column] = SubscriptionSource.ERASED;
+            }
+        } else {
+            subscription[fldCol] = null;
+            subscription['source_' + fldCol] = SubscriptionSource.ERASED;
+        }
+    }
+}
+
+async function _update(tx, listId, groupedFieldsMap, existing, filteredEntity) {
     if ('status' in filteredEntity) {
         if (existing.status !== filteredEntity.status) {
             filteredEntity.status_change = new Date();
         }
     }
 
-    console.log(filteredEntity);
-    await tx(getSubscriptionTableName(listId)).where('id', existing.id).update(filteredEntity);
-
-    if ('status' in filteredEntity) {
-        let countIncrement = 0;
-        if (existing.status === SubscriptionStatus.SUBSCRIBED && filteredEntity.status !== SubscriptionStatus.SUBSCRIBED) {
-            countIncrement = -1;
-        } else if (existing.status !== SubscriptionStatus.SUBSCRIBED && filteredEntity.status === SubscriptionStatus.SUBSCRIBED) {
-            countIncrement = 1;
+    if (filteredEntity.status === SubscriptionStatus.UNSUBSCRIBED || filteredEntity.status === SubscriptionStatus.COMPLAINED) {
+        if (existing.unsubscribed === null) {
+            filteredEntity.unsubscribed = new Date();
         }
 
-        if (countIncrement) {
-            await tx('lists').where('id', listId).increment('subscribers', countIncrement);
+        if (config.gdpr.deleteSubscriptionAfterUnsubscribe.enabled && config.gdpr.deleteSubscriptionAfterUnsubscribe.secondsAfterUnsubscribe === 0) {
+            filteredEntity = null;
+        } else if (config.gdpr.deleteDataAfterUnsubscribe.enabled && config.gdpr.deleteDataAfterUnsubscribe.secondsAfterUnsubscribe === 0) {
+            purgeSensitiveData(filteredEntity, groupedFieldsMap);
+        }
+    } else if (filteredEntity.status === SubscriptionStatus.SUBSCRIBED) {
+        filteredEntity.unsubscribed = null;
+    }
+
+    if (filteredEntity) {
+        await tx(getSubscriptionTableName(listId)).where('id', existing.id).update(filteredEntity);
+
+        if ('status' in filteredEntity) {
+            let countIncrement = 0;
+            if (existing.status === SubscriptionStatus.SUBSCRIBED && filteredEntity.status !== SubscriptionStatus.SUBSCRIBED) {
+                countIncrement = -1;
+            } else if (existing.status !== SubscriptionStatus.SUBSCRIBED && filteredEntity.status === SubscriptionStatus.SUBSCRIBED) {
+                countIncrement = 1;
+            }
+
+            if (countIncrement) {
+                await tx('lists').where('id', listId).increment('subscribers', countIncrement);
+            }
+        }
+    } else {
+        await tx(getSubscriptionTableName(listId)).where('id', existing.id).del();
+
+        if (existing.status === SubscriptionStatus.SUBSCRIBED) {
+            await tx('lists').where('id', listId).decrement('subscribers', 1);
         }
     }
 }
@@ -586,20 +630,17 @@ async function createTxWithGroupedFieldsMap(tx, context, listId, groupedFieldsMa
 
     updateSourcesAndHashEmail(filteredEntity, source, groupedFieldsMap);
 
-    filteredEntity.opt_in_ip = meta && meta.ip;
-    filteredEntity.opt_in_country = meta && meta.country;
+    filteredEntity.opt_in_ip = meta.ip;
+    filteredEntity.opt_in_country = meta.country;
 
-    if (meta && meta.update) { // meta.update is set by _validateAndPreprocess
-        await _update(tx, listId, meta.existing, filteredEntity);
+    if (meta.update) { // meta.update is set by _validateAndPreprocess
+        await _update(tx, listId, groupedFieldsMap, meta.existing, filteredEntity);
         meta.cid = meta.existing.cid; // The cid is needed by /confirm/subscribe/:cid
         return meta.existing.id;
+
     } else {
         filteredEntity.cid = shortid.generate();
-
-        if (meta) {
-            meta.cid = filteredEntity.cid; // The cid is needed by /confirm/subscribe/:cid
-        }
-
+        meta.cid = filteredEntity.cid; // The cid is needed by /confirm/subscribe/:cid
         return await _create(tx, listId, filteredEntity);
     }
 }
@@ -630,7 +671,7 @@ async function updateWithConsistencyCheck(context, listId, entity, source) {
             throw new interoperableErrors.ChangedError();
         }
 
-        await _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, null, false);
+        await _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, {}, false);
 
         const filteredEntity = filterObject(entity, allowedKeys);
 
@@ -638,7 +679,7 @@ async function updateWithConsistencyCheck(context, listId, entity, source) {
 
         updateSourcesAndHashEmail(filteredEntity, source, groupedFieldsMap);
 
-        await _update(tx, listId, existing, filteredEntity);
+        await _update(tx, listId, groupedFieldsMap, existing, filteredEntity);
     });
 }
 
@@ -674,15 +715,13 @@ async function removeByEmailAndGet(context, listId, email) {
 async function _changeStatusTx(tx, context, listId, existing, newStatus) {
     enforce(newStatus !== SubscriptionStatus.SUBSCRIBED);
 
+    const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
+
     await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
-    await tx(getSubscriptionTableName(listId)).where('id', existing.id).update({
+    await _update(tx, listId, groupedFieldsMap, existing, {
         status: newStatus
     });
-
-    if (existing.status === SubscriptionStatus.SUBSCRIBED) {
-        await tx('lists').where('id', listId).decrement('subscribers', 1);
-    }
 }
 
 async function _unsubscribeExistingAndGetTx(tx, context, listId, existing) {
@@ -825,3 +864,4 @@ module.exports.updateAddressAndGet = updateAddressAndGet;
 module.exports.updateManaged = updateManaged;
 module.exports.getListsWithEmail = getListsWithEmail;
 module.exports.changeStatusTx = changeStatusTx;
+module.exports.purgeSensitiveData = purgeSensitiveData;
