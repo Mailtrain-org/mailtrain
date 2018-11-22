@@ -11,9 +11,9 @@ import moment from 'moment';
 import { getTemplateTypes } from './helpers';
 import {checkPermissions} from "../../lib/permissions";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../../lib/modals";
 
 
@@ -28,7 +28,7 @@ export default class List extends Component {
         this.templateTypes = getTemplateTypes(props.t);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -92,7 +92,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+                    tableAddDeleteButton(actions, this, perms, `rest/mosaico-templates/${data[0]}`, data[1], t('deletingMosaicoTemplate'), t('mosaicoTemplateDeleted'));
 
                     return actions;
                 }
@@ -101,7 +101,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/mosaico-templates`, t('deletingMosaicoTemplate'), t('mosaicoTemplateDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('createMosaicoTemplate')}>

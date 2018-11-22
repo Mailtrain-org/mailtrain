@@ -12,9 +12,9 @@ import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
 import {getUrl} from "../lib/urls";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 
 @withTranslation()
@@ -26,7 +26,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -165,7 +165,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+                    tableAddDeleteButton(actions, this, perms, `rest/reports/${data[0]}`, data[1], t('deletingReport'), t('reportDeleted'));
 
                     return { refreshTimeout, actions };
                 }
@@ -175,7 +175,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/reports`, t('deletingReport'), t('reportDeleted'))}
+                {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {this.state.createPermitted &&
                         <NavButton linkTo="/reports/create" className="btn-primary" icon="plus" label={t('createReport')}/>

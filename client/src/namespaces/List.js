@@ -9,9 +9,9 @@ import axios from '../lib/axios';
 import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 
@@ -24,7 +24,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -67,7 +67,7 @@ export default class List extends Component {
             }
 
             if (Number.parseInt(node.key) !== getGlobalNamespaceId()) {
-                tableDeleteDialogAddDeleteButton(actions, this, node.data.permissions, node.key, node.data.unsanitizedTitle);
+                tableAddDeleteButton(actions, this, node.data.permissions, `rest/namespaces/${node.key}`, node.data.unsanitizedTitle, t('deletingNamespace'), t('namespaceDeleted'));
             }
 
             return actions;
@@ -75,7 +75,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/namespaces`, t('deletingNamespace'), t('namespaceDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <NavButton linkTo="/namespaces/create" className="btn-primary" icon="plus" label={t('createNamespace')}/>

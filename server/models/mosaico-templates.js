@@ -85,8 +85,6 @@ async function updateWithConsistencyCheck(context, entity) {
 
 async function remove(context, id) {
     await knex.transaction(async tx => {
-        const deps = [];
-
         await shares.enforceEntityPermissionTx(tx, context, 'mosaicoTemplate', id, 'delete');
 
         await dependencyHelpers.ensureNoDependencies(tx, context, id, [

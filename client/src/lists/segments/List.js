@@ -8,9 +8,9 @@ import { withErrorHandling } from '../../lib/error-handling';
 import { Table } from '../../lib/table';
 import {Icon} from "../../lib/bootstrap-components";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../../lib/modals";
 
 @withTranslation()
@@ -22,7 +22,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     static propTypes = {
@@ -47,7 +47,7 @@ export default class List extends Component {
                             link: `/lists/${this.props.list.id}/segments/${data[0]}/edit`
                         });
 
-                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                        tableAddDeleteButton(actions, this, null, `rest/segments/${this.props.list.id}/${data[0]}`, data[1], t('deletingSegment'), t('segmentDeleted'));
                     }
 
                     return actions;
@@ -57,7 +57,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/segments/${this.props.list.id}`, t('deletingSegment'), t('segmentDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {this.props.list.permissions.includes('manageSegments') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('createSegment')}/>

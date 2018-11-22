@@ -7,8 +7,13 @@ import {withAsyncErrorHandler, withErrorHandling} from "../lib/error-handling";
 import {Table} from "../lib/table";
 import {ButtonRow, Form, InputField, withForm, FormSendMethod} from "../lib/form";
 import {Button, Icon} from "../lib/bootstrap-components";
-import axios from "../lib/axios";
+import axios, {HTTPMethod} from "../lib/axios";
 import {getUrl} from "../lib/urls";
+import {
+    tableAddRestActionButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
+} from "../lib/modals";
 
 @withTranslation()
 @withForm
@@ -22,6 +27,7 @@ export default class List extends Component {
         const t = props.t;
 
         this.state = {};
+        tableRestActionDialogInit(this);
 
         this.initForm({
             serverValidation: {
@@ -73,7 +79,7 @@ export default class List extends Component {
             this.enableForm();
 
             this.clearFormStatusMessage();
-            this.blacklistTable.refresh();
+            this.table.refresh();
 
         } else {
             this.enableForm();
@@ -85,29 +91,36 @@ export default class List extends Component {
         this.clearFields();
     }
 
-    @withAsyncErrorHandler
-    async deleteBlacklisted(email) {
-        await axios.delete(getUrl(`rest/blacklist/${email}`));
-        this.blacklistTable.refresh();
-    }
-
     render() {
         const t = this.props.t;
 
         const columns = [
             { data: 0, title: t('email') },
             {
-                actions: data => [
-                    {
-                        label: <Icon icon="remove" title={t('removeFromBlacklist')}/>,
-                        action: () => this.deleteBlacklisted(data[0])
-                    }
-                ]
+                actions: data => {
+                    const actions = [];
+
+                    const email = data[0];
+
+                    tableAddRestActionButton(
+                        actions, this,
+                        { method: HTTPMethod.DELETE, url: `rest/blacklist/${email}`},
+                        { icon: 'remove', label: t('removeFromBlacklist') },
+                        t('Confirm Removal From Blacklist'),
+                        t('Are you sure you want to remove {{email}} from the blacklist?', {email}),
+                        t('Removing {{email}} from the blacklist', {email}),
+                        t('{{email}} removed from the blacklist', {email}),
+                        null
+                    );
+
+                    return actions;
+                }
             }
         ];
 
         return (
             <div>
+                {tableRestActionDialogRender(this)}
                 <Title>{t('blacklist')}</Title>
 
                 <h3 className="legend">{t('addEmailToBlacklist-1')}</h3>
@@ -123,7 +136,7 @@ export default class List extends Component {
 
                 <h3 className="legend">{t('blacklistedEmails')}</h3>
 
-                <Table ref={node => this.blacklistTable = node} withHeader dataUrl="rest/blacklist-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/blacklist-table" columns={columns} />
             </div>
         );
     }

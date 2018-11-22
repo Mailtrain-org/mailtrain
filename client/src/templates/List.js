@@ -19,9 +19,9 @@ import moment from 'moment';
 import {getTemplateTypes} from './helpers';
 import {checkPermissions} from "../lib/permissions";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 
 @withTranslation()
@@ -35,7 +35,7 @@ export default class List extends Component {
         this.templateTypes = getTemplateTypes(props.t);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -101,7 +101,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+                    tableAddDeleteButton(actions, this, perms, `rest/templates/${data[0]}`, data[1], t('deletingTemplate'), t('templateDeleted'));
 
                     return actions;
                 }
@@ -110,7 +110,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/templates`, t('deletingTemplate'), t('templateDeleted'))}
+                {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {this.state.createPermitted &&
                        <NavButton linkTo="/templates/create" className="btn-primary" icon="plus" label={t('createTemplate')}/>

@@ -18,9 +18,9 @@ import mailtrainConfig from 'mailtrainConfig';
 import moment from "moment";
 import {inProgress} from '../../../../shared/imports';
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../../lib/modals";
 
 @withTranslation()
@@ -32,7 +32,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
 
         const {importSourceLabels, importStatusLabels} = getImportLabels(props.t);
         this.importSourceLabels = importSourceLabels;
@@ -79,7 +79,7 @@ export default class List extends Component {
                     });
 
                     if (this.props.list.permissions.includes('manageImports')) {
-                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                        tableAddDeleteButton(actions, this, null, `rest/imports/${this.props.list.id}/${data[0]}`, data[1], t('deletingImport'), t('importDeleted'));
                     }
 
                     return { refreshTimeout, actions };
@@ -89,7 +89,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/imports/${this.props.list.id}`, t('deletingImport'), t('importDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('createImport')}/>

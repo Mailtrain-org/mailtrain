@@ -14,9 +14,9 @@ import {getTriggerTypes} from '../campaigns/triggers/helpers';
 import {Icon} from "../lib/bootstrap-components";
 import mailtrainConfig from 'mailtrainConfig';
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 
 @withTranslation()
@@ -32,7 +32,7 @@ export default class List extends Component {
         this.eventLabels = eventLabels;
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     static propTypes = {
@@ -67,7 +67,7 @@ export default class List extends Component {
                     }
 
                     if (perms.includes('manageTriggers')) {
-                        tableDeleteDialogAddDeleteButton(actions, this, null, campaignId + '/' + data[0], data[1]);
+                        tableAddDeleteButton(actions, this, null, `rest/triggers/${campaignId}/${data[0]}`, data[1], t('deletingTrigger'), t('triggerDeleted'));
                     }
 
                     return actions;
@@ -77,7 +77,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/triggers`, t('deletingTrigger'), t('triggerDeleted'))}
+                {tableRestActionDialogRender(this)}
                 <Title>{t('triggers')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/triggers-by-list-table/${this.props.list.id}`} columns={columns} />

@@ -177,10 +177,6 @@ async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'delete');
 
-        await fields.removeAllByListIdTx(tx, context, id);
-        await segments.removeAllByListIdTx(tx, context, id);
-        await imports.removeAllByListIdTx(tx, context, id);
-
         await dependencyHelpers.ensureNoDependencies(tx, context, id, [
             {
                 entityTypeId: 'campaign',
@@ -190,6 +186,10 @@ async function remove(context, id) {
                     .select(['campaigns.id', 'campaigns.name'])
             }
         ]);
+
+        await fields.removeAllByListIdTx(tx, context, id);
+        await segments.removeAllByListIdTx(tx, context, id);
+        await imports.removeAllByListIdTx(tx, context, id);
 
         await tx('lists').where('id', id).del();
         await knex.schema.dropTableIfExists('subscription__' + id);

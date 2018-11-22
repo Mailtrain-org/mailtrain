@@ -27,9 +27,9 @@ import {
 import {checkPermissions} from "../lib/permissions";
 import {getCampaignLabels} from "./helpers";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 
 @withTranslation()
@@ -47,7 +47,7 @@ export default class List extends Component {
         this.campaignStatusLabels = campaignStatusLabels;
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -151,7 +151,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+                    tableAddDeleteButton(actions, this, perms, `rest/campaigns/${data[0]}`, data[1], t('deletingCampaign'), t('campaignDeleted'));
 
                     return actions;
                 }
@@ -160,7 +160,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/campaigns`, t('deletingCampaign'), t('campaignDeleted'))}
+                {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {this.state.createPermitted &&
                     <DropdownMenu className="btn-primary" label={t('createCampaign')}>

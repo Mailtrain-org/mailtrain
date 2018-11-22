@@ -24,6 +24,7 @@ export class RestActionModalDialog extends Component {
         visible: PropTypes.bool.isRequired,
         actionMethod: PropTypes.func.isRequired,
         actionUrl: PropTypes.string.isRequired,
+        actionData: PropTypes.object,
 
         backUrl: PropTypes.string,
         successUrl: PropTypes.string,
@@ -65,7 +66,7 @@ export class RestActionModalDialog extends Component {
                 owner.setFormStatusMessage('info', props.actionInProgressMsg);
             }
 
-            await axios.method(props.actionMethod, getUrl(props.actionUrl));
+            await axios.method(props.actionMethod, getUrl(props.actionUrl), props.actionData);
 
             if (props.successUrl) {
                 this.navigateToWithFlashMessage(props.successUrl, 'success', props.actionDoneMsg);
@@ -96,6 +97,35 @@ export class RestActionModalDialog extends Component {
     }
 }
 
+const entityTypeLabels = {
+    'namespace': t => t('namespace'),
+    'list': t => t('list'),
+    'customForm': t => t('customForms'),
+    'campaign': t => t('campaign'),
+    'template': t => t('template'),
+    'sendConfiguration': t => t('sendConfiguration'),
+    'report': t => t('report'),
+    'reportTemplate': t => t('reportTemplate'),
+    'mosaicoTemplate': t => t('mosaicoTemplate')
+};
+
+function _getDependencyErrorMessage(err, t, name) {
+    return (
+        <div>
+            <p>{t('cannoteDeleteNameDueToTheFollowing', {name})}</p>
+            <ul className={styles.dependenciesList}>
+                {err.data.dependencies.map(dep =>
+                    dep.link ?
+                        <li key={dep.link}><Link to={dep.link}>{entityTypeLabels[dep.entityTypeId](t)}: {dep.name}</Link></li>
+                        : // if no dep.link is present, it means the user has no permission to view the entity, thus only id without the link is shown
+                        <li key={dep.id}>{entityTypeLabels[dep.entityTypeId](t)}: [{dep.id}]</li>
+                )}
+                {err.data.andMore && <li>{t('andMore')}</li>}
+            </ul>
+        </div>
+    );
+}
+
 
 @withTranslation()
 @withPageHelpers
@@ -103,35 +133,14 @@ export class DeleteModalDialog extends Component {
     constructor(props) {
         super(props);
         const t = props.t;
-
-        this.entityTypeLabels = {
-            'namespace': t('namespace'),
-            'list': t('list'),
-            'customForm': t('customForms'),
-            'campaign': t('campaign'),
-            'template': t('template'),
-            'sendConfiguration': t('sendConfiguration'),
-            'report': t('report'),
-            'reportTemplate': t('reportTemplate'),
-            'mosaicoTemplate': t('mosaicoTemplate')
-        };
     }
 
     static propTypes = {
         visible: PropTypes.bool.isRequired,
-
-        stateOwner: PropTypes.object,
-        name: PropTypes.string,
+        stateOwner: PropTypes.object.isRequired,
         deleteUrl: PropTypes.string.isRequired,
-
         backUrl: PropTypes.string,
         successUrl: PropTypes.string,
-
-        onBack: PropTypes.func,
-        onPerformingAction: PropTypes.func,
-        onSuccess: PropTypes.func,
-        onFail: PropTypes.func,
-
         deletingMsg:  PropTypes.string.isRequired,
         deletedMsg:  PropTypes.string.isRequired
     }
@@ -142,32 +151,13 @@ export class DeleteModalDialog extends Component {
         if (err instanceof interoperableErrors.DependencyPresentError) {
             const owner = this.props.stateOwner;
 
-            const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
-            this.setFlashMessage('danger',
-                <div>
-                    <p>{t('cannoteDeleteNameDueToTheFollowing', {name})}</p>
-                    <ul className={styles.dependenciesList}>
-                    {err.data.dependencies.map(dep =>
-                        dep.link ?
-                            <li key={dep.link}><Link to={dep.link}>{this.entityTypeLabels[dep.entityTypeId]}: {dep.name}</Link></li>
-                        : // if no dep.link is present, it means the user has no permission to view the entity, thus only id without the link is shown
-                            <li key={dep.id}>{this.entityTypeLabels[dep.entityTypeId]}: [{dep.id}]</li>
-                    )}
-                    {err.data.andMore && <li>{t('andMore')}</li>}
-                    </ul>
-                </div>
-            );
+            const name = owner.getFormValue('name');
+            this.setFlashMessage('danger', _getDependencyErrorMessage(err, t, name));
 
             window.scrollTo(0, 0); // This is to scroll up because the flash message appears on top and it's quite misleading if the delete fails and the message is not in the viewport
 
-            if (this.props.onFail) {
-                this.props.onFail();
-            }
-
-            if (owner) {
-                owner.enableForm();
-                owner.clearFormStatusMessage();
-            }
+            owner.enableForm();
+            owner.clearFormStatusMessage();
 
         } else {
             throw err;
@@ -177,7 +167,7 @@ export class DeleteModalDialog extends Component {
     render() {
         const t = this.props.t;
         const owner = this.props.stateOwner;
-        const name = this.props.name !== undefined ? this.props.name : (owner ? owner.getFormValue('name') : '');
+        const name = owner.getFormValue('name');
 
         return <RestActionModalDialog
             title={t('confirmDeletion')}
@@ -188,9 +178,6 @@ export class DeleteModalDialog extends Component {
             actionUrl={this.props.deleteUrl} 
             backUrl={this.props.backUrl}
             successUrl={this.props.successUrl}
-            onBack={this.props.onBack}
-            onPerformingAction={this.props.onPerformingAction}
-            onSuccess={this.props.onSuccess}
             actionInProgressMsg={this.props.deletingMsg}
             actionDoneMsg={this.props.deletedMsg}
             onErrorAsync={::this.onErrorAsync}
@@ -198,16 +185,36 @@ export class DeleteModalDialog extends Component {
     }
 }
 
-export function tableDeleteDialogInit(owner) {
-    owner.deleteDialogData = {};
-    owner.state.deleteDialogShown = false;
+export function tableRestActionDialogInit(owner) {
+    owner.tableRestActionDialogData = {};
+    owner.state.tableRestActionDialogShown = false;
 }
 
-export function tableDeleteDialogAddDeleteButton(actions, owner, perms, id, name) {
+
+
+function _hide(owner, dontRefresh = false) {
+    owner.tableRestActionDialogData = {};
+    owner.setState({ tableRestActionDialogShown: false });
+    if (!dontRefresh) {
+        owner.table.refresh();
+    }
+}
+
+export function tableAddDeleteButton(actions, owner, perms, deleteUrl, name, deletingMsg, deletedMsg) {
     const t = owner.props.t;
 
+    async function onErrorAsync(err) {
+        if (err instanceof interoperableErrors.DependencyPresentError) {
+            owner.setFlashMessage('danger', _getDependencyErrorMessage(err, t, name));
+            window.scrollTo(0, 0); // This is to scroll up because the flash message appears on top and it's quite misleading if the delete fails and the message is not in the viewport
+            _hide(owner);
+        } else {
+            throw err;
+        }
+    }
+
     if (!perms || perms.includes('delete')) {
-        if (owner.deleteDialogData.id) {
+        if (owner.tableRestActionDialogData.shown) {
             actions.push({
                 label: <Icon className={styles.iconDisabled} icon="remove" title={t('delete')}/>
             });
@@ -215,10 +222,21 @@ export function tableDeleteDialogAddDeleteButton(actions, owner, perms, id, name
             actions.push({
                 label: <Icon icon="remove" title={t('delete')}/>,
                 action: () => {
-                    owner.deleteDialogData = {name, id};
+                    owner.tableRestActionDialogData = {
+                        shown: true,
+                        title: t('confirmDeletion'),
+                        message:t('areYouSureYouWantToDeleteName?', {name}),
+                        httpMethod: HTTPMethod.DELETE,
+                        actionUrl: deleteUrl,
+                        actionInProgressMsg: deletingMsg,
+                        actionDoneMsg: deletedMsg,
+                        onErrorAsync: onErrorAsync
+                    };
+
                     owner.setState({
-                        deleteDialogShown: true
+                        tableRestActionDialogShown: true
                     });
+
                     owner.table.refresh();
                 }
             });
@@ -226,24 +244,55 @@ export function tableDeleteDialogAddDeleteButton(actions, owner, perms, id, name
     }
 }
 
-export function tableDeleteDialogRender(owner, deleteUrlBase, deletingMsg, deletedMsg) {
-    function hide() {
-        owner.deleteDialogData = {};
-        owner.setState({ deleteDialogShown: false });
-        owner.table.refresh();
-    }
+export function tableAddRestActionButton(actions, owner, action, button, title, message, actionInProgressMsg, actionDoneMsg, onErrorAsync) {
+    const t = owner.props.t;
 
-    return (
-        <DeleteModalDialog
-            visible={owner.state.deleteDialogShown}
-            name={owner.deleteDialogData.name}
-            deleteUrl={deleteUrlBase + '/' + owner.deleteDialogData.id}
-            onBack={hide}
-            onPerformingAction={() => owner.setState({ deleteDialogShown: false })}
-            onSuccess={hide}
-            onFail={hide}
-            deletingMsg={deletingMsg}
-            deletedMsg={deletedMsg}
-        />
-    );
+    if (owner.tableRestActionDialogData.shown) {
+        actions.push({
+            label: <Icon className={styles.iconDisabled} icon={button.icon} title={button.label}/>
+        });
+    } else {
+        actions.push({
+            label: <Icon icon={button.icon} title={button.label}/>,
+            action: () => {
+                owner.tableRestActionDialogData = {
+                    shown: true,
+                    title: title,
+                    message: message,
+                    httpMethod: action.method,
+                    actionUrl: action.url,
+                    actionData: action.data,
+                    actionInProgressMsg: actionInProgressMsg,
+                    actionDoneMsg: actionDoneMsg,
+                    onErrorAsync: onErrorAsync
+                };
+
+                owner.setState({
+                    tableRestActionDialogShown: true
+                });
+
+                owner.table.refresh();
+            }
+        });
+    }
+}
+
+export function tableRestActionDialogRender(owner) {
+    const data = owner.tableRestActionDialogData;
+
+    return <RestActionModalDialog
+        title={data.title || ''}
+        message={data.message || ''}
+        visible={owner.state.tableRestActionDialogShown}
+        actionMethod={data.httpMethod || HTTPMethod.POST}
+        actionUrl={data.actionUrl || ''}
+        actionData={data.actionData}
+        onBack={() => _hide(owner)}
+        onPerformingAction={() => _hide(owner, true)}
+        onSuccess={() => _hide(owner)}
+        actionInProgressMsg={data.actionInProgressMsg || ''}
+        actionDoneMsg={data.actionDoneMsg || ''}
+        onErrorAsync={data.onErrorAsync}
+    />
+
 }

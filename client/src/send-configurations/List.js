@@ -20,9 +20,9 @@ import moment from 'moment';
 import {getMailerTypes} from './helpers';
 import {checkPermissions} from "../lib/permissions";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 
 
@@ -37,7 +37,7 @@ export default class List extends Component {
         this.mailerTypes = getMailerTypes(props.t);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     @withAsyncErrorHandler
@@ -88,7 +88,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableDeleteDialogAddDeleteButton(actions, this, perms, data[0], data[1]);
+                    tableAddDeleteButton(actions, this, perms, `rest/send-configurations/${data[0]}`, data[1], t('deletingSendConfiguration'), t('sendConfigurationDeleted'));
 
                     return actions;
                 }
@@ -97,7 +97,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/send-configurations`, t('deletingSendConfiguration'), t('sendConfigurationDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
                         <NavButton linkTo="/send-configurations/create" className="btn-primary" icon="plus" label={t('createSendConfiguration')}/>

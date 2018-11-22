@@ -7,9 +7,9 @@ import {Table} from "../lib/table";
 import mailtrainConfig from "mailtrainConfig";
 import {Icon} from "../lib/bootstrap-components";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../lib/modals";
 
 @withTranslation()
@@ -20,7 +20,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     render() {
@@ -54,7 +54,7 @@ export default class List extends Component {
                     link: `/users/${data[0]}/shares`
                 });
 
-                tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                tableAddDeleteButton(actions, this, null, `rest/users/${data[0]}`, data[1], t('deletingUser'), t('userDeleted'));
 
                 return actions;
             }
@@ -62,7 +62,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/users`, t('deletingUser'), t('userDeleted'))}
+                {tableRestActionDialogRender(this)}
                 <Toolbar>
                     <NavButton linkTo="/users/create" className="btn-primary" icon="plus" label={t('createUser')}/>
                 </Toolbar>

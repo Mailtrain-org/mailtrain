@@ -16,9 +16,9 @@ import {getTriggerTypes} from './helpers';
 import {Icon} from "../../lib/bootstrap-components";
 import mailtrainConfig from 'mailtrainConfig';
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../../lib/modals";
 
 @withTranslation()
@@ -34,7 +34,7 @@ export default class List extends Component {
         this.eventLabels = eventLabels;
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
     }
 
     static propTypes = {
@@ -66,7 +66,7 @@ export default class List extends Component {
                     }
 
                     if (this.props.campaign.permissions.includes('manageTriggers')) {
-                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                        tableAddDeleteButton(actions, this, null, `rest/triggers/${this.props.campaign.id}/${data[0]}`, data[1], t('deletingTrigger'), t('triggerDeleted'));
                     }
 
                     return actions;
@@ -76,7 +76,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/triggers/${this.props.campaign.id}`, t('deletingTrigger'), t('triggerDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {mailtrainConfig.globalPermissions.setupAutomation && this.props.campaign.permissions.includes('manageTriggers') &&
                     <Toolbar>
                         <NavButton linkTo={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('createTrigger')}/>

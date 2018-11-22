@@ -9,9 +9,9 @@ import { Table } from '../../lib/table';
 import { getFieldTypes } from './helpers';
 import {Icon} from "../../lib/bootstrap-components";
 import {
-    tableDeleteDialogAddDeleteButton,
-    tableDeleteDialogInit,
-    tableDeleteDialogRender
+    tableAddDeleteButton,
+    tableRestActionDialogInit,
+    tableRestActionDialogRender
 } from "../../lib/modals";
 
 @withTranslation()
@@ -23,7 +23,7 @@ export default class List extends Component {
         super(props);
 
         this.state = {};
-        tableDeleteDialogInit(this);
+        tableRestActionDialogInit(this);
 
         this.fieldTypes = getFieldTypes(props.t);
     }
@@ -55,7 +55,7 @@ export default class List extends Component {
                             link: `/lists/${this.props.list.id}/fields/${data[0]}/edit`
                         });
 
-                        tableDeleteDialogAddDeleteButton(actions, this, null, data[0], data[1]);
+                        tableAddDeleteButton(actions, this, null, `rest/fields/${this.props.list.id}/${data[0]}`, data[1], t('deletingField'), t('fieldDeleted'));
                     }
 
                     return actions;
@@ -65,7 +65,7 @@ export default class List extends Component {
 
         return (
             <div>
-                {tableDeleteDialogRender(this, `rest/fields/${this.props.list.id}`, t('deletingField'), t('fieldDeleted'))}
+                {tableRestActionDialogRender(this)}
                 {this.props.list.permissions.includes('manageFields') &&
                     <Toolbar>
                         <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('createField')}/>

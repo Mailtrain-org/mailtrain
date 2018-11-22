@@ -129,7 +129,7 @@ export function getRuleHelpers(t, fields) {
         },
         eqTodayPlusDays: {
             dropdownLabel: t('onXthDayBeforeafterCurrentDate'),
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is', [tMark('dateInColumnColNameIsTheCurrentDate'), tMark('dateInColumnColNameIsValuethDayAfterThe'), tMark('dateInColumnColNameIsValuethDayBeforeThe')]),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnColNameIsTheCurrentDate'), tMark('dateInColumnColNameIsValuethDayAfterThe'), tMark('dateInColumnColNameIsValuethDayBeforeThe')]),
         },
         ltTodayPlusDays: {
             dropdownLabel: t('beforeXthDayBeforeafterCurrentDate'),

@@ -38,7 +38,7 @@ import {
 } from "../../../shared/campaigns";
 import moment from 'moment';
 import campaignsStyles from "./styles.scss";
-import {tableDeleteDialogAddDeleteButton} from "../lib/modals";
+import {tableAddDeleteButton} from "../lib/modals";
 
 
 @withTranslation()
