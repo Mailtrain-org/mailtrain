@@ -52,7 +52,7 @@ export default class CUD extends Component {
         this.state = {
             showMergeTagReference: false,
             elementInFullscreen: false,
-            showTestSendModal: false
+            showTestSendModal: false,
         };
 
         this.initForm({
@@ -76,11 +76,13 @@ export default class CUD extends Component {
         }
     }
 
+    loadFromEntityMutator(data) {
+        this.templateTypes[data.type].afterLoad(data);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                this.templateTypes[data.type].afterLoad(data);
-            });
+            this.getFormValuesFromEntity(this.props.entity, data => this.loadFromEntityMutator(data));
         } else {
             this.populateFormValues({
                 name: '',
@@ -146,6 +148,7 @@ export default class CUD extends Component {
 
         if (submitResponse) {
             if (stayOnPage) {
+                await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`, data => this.loadFromEntityMutator(data));
                 this.enableForm();
                 this.clearFormStatusMessage();
                 this.setFlashMessage('success', t('templateSaved'));

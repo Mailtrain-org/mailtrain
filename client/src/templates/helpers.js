@@ -121,6 +121,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     templateId={owner.getFormValue(prefix + 'mosaicoTemplate')}
                     entityTypeId={entityTypeId}
                     title={t('mosaicoTemplateDesigner')}
+                    onSave={::owner.save}
+                    canSave={owner.isFormWithoutErrors()}
                     onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
@@ -194,6 +196,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     templatePath={getSandboxUrl(`static/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/index.html`)}
                     entityTypeId={entityTypeId}
                     title={t('mosaicoTemplateDesigner')}
+                    onSave={::owner.save}
+                    canSave={owner.isFormWithoutErrors()}
                     onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
@@ -270,6 +274,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     initialStyle={owner.getFormValue(prefix + 'grapesJSData').style}
                     sourceType={owner.getFormValue(prefix + 'grapesJSSourceType')}
                     title={t('grapesJsTemplateDesigner')}
+                    onSave={::owner.save}
+                    canSave={owner.isFormWithoutErrors()}
                     onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
@@ -322,6 +328,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     initialSource={owner.getFormValue(prefix + 'ckeditor4Data').source}
                     entityTypeId={entityTypeId}
                     title={t('ckEditor4TemplateDesigner')}
+                    onSave={::owner.save}
+                    canSave={owner.isFormWithoutErrors()}
                     onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />

@@ -91,6 +91,9 @@ class CodeEditorSandbox extends Component {
 
         this.refreshHandler = ::this.refresh;
         this.refreshTimeoutId = null;
+
+        this.onMessageFromPreviewHandler = ::this.onMessageFromPreview;
+        this.previewScroll = {x: 0, y: 0};
     }
 
     static propTypes = {
@@ -128,6 +131,8 @@ class CodeEditorSandbox extends Component {
         parentRPC.setMethodHandler('exportState', ::this.exportState);
         parentRPC.setMethodHandler('setPreview', ::this.setPreview);
         parentRPC.setMethodHandler('setWrap', ::this.setWrap);
+
+        window.addEventListener('message', this.onMessageFromPreviewHandler, false);
     }
 
     componentWillUnmount() {
@@ -156,6 +161,12 @@ class CodeEditorSandbox extends Component {
         }
     }
 
+    onMessageFromPreview(evt) {
+        if (evt.data.type === 'scroll') {
+            this.previewScroll = evt.data.data;
+        }
+    }
+
     refresh() {
         this.refreshTimeoutId = null;
 
@@ -165,6 +176,16 @@ class CodeEditorSandbox extends Component {
     }
 
     render() {
+        const previewScript =
+            '(function() {\n' +
+            '    function reportScroll() { window.parent.postMessage({type: \'scroll\', data: {x: window.scrollX, y: window.scrollY}}, \'*\'); }\n' +
+            '    reportScroll();\n' +
+            '    window.addEventListener(\'scroll\', reportScroll);\n' +
+            '    window.addEventListener(\'load\', function(evt) { window.scrollTo(' + this.previewScroll.x + ',' + this.previewScroll.y +'); });\n' +
+            '})();\n';
+
+        const previewContents = this.state.previewContents.replace(/<\s*head\s*>/i, `<head><script>${previewScript}</script>`);
+
         return (
             <div className={styles.sandbox}>
                 <div className={this.state.preview ? styles.aceEditorWithPreview : styles.aceEditorWithoutPreview}>
@@ -185,7 +206,7 @@ class CodeEditorSandbox extends Component {
                 {
                     this.state.preview &&
                     <div className={styles.preview}>
-                        <iframe ref={node => this.previewNode = node} src={"data:text/html;charset=utf-8," + escape(this.state.previewContents)}></iframe>
+                        <iframe ref={node => this.previewNode = node} src={"data:text/html;charset=utf-8," + escape(previewContents)}></iframe>
                     </div>
                 }
             </div>

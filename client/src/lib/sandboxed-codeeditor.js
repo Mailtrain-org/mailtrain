@@ -29,8 +29,9 @@ export class CodeEditorHost extends Component {
         initialSource: PropTypes.string,
         sourceType: PropTypes.string,
         title: PropTypes.string,
-        onTestSend: PropTypes.func,
         onSave: PropTypes.func,
+        canSave: PropTypes.bool,
+        onTestSend: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 

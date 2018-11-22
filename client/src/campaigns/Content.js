@@ -63,15 +63,17 @@ export default class CustomContent extends Component {
         entity: PropTypes.object
     }
 
-    componentDidMount() {
-        this.getFormValuesFromEntity(this.props.entity, data => {
-            data.data_sourceCustom_type = data.data.sourceCustom.type;
-            data.data_sourceCustom_data = data.data.sourceCustom.data;
-            data.data_sourceCustom_html = data.data.sourceCustom.html;
-            data.data_sourceCustom_text = data.data.sourceCustom.text;
+    loadFromEntityMutator(data) {
+        data.data_sourceCustom_type = data.data.sourceCustom.type;
+        data.data_sourceCustom_data = data.data.sourceCustom.data;
+        data.data_sourceCustom_html = data.data.sourceCustom.html;
+        data.data_sourceCustom_text = data.data.sourceCustom.text;
 
-            this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
-        });
+        this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
+    }
+
+    componentDidMount() {
+        this.getFormValuesFromEntity(this.props.entity, data => this.loadFromEntityMutator(data));
     }
 
     localValidateFormValues(state) {
@@ -84,7 +86,15 @@ export default class CustomContent extends Component {
         }
     }
 
+    async save() {
+        await this.doSave(true);
+    }
+
     async submitHandler() {
+        await this.doSave(false);
+    }
+
+    async doSave(stayOnPage) {
         const t = this.props.t;
 
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
@@ -115,10 +125,14 @@ export default class CustomContent extends Component {
         });
 
         if (submitResponse) {
-            if (this.props.entity) {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignSaved'));
+            if (stayOnPage) {
+                await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`, data => this.loadFromEntityMutator(data));
+                this.enableForm();
+                this.clearFormStatusMessage();
+                this.setFlashMessage('success', t('campaignSaved'));
+
             } else {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/edit`, 'success', t('campaignSaved'));
+                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignSaved'));
             }
         } else {
             this.enableForm();
