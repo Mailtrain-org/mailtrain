@@ -129,23 +129,23 @@ export function getRuleHelpers(t, fields) {
         },
         eqTodayPlusDays: {
             dropdownLabel: t('onXthDayBeforeafterCurrentDate'),
-            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is', [tMark('Date in column "{{colName}}" is the current date'), tMark('Date in column "{{colName}}" is {{value}}-th day after the current date'), tMark('Date in column "{{colName}}" is {{value}}-th day before the current date')]),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, 'is', [tMark('dateInColumnColNameIsTheCurrentDate'), tMark('dateInColumnColNameIsValuethDayAfterThe'), tMark('dateInColumnColNameIsValuethDayBeforeThe')]),
         },
         ltTodayPlusDays: {
             dropdownLabel: t('beforeXthDayBeforeafterCurrentDate'),
-            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('Date in column "{{colName}}" is before the current date'), tMark('Date in column "{{colName}}" is before {{value}}-th day after the current date'), tMark('Date in column "{{colName}}" is before {{value}}-th day before the current date')]),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnColNameIsBeforeTheCurrent'), tMark('dateInColumnColNameIsBeforeValuethDay'), tMark('dateInColumnColNameIsBeforeValuethDay-1')]),
         },
         leTodayPlusDays: {
             dropdownLabel: t('beforeOrOnXthDayBeforeafterCurrentDate'),
-            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('Date in column "{{colName}}" is before or on the current date'), tMark('Date in column "{{colName}}" is before or on {{value}}-th day after the current date'), tMark('Date in column "{{colName}}" is before or on {{value}}-th day before the current date')]),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnColNameIsBeforeOrOnThe'), tMark('dateInColumnColNameIsBeforeOrOnValueth'), tMark('dateInColumnColNameIsBeforeOrOnValueth-1')]),
         },
         gtTodayPlusDays: {
             dropdownLabel: t('afterXthDayBeforeafterCurrentDate'),
-            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('Date in column "{{colName}}" is after the current date'), tMark('Date in column "{{colName}}" is after {{value}}-th day after the current date'), tMark('Date in column "{{colName}}" is after {{value}}-th day before the current date')]),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnColNameIsAfterTheCurrentDate'), tMark('dateInColumnColNameIsAfterValuethDay'), tMark('dateInColumnColNameIsAfterValuethDay-1')]),
         },
         geTodayPlusDays: {
             dropdownLabel: t('afterOrOnXthDayBeforeafterCurrentDate'),
-            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('Date in column "{{colName}}" is after or on the current date'), tMark('Date in column "{{colName}}" is after or on {{value}}-th day after the current date'), tMark('Date in column "{{colName}}" is after or on {{value}}-th day before the current date')]),
+            treeLabel: rule => getRelativeDateTreeLabel(rule, [tMark('dateInColumnColNameIsAfterOrOnTheCurrent'), tMark('dateInColumnColNameIsAfterOrOnValuethDay'), tMark('dateInColumnColNameIsAfterOrOnValuethDay-1')]),
         }
     };
 
