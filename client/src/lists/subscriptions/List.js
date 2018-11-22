@@ -119,10 +119,10 @@ export default class List extends Component {
                             actions, this,
                             { method: HTTPMethod.POST, url: `rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`},
                             { icon: 'off', label: t('unsubscribe') },
-                            t('Confirm Unsubscription'),
-                            t('Are you sure you want to unsubscribe {{email}}?', {email}),
-                            t('Unsubscribing {{email}}', {email}),
-                            t('{{email}} unsubscribed', {email}),
+                            t('confirmUnsubscription'),
+                            t('areYouSureYouWantToUnsubscribeEmail?', {email}),
+                            t('unsubscribingEmail', {email}),
+                            t('emailUnsubscribed', {email}),
                             null
                         );
                     }
@@ -132,10 +132,10 @@ export default class List extends Component {
                             actions, this,
                             { method: HTTPMethod.POST, url: `rest/blacklist`, data: {email} },
                             { icon: 'ban-circle', label: t('blacklist') },
-                            t('Confirm Email Blacklisting'),
-                            t('Are you sure you want to blacklist {{email}}?', {email}),
-                            t('Blacklisting {{email}}', {email}),
-                            t('{{email}} blacklisted', {email}),
+                            t('confirmEmailBlacklisting'),
+                            t('areYouSureYouWantToBlacklistEmail?', {email}),
+                            t('blacklistingEmail', {email}),
+                            t('emailBlacklisted', {email}),
                             null
                         );
                     }

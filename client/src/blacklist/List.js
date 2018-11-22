@@ -106,10 +106,10 @@ export default class List extends Component {
                         actions, this,
                         { method: HTTPMethod.DELETE, url: `rest/blacklist/${email}`},
                         { icon: 'remove', label: t('removeFromBlacklist') },
-                        t('Confirm Removal From Blacklist'),
-                        t('Are you sure you want to remove {{email}} from the blacklist?', {email}),
-                        t('Removing {{email}} from the blacklist', {email}),
-                        t('{{email}} removed from the blacklist', {email}),
+                        t('confirmRemovalFromBlacklist'),
+                        t('areYouSureYouWantToRemoveEmailFromThe', {email}),
+                        t('removingEmailFromTheBlacklist', {email}),
+                        t('emailRemovedFromTheBlacklist', {email}),
                         null
                     );
 
