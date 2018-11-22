@@ -33,7 +33,6 @@ editors:
 - grapesjs
 - mosaico
 - mosaicoWithFsTemplate
-- ckeditor5
 - ckeditor4
 - codeeditor
 

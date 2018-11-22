@@ -61,7 +61,7 @@ const langCodes = {
     }
 }
 
-langCodes.en = langCodes.en_US;
+langCodes.en = langCodes['en-US'] = langCodes.en_US;
 
 module.exports.convertToFake = convertToFake;
 module.exports.langCodes = langCodes;

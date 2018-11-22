@@ -59,6 +59,9 @@ export class UntrustedContentHost extends Component {
         const msg = evt.data;
 
         if (msg.type === 'initNeeded') {
+            // It seems that sometime the message that the content node does not arrive. However if the content root notifies us, we just proceed
+            this.contentNodeIsLoaded = true;
+
             if (this.isInitialized()) {
                 this.sendMessage('init', {
                     accessToken: this.accessToken,
@@ -181,7 +184,7 @@ export class UntrustedContentRoot extends Component {
 
         this.receiveMessageHandler = ::this.receiveMessage;
 
-        this.periodicTimeoutHandler = ::this.periodicTimeoutHandler;
+        this.periodicTimeoutHandler = ::this.onPeriodicTimeout;
         this.periodicTimeoutId = 0;
 
         this.clientHeight = 0;
@@ -192,13 +195,13 @@ export class UntrustedContentRoot extends Component {
     }
 
 
-    async periodicTimeoutHandler() {
+    onPeriodicTimeout() {
         const newHeight = document.body.clientHeight;
         if (this.clientHeight !== newHeight) {
             this.clientHeight = newHeight;
             this.sendMessage('clientHeight', newHeight);
         }
-        this.periodicTimeoutId = setTimeout(this.periodicTimeoutHandler, 250);
+        //this.periodicTimeoutId = setTimeout(this.periodicTimeoutHandler, 250);
     }
 
 

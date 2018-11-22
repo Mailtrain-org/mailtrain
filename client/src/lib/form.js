@@ -17,7 +17,7 @@ import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 
-import CKEditorRaw from './ckeditor5';
+//import CKEditorRaw from './ckeditor5';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
@@ -863,6 +863,7 @@ class ACEEditor extends Component {
     }
 }
 
+/* Excluded. It's not very useful and just eats a lot of space in the resulting JS.
 
 class CKEditor extends Component {
     static propTypes = {
@@ -893,6 +894,7 @@ class CKEditor extends Component {
         );
     }
 }
+ */
 
 
 function withForm(target) {

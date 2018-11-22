@@ -167,7 +167,7 @@ export class DeleteModalDialog extends Component {
     render() {
         const t = this.props.t;
         const owner = this.props.stateOwner;
-        const name = owner.getFormValue('name');
+        const name = owner.getFormValue('name') || '';
 
         return <RestActionModalDialog
             title={t('confirmDeletion')}

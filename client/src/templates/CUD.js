@@ -118,7 +118,7 @@ export default class CUD extends Component {
         }
     }
 
-    async submitHandler() {
+    async doSave(stayOnPage) {
         const t = this.props.t;
 
         let exportedData = {};
@@ -145,8 +145,14 @@ export default class CUD extends Component {
         });
 
         if (submitResponse) {
-            if (this.props.entity) {
+            if (stayOnPage) {
+                this.enableForm();
+                this.clearFormStatusMessage();
+                this.setFlashMessage('success', t('templateSaved'));
+
+            } else if (this.props.entity) {
                 this.navigateToWithFlashMessage('/templates', 'success', t('templateSaved'));
+
             } else {
                 this.navigateToWithFlashMessage(`/templates/${submitResponse}/edit`, 'success', t('templateSaved'));
             }
@@ -154,6 +160,14 @@ export default class CUD extends Component {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
+    }
+
+    async save() {
+        await this.doSave(true);
+    }
+
+    async submitHandler() {
+        await this.doSave(false);
     }
 
     async extractPlainText() {

@@ -82,7 +82,8 @@ class CodeEditorSandbox extends Component {
 
         this.state = {
             source,
-            preview: props.initialPreview
+            preview: props.initialPreview,
+            wrapEnabled: props.initialWrap
         };
         this.state.previewContents = this.getHtml();
 
@@ -97,7 +98,8 @@ class CodeEditorSandbox extends Component {
         entityId: PropTypes.number,
         initialSource: PropTypes.string,
         sourceType: PropTypes.string,
-        initialPreview: PropTypes.bool
+        initialPreview: PropTypes.bool,
+        initialWrap: PropTypes.bool
     }
 
     async exportState(method, params) {
@@ -116,9 +118,16 @@ class CodeEditorSandbox extends Component {
         });
     }
 
+    async setWrap(method, wrap) {
+        this.setState({
+            wrapEnabled: wrap
+        });
+    }
+
     componentDidMount() {
         parentRPC.setMethodHandler('exportState', ::this.exportState);
         parentRPC.setMethodHandler('setPreview', ::this.setPreview);
+        parentRPC.setMethodHandler('setWrap', ::this.setWrap);
     }
 
     componentWillUnmount() {
@@ -169,13 +178,14 @@ class CodeEditorSandbox extends Component {
                         showPrintMargin={false}
                         value={this.state.source}
                         tabSize={2}
+                        wrapEnabled={this.state.wrapEnabled}
                         setOptions={{useWorker: false}} // This disables syntax check because it does not always work well (e.g. in case of JS code in report templates)
                     />
                 </div>
                 {
                     this.state.preview &&
                     <div className={styles.preview}>
-                        <iframe src={"data:text/html;charset=utf-8," + escape(this.state.previewContents)}></iframe>
+                        <iframe ref={node => this.previewNode = node} src={"data:text/html;charset=utf-8," + escape(this.state.previewContents)}></iframe>
                     </div>
                 }
             </div>

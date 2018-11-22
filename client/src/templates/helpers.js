@@ -5,7 +5,6 @@ import React
 import {
     ACEEditor,
     AlignedRow,
-    CKEditor,
     Dropdown,
     StaticField,
     TableSelect
@@ -80,18 +79,40 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     const mosaicoTemplateTypes = getMosaicoTemplateTypes(t);
     const mosaicoTemplatesColumns = [
-        { data: 1, title: t('name') },
-        { data: 2, title: t('description') },
-        { data: 3, title: t('type'), render: data => mosaicoTemplateTypes[data].typeName },
-        { data: 5, title: t('namespace') },
+        {
+            data: 1,
+            title: t('name')
+        },
+        {
+            data: 2,
+            title: t('description')
+        },
+        {
+            data: 3,
+            title: t('type'),
+            render: data => mosaicoTemplateTypes[data].typeName
+        },
+        {
+            data: 5,
+            title: t('namespace')
+        },
     ];
 
     templateTypes.mosaico = {
         typeName: t('mosaico'),
         getTypeForm: (owner, isEdit) =>
-            <TableSelect id={prefix + 'mosaicoTemplate'} label={t('mosaicoTemplate')} withHeader dropdown dataUrl='rest/mosaico-templates-table' columns={mosaicoTemplatesColumns} selectionLabelIndex={1} disabled={isEdit} />,
+            <TableSelect
+                id={prefix + 'mosaicoTemplate'}
+                label={t('mosaicoTemplate')}
+                withHeader
+                dropdown
+                dataUrl='rest/mosaico-templates-table'
+                columns={mosaicoTemplatesColumns}
+                selectionLabelIndex={1}
+                disabled={isEdit}/>,
         getHTMLEditor: owner =>
-            <AlignedRow label={t('templateContentHtml')}>
+            <AlignedRow
+                label={t('templateContentHtml')}>
                 <MosaicoHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
@@ -151,13 +172,20 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         typeName: t('mosaicoWithPredefinedTemplates'),
         getTypeForm: (owner, isEdit) => {
             if (isEdit) {
-                return <StaticField id={prefix + 'mosaicoFsTemplate'} className={styles.formDisabled} label={t('mosaicoTemplate-1')}>{mosaicoFsTemplatesLabels.get(owner.getFormValue(prefix + 'mosaicoFsTemplate'))}</StaticField>;
+                return <StaticField
+                    id={prefix + 'mosaicoFsTemplate'}
+                    className={styles.formDisabled}
+                    label={t('mosaicoTemplate-1')}>{mosaicoFsTemplatesLabels.get(owner.getFormValue(prefix + 'mosaicoFsTemplate'))}</StaticField>;
             } else {
-                return <Dropdown id={prefix + 'mosaicoFsTemplate'} label={t('mosaicoTemplate-1')} options={mosaicoFsTemplatesOptions}/>;
+                return <Dropdown
+                    id={prefix + 'mosaicoFsTemplate'}
+                    label={t('mosaicoTemplate-1')}
+                    options={mosaicoFsTemplatesOptions}/>;
             }
         },
         getHTMLEditor: owner =>
-            <AlignedRow label={t('templateContentHtml')}>
+            <AlignedRow
+                label={t('templateContentHtml')}>
                 <MosaicoHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
@@ -202,13 +230,17 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'mosaicoWithFsTemplate');
         },
-        validate: state => {}
+        validate: state => {
+        }
     };
 
 
     const grapesJSSourceTypes = getGrapesJSSourceTypeOptions(t);
     const grapesJSSourceTypeLabels = {};
-    for ({key, label} of grapesJSSourceTypes) {
+    for ({
+        key,
+        label
+    } of grapesJSSourceTypes) {
         grapesJSSourceTypeLabels[key] = label;
     }
 
@@ -216,13 +248,20 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         typeName: t('grapesJs'),
         getTypeForm: (owner, isEdit) => {
             if (isEdit) {
-                return <StaticField id={prefix + 'grapesJSSourceType'} className={styles.formDisabled} label={t('type')}>{grapesJSSourceTypeLabels[owner.getFormValue(prefix + 'grapesJSSourceType')]}</StaticField>;
+                return <StaticField
+                    id={prefix + 'grapesJSSourceType'}
+                    className={styles.formDisabled}
+                    label={t('type')}>{grapesJSSourceTypeLabels[owner.getFormValue(prefix + 'grapesJSSourceType')]}</StaticField>;
             } else {
-                return <Dropdown id={prefix + 'grapesJSSourceType'} label={t('type')} options={grapesJSSourceTypes}/>;
+                return <Dropdown
+                    id={prefix + 'grapesJSSourceType'}
+                    label={t('type')}
+                    options={grapesJSSourceTypes}/>;
             }
         },
         getHTMLEditor: owner =>
-            <AlignedRow label={t('templateContentHtml')}>
+            <AlignedRow
+                label={t('templateContentHtml')}>
                 <GrapesJSHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
@@ -267,14 +306,16 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'grapesjs');
         },
-        validate: state => {}
+        validate: state => {
+        }
     };
 
     templateTypes.ckeditor4 = {
         typeName: t('ckEditor4'),
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner =>
-            <AlignedRow label={t('templateContentHtml')}>
+            <AlignedRow
+                label={t('templateContentHtml')}>
                 <CKEditorHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
@@ -311,13 +352,21 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'ckeditor4');
         },
-        validate: state => {}
+        validate: state => {
+        }
     };
+
+/* Excluded. It's not very useful and just eats a lot of space in the resulting JS.
 
     templateTypes.ckeditor5 = {
         typeName: t('ckEditor5'),
         getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner => <CKEditor id={prefix + 'ckeditor5Source'} height="600px" mode="html" label={t('templateContentHtml')}/>,
+        getHTMLEditor: owner =>
+            <CKEditor
+                id={prefix + 'ckeditor5Source'}
+                height="600px"
+                mode="html"
+                label={t('templateContentHtml')}/>,
         exportHTMLEditorData: async owner => {
             const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
             const postHtml = '</body></html>';
@@ -354,12 +403,17 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'ckeditor5');
         },
-        validate: state => {}
+        validate: state => {
+        }
     };
+*/
 
     const codeEditorSourceTypes = getCodeEditorSourceTypeOptions(t);
     const codeEditorSourceTypeLabels = {};
-    for ({key, label} of codeEditorSourceTypes) {
+    for ({
+        key,
+        label
+    } of codeEditorSourceTypes) {
         codeEditorSourceTypeLabels[key] = label;
     }
 
@@ -368,13 +422,20 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         getTypeForm: (owner, isEdit) => {
             const sourceType = owner.getFormValue(prefix + 'codeEditorSourceType');
             if (isEdit) {
-                return <StaticField id={prefix + 'codeEditorSourceType'} className={styles.formDisabled} label={t('type')}>{codeEditorSourceTypeLabels[sourceType]}</StaticField>;
+                return <StaticField
+                    id={prefix + 'codeEditorSourceType'}
+                    className={styles.formDisabled}
+                    label={t('type')}>{codeEditorSourceTypeLabels[sourceType]}</StaticField>;
             } else {
-                return <Dropdown id={prefix + 'codeEditorSourceType'} label={t('type')} options={codeEditorSourceTypes}/>;
+                return <Dropdown
+                    id={prefix + 'codeEditorSourceType'}
+                    label={t('type')}
+                    options={codeEditorSourceTypes}/>;
             }
         },
         getHTMLEditor: owner =>
-            <AlignedRow label={t('templateContentHtml')}>
+            <AlignedRow
+                label={t('templateContentHtml')}>
                 <CodeEditorHost
                     ref={node => owner.editorNode = node}
                     entity={owner.props.entity}
@@ -382,6 +443,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     initialSource={owner.getFormValue(prefix + 'codeEditorData').source}
                     sourceType={owner.getFormValue(prefix + 'codeEditorSourceType')}
                     title={t('codeEditorTemplateDesigner')}
+                    onSave={::owner.save}
+                    canSave={owner.isFormWithoutErrors()}
                     onTestSend={::owner.showTestSendModal}
                     onFullscreenAsync={::owner.setElementInFullscreen}
                 />
@@ -416,7 +479,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'codeeditor');
         },
-        validate: state => {}
+        validate: state => {
+        }
     };
 
     return templateTypes;
@@ -428,19 +492,94 @@ export function getEditForm(owner, typeKey, prefix = '') {
 
     return <div>
         <AlignedRow>
-            <Button className="btn-default" onClickAsync={::owner.toggleMergeTagReference} label={t('mergeTagReference')}/>
+            <Button
+                className="btn-default"
+                onClickAsync={::owner.toggleMergeTagReference}
+                label={t('mergeTagReference')}/>
             {owner.state.showMergeTagReference &&
-            <div style={{marginTop: '15px'}}>
-                <Trans i18nKey="mergeTagsAreTagsThatAreReplacedBefore"><p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p></Trans>
-                <Trans i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow"><p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p></Trans>
-                <table className="table table-bordered table-condensed table-striped">
+            <div
+                style={{marginTop: '15px'}}>
+                <Trans
+                    i18nKey="mergeTagsAreTagsThatAreReplacedBefore">
+                    <p>Merge
+                        tags
+                        are
+                        tags
+                        that
+                        are
+                        replaced
+                        before
+                        sending
+                        out
+                        the
+                        message.
+                        The
+                        format
+                        of
+                        the
+                        merge
+                        tag
+                        is
+                        the
+                        following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is
+                        an
+                        optional
+                        text
+                        value
+                        used
+                        when <code>TAG_NAME</code> is
+                        empty.
+                    </p>
+                </Trans>
+                <Trans
+                    i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
+                    <p>You
+                        can
+                        use
+                        any
+                        of
+                        the
+                        standard
+                        merge
+                        tags
+                        below.
+                        In
+                        addition
+                        to
+                        that
+                        every
+                        custom
+                        field
+                        has
+                        its
+                        own
+                        merge
+                        tag.
+                        Check
+                        the
+                        fields
+                        of
+                        the
+                        list
+                        you
+                        are
+                        going
+                        to
+                        send
+                        to.</p>
+                </Trans>
+                <table
+                    className="table table-bordered table-condensed table-striped">
                     <thead>
                     <tr>
                         <th>
-                            <Trans i18nKey="mergeTag-1">Merge tag</Trans>
+                            <Trans
+                                i18nKey="mergeTag-1">Merge
+                                tag</Trans>
                         </th>
                         <th>
-                            <Trans i18nKey="description">Description</Trans>
+                            <Trans
+                                i18nKey="description">Description</Trans>
                         </th>
                     </tr>
                     </thead>
@@ -450,7 +589,14 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [LINK_UNSUBSCRIBE]
                         </th>
                         <td>
-                            <Trans i18nKey="urlThatPointsToTheUnsubscribePage">URL that points to the unsubscribe page</Trans>
+                            <Trans
+                                i18nKey="urlThatPointsToTheUnsubscribePage">URL
+                                that
+                                points
+                                to
+                                the
+                                unsubscribe
+                                page</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -458,7 +604,17 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [LINK_PREFERENCES]
                         </th>
                         <td>
-                            <Trans i18nKey="urlThatPointsToThePreferencesPageOfThe">URL that points to the preferences page of the subscriber</Trans>
+                            <Trans
+                                i18nKey="urlThatPointsToThePreferencesPageOfThe">URL
+                                that
+                                points
+                                to
+                                the
+                                preferences
+                                page
+                                of
+                                the
+                                subscriber</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -466,7 +622,15 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [LINK_BROWSER]
                         </th>
                         <td>
-                            <Trans i18nKey="urlToPreviewTheMessageInABrowser">URL to preview the message in a browser</Trans>
+                            <Trans
+                                i18nKey="urlToPreviewTheMessageInABrowser">URL
+                                to
+                                preview
+                                the
+                                message
+                                in
+                                a
+                                browser</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -474,7 +638,9 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [EMAIL]
                         </th>
                         <td>
-                            <Trans i18nKey="emailAddress-1">Email address</Trans>
+                            <Trans
+                                i18nKey="emailAddress-1">Email
+                                address</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -482,7 +648,16 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [TO_NAME]
                         </th>
                         <td>
-                            <Trans i18nKey="recipientNameAsItAppearsInEmailsToHeader">Recipient name as it appears in email's 'To' header</Trans>
+                            <Trans
+                                i18nKey="recipientNameAsItAppearsInEmailsToHeader">Recipient
+                                name
+                                as
+                                it
+                                appears
+                                in
+                                email's
+                                'To'
+                                header</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -490,7 +665,13 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [SUBSCRIPTION_ID]
                         </th>
                         <td>
-                            <Trans i18nKey="uniqueIdThatIdentifiesTheRecipient">Unique ID that identifies the recipient</Trans>
+                            <Trans
+                                i18nKey="uniqueIdThatIdentifiesTheRecipient">Unique
+                                ID
+                                that
+                                identifies
+                                the
+                                recipient</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -498,7 +679,17 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [LIST_ID]
                         </th>
                         <td>
-                            <Trans i18nKey="uniqueIdThatIdentifiesTheListUsedForThis">Unique ID that identifies the list used for this campaign</Trans>
+                            <Trans
+                                i18nKey="uniqueIdThatIdentifiesTheListUsedForThis">Unique
+                                ID
+                                that
+                                identifies
+                                the
+                                list
+                                used
+                                for
+                                this
+                                campaign</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -506,20 +697,42 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [CAMPAIGN_ID]
                         </th>
                         <td>
-                            <Trans i18nKey="uniqueIdThatIdentifiesCurrentCampaign">Unique ID that identifies current campaign</Trans>
+                            <Trans
+                                i18nKey="uniqueIdThatIdentifiesCurrentCampaign">Unique
+                                ID
+                                that
+                                identifies
+                                current
+                                campaign</Trans>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-                <Trans i18nKey="forRssCampaignsTheFollowingFurtherTags"><p>For RSS campaigns, the following further tags can be used.</p></Trans>
-                <table className="table table-bordered table-condensed table-striped">
+                <Trans
+                    i18nKey="forRssCampaignsTheFollowingFurtherTags">
+                    <p>For
+                        RSS
+                        campaigns,
+                        the
+                        following
+                        further
+                        tags
+                        can
+                        be
+                        used.</p>
+                </Trans>
+                <table
+                    className="table table-bordered table-condensed table-striped">
                     <thead>
                     <tr>
                         <th>
-                            <Trans i18nKey="mergeTag-1">Merge tag</Trans>
+                            <Trans
+                                i18nKey="mergeTag-1">Merge
+                                tag</Trans>
                         </th>
                         <th>
-                            <Trans i18nKey="description">Description</Trans>
+                            <Trans
+                                i18nKey="description">Description</Trans>
                         </th>
                     </tr>
                     </thead>
@@ -529,7 +742,10 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [RSS_ENTRY_TITLE]
                         </th>
                         <td>
-                            <Trans i18nKey="rssEntryTitle">RSS entry title</Trans>
+                            <Trans
+                                i18nKey="rssEntryTitle">RSS
+                                entry
+                                title</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -537,7 +753,10 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [RSS_ENTRY_DATE]
                         </th>
                         <td>
-                            <Trans i18nKey="rssEntryDate">RSS entry date</Trans>
+                            <Trans
+                                i18nKey="rssEntryDate">RSS
+                                entry
+                                date</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -545,7 +764,10 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [RSS_ENTRY_LINK]
                         </th>
                         <td>
-                            <Trans i18nKey="rssEntryLink">RSS entry link</Trans>
+                            <Trans
+                                i18nKey="rssEntryLink">RSS
+                                entry
+                                link</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -553,7 +775,12 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [RSS_ENTRY_CONTENT]
                         </th>
                         <td>
-                            <Trans i18nKey="contentOfAnRssEntry">Content of an RSS entry</Trans>
+                            <Trans
+                                i18nKey="contentOfAnRssEntry">Content
+                                of
+                                an
+                                RSS
+                                entry</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -561,7 +788,10 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [RSS_ENTRY_SUMMARY]
                         </th>
                         <td>
-                            <Trans i18nKey="rssEntrySummary">RSS entry summary</Trans>
+                            <Trans
+                                i18nKey="rssEntrySummary">RSS
+                                entry
+                                summary</Trans>
                         </td>
                     </tr>
                     <tr>
@@ -569,7 +799,11 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             [RSS_ENTRY_IMAGE_URL]
                         </th>
                         <td>
-                            <Trans i18nKey="rssEntryImageUrl">RSS entry image URL</Trans>
+                            <Trans
+                                i18nKey="rssEntryImageUrl">RSS
+                                entry
+                                image
+                                URL</Trans>
                         </td>
                     </tr>
                     </tbody>
@@ -579,7 +813,52 @@ export function getEditForm(owner, typeKey, prefix = '') {
 
         {owner.templateTypes[typeKey].getHTMLEditor(owner)}
 
-        <ACEEditor id={prefix + 'text'} height="400px" mode="text" label={t('templateContentPlainText')} help={<Trans i18nKey="toExtractTheTextFromHtmlClickHerePlease">To extract the text from HTML click <ActionLink onClickAsync={::owner.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a href="http://premailer.dialect.ca/api">Premailer API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}/>
+        <ACEEditor
+            id={prefix + 'text'}
+            height="400px"
+            mode="text"
+            label={t('templateContentPlainText')}
+            help={
+                <Trans
+                    i18nKey="toExtractTheTextFromHtmlClickHerePlease">To
+                    extract
+                    the
+                    text
+                    from
+                    HTML
+                    click <ActionLink
+                        onClickAsync={::owner.extractPlainText}>here</ActionLink>.
+                    Please
+                    note
+                    that
+                    your
+                    existing
+                    plaintext
+                    in
+                    the
+                    field
+                    above
+                    will
+                    be
+                    overwritten.
+                    This
+                    feature
+                    uses
+                    the <a
+                        href="http://premailer.dialect.ca/api">Premailer
+                        API</a>,
+                    a
+                    third
+                    party
+                    service.
+                    Their
+                    Terms
+                    of
+                    Service
+                    and
+                    Privacy
+                    Policy
+                    apply.</Trans>}/>
     </div>;
 }
 

@@ -52,7 +52,7 @@ $editorNormalHeight: 800px !default;
   height: $navbarHeight;
 }
 
-.btn {
+.btn, .btnDisabled {
   display: block;
   float: right;
   padding: 0px 15px;
@@ -68,4 +68,10 @@ $editorNormalHeight: 800px !default;
 .btn:hover {
   background-color: #b1381e;
   color: white;
+  text-decoration: none;
+}
+
+.btnDisabled {
+  color: #581c00;
+  cursor: default;
 }

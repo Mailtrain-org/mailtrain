@@ -7,7 +7,6 @@ import ReactDOM
     from 'react-dom';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './lib/i18n';
-
 import account
     from './account/root';
 import blacklist
@@ -54,6 +53,7 @@ const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 if (mailtrainConfig.reportsEnabmed) {
     topLevelMenuKeys.push('reports');
 }
+
 
 @withTranslation()
 class Root extends Component {
@@ -166,20 +166,20 @@ class Root extends Component {
 
         structure[''] ={
             title: t('home'),
-                link: '/',
-                panelComponent: Home,
-                primaryMenuComponent: MainMenu,
-                children: {
-            ...lists.getMenus(t),
-            ...reports.getMenus(t),
-            ...templates.getMenus(t),
-            ...namespaces.getMenus(t),
-            ...users.getMenus(t),
-            ...blacklist.getMenus(t),
-            ...account.getMenus(t),
-            ...settings.getMenus(t),
-            ...sendConfigurations.getMenus(t),
-            ...campaigns.getMenus(t)
+            link: '/',
+            panelComponent: Home,
+            primaryMenuComponent: MainMenu,
+            children: {
+                ...lists.getMenus(t),
+                ...reports.getMenus(t),
+                ...templates.getMenus(t),
+                ...namespaces.getMenus(t),
+                ...users.getMenus(t),
+                ...blacklist.getMenus(t),
+                ...account.getMenus(t),
+                ...settings.getMenus(t),
+                ...sendConfigurations.getMenus(t),
+                ...campaigns.getMenus(t)
             }
         };
 

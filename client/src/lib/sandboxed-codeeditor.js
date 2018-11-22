@@ -18,7 +18,8 @@ export class CodeEditorHost extends Component {
 
         this.state = {
             fullscreen: false,
-            preview: true
+            preview: true,
+            wrap: true
         }
     }
 
@@ -29,6 +30,7 @@ export class CodeEditorHost extends Component {
         sourceType: PropTypes.string,
         title: PropTypes.string,
         onTestSend: PropTypes.func,
+        onSave: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 
@@ -49,6 +51,15 @@ export class CodeEditorHost extends Component {
         await this.contentNode.ask('setPreview', preview);
     }
 
+    async toggleWrapAsync() {
+        const wrap = !this.state.wrap;
+        this.setState({
+            wrap
+        });
+
+        await this.contentNode.ask('setWrap', wrap);
+    }
+
     async exportState() {
         return await this.contentNode.ask('exportState');
     }
@@ -61,7 +72,8 @@ export class CodeEditorHost extends Component {
             entityId: this.props.entity.id,
             initialSource: this.props.initialSource,
             sourceType: this.props.sourceType,
-            initialPreview: this.state.preview
+            initialPreview: this.state.preview,
+            initialWrap: this.state.wrap
         };
 
         const tokenData = {
@@ -77,6 +89,8 @@ export class CodeEditorHost extends Component {
                     <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
                     <a className={styles.btn} onClick={this.props.onTestSend}><Icon icon="send"/></a>
                     <a className={styles.btn} onClick={::this.togglePreviewAsync}><Icon icon={this.state.preview ? 'eye-close': 'eye-open'}/></a>
+                    {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave}><Icon icon="floppy-disk"/></a> : <span className={styles.btnDisabled}><Icon icon="floppy-disk"/></span>}
+                    <a className={styles.btn} onClick={::this.toggleWrapAsync}>{this.state.wrap ? 'WRAP': 'NOWRAP'}</a>
                 </div>
                 <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="codeeditor/editor" tokenMethod="codeeditor" tokenParams={tokenData}/>
             </div>
