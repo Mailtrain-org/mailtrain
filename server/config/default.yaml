@@ -47,6 +47,7 @@ enabledLanguages:
 # Inject custom scripts in subscription/layout.mjml.hbs
 # customSubscriptionScripts: [/custom/hello-world.js]
 
+
 # If you start out as a root user (eg. if you want to use ports lower than 1000)
 # then you can downgrade the user once all services are up and running
 #user: mailtrain
@@ -60,24 +61,24 @@ enabledLanguages:
 
 log:
   # silly|verbose|info|http|warn|error|silent
-  level: verbose
+  level: info
 
 www:
   # HTTP port to listen on for trusted requests (logged-in users)
   trustedPort: 3000
   # HTTP port to listen on for sandboxed requests (logged-in users)
-  sandboxPort: 8081
+  sandboxPort: 3003
   # HTTP port to listen on for public requests (campaign recipients)
-  publicPort: 8082
+  publicPort: 3004
   # HTTP interface to listen on
   host: 0.0.0.0
   # URL base for trusted urls (logged-in users). It must be absolute (starting with http:// or https://). If Mailtrain is served on
   # a non-standard port (e.g. 3000), the URL must also specify the port.
   trustedUrlBase: http://localhost:3000
   # URL base for sandbox urls (logged-in users). It must be absolute (starting with http:// or https://) and contain the sandbox port.
-  sandboxUrlBase: http://localhost:8081
+  sandboxUrlBase: http://localhost:3003
   # URL base for public urls (campaign recipients). It must be absolute (starting with http:// or https://) and contain the sandbox port.
-  publicUrlBase: http://localhost:8082
+  publicUrlBase: http://localhost:3004
 
 
   # Secret for signing the session ID cookie
