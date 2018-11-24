@@ -551,7 +551,7 @@ async function create(context, listId, entity) {
                 }
             });
 
-            // Altough this is a reference to another list, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
+            // Altough this is a reference to an import, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
             await knex.schema.raw('ALTER TABLE `subscription__' + listId + '` ADD `source_' + columnName +'` int(11) DEFAULT NULL');
         }
 
@@ -600,6 +600,7 @@ async function removeTx(tx, context, listId, id) {
     } else {
         await knex.schema.table('subscription__' + listId, table => {
             table.dropColumn(existing.column);
+            table.dropColumn('source_' + existing.column);
         });
 
         await segments.removeRulesByColumnTx(tx, context, listId, existing.column);

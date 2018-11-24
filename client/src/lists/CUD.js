@@ -75,7 +75,7 @@ export default class CUD extends Component {
                 homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
                 namespace: mailtrainConfig.user.namespace,
-                to_name: '[FIRST_NAME] [LAST_NAME]',
+                to_name: '[MERGE_FIRST_NAME] [MERGE_LAST_NAME]',
                 send_configuration: null,
                 listunsubscribe_disabled: false
             });

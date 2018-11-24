@@ -242,7 +242,7 @@ async function migrateSubscriptions(knex) {
     const lists = await knex('lists');
     for (const list of lists) {
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `unsubscribed` timestamp NULL DEFAULT NULL');
-        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_email` int(10) unsigned DEFAULT NULL');
+        await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_email` int(11) DEFAULT NULL');
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `hash_email` varchar(255) CHARACTER SET ascii');
 
 
@@ -250,7 +250,7 @@ async function migrateSubscriptions(knex) {
         const info = await knex('subscription__' + list.id).columnInfo();
         for (const field of fields) {
             if (field.column != null) {
-                // Altough this is a reference to another list, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
+                // Altough this is a reference to an import, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
                 await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_' + field.column +'` int(11) DEFAULT NULL');
             }
 

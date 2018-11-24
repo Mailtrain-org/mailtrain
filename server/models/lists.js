@@ -123,7 +123,7 @@ async function create(context, entity) {
             '  `cid` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
             '  `email` varchar(255) CHARACTER SET utf8 DEFAULT NULL,\n' +
             '  `hash_email` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
-            '  `source_email` int(10) unsigned,\n' + // This references imports if the source is an import, 0 means some import in version 1, NULL if the source is via subscription or edit of the subscription
+            '  `source_email` int(11) DEFAULT NULL,\n' +  // Altough this is a reference to an import, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
             '  `opt_in_ip` varchar(100) DEFAULT NULL,\n' +
             '  `opt_in_country` varchar(2) DEFAULT NULL,\n' +
             '  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,\n' +
