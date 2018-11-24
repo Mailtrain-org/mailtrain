@@ -250,6 +250,7 @@ async function migrateSubscriptions(knex) {
         const info = await knex('subscription__' + list.id).columnInfo();
         for (const field of fields) {
             if (field.column != null) {
+                // Altough this is a reference to another list, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
                 await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_' + field.column +'` int(11) DEFAULT NULL');
             }
 
@@ -1007,7 +1008,7 @@ async function migrateCampaigns(knex) {
         '  `ip` varchar(100) CHARACTER SET ascii DEFAULT NULL,\n' +
         '  `device_type` varchar(50) DEFAULT NULL,\n' +
         '  `country` varchar(2) CHARACTER SET ascii DEFAULT NULL,\n' +
-        '  `count` int(11) unsigned NOT NULL DEFAULT \'1\',\n' +
+        '  `count` int(10) unsigned NOT NULL DEFAULT \'1\',\n' +
         '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
         '  PRIMARY KEY (`campaign`, `list`,`subscription`,`link`),\n' +
         '  KEY `created_index` (`created`)\n' +
@@ -1174,8 +1175,8 @@ async function migrateTriggers(knex) {
 
     await knex.schema.raw('CREATE TABLE `trigger_messages` (\n' +
         '  `trigger` int(10) unsigned NOT NULL,\n' +
-        '  `list` int(11) unsigned NOT NULL,\n' +
-        '  `subscription` int(11) unsigned NOT NULL,\n' +
+        '  `list` int(10) unsigned NOT NULL,\n' +
+        '  `subscription` int(10) unsigned NOT NULL,\n' +
         '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
         '  PRIMARY KEY (`trigger`, `list`,`subscription`)\n' +
         ') ENGINE=InnoDB DEFAULT CHARSET=utf8;\n');

@@ -550,6 +550,9 @@ async function create(context, listId, entity) {
                     table.index(columnName);
                 }
             });
+
+            // Altough this is a reference to another list, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
+            await knex.schema.raw('ALTER TABLE `subscription__' + listId + '` ADD `source_' + columnName +'` int(11) DEFAULT NULL');
         }
 
         return id;
