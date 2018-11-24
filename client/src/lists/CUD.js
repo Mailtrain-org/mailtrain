@@ -76,6 +76,7 @@ export default class CUD extends Component {
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
                 namespace: mailtrainConfig.user.namespace,
                 to_name: '[FIRST_NAME] [LAST_NAME]',
+                send_configuration: null,
                 listunsubscribe_disabled: false
             });
         }
@@ -88,6 +89,12 @@ export default class CUD extends Component {
             state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         } else {
             state.setIn(['name', 'error'], null);
+        }
+
+        if (!state.getIn(['send_configuration', 'value'])) {
+            state.setIn(['send_configuration', 'error'], t('Send configuration must be selected'));
+        } else {
+            state.setIn(['send_configuration', 'error'], null);
         }
 
         if (state.getIn(['form', 'value']) === 'custom' && !state.getIn(['default_form', 'value'])) {

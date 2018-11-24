@@ -1,6 +1,0 @@
-[www]
-port=3000
-[mysql]
-user="mailtrain_test"
-password="bahquaiphoor"
-database="mailtrain_test"

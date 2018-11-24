@@ -1,21 +1,9 @@
 const webpack = require('webpack');
 const path = require('path');
 
-/* Excluded. It's not very useful and just eats a lot of space in the resulting JS.
-// The CKEditor part comes from https://ckeditor.com/docs/ckeditor5/latest/builds/guides/integration/advanced-setup.html
-const CKEditorWebpackPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' );
-const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
-*/
-
 module.exports = {
     mode: 'development',
     plugins: [
-/*
-        new CKEditorWebpackPlugin( {
-            // See https://ckeditor.com/docs/ckeditor5/latest/features/ui-language.html
-            language: 'en'
-        } )
-*/
     ],
     entry: {
         "root": ['./src/root.js'],
@@ -69,22 +57,6 @@ module.exports = {
                     }
                 ]
             },
-/*
-            {
-                test: /ckeditor5-[^/]+\/theme\/[\w-/]+\.css$/,
-                use: [
-                    {
-                        loader: 'postcss-loader',
-                        options: styles.getPostCssConfig( {
-                            themeImporter: {
-                                themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-                            },
-                            minify: true
-                        } )
-                    }
-                ]
-            },
-*/
             {
                 test: /\.(png|jpg|gif)$/,
                 use: [ 
@@ -111,17 +83,8 @@ module.exports = {
                     'sass-loader'
                 ]
             },
-/*
-            {
-                test: /ckeditor5-[^/]+\/theme\/icons\/[^/]+\.svg|ckeditor-insert-image\.svg$/,
-                use: [
-                    'raw-loader'
-                ]
-            },
-*/
             {
                 test: /\.(svg|otf|woff2|woff|ttf|eot)$/,
-                // exclude: /ckeditor5-[^/]+\/theme\/icons\/[^/]+\.svg|ckeditor-insert-image\.svg$/,
                 use: [
                     'url-loader'
                 ]

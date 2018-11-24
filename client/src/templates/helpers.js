@@ -364,57 +364,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         }
     };
 
-/* Excluded. It's not very useful and just eats a lot of space in the resulting JS.
-
-    templateTypes.ckeditor5 = {
-        typeName: t('ckEditor5'),
-        getTypeForm: (owner, isEdit) => null,
-        getHTMLEditor: owner =>
-            <CKEditor
-                id={prefix + 'ckeditor5Source'}
-                height="600px"
-                mode="html"
-                label={t('templateContentHtml')}/>,
-        exportHTMLEditorData: async owner => {
-            const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
-            const postHtml = '</body></html>';
-
-            const trustedUrlBase = getTrustedUrl();
-            const sandboxUrlBase = getSandboxUrl();
-            const publicUrlBase = getPublicUrl();
-
-            const unbasedSource = unbase(owner.getFormValue(prefix + 'ckeditor5Source'), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
-            const html = preHtml + unbasedSource + postHtml
-
-            return {
-                [prefix + 'ckeditor5Source']: unbasedSource,
-                [prefix + 'html']: html
-            }
-        },
-        initData: () => ({
-            [prefix + 'ckeditor5Source']: ''
-        }),
-        afterLoad: data => {
-            const trustedUrlBase = getTrustedUrl();
-            const sandboxUrlBase = getSandboxUrl();
-            const publicUrlBase = getPublicUrl();
-            const source = base(data[prefix + 'data'].source, trustedUrlBase, sandboxUrlBase, publicUrlBase);
-
-            data[prefix + 'ckeditor5Source'] = source;
-        },
-        beforeSave: data => {
-            data[prefix + 'data'] = {
-                source: data[prefix + 'ckeditor5Source'],
-            };
-            clearBeforeSave(data);
-        },
-        afterTypeChange: mutState => {
-            initFieldsIfMissing(mutState, 'ckeditor5');
-        },
-        validate: state => {
-        }
-    };
-*/
 
     const codeEditorSourceTypes = getCodeEditorSourceTypeOptions(t);
     const codeEditorSourceTypeLabels = {};

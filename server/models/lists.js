@@ -16,7 +16,7 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 
 const UnsubscriptionMode = require('../../shared/lists').UnsubscriptionMode;
 
-const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled']);
+const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
@@ -130,6 +130,7 @@ async function create(context, entity) {
             '  `status` tinyint(4) unsigned NOT NULL DEFAULT \'1\',\n' +
             '  `is_test` tinyint(4) unsigned NOT NULL DEFAULT \'0\',\n' +
             '  `status_change` timestamp NULL DEFAULT NULL,\n' +
+            '  `unsubscribed` timestamp NULL DEFAULT NULL,\n' +
             '  `latest_open` timestamp NULL DEFAULT NULL,\n' +
             '  `latest_click` timestamp NULL DEFAULT NULL,\n' +
             '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
@@ -144,6 +145,8 @@ async function create(context, entity) {
             '  KEY `latest_click` (`latest_click`),\n' +
             '  KEY `created` (`created`)\n' +
             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
+
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: id });
 
         return id;
     });

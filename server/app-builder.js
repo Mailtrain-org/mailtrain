@@ -11,6 +11,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
 const flash = require('connect-flash');
 const hbs = require('hbs');
 const compression = require('compression');
@@ -157,6 +158,7 @@ function createApp(appType) {
 
     app.use(cookieParser());
     app.use(session({
+        store: config.redis.enabled ? new RedisStore(config.redis) : false,
         secret: config.www.secret,
         saveUninitialized: false,
         resave: false

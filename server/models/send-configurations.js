@@ -125,7 +125,7 @@ async function create(context, entity) {
 
 async function updateWithConsistencyCheck(context, entity) {
     await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', entity.id, 'edit');
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.id, 'edit');
 
         const existing = await tx('send_configurations').where('id', entity.id).first();
         if (!existing) {

@@ -48,6 +48,16 @@ enabledLanguages:
 # customSubscriptionScripts: [/custom/hello-world.js]
 
 
+# Enable to use Redis session cache or disable if Redis is not installed
+redis:
+  enabled: false
+  host: localhost
+  port: 6379
+  db: 5
+  # Uncomment if your Redis installation requires a password
+  # password=""
+
+
 # If you start out as a root user (eg. if you want to use ports lower than 1000)
 # then you can downgrade the user once all services are up and running
 #user: mailtrain

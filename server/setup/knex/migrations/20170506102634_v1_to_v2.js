@@ -782,12 +782,12 @@ async function migrateSettings(knex) {
 
     await knex('settings').del();
     await knex('settings').insert([
-        { key: 'uaCode', value: settings.uaCode },
-        { key: 'shoutout', value: settings.shoutout },
-        { key: 'adminEmail', value: settings.adminEmail },
-        { key: 'defaultHomepage', value: settings.defaultHomepage },
-        { key: 'pgpPassphrase', value: settings.pgpPassphrase },
-        { key: 'pgpPrivateKey', value: settings.pgpPrivateKey }
+        { key: 'uaCode', value: settings.uaCode || '' },
+        { key: 'shoutout', value: settings.shoutout || '' },
+        { key: 'adminEmail', value: settings.adminEmail || '' },
+        { key: 'defaultHomepage', value: settings.defaultHomepage || '' },
+        { key: 'pgpPassphrase', value: settings.pgpPassphrase || '' },
+        { key: 'pgpPrivateKey', value: settings.pgpPrivateKey || '' }
     ]);
 
 }

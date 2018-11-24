@@ -108,6 +108,7 @@ async function create(context, listId, entity, files) {
         const filteredEntity = filterObject(entity, allowedKeysCreate);
         filteredEntity.list = listId;
         filteredEntity.settings = JSON.stringify(filteredEntity.settings);
+        filteredEntity.status = entity.status;
 
         filteredEntity.mapping_type = MappingType.BASIC_SUBSCRIBE; // This is not set in the create form. It can be changed in the update form.
         filteredEntity.mapping = JSON.stringify({});
