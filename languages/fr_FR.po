@@ -254,11 +254,11 @@ msgstr "Abonnés ayant cliqué sur ce lien :"
 
 #: views/campaigns/clicked.hbs:13 views/campaigns/opened.hbs:7
 msgid "Stats by country"
-msgstr "Stats par pays"
+msgstr "Statistiques par pays"
 
 #: views/campaigns/clicked.hbs:14 views/campaigns/opened.hbs:8
 msgid "Stats by device type"
-msgstr "Statits par type d'équipement"
+msgstr "Statistiques par type d'équipement"
 
 #: views/campaigns/clicked.hbs:18
 msgid "First click time"
@@ -371,7 +371,7 @@ msgstr "Nom de l'émetteur du message"
 #: views/campaigns/edit-triggered.hbs:17 views/campaigns/edit.hbs:18
 #: views/settings.hbs:25
 msgid "This is the name your emails will come from"
-msgstr "Il s'agit du nom d'émetteur utilisés pour les messages de la liste"
+msgstr "Il s'agit du nom d'émetteur utilisé pour les messages de la liste"
 
 #: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:20
 #: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
@@ -450,7 +450,7 @@ msgid ""
 "This is the address people will send replies to unless reply-to address is "
 "set"
 msgstr ""
-"L'adresse à laquelle les utilisateurs enverront leurs réponses, sauf si "
+"L'adresse à laquelle les utilisateurs enverront leurs réponses, sauf si une "
 "autre adresse Reply-to a été précisée"
 
 #: views/campaigns/create.hbs:22 views/campaigns/edit.hbs:21
@@ -994,7 +994,7 @@ msgid ""
 "HTML yourself."
 msgstr ""
 "Mailtrain inclut GrapeJS et Mosaico, deux éditeurs de templates avancés. "
-"Mailtrain offre également un éditeur de code si vous préférer créer le HTML "
+"Mailtrain offre également un éditeur de code si vous préférez créer le HTML "
 "par vous-même."
 
 #: views/index.hbs:23
@@ -1142,7 +1142,7 @@ msgid ""
 "The custom form used for this list. You can create a form <a href=\"/forms/"
 "{{id}}/create\">here</a>."
 msgstr ""
-"Le formulaire personnalisé utilisé pour cette liste. Vous pouvez créé un "
+"Le formulaire personnalisé utilisé pour cette liste. Vous pouvez créer un "
 "formulaire <a href=\"/forms/{{id}}/create\">ici</a>."
 
 #: views/lists/edit.hbs:19
@@ -1415,11 +1415,11 @@ msgstr "Notification enregistrée"
 
 #: views/lists/forms/edit.hbs:18
 msgid "Unsubscribed Notice"
-msgstr "Mention de désabonnement"
+msgstr "Notification de désabonnement"
 
 #: views/lists/forms/edit.hbs:19
 msgid "Manual Unsubscribe Notice"
-msgstr "Information de désabonnement manuel"
+msgstr "Notification de désabonnement manuel"
 
 #: views/lists/forms/edit.hbs:21 routes/forms.js:205
 msgid "Manage"
@@ -1555,7 +1555,7 @@ msgstr "vaut"
 
 #: views/lists/segments/rule-configure.hbs:9
 #: views/lists/segments/rule-edit.hbs:9
-msgid "Not squals"
+msgid "Not equals"
 msgstr "Différent"
 
 #: views/lists/segments/rule-configure.hbs:10
@@ -2750,7 +2750,7 @@ msgstr "Votre abonnement à la liste a été confirmé."
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:1
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:1
 msgid "You Are Now Unsubscribed"
-msgstr "Vous n'êtes désormais plus abonné"
+msgstr "Vous êtes désormais désabonné"
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:2
 msgid "We have removed your email address from our list"
@@ -2769,7 +2769,7 @@ msgstr "Nous avons retiré votre adresse mail de notre liste."
 
 #: views/subscription/partials/subscription-custom-fields.hbs:2
 msgid "want to change it?"
-msgstr "Vous voulez le changer ?"
+msgstr "Voulez-vous le changer ?"
 
 #: views/subscription/partials/subscription-custom-fields.hbs:5
 msgid "Download signature verification key"
@@ -2869,7 +2869,7 @@ msgstr "Mettre à jour votre adresse mail"
 
 #: views/subscription/web-manage.mjml.hbs:1
 msgid "Update Your Preferences"
-msgstr "Mettre à jour vos préférence"
+msgstr "Mettre à jour vos préférences"
 
 #: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:1
 msgid "Online Unsubscription Is Not Possible"
@@ -3091,15 +3091,15 @@ msgstr "Êtes-vous sûr ?"
 
 #: views/users/api.hbs:6
 msgid "Reset Access Token"
-msgstr "Réinitialiser le token d'accès"
+msgstr "Réinitialiser le jeton d'accès"
 
 #: views/users/api.hbs:7
 msgid "Generate Access Token"
-msgstr "Générer un token d'accès"
+msgstr "Générer un jeton d'accès"
 
 #: views/users/api.hbs:8
 msgid "Personal access token:"
-msgstr "Token d'accès privé :"
+msgstr "Jeton d'accès privé :"
 
 #: views/users/api.hbs:9
 msgid "Access token not yet generated"
@@ -3383,7 +3383,7 @@ msgid ""
 "Please provide the username or email address that you used when you signed "
 "up for your Mailtrain account."
 msgstr ""
-"Merci de fournir le nom d'utilisateur et l'adresse mail que vous avez "
+"Merci d'entrer le nom d'utilisateur et l'adresse mail que vous avez "
 "fournis lors de votre inscription au service."
 
 #: views/users/forgot.hbs:8
@@ -3425,7 +3425,7 @@ msgstr "Ne peut trouver de modèle avec cet identifiant"
 #: routes/campaigns.js:468 routes/campaigns.js:845 routes/campaigns.js:868
 #: routes/campaigns.js:887 routes/campaigns.js:909 routes/triggers.js:172
 msgid "Could not find campaign with specified ID"
-msgstr "Ne peut trouver de campagne avec cet identifiant"
+msgstr "Aucune campagne ne correspond à cet identifiant"
 
 #: lib/editor-helpers.js:47 routes/editorapi.js:320
 msgid "Invalid resource type"
@@ -3461,15 +3461,15 @@ msgstr "Nom complet (Prénom et nom combinés)"
 
 #: lib/helpers.js:54
 msgid "Unique ID that identifies the recipient"
-msgstr "Identifiant unique qui identifie le destinataire"
+msgstr "Identifiant unique du destinataire"
 
 #: lib/helpers.js:57
 msgid "Unique ID that identifies the list used for this campaign"
-msgstr "Identifiant unique qui identifie la liste utilisée pour cette campagne"
+msgstr "Identifiant unique de la liste utilisée pour cette campagne"
 
 #: lib/helpers.js:60
 msgid "Unique ID that identifies current campaign"
-msgstr "Identifiant unique qui identifie cette campagne"
+msgstr "Identifiant unique de cette campagne"
 
 #: lib/helpers.js:68 lib/helpers.js:80
 msgid "content from an RSS entry"
@@ -3929,7 +3929,7 @@ msgstr "Non trouvé"
 
 #: routes/archive.js:121 services/sender.js:454
 msgid "Received status code %s from %s"
-msgstr "Le code de status %s a été reçu de %s"
+msgstr "Le code de statut %s a été reçu de %s"
 
 #: routes/archive.js:153 routes/campaigns.js:895
 msgid "Attachment not found"
@@ -4034,7 +4034,7 @@ msgstr "Envoi activé"
 
 #: routes/campaigns.js:821
 msgid "Could not activate sending"
-msgstr "Ne peut activer l'envoi"
+msgstr "Impossible d'activer l'envoi"
 
 #: routes/campaigns.js:856
 msgid "Attachment uploaded"
@@ -4169,7 +4169,7 @@ msgstr "Mail - Abonnement confirmé (Texte)"
 
 #: routes/forms.js:208
 msgid "Web - Manage Preferences"
-msgstr "Web - Gesteion des préférences"
+msgstr "Web - Gestion des préférences"
 
 #: routes/forms.js:213
 msgid "Web - Manage Address"
@@ -4264,7 +4264,7 @@ msgstr "Les paramètres de la liste ont été mis à jour"
 
 #: routes/lists.js:124
 msgid "List settings not updated"
-msgstr "Les paramètres de la liste n'ont pu être registrés"
+msgstr "Les paramètres de la liste n'ont pu être enregistrés"
 
 #: routes/lists.js:142
 msgid "List deleted"
@@ -4657,7 +4657,7 @@ msgstr "Un mail avec des instructions a été envoyé à l'adresse fournie"
 
 #: routes/subscription.js:861 routes/subscription.js:877
 msgid "Public key is not set"
-msgstr "La clé publlique n'est pas renseignée"
+msgstr "La clé publique n'est pas renseignée"
 
 #: routes/templates.js:84
 msgid "Could not create template"
