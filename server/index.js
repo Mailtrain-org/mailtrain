@@ -92,37 +92,36 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
 */
 
     .then(() =>
-        executor.spawn(() => {
-            testServer(() => {
-                verpServer(() => {
-                    startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () => {
-                        startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () => {
+        executor.spawn(() => 
+            testServer(() => 
+                verpServer(() => 
+                    startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () => 
+                        startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () => 
                             startHTTPServer(AppType.PUBLIC, 'public', publicPort, () => {
                                 privilegeHelpers.dropRootPrivileges();
 
                                 tzupdate.start();
 
-                                importer.spawn(() => {
-                                    feedcheck.spawn(() => {
+                                importer.spawn(() => 
+                                    feedcheck.spawn(() => 
                                         senders.spawn(() => {
                                             triggers.start();
                                             gdprCleanup.start();
 
                                             postfixBounceServer(async () => {
-                                                (async () => {
-                                                    await reportProcessor.init();
-                                                    log.info('Service', 'All services started');
-                                                })();
+                                                await reportProcessor.init();
+                                                log.info('Service', 'All services started');
+                                                appBuilder.setReady();
                                             });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        })
+                                        })
+                                    )
+                                );
+                            })
+                        )
+                    )
+                )
+            )
+        )
     );
 });
 

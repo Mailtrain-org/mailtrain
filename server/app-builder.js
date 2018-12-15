@@ -62,6 +62,13 @@ const interoperableErrors = require('../shared/interoperable-errors');
 const { getTrustedUrl } = require('./lib/urls');
 const { AppType } = require('../shared/app');
 
+
+let isReady = false;
+function setReady() {
+    isReady = true;
+}
+
+
 hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerPartials(__dirname + '/views/subscription/partials/');
 
@@ -200,6 +207,19 @@ function createApp(appType) {
     app.use(bodyParser.json({
         limit: config.www.postSize
     }));
+
+
+    app.use((req, res, next) => {
+        if (isReady) {
+            next();
+        } else {
+            res.status(500);
+            res.render('error', {
+                message: 'Mailtrain is starting. Try again after a few seconds.',
+                error: {}
+            });
+        }
+    });
 
     if (appType === AppType.TRUSTED) {
         passport.setupRegularAuth(app);
@@ -385,3 +405,4 @@ function createApp(appType) {
 }
 
 module.exports.createApp = createApp;
+module.exports.setReady = setReady;
