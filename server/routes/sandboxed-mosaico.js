@@ -185,7 +185,7 @@ function getRouter(appType) {
             const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
 
             let languageStrings = null;
-            const lang = req.language;
+            const lang = req.locale.language;
             if (lang && lang !== 'en') {
                 try {
                     const file = path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'lang', 'mosaico-' + lang + '.json');

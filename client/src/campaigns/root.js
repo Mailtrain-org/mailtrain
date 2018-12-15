@@ -3,6 +3,7 @@
 import React from 'react';
 
 import Status from './Status';
+import Statistics from './Statistics';
 import CampaignsCUD from './CUD';
 import Content from './Content';
 import CampaignsList from './List';
@@ -10,6 +11,7 @@ import Share from '../shares/Share';
 import Files from "../lib/files";
 import {
     CampaignSource,
+    CampaignStatus,
     CampaignType
 } from "../../../shared/campaigns";
 import TriggersCUD from './triggers/CUD';
@@ -35,6 +37,12 @@ function getMenus(t) {
                             link: params => `/campaigns/${params.campaignId}/status`,
                             visible: resolved => resolved.campaign.permissions.includes('viewStats'),
                             panelRender: props => <Status entity={props.resolved.campaign} />
+                        },
+                        statistics: {
+                            title: t('Statistics'),
+                            link: params => `/campaigns/${params.campaignId}/statistics`,
+                            visible: resolved => resolved.campaign.permissions.includes('viewStats') && (resolved.campaign.status === CampaignStatus.SENDING || resolved.campaign.status === CampaignStatus.PAUSED || resolved.campaign.status === CampaignStatus.FINISHED),
+                            panelRender: props => <Statistics entity={props.resolved.campaign} />
                         },
                         ':action(edit|delete)': {
                             title: t('edit'),

@@ -46,7 +46,7 @@ import {Link} from "react-router-dom";
 import axios
     from './lib/axios';
 import {getUrl} from "./lib/urls";
-import {langCodes} from "../../shared/langs";
+import {getLang} from "../../shared/langs";
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
@@ -81,15 +81,15 @@ class Root extends Component {
             render() {
                 const languageOptions = [];
                 for (const lng of mailtrainConfig.enabledLanguages) {
-                    const langDesc = langCodes[lng];
+                    const langDesc = getLang(lng);
                     const label = langDesc.getLabel(t);
 
                     languageOptions.push(
-                        <li key={lng}><ActionLink onClickAsync={() => i18n.changeLanguage(langDesc.shortCode)}>{label}</ActionLink></li>
+                        <li key={lng}><ActionLink onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</ActionLink></li>
                     )
                 }
 
-                const currentLngCode = langCodes[i18n.language].getShortLabel(t);
+                const currentLngCode = getLang(i18n.language).getShortLabel(t);
 
                 const path = this.props.location.pathname;
 

@@ -126,7 +126,7 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
 
     const list = await lists.getById(contextHelpers.getAdminContext(), confirmation.list);
     subscription.cid = meta.cid;
-    await mailHelpers.sendSubscriptionConfirmed(req.language, list, subscription.email, subscription);
+    await mailHelpers.sendSubscriptionConfirmed(req.locale, list, subscription.email, subscription);
 
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/subscribed-notice');
 });
@@ -139,9 +139,9 @@ router.getAsync('/confirm/change-address/:cid', async (req, res) => {
 
     const subscription = await subscriptions.updateAddressAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionId, data.emailNew);
 
-    await mailHelpers.sendSubscriptionConfirmed(req.language, list, data.emailNew, subscription);
+    await mailHelpers.sendSubscriptionConfirmed(req.locale, list, data.emailNew, subscription);
 
-    req.flash('info', tUI('emailAddressChanged', req.language));
+    req.flash('info', tUI('emailAddressChanged', req.locale));
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/manage/' + subscription.cid);
 });
 
@@ -153,7 +153,7 @@ router.getAsync('/confirm/unsubscribe/:cid', async (req, res) => {
 
     const subscription = await subscriptions.unsubscribeByCidAndGet(contextHelpers.getAdminContext(), list.id, data.subscriptionCid, data.campaignCid);
 
-    await mailHelpers.sendUnsubscriptionConfirmed(req.language, list, subscription.email, subscription);
+    await mailHelpers.sendUnsubscriptionConfirmed(req.locale, list, subscription.email, subscription);
 
     res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribed-notice');
 });
@@ -181,7 +181,7 @@ async function _renderSubscribe(req, res, list, subscription) {
 
     await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
 
-    const htmlRenderer = await tools.getTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
     data.needsJsWarning = true;
@@ -245,7 +245,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
             throw new Error('Email address not set');
         }
 
-        req.flash('danger', tUI('emailAddressNotSet', req.language));
+        req.flash('danger', tUI('emailAddressNotSet', req.locale));
         return await _renderSubscribe(req, res, list, subscriptionData);
     }
 
@@ -282,7 +282,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     }
 
     if (existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED) {
-        await mailHelpers.sendAlreadySubscribed(req.language, list, email, existingSubscription);
+        await mailHelpers.sendAlreadySubscribed(req.locale, list, email, existingSubscription);
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
     } else {
@@ -296,12 +296,12 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
         if (!testsPass) {
             log.info('Subscription', 'Confirmation message for %s marked to be skipped (%s)', email, JSON.stringify(data));
         } else {
-            await mailHelpers.sendConfirmSubscription(req.language, list, email, confirmCid, subscriptionData);
+            await mailHelpers.sendConfirmSubscription(req.locale, list, email, confirmCid, subscriptionData);
         }
 
         if (req.xhr) {
             return res.status(200).json({
-                msg: tUI('pleaseConfirmSubscription', req.language)
+                msg: tUI('pleaseConfirmSubscription', req.locale)
             });
         }
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
@@ -385,7 +385,7 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
 
     await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage', data);
 
-    const htmlRenderer = await tools.getTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
     data.needsJsWarning = true;
@@ -435,7 +435,7 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
 
     await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage-address', data);
 
-    const htmlRenderer = await tools.getTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
     data.needsJsWarning = true;
@@ -458,7 +458,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
     }
 
     if (subscription.email === emailNew) {
-        req.flash('info', tUI('nothingSeemsToBeChanged', req.language));
+        req.flash('info', tUI('nothingSeemsToBeChanged', req.locale));
 
     } else {
         const emailErr = await tools.validateEmail(emailNew);
@@ -479,7 +479,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
             }
 
             if (newSubscription && newSubscription.status === SubscriptionStatus.SUBSCRIBED) {
-                await mailHelpers.sendAlreadySubscribed(req.language, list, emailNew, subscription);
+                await mailHelpers.sendAlreadySubscribed(req.locale, list, emailNew, subscription);
             } else {
                 const data = {
                     subscriptionId: subscription.id,
@@ -487,10 +487,10 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
                 };
 
                 const confirmCid = await confirmations.addConfirmation(list.id, 'change-address', req.ip, data);
-                await mailHelpers.sendConfirmAddressChange(req.language, list, emailNew, confirmCid, subscription);
+                await mailHelpers.sendConfirmAddressChange(req.locale, list, emailNew, confirmCid, subscription);
             }
 
-            req.flash('info', tUI('anEmailWithFurtherInstructionsHasBeen', req.language));
+            req.flash('info', tUI('anEmailWithFurtherInstructionsHasBeen', req.locale));
         }
     }
 
@@ -535,7 +535,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
 
         await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-unsubscribe', data);
 
-        const htmlRenderer = await tools.getTemplate(data.template);
+        const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
         data.isWeb = true;
         data.needsJsWarning = true;
@@ -565,7 +565,7 @@ async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaig
         try {
             const subscription = await subscriptions.unsubscribeByCidAndGet(contextHelpers.getAdminContext(), list.id, subscriptionCid, campaignCid);
 
-            await mailHelpers.sendUnsubscriptionConfirmed(req.language, list, subscription.email, subscription);
+            await mailHelpers.sendUnsubscriptionConfirmed(req.locale, list, subscription.email, subscription);
 
             res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/unsubscribed-notice');
 
@@ -590,7 +590,7 @@ async function handleUnsubscribe(list, subscriptionCid, autoUnsubscribe, campaig
             };
 
             const confirmCid = await confirmations.addConfirmation(list.id, 'unsubscribe', ip, data);
-            await mailHelpers.sendConfirmUnsubscription(req.language, list, subscription.email, confirmCid, subscription);
+            await mailHelpers.sendConfirmUnsubscription(req.locale, list, subscription.email, confirmCid, subscription);
 
             res.redirect('/subscription/' + encodeURIComponent(list.cid) + '/confirm-unsubscription-notice');
 
@@ -684,7 +684,7 @@ async function webNotice(type, req, res) {
 
     await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-' + type + '-notice', data);
 
-    const htmlRenderer = await tools.getTemplate(data.template);
+    const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
     data.flashMessages = await captureFlashMessages(res);

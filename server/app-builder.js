@@ -11,7 +11,6 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
 const flash = require('connect-flash');
 const hbs = require('hbs');
 const compression = require('compression');
@@ -157,17 +156,32 @@ function createApp(appType) {
     }));
 
     app.use(cookieParser());
-    app.use(session({
-        store: config.redis.enabled ? new RedisStore(config.redis) : false,
-        secret: config.www.secret,
-        saveUninitialized: false,
-        resave: false
-    }));
+
+    if (config.redis.enabled) {
+        const RedisStore = require('connect-redis')(session);
+
+        app.use(session({
+            store: new RedisStore(config.redis),
+            secret: config.www.secret,
+            saveUninitialized: false,
+            resave: false
+        }));
+    } else {
+        app.use(session({
+            store: false,
+            secret: config.www.secret,
+            saveUninitialized: false,
+            resave: false
+        }));
+    }
 
     app.use(expressLocale({
-        priority: ['query', 'accept-language', 'default'],
+        priority: ['query', 'cookie', 'accept-language', 'default'],
         query: {
-            name: 'language'
+            name: 'locale'
+        },
+        cookie: {
+            name: 'i18nextLng'
         },
         default: config.defaultLanguage
     }));

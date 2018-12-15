@@ -20,49 +20,49 @@ module.exports = {
     sendUnsubscriptionConfirmed
 };
 
-async function sendSubscriptionConfirmed(lang, list, email, subscription) {
+async function sendSubscriptionConfirmed(locale, list, email, subscription) {
     const relativeUrls = {
         preferencesUrl: '/subscription/' + list.cid + '/manage/' + subscription.cid,
         unsubscribeUrl: '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid
     };
 
-    await _sendMail(list, email, 'subscription_confirmed', lang, tMark('subscriptionconfirmed'), relativeUrls, subscription);
+    await _sendMail(list, email, 'subscription_confirmed', locale, tMark('subscriptionconfirmed'), relativeUrls, subscription);
 }
 
-async function sendAlreadySubscribed(lang, list, email, subscription) {
+async function sendAlreadySubscribed(locale, list, email, subscription) {
     const relativeUrls = {
         preferencesUrl: '/subscription/' + list.cid + '/manage/' + subscription.cid,
         unsubscribeUrl: '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid
     };
-    await _sendMail(list, email, 'already_subscribed', lang, tMark('listEmailAddressAlreadyRegistered'), relativeUrls, subscription);
+    await _sendMail(list, email, 'already_subscribed', locale, tMark('listEmailAddressAlreadyRegistered'), relativeUrls, subscription);
 }
 
-async function sendConfirmAddressChange(lang, list, email, cid, subscription) {
+async function sendConfirmAddressChange(locale, list, email, cid, subscription) {
     const relativeUrls = {
         confirmUrl: '/subscription/confirm/change-address/' + cid
     };
-    await _sendMail(list, email, 'confirm_address_change', lang, tMark('listPleaseConfirmEmailChangeIn'), relativeUrls, subscription);
+    await _sendMail(list, email, 'confirm_address_change', locale, tMark('listPleaseConfirmEmailChangeIn'), relativeUrls, subscription);
 }
 
-async function sendConfirmSubscription(lang, list, email, cid, subscription) {
+async function sendConfirmSubscription(locale, list, email, cid, subscription) {
     const relativeUrls = {
         confirmUrl: '/subscription/confirm/subscribe/' + cid
     };
-    await _sendMail(list, email, 'confirm_subscription', lang, tMark('pleaseConfirmSubscription'), relativeUrls, subscription);
+    await _sendMail(list, email, 'confirm_subscription', locale, tMark('pleaseConfirmSubscription'), relativeUrls, subscription);
 }
 
-async function sendConfirmUnsubscription(lang, list, email, cid, subscription) {
+async function sendConfirmUnsubscription(locale, list, email, cid, subscription) {
     const relativeUrls = {
         confirmUrl: '/subscription/confirm/unsubscribe/' + cid
     };
-    await _sendMail(list, email, 'confirm_unsubscription', lang, tMark('listPleaseConfirmUnsubscription'), relativeUrls, subscription);
+    await _sendMail(list, email, 'confirm_unsubscription', locale, tMark('listPleaseConfirmUnsubscription'), relativeUrls, subscription);
 }
 
-async function sendUnsubscriptionConfirmed(lang, list, email, subscription) {
+async function sendUnsubscriptionConfirmed(locale, list, email, subscription) {
     const relativeUrls = {
         subscribeUrl: '/subscription/' + list.cid + '?cid=' + subscription.cid
     };
-    await _sendMail(list, email, 'unsubscription_confirmed', lang, tMark('listUnsubscriptionConfirmed'), relativeUrls, subscription);
+    await _sendMail(list, email, 'unsubscription_confirmed', locale, tMark('listUnsubscriptionConfirmed'), relativeUrls, subscription);
 }
 
 function getDisplayName(flds, subscription) {
@@ -95,7 +95,7 @@ function getDisplayName(flds, subscription) {
     }
 }
 
-async function _sendMail(list, email, template, language, subjectKey, relativeUrls, subscription) {
+async function _sendMail(list, email, template, locale, subjectKey, relativeUrls, subscription) {
     const flds = await fields.list(contextHelpers.getAdminContext(), list.id);
 
     const encryptionKeys = [];
@@ -114,7 +114,7 @@ async function _sendMail(list, email, template, language, subjectKey, relativeUr
     };
 
     for (let relativeUrlKey in relativeUrls) {
-        data[relativeUrlKey] = getPublicUrl(relativeUrls[relativeUrlKey], {language});
+        data[relativeUrlKey] = getPublicUrl(relativeUrls[relativeUrlKey], {locale});
     }
 
     const fsTemplate = template.replace(/_/g, '-');
@@ -148,11 +148,12 @@ async function _sendMail(list, email, template, language, subjectKey, relativeUr
                     name: getDisplayName(flds, subscription),
                     address: email
                 },
-                subject: tUI(subjectKey, language, { list: list.name }),
+                subject: tUI(subjectKey, locale, { list: list.name }),
                 encryptionKeys
             }, {
                 html,
                 text,
+                locale,
                 data
             });
         } else {

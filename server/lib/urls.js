@@ -3,6 +3,7 @@
 const config = require('config');
 const urllib = require('url');
 const {anonymousRestrictedAccessToken} = require('../../shared/urls');
+const {getLangCodeFromExpressLocale} = require('./translate');
 
 function getTrustedUrlBase() {
     return urllib.resolve(config.www.trustedUrlBase, '');
@@ -19,8 +20,8 @@ function getPublicUrlBase() {
 function _getUrl(urlBase, path, opts) {
     const url = new URL(path || '', urlBase);
 
-    if (opts && opts.language) {
-        url.searchParams.append('lang', opts.language)
+    if (opts && opts.locale) {
+        url.searchParams.append('locale', getLangCodeFromExpressLocale(opts.locale));
     }
 
     return url.toString();

@@ -67,7 +67,7 @@ async function _sendTransactionalMail(transport, mail, template) {
     }
     mail.headers['X-Sending-Zone'] = 'transactional';
 
-    const htmlRenderer = await tools.getTemplate(template.html);
+    const htmlRenderer = await tools.getTemplate(template.html, template.locale);
 
     if (htmlRenderer) {
         mail.html = htmlRenderer(template.data || {});
@@ -79,7 +79,7 @@ async function _sendTransactionalMail(transport, mail, template) {
         mail.html = preparedHtml;
     }
 
-    const textRenderer = await tools.getTemplate(template.text);
+    const textRenderer = await tools.getTemplate(template.text, template.locale);
 
     if (textRenderer) {
         mail.text = textRenderer(template.data || {});

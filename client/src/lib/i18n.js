@@ -12,25 +12,24 @@ import mailtrainConfig
 import hoistStatics
     from 'hoist-non-react-statics';
 
-import {convertToFake, langCodes} from '../../../shared/langs';
+import {convertToFake, getLang} from '../../../shared/langs';
 
-import commonEn from "../../../locales/en/common";
-import commonEs from "../../../locales/es/common";
+import lang_en_US_common from "../../../locales/en-US/common";
 
 const resourcesCommon = {
-    en: commonEn,
-    es: commonEs,
-    fake: convertToFake(commonEn)
+    'en-US': lang_en_US_common,
+    'fk-FK': convertToFake(lang_en_US_common)
 };
 
 const resources = {};
 for (const lng of mailtrainConfig.enabledLanguages) {
-    const shortCode = langCodes[lng].shortCode;
-    resources[shortCode] = {
-        common: resourcesCommon[shortCode]
+    const langDesc = getLang(lng);
+    resources[langDesc.longCode] = {
+        common: resourcesCommon[langDesc.longCode]
     };
 }
 
+console.log(resources);
 
 i18n
     .use(LanguageDetector)
@@ -46,16 +45,19 @@ i18n
 
         react: {
             wait: true,
-            defaultTransParent: 'span' // This is because we use React < v16
+            defaultTransParent: 'span' // This is because we use React < v16 FIXME
         },
 
         detection: {
             order: ['querystring', 'cookie', 'localStorage', 'navigator'],
-            lookupQuerystring: 'language',
-            lookupCookie: 'i18next',
+            lookupQuerystring: 'locale',
+            lookupCookie: 'i18nextLng',
             lookupLocalStorage: 'i18nextLng',
-            caches: ['localStorage']
+            caches: ['localStorage', 'cookie']
         },
+
+        whitelist: mailtrainConfig.enabledLanguages,
+        load: 'currentOnly',
 
         debug: true
     })

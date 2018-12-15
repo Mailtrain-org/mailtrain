@@ -100,6 +100,7 @@ export default class List extends Component {
                     const actions = [];
                     const perms = data[10];
                     const campaignType = data[4];
+                    const status = data[5];
                     const campaignSource = data[7];
 
                     if (perms.includes('viewStats')) {
@@ -107,6 +108,13 @@ export default class List extends Component {
                             label: <Icon icon="send" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`
                         });
+
+                        if (status === CampaignStatus.SENDING || status === CampaignStatus.PAUSED || status === CampaignStatus.FINISHED) {
+                            actions.push({
+                                label: <Icon icon="signal" title={t('Statistics')}/>,
+                                link: `/campaigns/${data[0]}/statistics`
+                            });
+                        }
                     }
 
                     if (perms.includes('edit')) {

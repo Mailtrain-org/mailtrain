@@ -14,7 +14,7 @@ const camelCase = require('camelcase');
 const slugify = require('slugify');
 const readline = require('readline');
 
-const localeFile = 'en/common.json';
+const localeFile = 'en_US/common.json';
 const searchDirs = [
     '../client/src',
     '../server',
@@ -121,7 +121,7 @@ function allowedDirOrFile(item) {
             pp.base !== 'node_modules'
         ) ||
         (item.stats.isFile() &&
-            ( pp.ext === '.js' || pp.ext === '.jsx')
+            ( pp.ext === '.js' || pp.ext === '.jsx' || pp.ext === '.hbs')
         )
     );
 }
@@ -148,11 +148,12 @@ function parseSpec(specStr) {
 
 // see http://blog.stevenlevithan.com/archives/match-quoted-string
 const tMatcher = /(^|[ {+(=.\[])((?:tUI|tLog|t|tMark)\s*\(\s*(?:\/\*(.*?)\*\/)?\s*)(["'])((?:(?!\4)[^\\]|\\.)*)(\4)/;
-const transMatcher = /(\/\*(.*?)\*\/\s*)?(\<Trans[ >][\s\S]*?\<\/Trans\>)/;
+const jsxTransMatcher = /(\/\*(.*?)\*\/\s*)?(\<Trans[ >][\s\S]*?\<\/Trans\>)/;
+const hbsTranslateMatcher = /(\{\{!--(.*?)--\}\}\s*)?\{\{#translate\}\}([\s\S]*?)\{\{\/translate\}\}/;
 
 const jsxParser = acorn.Parser.extend(acornJsx());
-function parseTrans(fragment) {
-    const match = fragment.match(transMatcher);
+function parseJsxTrans(fragment) {
+    const match = fragment.match(jsxTransMatcher);
     const spec = parseSpec(match[2]);
     const jsxStr = match[3];
 
@@ -219,6 +220,27 @@ function parseTrans(fragment) {
     return { key, originalKey, value, replacement };
 }
 
+
+function parseHbsTranslate(fragment) {
+    const match = fragment.match(hbsTranslateMatcher);
+    const spec = parseSpec(match[2]);
+    const originalKey = match[3];
+
+    let value;
+    const originalValue = findInDict(originalResDict, originalKey);
+
+    if (originalValue === undefined) {
+        value = originalKey;
+    } else {
+        value = originalValue;
+    }
+
+    const key = getKeyFromValue(spec, value);
+
+    const replacement = `${match[1] || ''}${key}`;
+
+    return { key, originalKey, value, replacement };
+}
 
 function parseT(fragment) {
     const match = fragment.match(tMatcher);
@@ -295,8 +317,11 @@ function processFile(file) {
         update(fragments, parseT);
     }
 
-    const fragments = source.match(new RegExp(transMatcher, 'g'));
-    update(fragments, parseTrans);
+    const hbsFragments = source.match(new RegExp(hbsTranslateMatcher, 'g'));
+    update(hbsFragments, parseHbsTranslate);
+
+    const jsxFragments = source.match(new RegExp(jsxTransMatcher, 'g'));
+    update(jsxFragments, parseJsxTrans);
 
     if (anyUpdates) {
         console.log(`Updating ${file}`);

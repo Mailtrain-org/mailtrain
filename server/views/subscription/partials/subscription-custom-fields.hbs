@@ -2,11 +2,11 @@
 
     {{#if typeSubscriptionEmail}}
         <div class="form-group email">
-            <label for="EMAIL">Email Address</label>
+            <label for="EMAIL">{{#translate}}Email Address{{/translate}}</label>
             {{#if ../isManagePreferences}}
                 <div class="input-group">
                     <input type="email" name="EMAIL" id="email" placeholder="" value="{{../email}}" readonly>
-                    <div class="input-group-addon"><a href="/subscription/{{../lcid}}/manage-address/{{../cid}}">want to change it?</a></div>
+                    <div class="input-group-addon"><a href="/subscription/{{../lcid}}/manage-address/{{../cid}}">{{#translate}}want to change it?{{/translate}}</a></div>
                 </div>
             {{else}}
                 <input type="email" name="EMAIL" id="email" placeholder="" value="{{../email}}" required>
@@ -53,11 +53,11 @@
         <div class="form-group gpg {{key}}">
             <label for="{{key}}">{{name}}</label>
             {{#if ../hasPubkey}}
-                <button class="btn-download-pubkey" type="submit" form="download-pubkey">Download signature verification key</button>
+                <button class="btn-download-pubkey" type="submit" form="download-pubkey">{{#translate}}Download signature verification key{{/translate}}</button>
             {{/if}}
-            <textarea class="form-control gpg-text" rows="4" name="{{key}}" placeholder="Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
+            <textarea class="form-control gpg-text" rows="4" name="{{key}}" placeholder="{{#translate}}Begins with &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;{{/translate}}">{{value}}</textarea>
             <span class="help-block">
-                Insert your GPG public key here to encrypt messages sent to your address <em>(optional)</em>
+                {{#translate}}Insert your GPG public key here to encrypt messages sent to your address <em>(optional)</em>{{/translate}}
             </span>
         </div>
     {{/if}}
@@ -95,7 +95,7 @@
             <label for="{{key}}">{{name}}</label>
             <select name="{{key}}" class="form-control">
                 <option value="">
-                    –– Select ––
+                    {{#translate}}–– Select ––{{/translate}}
                 </option>
                 {{#each options}}
                     <option value="{{key}}" {{#if value}} selected {{/if}}>{{name}}</option>

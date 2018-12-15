@@ -29,7 +29,7 @@ function getFilePath(type, subType, entityId, filename) {
 }
 
 function getFileUrl(context, type, subType, entityId, filename) {
-    return getPublicUrl(`files/${type}/${subType}/${entityId}/${filename}`, context)
+    return getPublicUrl(`files/${type}/${subType}/${entityId}/${filename}`)
 }
 
 function getFilesTable(type, subType) {
@@ -109,7 +109,7 @@ async function getFileByFilename(context, type, subType, entityId, name) {
 }
 
 async function getFileByUrl(context, url) {
-    const urlPrefix = getPublicUrl('files/', context);
+    const urlPrefix = getPublicUrl('files/');
     if (url.startsWith(urlPrefix)) {
         const path = url.substring(urlPrefix.length);
         const pathElem = path.split('/');

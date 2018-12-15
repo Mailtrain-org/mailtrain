@@ -37,6 +37,7 @@
     "react-dnd-touch-backend": "^0.3.21",
     "react-dom": "^15.6.1",
     "react-dropzone": "^4.3.0",
+    "react-google-charts": "^2.0.29",
     "react-i18next": "^8.3.8",
     "react-router-dom": "^4.3.1",
     "react-sortable-tree": "^1.2.0",

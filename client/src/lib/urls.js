@@ -3,6 +3,7 @@
 import {anonymousRestrictedAccessToken} from '../../../shared/urls';
 import {AppType} from '../../../shared/app';
 import mailtrainConfig from "mailtrainConfig";
+import i18n from './i18n';
 
 let restrictedAccessToken = anonymousRestrictedAccessToken;
 
@@ -18,8 +19,14 @@ function getSandboxUrl(path) {
     return mailtrainConfig.sandboxUrlBase + restrictedAccessToken + '/' + (path || '');
 }
 
-function getPublicUrl(path) {
-    return mailtrainConfig.publicUrlBase + (path || '');
+function getPublicUrl(path, opts) {
+    const url = new URL(path || '', mailtrainConfig.publicUrlBase);
+
+    if (opts && opts.withLocale) {
+        url.searchParams.append('locale', i18n.language);
+    }
+
+    return url.toString();
 }
 
 function getUrl(path) {

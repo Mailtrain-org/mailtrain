@@ -286,7 +286,7 @@ async function resetAccessToken(userId) {
     return token;
 }
 
-async function sendPasswordReset(language, usernameOrEmail) {
+async function sendPasswordReset(locale, usernameOrEmail) {
     enforce(passport.isAuthMethodLocal, 'Local user management is required');
 
     await knex.transaction(async tx => {
@@ -310,12 +310,13 @@ async function sendPasswordReset(language, usernameOrEmail) {
                 to: {
                     address: user.email
                 },
-                subject: tUI('mailerPasswordChangeRequest', language)
+                subject: tUI('mailerPasswordChangeRequest', locale)
             }, {
-                html: 'emails/password-reset-html.hbs',
-                text: 'emails/password-reset-text.hbs',
+                html: 'users/password-reset-html.hbs',
+                text: 'users/password-reset-text.hbs',
+                locale,
                 data: {
-                    title: 'Mailtrain',
+                    title: tUI('Mailtrain', locale),
                     username: user.username,
                     name: user.name,
                     confirmUrl: getTrustedUrl(`/account/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)

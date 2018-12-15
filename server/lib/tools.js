@@ -19,17 +19,34 @@ const he = require('he');
 const fs = require('fs-extra');
 
 const { JSDOM } = require('jsdom');
-const { tUI, tLog } = require('./translate');
+const { tUI, tLog, getLangCodeFromExpressLocale } = require('./translate');
 
 
 const templates = new Map();
 
-async function getTemplate(template) {
+async function getLocalizedFile(basePath, fileName, language) {
+    try {
+        const locFn = path.join(basePath, language, fileName);
+        const stats = await fs.stat(locFn);
+
+        if (stats.isFile()) {
+            return locFn;
+        }
+    } catch (err) {
+        if (err.code !== 'ENOENT') {
+            throw err;
+        }
+    }
+
+    return path.join(basePath, fileName)
+}
+
+async function getTemplate(template, locale) {
     if (!template) {
         return false;
     }
 
-    const key = (typeof template === 'object') ? hasher.hash(template) : template;
+    const key = getLangCodeFromExpressLocale(locale) + ':' + ((typeof template === 'object') ? hasher.hash(template) : template);
 
     if (templates.has(key)) {
         return templates.get(key);
@@ -37,9 +54,9 @@ async function getTemplate(template) {
 
     let source;
     if (typeof template === 'object') {
-        source = await mergeTemplateIntoLayout(template.template, template.layout);
+        source = await mergeTemplateIntoLayout(template.template, template.layout, locale);
     } else {
-        source = await fs.readFile(path.join(__dirname, '..', 'views', template), 'utf-8');
+        source = await fs.readFile(await getLocalizedFile(path.join(__dirname, '..', 'views'), template, getLangCodeFromExpressLocale(locale)), 'utf-8');
     }
 
     if (template.type === 'mjml') {
@@ -53,17 +70,35 @@ async function getTemplate(template) {
     }
 
     const renderer = hbs.handlebars.compile(source);
-    templates.set(key, renderer);
 
-    return renderer;
+    const localizedRenderer = (data, options) => {
+        if (!options) {
+            options = {};
+        }
+
+        if (!options.helpers) {
+            options.helpers = {};
+        }
+
+        options.helpers.translate = function (opts) { // eslint-disable-line prefer-arrow-callback
+            const result = tUI(opts.fn(this), locale, opts.hash); // eslint-disable-line no-invalid-this
+            return new hbs.handlebars.SafeString(result);
+        };
+
+        return renderer(data, options);
+    };
+
+    templates.set(key, localizedRenderer);
+
+    return localizedRenderer;
 }
 
 
-async function mergeTemplateIntoLayout(template, layout) {
+async function mergeTemplateIntoLayout(template, layout, locale) {
     layout = layout || '{{{body}}}';
 
     async function readFile(relPath) {
-        return await fs.readFile(path.join(__dirname, '..', 'views', relPath), 'utf-8');
+        return await fs.readFile(await getLocalizedFile(path.join(__dirname, '..', 'views'), relPath, getLangCodeFromExpressLocale(locale)), 'utf-8');
     }
 
     // Please dont end your custom messages with .hbs ...
@@ -184,7 +219,6 @@ function getMessageLinks(campaign, list, subscription) {
 module.exports = {
     validateEmail,
     validateEmailGetMessage,
-    mergeTemplateIntoLayout,
     getTemplate,
     prepareHtml,
     getMessageLinks,

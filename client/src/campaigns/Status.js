@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withTranslation } from '../lib/i18n';
 import {
+    NavButton,
     requiresAuthenticatedUser,
     Title,
     withPageHelpers
@@ -77,7 +78,7 @@ class TestUser extends Component {
             const campaignCid = this.props.entity.cid;
             const [listCid, subscriptionCid] = this.getFormValue('testUser').split(':');
 
-            window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`), '_blank');
+            window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');
         } else {
             this.showFormValidation();
         }
@@ -257,6 +258,7 @@ class SendControls extends Component {
                             :
                             <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.startAsync}/>
                         }
+                        {entity.status === CampaignStatus.PAUSED && <NavButton className="btn-default" icon="signal" label={t('View statistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>}
                     </ButtonRow>
                 </div>
             );
@@ -269,6 +271,7 @@ class SendControls extends Component {
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
+                        <NavButton className="btn-default" icon="signal" label={t('View statistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
                 </div>
             );
@@ -284,6 +287,7 @@ class SendControls extends Component {
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.startAsync}/>
                         <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
+                        <NavButton className="btn-default" icon="signal" label={t('View statistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
                 </div>
             );

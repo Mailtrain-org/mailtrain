@@ -62,7 +62,7 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
         };
 
         const confirmCid = await confirmations.addConfirmation(list.id, 'subscribe', req.ip, data);
-        await mailHelpers.sendConfirmSubscription(req.language, list, input.EMAIL, confirmCid, subscription);
+        await mailHelpers.sendConfirmSubscription(req.locale, list, input.EMAIL, confirmCid, subscription);
 
         res.status(200);
         res.json({
