@@ -12,7 +12,7 @@ const settings = require('../models/settings');
 const { tUI } = require('../lib/translate');
 const contextHelpers = require('../lib/context-helpers');
 const forms = require('../models/forms');
-const {getTrustedUrl} = require('../lib/urls');
+const {getTrustedUrl, getPublicUrl} = require('../lib/urls');
 const bluebird = require('bluebird');
 
 const { SubscriptionStatus, SubscriptionSource } = require('../../shared/lists');
@@ -86,7 +86,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
 
     data.template.template = form[viewKey] || data.template.template;
     data.template.layout = form.layout || data.template.layout;
-    data.formInputStyle = form.formInputStyle || '@import url(/static/subscription/form-input-style.css);';
+    data.formInputStyle = form.formInputStyle || `@import url(${getPublicUrl('static/subscription/form-input-style.css')});`;
 
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['uaCode']);
 
@@ -168,7 +168,6 @@ async function _renderSubscribe(req, res, list, subscription) {
     data.csrfToken = req.csrfToken();
 
     data.customFields = await fields.forHbs(contextHelpers.getAdminContext(), list.id, subscription);
-    data.useEditor = true;
 
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPrivateKey']);
     data.hasPubkey = !!configItems.pgpPrivateKey;
@@ -179,7 +178,7 @@ async function _renderSubscribe(req, res, list, subscription) {
         type: 'mjml'
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'web_subscribe', data);
 
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
@@ -334,7 +333,7 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
         layout: null,
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-subscribe', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'web_subscribe', data);
 
     const renderAsync = bluebird.promisify(res.render);
     const html = await renderAsync('subscription/widget-subscribe', data);
@@ -372,8 +371,6 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
 
     data.customFields = await fields.forHbs(contextHelpers.getAdminContext(), list.id, subscription);
 
-    data.useEditor = true;
-
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['pgpPrivateKey']);
     data.hasPubkey = !!configItems.pgpPrivateKey;
 
@@ -383,7 +380,7 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
         type: 'mjml'
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'web_manage', data);
 
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
@@ -433,7 +430,7 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
         type: 'mjml'
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'data/web-manage-address', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'web_manage_address', data);
 
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
@@ -533,7 +530,7 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
             type: 'mjml'
         };
 
-        await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-unsubscribe', data);
+        await injectCustomFormData(req.query.fid || list.default_form, 'web_unsubscribe', data);
 
         const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
@@ -682,7 +679,7 @@ async function webNotice(type, req, res) {
         }
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'subscription/web-' + type + '-notice', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'web_' + type + '_notice', data);
 
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 

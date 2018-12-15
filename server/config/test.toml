@@ -22,3 +22,5 @@ nameTag="username"
 passwordresetlink="xxx"
 [reports]
 enabled=true
+[redis]
+enabled=true

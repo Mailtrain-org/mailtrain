@@ -206,7 +206,7 @@ class CodeEditorSandbox extends Component {
                 {
                     this.state.preview &&
                     <div className={styles.preview}>
-                        <iframe ref={node => this.previewNode = node} src={"data:text/html;charset=utf-8," + escape(previewContents)}></iframe>
+                        <iframe ref={node => this.previewNode = node} src={"data:text/html;charset=utf-8," + encodeURIComponent(previewContents)}></iframe>
                     </div>
                 }
             </div>

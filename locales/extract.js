@@ -14,7 +14,7 @@ const camelCase = require('camelcase');
 const slugify = require('slugify');
 const readline = require('readline');
 
-const localeFile = 'en_US/common.json';
+const localeFile = 'en-US/common.json';
 const searchDirs = [
     '../client/src',
     '../server',
@@ -149,7 +149,7 @@ function parseSpec(specStr) {
 // see http://blog.stevenlevithan.com/archives/match-quoted-string
 const tMatcher = /(^|[ {+(=.\[])((?:tUI|tLog|t|tMark)\s*\(\s*(?:\/\*(.*?)\*\/)?\s*)(["'])((?:(?!\4)[^\\]|\\.)*)(\4)/;
 const jsxTransMatcher = /(\/\*(.*?)\*\/\s*)?(\<Trans[ >][\s\S]*?\<\/Trans\>)/;
-const hbsTranslateMatcher = /(\{\{!--(.*?)--\}\}\s*)?\{\{#translate\}\}([\s\S]*?)\{\{\/translate\}\}/;
+const hbsTranslateMatcher = /(\{\{!--(.*?)--\}\}\s*)?(\{\{#translate\}\})([\s\S]*?)(\{\{\/translate\}\})/;
 
 const jsxParser = acorn.Parser.extend(acornJsx());
 function parseJsxTrans(fragment) {
@@ -224,7 +224,7 @@ function parseJsxTrans(fragment) {
 function parseHbsTranslate(fragment) {
     const match = fragment.match(hbsTranslateMatcher);
     const spec = parseSpec(match[2]);
-    const originalKey = match[3];
+    const originalKey = match[4];
 
     let value;
     const originalValue = findInDict(originalResDict, originalKey);
@@ -237,7 +237,7 @@ function parseHbsTranslate(fragment) {
 
     const key = getKeyFromValue(spec, value);
 
-    const replacement = `${match[1] || ''}${key}`;
+    const replacement = `${match[1] || ''}${match[3]}${key}${match[5]}`;
 
     return { key, originalKey, value, replacement };
 }

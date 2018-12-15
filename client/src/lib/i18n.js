@@ -29,8 +29,6 @@ for (const lng of mailtrainConfig.enabledLanguages) {
     };
 }
 
-console.log(resources);
-
 i18n
     .use(LanguageDetector)
     .init({

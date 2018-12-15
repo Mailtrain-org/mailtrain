@@ -34,6 +34,21 @@ import {
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig
     from 'mailtrainConfig';
+import {
+    getTrustedUrl,
+    getUrl
+} from "../../lib/urls";
+import {
+    ActionLink,
+    Icon
+} from "../../lib/bootstrap-components";
+import styles
+    from "../../lib/styles.scss";
+import formsStyles
+    from "./styles.scss";
+import axios
+    from "../../lib/axios";
+import {UntrustedContentHost} from "../../lib/untrusted";
 
 @withTranslation()
 @withForm
@@ -44,7 +59,10 @@ export default class CUD extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {};
+        this.state = {
+            previewContents: null,
+            previewFullscreen: false
+        };
 
         this.serverValidatedFields = [
             'layout',
@@ -77,6 +95,13 @@ export default class CUD extends Component {
             serverValidation: {
                 url: 'rest/forms-validate',
                 changed: this.serverValidatedFields
+            },
+            onChange: {
+                previewList: () => {
+                    this.setState({
+                        previewContents: null
+                    });
+                }
             }
         });
 
@@ -372,6 +397,23 @@ export default class CUD extends Component {
         }
     }
 
+    async preview(formKey) {
+        const data = {
+            formKey,
+            template: this.getFormValue(formKey),
+            layout: this.getFormValue('layout'),
+            formInputStyle: this.getFormValue('form_input_style'),
+            listId: this.getFormValue('previewList')
+        }
+
+        const response = await axios.post(getUrl('rest/forms-preview'), data);
+
+        this.setState({
+            previewContents: response.data.content,
+            previewLabel: this.templateSettings[formKey].label
+        });
+    }
+
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
@@ -394,7 +436,7 @@ export default class CUD extends Component {
         const listsColumns = [
             { data: 0, title: "#" },
             { data: 1, title: t('name') },
-            { data: 2, title: t('id'), render: data => `<code>${data}</code>` },
+            { data: 2, title: t('id'), render: data => <code>{data}</code> },
             { data: 5, title: t('namespace') }
         ];
 
@@ -402,7 +444,7 @@ export default class CUD extends Component {
         const selectedTemplate = this.getFormValue('selectedTemplate');
 
         return (
-            <div>
+            <div className={this.state.previewFullscreen ? styles.withElementInFullscreen : ''}>
                 {canDelete &&
                     <DeleteModalDialog
                         stateOwner={this}
@@ -427,34 +469,49 @@ export default class CUD extends Component {
                         <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
 
                         { previewListId &&
-                            <AlignedRow>
-                                <div className="help-block">
-                                    <small>
-                                        Note: These links are solely for a quick preview. If you submit a preview form you'll get redirected to the list's default form.
-                                    </small>
+                            <div>
+                                <AlignedRow>
+                                    <div className="help-block">
+                                        <small>
+                                            {t('Note: These links are solely for a quick preview. To get the address of the subscription form, go to the list\'s subscribers and click on "Subscription Form".')}
+                                        </small>
+                                    </div>
+                                    <p>
+                                        <ActionLink onClickAsync={async () => await this.preview('web_subscribe')}>Subscribe</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_confirm_subscription_notice')}>Confirm Subscription Notice</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_confirm_unsubscription_notice')}>Confirm Unsubscription Notice</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_subscribed_notice')}>Subscribed Notice</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_updated_notice')}>Updated Notice</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_unsubscribed_notice')}>Unsubscribed Notice</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_manual_unsubscribe_notice')}>Manual Unsubscribe Notice</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_unsubscribe')}>Unsubscribe</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_manage')}>Manage</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_manage_address')}>Manage Address</ActionLink>
+                                        {' | '}
+                                        <ActionLink onClickAsync={async () => await this.preview('web_privacy_policy_notice')}>Privacy Policy</ActionLink>
+                                    </p>
+                                </AlignedRow>
+                                {this.state.previewContents &&
+                                <div className={this.state.previewFullscreen ? formsStyles.editorFullscreen : formsStyles.editor}>
+                                    <div className={formsStyles.navbar}>
+                                        {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
+                                        <div className={formsStyles.title}>{t('Form preview:') + ' ' + this.state.previewLabel}</div>
+                                        <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})}><Icon icon="remove"/></a>
+                                        <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})}><Icon icon="fullscreen"/></a>
+                                    </div>
+                                    <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
                                 </div>
-                                <p>
-                                    <a href={`/lists/forms/preview/${previewListId}`} target="_blank">Subscribe</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/confirm-subscription-notice`} target="_blank">Confirm Subscription Notice</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/confirm-unsubscription-notice`} target="_blank">Confirm Unsubscription Notice</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/subscribed-notice`} target="_blank">Subscribed Notice</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/updated-notice`} target="_blank">Updated Notice</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/unsubscribed-notice`} target="_blank">Unsubscribed Notice</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/manual-unsubscribe-notice`} target="_blank">Manual Unsubscribe Notice</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/unsubscribe`} target="_blank">Unsubscribe</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/manage`} target="_blank">Manage</a>
-                                    |
-                                    <a href={`/lists/forms/preview/${previewListId}/manage-address`} target="_blank">Manage Address</a>
-                                </p>
-                            </AlignedRow>
+                                }
+                            </div>
                         }
                     </Fieldset>
 

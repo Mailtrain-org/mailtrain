@@ -258,7 +258,7 @@ class SendControls extends Component {
                             :
                             <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.startAsync}/>
                         }
-                        {entity.status === CampaignStatus.PAUSED && <NavButton className="btn-default" icon="signal" label={t('View statistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>}
+                        {entity.status === CampaignStatus.PAUSED && <NavButton className="btn-default" icon="signal" label={t('viewStatistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>}
                     </ButtonRow>
                 </div>
             );
@@ -271,7 +271,7 @@ class SendControls extends Component {
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
-                        <NavButton className="btn-default" icon="signal" label={t('View statistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
+                        <NavButton className="btn-default" icon="signal" label={t('viewStatistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
                 </div>
             );
@@ -287,7 +287,7 @@ class SendControls extends Component {
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.startAsync}/>
                         <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
-                        <NavButton className="btn-default" icon="signal" label={t('View statistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
+                        <NavButton className="btn-default" icon="signal" label={t('viewStatistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
                 </div>
             );

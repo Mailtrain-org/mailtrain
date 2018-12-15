@@ -9,9 +9,7 @@ const {convertToFake, getLang} = require('../../shared/langs');
 const resourcesCommon = {};
 
 function loadLanguage(longCode) {
-    resourcesCommon[longCode] = {
-        common: JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'locales', longCode, 'common.json')))
-    };
+    resourcesCommon[longCode] = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'locales', longCode, 'common.json')));
 }
 
 loadLanguage('en-US');

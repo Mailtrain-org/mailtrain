@@ -316,7 +316,7 @@ async function sendPasswordReset(locale, usernameOrEmail) {
                 text: 'users/password-reset-text.hbs',
                 locale,
                 data: {
-                    title: tUI('Mailtrain', locale),
+                    title: tUI('mailtrain', locale),
                     username: user.username,
                     name: user.name,
                     confirmUrl: getTrustedUrl(`/account/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)

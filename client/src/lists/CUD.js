@@ -92,7 +92,7 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
-            state.setIn(['send_configuration', 'error'], t('Send configuration must be selected'));
+            state.setIn(['send_configuration', 'error'], t('sendConfigurationMustBeSelected'));
         } else {
             state.setIn(['send_configuration', 'error'], null);
         }

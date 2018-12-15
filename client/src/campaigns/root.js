@@ -39,7 +39,7 @@ function getMenus(t) {
                             panelRender: props => <Status entity={props.resolved.campaign} />
                         },
                         statistics: {
-                            title: t('Statistics'),
+                            title: t('statistics'),
                             link: params => `/campaigns/${params.campaignId}/statistics`,
                             visible: resolved => resolved.campaign.permissions.includes('viewStats') && (resolved.campaign.status === CampaignStatus.SENDING || resolved.campaign.status === CampaignStatus.PAUSED || resolved.campaign.status === CampaignStatus.FINISHED),
                             panelRender: props => <Statistics entity={props.resolved.campaign} />

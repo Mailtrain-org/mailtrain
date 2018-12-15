@@ -111,7 +111,7 @@ export default class List extends Component {
 
                         if (status === CampaignStatus.SENDING || status === CampaignStatus.PAUSED || status === CampaignStatus.FINISHED) {
                             actions.push({
-                                label: <Icon icon="signal" title={t('Statistics')}/>,
+                                label: <Icon icon="signal" title={t('statistics')}/>,
                                 link: `/campaigns/${data[0]}/statistics`
                             });
                         }

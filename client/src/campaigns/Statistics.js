@@ -79,7 +79,7 @@ export default class Statistics extends Component {
 
         return (
             <div>
-                <Title>{t('Campaign Statistics')}</Title>
+                <Title>{t('campaignStatistics')}</Title>
 
                 <Chart
                     width="100%"
