@@ -5,6 +5,8 @@ const config = require('config');
 const forms = require('../models/forms');
 const shares = require('../models/shares');
 const urls = require('./urls');
+const settings = require('../models/settings');
+const contextHelpers = require('./context-helpers');
 
 
 async function getAnonymousConfig(context, appType) {
@@ -31,6 +33,8 @@ async function getAuthenticatedConfig(context) {
         globalPermissions[perm] = true;
     }
 
+    const setts = await settings.get(contextHelpers.getAdminContext(), ['mapsApiKey']);
+
     return {
         defaultCustomFormValues: await forms.getDefaultCustomFormValues(),
         user: {
@@ -42,7 +46,8 @@ async function getAuthenticatedConfig(context) {
         editors: config.editors,
         mosaico: config.mosaico,
         verpEnabled: config.verp.enabled,
-        reportsEnabled: config.reports.enabled
+        reportsEnabled: config.reports.enabled,
+        mapsApiKey: setts.mapsApiKey
     }
 }
 

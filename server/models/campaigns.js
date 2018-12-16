@@ -10,13 +10,14 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
-const { CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend} = require('../../shared/campaigns');
+const { CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
 const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
 const {SubscriptionStatus} = require('../../shared/lists');
 const subscriptions = require('./subscriptions');
 const segments = require('./segments');
 const senders = require('../lib/senders');
+const {LinkId} = require('./links');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
@@ -158,7 +159,8 @@ async function listTestUsersDTAjax(context, campaignId, params) {
                 subsQry = knex.raw(subsUnionSql, subsUnionBindings);
             }
 
-            return await dtHelpers.ajaxListWithPermissions(
+            return await dtHelpers.ajaxListWithPermissionsTx(
+                tx,
                 context,
                 [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'], column: 'subs.list_id' }],
                 params,
@@ -190,6 +192,115 @@ async function listTestUsersDTAjax(context, campaignId, params) {
         }
     });
 }
+
+async function _listSubscriberResultsDTAjax(context, campaignId, getSubsQrys, columns, params) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
+
+        const subsQrys = [];
+        const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
+
+        for (const cpgList of cpgLists) {
+            const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
+            subsQrys.push(getSubsQrys(subsTable, cpgList));
+        }
+
+        if (subsQrys.length > 0) {
+            let subsSql, subsBindings;
+
+            if (subsQrys.length === 1) {
+                subsSql = '(' + subsQrys[0].sql + ') as `subs`'
+                subsBindings = subsQrys[0].bindings;
+
+            } else {
+                subsSql = '(' +
+                    subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ') +
+                    ') as `subs`';
+                subsBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
+            }
+
+            return await dtHelpers.ajaxListWithPermissionsTx(
+                tx,
+                context,
+                [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'], column: 'lists.id' }],
+                params,
+                (builder, tx) => builder.from(knex.raw(subsSql, subsBindings))
+                    .innerJoin('lists', 'subs.list', 'lists.id')
+                    .innerJoin('namespaces', 'lists.namespace', 'namespaces.id')
+                ,
+                columns
+            );
+
+        } else {
+            const result = {
+                draw: params.draw,
+                recordsTotal: 0,
+                recordsFiltered: 0,
+                data: []
+            };
+
+            return result;
+        }
+    });
+}
+
+
+async function listSentByStatusDTAjax(context, campaignId, status, params) {
+    return await _listSubscriberResultsDTAjax(
+        context,
+        campaignId,
+        (subsTable, cpgList) => knex.from(subsTable)
+            .innerJoin(
+                function () {
+                    return this.from('campaign_messages')
+                        .where('campaign_messages.campaign', campaignId)
+                        .where('campaign_messages.list', cpgList.list)
+                        .where('campaign_messages.status', status)
+                        .as('related_campaign_messages');
+                },
+                'related_campaign_messages.subscription', subsTable + '.id')
+            .select([subsTable + '.email', subsTable + '.cid', knex.raw('? AS list', [cpgList.list])])
+            .toSQL().toNative(),
+        [ 'subs.email', 'subs.cid', 'lists.cid', 'lists.name', 'namespaces.name' ],
+        params
+    );
+}
+
+async function listOpensDTAjax(context, campaignId, params) {
+    return await _listSubscriberResultsDTAjax(
+        context,
+        campaignId,
+        (subsTable, cpgList) => knex.from(subsTable)
+            .innerJoin(
+                function () {
+                    return this.from('campaign_links')
+                        .where('campaign_links.campaign', campaignId)
+                        .where('campaign_links.list', cpgList.list)
+                        .where('campaign_links.link', LinkId.OPEN)
+                        .as('related_campaign_links');
+                },
+                'related_campaign_links.subscription', subsTable + '.id')
+            .select([subsTable + '.email', subsTable + '.cid', knex.raw('? AS list', [cpgList.list]), 'related_campaign_links.count'])
+            .toSQL().toNative(),
+        [ 'subs.email', 'subs.cid', 'lists.cid', 'lists.name', 'namespaces.name', 'subs.count' ],
+        params
+    );
+}
+
+async function listLinkClicksDTAjax(context, campaignId, params) {
+    return await knex.transaction(async (tx) => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'viewStats');
+
+        return await dtHelpers.ajaxListTx(
+            tx,
+            params,
+            builder => builder.from('links')
+                .where('links.campaign', campaignId),
+            [ 'links.url', 'links.visits', 'links.hits' ]
+        );
+    });
+}
+
 
 async function getTrackingSettingsByCidTx(tx, cid) {
     const entity = await tx('campaigns').where('campaigns.cid', cid)
@@ -511,6 +622,8 @@ async function _removeTx(tx, context, id, existing = null) {
     await tx('campaign_messages').where('campaign', id).del();
     await tx('campaign_links').where('campaign', id).del();
 
+    await tx('links').where('campaign', id).del();
+
     await triggers.removeAllByCampaignIdTx(tx, context, id);
 
     await tx('template_dep_campaigns')
@@ -779,11 +892,19 @@ async function reset(context, campaignId) {
         }
 
         await tx('campaigns').where('id', campaignId).update({
-            status: CampaignStatus.IDLE
+            status: CampaignStatus.IDLE,
+            delivered: 0,
+            unsubscribed: 0,
+            bounced: 0,
+            complained: 0,
+            blacklisted: 0,
+            opened: 0,
+            clicks: 0
         });
 
         await tx('campaign_messages').where('campaign', campaignId).del();
         await tx('campaign_links').where('campaign', campaignId).del();
+        await tx('links').where('campaign', campaignId).del();
     });
 }
 
@@ -796,14 +917,51 @@ async function disable(context, campaignId) {
 }
 
 
+async function getStatisticsOverview(context, id) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
+
+        const stats = await tx('campaigns').where('id', id).select(['delivered', 'unsubscribed', 'bounced', 'complained', 'blacklisted', 'opened', 'clicks']).first();
+
+        const totalQryGen = await getSubscribersQueryGeneratorTx(tx, id, false);
+        if (totalQryGen) {
+            const res = await totalQryGen(tx).count('* AS subscriptionsTotal').first();
+            stats.total = res.subscriptionsTotal;
+        } else {
+            stats.total = 0;
+        }
+
+        return stats;
+    });
+}
+
+async function getStatisticsOpened(context, id) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
+
+        const devices = await tx('campaign_links').where('campaign', id).groupBy('device_type').select('device_type AS key').count('* as count');
+        const countries = await tx('campaign_links').where('campaign', id).groupBy('country').select('country AS key').count('* as count');
+
+        return {
+            devices,
+            countries
+        };
+    });
+}
 
 module.exports.Content = Content;
 module.exports.hash = hash;
+
 module.exports.listDTAjax = listDTAjax;
 module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;
 module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
+module.exports.listSentByStatusDTAjax = listSentByStatusDTAjax;
+module.exports.listOpensDTAjax = listOpensDTAjax;
+module.exports.listLinkClicksDTAjax = listLinkClicksDTAjax;
+
+
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.create = create;
@@ -830,3 +988,5 @@ module.exports.disable = disable;
 
 module.exports.rawGetByTx = rawGetByTx;
 module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
+module.exports.getStatisticsOverview = getStatisticsOverview;
+module.exports.getStatisticsOpened = getStatisticsOpened;

@@ -1,24 +1,46 @@
 'use strict';
 
-import React from 'react';
+import React
+    from 'react';
 
-import Status from './Status';
-import Statistics from './Statistics';
-import CampaignsCUD from './CUD';
-import Content from './Content';
-import CampaignsList from './List';
-import Share from '../shares/Share';
-import Files from "../lib/files";
+import Status
+    from './Status';
+import Statistics
+    from './Statistics';
+import CampaignsCUD
+    from './CUD';
+import Content
+    from './Content';
+import CampaignsList
+    from './List';
+import Share
+    from '../shares/Share';
+import Files
+    from "../lib/files";
 import {
     CampaignSource,
     CampaignStatus,
     CampaignType
 } from "../../../shared/campaigns";
-import TriggersCUD from './triggers/CUD';
-import TriggersList from './triggers/List';
+import TriggersCUD
+    from './triggers/CUD';
+import TriggersList
+    from './triggers/List';
+import StatisticsSubsList
+    from "./StatisticsSubsList";
+import {SubscriptionStatus} from "../../../shared/lists";
+import StatisticsOpened
+    from "./StatisticsOpened";
+import StatisticsLinkClicks
+    from "./StatisticsLinkClicks";
 
 
 function getMenus(t) {
+    const aggLabels = {
+        'countries': t('Countries'),
+        'devices': t('Devices')
+    };
+
     return {
         'campaigns': {
             title: t('campaigns'),
@@ -30,7 +52,7 @@ function getMenus(t) {
                     resolve: {
                         campaign: params => `rest/campaigns-settings/${params.campaignId}`
                     },
-                    link: params => `/campaigns/${params.campaignId}/edit`,
+                    link: params => `/campaigns/${params.campaignId}/status`,
                     navs: {
                         status: {
                             title: t('status'),
@@ -40,9 +62,53 @@ function getMenus(t) {
                         },
                         statistics: {
                             title: t('statistics'),
+                            resolve: {
+                                statisticsOverview: params => `rest/campaign-statistics/${params.campaignId}/overview`
+                            },
                             link: params => `/campaigns/${params.campaignId}/statistics`,
                             visible: resolved => resolved.campaign.permissions.includes('viewStats') && (resolved.campaign.status === CampaignStatus.SENDING || resolved.campaign.status === CampaignStatus.PAUSED || resolved.campaign.status === CampaignStatus.FINISHED),
-                            panelRender: props => <Statistics entity={props.resolved.campaign} />
+                            panelRender: props => <Statistics entity={props.resolved.campaign} statisticsOverview={props.resolved.statisticsOverview} />,
+                            children: {
+                                delivered: {
+                                    title: t('Delivered'),
+                                    link: params => `/campaigns/${params.campaignId}/statistics/delivered`,
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Delivered Emails')} status={SubscriptionStatus.SUBSCRIBED} />
+                                },
+                                complained: {
+                                    title: t('Complained'),
+                                    link: params => `/campaigns/${params.campaignId}/statistics/complained`,
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Subscribers that Complained')} status={SubscriptionStatus.COMPLAINED} />
+                                },
+                                bounced: {
+                                    title: t('Bounced'),
+                                    link: params => `/campaigns/${params.campaignId}/statistics/bounced`,
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Emails that Bounced')} status={SubscriptionStatus.BOUNCED} />
+                                },
+                                unsubscribed: {
+                                    title: t('Unsubscribed'),
+                                    link: params => `/campaigns/${params.campaignId}/statistics/unsubscribed`,
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Subscribers that Unsubscribed')} status={SubscriptionStatus.UNSUBSCRIBED} />
+                                },
+                                'opened': {
+                                    title: t('Opened'),
+                                    resolve: {
+                                        statisticsOpened: params => `rest/campaign-statistics/${params.campaignId}/opened`
+                                    },
+                                    link: params => `/campaigns/${params.campaignId}/statistics/opened/countries`,
+                                    children: {
+                                        ':agg(countries|devices)': {
+                                            title: (resolved, params) => aggLabels[params.agg],
+                                            link: params => `/campaigns/${params.campaignId}/statistics/opened/${params.agg}`,
+                                            panelRender: props => <StatisticsOpened entity={props.resolved.campaign} statisticsOpened={props.resolved.statisticsOpened} agg={props.match.params.agg} />
+                                        }
+                                    }
+                                },
+                                'clicks': {
+                                    title: t('Clicks'),
+                                    link: params => `/campaigns/${params.campaignId}/statistics/clicks`,
+                                    panelRender: props => <StatisticsLinkClicks entity={props.resolved.campaign} />
+                                }
+                            }
                         },
                         ':action(edit|delete)': {
                             title: t('edit'),

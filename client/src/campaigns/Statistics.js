@@ -16,8 +16,12 @@ import {
 import axios
     from "../lib/axios";
 import {getUrl} from "../lib/urls";
+import {AlignedRow} from "../lib/form";
+import {Icon} from "../lib/bootstrap-components";
 
-import Chart from 'react-google-charts';
+import styles
+    from "./styles.scss";
+import {Link} from "react-router-dom";
 
 @withTranslation()
 @withPageHelpers
@@ -30,7 +34,8 @@ export default class Statistics extends Component {
         const t = props.t;
 
         this.state = {
-            entity: props.entity
+            entity: props.entity,
+            statisticsOverview: props.statisticsOverview
         };
 
         this.refreshTimeoutHandler = ::this.periodicRefreshTask;
@@ -38,7 +43,8 @@ export default class Statistics extends Component {
     }
 
     static propTypes = {
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        statisticsOverview: PropTypes.object
     }
 
     @withAsyncErrorHandler
@@ -48,8 +54,12 @@ export default class Statistics extends Component {
         resp = await axios.get(getUrl(`rest/campaigns-stats/${this.props.entity.id}`));
         const entity = resp.data;
 
+        resp = await axios.get(getUrl(`rest/campaign-statistics/${this.props.entity.id}/overview`));
+        const statisticsOverview = resp.data;
+
         this.setState({
-            entity
+            entity,
+            statisticsOverview
         });
     }
 
@@ -57,7 +67,7 @@ export default class Statistics extends Component {
         // The periodic task runs all the time, so that we don't have to worry about starting/stopping it as a reaction to the buttons.
         await this.refreshEntity();
         if (this.refreshTimeoutHandler) { // For some reason the task gets rescheduled if server is restarted while the page is shown. That why we have this check here.
-            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 10000);
+            this.refreshTimeoutId = setTimeout(this.refreshTimeoutHandler, 60000);
         }
     }
 
@@ -76,49 +86,56 @@ export default class Statistics extends Component {
         const t = this.props.t;
         const entity = this.state.entity;
 
+        const stats = this.state.statisticsOverview;
+
+        const renderMetrics = (key, label, showZoomIn = true) => {
+            const val = stats[key]
+
+            return (
+                <AlignedRow label={label}><span className={styles.statsMetrics}>{val}</span>{showZoomIn && <span className={styles.zoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="zoom-in"/></Link></span>}</AlignedRow>
+            );
+        }
+
+        const renderMetricsWithProgress = (key, label, progressBarClass, showZoomIn = true) => {
+            const val = stats[key]
+
+            if (!stats.total) {
+                return renderMetrics(key, label);
+            }
+
+            const rate = Math.round(val / stats.total * 100);
+
+            return (
+                <AlignedRow label={label}>
+                    {showZoomIn && <span className={styles.statsProgressBarZoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="zoom-in"/></Link></span>}
+                    <div className={`progress ${styles.statsProgressBar}`}>
+                        <div
+                            className={`progress-bar progress-bar-${progressBarClass}`}
+                            role="progressbar"
+                            aria-valuenow={stats.bounced}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            style={{minWidth: '6em', width: rate + '%'}}>
+                            {val}&nbsp;({rate}%)
+                        </div>
+                    </div>
+                </AlignedRow>
+            );
+        }
 
         return (
             <div>
                 <Title>{t('campaignStatistics')}</Title>
 
-                <Chart
-                    width="100%"
-                    height="500px"
-                    chartType="PieChart"
-                    loader={<div>Loading Chart</div>}
-                    data={[
-                        ['Task', 'Hours per Day'],
-                        ['Work', 11],
-                        ['Eat', 2],
-                        ['Commute', 2],
-                        ['Watch TV', 2],
-                        ['Sleep', 7],
-                    ]}
-                    options={{
-                        title: 'My Daily Activities',
-                    }}
-                    rootProps={{ 'data-testid': '1' }}
-                />
-
-                <Chart
-                    width="100%"
-                    height="500px"
-                    chartType="GeoChart"
-                    data={[
-                        ['Country', 'Popularity'],
-                        ['Germany', 200],
-                        ['United States', 300],
-                        ['Brazil', 400],
-                        ['Canada', 500],
-                        ['France', 600],
-                        ['RU', 700],
-                    ]}
-                    // Note: you will need to get a mapsApiKey for your project.
-                    // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-                    mapsApiKey="YOUR_KEY_HERE"
-                    rootProps={{ 'data-testid': '1' }}
-                />
-            </div>
+                {renderMetrics('total', t('Total'), false)}
+                {renderMetrics('delivered', t('Delivered'))}
+                {renderMetrics('blacklisted', t('Blacklisted'), false)}
+                {renderMetricsWithProgress('bounced', t('Bounced'), 'info')}
+                {renderMetricsWithProgress('complained', t('Complaints'), 'danger')}
+                {renderMetricsWithProgress('unsubscribed', t('Unsubscribed'), 'warning')}
+                {!entity.open_tracking_disabled && renderMetricsWithProgress('opened', t('Opened'), 'success')}
+                {!entity.click_tracking_disabled && renderMetricsWithProgress('clicks', t('Clicked'), 'success')}
+           </div>
         );
     }
 }

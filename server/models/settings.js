@@ -5,7 +5,7 @@ const { filterObject } = require('../lib/helpers');
 const hasher = require('node-object-hash')();
 const shares = require('./shares');
 
-const allowedKeys = new Set(['adminEmail', 'uaCode', 'shoutout', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);
+const allowedKeys = new Set(['adminEmail', 'uaCode', 'mapsApiKey', 'shoutout', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);
 // defaultHomepage is used as a default to list.homepage - if the list.homepage is not filled in
 
 function hash(entity) {

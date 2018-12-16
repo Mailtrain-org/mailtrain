@@ -28,7 +28,7 @@ class Breadcrumb extends Component {
         const params = this.props.params;
         let title;
         if (typeof entry.title === 'function') {
-            title = entry.title(this.props.resolved);
+            title = entry.title(this.props.resolved, params);
         } else {
             title = entry.title;
         }

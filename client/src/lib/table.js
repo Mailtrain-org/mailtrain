@@ -48,12 +48,14 @@ class Table extends Component {
         onSelectionChangedAsync: PropTypes.func,
         onSelectionDataAsync: PropTypes.func,
         withHeader: PropTypes.bool,
-        refreshInterval: PropTypes.number
+        refreshInterval: PropTypes.number,
+        pageLength: PropTypes.number
     }
 
     static defaultProps = {
         selectMode: TableSelectMode.NONE,
-        selectionKeyIndex: 0
+        selectionKeyIndex: 0,
+        pageLength: 50
     }
 
     refresh() {
@@ -262,7 +264,8 @@ class Table extends Component {
         }
 
         const dtOptions = {
-            columns
+            columns,
+            pageLength: this.props.pageLength
         };
 
         const self = this;

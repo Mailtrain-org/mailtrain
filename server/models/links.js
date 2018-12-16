@@ -14,6 +14,7 @@ const he = require('he');
 const { enforce } = require('../lib/helpers');
 const { getPublicUrl } = require('../lib/urls');
 const tools = require('../lib/tools');
+const shortid = require('shortid');
 
 const LinkId = {
     OPEN: -1,
@@ -41,7 +42,7 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
                         campaign: campaign.id,
                         list: list.id,
                         subscription: subscription.id,
-                        link: linkId,
+                        link: clickLinkId,
                         ip: remoteIp,
                         device_type: device.type,
                         country
@@ -49,7 +50,7 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
 
                 const campaignLinksQryResult = await tx.raw(campaignLinksQry.sql + (incrementOnDup ? ' ON DUPLICATE KEY UPDATE `count`=`count`+1' : ''), campaignLinksQry.bindings);
 
-                if (campaignLinksQryResult.affectedRows > 1) { // When using DUPLICATE KEY UPDATE, this means that the entry was already there
+                if (campaignLinksQryResult[0].affectedRows > 1) { // When using DUPLICATE KEY UPDATE, this means that the entry was already there
                     return false;
                 }
 
@@ -84,7 +85,10 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
 
         // Update clicks
         if (linkId > LinkId.GENERAL_CLICK && !campaign.click_tracking_disabled) {
+            await tx('links').increment('hits').where('id', linkId);
             if (await _countLink(linkId, true)) {
+                await tx('links').increment('visits').where('id', linkId);
+
                 if (await _countLink(LinkId.GENERAL_CLICK, false)) {
                     await tx('campaigns').increment('clicks').where('id', campaign.id);
                 }
@@ -103,7 +107,7 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
 
 async function addOrGet(campaignId, url) {
     return await knex.transaction(async tx => {
-        const link = tx('links').select(['id', 'cid']).where({
+        const link = await tx('links').select(['id', 'cid']).where({
             campaign: campaignId,
             url
         }).first();
@@ -111,7 +115,7 @@ async function addOrGet(campaignId, url) {
         if (!link) {
             let cid = shortid.generate();
 
-            const ids = tx('links').insert({
+            const ids = await tx('links').insert({
                 campaign: campaignId,
                 cid,
                 url

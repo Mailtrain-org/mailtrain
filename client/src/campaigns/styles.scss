@@ -40,3 +40,54 @@
 .sendButtonRow {
   margin-top: 10px;
 }
+
+.statsMetrics {
+  width: 10ex;
+  display: inline-block;
+}
+
+.statsProgressBar {
+  margin-right: 30px;
+  margin-bottom: 0px;
+}
+
+.statsProgressBarZoomIn {
+  float: right;
+  width: 30px;
+  text-align: right;
+  display: block;
+}
+
+.zoomIn {
+  padding-left: 15px;
+}
+
+.navPills {
+  margin-top: -3px;
+  margin-bottom: 5px;
+  float: right;
+
+  & > li {
+    display: inline-block;
+    float: none;
+
+    & > a {
+      padding: 3px 10px;
+    }
+  }
+}
+
+.charts {
+  margin-bottom: 30px;
+
+  .chart {
+    margin-bottom: 30px;
+  }
+}
+
+.sectionTitle {
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+

@@ -94,5 +94,26 @@ router.postAsync('/campaign-disable/:campaignId', passport.loggedIn, passport.cs
     return res.json(await campaigns.disable(req.context, castToInteger(req.params.campaignId), null));
 });
 
+router.getAsync('/campaign-statistics/:campaignId/overview', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.getStatisticsOverview(req.context, castToInteger(req.params.campaignId)));
+});
+
+router.getAsync('/campaign-statistics/:campaignId/opened', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.getStatisticsOpened(req.context, castToInteger(req.params.campaignId)));
+});
+
+router.postAsync('/campaigns-subscribers-by-status-table/:campaignId/:status', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listSentByStatusDTAjax(req.context, castToInteger(req.params.campaignId), castToInteger(req.params.status), req.body));
+});
+
+router.postAsync('/campaigns-opens-table/:campaignId', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listOpensDTAjax(req.context, castToInteger(req.params.campaignId), req.body));
+});
+
+router.postAsync('/campaigns-link-clicks-table/:campaignId', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listLinkClicksDTAjax(req.context, castToInteger(req.params.campaignId), req.body));
+});
+
+
 
 module.exports = router;

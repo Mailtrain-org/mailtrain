@@ -27,7 +27,8 @@ import {getCampaignLabels} from './helpers';
 import {Table} from "../lib/table";
 import {
     Button,
-    Icon
+    Icon,
+    ModalDialog
 } from "../lib/bootstrap-components";
 import axios from "../lib/axios";
 import {getUrl, getPublicUrl} from "../lib/urls";
@@ -214,8 +215,15 @@ class SendControls extends Component {
     }
 
     async resetAsync() {
-        await this.postAndMaskStateError(`rest/campaign-reset/${this.props.entity.id}`);
-        await this.refreshEntity();
+        const t = this.props.t;
+        this.actionDialog(
+            t('Confirm reset'),
+            t('Do you want to reset the campaign? All statistics and the track of delivered messages will be lost.'),
+            async () => {
+                await this.postAndMaskStateError(`rest/campaign-reset/${this.props.entity.id}`);
+                await this.refreshEntity();
+            }
+        );
     }
 
     async enableAsync() {
@@ -228,16 +236,47 @@ class SendControls extends Component {
         await this.refreshEntity();
     }
 
+    actionDialog(title, message, callback) {
+        this.setState({
+            modalTitle: title,
+            modalMessage: message,
+            modalCallback: callback,
+            modalVisible: true
+        });
+    }
+
+    modalAction(isYes) {
+        if (isYes && this.state.modalCallback) {
+            this.state.modalCallback();
+        }
+
+        this.setState({
+            modalTitle: '',
+            modalMessage: '',
+            modalCallback: null,
+            modalVisible: false
+        });
+    }
+
     render() {
         const t = this.props.t;
         const entity = this.props.entity;
+
+        const yesNoDialog = (
+            <ModalDialog hidden={!this.state.modalVisible} title={this.state.modalTitle} onCloseAsync={() => this.modalAction(false)} buttons={[
+                { label: t('no'), className: 'btn-primary', onClickAsync: () => this.modalAction(false) },
+                { label: t('yes'), className: 'btn-danger', onClickAsync: () => this.modalAction(true) }
+            ]}>
+                {this.state.modalMessage}
+            </ModalDialog>
+        );
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
             const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
-                <div>
+                <div>{yesNoDialog}
                     <AlignedRow label={t('sendStatus')}>
                         {entity.scheduled ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
                     </AlignedRow>
@@ -265,7 +304,7 @@ class SendControls extends Component {
 
         } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
             return (
-                <div>
+                <div>{yesNoDialog}
                     <AlignedRow label={t('sendStatus')}>
                         {t('campaignIsBeingSentOut')}
                     </AlignedRow>
@@ -280,7 +319,7 @@ class SendControls extends Component {
             const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
-                <div>
+                <div>{yesNoDialog}
                     <AlignedRow label={t('sendStatus')}>
                         {t('allMessagesSent!HitContinueIfYouYouWant')}
                     </AlignedRow>
@@ -294,7 +333,7 @@ class SendControls extends Component {
 
         } else if (entity.status === CampaignStatus.INACTIVE) {
             return (
-                <div>
+                <div>{yesNoDialog}
                     <AlignedRow label={t('sendStatus')}>
                         {t('yourCampaignIsCurrentlyDisabledClick')}
                     </AlignedRow>
@@ -306,7 +345,7 @@ class SendControls extends Component {
 
         } else if (entity.status === CampaignStatus.ACTIVE) {
             return (
-                <div>
+                <div>{yesNoDialog}
                     <AlignedRow label={t('sendStatus')}>
                         {t('yourCampaignIsEnabledAndSendingMessages')}
                     </AlignedRow>

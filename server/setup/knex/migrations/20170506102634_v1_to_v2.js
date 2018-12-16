@@ -1102,6 +1102,11 @@ async function migrateCampaigns(knex) {
         table.integer('send_configuration').unsigned().notNullable().alter();
     });
 
+    await knex.schema.table('links', table => {
+        table.dropColumn('clicks');
+        table.integer('visits').unsigned().notNullable().defaultTo(0);
+        table.integer('hits').unsigned().notNullable().defaultTo(0);
+    });
 
     await knex.schema.dropTableIfExists('campaign');
     await knex.schema.dropTableIfExists('campaign_tracker');
