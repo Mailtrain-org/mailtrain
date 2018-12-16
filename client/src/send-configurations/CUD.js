@@ -82,6 +82,7 @@ export default class CUD extends Component {
             this.getFormValuesFromEntity(this.props.entity, data => {
                 this.mailerTypes[data.mailer_type].afterLoad(data);
                 data.verpEnabled = !!data.verp_hostname;
+                data.verp_hostname = data.verp_hostname || '';
             });
 
         } else {
@@ -89,9 +90,13 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 namespace: mailtrainConfig.user.namespace,
+                from_email: '',
                 from_email_overridable: false,
+                from_name: '',
                 from_name_overridable: false,
+                reply_to: '',
                 reply_to_overridable: false,
+                subject: '',
                 subject_overridable: false,
                 verpEnabled: false,
                 verp_hostname: '',

@@ -142,14 +142,16 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async fetchSendConfiguration(sendConfigurationId) {
-        this.fetchSendConfigurationId = sendConfigurationId;
+        if (sendConfigurationId) {
+            this.fetchSendConfigurationId = sendConfigurationId;
 
-        const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
+            const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
 
-        if (sendConfigurationId === this.fetchSendConfigurationId) {
-            this.setState({
-                sendConfiguration: result.data
-            });
+            if (sendConfigurationId === this.fetchSendConfigurationId) {
+                this.setState({
+                    sendConfiguration: result.data
+                });
+            }
         }
     }
 

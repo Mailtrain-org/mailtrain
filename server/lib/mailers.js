@@ -22,7 +22,7 @@ const transports = new Map();
 async function getOrCreateMailer(sendConfigurationId) {
     let sendConfiguration;
 
-    if (!sendConfiguration) {
+    if (!sendConfigurationId) {
         sendConfiguration = await sendConfigurations.getSystemSendConfiguration();
     } else {
         sendConfiguration = await sendConfigurations.getById(contextHelpers.getAdminContext(), sendConfigurationId, false, true);
@@ -38,8 +38,35 @@ function invalidateMailer(sendConfigurationId) {
 
 
 
+function _addDkimKeys(transport, mail) {
+    const sendConfiguration = transport.mailer.sendConfiguration;
+
+    if (sendConfiguration.mailer_type === sendConfigurations.MailerType.ZONE_MTA) {
+        if (!mail.headers) {
+            mail.headers = {};
+        }
+
+        const dkimDomain = sendConfiguration.mailer_settings.dkimDomain;
+        const dkimSelector = (sendConfiguration.mailer_settings.dkimSelector || '').trim();
+        const dkimPrivateKey = (sendConfiguration.mailer_settings.dkimPrivateKey || '').trim();
+
+        if (dkimSelector && dkimPrivateKey) {
+            const from = (mail.from.address || '').trim();
+            const domain = from.split('@').pop().toLowerCase().trim();
+
+            mail.headers['x-mailtrain-dkim'] = JSON.stringify({
+                domainName: dkimDomain || domain,
+                keySelector: dkimSelector,
+                privateKey: dkimPrivateKey
+            });
+        }
+    }
+}
+
 
 async function _sendMail(transport, mail, template) {
+    _addDkimKeys(transport, mail);
+
     let tryCount = 0;
     const trySend = (callback) => {
         tryCount++;
@@ -209,6 +236,7 @@ async function _createTransport(sendConfiguration) {
     }
 
     transport.mailer = {
+        sendConfiguration,
         throttleWait: bluebird.promisify(throttleWait),
         sendTransactionalMail: async (mail, template) => await _sendTransactionalMail(transport, mail, template),
         sendMassMail: async (mail, template) => await _sendMail(transport, mail)

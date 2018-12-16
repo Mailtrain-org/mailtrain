@@ -328,9 +328,9 @@ class CampaignSender {
 
         const getOverridable = key => {
             if (sendConfiguration[key + '_overridable'] && this.campaign[key + '_override'] !== null) {
-                return campaign[key + '_override'];
+                return campaign[key + '_override'] || '';
             } else {
-                return sendConfiguration[key];
+                return sendConfiguration[key] || '';
             }
         }
 

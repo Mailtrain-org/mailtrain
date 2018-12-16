@@ -164,7 +164,7 @@ async function processCampaign(campaignId) {
         }
     } catch (err) {
         log.error('Senders', `Sending campaign ${campaignId} failed with error: ${err.message}`)
-        log.verbose(err);
+        log.verbose(err.stack);
     }
 }
 
@@ -204,7 +204,7 @@ async function scheduleCampaigns() {
         }
     } catch (err) {
         log.error('Senders', `Scheduling campaigns failed with error: ${err.message}`)
-        log.verbose(err);
+        log.verbose(err.stack);
     }
 
 
@@ -249,7 +249,7 @@ async function processQueued() {
         }
     } catch (err) {
         log.error('Senders', `Processing queued messages failed with error: ${err.message}`)
-        log.verbose(err);
+        log.verbose(err.stack);
     }
 
     queuedSchedulerRunning = false;
@@ -326,7 +326,7 @@ async function init() {
                 scheduleCampaigns();
 
             } else if (type === 'reload-config') {
-                for (const worker of workerProcesses.keys()) {
+                for (const workerId of workerProcesses.keys()) {
                     sendToWorker(workerId, 'reload-config', msg.data);
                 }
             }

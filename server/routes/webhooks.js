@@ -180,22 +180,28 @@ router.postAsync('/mailgun', uploads.any(), async (req, res) => {
 
 
 router.postAsync('/zone-mta', async (req, res) => {
-    if (typeof req.body === 'string') {
-        req.body = JSON.parse(req.body);
-    }
-
-    if (req.body.id) {
-        const message = await campaigns.getMessageByCid(req.body.id);
-
-        if (message) {
-            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
-            log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+    try {
+        if (typeof req.body === 'string') {
+            req.body = JSON.parse(req.body);
         }
-    }
 
-    res.json({
-        success: true
-    });
+        if (req.body.id) {
+            const message = await campaigns.getMessageByResponseId(req.body.id);
+            console.log(message);
+
+            if (message) {
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+            }
+        }
+
+        res.json({
+            success: true
+        });
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
 });
 
 

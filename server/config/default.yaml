@@ -215,6 +215,9 @@ testServer:
   password: testpass
   logger: false
 
+builtinZoneMTA:
+  enabled: true
+
 seleniumWebDriver:
   browser: phantomjs
 

@@ -35,7 +35,7 @@ async function processMessages(campaignId, subscribers) {
             log.verbose('Senders', 'Message sent and status updated for %s:%s', subData.listId, subData.email || subData.subscriptionId);
         } catch (err) {
             log.error('Senders', `Sending message to ${subData.listId}:${subData.email} failed with error: ${err.message}`)
-            log.verbose(err);
+            log.verbose(err.stack);
         }
     }
 

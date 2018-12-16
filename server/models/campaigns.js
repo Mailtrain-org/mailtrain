@@ -666,46 +666,33 @@ async function getMessageByCid(messageCid) {
 
     const [campaignCid, listCid, subscriptionCid] = messageCidElems;
 
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
         const list = await tx('lists').where('cid', listCid).select('id');
         const subscrTblName = subscriptions.getSubscriptionTableName(list.id);
 
         const message = await tx('campaign_messages')
             .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
             .innerJoin(subscrTblName, subscrTblName + '.id', 'campaign_messages.subscription')
-            .leftJoin('segments', 'segment.id', 'campaign_messages.segment') // This is just to make sure that the respective segment still exists or return null if it doesn't
-            .leftJoin('send_configurations', 'send_configurations.id', 'campaign_messages.send_configuration') // This is just to make sure that the respective send_configuration still exists or return null if it doesn't
             .where(subscrTblName + '.cid', subscriptionCid)
             .where('campaigns.cid', campaignCid)
             .select([
-                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'segments.id AS segment', 'campaign_messages.subscription',
-                'send_configurations.id AS send_configuration', 'campaign_messages.status', 'campaign_messages.response', 'campaign_messages.response_id',
-                'campaign_messages.updated', 'campaign_messages.created', 'send_configurations.verp_hostname AS verp_hostname'
-            ]);
-
-        if (message) {
-            await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
-        }
+                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+            ])
+            .first();
 
         return message;
     });
 }
 
 async function getMessageByResponseId(responseId) {
-    await knex.transaction(async tx => {
+    return await knex.transaction(async tx => {
+        console.log(responseId);
         const message = await tx('campaign_messages')
-            .leftJoin('segments', 'segment.id', 'campaign_messages.segment') // This is just to make sure that the respective segment still exists or return null if it doesn't
-            .leftJoin('send_configurations', 'send_configurations.id', 'campaign_messages.send_configuration') // This is just to make sure that the respective send_configuration still exists or return null if it doesn't
             .where('campaign_messages.response_id', responseId)
             .select([
-                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'segments.id AS segment', 'campaign_messages.subscription',
-                'send_configurations.id AS send_configuration', 'campaign_messages.status', 'campaign_messages.response', 'campaign_messages.response_id',
-                'campaign_messages.updated', 'campaign_messages.created', 'send_configurations.verp_hostname AS verp_hostname'
-            ]);
-
-        if (message) {
-            await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
-        }
+                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+            ])
+            .first();
 
         return message;
     });
@@ -763,6 +750,7 @@ async function changeStatusByMessage(context, message, subscriptionStatus, updat
         }
 
         await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
+
     });
 }
 

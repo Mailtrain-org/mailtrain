@@ -4,7 +4,7 @@ const contextHelpers = require('../../../lib/context-helpers');
 const mosaicoTemplates = require('../../../../shared/mosaico-templates');
 const {getGlobalNamespaceId} = require('../../../../shared/namespaces');
 const {getAdminId} = require('../../../../shared/users');
-const { MailerType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../../shared/send-configurations');
+const { MailerType, ZoneMTAType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../../shared/send-configurations');
 const { enforce } = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../../shared/triggers');
 const { SubscriptionSource } = require('../../../../shared/lists');
@@ -753,6 +753,7 @@ async function migrateSettings(knex) {
         if (settings.dkimApiKey) {
             mailer_type = MailerType.ZONE_MTA;
             mailer_settings.dkimApiKey = settings.dkimApiKey;
+            mailer_settings.zoneMtaType = ZoneMTAType.WITH_HTTP_CONF;
             mailer_settings.dkimDomain = settings.dkimDomain;
             mailer_settings.dkimSelector = settings.dkimSelector;
             mailer_settings.dkimPrivateKey = settings.dkimPrivateKey;

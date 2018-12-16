@@ -24,3 +24,5 @@ passwordresetlink="xxx"
 enabled=true
 [redis]
 enabled=true
+[log]
+level="verbose"

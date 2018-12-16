@@ -442,7 +442,8 @@ class TextArea extends Component {
         label: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string
+        format: PropTypes.string,
+        className: PropTypes.string
     }
 
     static contextTypes = {
@@ -452,11 +453,12 @@ class TextArea extends Component {
     render() {
         const props = this.props;
         const owner = this.context.formStateOwner;
-        const id = this.props.id;
+        const id = props.id;
         const htmlId = 'form_' + id;
+        const className = props.className || ''
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <textarea id={htmlId} placeholder={props.placeholder} value={owner.getFormValue(id) || ''} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
+            <textarea id={htmlId} placeholder={props.placeholder} value={owner.getFormValue(id) || ''} className={`form-control ${className}`} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
 }

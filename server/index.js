@@ -21,6 +21,7 @@ const privilegeHelpers = require('./lib/privilege-helpers');
 const knex = require('./lib/knex');
 const shares = require('./models/shares');
 const { AppType } = require('../shared/app');
+const builtinZoneMta = require('./lib/builtin-zone-mta');
 
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
@@ -94,29 +95,31 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
     .then(() =>
         executor.spawn(() => 
             testServer(() => 
-                verpServer(() => 
-                    startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () => 
-                        startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () => 
-                            startHTTPServer(AppType.PUBLIC, 'public', publicPort, () => {
-                                privilegeHelpers.dropRootPrivileges();
+                verpServer(() =>
+                    builtinZoneMta.spawn(() =>
+                        startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () =>
+                            startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () =>
+                                startHTTPServer(AppType.PUBLIC, 'public', publicPort, () => {
+                                    privilegeHelpers.dropRootPrivileges();
 
-                                tzupdate.start();
+                                    tzupdate.start();
 
-                                importer.spawn(() => 
-                                    feedcheck.spawn(() => 
-                                        senders.spawn(() => {
-                                            triggers.start();
-                                            gdprCleanup.start();
+                                    importer.spawn(() =>
+                                        feedcheck.spawn(() =>
+                                            senders.spawn(() => {
+                                                triggers.start();
+                                                gdprCleanup.start();
 
-                                            postfixBounceServer(async () => {
-                                                await reportProcessor.init();
-                                                log.info('Service', 'All services started');
-                                                appBuilder.setReady();
-                                            });
-                                        })
-                                    )
-                                );
-                            })
+                                                postfixBounceServer(async () => {
+                                                    await reportProcessor.init();
+                                                    log.info('Service', 'All services started');
+                                                    appBuilder.setReady();
+                                                });
+                                            })
+                                        )
+                                    );
+                                })
+                            )
                         )
                     )
                 )
