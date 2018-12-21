@@ -127,10 +127,16 @@ export function getMailerTypes(t) {
         validateNumber(state, 'smtpMaxMessages', 'Max messages');
     }
 
+    const typeNames = {
+        [MailerType.GENERIC_SMTP]: t('genericSmtp'),
+        [MailerType.ZONE_MTA]: t('zoneMta'),
+        [MailerType.AWS_SES]: t('amazonSes')
+    };
+
     const typeOptions = [
-        { key: MailerType.GENERIC_SMTP, label: t('genericSmtp')},
-        { key: MailerType.ZONE_MTA, label: t('zoneMta')},
-        { key: MailerType.AWS_SES, label: t('amazonSes')}
+        { key: MailerType.GENERIC_SMTP, label: typeNames[MailerType.GENERIC_SMTP]},
+        { key: MailerType.ZONE_MTA, label: typeNames[MailerType.ZONE_MTA]},
+        { key: MailerType.AWS_SES, label: typeNames[MailerType.AWS_SES]}
     ];
 
     const smtpEncryptionOptions = [
@@ -155,6 +161,7 @@ export function getMailerTypes(t) {
     zoneMtaTypeOptions.push({ key: ZoneMTAType.REGULAR, label: t('No dynamic configuration of DKIM keys')});
 
     mailerTypes[MailerType.GENERIC_SMTP] = {
+        typeName: typeNames[MailerType.GENERIC_SMTP],
         getForm: owner =>
             <div>
                 <Fieldset label={t('mailerSettings')}>
@@ -197,6 +204,7 @@ export function getMailerTypes(t) {
     };
 
     mailerTypes[MailerType.ZONE_MTA] = {
+        typeName: typeNames[MailerType.ZONE_MTA],
         getForm: owner => {
             const zoneMtaType = Number.parseInt(owner.getFormValue('zoneMtaType'));
             return (
@@ -283,6 +291,7 @@ export function getMailerTypes(t) {
     };
 
     mailerTypes[MailerType.AWS_SES] = {
+        typeName: typeNames[MailerType.AWS_SES],
         getForm: owner =>
             <div>
                 <Fieldset label={t('mailerSettings')}>
