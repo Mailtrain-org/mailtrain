@@ -100,15 +100,19 @@ export function getMailerTypes(t) {
         data.mailer_settings.logTransactions = data.logTransactions;
     }
 
-    function beforeSaveGenericSMTP(data) {
+    function beforeSaveGenericSMTP(data, builtin = false) {
         beforeSaveCommon(data);
-        data.mailer_settings.hostname = data.smtpHostname;
-        data.mailer_settings.port = Number(data.smtpPort);
-        data.mailer_settings.encryption = data.smtpEncryption;
-        data.mailer_settings.useAuth = data.smtpUseAuth;
-        data.mailer_settings.user = data.smtpUser;
-        data.mailer_settings.password = data.smtpPassword;
-        data.mailer_settings.allowSelfSigned = data.smtpAllowSelfSigned;
+
+        if (!builtin) {
+            data.mailer_settings.hostname = data.smtpHostname;
+            data.mailer_settings.port = Number(data.smtpPort);
+            data.mailer_settings.encryption = data.smtpEncryption;
+            data.mailer_settings.useAuth = data.smtpUseAuth;
+            data.mailer_settings.user = data.smtpUser;
+            data.mailer_settings.password = data.smtpPassword;
+            data.mailer_settings.allowSelfSigned = data.smtpAllowSelfSigned;
+        }
+
         data.mailer_settings.maxMessages = Number(data.smtpMaxMessages);
     }
 
@@ -254,7 +258,8 @@ export function getMailerTypes(t) {
             data.dkimPrivateKey = data.mailer_settings.dkimPrivateKey;
         },
         beforeSave: data => {
-            beforeSaveGenericSMTP(data);
+            beforeSaveGenericSMTP(data, zoneMtaType === ZoneMTAType.BUILTIN);
+            
             const zoneMtaType = Number.parseInt(data.zoneMtaType);
             data.mailer_settings.zoneMtaType = zoneMtaType;
             if (zoneMtaType === ZoneMTAType.WITH_HTTP_CONF || zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF) {

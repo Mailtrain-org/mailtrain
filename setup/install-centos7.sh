@@ -105,11 +105,14 @@ mysql:
 EOT
 
 # Install required node packages
-(cd
-npm install --no-progress --production
+for idx in client shared server zone-mta; do
+    (cd $idx && npm install)
+done
+
+(cd client && npm run build)
 
 chown -R mailtrain:mailtrain .
-chmod o-rwx config
+chmod o-rwx server/config
 
 # Setup log rotation to not spend up entire storage on logs
 cat <<EOM > /etc/logrotate.d/mailtrain
