@@ -258,9 +258,10 @@ export function getMailerTypes(t) {
             data.dkimPrivateKey = data.mailer_settings.dkimPrivateKey;
         },
         beforeSave: data => {
-            beforeSaveGenericSMTP(data, zoneMtaType === ZoneMTAType.BUILTIN);
-            
             const zoneMtaType = Number.parseInt(data.zoneMtaType);
+
+            beforeSaveGenericSMTP(data, zoneMtaType === ZoneMTAType.BUILTIN);
+
             data.mailer_settings.zoneMtaType = zoneMtaType;
             if (zoneMtaType === ZoneMTAType.WITH_HTTP_CONF || zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF) {
                 data.mailer_settings.dkimDomain = data.dkimDomain;
