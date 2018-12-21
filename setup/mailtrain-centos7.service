@@ -1,11 +1,11 @@
 [Unit]
 Description=Mailtrain server
-Requires=mysql.service
+Requires=mariadb.service
 After=syslog.target network.target
 
 [Service]
 Environment="NODE_ENV=production"
-WorkingDirectory=/opt/mailtrain
+WorkingDirectory=/opt/mailtrain/server
 ExecStart=/usr/bin/node index.js
 Type=simple
 Restart=always

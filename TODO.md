@@ -1,11 +1,7 @@
 ### Front page
 - Some dashboard
 
-### Message delivery
-- Better integration with ZoneMTA to allow multiple send configurations (with different DKIM) against one ZoneMTA instance via different HTTP configuration of ZoneMTA. This may need an extension of ZoneMTA to provide some header entry that identifies the campaign.
-
 ### Campaigns
-- Statistics for a sent campaign
 - List of sent RSS campaigns (?)
 
 ### Pull requests
@@ -19,9 +15,7 @@
 - Add API extensions
 
 ### GDPR
-- Removal of personal data upon unsubscribe (settable per list)
 - Refuse editing subscriptions which have been anonymized
 - Add field to subscriptions which says till when the consent has been given
 - Provide a link (and merge tag) that will update the consent date to now
 - Add campaign trigger that triggers if the consent for specific subscription field is about to expire (i.e. it is greater than now - seconds)
-- Removal of personal data upon consent expiration (settable per list)
