@@ -9,7 +9,8 @@ const MailerType = {
 const ZoneMTAType = {
     REGULAR: 0,
     WITH_HTTP_CONF: 1,
-    WITH_MAILTRAIN_HEADER_CONF: 2
+    WITH_MAILTRAIN_HEADER_CONF: 2,
+    BUILTIN: 3
 }
 
 function getSystemSendConfigurationId() {

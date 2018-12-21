@@ -173,7 +173,6 @@ async function getSystemSendConfiguration() {
     return await getById(contextHelpers.getAdminContext(), getSystemSendConfigurationId(), false);
 }
 
-module.exports.MailerType = MailerType;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
 module.exports.listWithSendPermissionDTAjax = listWithSendPermissionDTAjax;

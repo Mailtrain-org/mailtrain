@@ -61,10 +61,10 @@ export default class CUD extends Component {
         } else {
             const wizard = this.props.wizard;
 
-            if (wizard === 'subscribers-all') {
+            if (wizard === 'open-counts') {
                 this.populateFormValues({
                     name: '',
-                    description: 'Generates a campaign report listing all subscribers along with their statistics.',
+                    description: 'Generates a campaign report listing all subscribers along with open counts.',
                     namespace: mailtrainConfig.user.namespace,
                     mime_type: 'text/html',
                     user_fields:
@@ -78,13 +78,13 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'const results = await campaigns.getResults(inputs.campaign, ["*"]);\n' +
-                        'render({ results });',
+                        'const results = await campaigns.getCampaignOpenStatistics(inputs.campaign, ["*"])\n' +
+                        'render({ results })',
                     hbs:
                         '<h2>{{title}}</h2>\n' +
                         '\n' +
                         '<div class="table-responsive">\n' +
-                        '  <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="1,1" data-paging="false">\n' +
+                        '  <table class="table table-bordered table-hover" width="100%">\n' +
                         '    <thead>\n' +
                         '    <th>\n' +
                         '      Email\n' +
@@ -98,10 +98,10 @@ export default class CUD extends Component {
                         '      {{#each results}}\n' +
                         '        <tr>\n' +
                         '          <th scope="row">\n' +
-                        '            {{email}}\n' +
+                        '            {{subscription:email}}\n' +
                         '          </th>\n' +
                         '          <td style="width: 20%;">\n' +
-                        '            {{tracker_count}}\n' +
+                        '            {{tracker:count}}\n' +
                         '          </td>\n' +
                         '        </tr>\n' +
                         '      {{/each}}\n' +
@@ -111,10 +111,46 @@ export default class CUD extends Component {
                         '</div>'
                 });
 
-            } else if (wizard === 'subscribers-grouped') {
+            } else if (wizard === 'open-counts-csv') {
                 this.populateFormValues({
                     name: '',
-                    description: 'Generates a campaign report with results are aggregated by some "Country" custom field.',
+                    description: 'Generates a campaign report as CSV that lists all subscribers along with open counts.',
+                    namespace: mailtrainConfig.user.namespace,
+                    mime_type: 'text/csv',
+                    user_fields:
+                        '[\n' +
+                        '  {\n' +
+                        '    "id": "campaign",\n' +
+                        '    "name": "Campaign",\n' +
+                        '    "type": "campaign",\n' +
+                        '    "minOccurences": 1,\n' +
+                        '    "maxOccurences": 1\n' +
+                        '  }\n' +
+                        ']',
+                    js:
+                        'const sampleRowTransform = new stream.Transform({\n' +
+                        '  objectMode: true,\n' +
+                        '  transform(row, encoding, callback) {\n' +
+                        '    callback(null, row)\n' +
+                        '  }\n' +
+                        '})\n' +
+                        '\n' +
+                        'const results = await campaigns.getCampaignOpenStatisticsStream(inputs.campaign, [\'subscription:email\', \'tracker:count\'])\n' +
+                        '\n' +
+                        'results.pipe(sampleRowTransform)\n' +
+                        '\n' +
+                        'await renderCsvFromStream(sampleRowTransform, {\n' +
+                        '  header: true,\n' +
+                        '  columns: [ { key: \'subscription:email\', header: \'Email\' }, { key: \'tracker:count\', header: \'Open count\' } ],\n' +
+                        '  delimiter: \',\'\n' +
+                        '})',
+                    hbs: ''
+                });
+
+            } else if (wizard === 'aggregated-open-counts') {
+                this.populateFormValues({
+                    name: '',
+                    description: 'Generates a campaign report with results are aggregated by "Country" custom field. (Note that this custom field has to be presents in the subscription custom fields.)',
                     namespace: mailtrainConfig.user.namespace,
                     mime_type: 'text/html',
                     user_fields:
@@ -128,22 +164,22 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'const results = await campaigns.getResults(inputs.campaign, ["merge_country"], query =>\n' +
+                        'const results = await campaigns.getCampaignOpenStatistics(inputs.campaign, ["field:country", "count_opened", "count_all"], query =>\n' +
                         '  query.count("* AS count_all")\n' +
-                        '    .select(knex.raw("SUM(IF(tracker.count IS NULL, 0, 1)) AS count_opened"))\n' +
-                        '    .groupBy("merge_country")\n' +
-                        ');\n' +
+                        '    .select(knex.raw("SUM(IF(`tracker:count` IS NULL, 0, 1)) AS count_opened"))\n' +
+                        '    .groupBy("field:country")\n' +
+                        ')\n' +
                         '\n' +
                         'for (const row of results) {\n' +
-                        '    row.percentage = Math.round((row.count_opened / row.count_all) * 100);\n' +
+                        '    row.percentage = Math.round((row["tracker:count"] / row.count_all) * 100)\n' +
                         '}\n' +
                         '\n' +
-                        'render({ results });',
+                        'render({ results })',
                     hbs:
                         '<h2>{{title}}</h2>\n' +
                         '\n' +
                         '<div class="table-responsive">\n' +
-                        '  <table class="table table-bordered table-hover data-table display nowrap" width="100%" data-row-sort="1,1,1,1" data-paging="false">\n' +
+                        '  <table class="table table-bordered table-hover" width="100%">\n' +
                         '    <thead>\n' +
                         '      <th>\n' +
                         '        Country\n' +
@@ -163,7 +199,7 @@ export default class CUD extends Component {
                         '    {{#each results}}\n' +
                         '      <tr>\n' +
                         '        <th scope="row">\n' +
-                        '          {{merge_country}}\n' +
+                        '          {{field:merge_country}}\n' +
                         '        </th>\n' +
                         '        <td style="width: 20%;">\n' +
                         '          {{count_opened}}\n' +
@@ -180,31 +216,6 @@ export default class CUD extends Component {
                         '    {{/if}}\n' +
                         '  </table>\n' +
                         '</div>'
-                });
-
-            } else if (wizard === 'export-list-csv') {
-                this.populateFormValues({
-                    name: '',
-                    description: 'Exports a list as a CSV file.',
-                    namespace: mailtrainConfig.user.namespace,
-                    mime_type: 'text/csv',
-                    user_fields:
-                        '[\n' +
-                        '  {\n' +
-                        '    "id": "list",\n' +
-                        '    "name": "List",\n' +
-                        '    "type": "list",\n' +
-                        '    "minOccurences": 1,\n' +
-                        '    "maxOccurences": 1\n' +
-                        '  }\n' +
-                        ']',
-                    js:
-                        'const results = await subscriptions.list(inputs.list.id);\n' +
-                        'render({ results });',
-                    hbs:
-                        '{{#each results}}\n' +
-                        '{{firstName}},{{lastName}},{{email}}\n' +
-                        '{{/each}}'
                 });
 
             } else {
@@ -298,7 +309,7 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`rest/reports/templates/${this.props.entity.id}`}
+                        deleteUrl={`rest/report-templates/${this.props.entity.id}`}
                         backUrl={`/reports/templates/${this.props.entity.id}/edit`}
                         successUrl="/reports/templates"
                         deletingMsg={t('deletingReportTemplate')}
@@ -313,7 +324,7 @@ export default class CUD extends Component {
                     <Dropdown id="mime_type" label={t('type')} options={[{key: 'text/html', label: t('html')}, {key: 'text/csv', label: t('csv')}]}/>
                     <NamespaceSelect/>
                     <ACEEditor id="user_fields" height="250px" mode="json" label={t('userSelectableFields')} help={t('jsonSpecificationOfUserSelectableFields')}/>
-                    <ACEEditor id="js" height="700px" mode="javascript" label={t('dataProcessingCode')} help={<Trans i18nKey="writeTheBodyOfTheJavaScriptFunctionWith">Write the body of the JavaScript function with signature <code>function(inputs, callback)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
+                    <ACEEditor id="js" height="700px" mode="javascript" label={t('dataProcessingCode')} help={<Trans i18nKey="writeTheBodyOfTheJavaScriptFunctionWith">Write the body of the JavaScript function with signature <code>async function(inputs)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
                     <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('renderingTemplate')} help={<Trans i18nKey="useHtmlWithHandlebarsSyntaxSee">Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>
 
                     {isEdit ?

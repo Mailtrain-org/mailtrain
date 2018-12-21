@@ -65,6 +65,10 @@ process.on('message', msg => {
     }
 });
 
+if (config.title) {
+    process.title = config.title + ': sender/worker ' + workerId;
+}
+
 sendToMaster('worker-started');
 
 

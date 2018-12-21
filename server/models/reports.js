@@ -10,6 +10,10 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
 const reportHelpers = require('../lib/report-helpers');
 const fs = require('fs-extra-promise');
+const contextHelpers = require('../lib/context-helpers');
+const {LinkId} = require('./links');
+const subscriptions = require('./subscriptions');
+const {Readable} = require('stream');
 
 const ReportState = require('../../shared/reports').ReportState;
 
@@ -118,7 +122,7 @@ async function updateWithConsistencyCheck(context, entity) {
 async function removeTx(tx, context, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'delete');
 
-    const report = tx('reports').where('id', id).first();
+    const report = await tx('reports').where('id', id).first();
 
     await fs.removeAsync(reportHelpers.getReportContentFile(report));
     await fs.removeAsync(reportHelpers.getReportOutputFile(report));
@@ -144,54 +148,233 @@ async function bulkChangeState(oldState, newState) {
     return await knex('reports').where('state', oldState).update('state', newState);
 }
 
+async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, asStream) {
+    const subsQrys = [];
 
-const campaignFieldsMapping = {
-    tracker_count: 'campaign_links.count',
-    country: 'campaign_links.country',
-    device_type: 'campaign_links.device_type',
-    status: 'campaign_messages.status',
-    first_name: 'subscriptions.first_name',
-    last_name: 'subscriptions.last_name',
-    email: 'subscriptions.email'
-};
+    const commonFieldsMapping = {};
+    let firstIteration = true;
+    for (const cpgList of campaign.lists) {
+        const cpgListId = cpgList.list;
+        const subsTable = subscriptions.getSubscriptionTableName(cpgListId);
 
-async function getCampaignResults(context, campaign, select, extra) {
-    const flds = await fields.list(context, campaign.list);
+        const flds = await fields.list(contextHelpers.getAdminContext(), cpgListId);
 
-    const fieldsMapping = Object.assign({}, campaignFieldsMapping);
-    for (const fld of flds) {
-        /* Dropdown and checkbox groups have field.column == null
-           TODO - For the time being, we don't group options and we don't expand enums. We just provide it as it is in the DB. */
-        if (fld.column) {
-            fieldsMapping[fld.key.toLowerCase()] = 'subscriptions.' + fld.column;
+        const assignedFlds = new Set();
+
+        for (const fld of flds) {
+            /* Dropdown and checkbox groups have field.column == null
+               For the time being, we don't group options and we don't expand enums. We just provide it as it is in the DB. */
+            if (fld.column) {
+                const fldKey = 'field:' + fld.key.toLowerCase();
+                if (firstIteration || commonFieldsMapping[fldKey]) {
+                    commonFieldsMapping[fldKey] = 'subscriptions.' + fld.column;
+                    assignedFlds.add(fldKey);
+                }
+            }
         }
+
+        for (const fldKey in commonFieldsMapping) {
+            if (!assignedFlds.has(fldKey)) {
+                delete commonFieldsMapping[fldKey];
+            }
+        }
+
+        firstIteration = false;
     }
 
-    let selFields = [];
-    for (let idx = 0; idx < select.length; idx++) {
-        const item = select[idx];
-        if (item in fieldsMapping) {
-            selFields.push(fieldsMapping[item] + ' AS ' + item);
-        } else if (item === '*') {
-            selFields = selFields.concat(Object.keys(fieldsMapping).map(item => fieldsMapping[item] + ' AS ' + item));
+    for (const cpgList of campaign.lists) {
+        const cpgListId = cpgList.list;
+        const subsTable = subscriptions.getSubscriptionTableName(cpgListId);
+
+        const campaignFieldsMapping = {
+            'list:id': {raw: knex.raw('?', [cpgListId])},
+            'tracker:count': {raw: 'COALESCE(`campaign_links`.`count`, 0)'},
+            'tracker:country': 'campaign_links.country',
+            'tracker:deviceType': 'campaign_links.device_type',
+            'tracker:status': 'campaign_messages.status',
+            'subscription:status': 'subscriptions.status',
+            'subscription:id': 'subscriptions.id',
+            'subscription:cid': 'subscriptions.cid',
+            'subscription:email': 'subscriptions.email'
+        };
+
+        const fieldsMapping = {
+            ...commonFieldsMapping,
+            ...campaignFieldsMapping
+        };
+
+        const getSelField = item => {
+            const itemMapping = fieldsMapping[item];
+            if (typeof itemMapping === 'string') {
+                return fieldsMapping[item] + ' AS ' + item;
+            } else if (itemMapping.raw) {
+                return knex.raw(fieldsMapping[item].raw + ' AS `' + item + '`');
+            }
+        };
+
+        let selFields = [];
+        for (let idx = 0; idx < select.length; idx++) {
+            const item = select[idx];
+            if (item in fieldsMapping) {
+                selFields.push(getSelField(item));
+            } else if (item === '*') {
+                selFields = selFields.concat(Object.keys(fieldsMapping).map(entry => getSelField(entry)));
+            } else {
+                selFields.push(item);
+            }
+        }
+
+        let query = knex(`subscription__${cpgListId} AS subscriptions`)
+            .leftJoin('campaign_messages', {
+                'campaign_messages.subscription': 'subscriptions.id',
+                'campaign_messages.list': knex.raw('?', [cpgListId])
+            })
+            .leftJoin('campaign_links', {
+                'campaign_links.subscription': 'subscriptions.id',
+                'campaign_links.list': knex.raw('?', [cpgListId])
+            })
+            .select(selFields);
+
+        if (listQryFn) {
+            query = listQryFn(query);
+        }
+
+        subsQrys.push(query.toSQL().toNative());
+    }
+
+    if (subsQrys.length > 0) {
+        let subsSql, subsBindings;
+
+        const applyUnionQryFn = (subsSql, subsBindings) => {
+            if (unionQryFn) {
+                return unionQryFn(
+                    knex.from(function() {
+                        return knex.raw('(' + subsSql + ')', subsBindings);
+                    })
+                );
+            } else {
+                return knex.raw(subsSql, subsBindings);
+            }
+        }
+
+        if (subsQrys.length === 1) {
+            subsSql = subsQrys[0].sql;
+            subsBindings = subsQrys[0].bindings;
+
+            if (asStream) {
+                return await applyUnionQryFn(subsSql, subsBindings).stream();
+            } else {
+                return await applyUnionQryFn(subsSql, subsBindings);
+            }
+
         } else {
-            selFields.push(item);
+            subsSql = subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ');
+            subsBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
+
+            if (asStream) {
+                return applyUnionQryFn(subsSql, subsBindings).stream();
+            } else {
+                const res = await applyUnionQryFn(subsSql, subsBindings);
+                if (res[0] && Array.isArray(res[0])) {
+                    return res[0]; // UNION ALL generates an array with result and schema
+                } else {
+                    return res;
+                }
+            }
+        }
+
+    } else {
+        if (asStream) {
+            const result = new Readable({
+                objectMode: true,
+            });
+            result.push(null);
+            return result;
+            
+        } else {
+            return [];
         }
     }
+}
 
-    let query = knex(`subscription__${campaign.list} AS subscriptions`)
-        .innerJoin('campaign_messages', 'subscriptions.id', 'campaign_messages.subscription')
-        .leftJoin('campaign_links', 'subscriptions.id', 'campaign_links.subscription')
-        .where('campaign_messages.list', campaign.list)
-        .where('campaign_links.list', campaign.list)
-        .select(selFields);
-
-    if (extra) {
-        query = extra(query);
+async function _getCampaignOpenStatistics(campaign, select, unionQryFn, listQryFn, asStream) {
+    if (!listQryFn) {
+        listQryFn = qry => qry;
     }
 
-    return await query;
+    return await _getCampaignStatistics(
+        campaign,
+        select,
+        unionQryFn,
+        qry => listQryFn(
+            qry.where(function() {
+                this.whereNull('campaign_links.link').orWhere('campaign_links.link', LinkId.OPEN)
+            })
+        ),
+        asStream
+    );
 }
+
+async function _getCampaignClickStatistics(campaign, select, unionQryFn, listQryFn) {
+    if (!listQryFn) {
+        listQryFn = qry => qry;
+    }
+
+    return await _getCampaignStatistics(
+        campaign,
+        select,
+        unionQryFn,
+        qry => listQryFn(
+            qry.where(function() {
+                this.whereNull('campaign_links.link').orWhere('campaign_links.link', LinkId.GENERAL_CLICK)
+            })
+        ),
+        asStream
+    );
+}
+
+async function _getCampaignLinkClickStatistics(campaign, select, unionQryFn, listQryFn) {
+    if (!listQryFn) {
+        listQryFn = qry => qry;
+    }
+
+    return await _getCampaignStatistics(
+        campaign,
+        select,
+        unionQryFn,
+        qry => listQryFn(
+            qry.where(function() {
+                this.whereNull('campaign_links.link').orWhere('campaign_links.link', '>', LinkId.GENERAL_CLICK)
+            })
+        ),
+        asStream
+    );
+}
+
+async function getCampaignOpenStatistics(campaign, select, unionQryFn, listQryFn) {
+    return await _getCampaignOpenStatistics(campaign, select, unionQryFn, listQryFn, false);
+}
+
+async function getCampaignOpenStatisticsStream(campaign, select, unionQryFn, listQryFn) {
+    return await _getCampaignOpenStatistics(campaign, select, unionQryFn, listQryFn, true);
+}
+
+async function getCampaignClickStatistics(campaign, select, unionQryFn, listQryFn) {
+    return await _getCampaignClickStatistics(campaign, select, unionQryFn, listQryFn, false);
+}
+
+async function getCampaignClickStatisticsStream(campaign, select, unionQryFn, listQryFn) {
+    return await _getCampaignClickStatistics(campaign, select, unionQryFn, listQryFn, true);
+}
+
+async function getCampaignLinkClickStatistics(campaign, select, unionQryFn, listQryFn) {
+    return await _getCampaignLinkClickStatistics(campaign, select, unionQryFn, listQryFn, false);
+}
+
+async function getCampaignLinkClickStatisticsStream(campaign, select, unionQryFn, listQryFn) {
+    return await _getCampaignLinkClickStatistics(campaign, select, unionQryFn, listQryFn, true);
+}
+
 
 
 
@@ -205,4 +388,9 @@ module.exports.remove = remove;
 module.exports.updateFields = updateFields;
 module.exports.listByState = listByState;
 module.exports.bulkChangeState = bulkChangeState;
-module.exports.getCampaignResults = getCampaignResults;
+module.exports.getCampaignOpenStatistics = getCampaignOpenStatistics;
+module.exports.getCampaignClickStatistics = getCampaignClickStatistics;
+module.exports.getCampaignLinkClickStatistics = getCampaignLinkClickStatistics;
+module.exports.getCampaignOpenStatisticsStream = getCampaignOpenStatisticsStream;
+module.exports.getCampaignClickStatisticsStream = getCampaignClickStatisticsStream;
+module.exports.getCampaignLinkClickStatisticsStream = getCampaignLinkClickStatisticsStream;

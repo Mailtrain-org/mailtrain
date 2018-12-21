@@ -10,7 +10,10 @@ import axios from '../lib/axios';
 import { ReportState } from '../../../shared/reports';
 import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
-import {getUrl} from "../lib/urls";
+import {
+    getPublicUrl,
+    getUrl
+} from "../lib/urls";
 import {
     tableAddDeleteButton,
     tableRestActionDialogInit,
@@ -114,7 +117,7 @@ export default class List extends Component {
                         } else if (mimeType === 'text/csv') {
                             viewContent = {
                                 label: <Icon icon="download-alt" title={t('download')}/>,
-                                href: `/reports/${id}/download`
+                                href: getUrl(`rpts/${id}/download`)
                             };
                         }
 

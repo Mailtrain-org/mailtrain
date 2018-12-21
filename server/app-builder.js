@@ -272,12 +272,12 @@ function createApp(appType) {
     useWith404Fallback('/codeeditor', sandboxedCodeEditor.getRouter(appType));
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
-        if (config.reports && config.reports.enabled === true) {
-            useWith404Fallback('/reports', reports);
-        }
-
         useWith404Fallback('/subscriptions', subscriptions);
         useWith404Fallback('/webhooks', webhooks);
+
+        if (config.reports && config.reports.enabled === true) {
+            useWith404Fallback('/rpts', reports); // This needs to be different from "reports", which is already used by the UI
+        }
 
         // API endpoints
         useWith404Fallback('/api', api);

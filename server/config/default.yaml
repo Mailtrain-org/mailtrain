@@ -217,6 +217,12 @@ testServer:
 
 builtinZoneMTA:
   enabled: true
+  host: localhost
+  port: 2525
+  mongo: mongodb://127.0.0.1:27017/zone-mta
+  redis: redis://localhost:6379/2
+  log:
+    level: warn
 
 seleniumWebDriver:
   browser: phantomjs

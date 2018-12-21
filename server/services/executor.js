@@ -4,6 +4,7 @@
    that can chroot.
   */
 
+const config = require('config');
 const reportHelpers = require('../lib/report-helpers');
 const fork = require('child_process').fork;
 const path = require('path');
@@ -111,7 +112,7 @@ process.on('message', msg => {
         if (type === 'start-report-processor-worker') {
 
             const ids = privilegeHelpers.getConfigROUidGid();
-            spawnProcess(msg.tid, path.join(__dirname, '..', 'workers', 'reports', 'report-processor.js'), [msg.data.id], reportHelpers.getReportContentFile(msg.data), reportHelpers.getReportOutputFile(msg.data), path.join(__dirname, '..', 'workers', 'reports'), ids.uid, ids.gid);
+            spawnProcess(msg.tid, path.join(__dirname, 'workers', 'reports', 'report-processor.js'), [msg.data.id], reportHelpers.getReportContentFile(msg.data), reportHelpers.getReportOutputFile(msg.data), path.join(__dirname, 'workers', 'reports'), ids.uid, ids.gid);
 
         } else if (type === 'stop-process') {
             const child = processes[msg.tid];
@@ -125,6 +126,10 @@ process.on('message', msg => {
         }
     }
 });
+
+if (config.title) {
+    process.title = config.title + ': worker executor';
+}
 
 process.send({
     type: 'executor-started'

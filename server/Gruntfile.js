@@ -12,7 +12,6 @@ module.exports = function (grunt) {
                 'services/**/*.js',
                 'lib/**/*.js',
                 'test/**/*.js',
-                'workers/**/*.js',
                 'app-builder.js',
                 'index.js',
                 'Gruntfile.js',

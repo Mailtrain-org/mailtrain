@@ -50,7 +50,7 @@ import {getLang} from "../../shared/langs";
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
-if (mailtrainConfig.reportsEnabmed) {
+if (mailtrainConfig.reportsEnabled) {
     topLevelMenuKeys.push('reports');
 }
 

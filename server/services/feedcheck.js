@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('config');
 const log = require('../lib/log');
 const knex = require('../lib/knex');
 const feedparser = require('feedparser-promised');
@@ -156,6 +157,10 @@ async function run() {
     running = false;
 
     setTimeout(run, dbCheckInterval);
+}
+
+if (config.title) {
+    process.title = config.title + ': feedcheck';
 }
 
 process.send({

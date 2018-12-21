@@ -74,7 +74,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableAddDeleteButton(actions, this, perms, `rest/reports/templates/${data[0]}`, data[1], t('deletingReportTemplate'), t('reportTemplateDeleted'));
+                    tableAddDeleteButton(actions, this, perms, `rest/report-templates/${data[0]}`, data[1], t('deletingReportTemplate'), t('reportTemplateDeleted'));
 
                     return actions;
                 }
@@ -88,9 +88,9 @@ export default class List extends Component {
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('createReportTemplate')}>
                             <MenuLink to="/reports/templates/create">{t('blank')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/subscribers-all">{t('allSubscribers')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/subscribers-grouped">{t('groupedSubscribers')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/export-list-csv">{t('exportListAsCsv')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts">{t('Open counts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('Open counts as CSV')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('Aggregrated open counts')}</MenuLink>
                         </DropdownMenu>
                     </Toolbar>
                 }

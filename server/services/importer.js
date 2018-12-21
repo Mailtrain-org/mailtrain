@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('config');
 const knex = require('../lib/knex');
 const path = require('path');
 const log = require('../lib/log');
@@ -401,6 +402,10 @@ process.on('message', msg => {
         }
     }
 });
+
+if (config.title) {
+    process.title = config.title + ': importer';
+}
 
 process.send({
     type: 'importer-started'

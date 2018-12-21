@@ -1,12 +1,17 @@
 # Process title visible in monitoring logs and process listing
 title: mailtrain
 
-# Default language to use
-language: en
-
 log:
   # silly|verbose|info|http|warn|error|silent
   level: info
+
+# Default language to use
+defaultLanguage: en-US
+
+# Enabled languages
+enabledLanguages:
+- en-US
+- fk-FK
 
 mysql:
   host: localhost
@@ -18,5 +23,5 @@ mysql:
   port: 3306
   charset: utf8mb4
   # The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
+  # If the MySQL server runs on the same server as Mailtrain, use 'local'
   timezone: local
-

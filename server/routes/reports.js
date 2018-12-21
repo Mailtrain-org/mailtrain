@@ -16,7 +16,7 @@ const fileSuffixes = {
 router.getAsync('/:id/download', passport.loggedIn, async (req, res) => {
     await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id, false);
 
     if (report.state == reports.ReportState.FINISHED) {
         const headers = {

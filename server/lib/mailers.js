@@ -9,6 +9,8 @@ const nodemailer = require('nodemailer');
 const aws = require('aws-sdk');
 const openpgpEncrypt = require('nodemailer-openpgp').openpgpEncrypt;
 const sendConfigurations = require('../models/send-configurations');
+const { ZoneMTAType, MailerType } = require('../../shared/send-configurations');
+const builtinZoneMta = require('./builtin-zone-mta');
 
 const contextHelpers = require('./context-helpers');
 const settings = require('../models/settings');
@@ -41,24 +43,28 @@ function invalidateMailer(sendConfigurationId) {
 function _addDkimKeys(transport, mail) {
     const sendConfiguration = transport.mailer.sendConfiguration;
 
-    if (sendConfiguration.mailer_type === sendConfigurations.MailerType.ZONE_MTA) {
-        if (!mail.headers) {
-            mail.headers = {};
-        }
+    if (sendConfiguration.mailer_type === MailerType.ZONE_MTA) {
+        const mailerSettings = sendConfiguration.mailer_settings;
 
-        const dkimDomain = sendConfiguration.mailer_settings.dkimDomain;
-        const dkimSelector = (sendConfiguration.mailer_settings.dkimSelector || '').trim();
-        const dkimPrivateKey = (sendConfiguration.mailer_settings.dkimPrivateKey || '').trim();
+        if (mailerSettings.zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF || mailerSettings.zoneMtaType === ZoneMTAType.BUILTIN) {
+            if (!mail.headers) {
+                mail.headers = {};
+            }
 
-        if (dkimSelector && dkimPrivateKey) {
-            const from = (mail.from.address || '').trim();
-            const domain = from.split('@').pop().toLowerCase().trim();
+            const dkimDomain = mailerSettings.dkimDomain;
+            const dkimSelector = (mailerSettings.dkimSelector || '').trim();
+            const dkimPrivateKey = (mailerSettings.dkimPrivateKey || '').trim();
 
-            mail.headers['x-mailtrain-dkim'] = JSON.stringify({
-                domainName: dkimDomain || domain,
-                keySelector: dkimSelector,
-                privateKey: dkimPrivateKey
-            });
+            if (dkimSelector && dkimPrivateKey) {
+                const from = (mail.from.address || '').trim();
+                const domain = from.split('@').pop().toLowerCase().trim();
+
+                mail.headers['x-mailtrain-dkim'] = JSON.stringify({
+                    domainName: dkimDomain || domain,
+                    keySelector: dkimSelector,
+                    privateKey: dkimPrivateKey
+                });
+            }
         }
     }
 }
@@ -144,17 +150,9 @@ async function _createTransport(sendConfiguration) {
 
     let transportOptions;
 
-    if (mailerType === sendConfigurations.MailerType.GENERIC_SMTP || mailerType === sendConfigurations.MailerType.ZONE_MTA) {
+    if (mailerType === MailerType.GENERIC_SMTP || mailerType === MailerType.ZONE_MTA) {
         transportOptions = {
             pool: true,
-            host: mailerSettings.hostname,
-            port: mailerSettings.port || false,
-            secure: mailerSettings.encryption === 'TLS',
-            ignoreTLS: mailerSettings.encryption === 'NONE',
-            auth: mailerSettings.useAuth ? {
-                user: mailerSettings.user,
-                pass: mailerSettings.password
-            } : false,
             debug: mailerSettings.logTransactions,
             logger: mailerSettings.logTransactions ? {
                 debug: logFunc.bind(null, 'verbose'),
@@ -168,7 +166,27 @@ async function _createTransport(sendConfiguration) {
             }
         };
 
-    } else if (mailerType === sendConfigurations.MailerType.AWS_SES) {
+        if (mailerType === MailerType.ZONE_MTA || mailerSettings.zoneMTAType === ZoneMTAType.BUILTIN) {
+            transportOptions.host = config.builtinZoneMTA.host;
+            transportOptions.port = config.builtinZoneMTA.port;
+            transportOptions.secure = false;
+            transportOptions.ignoreTLS = true;
+            transportOptions.auth = {
+                user: builtinZoneMta.getUsername(),
+                pass: builtinZoneMta.getPassword()
+            };
+        } else {
+            transportOptions.host = mailerSettings.hostname;
+            transportOptions.port = mailerSettings.port || false;
+            transportOptions.secure = mailerSettings.encryption === 'TLS';
+            transportOptions.ignoreTLS = mailerSettings.encryption === 'NONE';
+            transportOptions.auth = mailerSettings.useAuth ? {
+                user: mailerSettings.user,
+                pass: mailerSettings.password
+            } : false;
+        }
+
+    } else if (mailerType === MailerType.AWS_SES) {
         const sendingRate = mailerSettings.throttling / 3600;  // convert to messages/second
 
         transportOptions = {
@@ -206,7 +224,7 @@ async function _createTransport(sendConfiguration) {
 
     let throttleWait;
 
-    if (mailerType === sendConfigurations.MailerType.GENERIC_SMTP || mailerType === sendConfigurations.MailerType.ZONE_MTA) {
+    if (mailerType === MailerType.GENERIC_SMTP || mailerType === MailerType.ZONE_MTA) {
         let throttling = mailerSettings.throttling;
         if (throttling) {
             throttling = 1 / (throttling / (3600 * 1000));

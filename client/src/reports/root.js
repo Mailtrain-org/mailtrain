@@ -3,8 +3,7 @@
 import React from 'react';
 import ReportsCUD from './CUD';
 import ReportsList from './List';
-import ReportsView from './View';
-import ReportsOutput from './Output';
+import ReportsViewAndOutput from './ViewAndOutput';
 import ReportTemplatesCUD from './templates/CUD';
 import ReportTemplatesList from './templates/List';
 import Share from '../shares/Share';
@@ -36,7 +35,7 @@ function getMenus(t) {
                             title: t('view'),
                             link: params => `/reports/${params.reportId}/view`,
                             visible: resolved => resolved.report.permissions.includes('viewContent') && resolved.report.state === ReportState.FINISHED && resolved.report.mime_type === 'text/html',
-                            panelRender: props => (<ReportsView {...props} />),
+                            panelRender: props => (<ReportsViewAndOutput viewType="view" {...props} />),
                         },
                         download: {
                             title: t('download'),
@@ -47,7 +46,7 @@ function getMenus(t) {
                             title: t('output'),
                             link: params => `/reports/${params.reportId}/output`,
                             visible: resolved => resolved.report.permissions.includes('viewOutput'),
-                            panelRender: props => (<ReportsOutput {...props} />)
+                            panelRender: props => (<ReportsViewAndOutput viewType="output" {...props} />)
                         },
                         share: {
                             title: t('share'),

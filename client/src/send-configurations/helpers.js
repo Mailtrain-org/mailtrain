@@ -12,6 +12,7 @@ import {
 } from "../lib/form";
 import {Trans} from "react-i18next";
 import styles from "./styles.scss";
+import mailtrainConfig from 'mailtrainConfig';
 
 export const mailerTypesOrder = [
     MailerType.ZONE_MTA,
@@ -140,11 +141,14 @@ export function getMailerTypes(t) {
         { key: 'eu-west-1', label: t('euwest1')}
     ];
 
-    const zoneMtaTypeOptions = [
-        { key: ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF, label: t('Dynamic configuration of DKIM keys via ZoneMTA\'s Mailtrain plugin (use this option for builtin ZoneMTA)')},
-        { key: ZoneMTAType.WITH_HTTP_CONF, label: t('Dynamic configuration of DKIM keys via ZoneMTA\'s HTTP config plugin')},
-        { key: ZoneMTAType.REGULAR, label: t('No dynamic configuration of DKIM keys')}
-    ]
+    const zoneMtaTypeOptions = [];
+
+    if (mailtrainConfig.builtinZoneMTAEnabled) {
+        zoneMtaTypeOptions.push({ key: ZoneMTAType.BUILTIN, label: t('Built-in ZoneMTA')});
+    }
+    zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF, label: t('Dynamic configuration of DKIM keys via ZoneMTA\'s Mailtrain plugin (use this option for builtin ZoneMTA)')});
+    zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_HTTP_CONF, label: t('Dynamic configuration of DKIM keys via ZoneMTA\'s HTTP config plugin')});
+    zoneMtaTypeOptions.push({ key: ZoneMTAType.REGULAR, label: t('No dynamic configuration of DKIM keys')});
 
     mailerTypes[MailerType.GENERIC_SMTP] = {
         getForm: owner =>
@@ -196,18 +200,22 @@ export function getMailerTypes(t) {
                     <Fieldset label={t('mailerSettings')}>
                         <Dropdown id="mailer_type" label={t('mailerType')} options={typeOptions}/>
                         <Dropdown id="zoneMtaType" label={t('Dynamic configuration')} options={zoneMtaTypeOptions}/>
-                        <InputField id="smtpHostname" label={t('hostname')} placeholder={t('hostnameEgSmtpexamplecom')}/>
-                        <InputField id="smtpPort" label={t('port')} placeholder={t('portEg465AutodetectedIfLeftBlank')}/>
-                        <Dropdown id="smtpEncryption" label={t('encryption')} options={smtpEncryptionOptions}/>
-                        <CheckBox id="smtpUseAuth" text={t('enableSmtpAuthentication')}/>
-                        { owner.getFormValue('smtpUseAuth') &&
-                        <div>
-                            <InputField id="smtpUser" label={t('username')} placeholder={t('usernameEgMyaccount@examplecom')}/>
-                            <InputField id="smtpPassword" label={t('password')} placeholder={t('usernameEgMyaccount@examplecom')}/>
-                        </div>
+                        {(zoneMtaType === ZoneMTAType.REGULAR || zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF || zoneMtaType === ZoneMTAType.WITH_HTTP_CONF) &&
+                            <div>
+                                <InputField id="smtpHostname" label={t('hostname')} placeholder={t('hostnameEgSmtpexamplecom')}/>
+                                <InputField id="smtpPort" label={t('port')} placeholder={t('portEg465AutodetectedIfLeftBlank')}/>
+                                <Dropdown id="smtpEncryption" label={t('encryption')} options={smtpEncryptionOptions}/>
+                                <CheckBox id="smtpUseAuth" text={t('enableSmtpAuthentication')}/>
+                                { owner.getFormValue('smtpUseAuth') &&
+                                <div>
+                                    <InputField id="smtpUser" label={t('username')} placeholder={t('usernameEgMyaccount@examplecom')}/>
+                                    <InputField id="smtpPassword" label={t('password')} placeholder={t('usernameEgMyaccount@examplecom')}/>
+                                </div>
+                                }
+                            </div>
                         }
                     </Fieldset>
-                    {(zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF || zoneMtaType === ZoneMTAType.WITH_HTTP_CONF) &&
+                    {(zoneMtaType === ZoneMTAType.BUILTIN || zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF || zoneMtaType === ZoneMTAType.WITH_HTTP_CONF) &&
                         <Fieldset label={t('dkimSigning')}>
                             <Trans i18nKey="ifYouAreUsingZoneMtaThenMailtrainCan"><p>If you are using ZoneMTA then Mailtrain can provide a DKIM key for signing all outgoing messages.</p></Trans>
                             <Trans i18nKey="doNotUseSensitiveKeysHereThePrivateKeyIs"><p className="text-warning">Do not use sensitive keys here. The private key is not encrypted in the database.</p></Trans>
@@ -231,7 +239,7 @@ export function getMailerTypes(t) {
         },
         initData: () => ({
             ...getInitGenericSMTP(),
-            zoneMtaType: ZoneMTAType.REGULAR,
+            zoneMtaType: mailtrainConfig.builtinZoneMTAEnabled ? ZoneMTAType.BUILTIN : ZoneMTAType.REGULAR,
             dkimApiKey: '',
             dkimDomain: '',
             dkimSelector: '',

@@ -369,7 +369,7 @@ async function listTestUsersDTAjax(context, listCid, params) {
     });
 }
 
-async function list(context, listId, grouped = true, offset, limit) {
+async function list(context, listId, grouped, offset, limit) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 

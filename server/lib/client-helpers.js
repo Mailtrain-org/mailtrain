@@ -47,7 +47,8 @@ async function getAuthenticatedConfig(context) {
         mosaico: config.mosaico,
         verpEnabled: config.verp.enabled,
         reportsEnabled: config.reports.enabled,
-        mapsApiKey: setts.mapsApiKey
+        mapsApiKey: setts.mapsApiKey,
+        builtinZoneMTAEnabled: config.builtinZoneMTA.enabled
     }
 }
 

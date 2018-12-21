@@ -333,6 +333,10 @@ async function init() {
         }
     });
 
+    if (config.title) {
+        process.title = config.title + ': sender/master';
+    }
+
     process.send({
         type: 'master-sender-started'
     });
