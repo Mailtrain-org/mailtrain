@@ -10,13 +10,41 @@ fi
 
 set -e
 
+SCRIPT_PATH=$(dirname $(realpath -s $0))
+cd $SCRIPT_PATH/..
+
+#Help function
+function HELP {
+cat << EOF
+
+Basic usage: install-centos7.sh <trusted URL base> <sandbox URL base> <public URL base>
+
+Installs Mailtrain 2 on CentOS 7.
+
+Example (local installation): install-centos7.sh http://localhost:3000 http://localhost:3003 http://localhost:3004
+Example (installation behind HTTPD proxy - see mailtrain-apache-sample.conf): install-centos7.sh https://mailtrain.example.com https://sbox.mailtrain.example.com https://mail.example.com
+EOF
+
+  exit 1
+}
+
+if [ $# -lt 3 ]; then
+        echo "Error: incorrect number of parameters."
+        HELP
+fi
+
+URL_BASE_TRUSTED="$1"
+URL_BASE_SANDBOX="$2"
+URL_BASE_PUBLIC="$3"
+
+
 yum -y install epel-release
 
 curl --silent --location https://rpm.nodesource.com/setup_11.x | bash -
 cat > /etc/yum.repos.d/mongodb-org.repo <<EOT
 [mongodb-org-4.0]
 name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/4.0/x86_64/
 gpgcheck=1
 enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
@@ -34,13 +62,6 @@ systemctl start mongod
 systemctl enable mongod
 
 
-PUBLIC_IP=`curl -s https://api.ipify.org`
-if [ ! -z "$PUBLIC_IP" ]; then
-    HOSTNAME=`dig +short -x $PUBLIC_IP | sed 's/\.$//'`
-    HOSTNAME="${HOSTNAME:-$PUBLIC_IP}"
-fi
-HOSTNAME="${HOSTNAME:-`hostname`}"
-
 MYSQL_PASSWORD=`pwgen 12 -1`
 MYSQL_RO_PASSWORD=`pwgen 12 -1`
 
@@ -51,20 +72,11 @@ mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$MYSQL_R
 mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';"
 mysql -u mailtrain --password="$MYSQL_PASSWORD" -e "CREATE database mailtrain;"
 
-# Enable firewall, allow connections to SSH, HTTP, HTTPS and SMTP
-for port in 80/tcp 443/tcp 25/tcp; do firewall-cmd --add-port=$port --permanent; done
-firewall-cmd --reload
-
-# Fetch Mailtrain files
-mkdir -p /opt/mailtrain
-cd /opt/mailtrain
-git clone git://github.com/Mailtrain-org/mailtrain.git .
-
 # Add new user for the mailtrain daemon to run as
 useradd mailtrain || true
 
 # Setup installation configuration
-cat > config/production.yaml <<EOT
+cat > server/config/production.yaml <<EOT
 user: mailtrain
 group: mailtrain
 roUser: nobody
@@ -73,9 +85,9 @@ roGroup: nobody
 www:
   port: 3000
   secret: "`pwgen -1`"
-  trustedUrlBase: http://$HOSTNAME:3000
-  sandboxUrlBase: http://$HOSTNAME:3003
-  publicUrlBase: http://$HOSTNAME:3004
+  trustedUrlBase: $URL_BASE_TRUSTED
+  sandboxUrlBase: $URL_BASE_SANDBOX
+  publicUrlBase: $URL_BASE_PUBLIC
 
 
 mysql:
@@ -95,7 +107,7 @@ queue:
   processes: 5
 EOT
 
-cat >> workers/reports/config/production.yaml <<EOT
+cat >> server/services/workers/reports/config/production.yaml <<EOT
 log:
   level: warn
 
