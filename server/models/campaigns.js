@@ -324,6 +324,7 @@ async function rawGetByTx(tx, key, id) {
             'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
             'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject_override',
             'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
+            'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks',
             knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
         ])
         .first();
@@ -361,16 +362,10 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
-        const unsentQryGen = await getSubscribersQueryGeneratorTx(tx, id, true);
+        const unsentQryGen = await getSubscribersQueryGeneratorTx(tx, id);
         if (unsentQryGen) {
             const res = await unsentQryGen(tx).count('* AS subscriptionsToSend').first();
             entity.subscriptionsToSend = res.subscriptionsToSend;
-        }
-
-        const totalQryGen = await getSubscribersQueryGeneratorTx(tx, id, false);
-        if (totalQryGen) {
-            const res = await totalQryGen(tx).count('* AS subscriptionsTotal').first();
-            entity.subscriptionsTotal = res.subscriptionsTotal;
         }
 
     } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
@@ -765,7 +760,7 @@ async function updateMessageResponse(context, message, response, responseId) {
     });
 }
 
-async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent) {
+async function getSubscribersQueryGeneratorTx(tx, campaignId) {
     /*
     This is supposed to produce queries like this:
 
@@ -812,7 +807,7 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId, onlyUnsent) {
 
     if (subsQrys.length > 0) {
         let subsQry;
-        const unsentWhere = onlyUnsent ? ' where `sent` = false' : '';
+        const unsentWhere = ' where `sent` = false';
 
         if (subsQrys.length === 1) {
             const subsUnionSql = '(select `email`, `campaign_list_id`, `sent` from (' + subsQrys[0].sql + ') as `pending_subscriptions_all`' +  unsentWhere + ') as `pending_subscriptions`'
@@ -905,30 +900,12 @@ async function disable(context, campaignId) {
 }
 
 
-async function getStatisticsOverview(context, id) {
-    return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
-
-        const stats = await tx('campaigns').where('id', id).select(['delivered', 'unsubscribed', 'bounced', 'complained', 'blacklisted', 'opened', 'clicks']).first();
-
-        const totalQryGen = await getSubscribersQueryGeneratorTx(tx, id, false);
-        if (totalQryGen) {
-            const res = await totalQryGen(tx).count('* AS subscriptionsTotal').first();
-            stats.total = res.subscriptionsTotal;
-        } else {
-            stats.total = 0;
-        }
-
-        return stats;
-    });
-}
-
 async function getStatisticsOpened(context, id) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
-        const devices = await tx('campaign_links').where('campaign', id).groupBy('device_type').select('device_type AS key').count('* as count');
-        const countries = await tx('campaign_links').where('campaign', id).groupBy('country').select('country AS key').count('* as count');
+        const devices = await tx('campaign_links').where('campaign', id).where('link', LinkId.OPEN).groupBy('device_type').select('device_type AS key').count('* as count');
+        const countries = await tx('campaign_links').where('campaign', id).where('link', LinkId.OPEN).groupBy('country').select('country AS key').count('* as count');
 
         return {
             devices,
@@ -976,5 +953,4 @@ module.exports.disable = disable;
 
 module.exports.rawGetByTx = rawGetByTx;
 module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
-module.exports.getStatisticsOverview = getStatisticsOverview;
 module.exports.getStatisticsOpened = getStatisticsOpened;

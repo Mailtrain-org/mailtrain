@@ -62,12 +62,9 @@ function getMenus(t) {
                         },
                         statistics: {
                             title: t('statistics'),
-                            resolve: {
-                                statisticsOverview: params => `rest/campaign-statistics/${params.campaignId}/overview`
-                            },
                             link: params => `/campaigns/${params.campaignId}/statistics`,
-                            visible: resolved => resolved.campaign.permissions.includes('viewStats') && (resolved.campaign.status === CampaignStatus.SENDING || resolved.campaign.status === CampaignStatus.PAUSED || resolved.campaign.status === CampaignStatus.FINISHED),
-                            panelRender: props => <Statistics entity={props.resolved.campaign} statisticsOverview={props.resolved.statisticsOverview} />,
+                            visible: resolved => resolved.campaign.permissions.includes('viewStats'),
+                            panelRender: props => <Statistics entity={props.resolved.campaign} />,
                             children: {
                                 delivered: {
                                     title: t('Delivered'),

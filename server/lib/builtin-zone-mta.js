@@ -10,9 +10,9 @@ const crypto = require('crypto');
 let zoneMtaProcess;
 
 const zoneMtaDir = path.join(__dirname, '..', '..', 'zone-mta');
-const zoneMtaBuiltingConfig = path.join(zoneMtaDir, 'config', 'builtin-zonemta.json')
+const zoneMtaBuiltingConfig = path.join(zoneMtaDir, 'config', 'builtin-zonemta.json');
 
-const password = crypto.randomBytes(20).toString('hex').toLowerCase();
+const password = process.env.BUILTIN_ZONE_MTA_PASSWORD || crypto.randomBytes(20).toString('hex').toLowerCase();
 
 function getUsername() {
     return 'mailtrain';

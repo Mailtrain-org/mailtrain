@@ -95,10 +95,17 @@ async function _sendMail(transport, mail, template) {
 }
 
 async function _sendTransactionalMail(transport, mail, template) {
+    const sendConfiguration = transport.mailer.sendConfiguration;
+
     if (!mail.headers) {
         mail.headers = {};
     }
     mail.headers['X-Sending-Zone'] = 'transactional';
+
+    mail.from = {
+        name: sendConfiguration.from_name,
+        address: sendConfiguration.from_email
+    };
 
     const htmlRenderer = await tools.getTemplate(template.html, template.locale);
 

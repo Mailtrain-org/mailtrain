@@ -110,7 +110,7 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
     const data = {
         title: list.name,
         homepage: configItems.defaultHomepage || getTrustedUrl(),
-        contactAddress: list.from_email || configItems.adminEmail,
+        contactAddress: list.contact_email || configItems.adminEmail,
     };
 
     for (let relativeUrlKey in relativeUrls) {
@@ -140,10 +140,6 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
         if (list.send_configuration) {
             const mailer = await mailers.getOrCreateMailer(list.send_configuration);
             await mailer.sendTransactionalMail({
-                from: {
-                    name: configItems.defaultFrom,
-                    address: configItems.defaultAddress
-                },
                 to: {
                     name: getDisplayName(flds, subscription),
                     address: email

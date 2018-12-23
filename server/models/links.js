@@ -32,7 +32,10 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
         const subscription = await subscriptions.getByCidTx(tx, contextHelpers.getAdminContext(), list.id, subscriptionCid);
 
         const country = geoip.lookupCountry(remoteIp) || null;
-        const device = uaParser(userAgent, { unknownUserAgentDeviceType: 'desktop', emptyUserAgentDeviceType: 'desktop' });
+        const device = uaParser(userAgent, {
+            unknownUserAgentDeviceType: 'desktop',
+            emptyUserAgentDeviceType: 'desktop'
+        });
         const now = new Date();
 
         const _countLink = async (clickLinkId, incrementOnDup) => {
@@ -66,7 +69,6 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
         };
 
 
-
         // Update opened and click timestamps
         const latestUpdates = {};
 
@@ -81,7 +83,6 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
         if (latestUpdates.latest_click || latestUpdates.latest_open) {
             await tx(subscriptions.getSubscriptionTableName(list.id)).update(latestUpdates).where('id', subscription.id);
         }
-
 
         // Update clicks
         if (linkId > LinkId.GENERAL_CLICK && !campaign.click_tracking_disabled) {
@@ -125,6 +126,8 @@ async function addOrGet(campaignId, url) {
                 id: ids[0],
                 cid
             };
+        } else {
+            return link;
         }
     });
 }

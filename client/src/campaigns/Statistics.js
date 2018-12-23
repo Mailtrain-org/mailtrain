@@ -35,7 +35,6 @@ export default class Statistics extends Component {
 
         this.state = {
             entity: props.entity,
-            statisticsOverview: props.statisticsOverview
         };
 
         this.refreshTimeoutHandler = ::this.periodicRefreshTask;
@@ -43,8 +42,7 @@ export default class Statistics extends Component {
     }
 
     static propTypes = {
-        entity: PropTypes.object,
-        statisticsOverview: PropTypes.object
+        entity: PropTypes.object
     }
 
     @withAsyncErrorHandler
@@ -54,12 +52,8 @@ export default class Statistics extends Component {
         resp = await axios.get(getUrl(`rest/campaigns-stats/${this.props.entity.id}`));
         const entity = resp.data;
 
-        resp = await axios.get(getUrl(`rest/campaign-statistics/${this.props.entity.id}/overview`));
-        const statisticsOverview = resp.data;
-
         this.setState({
-            entity,
-            statisticsOverview
+            entity
         });
     }
 
@@ -85,11 +79,10 @@ export default class Statistics extends Component {
     render() {
         const t = this.props.t;
         const entity = this.state.entity;
-
-        const stats = this.state.statisticsOverview;
+        const total = entity.subscriptionsToSend === undefined ? undefined : entity.subscriptionsToSend + entity.delivered;
 
         const renderMetrics = (key, label, showZoomIn = true) => {
-            const val = stats[key]
+            const val = entity[key]
 
             return (
                 <AlignedRow label={label}><span className={styles.statsMetrics}>{val}</span>{showZoomIn && <span className={styles.zoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="zoom-in"/></Link></span>}</AlignedRow>
@@ -97,13 +90,13 @@ export default class Statistics extends Component {
         }
 
         const renderMetricsWithProgress = (key, label, progressBarClass, showZoomIn = true) => {
-            const val = stats[key]
+            const val = entity[key]
 
-            if (!stats.total) {
+            if (!total) {
                 return renderMetrics(key, label);
             }
 
-            const rate = Math.round(val / stats.total * 100);
+            const rate = Math.round(val / total * 100);
 
             return (
                 <AlignedRow label={label}>
@@ -112,9 +105,6 @@ export default class Statistics extends Component {
                         <div
                             className={`progress-bar progress-bar-${progressBarClass}`}
                             role="progressbar"
-                            aria-valuenow={stats.bounced}
-                            aria-valuemin="0"
-                            aria-valuemax="100"
                             style={{minWidth: '6em', width: rate + '%'}}>
                             {val}&nbsp;({rate}%)
                         </div>

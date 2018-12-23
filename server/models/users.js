@@ -304,9 +304,6 @@ async function sendPasswordReset(locale, usernameOrEmail) {
 
             const mailer = await mailers.getOrCreateMailer();
             await mailer.sendTransactionalMail({
-                from: {
-                    address: adminEmail
-                },
                 to: {
                     address: user.email
                 },

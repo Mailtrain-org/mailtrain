@@ -255,31 +255,24 @@ async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, a
             } else {
                 return knex.raw(subsSql, subsBindings);
             }
-        }
+        };
 
         if (subsQrys.length === 1) {
             subsSql = subsQrys[0].sql;
             subsBindings = subsQrys[0].bindings;
-
-            if (asStream) {
-                return await applyUnionQryFn(subsSql, subsBindings).stream();
-            } else {
-                return await applyUnionQryFn(subsSql, subsBindings);
-            }
-
         } else {
             subsSql = subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ');
             subsBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
+        }
 
-            if (asStream) {
-                return applyUnionQryFn(subsSql, subsBindings).stream();
+        if (asStream) {
+            return applyUnionQryFn(subsSql, subsBindings).stream();
+        } else {
+            const res = await applyUnionQryFn(subsSql, subsBindings);
+            if (res[0] && Array.isArray(res[0])) {
+                return res[0]; // UNION ALL generates an array with result and schema
             } else {
-                const res = await applyUnionQryFn(subsSql, subsBindings);
-                if (res[0] && Array.isArray(res[0])) {
-                    return res[0]; // UNION ALL generates an array with result and schema
-                } else {
-                    return res;
-                }
+                return res;
             }
         }
 

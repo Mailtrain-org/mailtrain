@@ -5,6 +5,7 @@ const log = require('./log');
 const path = require('path');
 const knex = require('./knex');
 const {CampaignStatus} = require('../../shared/campaigns');
+const builtinZoneMta = require('./builtin-zone-mta');
 
 let messageTid = 0;
 let senderProcess;
@@ -16,7 +17,10 @@ function spawn(callback) {
     .then(() => {
         senderProcess = fork(path.join(__dirname, '..', 'services', 'sender-master.js'), [], {
             cwd: path.join(__dirname, '..'),
-            env: {NODE_ENV: process.env.NODE_ENV}
+            env: {
+                NODE_ENV: process.env.NODE_ENV,
+                BUILTIN_ZONE_MTA_PASSWORD: builtinZoneMta.getPassword()
+            }
         });
 
         senderProcess.on('message', msg => {

@@ -273,7 +273,7 @@ class SendControls extends Component {
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
-            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
+            const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
                 <div>{yesNoDialog}
@@ -316,7 +316,7 @@ class SendControls extends Component {
             );
 
         } else if (entity.status === CampaignStatus.FINISHED) {
-            const subscrInfo = entity.subscriptionsTotal === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
+            const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
                 <div>{yesNoDialog}
@@ -479,7 +479,7 @@ export default class Status extends Component {
                 <Title>{t('campaignStatus')}</Title>
 
                 <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('subscribers')}>{entity.subscriptionsTotal === undefined ? t('computing') : entity.subscriptionsTotal}</AlignedRow>
+                <AlignedRow label={t('Delivered')}>{entity.delivered}</AlignedRow>
                 <AlignedRow label={t('status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
 
                 {sendSettings}

@@ -94,10 +94,6 @@ router.postAsync('/campaign-disable/:campaignId', passport.loggedIn, passport.cs
     return res.json(await campaigns.disable(req.context, castToInteger(req.params.campaignId), null));
 });
 
-router.getAsync('/campaign-statistics/:campaignId/overview', passport.loggedIn, async (req, res) => {
-    return res.json(await campaigns.getStatisticsOverview(req.context, castToInteger(req.params.campaignId)));
-});
-
 router.getAsync('/campaign-statistics/:campaignId/opened', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.getStatisticsOpened(req.context, castToInteger(req.params.campaignId)));
 });

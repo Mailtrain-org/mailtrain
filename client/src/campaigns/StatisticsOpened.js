@@ -60,7 +60,7 @@ export default class StatisticsOpened extends Component {
     async refreshEntity() {
         let resp;
 
-        resp = await axios.get(getUrl(`rest/campaigns-stats/${this.props.entity.id}`));
+        resp = await axios.get(getUrl(`rest/campaigns-settings/${this.props.entity.id}`));
         const entity = resp.data;
 
         resp = await axios.get(getUrl(`rest/campaign-statistics/${this.props.entity.id}/opened`));
@@ -132,7 +132,7 @@ export default class StatisticsOpened extends Component {
                     <h4 className={styles.chartTitle}>{t('Distribution by device type')}</h4>
                     <Chart
                         width="100%"
-                        height="300px"
+                        height="380px"
                         chartType="PieChart"
                         loader={<div>{t('Loading chart')}</div>}
                         data={[
@@ -144,7 +144,7 @@ export default class StatisticsOpened extends Component {
                                 left: "25%",
                                 top: 15,
                                 width: "100%",
-                                height: 270
+                                height: 350
                             },
                             tooltip: {
                                 showColorCode: true
@@ -169,7 +169,7 @@ export default class StatisticsOpened extends Component {
                         <div className={`col-md-6 ${styles.chart}`}>
                             <Chart
                                 width="100%"
-                                height="300px"
+                                height="380px"
                                 chartType="PieChart"
                                 loader={<div>{t('Loading chart')}</div>}
                                 data={[
@@ -181,7 +181,7 @@ export default class StatisticsOpened extends Component {
                                         left: "25%",
                                         top: 15,
                                         width: "100%",
-                                        height: 270
+                                        height: 350
                                     },
                                     tooltip: {
                                         showColorCode: true
@@ -199,7 +199,7 @@ export default class StatisticsOpened extends Component {
                         <div className={`col-md-6 ${styles.chart}`}>
                             <Chart
                                 width="100%"
-                                height="300px"
+                                height="380px"
                                 chartType="GeoChart"
                                 data={[
                                     ['Country', 'Count'],

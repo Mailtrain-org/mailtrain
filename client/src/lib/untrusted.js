@@ -201,7 +201,7 @@ export class UntrustedContentRoot extends Component {
             this.clientHeight = newHeight;
             this.sendMessage('clientHeight', newHeight);
         }
-        //this.periodicTimeoutId = setTimeout(this.periodicTimeoutHandler, 250);
+        this.periodicTimeoutId = setTimeout(this.periodicTimeoutHandler, 250);
     }
 
 

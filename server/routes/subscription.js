@@ -670,8 +670,8 @@ async function webNotice(type, req, res) {
 
     const data = {
         title: list.name,
-        homepage: configItems.defaultHomepage || getTrustedUrl(),
-        contactAddress: list.from_email || configItems.adminEmail,
+        homepage: list.homepage || configItems.defaultHomepage || getTrustedUrl(),
+        contactAddress: list.contact_email || configItems.adminEmail,
         template: {
             template: 'subscription/web-' + type + '-notice.mjml.hbs',
             layout: 'subscription/layout.mjml.hbs',

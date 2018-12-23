@@ -90,7 +90,7 @@ export default class CUD extends Component {
                         '      Email\n' +
                         '    </th>\n' +
                         '    <th>\n' +
-                        '      Tracker Count\n' +
+                        '      Open Count\n' +
                         '    </th>\n' +
                         '    </thead>\n' +
                         '    {{#if results}}\n' +

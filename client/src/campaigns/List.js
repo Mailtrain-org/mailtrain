@@ -109,12 +109,10 @@ export default class List extends Component {
                             link: `/campaigns/${data[0]}/status`
                         });
 
-                        if (status === CampaignStatus.SENDING || status === CampaignStatus.PAUSED || status === CampaignStatus.FINISHED) {
-                            actions.push({
-                                label: <Icon icon="signal" title={t('statistics')}/>,
-                                link: `/campaigns/${data[0]}/statistics`
-                            });
-                        }
+                        actions.push({
+                            label: <Icon icon="signal" title={t('statistics')}/>,
+                            link: `/campaigns/${data[0]}/statistics`
+                        });
                     }
 
                     if (perms.includes('edit')) {
