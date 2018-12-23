@@ -224,7 +224,7 @@ export default class CUD extends Component {
                 namespace: mailtrainConfig.user.namespace,
 
                 click_tracking_disabled: false,
-                open_trackings_disabled: false,
+                open_tracking_disabled: false,
 
                 unsubscribe_url: '',
 
@@ -718,7 +718,7 @@ export default class CUD extends Component {
 
                     <hr/>
 
-                    <CheckBox id="open_trackings_disabled" text={t('disableOpenedTracking')}/>
+                    <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
                     <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
 
                     {sourceEdit && <hr/> }

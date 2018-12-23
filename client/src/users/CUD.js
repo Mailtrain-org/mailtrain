@@ -74,6 +74,12 @@ export default class CUD extends Component {
             state.setIn(['username', 'error'], null);
         }
 
+        if (!state.getIn(['role', 'value'])) {
+            state.setIn(['role', 'error'], t('Role must be selected'));
+        } else {
+            state.setIn(['role', 'error'], null);
+        }
+
 
         if (mailtrainConfig.isAuthMethodLocal) {
             const email = state.getIn(['email', 'value']);
