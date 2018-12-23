@@ -1,9 +1,6 @@
 'use strict';
 
-const log = require('../lib/log');
 const knex = require('../lib/knex');
-const dtHelpers = require('../lib/dt-helpers');
-const shares = require('./shares');
 const campaigns = require('./campaigns');
 const lists = require('./lists');
 const subscriptions = require('./subscriptions');
@@ -11,7 +8,6 @@ const contextHelpers = require('../lib/context-helpers');
 const geoip = require('geoip-ultralight');
 const uaParser = require('device');
 const he = require('he');
-const { enforce } = require('../lib/helpers');
 const { getPublicUrl } = require('../lib/urls');
 const tools = require('../lib/tools');
 const shortid = require('shortid');

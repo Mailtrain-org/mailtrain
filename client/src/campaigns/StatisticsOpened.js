@@ -125,6 +125,16 @@ export default class StatisticsOpened extends Component {
 
         let charts = null;
 
+        const deviceTypes = {
+            desktop: t('Desktop'),
+            tv: t('TV'),
+            tablet: t('Tablet'),
+            phone: t('Phone'),
+            bot: t('Bot'),
+            car: t('Car'),
+            console: t('Console')
+        };
+
         if (agg === 'devices') {
             charts = (
                 <div className={styles.charts}>
@@ -137,7 +147,7 @@ export default class StatisticsOpened extends Component {
                         loader={<div>{t('Loading chart')}</div>}
                         data={[
                             [t('Device type'), t('Count')],
-                            ...stats.devices.map(entry => [entry.key, entry.count])
+                            ...stats.devices.map(entry => [deviceTypes[entry.key] || t('Unknown'), entry.count])
                         ]}
                         options={{
                             chartArea: {
