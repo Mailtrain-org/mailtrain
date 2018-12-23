@@ -99,12 +99,12 @@ export default class StatisticsOpened extends Component {
         const stats = this.state.statisticsOpened;
 
         const subscribersColumns = [
-            { data: 0, title: t('Email') },
+            { data: 0, title: t('email') },
             { data: 1, title: t('subscriptionId'), render: data => <code>{data}</code> },
             { data: 2, title: t('listId'), render: data => <code>{data}</code> },
             { data: 3, title: t('list') },
             { data: 4, title: t('listNamespace') },
-            { data: 5, title: t('Opens count') }
+            { data: 5, title: t('opensCount') }
         ];
 
         console.log(this.state.statisticsOpened);
@@ -117,8 +117,8 @@ export default class StatisticsOpened extends Component {
 
         const navPills = (
             <ul className={`nav nav-pills ${styles.navPills}`}>
-                {renderNavPill('countries', t('Countries'))}
-                {renderNavPill('devices', t('Devices'))}
+                {renderNavPill('countries', t('countries'))}
+                {renderNavPill('devices', t('devices'))}
             </ul>
         );
 
@@ -126,28 +126,28 @@ export default class StatisticsOpened extends Component {
         let charts = null;
 
         const deviceTypes = {
-            desktop: t('Desktop'),
-            tv: t('TV'),
-            tablet: t('Tablet'),
-            phone: t('Phone'),
-            bot: t('Bot'),
-            car: t('Car'),
-            console: t('Console')
+            desktop: t('desktop'),
+            tv: t('tv'),
+            tablet: t('tablet'),
+            phone: t('phone'),
+            bot: t('bot'),
+            car: t('car'),
+            console: t('console')
         };
 
         if (agg === 'devices') {
             charts = (
                 <div className={styles.charts}>
                     {navPills}
-                    <h4 className={styles.chartTitle}>{t('Distribution by device type')}</h4>
+                    <h4 className={styles.chartTitle}>{t('distributionByDeviceType')}</h4>
                     <Chart
                         width="100%"
                         height="380px"
                         chartType="PieChart"
-                        loader={<div>{t('Loading chart')}</div>}
+                        loader={<div>{t('loadingChart')}</div>}
                         data={[
-                            [t('Device type'), t('Count')],
-                            ...stats.devices.map(entry => [deviceTypes[entry.key] || t('Unknown'), entry.count])
+                            [t('deviceType'), t('count')],
+                            ...stats.devices.map(entry => [deviceTypes[entry.key] || t('unknown'), entry.count])
                         ]}
                         options={{
                             chartArea: {
@@ -174,17 +174,17 @@ export default class StatisticsOpened extends Component {
             charts = (
                 <div className={styles.charts}>
                     {navPills}
-                    <h4 className={styles.sectionTitle}>{t('Distribution by country')}</h4>
+                    <h4 className={styles.sectionTitle}>{t('distributionByCountry')}</h4>
                     <div className="row">
                         <div className={`col-md-6 ${styles.chart}`}>
                             <Chart
                                 width="100%"
                                 height="380px"
                                 chartType="PieChart"
-                                loader={<div>{t('Loading chart')}</div>}
+                                loader={<div>{t('loadingChart')}</div>}
                                 data={[
-                                    [t('Country'), t('Count')],
-                                    ...stats.countries.map(entry => [entry.key || t('Unknown'), entry.count])
+                                    [t('country'), t('count')],
+                                    ...stats.countries.map(entry => [entry.key || t('unknown'), entry.count])
                                 ]}
                                 options={{
                                     chartArea: {
@@ -213,7 +213,7 @@ export default class StatisticsOpened extends Component {
                                 chartType="GeoChart"
                                 data={[
                                     ['Country', 'Count'],
-                                    ...stats.countries.map(entry => [entry.key || t('Unknown'), entry.count])
+                                    ...stats.countries.map(entry => [entry.key || t('unknown'), entry.count])
                                 ]}
                                 mapsApiKey={mailtrainConfig.mapsApiKey}
                             />
@@ -227,13 +227,13 @@ export default class StatisticsOpened extends Component {
 
         return (
             <div>
-                <Title>{t('Detailed Statistics')}</Title>
+                <Title>{t('detailedStatistics')}</Title>
 
                 {charts}
 
                 <hr/>
 
-                <h4 className={styles.sectionTitle}>{t('List of subscribers that opened the campaign')}</h4>
+                <h4 className={styles.sectionTitle}>{t('listOfSubscribersThatOpenedTheCampaign')}</h4>
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/campaigns-opens-table/${entity.id}`} columns={subscribersColumns} />
             </div>
         );

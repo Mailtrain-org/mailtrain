@@ -79,7 +79,7 @@ export default class Update extends Component {
                     <InputField id="defaultHomepage" label={t('defaultHomepageUrl')} help={t('thisUrlWillBeUsedInListSubscriptionForms')}/>
 
                     <InputField id="uaCode" label={t('trackingId')} placeholder={t('uaxxxxxxx')} help={t('enterGoogleAnalyticsTrackingCode')}/>
-                    <InputField id="mapsApiKey" label={t('Google Maps API Key')} placeholder={t('XXXXXX')} help={t('The map overview in campaign statistics requires a Google Maps API key. Please enter it here. If no key is given, Google may throttle map requests, which will result in occassional unavailability of the map in the campaign statistics.')}/>
+                    <InputField id="mapsApiKey" label={t('googleMapsApiKey')} placeholder={t('xxxxxx')} help={t('theMapOverviewInCampaignStatistics')}/>
 
                     <TextArea id="shoutout" label={t('frontpageShoutOut')} help={t('htmlCodeShownInTheFrontPageHeaderSection')}/>
 

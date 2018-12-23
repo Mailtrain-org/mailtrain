@@ -88,9 +88,9 @@ export default class List extends Component {
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('createReportTemplate')}>
                             <MenuLink to="/reports/templates/create">{t('blank')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts">{t('Open counts')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('Open counts as CSV')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('Aggregrated open counts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts">{t('openCounts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('aggregratedOpenCounts')}</MenuLink>
                         </DropdownMenu>
                     </Toolbar>
                 }

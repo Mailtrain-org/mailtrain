@@ -37,7 +37,7 @@ export default class StatisticsSubsList extends Component {
         const t = this.props.t;
 
         const subscribersColumns = [
-            { data: 0, title: t('Email') },
+            { data: 0, title: t('email') },
             { data: 1, title: t('subscriptionId'), render: data => <code>{data}</code> },
             { data: 2, title: t('listId'), render: data => <code>{data}</code> },
             { data: 3, title: t('list') },

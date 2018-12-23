@@ -105,7 +105,7 @@ export default class ViewAndOutput extends Component {
             if (this.state.report.state === ReportState.FINISHED) {
                 reportContent = viewType.getContent(this.state.content);
             } else if (this.state.report.state === ReportState.SCHEDULED || this.state.report.state === ReportState.PROCESSING) {
-                reportContent = <div className="alert alert-info" role="alert">{t('Report is being generated')}</div>;
+                reportContent = <div className="alert alert-info" role="alert">{t('reportIsBeingGenerated')}</div>;
             } else {
                 reportContent = <div className="alert alert-danger" role="alert">{t('reportNotGenerated')}</div>;
             }
@@ -113,7 +113,7 @@ export default class ViewAndOutput extends Component {
             return (
                 <div>
                     <Toolbar>
-                        <Button className="btn-primary" icon="repeat" label={t('Refresh')} onClickAsync={::this.refresh}/>
+                        <Button className="btn-primary" icon="repeat" label={t('refresh')} onClickAsync={::this.refresh}/>
                     </Toolbar>
 
                     <Title>{viewType.getTitle(this.state.report.name)}</Title>

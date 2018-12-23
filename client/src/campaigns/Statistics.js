@@ -117,14 +117,14 @@ export default class Statistics extends Component {
             <div>
                 <Title>{t('campaignStatistics')}</Title>
 
-                {renderMetrics('total', t('Total'), false)}
-                {renderMetrics('delivered', t('Delivered'))}
-                {renderMetrics('blacklisted', t('Blacklisted'), false)}
-                {renderMetricsWithProgress('bounced', t('Bounced'), 'info')}
-                {renderMetricsWithProgress('complained', t('Complaints'), 'danger')}
-                {renderMetricsWithProgress('unsubscribed', t('Unsubscribed'), 'warning')}
-                {!entity.open_tracking_disabled && renderMetricsWithProgress('opened', t('Opened'), 'success')}
-                {!entity.click_tracking_disabled && renderMetricsWithProgress('clicks', t('Clicked'), 'success')}
+                {renderMetrics('total', t('total'), false)}
+                {renderMetrics('delivered', t('delivered'))}
+                {renderMetrics('blacklisted', t('blacklisted'), false)}
+                {renderMetricsWithProgress('bounced', t('bounced'), 'info')}
+                {renderMetricsWithProgress('complained', t('complaints'), 'danger')}
+                {renderMetricsWithProgress('unsubscribed', t('unsubscribed'), 'warning')}
+                {!entity.open_tracking_disabled && renderMetricsWithProgress('opened', t('opened'), 'success')}
+                {!entity.click_tracking_disabled && renderMetricsWithProgress('clicks', t('clicked'), 'success')}
            </div>
         );
     }

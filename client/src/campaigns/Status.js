@@ -217,8 +217,8 @@ class SendControls extends Component {
     async resetAsync() {
         const t = this.props.t;
         this.actionDialog(
-            t('Confirm reset'),
-            t('Do you want to reset the campaign? All statistics and the track of delivered messages will be lost.'),
+            t('confirmReset'),
+            t('doYouWantToResetTheCampaign?All'),
             async () => {
                 await this.postAndMaskStateError(`rest/campaign-reset/${this.props.entity.id}`);
                 await this.refreshEntity();
@@ -479,7 +479,7 @@ export default class Status extends Component {
                 <Title>{t('campaignStatus')}</Title>
 
                 <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('Delivered')}>{entity.delivered}</AlignedRow>
+                <AlignedRow label={t('delivered')}>{entity.delivered}</AlignedRow>
                 <AlignedRow label={t('status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
 
                 {sendSettings}

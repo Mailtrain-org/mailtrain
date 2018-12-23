@@ -154,11 +154,11 @@ export function getMailerTypes(t) {
     const zoneMtaTypeOptions = [];
 
     if (mailtrainConfig.builtinZoneMTAEnabled) {
-        zoneMtaTypeOptions.push({ key: ZoneMTAType.BUILTIN, label: t('Built-in ZoneMTA')});
+        zoneMtaTypeOptions.push({ key: ZoneMTAType.BUILTIN, label: t('builtinZoneMta')});
     }
-    zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF, label: t('Dynamic configuration of DKIM keys via ZoneMTA\'s Mailtrain plugin (use this option for builtin ZoneMTA)')});
-    zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_HTTP_CONF, label: t('Dynamic configuration of DKIM keys via ZoneMTA\'s HTTP config plugin')});
-    zoneMtaTypeOptions.push({ key: ZoneMTAType.REGULAR, label: t('No dynamic configuration of DKIM keys')});
+    zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF, label: t('dynamicConfigurationOfDkimKeysViaZoneMt')});
+    zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_HTTP_CONF, label: t('dynamicConfigurationOfDkimKeysViaZoneMt-1')});
+    zoneMtaTypeOptions.push({ key: ZoneMTAType.REGULAR, label: t('noDynamicConfigurationOfDkimKeys')});
 
     mailerTypes[MailerType.GENERIC_SMTP] = {
         typeName: typeNames[MailerType.GENERIC_SMTP],
@@ -211,7 +211,7 @@ export function getMailerTypes(t) {
                 <div>
                     <Fieldset label={t('mailerSettings')}>
                         <Dropdown id="mailer_type" label={t('mailerType')} options={typeOptions}/>
-                        <Dropdown id="zoneMtaType" label={t('Dynamic configuration')} options={zoneMtaTypeOptions}/>
+                        <Dropdown id="zoneMtaType" label={t('dynamicConfiguration')} options={zoneMtaTypeOptions}/>
                         {(zoneMtaType === ZoneMTAType.REGULAR || zoneMtaType === ZoneMTAType.WITH_MAILTRAIN_HEADER_CONF || zoneMtaType === ZoneMTAType.WITH_HTTP_CONF) &&
                             <div>
                                 <InputField id="smtpHostname" label={t('hostname')} placeholder={t('hostnameEgSmtpexamplecom')}/>

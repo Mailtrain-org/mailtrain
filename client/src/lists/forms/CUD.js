@@ -473,7 +473,7 @@ export default class CUD extends Component {
                                 <AlignedRow>
                                     <div className="help-block">
                                         <small>
-                                            {t('Note: These links are solely for a quick preview. To get the address of the subscription form, go to the list\'s subscribers and click on "Subscription Form".')}
+                                            {t('noteTheseLinksAreSolelyForAQuickPreview')}
                                         </small>
                                     </div>
                                     <p>
@@ -504,7 +504,7 @@ export default class CUD extends Component {
                                 <div className={this.state.previewFullscreen ? formsStyles.editorFullscreen : formsStyles.editor}>
                                     <div className={formsStyles.navbar}>
                                         {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
-                                        <div className={formsStyles.title}>{t('Form preview:') + ' ' + this.state.previewLabel}</div>
+                                        <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
                                         <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})}><Icon icon="remove"/></a>
                                         <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})}><Icon icon="fullscreen"/></a>
                                     </div>

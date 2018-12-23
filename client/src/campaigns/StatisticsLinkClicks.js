@@ -36,14 +36,14 @@ export default class StatisticsLinkClicks extends Component {
         const t = this.props.t;
 
         const linksColumns = [
-            { data: 0, title: t('URL'), render: data => <code>{data}</code> },
-            { data: 1, title: t('Unique visitors') },
-            { data: 2, title: t('Total clicks') }
+            { data: 0, title: t('url'), render: data => <code>{data}</code> },
+            { data: 1, title: t('uniqueVisitors') },
+            { data: 2, title: t('totalClicks') }
         ];
 
         return (
             <div>
-                <Title>{t('Campaign links')}</Title>
+                <Title>{t('campaignLinks')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/campaigns-link-clicks-table/${this.props.entity.id}`} columns={linksColumns} />
            </div>

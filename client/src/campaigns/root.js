@@ -37,8 +37,8 @@ import StatisticsLinkClicks
 
 function getMenus(t) {
     const aggLabels = {
-        'countries': t('Countries'),
-        'devices': t('Devices')
+        'countries': t('countries'),
+        'devices': t('devices')
     };
 
     return {
@@ -67,27 +67,27 @@ function getMenus(t) {
                             panelRender: props => <Statistics entity={props.resolved.campaign} />,
                             children: {
                                 delivered: {
-                                    title: t('Delivered'),
+                                    title: t('delivered'),
                                     link: params => `/campaigns/${params.campaignId}/statistics/delivered`,
-                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Delivered Emails')} status={SubscriptionStatus.SUBSCRIBED} />
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('deliveredEmails')} status={SubscriptionStatus.SUBSCRIBED} />
                                 },
                                 complained: {
-                                    title: t('Complained'),
+                                    title: t('complained'),
                                     link: params => `/campaigns/${params.campaignId}/statistics/complained`,
-                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Subscribers that Complained')} status={SubscriptionStatus.COMPLAINED} />
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('subscribersThatComplained')} status={SubscriptionStatus.COMPLAINED} />
                                 },
                                 bounced: {
-                                    title: t('Bounced'),
+                                    title: t('bounced'),
                                     link: params => `/campaigns/${params.campaignId}/statistics/bounced`,
-                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Emails that Bounced')} status={SubscriptionStatus.BOUNCED} />
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('emailsThatBounced')} status={SubscriptionStatus.BOUNCED} />
                                 },
                                 unsubscribed: {
-                                    title: t('Unsubscribed'),
+                                    title: t('unsubscribed'),
                                     link: params => `/campaigns/${params.campaignId}/statistics/unsubscribed`,
-                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('Subscribers that Unsubscribed')} status={SubscriptionStatus.UNSUBSCRIBED} />
+                                    panelRender: props => <StatisticsSubsList entity={props.resolved.campaign} title={t('subscribersThatUnsubscribed')} status={SubscriptionStatus.UNSUBSCRIBED} />
                                 },
                                 'opened': {
-                                    title: t('Opened'),
+                                    title: t('opened'),
                                     resolve: {
                                         statisticsOpened: params => `rest/campaign-statistics/${params.campaignId}/opened`
                                     },
@@ -101,7 +101,7 @@ function getMenus(t) {
                                     }
                                 },
                                 'clicks': {
-                                    title: t('Clicks'),
+                                    title: t('clicks'),
                                     link: params => `/campaigns/${params.campaignId}/statistics/clicks`,
                                     panelRender: props => <StatisticsLinkClicks entity={props.resolved.campaign} />
                                 }
