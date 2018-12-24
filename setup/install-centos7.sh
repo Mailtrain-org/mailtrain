@@ -21,6 +21,15 @@ Basic usage: install-centos7.sh <trusted URL base> <sandbox URL base> <public UR
 
 Installs Mailtrain 2 on CentOS 7.
 
+Command line options. The following switches are recognized.
+  --with-httpd-proxy     -- URL of the ssio-template GIT repository (default: git@gitlab.sathyasai.org:webs/ssio-template.git)
+  --db-name ...          -- Name of DB and user in the DB (defaults to id with - -> _ substitution)
+  --aliases ...          -- Server aliases divided by spaces (e.g. "www.esse-institute.org www.esse-institut.de")
+  --cert-domains ...     -- Domains for which to get certs via letsencrypt (e.g. "www.esse-institute.org www.esse-institut.de")
+  --dont-push            -- Don't push the website to gitlab. It stops after creating a directory, setting the remote and doing commit
+
+
+
 Example (local installation): install-centos7.sh http://localhost:3000 http://localhost:3003 http://localhost:3004
 Example (installation behind HTTPD proxy - see mailtrain-apache-sample.conf): install-centos7.sh https://mailtrain.example.com https://sbox.mailtrain.example.com https://mail.example.com
 EOF
