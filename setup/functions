@@ -305,7 +305,7 @@ function installHttpsProxy {
     ServerName ${hostTrusted}:${portTrusted}
 
     ErrorLog ${apacheLogsPath}/${hostTrusted}_ssl_error.log
-    TransferLog logs/${hostTrusted}_ssl_access.log
+    TransferLog ${apacheLogsPath}/${hostTrusted}_ssl_access.log
     LogLevel warn
 
     SSLEngine on
@@ -322,7 +322,7 @@ function installHttpsProxy {
     ServerName ${hostSandbox}:${portSandbox}
 
     ErrorLog ${apacheLogsPath}/${hostSandbox}_ssl_error.log
-    TransferLog logs/${hostSandbox}_ssl_access.log
+    TransferLog ${apacheLogsPath}/${hostSandbox}_ssl_access.log
     LogLevel warn
 
     SSLEngine on
@@ -339,7 +339,7 @@ function installHttpsProxy {
     ServerName ${hostPublic}:${portPublic}
 
     ErrorLog ${apacheLogsPath}/${hostPublic}_ssl_error.log
-    TransferLog logs/${hostPublic}_ssl_access.log
+    TransferLog ${apacheLogsPath}/${hostPublic}_ssl_access.log
     LogLevel warn
 
     SSLEngine on
