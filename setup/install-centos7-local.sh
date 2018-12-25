@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 # This installation script works on CentOS 7
 # Run as root!
@@ -36,4 +35,8 @@ if [ $# -lt 0 ]; then
         HELP
 fi
 
-installBase http://localhost:3000 http://localhost:3003 http://localhost:3004
+installPrerequisities
+
+installMailtrain http://localhost:3000 http://localhost:3003 http://localhost:3004 0.0.0.0
+
+installService

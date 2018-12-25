@@ -25,11 +25,12 @@ Installs Mailtrain 2 on CentOS 7. This performs installation for external use. I
 a reverse HTTPS proxy using Apache HTTPD, sets up firewall rules, and obtains a certificate from Letsencrypt.
 
 You have to allocate three endpoints for Mailtrain - trusted (admin UI), sandbox (editors for templates), public (subscription forms and archive).
-These endpoints have to differ in hostname. It's fine to host them all from one IP address.
+These endpoints have to differ in hostname. It's fine to host them all from one IP address. The email parameters is needed by certbot.
 
-The email is needed by certbot. Please note that by running the script, you agree with Letsencrypt's conditions.
+Note, that this will automatically accept the Let's Encrypt's Terms of Service.
+Thus, by running this script below, you agree with the Let's Encrypt's Terms of Service (https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf).
 
-Example: install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com mail.example.com admin@example.com
+Example: install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
 EOF
 
   exit 1
@@ -45,8 +46,12 @@ hostSandbox="$2"
 hostPublic="$3"
 email="$4"
 
+installPrerequisities
+
 createCertificates "${hostTrusted}" "${hostSandbox}" "${hostPublic}" "${email}"
 
 installHttps "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem" 
 
-installBase "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" "${email}"
+installMailtrain "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" 127.0.0.1
+
+installService
