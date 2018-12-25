@@ -35,7 +35,7 @@ The recommended deployment of Mailtrain would use 3 DNS entries that all points 
 
 
 
-### Installation on fresh CentOS 7 (public website secured by SSL)
+### Installation on fresh CentOS 7 or Ubuntu 18.04 LTS (public website secured by SSL)
 
 This will setup a publicly accessible Mailtrain instance. All endpoints (trusted, sandbox, public) will provide both HTTP (on port 80)
 and HTTPS (on port 443). The HTTP ports just issue HTTP redirect to their HTTPS counterparts.
@@ -69,8 +69,15 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
 
 4. Run the installation script. Replace the urls and your email address with the correct values. **NOTE** that running this script you agree
    Let's Encrypt's conditions.
+
+   For Centos 7 type:
     ```
     sh setup/install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+    ```
+
+   For Ubuntu 18.04 LTS type:
+    ```
+    sh setup/install-ubuntu1804-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
     ```
 
 5. Start Mailtrain and enable to be started by default when your server starts.
@@ -90,7 +97,7 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
 10. If you intend to sign your email by DKIM, set the DKIM key and DKIM selector under Administration/Send Configurations.
 
 
-### Installation on fresh CentOS 7 (local installation)
+### Installation on fresh CentOS 7 or Ubuntu 18.04 LTS (local installation)
 
 This will setup a locally accessible Mailtrain instance (primarily for development and testing).
 All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
@@ -118,8 +125,15 @@ All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
 
 4. Run the installation script. Replace the urls and your email address with the correct values. **NOTE** that running this script you agree
    Let's Encrypt's conditions.
+
+   For Centos 7 type:
     ```
     sh setup/install-centos7-local.sh
+    ```
+
+   For Ubuntu 18.04 LTS type:
+    ```
+    sh setup/install-ubuntu1804-local.sh
     ```
 
 5. Start Mailtrain and enable to be started by default when your server starts.

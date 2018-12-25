@@ -1,6 +1,6 @@
 # This is not a standalone script. It provides common functions to server-*.sh scripts
 
-local hostType="$1"
+hostType="$1"
 
 case "$hostType" in
     centos7)
