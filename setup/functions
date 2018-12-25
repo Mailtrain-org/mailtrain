@@ -242,8 +242,6 @@ function installHttpd {
                 for port in "80/tcp" "${portTrusted}/tcp" "${portSandbox}/tcp" "${portPublic}/tcp"; do
                     ufw allow $port
                 done
-
-                ufw --force enable
             fi
             ;;
     esac
