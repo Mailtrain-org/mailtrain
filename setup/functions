@@ -1,14 +1,110 @@
 # This is not a standalone script. It provides common functions to server-*.sh scripts
 
-if hash firewall-cmd 2>/dev/null; then
-    firewallCmdExists=yes
-fi
+local hostType="$1"
+
+case "$hostType" in
+    centos7)
+        hostTypeLabel="CentOS 7"
+        redisService=redis
+        apacheConf="/etc/httpd/conf.d/mailtrain.conf"
+
+        if hash firewall-cmd 2>/dev/null; then
+            firewallCmdExists=yes
+        fi
+        ;;
+
+    ubuntu1804)
+        hostTypeLabel="Ubuntu 18.04 LTS"
+        redisService=redis-server
+        apacheConf="/etc/apache2/conf-available/mailtrain.conf"
+
+        if hash ufw 2>/dev/null; then
+            firewallCmdExists=yes
+        fi
+        ;;
+esac
+
+
+
+
+function performInstallLocal {
+    local paramCount="$1"
+
+    if [ $paramCount -ne 0 ]; then
+            echo "Error: incorrect number of parameters."
+
+    cat <<EOF
+
+Basic usage: install-${hostType}-local.sh
+
+Installs Mailtrain 2 on ${hostTypeLabel}. This performs installation for local use on HTTP ports 3000, 3003, 3004. If you want
+to make these ports available from outside, setup an HTTPS proxy yourself or use install-${hostType}-https.sh instead.
+
+Example: install-${hostType}-local.sh
+EOF
+
+      exit 1
+    fi
+
+    installPrerequisities
+    installMailtrain http://localhost:3000 http://localhost:3003 http://localhost:3004 0.0.0.0 false
+    installService
+}
+
+
+function performInstallHttps {
+    local paramCount="$1"
+    hostTrusted="$2"
+    hostSandbox="$3"
+    hostPublic="$4"
+    email="$5"
+
+
+    if [ $paramCount -ne 4 ]; then
+            echo "Error: incorrect number of parameters."
+
+    cat <<EOF
+
+Basic usage: install-${hostType}-https.sh <trusted host> <sandbox host> <public host> <email>
+
+Installs Mailtrain 2 on ${hostTypeLabel}. This performs installation for external use. It installs Mailtrain, sets up
+a reverse HTTPS proxy using Apache HTTPD, sets up firewall rules, and obtains a certificate from Letsencrypt.
+
+You have to allocate three endpoints for Mailtrain - trusted (admin UI), sandbox (editors for templates), public (subscription forms and archive).
+These endpoints have to differ in hostname. It's fine to host them all from one IP address. The email parameters is needed by certbot.
+
+Note, that this will automatically accept the Let's Encrypt's Terms of Service.
+Thus, by running this script below, you agree with the Let's Encrypt's Terms of Service (https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf).
+
+Example: install-${hostType}-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+EOF
+
+      exit 1
+    fi
+
+    installPrerequisities
+    installHttpd
+    createCertificates "${hostTrusted}" "${hostSandbox}" "${hostPublic}" "${email}"
+    installHttpsProxy "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem"
+    installMailtrain "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" 127.0.0.1 true
+    installService
+}
+
+
 
 function installPrerequisities {
-    yum -y install epel-release
+    # Run as root!
+    if [[ $EUID -ne 0 ]]; then
+       echo "This script must be run as root" 1>&2
+       exit 1
+    fi
 
-    curl --silent --location https://rpm.nodesource.com/setup_10.x | bash -
-    cat > /etc/yum.repos.d/mongodb-org.repo <<EOT
+    case "$hostType" in
+        centos7)
+            yum -y install epel-release
+
+            curl --silent --location https://rpm.nodesource.com/setup_10.x | bash -
+            cat > /etc/yum.repos.d/mongodb-org.repo <<EOT
 [mongodb-org-4.0]
 name=MongoDB Repository
 baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/4.0/x86_64/
@@ -17,24 +113,37 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 EOT
 
-    yum -y install mariadb-server nodejs ImageMagick git python redis pwgen bind-utils gcc-c++ make mongodb-org bzip2
+            yum -y install mariadb-server nodejs ImageMagick redis pwgen gcc-c++ make mongodb-org bzip2
+            ;;
+
+        ubuntu1804)
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+            echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+            apt-get update
+
+            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2
+            ;;
+    esac
+
 
     systemctl start mariadb
     systemctl enable mariadb
 
-    systemctl start redis
-    systemctl enable redis
+    systemctl start ${redisService}
+    systemctl enable ${redisService}
 
     systemctl start mongod
     systemctl enable mongod
 }
-
 
 function installMailtrain {
     local urlBaseTrusted="$1"
     local urlBaseSandbox="$2"
     local urlBasePublic="$3"
     local wwwHost="$4"
+    local wwwProxy="$5"
 
     mysqlPassword=`pwgen 12 -1`
     mysqlRoPassword=`pwgen 12 -1`
@@ -58,6 +167,7 @@ roGroup: nobody
 
 www:
   host: $wwwHost
+  proxy: $wwwProxy
   secret: "`pwgen -1`"
   trustedUrlBase: $urlBaseTrusted
   sandboxUrlBase: $urlBaseSandbox
@@ -99,42 +209,48 @@ EOT
     
     chown -R mailtrain:mailtrain .
     chmod o-rwx server/config
-    
-    # Setup log rotation to not spend up entire storage on logs
-    cat <<EOT > /etc/logrotate.d/mailtrain
-/var/log/mailtrain.log {
-    daily
-    rotate 12
-    compress
-    delaycompress
-    missingok
-    notifempty
-    copytruncate
-    nomail
-}
-EOT
-    
-    # Set up systemd service script
-    cp setup/mailtrain-centos7.service /etc/systemd/system/mailtrain.service
-    systemctl enable mailtrain.service
-    
-    # Start the service
-    systemctl daemon-reload
-    
-    systemctl start mailtrain.service
-
-    echo
-    echo
-    echo "Success! Open http://$urlBaseTrusted/ and login as admin:test"
-
-    if [ -z "$firewallCmdExists" ]; then
-        echo "Note that firewall was not setup because firewall-cmd is missing on your system. Please make sure your firewall is correctly setup. If you are on AWS, this means to enable HTTPS and HTTP in your security group."
-    fi
 }
 
 
+function installHttpd {
+    case "$hostType" in
+        centos7)
+            yum -y install httpd mod_ssl
+            systemctl start httpd
+            systemctl enable httpd
 
-function installHttps {
+            setsebool -P httpd_can_network_connect 1
+
+            if [ -n "$firewallCmdExists" ]; then
+                # Enable SSL ports on the firewall
+                for port in "80/tcp" "${portTrusted}/tcp" "${portSandbox}/tcp" "${portPublic}/tcp"; do
+                    firewall-cmd --add-port=$port --permanent
+                done
+
+                # Activate the firefall settings
+                firewall-cmd --reload
+            fi
+            ;;
+
+        ubuntu1804)
+            apt-get install -y apache2
+            a2enmod ssl
+            systemctl restart apache2
+
+            if [ -n "$firewallCmdExists" ]; then
+                # Enable SSL ports on the firewall
+                for port in "80/tcp" "${portTrusted}/tcp" "${portSandbox}/tcp" "${portPublic}/tcp"; do
+                    ufw allow $port
+                done
+
+                ufw --force enable
+            fi
+            ;;
+    esac
+}
+
+
+function installHttpsProxy {
     local hostTrusted="$1"
     local portTrusted="$2"
     local hostSandbox="$3"
@@ -145,11 +261,10 @@ function installHttps {
     local certificateKey="$8"
     local caChainFile="$9"
 
-    yum -y install httpd mod_ssl
 
-    echo > /etc/httpd/conf.d/mailtrain.conf
+    > $apacheConf
 
-    cat >> /etc/httpd/conf.d/mailtrain.conf <<EOT
+    cat >> $apacheConf <<EOT
 <VirtualHost *:80>
     ServerName ${hostTrusted}
 
@@ -186,14 +301,6 @@ function installHttps {
     LogLevel warn
 </VirtualHost>
 
-EOT
-
-    if [ -n "$firewallCmdExists" ]; then
-        # Enable port 80 on the firewall
-        firewall-cmd --add-port=80/tcp --permanent
-    fi
-
-    cat >> /etc/httpd/conf.d/mailtrain.conf <<EOT
 <VirtualHost *:${portTrusted}>
     ServerName ${hostTrusted}:${portTrusted}
 
@@ -247,56 +354,53 @@ EOT
 EOT
 
 
-    # Enable and start httpd
-    systemctl start httpd
-    systemctl enable httpd
+    case "$hostType" in
+        centos7)
+            systemctl restart httpd
+            ;;
 
-    if [ -n "$firewallCmdExists" ]; then
-        # Enable SSL ports on the firewall
-        for port in "${portTrusted}/tcp" "${portSandbox}/tcp" "${portPublic}/tcp"; do
-            firewall-cmd --add-port=$port --permanent
-        done
+        ubuntu1804)
+            a2enconf mailtrain
+            systemctl restart apache2
+            ;;
+    esac
 
-        # Activate the firefall settings
-        firewall-cmd --reload
-    fi
 }
 
 
 function createCertificates {
-    # This assumes that HTTPD is not yet running
+    # This assumes that HTTPD is already running
 
     local hostTrusted="$1"
     local hostSandbox="$2"
     local hostPublic="$3"
     local email="$4"
 
-    yum install -y certbot
+    case "$hostType" in
+        centos7)
+            yum install -y certbot
+            ;;
 
-    if [ -n "$firewallCmdExists" ]; then
-        # Temporarily enable port 80 on the firewall
-        firewall-cmd --add-port=80/tcp
-    fi
+        ubuntu1804)
+            apt-get install -y certbot
+            ;;
+    esac
 
-    certbot certonly --agree-tos --email "${email}" --standalone -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
+    certbot certonly --agree-tos --email "${email}" --apache -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
 
     # Install cron
     echo "0 3 * * * /usr/bin/certbot certonly --apache -n -d \"${hostPublic}\" -d \"${hostTrusted}\" -d \"${hostSandbox}\"" > crontab
     crontab crontab
     rm -rf crontab
-
-    if [ -n "$firewallCmdExists" ]; then
-        # Revert firewall to original state
-        firewall-cmd --reload
-    fi
 }
+
 
 
 function installService {
     cat > /etc/systemd/system/mailtrain.service <<EOT
 [Unit]
 Description=Mailtrain server
-After=syslog.target network.target mariadb.service redis.service mongod.service
+After=syslog.target network.target mariadb.service ${redisService}.service mongod.service
 
 [Service]
 Environment="NODE_ENV=production"
