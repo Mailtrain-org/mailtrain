@@ -1,7 +1,5 @@
 # This is not a standalone script. It provides common functions to server-*.sh scripts
 
-hostType="$1"
-
 case "$hostType" in
     centos7)
         hostTypeLabel="CentOS 7"
