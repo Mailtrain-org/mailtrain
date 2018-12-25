@@ -81,7 +81,7 @@ EOF
     fi
 
     installPrerequisities
-    installHttpd
+    installHttpd 443 443 443
     createCertificates "${hostTrusted}" "${hostSandbox}" "${hostPublic}" "${email}"
     installHttpsProxy "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem"
     installMailtrain "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" 127.0.0.1 true
@@ -211,6 +211,10 @@ EOT
 
 
 function installHttpd {
+    local portTrusted="$1"
+    local portSandbox="$2"
+    local portPublic="$3"
+
     case "$hostType" in
         centos7)
             yum -y install httpd mod_ssl
