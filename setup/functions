@@ -376,11 +376,11 @@ function createCertificates {
 
     case "$hostType" in
         centos7)
-            yum install -y certbot
+            yum install -y certbot python2-certbot-apache
             ;;
 
         ubuntu1804)
-            apt-get install -y certbot
+            apt-get install -y certbot python3-certbot-apache
             ;;
     esac
 
