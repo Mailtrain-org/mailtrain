@@ -5,6 +5,7 @@ case "$hostType" in
         hostTypeLabel="CentOS 7"
         redisService=redis
         apacheConf="/etc/httpd/conf.d/mailtrain.conf"
+        apacheLogsPath="logs"
 
         if hash firewall-cmd 2>/dev/null; then
             firewallCmdExists=yes
@@ -15,6 +16,7 @@ case "$hostType" in
         hostTypeLabel="Ubuntu 18.04 LTS"
         redisService=redis-server
         apacheConf="/etc/apache2/conf-available/mailtrain.conf"
+        apacheLogsPath="/var/log/apache2"
 
         if hash ufw 2>/dev/null; then
             firewallCmdExists=yes
@@ -271,7 +273,7 @@ function installHttpsProxy {
     RewriteEngine On
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,QSA,R=permanent]
 
-    ErrorLog logs/${hostTrusted}_redirect_error.log
+    ErrorLog ${apacheLogsPath}/${hostTrusted}_redirect_error.log
     LogLevel warn
 </VirtualHost>
 
@@ -283,7 +285,7 @@ function installHttpsProxy {
     RewriteEngine On
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,QSA,R=permanent]
 
-    ErrorLog logs/${hostSandbox}_redirect_error.log
+    ErrorLog ${apacheLogsPath}/${hostSandbox}_redirect_error.log
     LogLevel warn
 </VirtualHost>
 
@@ -295,14 +297,14 @@ function installHttpsProxy {
     RewriteEngine On
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,QSA,R=permanent]
 
-    ErrorLog logs/${hostPublic}_redirect_error.log
+    ErrorLog ${apacheLogsPath}/${hostPublic}_redirect_error.log
     LogLevel warn
 </VirtualHost>
 
 <VirtualHost *:${portTrusted}>
     ServerName ${hostTrusted}:${portTrusted}
 
-    ErrorLog logs/${hostTrusted}_ssl_error.log
+    ErrorLog ${apacheLogsPath}/${hostTrusted}_ssl_error.log
     TransferLog logs/${hostTrusted}_ssl_access.log
     LogLevel warn
 
@@ -319,7 +321,7 @@ function installHttpsProxy {
 <VirtualHost *:${portSandbox}>
     ServerName ${hostSandbox}:${portSandbox}
 
-    ErrorLog logs/${hostSandbox}_ssl_error.log
+    ErrorLog ${apacheLogsPath}/${hostSandbox}_ssl_error.log
     TransferLog logs/${hostSandbox}_ssl_access.log
     LogLevel warn
 
@@ -336,7 +338,7 @@ function installHttpsProxy {
 <VirtualHost *:${portPublic}>
     ServerName ${hostPublic}:${portPublic}
 
-    ErrorLog logs/${hostPublic}_ssl_error.log
+    ErrorLog ${apacheLogsPath}/${hostPublic}_ssl_error.log
     TransferLog logs/${hostPublic}_ssl_access.log
     LogLevel warn
 
