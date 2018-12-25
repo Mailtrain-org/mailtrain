@@ -55,8 +55,15 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
     ```
 
 2. Install git
+
+   For Centos 7 type:
     ```
     yum install -y git
+    ```
+
+   For Ubuntu 18.04 LTS type:
+    ```
+    apt-get install -y git
     ```
 
 3. Download Mailtrain using git to the `/opt/mailtrain` directory
@@ -111,8 +118,15 @@ All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
     ```
 
 2. Install git
+
+   For Centos 7 type:
     ```
     yum install -y git
+    ```
+
+   For Ubuntu 18.04 LTS type:
+    ```
+    apt-get install -y git
     ```
 
 3. Download Mailtrain using git to the `/opt/mailtrain` directory

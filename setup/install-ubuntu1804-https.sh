@@ -8,4 +8,4 @@ SCRIPT_PATH=$(dirname $(realpath -s $0))
 . $SCRIPT_PATH/functions
 cd $SCRIPT_PATH/..
 
-performInstallLocal "$#"
+performInstallHttps "$#" "$1" "$2" "$3" "$4"
