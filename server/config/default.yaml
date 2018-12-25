@@ -121,7 +121,7 @@ verp:
   # In most cases you do not want to use it
   # Requires root privileges
   enabled: false
-  port: 2525
+  port: 25
   host: 0.0.0.0
   # With DMARC, the Return-Path and From address must match the same domain.
   # By default we get around this by using the VERP address in the Sender header,

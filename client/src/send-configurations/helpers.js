@@ -173,7 +173,7 @@ export function getMailerTypes(t) {
                     { owner.getFormValue('smtpUseAuth') &&
                     <div>
                         <InputField id="smtpUser" label={t('username')} placeholder={t('usernameEgMyaccount@examplecom')}/>
-                        <InputField id="smtpPassword" label={t('password')} placeholder={t('usernameEgMyaccount@examplecom')}/>
+                        <InputField id="smtpPassword" type="password" label={t('password')} placeholder={t('usernameEgMyaccount@examplecom')}/>
                     </div>
                     }
                 </Fieldset>
@@ -221,7 +221,7 @@ export function getMailerTypes(t) {
                                 { owner.getFormValue('smtpUseAuth') &&
                                 <div>
                                     <InputField id="smtpUser" label={t('username')} placeholder={t('usernameEgMyaccount@examplecom')}/>
-                                    <InputField id="smtpPassword" label={t('password')} placeholder={t('usernameEgMyaccount@examplecom')}/>
+                                    <InputField id="smtpPassword" type="password" label={t('password')} placeholder={t('usernameEgMyaccount@examplecom')}/>
                                 </div>
                                 }
                             </div>

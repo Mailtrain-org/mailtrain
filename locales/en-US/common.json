@@ -728,7 +728,7 @@
   "subject": "Subject",
   "xMailer": "X-Mailer",
   "verpBounceHandling": "VERP Bounce Handling",
-  "verpEnabled": "verpEnabled",
+  "verpEnabled": "VERP Enabled",
   "serverHostname": "Server hostname",
   "theVerpServerHostnameEgBouncesexamplecom": "The VERP server hostname, eg. bounces.example.com",
   "verpBounceHandlingServerHostnameThis": "VERP bounce handling server hostname. This hostname is used in the SMTP envelope FROM address and the MX DNS records should point to this server",
