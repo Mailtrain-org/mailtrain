@@ -41,6 +41,9 @@ This will setup a publicly accessible Mailtrain instance. All endpoints (trusted
 and HTTPS (on port 443). The HTTP ports just issue HTTP redirect to their HTTPS counterparts. The script below will also acquire a
 valid certificate from [Let's Encrypt](https://letsencrypt.org/).
 
+**Note,** that this will automatically accept the Let's Encrypt's Terms of Service.
+Thus, by running this script below, you agree with the Let's Encrypt's Terms of Service (https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf).
+
 1. Login as root
     ```
     sudo -i

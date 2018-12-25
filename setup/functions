@@ -262,7 +262,7 @@ EOT
 
 function createCertificates {
     # This assumes that HTTPD is not yet running
-    
+
     local hostTrusted="$1"
     local hostSandbox="$2"
     local hostPublic="$3"
@@ -275,7 +275,7 @@ function createCertificates {
         firewall-cmd --add-port=80/tcp
     fi
 
-    certbot certonly --email "${email}" --standalone -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
+    certbot certonly --agree-tos --email "${email}" --standalone -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
 
     # Install cron
     echo "0 3 * * * /usr/bin/certbot certonly --apache -n -d \"${hostPublic}\" -d \"${hostTrusted}\" -d \"${hostSandbox}\"" > crontab

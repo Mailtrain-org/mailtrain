@@ -27,6 +27,9 @@ a reverse HTTPS proxy using Apache HTTPD, sets up firewall rules, and obtains a 
 You have to allocate three endpoints for Mailtrain - trusted (admin UI), sandbox (editors for templates), public (subscription forms and archive).
 These endpoints have to differ in hostname. It's fine to host them all from one IP address. The email parameters is needed by certbot.
 
+Note, that this will automatically accept the Let's Encrypt's Terms of Service.
+Thus, by running this script below, you agree with the Let's Encrypt's Terms of Service (https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf).
+
 Example: install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
 EOF
 
