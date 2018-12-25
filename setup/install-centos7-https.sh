@@ -43,10 +43,12 @@ hostSandbox="$2"
 hostPublic="$3"
 email="$4"
 
+installPrerequisities
+
 createCertificates "${hostTrusted}" "${hostSandbox}" "${hostPublic}" "${email}"
 
 installHttps "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem" 
 
-installBase "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" 127.0.0.1
+installMailtrain "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" 127.0.0.1
 
 installService
