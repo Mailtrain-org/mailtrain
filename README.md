@@ -72,12 +72,12 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
 
    For Centos 7 type:
     ```
-    sh setup/install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+    bash setup/install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
     ```
 
    For Ubuntu 18.04 LTS type:
     ```
-    sh setup/install-ubuntu1804-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+    bash setup/install-ubuntu1804-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
     ```
 
 5. Start Mailtrain and enable to be started by default when your server starts.
@@ -128,12 +128,12 @@ All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
 
    For Centos 7 type:
     ```
-    sh setup/install-centos7-local.sh
+    bash setup/install-centos7-local.sh
     ```
 
    For Ubuntu 18.04 LTS type:
     ```
-    sh setup/install-ubuntu1804-local.sh
+    bash setup/install-ubuntu1804-local.sh
     ```
 
 5. Start Mailtrain and enable to be started by default when your server starts.
