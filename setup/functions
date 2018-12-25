@@ -92,7 +92,7 @@ EOT
     
     # Install required node packages
     for idx in client shared server zone-mta; do
-        (cd $idx && npm install)
+        (cd $idx && npm --unsafe-perm install)
     done
     
     (cd client && npm run build)
