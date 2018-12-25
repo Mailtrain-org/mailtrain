@@ -227,6 +227,11 @@ function createApp(appType) {
         app.use(passport.tryAuthByRestrictedAccessToken);
     }
 
+    if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
+        // Endpoint under /api are authenticated by access token
+        app.all('/api/*', passport.authByAccessToken);
+    }
+
     useWith404Fallback('/static', express.static(path.join(__dirname, '..', 'client', 'static')));
     useWith404Fallback('/mailtrain', express.static(path.join(__dirname, '..', 'client', 'dist')));
     useWith404Fallback('/locales', express.static(path.join(__dirname, '..', 'client', 'locales')));
@@ -238,9 +243,6 @@ function createApp(appType) {
         res.locals.flash = req.flash.bind(req);
         next();
     });
-
-    // Endpoint under /api are authenticated by access token
-    app.all('/api/*', passport.authByAccessToken);
 
     // Marks the following endpoint to return JSON object when error occurs
     app.all('/api/*', (req, res, next) => {

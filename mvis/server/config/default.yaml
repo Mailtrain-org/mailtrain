@@ -1,0 +1,77 @@
+mysql:
+  host: localhost
+  user: mvis
+  password: mvis
+  database: mvis
+
+mailtrain:
+  url: http://localhost:3000/
+  namespaces:
+    campaigns: 2
+  userRole: mailtrainUser
+
+www:
+  # HTTP interface to listen on
+  host: 127.0.0.1
+  # HTTP(S) port to listen on
+  trustedPort: 3010
+  trustedPortIsHttps: false
+  sandboxPort: 3011
+  sandboxPortIsHttps: false
+  apiPort: 3012
+  apiPortIsHttps: false
+
+  trustedUrlBase: http://localhost:3010
+  sandboxUrlBase: http://localhost:3011
+
+
+roles:
+  global:
+    mailtrainUser:
+      name: "Mailtrain User"
+      admin: true
+      description: "Limited permissions that allow only read-only access"
+      permissions:
+
+  namespace:
+    mailtrainUser:
+      name: "Mailtrain User"
+      description: "Limited permissions that allow only read-only access"
+      permissions: ["view"]
+      children:
+        namespace: ["view"]
+        template: ["view", "viewFiles", "execute"]
+        workspace: ["view"]
+        panel: ["view"]
+        signal: ["view", "query"]
+        signalSet: ["view", "query"]
+
+#  template:
+#    mailtrainUser:
+#      name: "Mailtrain User"
+#      description: "Limited permissions that allow only read-only access"
+#      permissions: ["view", "viewFiles", "execute"]
+#
+#  workspace:
+#    mailtrainUser:
+#      name: "Mailtrain User"
+#      description: "Limited permissions that allow only read-only access"
+#      permissions: ["view"]
+#
+#  panel:
+#    mailtrainUser:
+#      name: "Mailtrain User"
+#      description: "Limited permissions that allow only read-only access"
+#      permissions: ["view"]
+#
+#  signal:
+#    mailtrainUser:
+#      name: "Mailtrain User"
+#      description: "Limited permissions that allow only read-only access"
+#      permissions: ["view", "query"]
+#
+#  signalSet:
+#    mailtrainUser:
+#      name: "Mailtrain User"
+#      description: "Limited permissions that allow only read-only access"
+#      permissions: ["view", "query"]
