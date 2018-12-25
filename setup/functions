@@ -49,6 +49,9 @@ EOF
     installPrerequisities
     installMailtrain http://localhost:3000 http://localhost:3003 http://localhost:3004 0.0.0.0 false
     installService
+
+    echo
+    echo "Success!"
 }
 
 
@@ -88,6 +91,9 @@ EOF
     installHttpsProxy "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem"
     installMailtrain "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" 127.0.0.1 true
     installService
+
+    echo
+    echo "Success!"
 }
 
 
