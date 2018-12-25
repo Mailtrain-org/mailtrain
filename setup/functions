@@ -384,7 +384,7 @@ function createCertificates {
             ;;
     esac
 
-    certbot certonly --agree-tos --email "${email}" --apache -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
+    certbot certonly --agree-tos --email "${email}" --webroot -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
 
     # Install cron
     echo "0 3 * * * /usr/bin/certbot certonly --apache -n -d \"${hostPublic}\" -d \"${hostTrusted}\" -d \"${hostSandbox}\"" > crontab
