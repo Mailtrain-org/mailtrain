@@ -6,11 +6,10 @@
 
 ## Features
 
-* Subscriber list management
+* Subscriber lists management
 * List segmentation
 * Custom fields
 * Email templates (including MJML-based templates)
-* Large CSV list import files
 * Custom reports
 * Automation (triggered and RSS campaigns)
 * Multiple users with granular user permissions and flexible sharing
@@ -19,6 +18,113 @@
 ## Hardware Requirements
 * 1 vCPU
 * 2048 MB RAM
+
+## Quick Start
+
+### Preparation
+Mailtrain creates three URL endpoints, which are referred to as "trusted", "sandbox" and "public". This allows Mailtrain
+to guarantee security and avoid XSS attacks in the multi-user settings. The function of these three endpoints is as follows:
+- *trusted* - This is the main endpoint for the UI that a logged-in user uses to manage lists, send campaigns, etc.
+- *sandbox* - This is an endpoint not directly visible to a user. It is used to host WYSIWYG template editors.
+- *public* - This is an endpoint for subscribers. It is used to host subscription management forms, files and archive.
+
+The recommended deployment of Mailtrain would use 3 DNS entries that all points to the **same** IP address. For example as follows:
+- *lists.example.com* - public endpoint (A record `lists` under `example.com` domain)
+- *mailtrain.example.com* - trusted endpoint (CNAME record `mailtrain` under `example.com` domain that points to `lists`)
+- *sbox.mailtrain.example.com* - sandbox endpoint (CNAME record `sbox.mailtrain` under `example.com` domain that points to `lists`)
+
+
+
+### Installation on fresh CentOS 7 (public website secured by SSL)
+
+This will setup a publicly accessible Mailtrain instance. All endpoints (trusted, sandbox, public) will provide both HTTP (on port 80)
+and HTTPS (on port 443). The HTTP ports just issue HTTP redirect to their HTTPS counterparts. The script below will also acquire a
+valid certificate from [Let's Encrypt](https://letsencrypt.org/).
+
+1. Login as root
+    ```
+    sudo -i
+    ```
+
+2. Install git
+    ```
+    yum install -y git
+    ```
+
+3. Download Mailtrain using git to the `/opt/mailtrain` directory
+    ```
+    cd /opt
+    git clone https://github.com/Mailtrain-org/mailtrain.git
+    cd mailtrain
+    git checkout development
+    ```
+
+4. Run the installation script. Replace the urls and your email address with the correct values. **NOTE** that running this script you agree
+   Let's Encrypt's conditions.
+    ```
+    sh setup/install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+    ```
+
+5. Start Mailtrain and enable to be started by default when your server starts.
+    ```
+    systemctl start mailtrain
+    systemctl enable mailtrain
+    ```
+
+6. Open the trusted endpoint (like `https://mailtrain.example.com`)
+
+7. Authenticate as `admin`:`test`
+
+8. Update your password under admin/Account
+
+9. Update your settings under Administration/Global Settings.
+
+10. If you intend to sign your email by DKIM, set the DKIM key and DKIM selector under Administration/Send Configurations.
+
+
+### Installation on fresh CentOS 7 (local installation)
+
+This will setup a locally accessible Mailtrain instance (primarily for development and testing).
+All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
+- http://localhost:3000 - trusted endpoint
+- http://localhost:3003 - sandbox endpoint
+- http://localhost:3004 - public endpoint
+
+1. Login as root
+    ```
+    sudo -i
+    ```
+
+2. Install git
+    ```
+    yum install -y git
+    ```
+
+3. Download Mailtrain using git to the `/opt/mailtrain` directory
+    ```
+    cd /opt
+    git clone https://github.com/Mailtrain-org/mailtrain.git
+    cd mailtrain
+    git checkout development
+    ```
+
+4. Run the installation script. Replace the urls and your email address with the correct values. **NOTE** that running this script you agree
+   Let's Encrypt's conditions.
+    ```
+    sh setup/install-centos7-local.sh
+    ```
+
+5. Start Mailtrain and enable to be started by default when your server starts.
+    ```
+    systemctl start mailtrain
+    systemctl enable mailtrain
+    ```
+
+6. Open the trusted endpoint http://localhost:3000
+
+7. Authenticate as `admin`:`test`
+
+
 
 ## Quick Start - Deploy with Docker
 #### Requirements:
@@ -37,23 +143,6 @@ Depending on how you have configured your system and Docker you may need to prep
 * Authenticate as user `admin` with password `test`
 * Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration.
 * Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password.
-
-## Quick Start - Manual Install (any OS that supports Node.js)
-
-### Requirements: 
- * Mailtrain requires at least **Node.js v10**.
-
-  1. Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
-  2. Run `npm install --production` in the Mailtrain folder to install required dependencies
-  3. Copy [config/default.toml](config/default.toml) as `config/production.toml` and update MySQL and any other settings in it
-  4. Run the server `NODE_ENV=production npm start`
-  5. Open [http://localhost:3000/](http://localhost:3000/)
-  6. Authenticate as `admin`:`test`
-  7. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration
-  8. Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password
-
-## Read The Docs
-For more information, please [read the docs](http://docs.mailtrain.org/).
 
 
 ## License

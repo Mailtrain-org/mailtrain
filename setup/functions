@@ -8,6 +8,7 @@ function installBase {
     local urlBaseTrusted="$1"
     local urlBaseSandbox="$2"
     local urlBasePublic="$3"
+    local wwwHost="$4"
     
     yum -y install epel-release
     
@@ -21,7 +22,7 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 EOT
     
-    yum -y install mariadb-server nodejs ImageMagick git python redis pwgen bind-utils gcc-c++ make mongodb-org
+    yum -y install mariadb-server nodejs ImageMagick git python redis pwgen bind-utils gcc-c++ make mongodb-org bzip2
     
     systemctl start mariadb
     systemctl enable mariadb
@@ -54,6 +55,7 @@ roUser: nobody
 roGroup: nobody
 
 www:
+  host: $wwwHost
   secret: "`pwgen -1`"
   trustedUrlBase: $urlBaseTrusted
   sandboxUrlBase: $urlBaseSandbox
@@ -67,11 +69,11 @@ redis:
   enabled: true
 
 log:
-  level: warn
+  level: info
 
 builtinZoneMTA:
   log:
-    level: info
+    level: warn
 
 queue:
   processes: 5
@@ -121,7 +123,7 @@ EOT
     
     echo "Success! Open http://$urlBaseTrusted/ and login as admin:test"
 
-    if [ -n "$firewallCmdExists" ]; then
+    if [ -z "$firewallCmdExists" ]; then
         echo "Note that firewall was not setup because firewall-cmd is missing on your system. Please make sure your firewall is correctly setup. If you are on AWS, this means to enable HTTPS and HTTP in your security group."
     fi
 }
@@ -269,7 +271,12 @@ function createCertificates {
         firewall-cmd --add-port=80/tcp
     fi
 
-    certbot certonly --agree-tos --email "${email}" --standalone -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
+    certbot certonly --email "${email}" --standalone -n -d "${hostPublic}" -d "${hostTrusted}" -d "${hostSandbox}"
+
+    # Install cron
+    echo "0 3 * * * /usr/bin/certbot certonly --apache -n -d \"${hostPublic}\" -d \"${hostTrusted}\" -d \"${hostSandbox}\"" > crontab
+    crontab crontab
+    rm -rf crontab
 
     if [ -n "$firewallCmdExists" ]; then
         # Revert firewall to original state
@@ -277,3 +284,24 @@ function createCertificates {
     fi
 }
 
+
+function installService {
+    cat > /etc/systemd/system/mailtrain.service <<EOT
+[Unit]
+Description=Mailtrain server
+After=syslog.target network.target mariadb.service redis.service mongod.service
+
+[Service]
+Environment="NODE_ENV=production"
+WorkingDirectory=/opt/mailtrain/server
+ExecStart=/usr/bin/node index.js
+Type=simple
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOT
+
+    systemctl daemon-reload
+}
