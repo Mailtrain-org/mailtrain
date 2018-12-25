@@ -49,15 +49,9 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
 
 
 
-<<<<<<< HEAD
 1. Login as root. (I had some problems running npm as root on CentOS 7 on AWS. This seems to be fixed by the seemingly extraneous `su` within `sudo`.)
     ```
     sudo su -
-=======
-1. Login as root
-    ```
-    sudo -i
->>>>>>> c3f5e6a6282e6fae51392b9a9f89edade3d614a1
     ```
 
 2. Install git
@@ -104,9 +98,9 @@ All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
 - http://localhost:3003 - sandbox endpoint
 - http://localhost:3004 - public endpoint
 
-1. Login as root
+1. Login as root. (I had some problems running npm as root on CentOS 7 on AWS. This seems to be fixed by the seemingly extraneous `su` within `sudo`.)
     ```
-    sudo -i
+    sudo su -
     ```
 
 2. Install git

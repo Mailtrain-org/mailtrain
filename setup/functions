@@ -229,7 +229,7 @@ EOT
 </VirtualHost>
 
 <VirtualHost *:${portPublic}>
-    ServerName *:${portPublic}
+    ServerName ${hostPublic}:${portPublic}
 
     ErrorLog logs/${hostPublic}_ssl_error.log
     TransferLog logs/${hostPublic}_ssl_access.log
