@@ -359,6 +359,7 @@ EOT
 
         ubuntu1804)
             a2enmod ssl
+            a2enmod rewrite
             a2enconf mailtrain
             systemctl restart apache2
             ;;
