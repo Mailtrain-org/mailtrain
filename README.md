@@ -14,10 +14,12 @@
 * Automation (triggered and RSS campaigns)
 * Multiple users with granular user permissions and flexible sharing
 * Hierarchical namespaces for enterprise-level situations
+* Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery
 
-## Hardware Requirements
-* 1 vCPU
-* 2048 MB RAM
+## Recommended minimal hardware Requirements
+* 2 vCPU
+* 4096 MB RAM
+
 
 ## Quick Start
 
@@ -32,7 +34,6 @@ The recommended deployment of Mailtrain would use 3 DNS entries that all points 
 - *lists.example.com* - public endpoint (A record `lists` under `example.com` domain)
 - *mailtrain.example.com* - trusted endpoint (CNAME record `mailtrain` under `example.com` domain that points to `lists`)
 - *sbox.mailtrain.example.com* - sandbox endpoint (CNAME record `sbox.mailtrain` under `example.com` domain that points to `lists`)
-
 
 
 ### Installation on fresh CentOS 7 or Ubuntu 18.04 LTS (public website secured by SSL)
@@ -54,14 +55,14 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
     sudo su -
     ```
 
-2. Install git
+2. Install GIT
 
    For Centos 7 type:
     ```
     yum install -y git
     ```
 
-   For Ubuntu 18.04 LTS type:
+   For Ubuntu 18.04 LTS type
     ```
     apt-get install -y git
     ```
@@ -162,23 +163,43 @@ All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
 
 
 
-## Quick Start - Deploy with Docker
-#### Requirements:
+### Deployment with Docker and Docker compose
 
-  * [Docker](https://www.docker.com/)
-  * [Docker Compose](https://docs.docker.com/compose/)
+This setup starts a stack composed of Mailtrain, MongoDB, Redis, and MariaDB. It will setup a locally accessible Mailtrain instance with HTTP endpoints as follows.
+- http://localhost:3000 - trusted endpoint
+- http://localhost:3003 - sandbox endpoint
+- http://localhost:3004 - public endpoint
 
-#### Steps:
-Depending on how you have configured your system and Docker you may need to prepend the commands below with `sudo`.
+To make this publicly accessible, you should add reverse proxy that makes these endpoints publicly available over HTTPS.
 
-* Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
-* Copy the file `docker-compose.override.yml.tmpl` to `docker-compose.override.yml` and modify it if you need to.
-* Bring up the stack with: `docker-compose up -d`
-* Start: `docker-compose start`
-* Open [http://localhost:3000/](http://localhost:3000/) (change the host name `localhost` to the name of the host where you are deploying the system).
-* Authenticate as user `admin` with password `test`
-* Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration.
-* Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password.
+To deploy Mailtrain with Docker, you need the following three dependencies installed:
+
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- Git - Typically already present. If not, just use the package manager of your OS distribution to install it.
+
+These are the steps to start Mailtrain via docker-compose:
+
+1. Download Mailtrain using git
+    ```
+    git clone https://github.com/Mailtrain-org/mailtrain.git
+    cd mailtrain
+    git checkout development
+    ```
+
+2. Deploy Mailtrain via docker-compose (in the root directory of the Mailtrain project). This will take quite some time when run for the first time. Subsequent executions will be fast.
+    ```
+    docker-compose up
+    ```
+
+    You can specify Mailtrain's URL bases via the `MAILTRAIN_SETTINGS` environment variable as follows. The `--withProxy` parameter is to be used when Mailtrain is put behind a reverse proxy.
+    ```
+    MAILTRAIN_SETTINGS="--trustedUrlBase https://mailtrain.example.com --sandboxUrlBase https://sbox.mailtrain.example.com --publicUrlBase https://lists.example.com --withProxy" docker-compose up
+    ```
+
+3. Open the trusted endpoint http://localhost:3000
+
+4. Authenticate as `admin`:`test`
 
 
 ## License
