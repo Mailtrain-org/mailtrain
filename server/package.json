@@ -46,7 +46,7 @@
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
-    "bounce-handler": "^7.3.2-fork.2",
+    "bounce-handler": "github:bures/node-bounce-handler#81ccca0d9c3bbc9efea54a9eaf5f10425e2153bb",
     "compression": "^1.7.3",
     "config": "^2.0.1",
     "connect-flash": "^0.1.1",

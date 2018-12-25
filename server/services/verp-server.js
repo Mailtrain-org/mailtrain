@@ -12,7 +12,7 @@ const BounceHandler = require('bounce-handler').BounceHandler;
 const SMTPServer = require('smtp-server').SMTPServer;
 
 async function onRcptTo(address, session) {
-    const addrSplit = address.split('@');
+    const addrSplit = address.address.split('@');
 
     if (addrSplit.length !== 2) {
         throw new MailerError('Unknown user ' + address.address, 510);
@@ -20,7 +20,7 @@ async function onRcptTo(address, session) {
 
     const [user, host] = addrSplit;
 
-    const message = await campaigns.getMessageByCid(user);
+    const message = await campaigns.getMessageByCid(user, true);
 
     if (!message) {
         throw new MailerError('Unknown user ' + address.address, 510);
@@ -32,22 +32,12 @@ async function onRcptTo(address, session) {
 
     session.message = message;
 
-    log.verbose('VERP', 'Incoming message for Campaign %s, List %s, Subscription %s', cids.campaignId, cids.listId, cids.subscriptionId);
+    log.verbose('VERP', 'Incoming message for Campaign %s, List %s, Subscription %s', message.campaign, message.list, message.subscription);
 }
 
 function onData(stream, session, callback) {
     let chunks = [];
     let totalLen = 0;
-
-    stream.on('data', chunk => {
-        if (!chunk || !chunk.length || totalLen > 60 * 1024) {
-            return;
-        }
-        chunks.push(chunk);
-        totalLen += chunk.length;
-    });
-
-    stream.on('end', () => nodeifyPromise(onStreamEnd(), callback));
 
     const onStreamEnd = async () => {
         const body = Buffer.concat(chunks, totalLen).toString();
@@ -57,7 +47,7 @@ function onData(stream, session, callback) {
 
         try {
             bounceResult = [].concat(bh.parse_email(body) || []).shift();
-        } catch (E) {
+        } catch (err) {
             log.error('Bounce', 'Failed parsing bounce message');
             log.error('Bounce', JSON.stringify(body));
         }
@@ -69,6 +59,16 @@ function onData(stream, session, callback) {
             log.verbose('VERP', 'Marked message %s as unsubscribed', session.message.campaign);
         }
     };
+
+    stream.on('data', chunk => {
+        if (!chunk || !chunk.length || totalLen > 60 * 1024) {
+            return;
+        }
+        chunks.push(chunk);
+        totalLen += chunk.length;
+    });
+
+    stream.on('end', () => nodeifyPromise(onStreamEnd(), callback));
 }
 
 // Setup server

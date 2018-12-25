@@ -652,7 +652,7 @@ function getMessageCid(campaignCid, listCid, subscriptionCid) {
     return [campaignCid, listCid, subscriptionCid].join('.')
 }
 
-async function getMessageByCid(messageCid) {
+async function getMessageByCid(messageCid, withVerpHostname = false) { // withVerpHostname is used by verp-server.js
     const messageCidElems = messageCid.split('.');
 
     if (messageCidElems.length !== 3) {
@@ -662,10 +662,10 @@ async function getMessageByCid(messageCid) {
     const [campaignCid, listCid, subscriptionCid] = messageCidElems;
 
     return await knex.transaction(async tx => {
-        const list = await tx('lists').where('cid', listCid).select('id');
+        const list = await tx('lists').where('cid', listCid).select('id').first();
         const subscrTblName = subscriptions.getSubscriptionTableName(list.id);
 
-        const message = await tx('campaign_messages')
+        const baseQuery = tx('campaign_messages')
             .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
             .innerJoin(subscrTblName, subscrTblName + '.id', 'campaign_messages.subscription')
             .where(subscrTblName + '.cid', subscriptionCid)
@@ -675,13 +675,20 @@ async function getMessageByCid(messageCid) {
             ])
             .first();
 
+        if (withVerpHostname) {
+            return await baseQuery
+                .innerJoin('send_configurations', 'send_configurations.id', 'campaigns.send_configuration')
+                .select('send_configurations.verp_hostname');
+        } else {
+            return await baseQuery;
+        }
+
         return message;
     });
 }
 
 async function getMessageByResponseId(responseId) {
     return await knex.transaction(async tx => {
-        console.log(responseId);
         const message = await tx('campaign_messages')
             .where('campaign_messages.response_id', responseId)
             .select([

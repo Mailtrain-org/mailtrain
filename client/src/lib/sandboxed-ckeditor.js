@@ -60,6 +60,7 @@ export class CKEditorHost extends Component {
     onWindowResize() {
         if (this.state.fullscreen) {
             const newHeight = window.innerHeight - navbarHeight;
+            // noinspection JSIgnoredPromiseFromCall
             this.contentNode.ask('setHeight', newHeight);
         }
     }

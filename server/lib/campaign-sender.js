@@ -182,10 +182,9 @@ class CampaignSender {
                 });
             }
 
+            this.useVerp = config.verp.enabled && this.sendConfiguration.verp_hostname;
+            this.useVerpSenderHeader = this.useVerp && config.verp.disablesenderheader !== true;
         });
-
-        this.useVerp = config.verp.enabled && sendConfiguration.verp_hostname;
-        this.useVerpSenderHeader = this.useVerp && config.verp.disablesenderheader !== true;
     }
 
     async _getMessage(campaign, list, subscriptionGrouped, mergeTags, replaceDataImgs) {
