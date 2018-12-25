@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # This installation script works on CentOS 7
 # Run as root!
@@ -17,7 +18,7 @@ cd $SCRIPT_PATH/..
 
 # Help function
 function HELP {
-cat << EOF
+cat <<EOF
 
 Basic usage: install-centos7-local.sh
 

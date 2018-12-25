@@ -17,7 +17,7 @@ cd $SCRIPT_PATH/..
 
 # Help function
 function HELP {
-cat << EOF
+cat <<EOF
 
 Basic usage: install-centos7-https.sh <trusted host> <sandbox host> <public host> <email>
 
@@ -47,6 +47,6 @@ email="$4"
 
 createCertificates "${hostTrusted}" "${hostSandbox}" "${hostPublic}" "${email}"
 
-installHttps "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem" ""
+installHttps "${hostTrusted}" 443 "${hostSandbox}" 443 "${hostPublic}" 443 "/etc/letsencrypt/live/${hostPublic}/cert.pem" "/etc/letsencrypt/live/${hostPublic}/privkey.pem" "/etc/letsencrypt/live/${hostPublic}/chain.pem" 
 
 installBase "https://${hostTrusted}" "https://${hostSandbox}" "https://${hostPublic}" "${email}"
