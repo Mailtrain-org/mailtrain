@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 # This installation script works on CentOS 7
 # Run as root!

@@ -2,7 +2,7 @@
 
 [Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).
 
-![](http://mailtrain.org/mailtrain.png)
+![](https://mailtrain.org/mailtrain.png)
 
 ## Features
 
