@@ -35,7 +35,7 @@ class CampaignSender {
             fieldsGrouped = await fields.listGroupedTx(tx, list.id);
 
             useVerp = config.verp.enabled && sendConfiguration.verp_hostname;
-            useVerpSenderHeader = this.useVerp && config.verp.disablesenderheader !== true;
+            useVerpSenderHeader = useVerp && !sendConfiguration.verp_disable_sender_header;
 
             subscriptionGrouped = await subscriptions.getByCid(context, list.id, subscriptionCid);
             mergeTags = fields.getMergeTags(fieldsGrouped, subscriptionGrouped);
@@ -94,9 +94,9 @@ class CampaignSender {
                 name: tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
                 address: subscriptionGrouped.email
             },
-            sender: this.useVerpSenderHeader ? campaignAddress + '@' + sendConfiguration.verp_hostname : false,
+            sender: useVerpSenderHeader ? campaignAddress + '@' + sendConfiguration.verp_hostname : false,
 
-            envelope: this.useVerp ? {
+            envelope: useVerp ? {
                 from: campaignAddress + '@' + sendConfiguration.verp_hostname,
                 to: subscriptionGrouped.email
             } : false,
@@ -183,7 +183,7 @@ class CampaignSender {
             }
 
             this.useVerp = config.verp.enabled && this.sendConfiguration.verp_hostname;
-            this.useVerpSenderHeader = this.useVerp && config.verp.disablesenderheader !== true;
+            this.useVerpSenderHeader = this.useVerp && !this.sendConfiguration.verp_disable_sender_header;
         });
     }
 

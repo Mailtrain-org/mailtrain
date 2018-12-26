@@ -13,6 +13,8 @@ const uploads = multer();
 
 
 router.postAsync('/aws', async (req, res) => {
+    console.log(req.body);
+
     if (typeof req.body === 'string') {
         req.body = JSON.parse(req.body);
     }
@@ -70,6 +72,8 @@ router.postAsync('/sparkpost', async (req, res) => {
     const events = [].concat(req.body || []); // This is just a cryptic way getting an array regardless whether req.body is empty, one item, or array
 
     for (const curEvent of events) {
+        console.log(curEvent);
+
         let msys = curEvent && curEvent.msys;
         let evt;
 
@@ -80,6 +84,8 @@ router.postAsync('/sparkpost', async (req, res) => {
         } else {
             continue;
         }
+
+        log.verbose('Sendgrid', 'Received issue "%s" for message id "%s"', evt.type, evt.campaign_id);
 
         const message = await campaigns.getMessageByCid(evt.campaign_id);
         if (!message) {
@@ -119,6 +125,9 @@ router.postAsync('/sendgrid', async (req, res) => {
             continue;
         }
 
+        console.log(evt);
+        log.verbose('Sendgrid', 'Received issue "%s" for message id "%s"', evt.event, evt.campaign_id);
+
         const message = await campaigns.getMessageByCid(evt.campaign_id);
         if (!message) {
             continue;
@@ -152,6 +161,9 @@ router.postAsync('/sendgrid', async (req, res) => {
 
 router.postAsync('/mailgun', uploads.any(), async (req, res) => {
     const evt = req.body;
+
+    console.log(evt);
+    log.verbose('Mailgun', 'Received issue "%s" for message id "%s"', evt.event, evt.campaign_id);
 
     const message = await campaigns.getMessageByCid([].concat(evt && evt.campaign_id || []).shift());
     if (message) {
@@ -187,11 +199,10 @@ router.postAsync('/zone-mta', async (req, res) => {
 
         if (req.body.id) {
             const message = await campaigns.getMessageByResponseId(req.body.id);
-            console.log(message);
 
             if (message) {
                 await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
-                log.verbose('ZoneMTA', 'Marked message %s as bounced', req.body.id);
+                log.verbose('ZoneMTA', 'Marked message (campaign:%s, list:%s, subscription:%s) as bounced', message.campaign, message.list, message.subscription);
             }
         }
 

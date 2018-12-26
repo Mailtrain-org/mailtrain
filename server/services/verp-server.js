@@ -32,7 +32,7 @@ async function onRcptTo(address, session) {
 
     session.message = message;
 
-    log.verbose('VERP', 'Incoming message for Campaign %s, List %s, Subscription %s', message.campaign, message.list, message.subscription);
+    log.verbose('VERP', 'Incoming message for campaign:%s, list:%s, subscription:%s', message.campaign, message.list, message.subscription);
 }
 
 function onData(stream, session, callback) {
@@ -56,7 +56,7 @@ function onData(stream, session, callback) {
             return 'Message accepted';
         } else {
             await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), session.message, SubscriptionStatus.BOUNCED, bounceResult.action === 'failed');
-            log.verbose('VERP', 'Marked message %s as unsubscribed', session.message.campaign);
+            log.verbose('VERP', 'Marked message (campaign:%s, list:%s, subscription:%s) as unsubscribed', session.message.campaign, session.message.list, session.message.subscription);
         }
     };
 

@@ -123,12 +123,6 @@ verp:
   enabled: false
   port: 25
   host: 0.0.0.0
-  # With DMARC, the Return-Path and From address must match the same domain.
-  # By default we get around this by using the VERP address in the Sender header,
-  # with the side effect that some email clients diplay an ugly on behalf of message.
-  # You can safely disable this Sender header if you're not using DMARC or your
-  # VERP hostname is in the same domain as the From address.
-  # disablesenderheader: true
 
 ldap:
   # enable to use ldap user backend
