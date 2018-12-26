@@ -533,7 +533,7 @@ CREATE TABLE `send_configurations` (
   KEY `send_configurations_namespace_foreign` (`namespace`),
   CONSTRAINT `send_configurations_namespace_foreign` FOREIGN KEY (`namespace`) REFERENCES `namespaces` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-INSERT INTO `send_configurations` (`id`, `cid`, `name`, `description`, `from_email`, `from_email_overridable`, `from_name`, `from_name_overridable`, `reply_to`, `reply_to_overridable`, `subject`, `subject_overridable`, `verp_hostname`, `mailer_type`, `mailer_settings`, `created`, `namespace`, `x_mailer`) VALUES (1,'system','System','Send configuration used to deliver system emails','admin@example.com',1,'My Awesome Company',1,'admin@example.com',1,'Test message',1,NULL,'zone_mta','{\"maxConnections\":5,\"throttling\":0,\"logTransactions\":false,\"maxMessages\":100,\"zoneMtaType\":3}',NOW(),1,NULL);
+INSERT INTO `send_configurations` (`id`, `cid`, `name`, `description`, `from_email`, `from_email_overridable`, `from_name`, `from_name_overridable`, `reply_to`, `reply_to_overridable`, `subject`, `subject_overridable`, `verp_hostname`, `mailer_type`, `mailer_settings`, `created`, `namespace`, `x_mailer`) VALUES (1,'system','System','Send configuration used to deliver system emails','admin@example.com',1,'My Awesome Company',1,'admin@example.com',1,'Test message',1,NULL,'zone_mta','{\"maxConnections\":5,\"throttling\":0,\"logTransactions\":false,\"maxMessages\":100,\"zoneMtaType\":3}',NOW(),1,'');
 CREATE TABLE `settings` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT '',
