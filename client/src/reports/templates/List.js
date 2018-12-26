@@ -103,10 +103,10 @@ export default class List extends Component {
                 {this.state.createPermitted &&
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('createReportTemplate')}>
-                            <MenuLink to="/reports/templates/create">{t('Blank')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts">{t('Open counts')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('Open counts as CSV')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('Aggregated open counts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create">{t('blank')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts">{t('openCounts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('aggregatedOpenCounts')}</MenuLink>
                         </DropdownMenu>
                     </Toolbar>
                 }

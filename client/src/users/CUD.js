@@ -98,7 +98,7 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['role', 'value'])) {
-            state.setIn(['role', 'error'], t('Role must be selected'));
+            state.setIn(['role', 'error'], t('roleMustBeSelected'));
         } else {
             state.setIn(['role', 'error'], null);
         }

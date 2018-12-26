@@ -235,9 +235,9 @@ export default class CUD extends Component {
                         <Trans i18nKey="verpUsuallyOnlyWorksIfYouAreUsingYourOwn"><p className="text-warning">VERP usually only works if you are using your own SMTP server. Regular relay services (SES, SparkPost, Gmail etc.) tend to remove the VERP address from the message.</p></Trans>
                         {mailtrainConfig.verpEnabled ?
                             <div>
-                                <CheckBox id="verpEnabled" label={t('VERP status')} text={t('Enabled')}/>
+                                <CheckBox id="verpEnabled" label={t('verpStatus')} text={t('enabled')}/>
                                 {verpEnabled && <InputField id="verp_hostname" label={t('serverHostname')} placeholder={t('theVerpServerHostnameEgBouncesexamplecom')} help={t('verpBounceHandlingServerHostnameThis')}/>}
-                                {verpEnabled && <CheckBox id="verp_disable_sender_header" text={t('Disable sender header')} help={t('With DMARC, the Return-Path and From address must match the same domain. By default we get around this by using the VERP address in the Sender header, with the side effect that some email clients diplay an ugly on behalf of message. You can safely disable this Sender header if you\'re not using DMARC or your VERP hostname is in the same domain as the From address.')}/>}
+                                {verpEnabled && <CheckBox id="verp_disable_sender_header" text={t('disableSenderHeader')} help={t('withDmarcTheReturnPathAndFromAddressMust')}/>}
                             </div>
                             :
                             <Trans i18nKey="verpBounceHandlingServerIsNotEnabled"><p>VERP bounce handling server is not enabled. Modify your server configuration file and restart server to enable it.</p></Trans>
