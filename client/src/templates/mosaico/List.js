@@ -1,26 +1,41 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../../lib/i18n';
-import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, MenuLink } from '../../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { Table } from '../../lib/table';
-import axios from '../../lib/axios';
-import moment from 'moment';
-import { getTemplateTypes } from './helpers';
+import React, {Component} from 'react';
+import {withTranslation} from '../../lib/i18n';
+import {
+    DropdownMenu,
+    Icon
+} from '../../lib/bootstrap-components';
+import {
+    MenuLink,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from '../../lib/page';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../../lib/error-handling';
+import {Table} from '../../lib/table';
+import moment
+    from 'moment';
+import {getTemplateTypes} from './helpers';
 import {checkPermissions} from "../../lib/permissions";
 import {
     tableAddDeleteButton,
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../../lib/modals";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

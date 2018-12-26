@@ -1,17 +1,32 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../lib/i18n';
-import { withPageHelpers, Title } from '../lib/page'
-import { Link } from 'react-router-dom'
+import React, {Component} from 'react';
+import {withTranslation} from '../lib/i18n';
 import {
-    withForm, Form, Fieldset, FormSendMethod, InputField, ButtonRow, Button
+    Title,
+    withPageHelpers
+} from '../lib/page'
+import {Link} from 'react-router-dom'
+import {
+    Button,
+    ButtonRow,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm
 } from '../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import passwordValidator from '../../../shared/password-validator';
-import axios from '../lib/axios';
-import interoperableErrors from '../../../shared/interoperable-errors';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import passwordValidator
+    from '../../../shared/password-validator';
+import axios
+    from '../lib/axios';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
 import {getUrl} from "../lib/urls";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
 const ResetTokenValidationState = {
     PENDING: 0,
@@ -19,10 +34,12 @@ const ResetTokenValidationState = {
     INVALID: 2
 };
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers
+])
 export default class Account extends Component {
     constructor(props) {
         super(props);

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { withTranslation } from '../lib/i18n';
+import {withTranslation} from '../lib/i18n';
 import {Icon} from '../lib/bootstrap-components';
 import {
     NavButton,
@@ -15,8 +15,8 @@ import {
     withErrorHandling
 } from '../lib/error-handling';
 import {Table} from '../lib/table';
-import axios from '../lib/axios';
-import moment from 'moment';
+import moment
+    from 'moment';
 import {getMailerTypes} from './helpers';
 import {checkPermissions} from "../lib/permissions";
 import {
@@ -24,12 +24,15 @@ import {
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../lib/modals";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

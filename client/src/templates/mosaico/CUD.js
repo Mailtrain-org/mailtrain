@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -31,12 +32,15 @@ import {
     getTemplateTypes,
     getTemplateTypesOrder
 } from "./helpers";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

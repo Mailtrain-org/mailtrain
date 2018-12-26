@@ -1,22 +1,41 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../lib/i18n';
-import { Trans } from 'react-i18next';
-import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page'
+import React, {Component} from 'react';
+import {withTranslation} from '../lib/i18n';
+import {Trans} from 'react-i18next';
 import {
-    withForm, Form, Fieldset, FormSendMethod, InputField, ButtonRow, Button
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page'
+import {
+    Button,
+    ButtonRow,
+    Fieldset,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm
 } from '../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import passwordValidator from '../../../shared/password-validator';
-import interoperableErrors from '../../../shared/interoperable-errors';
-import mailtrainConfig from 'mailtrainConfig';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import passwordValidator
+    from '../../../shared/password-validator';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
+import mailtrainConfig
+    from 'mailtrainConfig';
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Account extends Component {
     constructor(props) {
         super(props);

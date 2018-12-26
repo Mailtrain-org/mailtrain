@@ -39,6 +39,7 @@ import "./sandboxed-grapesjs.scss";
 import axios
     from './axios';
 import {GrapesJSSourceType} from "./sandboxed-grapesjs-shared";
+import {withComponentMixins} from "./decorator-helpers";
 
 
 grapesjs.plugins.add('mailtrain-remove-buttons', (editor, opts = {}) => {
@@ -52,7 +53,9 @@ grapesjs.plugins.add('mailtrain-remove-buttons', (editor, opts = {}) => {
 });
 
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation
+])
 export class GrapesJSSandbox extends Component {
     constructor(props) {
         super(props);

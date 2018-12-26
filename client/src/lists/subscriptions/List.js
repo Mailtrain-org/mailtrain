@@ -1,37 +1,56 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../../lib/i18n';
-import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../../lib/page';
-import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
-import { Table } from '../../lib/table';
-import { SubscriptionStatus } from '../../../../shared/lists';
-import moment from 'moment';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../../lib/i18n';
 import {
-    Dropdown, Form,
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from '../../lib/page';
+import {withErrorHandling} from '../../lib/error-handling';
+import {Table} from '../../lib/table';
+import {SubscriptionStatus} from '../../../../shared/lists';
+import moment
+    from 'moment';
+import {
+    Dropdown,
+    Form,
     withForm
 } from '../../lib/form';
-import {Icon, Button} from "../../lib/bootstrap-components";
-import {HTTPMethod} from '../../lib/axios';
-import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
-import {getUrl, getPublicUrl} from "../../lib/urls";
 import {
-    DeleteModalDialog,
-    RestActionModalDialog,
+    Button,
+    Icon
+} from "../../lib/bootstrap-components";
+import {HTTPMethod} from '../../lib/axios';
+import {
+    getFieldTypes,
+    getSubscriptionStatusLabels
+} from './helpers';
+import {
+    getPublicUrl,
+    getUrl
+} from "../../lib/urls";
+import {
     tableAddDeleteButton,
+    tableAddRestActionButton,
     tableRestActionDialogInit,
-    tableRestActionDialogRender,
-    tableAddRestActionButton
+    tableRestActionDialogRender
 } from "../../lib/modals";
-import listStyles from "../styles.scss";
-import styles from '../../lib/styles.scss';
+import listStyles
+    from "../styles.scss";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

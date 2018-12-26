@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -14,16 +15,21 @@ import {
     withErrorHandling
 } from '../../lib/error-handling';
 import {getImportLabels} from './helpers';
-import axios from "../../lib/axios";
+import axios
+    from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import moment from "moment";
+import moment
+    from "moment";
 import {runStatusInProgress} from "../../../../shared/imports";
 import {Table} from "../../lib/table";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Status extends Component {
     constructor(props) {
         super(props);

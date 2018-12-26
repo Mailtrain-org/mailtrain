@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from "react";
-import PropTypes from "prop-types";
-import { withTranslation } from './i18n';
+import PropTypes
+    from "prop-types";
+import {withTranslation} from './i18n';
 import {
     requiresAuthenticatedUser,
     withPageHelpers
@@ -11,18 +12,23 @@ import {
     withAsyncErrorHandler,
     withErrorHandling
 } from "./error-handling";
-import axios from "./axios";
-import styles from "./styles.scss";
+import axios
+    from "./axios";
+import styles
+    from "./styles.scss";
 import {
     getSandboxUrl,
     getTrustedUrl,
     getUrl,
     setRestrictedAccessToken
 } from "./urls";
+import {withComponentMixins} from "./decorator-helpers";
 
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+], ['ask'])
 export class UntrustedContentHost extends Component {
     constructor(props) {
         super(props);
@@ -173,7 +179,9 @@ export class UntrustedContentHost extends Component {
 }
 
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation
+])
 export class UntrustedContentRoot extends Component {
     constructor(props) {
         super(props);

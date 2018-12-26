@@ -23,6 +23,8 @@ const shares = require('./models/shares');
 const { AppType } = require('../shared/app');
 const builtinZoneMta = require('./lib/builtin-zone-mta');
 
+const { uploadedFilesDir } = require('./lib/file-helpers');
+
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
 const publicPort = config.www.publicPort;
@@ -68,7 +70,6 @@ function startHTTPServer(appType, appName, port, callback) {
     server.listen({port, host}, callback);
 }
 
-
 // ---------------------------------------------------------------------------------------
 // Start the whole circus here
 // ---------------------------------------------------------------------------------------
@@ -99,7 +100,10 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                     builtinZoneMta.spawn(() =>
                         startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () =>
                             startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () =>
-                                startHTTPServer(AppType.PUBLIC, 'public', publicPort, () => {
+                                startHTTPServer(AppType.PUBLIC, 'public', publicPort, async () => {
+
+                                    await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
+
                                     privilegeHelpers.dropRootPrivileges();
 
                                     tzupdate.start();

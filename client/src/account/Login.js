@@ -1,22 +1,37 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../lib/i18n';
-import { withPageHelpers, Title } from '../lib/page'
-import { Link } from 'react-router-dom'
+import React, {Component} from 'react';
+import {withTranslation} from '../lib/i18n';
 import {
-    withForm, Form, FormSendMethod, InputField, CheckBox, ButtonRow, Button, AlignedRow
+    Title,
+    withPageHelpers
+} from '../lib/page'
+import {Link} from 'react-router-dom'
+import {
+    Button,
+    ButtonRow,
+    CheckBox,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm
 } from '../lib/form';
-import { withErrorHandling } from '../lib/error-handling';
-import qs from 'querystringify';
-import interoperableErrors from '../../../shared/interoperable-errors';
-import mailtrainConfig from 'mailtrainConfig';
+import {withErrorHandling} from '../lib/error-handling';
+import qs
+    from 'querystringify';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers
+])
 export default class Login extends Component {
     constructor(props) {
         super(props);

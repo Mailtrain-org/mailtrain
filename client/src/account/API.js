@@ -16,11 +16,14 @@ import axios
     from '../lib/axios';
 import {Button} from '../lib/bootstrap-components';
 import {getUrl} from "../lib/urls";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class API extends Component {
     constructor(props) {
         super(props);

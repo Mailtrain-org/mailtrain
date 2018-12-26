@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -29,15 +30,19 @@ import {
     Entity,
     Event
 } from '../../../../shared/triggers';
-import moment from 'moment';
+import moment
+    from 'moment';
 import {getCampaignLabels} from "../helpers";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

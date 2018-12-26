@@ -1,23 +1,47 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../lib/i18n';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
-import { withForm, Form, FormSendMethod, InputField, TextArea, ButtonRow, Button, TreeTableSelect } from '../lib/form';
-import axios from '../lib/axios';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import interoperableErrors from '../../../shared/interoperable-errors';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../lib/i18n';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page';
+import {
+    Button,
+    ButtonRow,
+    Form,
+    FormSendMethod,
+    InputField,
+    TextArea,
+    TreeTableSelect,
+    withForm
+} from '../lib/form';
+import axios
+    from '../lib/axios';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
 import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig from 'mailtrainConfig';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {getUrl} from "../lib/urls";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

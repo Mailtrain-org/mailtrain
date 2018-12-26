@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -17,24 +18,30 @@ import {
     withForm
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import mailtrainConfig from 'mailtrainConfig';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {
     getEditForm,
     getTemplateTypes,
     getTypeForm,
     ResourceType
 } from '../templates/helpers';
-import axios from '../lib/axios';
-import styles from "../lib/styles.scss";
+import axios
+    from '../lib/axios';
+import styles
+    from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CustomContent extends Component {
     constructor(props) {
         super(props);

@@ -1,12 +1,20 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from './i18n';
-import PropTypes from 'prop-types';
-import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
+import React, {Component} from 'react';
+import {withTranslation} from './i18n';
+import PropTypes
+    from 'prop-types';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from './error-handling';
+import {withComponentMixins} from "./decorator-helpers";
 
-@withTranslation()
-@withErrorHandling
+
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling
+])
 class DismissibleAlert extends Component {
     static propTypes = {
         severity: PropTypes.string.isRequired,
@@ -51,7 +59,9 @@ class Icon extends Component {
     }
 }
 
-@withErrorHandling
+@withComponentMixins([
+    withErrorHandling
+])
 class Button extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
@@ -165,7 +175,9 @@ class DropdownMenuItem extends Component {
     }
 }
 
-@withErrorHandling
+@withComponentMixins([
+    withErrorHandling
+])
 class ActionLink extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
@@ -192,8 +204,10 @@ class ActionLink extends Component {
 }
 
 
-@withTranslation()
-@withErrorHandling
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling
+])
 class ModalDialog extends Component {
     constructor(props) {
         super(props);

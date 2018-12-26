@@ -1,22 +1,45 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../lib/i18n';
-import {requiresAuthenticatedUser, withPageHelpers, Title, NavButton} from '../lib/page';
-import { withForm, Form, FormSendMethod, InputField, ButtonRow, Button, TableSelect } from '../lib/form';
-import { withErrorHandling } from '../lib/error-handling';
-import interoperableErrors from '../../../shared/interoperable-errors';
-import passwordValidator from '../../../shared/password-validator';
-import mailtrainConfig from 'mailtrainConfig';
-import { validateNamespace, NamespaceSelect } from '../lib/namespace';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../lib/i18n';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page';
+import {
+    Button,
+    ButtonRow,
+    Form,
+    FormSendMethod,
+    InputField,
+    TableSelect,
+    withForm
+} from '../lib/form';
+import {withErrorHandling} from '../lib/error-handling';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
+import passwordValidator
+    from '../../../shared/password-validator';
+import mailtrainConfig
+    from 'mailtrainConfig';
+import {
+    NamespaceSelect,
+    validateNamespace
+} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

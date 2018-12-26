@@ -1,29 +1,60 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from './i18n';
+import React, {Component} from 'react';
+import {withTranslation} from './i18n';
 import axios, {HTTPMethod} from './axios';
-import Immutable from 'immutable';
-import PropTypes from 'prop-types';
-import interoperableErrors from '../../../shared/interoperable-errors';
-import { withPageHelpers } from './page'
-import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
-import { TreeTable, TreeSelectMode } from './tree';
-import { Table, TableSelectMode } from './table';
-import {Button, Icon} from "./bootstrap-components";
-
-import brace from 'brace';
-import ACEEditorRaw from 'react-ace';
+import Immutable
+    from 'immutable';
+import PropTypes
+    from 'prop-types';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
+import {withPageHelpers} from './page'
+import {
+    ParentErrorHandlerContext,
+    withAsyncErrorHandler,
+    withErrorHandling
+} from './error-handling';
+import {
+    TreeSelectMode,
+    TreeTable
+} from './tree';
+import {
+    Table,
+    TableSelectMode
+} from './table';
+import {
+    Button,
+    Icon
+} from "./bootstrap-components";
+import ACEEditorRaw
+    from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 
-import DayPicker from 'react-day-picker';
+import DayPicker
+    from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
-import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birthdayYear, getDateFormatString, getBirthdayFormatString } from '../../../shared/date';
+import {
+    birthdayYear,
+    DateFormat,
+    formatBirthday,
+    formatDate,
+    getBirthdayFormatString,
+    getDateFormatString,
+    parseBirthday,
+    parseDate
+} from '../../../shared/date';
 
-import styles from "./styles.scss";
-import moment from "moment";
+import styles
+    from "./styles.scss";
+import moment
+    from "moment";
 import {getUrl} from "./urls";
+import {
+    createComponentMixin,
+    withComponentMixins
+} from "./decorator-helpers";
 
 
 const FormState = {
@@ -34,25 +65,28 @@ const FormState = {
 
 const FormSendMethod = HTTPMethod;
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
+export const FormStateOwnerContext = React.createContext(null);
+
+const withFormStateOwner = createComponentMixin([{context: FormStateOwnerContext, propName: 'formStateOwner'}], [], (TargetClass, InnerClass) => {
+    InnerClass.prototype.getFormStateOwner = function() {
+        return this.props.formStateOwner;
+    }
+
+    return TargetClass;
+});
+
+
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers
+])
 class Form extends Component {
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
         onSubmitAsync: PropTypes.func,
         format: PropTypes.string,
         noStatus: PropTypes.bool
-    }
-
-    static childContextTypes = {
-        formStateOwner: PropTypes.object
-    }
-
-    getChildContext() {
-        return {
-            formStateOwner: this.props.stateOwner
-        };
     }
 
     @withAsyncErrorHandler
@@ -91,20 +125,25 @@ class Form extends Component {
         } else {
             return (
                 <form className={formClass} onSubmit={::this.onSubmit}>
-                    <fieldset disabled={owner.isFormDisabled()}>
-                        {props.children}
-                    </fieldset>
-                    {!props.noStatus && statusMessageText &&
-                    <AlignedRow htmlId="form-status-message">
-                        <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
-                    </AlignedRow>
-                    }
+                    <FormStateOwnerContext.Provider value={owner}>
+                        <fieldset disabled={owner.isFormDisabled()}>
+                            {props.children}
+                        </fieldset>
+                        {!props.noStatus && statusMessageText &&
+                        <AlignedRow htmlId="form-status-message">
+                            <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
+                        </AlignedRow>
+                        }
+                    </FormStateOwnerContext.Provider>
                 </form>
             );
         }
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class Fieldset extends Component {
     static propTypes = {
         id: PropTypes.string,
@@ -114,13 +153,9 @@ class Fieldset extends Component {
         className: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -230,6 +265,9 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class StaticField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -240,13 +278,9 @@ class StaticField extends Component {
         withValidation: PropTypes.bool
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -261,6 +295,9 @@ class StaticField extends Component {
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class InputField extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -275,13 +312,9 @@ class InputField extends Component {
         type: 'text'
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -298,6 +331,9 @@ class InputField extends Component {
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class CheckBox extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -307,13 +343,9 @@ class CheckBox extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -336,13 +368,9 @@ class CheckBoxGroup extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     onChange(key) {
         const id = this.props.id;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const existingSelection = owner.getFormValue(id);
 
         let newSelection;
@@ -357,7 +385,7 @@ class CheckBoxGroup extends Component {
     render() {
         const props = this.props;
 
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -388,6 +416,9 @@ class CheckBoxGroup extends Component {
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class RadioGroup extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -398,14 +429,10 @@ class RadioGroup extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
 
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -436,6 +463,9 @@ class RadioGroup extends Component {
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class TextArea extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -446,13 +476,9 @@ class TextArea extends Component {
         className: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = props.id;
         const htmlId = 'form_' + id;
         const className = props.className || ''
@@ -464,7 +490,10 @@ class TextArea extends Component {
 }
 
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation,
+    withFormStateOwner
+])
 class DatePicker extends Component {
     constructor(props) {
         super(props);
@@ -489,10 +518,6 @@ class DatePicker extends Component {
         dateFormat: DateFormat.INTL
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     toggleDayPicker() {
         this.setState({
             opened: !this.state.opened
@@ -500,7 +525,7 @@ class DatePicker extends Component {
     }
 
     daySelected(date) {
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const props = this.props;
 
@@ -517,7 +542,7 @@ class DatePicker extends Component {
 
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
         const t = props.t;
@@ -590,6 +615,9 @@ class DatePicker extends Component {
 }
 
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class Dropdown extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -600,14 +628,10 @@ class Dropdown extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
 
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
         const options = [];
@@ -639,6 +663,9 @@ class Dropdown extends Component {
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class AlignedRow extends Component {
     static propTypes = {
         className: PropTypes.string,
@@ -647,17 +674,13 @@ class AlignedRow extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object // AlignedRow may be used also outside forms to make a kind of fake read-only forms
-    }
-
     static defaultProps = {
         className: ''
     }
 
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
 
         return wrapInput(null, props.htmlId, owner, props.format, props.className, props.label, null, this.props.children);
     }
@@ -683,6 +706,9 @@ class ButtonRow extends Component {
 }
 
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class TreeTableSelect extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -693,18 +719,14 @@ class TreeTableSelect extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     async onSelectionChangedAsync(sel) {
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         owner.updateFormValue(this.props.id, sel);
     }
 
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -714,7 +736,10 @@ class TreeTableSelect extends Component {
     }
 }
 
-@withTranslation({delegateFuns: ['refresh']})
+@withComponentMixins([
+    withTranslation,
+    withFormStateOwner
+], ['refresh'])
 class TableSelect extends Component {
     constructor(props) {
         super(props);
@@ -751,10 +776,6 @@ class TableSelect extends Component {
         pageLength: 10
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     async onSelectionChangedAsync(sel, data) {
         if (this.props.selectMode === TableSelectMode.SINGLE && this.props.dropdown) {
             this.setState({
@@ -762,7 +783,7 @@ class TableSelect extends Component {
             });
         }
 
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         owner.updateFormValue(this.props.id, sel);
     }
 
@@ -796,7 +817,7 @@ class TableSelect extends Component {
 
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
         const t = props.t;
@@ -830,6 +851,9 @@ class TableSelect extends Component {
 }
 
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class ACEEditor extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -840,13 +864,9 @@ class ACEEditor extends Component {
         format: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -870,6 +890,9 @@ class ACEEditor extends Component {
 
 /* Excluded. It's not very useful and just eats a lot of space in the resulting JS.
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class CKEditor extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
@@ -878,13 +901,9 @@ class CKEditor extends Component {
         height: PropTypes.string
     }
 
-    static contextTypes = {
-        formStateOwner: PropTypes.object.isRequired
-    }
-
     render() {
         const props = this.props;
-        const owner = this.context.formStateOwner;
+        const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
@@ -901,9 +920,8 @@ class CKEditor extends Component {
 }
  */
 
-
-function withForm(target) {
-    const inst = target.prototype;
+const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
+    const proto = InnerClass.prototype;
 
     const cleanFormState = Immutable.Map({
         state: FormState.Loading,
@@ -1002,20 +1020,20 @@ function withForm(target) {
         }
     }
 
-    inst.initForm = function(settings) {
+    proto.initForm = function(settings) {
         const state = this.state || {};
         state.formState = cleanFormState;
         state.formSettings = settings || {};
         this.state = state;
     };
 
-    inst.resetFormState = function() {
+    proto.resetFormState = function() {
         this.setState({
             formState: cleanFormState
         });
     };
 
-    inst.getFormValuesFromEntity = function(entity, mutator) {
+    proto.getFormValuesFromEntity = function(entity, mutator) {
         const data = Object.assign({}, entity);
 
         data.originalHash = data.hash;
@@ -1028,7 +1046,7 @@ function withForm(target) {
         this.populateFormValues(data);
     };
 
-    inst.getFormValuesFromURL = async function(url, mutator) {
+    proto.getFormValuesFromURL = async function(url, mutator) {
         setTimeout(() => {
             this.setState(previousState => {
                 if (previousState.formState.get('state') === FormState.Loading) {
@@ -1057,7 +1075,7 @@ function withForm(target) {
         this.populateFormValues(data);
     };
 
-    inst.validateAndSendFormValuesToURL = async function(method, url, mutator) {
+    proto.validateAndSendFormValuesToURL = async function(method, url, mutator) {
         await this.waitForFormServerValidated();
 
         if (this.isFormWithoutErrors()) {
@@ -1081,7 +1099,7 @@ function withForm(target) {
     };
 
 
-    inst.populateFormValues = function(data) {
+    proto.populateFormValues = function(data) {
         this.setState(previousState => ({
             formState: previousState.formState.withMutations(mutState => {
                 mutState.set('state', FormState.Ready);
@@ -1099,17 +1117,17 @@ function withForm(target) {
         }));
     };
 
-    inst.waitForFormServerValidated = async function() {
+    proto.waitForFormServerValidated = async function() {
         if (!this.isFormServerValidated()) {
             await new Promise(resolve => { formValidateResolve = resolve; });
         }
     };
 
-    inst.scheduleFormRevalidate = function() {
+    proto.scheduleFormRevalidate = function() {
         scheduleValidateForm(this);
     };
 
-    inst.updateForm = function(mutator) {
+    proto.updateForm = function(mutator) {
         this.setState(previousState => {
             const onChangeBeforeValidationCallback = this.state.formSettings.onChangeBeforeValidation || {};
 
@@ -1152,7 +1170,7 @@ function withForm(target) {
         });
     };
 
-    inst.updateFormValue = function(key, value) {
+    proto.updateFormValue = function(key, value) {
         this.setState(previousState => {
             const oldValue = previousState.formState.getIn(['data', key, 'value']);
 
@@ -1193,35 +1211,35 @@ function withForm(target) {
         });
     };
 
-    inst.getFormValue = function(name) {
+    proto.getFormValue = function(name) {
         return this.state.formState.getIn(['data', name, 'value']);
     };
 
-    inst.getFormValues = function(name) {
+    proto.getFormValues = function(name) {
         return this.state.formState.get('data').map(attr => attr.get('value')).toJS();
     };
 
-    inst.getFormError = function(name) {
+    proto.getFormError = function(name) {
         return this.state.formState.getIn(['data', name, 'error']);
     };
 
-    inst.isFormWithLoadingNotice = function() {
+    proto.isFormWithLoadingNotice = function() {
         return this.state.formState.get('state') === FormState.LoadingWithNotice;
     };
 
-    inst.isFormLoading = function() {
+    proto.isFormLoading = function() {
         return this.state.formState.get('state') === FormState.Loading || this.state.formState.get('state') === FormState.LoadingWithNotice;
     };
 
-    inst.isFormReady = function() {
+    proto.isFormReady = function() {
         return this.state.formState.get('state') === FormState.Ready;
     };
 
-    inst.isFormValidationShown = function() {
+    proto.isFormValidationShown = function() {
         return this.state.formState.get('isValidationShown');
     };
 
-    inst.addFormValidationClass = function(className, name) {
+    proto.addFormValidationClass = function(className, name) {
         if (this.isFormValidationShown()) {
             const error = this.getFormError(name);
             if (error) {
@@ -1234,7 +1252,7 @@ function withForm(target) {
         }
     };
 
-    inst.getFormValidationMessage = function(name) {
+    proto.getFormValidationMessage = function(name) {
         if (this.isFormValidationShown()) {
             return this.getFormError(name);
         } else {
@@ -1242,31 +1260,31 @@ function withForm(target) {
         }
     };
 
-    inst.showFormValidation = function() {
+    proto.showFormValidation = function() {
         this.setState(previousState => ({formState: previousState.formState.set('isValidationShown', true)}));
     };
 
-    inst.hideFormValidation = function() {
+    proto.hideFormValidation = function() {
         this.setState(previousState => ({formState: previousState.formState.set('isValidationShown', false)}));
     };
 
-    inst.isFormWithoutErrors = function() {
+    proto.isFormWithoutErrors = function() {
         return !this.state.formState.get('data').find(attr => attr.get('error'));
     };
 
-    inst.isFormServerValidated = function() {
+    proto.isFormServerValidated = function() {
         return !this.state.formSettings.serverValidation || this.state.formSettings.serverValidation.changed.every(attr => this.state.formState.getIn(['data', attr, 'serverValidated']));
     };
 
-    inst.getFormStatusMessageText = function() {
+    proto.getFormStatusMessageText = function() {
         return this.state.formState.get('statusMessageText');
     };
 
-    inst.getFormStatusMessageSeverity = function() {
+    proto.getFormStatusMessageSeverity = function() {
         return this.state.formState.get('statusMessageSeverity');
     };
 
-    inst.setFormStatusMessage = function(severity, text) {
+    proto.setFormStatusMessage = function(severity, text) {
         this.setState(previousState => ({
             formState: previousState.formState.withMutations(map => {
                 map.set('statusMessageText', text);
@@ -1275,7 +1293,7 @@ function withForm(target) {
         }));
     };
 
-    inst.clearFormStatusMessage = function() {
+    proto.clearFormStatusMessage = function() {
         this.setState(previousState => ({
             formState: previousState.formState.withMutations(map => {
                 map.set('statusMessageText', '');
@@ -1283,19 +1301,19 @@ function withForm(target) {
         }));
     };
 
-    inst.enableForm = function() {
+    proto.enableForm = function() {
         this.setState(previousState => ({formState: previousState.formState.set('isDisabled', false)}));
     };
 
-    inst.disableForm = function() {
+    proto.disableForm = function() {
         this.setState(previousState => ({formState: previousState.formState.set('isDisabled', true)}));
     };
 
-    inst.isFormDisabled = function() {
+    proto.isFormDisabled = function() {
         return this.state.formState.get('isDisabled');
     };
 
-    inst.formHandleChangedError = async function(fn) {
+    proto.formHandleChangedError = async function(fn) {
         const t = this.props.t;
         try {
             await fn();
@@ -1337,8 +1355,8 @@ function withForm(target) {
         }
     };
 
-    return target;
-}
+    return TargetClass;
+});
 
 
 export {

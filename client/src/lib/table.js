@@ -1,22 +1,31 @@
 'use strict';
 
-import React, { Component } from 'react';
-import ReactDOMServer from 'react-dom/server';
-import PropTypes from 'prop-types';
-import { withTranslation } from './i18n';
+import React, {Component} from 'react';
+import ReactDOMServer
+    from 'react-dom/server';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from './i18n';
 
-import jQuery from 'jquery';
+import jQuery
+    from 'jquery';
 
 import 'datatables.net';
 import 'datatables.net-bs';
 import 'datatables.net-bs/css/dataTables.bootstrap.css';
 
-import axios from './axios';
+import axios
+    from './axios';
 
-import { withPageHelpers } from './page'
-import { withErrorHandling, withAsyncErrorHandler } from './error-handling';
-import styles from "./styles.scss";
+import {withPageHelpers} from './page'
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from './error-handling';
+import styles
+    from "./styles.scss";
 import {getUrl} from "./urls";
+import {withComponentMixins} from "./decorator-helpers";
 
 //dtFactory();
 //dtSelectFactory();
@@ -28,9 +37,11 @@ const TableSelectMode = {
     MULTI: 2
 };
 
-@withTranslation({delegateFuns: ['refresh']})
-@withPageHelpers
-@withErrorHandling
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers
+], ['refresh'])
 class Table extends Component {
     constructor(props) {
         super(props);

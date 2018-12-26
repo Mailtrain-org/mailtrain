@@ -29,9 +29,12 @@ import CKEditor
     from "react-ckeditor-component";
 
 import {initialHeight} from "./sandboxed-ckeditor-shared";
+import {withComponentMixins} from "./decorator-helpers";
 
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation
+])
 class CKEditorSandbox extends Component {
     constructor(props) {
         super(props);

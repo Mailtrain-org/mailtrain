@@ -1,23 +1,41 @@
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../lib/i18n';
-import { requiresAuthenticatedUser, withPageHelpers, Title } from '../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
+import React, {Component} from 'react';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../lib/i18n';
 import {
-    withForm, Form, FormSendMethod, TableSelect, ButtonRow, Button
+    requiresAuthenticatedUser,
+    Title,
+    withPageHelpers
+} from '../lib/page';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import {
+    Button,
+    ButtonRow,
+    Form,
+    FormSendMethod,
+    TableSelect,
+    withForm
 } from '../lib/form';
-import { Table } from '../lib/table';
-import axios from '../lib/axios';
-import mailtrainConfig from 'mailtrainConfig';
+import {Table} from '../lib/table';
+import axios
+    from '../lib/axios';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Share extends Component {
     constructor(props) {
         super(props);

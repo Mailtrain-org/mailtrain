@@ -2,16 +2,23 @@
 
 import React, { Component } from 'react';
 import { withTranslation } from '../lib/i18n';
-import { withPageHelpers, Title } from '../lib/page'
+import {
+    withPageHelpers,
+    Title,
+    requiresAuthenticatedUser
+} from '../lib/page'
 import {
     withForm, Form, FormSendMethod, InputField, ButtonRow, Button
 } from '../lib/form';
 import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers
+])
 export default class Forget extends Component {
     constructor(props) {
         super(props);

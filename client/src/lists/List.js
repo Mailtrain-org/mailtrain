@@ -1,11 +1,19 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../lib/i18n';
-import {requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, NavButton} from '../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import { Table } from '../lib/table';
-import axios from '../lib/axios';
+import React, {Component} from 'react';
+import {withTranslation} from '../lib/i18n';
+import {
+    NavButton,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from '../lib/page';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import {Table} from '../lib/table';
 import {Link} from "react-router-dom";
 import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
@@ -14,11 +22,16 @@ import {
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../lib/modals";
+import {withComponentMixins} from "../lib/decorator-helpers";
+import {withForm} from "../lib/form";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

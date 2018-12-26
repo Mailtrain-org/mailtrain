@@ -1,21 +1,27 @@
 'use strict';
 
-import React, { Component } from 'react';
-import axios, { HTTPMethod } from './axios';
-import { withTranslation } from './i18n';
-import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import axios, {HTTPMethod} from './axios';
+import {withTranslation} from './i18n';
+import PropTypes
+    from 'prop-types';
 import {
     Icon,
     ModalDialog
 } from "./bootstrap-components";
 import {getUrl} from "./urls";
 import {withPageHelpers} from "./page";
-import styles from './styles.scss';
-import interoperableErrors from '../../../shared/interoperable-errors';
+import styles
+    from './styles.scss';
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
 import {Link} from "react-router-dom";
+import {withComponentMixins} from "./decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
+@withComponentMixins([
+    withTranslation,
+    withPageHelpers
+])
 export class RestActionModalDialog extends Component {
     static propTypes = {
         title: PropTypes.string.isRequired,
@@ -127,8 +133,10 @@ function _getDependencyErrorMessage(err, t, name) {
 }
 
 
-@withTranslation()
-@withPageHelpers
+@withComponentMixins([
+    withTranslation,
+    withPageHelpers
+])
 export class DeleteModalDialog extends Component {
     constructor(props) {
         super(props);

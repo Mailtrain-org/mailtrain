@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -30,24 +31,32 @@ import {
     Icon,
     ModalDialog
 } from "../lib/bootstrap-components";
-import axios from "../lib/axios";
-import {getUrl, getPublicUrl} from "../lib/urls";
-import interoperableErrors from '../../../shared/interoperable-errors';
+import axios
+    from "../lib/axios";
 import {
-    CampaignSource,
+    getPublicUrl,
+    getUrl
+} from "../lib/urls";
+import interoperableErrors
+    from '../../../shared/interoperable-errors';
+import {
     CampaignStatus,
     CampaignType
 } from "../../../shared/campaigns";
-import moment from 'moment';
-import campaignsStyles from "./styles.scss";
-import {tableAddDeleteButton} from "../lib/modals";
+import moment
+    from 'moment';
+import campaignsStyles
+    from "./styles.scss";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 class TestUser extends Component {
     constructor(props) {
         super(props);
@@ -107,11 +116,13 @@ class TestUser extends Component {
     }
 }
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 class SendControls extends Component {
     constructor(props) {
         super(props);
@@ -361,10 +372,12 @@ class SendControls extends Component {
     }
 }
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Status extends Component {
     constructor(props) {
         super(props);

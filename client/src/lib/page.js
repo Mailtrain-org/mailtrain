@@ -1,17 +1,45 @@
 'use strict';
 
 import React, {Component} from "react";
-import { withTranslation } from './i18n';
-import PropTypes from "prop-types";
+import {withTranslation} from './i18n';
+import PropTypes
+    from "prop-types";
 import {withRouter} from "react-router";
-import {BrowserRouter as Router, Link, Redirect, Route, Switch} from "react-router-dom";
-import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
-import interoperableErrors from "../../../shared/interoperable-errors";
-import {Button, DismissibleAlert} from "./bootstrap-components";
-import mailtrainConfig from "mailtrainConfig";
-import styles from "./styles.scss";
-import {getRoutes, needsResolve, resolve, withPageHelpers} from "./page-common";
+import {
+    BrowserRouter as Router,
+    Link,
+    Redirect,
+    Route,
+    Switch
+} from "react-router-dom";
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from "./error-handling";
+import interoperableErrors
+    from "../../../shared/interoperable-errors";
+import {
+    Button,
+    DismissibleAlert
+} from "./bootstrap-components";
+import mailtrainConfig
+    from "mailtrainConfig";
+import styles
+    from "./styles.scss";
+import {
+    getRoutes,
+    needsResolve,
+    resolve,
+    SectionContentContext,
+    withPageHelpers
+} from "./page-common";
 import {getBaseDir} from "./urls";
+import {
+    createComponentMixin,
+    withComponentMixins
+} from "./decorator-helpers";
+
+export { withPageHelpers }
 
 class Breadcrumb extends Component {
     constructor(props) {
@@ -149,8 +177,10 @@ class SecondaryNavBar extends Component {
     }
 }
 
-@withTranslation()
-@withErrorHandling
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling
+])
 class RouteContent extends Component {
     constructor(props) {
         super(props);
@@ -276,8 +306,10 @@ class RouteContent extends Component {
 
 
 @withRouter
-@withErrorHandling
-class SectionContent extends Component {
+@withComponentMixins([
+    withErrorHandling
+])
+export class SectionContent extends Component {
     constructor(props) {
         super(props);
 
@@ -293,16 +325,6 @@ class SectionContent extends Component {
     static propTypes = {
         structure: PropTypes.object.isRequired,
         root: PropTypes.string.isRequired
-    }
-
-    static childContextTypes = {
-        sectionContent: PropTypes.object
-    }
-
-    getChildContext() {
-        return {
-            sectionContent: this
-        };
     }
 
     setFlashMessage(severity, text) {
@@ -367,13 +389,17 @@ class SectionContent extends Component {
         let routes = getRoutes('', {}, [], this.props.structure, [], null, null);
 
         return (
-            <Switch>{routes.map(x => this.renderRoute(x))}</Switch>
+            <SectionContentContext.Provider value={this}>
+                <Switch>{routes.map(x => this.renderRoute(x))}</Switch>
+            </SectionContentContext.Provider>
         );
     }
 }
 
-@withTranslation()
-class Section extends Component {
+@withComponentMixins([
+    withTranslation
+])
+export class Section extends Component {
     constructor(props) {
         super(props);
     }
@@ -398,7 +424,7 @@ class Section extends Component {
 }
 
 
-class Title extends Component {
+export class Title extends Component {
     render() {
         return (
             <div>
@@ -409,7 +435,7 @@ class Title extends Component {
     }
 }
 
-class Toolbar extends Component {
+export class Toolbar extends Component {
     static propTypes = {
         className: PropTypes.string,
     };
@@ -428,7 +454,7 @@ class Toolbar extends Component {
     }
 }
 
-class NavButton extends Component {
+export class NavButton extends Component {
     static propTypes = {
         label: PropTypes.string,
         icon: PropTypes.string,
@@ -445,7 +471,7 @@ class NavButton extends Component {
     }
 }
 
-class MenuLink extends Component {
+export class MenuLink extends Component {
     static propTypes = {
         to: PropTypes.string,
         className: PropTypes.string
@@ -460,33 +486,17 @@ class MenuLink extends Component {
     }
 }
 
-function requiresAuthenticatedUser(target) {
-    const comp1 = withPageHelpers(target);
-
-    function comp2(props, context) {
-        if (!new.target) {
-            throw new TypeError();
+export const requiresAuthenticatedUser = createComponentMixin([], [withPageHelpers], (TargetClass, InnerClass) => {
+    class RequiresAuthenticatedUser extends React.Component {
+        constructor(props) {
+            super(props);
+            props.sectionContent.ensureAuthenticated();
         }
 
-        context.sectionContent.ensureAuthenticated();
-        return Reflect.construct(comp1, [props, context], new.target);
+        render() {
+            return <TargetClass {...this.props}/>
+        }
     }
 
-    comp2.prototype = comp1.prototype;
-
-    for (const attr in comp1) {
-        comp2[attr] = comp1[attr];
-    }
-
-    return comp2;
-}
-
-export {
-    Section,
-    Title,
-    Toolbar,
-    NavButton,
-    MenuLink,
-    withPageHelpers,
-    requiresAuthenticatedUser
-};
+    return RequiresAuthenticatedUser;
+});

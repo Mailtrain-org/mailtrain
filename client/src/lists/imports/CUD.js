@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -32,15 +33,18 @@ import {
     ImportSource,
     inProgress,
     MappingType,
-    prepInProgress,
-    runInProgress
+    prepInProgress
 } from '../../../../shared/imports';
-import axios from "../../lib/axios";
+import axios
+    from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import listStyles from "../styles.scss";
-import styles from "../../lib/styles.scss";
+import listStyles
+    from "../styles.scss";
+import styles
+    from "../../lib/styles.scss";
 import interoperableErrors
     from "../../../../shared/interoperable-errors";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
 
 function truncate(str, len, ending = '...') {
@@ -54,11 +58,13 @@ function truncate(str, len, ending = '...') {
 }
 
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { withTranslation } from './i18n';
+import {withTranslation} from './i18n';
 import PropTypes
     from "prop-types";
 import styles
@@ -11,10 +11,14 @@ import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 
-import { initialHeight } from "./sandboxed-ckeditor-shared";
+import {initialHeight} from "./sandboxed-ckeditor-shared";
+import {withComponentMixins} from "./decorator-helpers";
+
 const navbarHeight = 34; // Sync this with navbarheight in sandboxed-ckeditor.scss
 
-@withTranslation({delegateFuns: ['exportState']})
+@withComponentMixins([
+    withTranslation
+], ['exportState'])
 export class CKEditorHost extends Component {
     constructor(props) {
         super(props);

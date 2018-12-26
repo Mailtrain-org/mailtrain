@@ -18,5 +18,6 @@ function installUploadHandler(router, url, replacementBehavior, type, subType, t
 }
 
 module.exports = {
-    installUploadHandler
+    installUploadHandler,
+    uploadedFilesDir
 };

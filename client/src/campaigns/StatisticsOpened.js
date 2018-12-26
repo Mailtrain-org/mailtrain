@@ -17,24 +17,24 @@ import axios
     from "../lib/axios";
 import {getUrl} from "../lib/urls";
 
-import Chart from 'react-google-charts';
-import {AlignedRow} from "../lib/form";
-import {
-    ActionLink,
-    Icon
-} from "../lib/bootstrap-components";
-import {SubscriptionStatus} from "../../../shared/lists";
+import Chart
+    from 'react-google-charts';
 
-import styles from "./styles.scss";
+import styles
+    from "./styles.scss";
 import {Table} from "../lib/table";
 import {Link} from "react-router-dom";
 
-import mailtrainConfig from "mailtrainConfig";
+import mailtrainConfig
+    from "mailtrainConfig";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class StatisticsOpened extends Component {
     constructor(props) {
         super(props);

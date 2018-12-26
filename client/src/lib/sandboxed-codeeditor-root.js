@@ -35,10 +35,13 @@ import mjml2html
     from "mjml4-in-browser";
 import juice
     from "juice";
+import {withComponentMixins} from "./decorator-helpers";
 
 const refreshTimeout = 1000;
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation
+])
 class CodeEditorSandbox extends Component {
     constructor(props) {
         super(props);

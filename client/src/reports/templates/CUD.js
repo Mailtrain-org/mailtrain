@@ -1,11 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {
-    Trans
-} from 'react-i18next';
-import { withTranslation } from '../../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {Trans} from 'react-i18next';
+import {withTranslation} from '../../lib/i18n';
 import {
     NavButton,
     requiresAuthenticatedUser,
@@ -29,16 +28,20 @@ import {
     validateNamespace
 } from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
-import mailtrainConfig from 'mailtrainConfig';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/handlebars';
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

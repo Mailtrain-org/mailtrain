@@ -11,7 +11,8 @@ const fs = require('fs-extra-promise');
 const path = require('path');
 const importer = require('../lib/importer');
 
-const filesDir = path.join(__dirname, '..', 'files', 'imports');
+const files = require('./files');
+const filesDir = path.join(files.filesDir, 'imports');
 
 const allowedKeysCreate = new Set(['name', 'description', 'source', 'settings']);
 const allowedKeysUpdate = new Set(['name', 'description', 'mapping_type', 'mapping']);

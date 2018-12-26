@@ -1,25 +1,41 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../../lib/i18n';
-import {DropdownMenu, Icon} from '../../lib/bootstrap-components';
-import { requiresAuthenticatedUser, withPageHelpers, Title, Toolbar, MenuLink } from '../../lib/page';
-import { withErrorHandling, withAsyncErrorHandler } from '../../lib/error-handling';
-import { Table } from '../../lib/table';
-import axios from '../../lib/axios';
-import moment from 'moment';
-import mailtrainConfig from 'mailtrainConfig';
+import React, {Component} from 'react';
+import {withTranslation} from '../../lib/i18n';
+import {
+    DropdownMenu,
+    Icon
+} from '../../lib/bootstrap-components';
+import {
+    MenuLink,
+    requiresAuthenticatedUser,
+    Title,
+    Toolbar,
+    withPageHelpers
+} from '../../lib/page';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../../lib/error-handling';
+import {Table} from '../../lib/table';
+import moment
+    from 'moment';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {checkPermissions} from "../../lib/permissions";
 import {
     tableAddDeleteButton,
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../../lib/modals";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);
@@ -87,10 +103,10 @@ export default class List extends Component {
                 {this.state.createPermitted &&
                     <Toolbar>
                         <DropdownMenu className="btn-primary" label={t('createReportTemplate')}>
-                            <MenuLink to="/reports/templates/create">{t('blank')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts">{t('openCounts')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('aggregratedOpenCounts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create">{t('Blank')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts">{t('Open counts')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('Open counts as CSV')}</MenuLink>
+                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('Aggregated open counts')}</MenuLink>
                         </DropdownMenu>
                     </Toolbar>
                 }

@@ -25,7 +25,7 @@ function enforceTypePermitted(type, subType) {
 }
 
 function getFilePath(type, subType, entityId, filename) {
-    return path.join(path.join(filesDir, type, subType, entityId.toString()), filename);
+    return path.join(filesDir, type, subType, entityId.toString(), filename);
 }
 
 function getFileUrl(context, type, subType, entityId, filename) {

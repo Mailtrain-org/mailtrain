@@ -16,7 +16,6 @@ import {
     AlignedRow,
     Button,
     ButtonRow,
-    CheckBox,
     Dropdown,
     Fieldset,
     Form,
@@ -48,13 +47,15 @@ import formsStyles
     from "./styles.scss";
 import axios
     from "../../lib/axios";
-import {UntrustedContentHost} from "../../lib/untrusted";
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class CUD extends Component {
     constructor(props) {
         super(props);

@@ -1,13 +1,15 @@
 'use strict';
 
-import React from "react";
-import PropTypes from "prop-types";
+import React
+    from "react";
 import {withRouter} from "react-router";
 import {withErrorHandling} from "./error-handling";
-import axios from "../lib/axios";
+import axios
+    from "../lib/axios";
 import {getUrl} from "./urls";
+import {createComponentMixin} from "./decorator-helpers";
 
-function needsResolve(route, nextRoute, match, nextMatch) {
+export function needsResolve(route, nextRoute, match, nextMatch) {
     const resolve = route.resolve;
     const nextResolve = nextRoute.resolve;
 
@@ -25,7 +27,7 @@ function needsResolve(route, nextRoute, match, nextMatch) {
     return false;
 }
 
-async function resolve(route, match) {
+export async function resolve(route, match) {
     const keys = Object.keys(route.resolve);
 
     const promises = keys.map(key => {
@@ -46,7 +48,7 @@ async function resolve(route, match) {
     return resolved;
 }
 
-function getRoutes(urlPrefix, resolve, parents, structure, navs, primaryMenuComponent, secondaryMenuComponent) {
+export function getRoutes(urlPrefix, resolve, parents, structure, navs, primaryMenuComponent, secondaryMenuComponent) {
     let routes = [];
     for (let routeKey in structure) {
         const entry = structure[routeKey];
@@ -119,39 +121,23 @@ function getRoutes(urlPrefix, resolve, parents, structure, navs, primaryMenuComp
     return routes;
 }
 
-function withPageHelpers(target) {
-    target = withErrorHandling(target);
-
-    const inst = target.prototype;
-
-    const contextTypes = target.contextTypes || {};
-
-    contextTypes.sectionContent = PropTypes.object.isRequired;
-
-    target.contextTypes = contextTypes;
-
-    inst.setFlashMessage = function(severity, text) {
-        return this.context.sectionContent.setFlashMessage(severity, text);
+export const SectionContentContext = React.createContext(null);
+export const withPageHelpers = createComponentMixin([{context: SectionContentContext, propName: 'sectionContent'}], [withErrorHandling], (TargetClass, InnerClass) => {
+    InnerClass.prototype.setFlashMessage = function(severity, text) {
+        return this.props.sectionContent.setFlashMessage(severity, text);
     };
 
-    inst.navigateTo = function(path) {
-        return this.context.sectionContent.navigateTo(path);
+    InnerClass.prototype.navigateTo = function(path) {
+        return this.props.sectionContent.navigateTo(path);
     }
 
-    inst.navigateBack = function() {
-        return this.context.sectionContent.navigateBack();
+    InnerClass.prototype.navigateBack = function() {
+        return this.props.sectionContent.navigateBack();
     }
 
-    inst.navigateToWithFlashMessage = function(path, severity, text) {
-        return this.context.sectionContent.navigateToWithFlashMessage(path, severity, text);
+    InnerClass.prototype.navigateToWithFlashMessage = function(path, severity, text) {
+        return this.props.sectionContent.navigateToWithFlashMessage(path, severity, text);
     }
 
-    return target;
-}
-
-export {
-    needsResolve,
-    resolve,
-    getRoutes,
-    withPageHelpers
-};
+    return TargetClass;
+});

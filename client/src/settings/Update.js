@@ -1,11 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {
-    Trans
-} from 'react-i18next';
-import { withTranslation } from '../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {Trans} from 'react-i18next';
+import {withTranslation} from '../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -22,12 +21,15 @@ import {
     withForm
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Update extends Component {
     constructor(props) {
         super(props);

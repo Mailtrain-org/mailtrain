@@ -9,12 +9,11 @@ import LanguageDetector
 import mailtrainConfig
     from 'mailtrainConfig';
 
-import hoistStatics
-    from 'hoist-non-react-statics';
-
 import {convertToFake, getLang} from '../../../shared/langs';
+import {createComponentMixin} from "./decorator-helpers";
 
 import lang_en_US_common from "../../../locales/en-US/common";
+import {withPageHelpers} from "./page-common";
 
 const resourcesCommon = {
     'en-US': lang_en_US_common,
@@ -42,8 +41,7 @@ i18n
         },
 
         react: {
-            wait: true,
-            defaultTransParent: 'span' // This is because we use React < v16 FIXME
+            wait: true
         },
 
         detection: {
@@ -64,34 +62,9 @@ i18n
 export default i18n;
 
 
-export function withTranslation(opts) {
-    if (opts && opts.delegateFuns) {
-        return function (WrappedComponent) {
-            class Wrapper extends Component {
-                constructor(props) {
-                    super(props);
-
-                    this.WrappedComponentWithNamespaces = withNamespaces(null, {innerRef: ref => this.wrappedComponent = ref})(WrappedComponent);
-                }
-
-                render() {
-                    const WrappedComponentWithNamespaces = this.WrappedComponentWithNamespaces;
-                    return <WrappedComponentWithNamespaces {...this.props}/>;
-                }
-            }
-
-            for (const fun of opts.delegateFuns) {
-                Wrapper.prototype[fun] = function (...args) {
-                    return this.wrappedComponent[fun](...args);
-                }
-            }
-
-            return hoistStatics(Wrapper, WrappedComponent);
-        }
-    } else {
-        return withNamespaces();
-    }
-}
+export const withTranslation = createComponentMixin([], [], (TargetClass, InnerClass) => {
+    return withNamespaces()(TargetClass)
+});
 
 export function tMark(key) {
     return key;

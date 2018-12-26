@@ -447,376 +447,178 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 export function getEditForm(owner, typeKey, prefix = '') {
     const t = owner.props.t;
 
-    return <div>
-        <AlignedRow>
-            <Button
-                className="btn-default"
-                onClickAsync={::owner.toggleMergeTagReference}
-                label={t('mergeTagReference')}/>
-            {owner.state.showMergeTagReference &&
-            <div
-                style={{marginTop: '15px'}}>
-                <Trans
-                    i18nKey="mergeTagsAreTagsThatAreReplacedBefore">
-                    <p>Merge
-                        tags
-                        are
-                        tags
-                        that
-                        are
-                        replaced
-                        before
-                        sending
-                        out
-                        the
-                        message.
-                        The
-                        format
-                        of
-                        the
-                        merge
-                        tag
-                        is
-                        the
-                        following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is
-                        an
-                        optional
-                        text
-                        value
-                        used
-                        when <code>TAG_NAME</code> is
-                        empty.
-                    </p>
-                </Trans>
-                <Trans
-                    i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
-                    <p>You
-                        can
-                        use
-                        any
-                        of
-                        the
-                        standard
-                        merge
-                        tags
-                        below.
-                        In
-                        addition
-                        to
-                        that
-                        every
-                        custom
-                        field
-                        has
-                        its
-                        own
-                        merge
-                        tag.
-                        Check
-                        the
-                        fields
-                        of
-                        the
-                        list
-                        you
-                        are
-                        going
-                        to
-                        send
-                        to.</p>
-                </Trans>
-                <table
-                    className="table table-bordered table-condensed table-striped">
-                    <thead>
-                    <tr>
-                        <th>
-                            <Trans
-                                i18nKey="mergeTag-1">Merge
-                                tag</Trans>
-                        </th>
-                        <th>
-                            <Trans
-                                i18nKey="description">Description</Trans>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <th scope="row">
-                            [LINK_UNSUBSCRIBE]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="urlThatPointsToTheUnsubscribePage">URL
-                                that
-                                points
-                                to
-                                the
-                                unsubscribe
-                                page</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [LINK_PREFERENCES]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="urlThatPointsToThePreferencesPageOfThe">URL
-                                that
-                                points
-                                to
-                                the
-                                preferences
-                                page
-                                of
-                                the
-                                subscriber</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [LINK_BROWSER]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="urlToPreviewTheMessageInABrowser">URL
-                                to
-                                preview
-                                the
-                                message
-                                in
-                                a
-                                browser</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [EMAIL]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="emailAddress-1">Email
-                                address</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [TO_NAME]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="recipientNameAsItAppearsInEmailsToHeader">Recipient
-                                name
-                                as
-                                it
-                                appears
-                                in
-                                email's
-                                'To'
-                                header</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [SUBSCRIPTION_ID]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="uniqueIdThatIdentifiesTheRecipient">Unique
-                                ID
-                                that
-                                identifies
-                                the
-                                recipient</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [LIST_ID]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="uniqueIdThatIdentifiesTheListUsedForThis">Unique
-                                ID
-                                that
-                                identifies
-                                the
-                                list
-                                used
-                                for
-                                this
-                                campaign</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [CAMPAIGN_ID]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="uniqueIdThatIdentifiesCurrentCampaign">Unique
-                                ID
-                                that
-                                identifies
-                                current
-                                campaign</Trans>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <Trans
-                    i18nKey="forRssCampaignsTheFollowingFurtherTags">
-                    <p>For
-                        RSS
-                        campaigns,
-                        the
-                        following
-                        further
-                        tags
-                        can
-                        be
-                        used.</p>
-                </Trans>
-                <table
-                    className="table table-bordered table-condensed table-striped">
-                    <thead>
-                    <tr>
-                        <th>
-                            <Trans
-                                i18nKey="mergeTag-1">Merge
-                                tag</Trans>
-                        </th>
-                        <th>
-                            <Trans
-                                i18nKey="description">Description</Trans>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <th scope="row">
-                            [RSS_ENTRY_TITLE]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="rssEntryTitle">RSS
-                                entry
-                                title</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [RSS_ENTRY_DATE]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="rssEntryDate">RSS
-                                entry
-                                date</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [RSS_ENTRY_LINK]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="rssEntryLink">RSS
-                                entry
-                                link</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [RSS_ENTRY_CONTENT]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="contentOfAnRssEntry">Content
-                                of
-                                an
-                                RSS
-                                entry</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [RSS_ENTRY_SUMMARY]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="rssEntrySummary">RSS
-                                entry
-                                summary</Trans>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            [RSS_ENTRY_IMAGE_URL]
-                        </th>
-                        <td>
-                            <Trans
-                                i18nKey="rssEntryImageUrl">RSS
-                                entry
-                                image
-                                URL</Trans>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>}
-        </AlignedRow>
+    return (
+        <div>
+            <AlignedRow>
+                <Button
+                    className="btn-default"
+                    onClickAsync={::owner.toggleMergeTagReference}
+                    label={t('mergeTagReference')}/>
+                {owner.state.showMergeTagReference &&
+                <div style={{marginTop: '15px'}}>
+                    <Trans i18nKey="mergeTagsAreTagsThatAreReplacedBefore">
+                        <p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p>
+                    </Trans>
+                    <Trans i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
+                        <p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p>
+                    </Trans>
+                    <table className="table table-bordered table-condensed table-striped">
+                        <thead>
+                        <tr>
+                            <th>
+                                <Trans i18nKey="mergeTag-1">Merge tag</Trans>
+                            </th>
+                            <th>
+                                <Trans i18nKey="description">Description</Trans>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">
+                                [LINK_UNSUBSCRIBE]
+                            </th>
+                            <td>
+                                <Trans i18nKey="urlThatPointsToTheUnsubscribePage">URL that points to the unsubscribe page</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [LINK_PREFERENCES]
+                            </th>
+                            <td>
+                                <Trans i18nKey="urlThatPointsToThePreferencesPageOfThe">URL that points to the preferences page of the subscriber</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [LINK_BROWSER]
+                            </th>
+                            <td>
+                                <Trans i18nKey="urlToPreviewTheMessageInABrowser">URL to preview the message in a browser</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [EMAIL]
+                            </th>
+                            <td>
+                                <Trans i18nKey="emailAddress-1">Email address</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [TO_NAME]
+                            </th>
+                            <td>
+                                <Trans i18nKey="recipientNameAsItAppearsInEmailsToHeader">Recipient name as it appears in email's 'To' header</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [SUBSCRIPTION_ID]
+                            </th>
+                            <td>
+                                <Trans i18nKey="uniqueIdThatIdentifiesTheRecipient">Unique ID that identifies the recipient</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [LIST_ID]
+                            </th>
+                            <td>
+                                <Trans i18nKey="uniqueIdThatIdentifiesTheListUsedForThis">Unique ID that identifies the list used for this campaign</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [CAMPAIGN_ID]
+                            </th>
+                            <td>
+                                <Trans i18nKey="uniqueIdThatIdentifiesCurrentCampaign">Unique ID that identifies current campaign</Trans>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <Trans i18nKey="forRssCampaignsTheFollowingFurtherTags">
+                        <p>For RSS campaigns, the following further tags can be used.</p>
+                    </Trans>
+                    <table className="table table-bordered table-condensed table-striped">
+                        <thead>
+                        <tr>
+                            <th>
+                                <Trans i18nKey="mergeTag-1">Merge tag</Trans>
+                            </th>
+                            <th>
+                                <Trans i18nKey="description">Description</Trans>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">
+                                [RSS_ENTRY_TITLE]
+                            </th>
+                            <td>
+                                <Trans i18nKey="rssEntryTitle">RSS entry title</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [RSS_ENTRY_DATE]
+                            </th>
+                            <td>
+                                <Trans i18nKey="rssEntryDate">RSS entry date</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [RSS_ENTRY_LINK]
+                            </th>
+                            <td>
+                                <Trans i18nKey="rssEntryLink">RSS entry link</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [RSS_ENTRY_CONTENT]
+                            </th>
+                            <td>
+                                <Trans i18nKey="contentOfAnRssEntry">Content of an RSS entry</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [RSS_ENTRY_SUMMARY]
+                            </th>
+                            <td>
+                                <Trans i18nKey="rssEntrySummary">RSS entry summary</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                [RSS_ENTRY_IMAGE_URL]
+                            </th>
+                            <td>
+                                <Trans i18nKey="rssEntryImageUrl">RSS entry image URL</Trans>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>}
+            </AlignedRow>
 
-        {owner.templateTypes[typeKey].getHTMLEditor(owner)}
+            {owner.templateTypes[typeKey].getHTMLEditor(owner)}
 
-        <ACEEditor
-            id={prefix + 'text'}
-            height="400px"
-            mode="text"
-            label={t('templateContentPlainText')}
-            help={
-                <Trans
-                    i18nKey="toExtractTheTextFromHtmlClickHerePlease">To
-                    extract
-                    the
-                    text
-                    from
-                    HTML
-                    click <ActionLink
-                        onClickAsync={::owner.extractPlainText}>here</ActionLink>.
-                    Please
-                    note
-                    that
-                    your
-                    existing
-                    plaintext
-                    in
-                    the
-                    field
-                    above
-                    will
-                    be
-                    overwritten.
-                    This
-                    feature
-                    uses
-                    the <a
-                        href="http://premailer.dialect.ca/api">Premailer
-                        API</a>,
-                    a
-                    third
-                    party
-                    service.
-                    Their
-                    Terms
-                    of
-                    Service
-                    and
-                    Privacy
-                    Policy
-                    apply.</Trans>}/>
-    </div>;
+            <ACEEditor
+                id={prefix + 'text'}
+                height="400px"
+                mode="text"
+                label={t('templateContentPlainText')}
+                help={<Trans i18nKey="toExtractTheTextFromHtmlClickHerePlease">To extract the text from HTML click <ActionLink     onClickAsync={::owner.extractPlainText}>here</ActionLink>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <a     href="http://premailer.dialect.ca/api">Premailer     API</a>, a third party service. Their Terms of Service and Privacy Policy apply.</Trans>}
+            />
+        </div>
+    );
 }
 
 export function getTypeForm(owner, typeKey, isEdit) {

@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -12,17 +13,21 @@ import {withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import {getTriggerTypes} from '../campaigns/triggers/helpers';
 import {Icon} from "../lib/bootstrap-components";
-import mailtrainConfig from 'mailtrainConfig';
+import mailtrainConfig
+    from 'mailtrainConfig';
 import {
     tableAddDeleteButton,
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../lib/modals";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

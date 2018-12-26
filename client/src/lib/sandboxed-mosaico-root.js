@@ -22,9 +22,12 @@ import {
     base,
     unbase
 } from "../../../shared/templates";
+import {withComponentMixins} from "./decorator-helpers";
 
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation
+])
 class MosaicoSandbox extends Component {
     constructor(props) {
         super(props);

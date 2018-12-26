@@ -1,25 +1,38 @@
 'use strict';
 
 import React, {Component} from "react";
-import PropTypes from "prop-types";
-import { withTranslation } from './i18n';
+import PropTypes
+    from "prop-types";
+import {withTranslation} from './i18n';
 import {
     requiresAuthenticatedUser,
-    Title
+    Title,
+    withPageHelpers
 } from "./page";
 import {withErrorHandling} from "./error-handling";
 import {Table} from "./table";
-import Dropzone from "react-dropzone";
-import {Icon, ModalDialog} from "./bootstrap-components";
-import axios from './axios';
-import styles from "./styles.scss";
-import {withPageHelpers} from "./page";
-import {getUrl, getPublicUrl} from "./urls";
+import Dropzone
+    from "react-dropzone";
+import {
+    Icon,
+    ModalDialog
+} from "./bootstrap-components";
+import axios
+    from './axios';
+import styles
+    from "./styles.scss";
+import {
+    getPublicUrl,
+    getUrl
+} from "./urls";
+import {withComponentMixins} from "./decorator-helpers";
 
-@withTranslation()
-@withErrorHandling
-@withPageHelpers
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Files extends Component {
     constructor(props) {
         super(props);

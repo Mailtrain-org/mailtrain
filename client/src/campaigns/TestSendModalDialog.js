@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { withTranslation } from '../lib/i18n';
+import {withTranslation} from '../lib/i18n';
 import PropTypes
     from 'prop-types';
 import {ModalDialog} from "../lib/bootstrap-components";
@@ -16,16 +16,19 @@ import {
 } from "../lib/form";
 import {withErrorHandling} from "../lib/error-handling";
 import {getMailerTypes} from "../send-configurations/helpers";
-import axios from '../lib/axios';
-import {} from '../lib/urls';
-import {getUrl} from "../lib/urls";
+import axios
+    from '../lib/axios';
+import {getUrl} from '../lib/urls';
+import {withComponentMixins} from "../lib/decorator-helpers";
 
 
-@withTranslation()
-@withForm
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export class TestSendModalDialog extends Component {
     constructor(props) {
         super(props);

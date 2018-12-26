@@ -47,6 +47,7 @@ import axios
     from './lib/axios';
 import {getUrl} from "./lib/urls";
 import {getLang} from "../../shared/langs";
+import {withComponentMixins} from "./lib/decorator-helpers";
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
@@ -55,7 +56,9 @@ if (mailtrainConfig.reportsEnabled) {
 }
 
 
-@withTranslation()
+@withComponentMixins([
+    withTranslation
+])
 class Root extends Component {
     constructor(props) {
         super(props);

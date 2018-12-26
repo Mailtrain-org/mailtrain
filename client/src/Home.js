@@ -1,11 +1,14 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { withTranslation } from './lib/i18n';
-import { requiresAuthenticatedUser } from './lib/page';
+import {withTranslation} from './lib/i18n';
+import {requiresAuthenticatedUser} from './lib/page';
+import {withComponentMixins} from "./lib/decorator-helpers";
 
-@withTranslation()
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

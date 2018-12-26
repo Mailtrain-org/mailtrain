@@ -1,8 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { withTranslation } from '../../lib/i18n';
+import PropTypes
+    from 'prop-types';
+import {withTranslation} from '../../lib/i18n';
 import {
     requiresAuthenticatedUser,
     Title,
@@ -10,8 +11,7 @@ import {
 } from '../../lib/page';
 import {
     AlignedRow,
-    ButtonRow,
-    Fieldset
+    ButtonRow
 } from '../../lib/form';
 import {
     withAsyncErrorHandler,
@@ -21,7 +21,6 @@ import {getImportLabels} from './helpers';
 import {
     prepFinishedAndNotInProgress,
     runInProgress,
-    RunStatus,
     runStatusInProgress
 } from '../../../../shared/imports';
 import {Table} from "../../lib/table";
@@ -29,15 +28,21 @@ import {
     Button,
     Icon
 } from "../../lib/bootstrap-components";
-import axios from "../../lib/axios";
+import axios
+    from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import moment from "moment";
-import interoperableErrors from '../../../../shared/interoperable-errors';
+import moment
+    from "moment";
+import interoperableErrors
+    from '../../../../shared/interoperable-errors';
+import {withComponentMixins} from "../../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Status extends Component {
     constructor(props) {
         super(props);

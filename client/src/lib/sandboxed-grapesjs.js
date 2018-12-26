@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { withTranslation } from './i18n';
+import {withTranslation} from './i18n';
 import PropTypes
     from "prop-types";
 import styles
@@ -10,8 +10,11 @@ import styles
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
+import {withComponentMixins} from "./decorator-helpers";
 
-@withTranslation({delegateFuns: ['exportState']})
+@withComponentMixins([
+    withTranslation
+], ['exportState'])
 export class GrapesJSHost extends Component {
     constructor(props) {
         super(props);

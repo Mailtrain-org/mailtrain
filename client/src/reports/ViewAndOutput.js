@@ -1,27 +1,33 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../lib/i18n';
+import React, {Component} from 'react';
+import {withTranslation} from '../lib/i18n';
 import {
     requiresAuthenticatedUser,
-    withPageHelpers,
     Title,
     Toolbar,
-    NavButton
+    withPageHelpers
 } from '../lib/page'
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
-import axios from '../lib/axios';
-import { ReportState } from '../../../shared/reports';
+import {
+    withAsyncErrorHandler,
+    withErrorHandling
+} from '../lib/error-handling';
+import axios
+    from '../lib/axios';
+import {ReportState} from '../../../shared/reports';
 import {getUrl} from "../lib/urls";
 import {Button} from "../lib/bootstrap-components";
 import {Link} from "react-router-dom";
 import PropTypes
     from "prop-types";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class ViewAndOutput extends Component {
     constructor(props) {
         super(props);

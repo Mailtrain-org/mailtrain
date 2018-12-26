@@ -22,11 +22,14 @@ import {Icon} from "../lib/bootstrap-components";
 import styles
     from "./styles.scss";
 import {Link} from "react-router-dom";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class Statistics extends Component {
     constructor(props) {
         super(props);

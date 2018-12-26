@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
-import { withTranslation } from '../lib/i18n';
+import {withTranslation} from '../lib/i18n';
 import {
     DropdownMenu,
     Icon
@@ -18,7 +18,8 @@ import {
     withErrorHandling
 } from '../lib/error-handling';
 import {Table} from '../lib/table';
-import moment from 'moment';
+import moment
+    from 'moment';
 import {
     CampaignSource,
     CampaignStatus,
@@ -31,11 +32,14 @@ import {
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../lib/modals";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class List extends Component {
     constructor(props) {
         super(props);

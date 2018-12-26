@@ -11,11 +11,14 @@ import {
 } from '../lib/page';
 import {withErrorHandling} from '../lib/error-handling';
 import {Table} from "../lib/table";
+import {withComponentMixins} from "../lib/decorator-helpers";
 
-@withTranslation()
-@withPageHelpers
-@withErrorHandling
-@requiresAuthenticatedUser
+@withComponentMixins([
+    withTranslation,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
 export default class StatisticsLinkClicks extends Component {
     constructor(props) {
         super(props);
