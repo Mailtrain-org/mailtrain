@@ -108,14 +108,14 @@ export default class List extends Component {
 
                     if (perms.includes('viewSegments')) {
                         actions.push({
-                            label: <Icon icon="tag" title={t('segments')}/>,
+                            label: <Icon icon="tags" title={t('segments')}/>,
                             link: `/lists/${data[0]}/segments`
                         });
                     }
 
                     if (perms.includes('viewImports')) {
                         actions.push({
-                            label: <Icon icon="sort" title={t('imports')}/>,
+                            label: <Icon icon="file-import" title={t('imports')}/>,
                             link: `/lists/${data[0]}/imports`
                         });
                     }
@@ -129,7 +129,7 @@ export default class List extends Component {
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('share')}/>,
+                            label: <Icon icon="share" title={t('share')}/>,
                             link: `/lists/${data[0]}/share`
                         });
                     }

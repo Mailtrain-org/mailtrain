@@ -354,14 +354,14 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
                     {isEdit ?
                         <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
-                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('saveAndLeave')}/>
+                            <FormButton type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
+                            <FormButton type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')}/>
 
                             <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
                         </ButtonRow>
                     :
                         <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                            <FormButton type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                            <FormButton type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         </ButtonRow>
                     }
 

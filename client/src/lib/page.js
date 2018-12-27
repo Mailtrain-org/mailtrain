@@ -20,7 +20,8 @@ import interoperableErrors
     from "../../../shared/interoperable-errors";
 import {
     Button,
-    DismissibleAlert
+    DismissibleAlert,
+    Icon
 } from "./bootstrap-components";
 import mailtrainConfig
     from "mailtrainConfig";
@@ -62,7 +63,7 @@ class Breadcrumb extends Component {
         }
 
         if (isActive) {
-            return <li key={entry.path} className="active">{title}</li>;
+            return <li key={entry.path} className="breadcrumb-item active">{title}</li>;
 
         } else if (entry.externalLink) {
             let externalLink;
@@ -72,7 +73,7 @@ class Breadcrumb extends Component {
                 externalLink = entry.externalLink;
             }
 
-            return <li key={entry.path}><a href={externalLink}>{title}</a></li>;
+            return <li key={entry.path} className="breadcrumb-item"><a href={externalLink}>{title}</a></li>;
 
         } else if (entry.link) {
             let link;
@@ -81,10 +82,10 @@ class Breadcrumb extends Component {
             } else {
                 link = entry.link;
             }
-            return <li key={entry.path}><Link to={link}>{title}</Link></li>;
+            return <li key={entry.path} className="breadcrumb-item"><Link to={link}>{title}</Link></li>;
 
         } else {
-            return <li key={entry.path}>{title}</li>;
+            return <li key={entry.path} className="breadcrumb-item">{title}</li>;
         }
     }
 
@@ -93,10 +94,11 @@ class Breadcrumb extends Component {
 
         const renderedElems = [...route.parents.map(x => this.renderElement(x)), this.renderElement(route, true)];
 
-        return <ol className="breadcrumb">{renderedElems}</ol>;
+        return <nav aria-label="breadcrumb"><ol className="breadcrumb">{renderedElems}</ol></nav>;
     }
 }
 
+//TODO
 class SecondaryNavBar extends Component {
     static propTypes = {
         route: PropTypes.object.isRequired,
@@ -441,7 +443,7 @@ export class Toolbar extends Component {
     };
 
     render() {
-        let className = 'pull-right ' + styles.buttonRow;
+        let className = 'float-right ' + styles.buttonRow;
         if (this.props.className) {
             className += ' ' + this.props.className;
         }
@@ -471,6 +473,7 @@ export class NavButton extends Component {
     }
 }
 
+// TODO
 export class MenuLink extends Component {
     static propTypes = {
         to: PropTypes.string,
@@ -480,11 +483,77 @@ export class MenuLink extends Component {
     render() {
         const props = this.props;
 
+        const clsName = "nav-item" + (props.className ? " " + props.className : "")
         return (
-            <li className={props.className}><Link to={props.to}>{props.children}</Link></li>
+            <li className={clsName}><Link to={props.to} className="nav-link">{props.children}</Link></li>
         );
     }
 }
+
+export class NavLink extends Component {
+    static propTypes = {
+        to: PropTypes.string,
+        className: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        const clsName = "nav-item" + (props.className ? " " + props.className : "")
+        return (
+            <li className={clsName}><Link to={props.to} className="nav-link">{props.children}</Link></li>
+        );
+    }
+}
+
+export class NavDropdown extends Component {
+    static propTypes = {
+        label: PropTypes.string,
+        icon: PropTypes.string,
+        className: PropTypes.string,
+        menuClassName: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        const className = 'nav-item dropdown' + (props.className ? ' ' + props.className : '');
+        const menuClassName = 'dropdown-menu' + (props.menuClassName ? ' ' + props.menuClassName : '');
+
+        return (
+            <li className={className}>
+                {props.icon ?
+                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <Icon icon={props.icon}/>{' '}{props.label}
+                    </a>
+                    :
+                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {props.label}
+                    </a>
+                }
+                <ul className={menuClassName}>
+                    {props.children}
+                </ul>
+            </li>
+        );
+    }
+}
+
+export class NavDropdownLink extends Component {
+    static propTypes = {
+        to: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        return (
+            <Link to={props.to} className="dropdown-item">{props.children}</Link>
+        );
+    }
+}
+
+
 
 export const requiresAuthenticatedUser = createComponentMixin([], [withPageHelpers], (TargetClass, InnerClass) => {
     class RequiresAuthenticatedUser extends React.Component {

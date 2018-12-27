@@ -228,7 +228,7 @@ export function tableAddDeleteButton(actions, owner, perms, deleteUrl, name, del
             });
         } else {
             actions.push({
-                label: <Icon icon="remove" title={t('delete')}/>,
+                label: <Icon icon="trash-alt" title={t('delete')}/>,
                 action: () => {
                     owner.tableRestActionDialogData = {
                         shown: true,

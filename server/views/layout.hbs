@@ -14,12 +14,19 @@
         {{#if title}} | {{title}}{{/if}}
     </title>
 
-    <link rel="stylesheet" href="/static/bootstrap/themes/united.min.css">
-    <link rel="stylesheet" href="/static/css/footer.css">
-    <link rel="stylesheet" href="/static/css/mailtrain.css">
-    <script src="/static/jquery-2.2.1.min.js"></script>
-    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{{publicPath}}mailtrain/mailtrain.css">
 
+    <script src="{{publicPath}}static/jquery-3.3.1.min.js"></script>
+
+    <script src="{{publicPath}}static-npm/popper.min.js"></script>
+    <script src="{{publicPath}}static-npm/bootstrap.min.js"></script>
+    <script src="{{publicPath}}static-npm/coreui.min.js"></script>
+
+    <script>
+        if (!window.location.href.startsWith('{{publicPath}}')) {
+            console.warn('Warning: Misconfigured urlBases. If the website does not work, check the settings of www.trustedUrlBase, www.sandboxUrlBase and www.publicUrlBase in server config file.');
+        }
+    </script>
 
     {{#if mailtrainConfig}}
     <script>
@@ -33,7 +40,7 @@
     {{/if}}
 </head>
 
-<body class="{{bodyClass}}">
+<body class="mailtrain {{bodyClass}}">
     {{{body}}}
 
     {{> tracking_scripts}}

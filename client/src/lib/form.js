@@ -109,7 +109,7 @@ class Form extends Component {
         const statusMessageText = owner.getFormStatusMessageText();
         const statusMessageSeverity = owner.getFormStatusMessageSeverity();
 
-        let formClass = `form-horizontal ${styles.form} `;
+        let formClass = styles.form;
         if (props.format === 'wide') {
             formClass = '';
         } else if (props.format === 'inline') {
@@ -166,14 +166,14 @@ class Fieldset extends Component {
 
         let helpBlock = null;
         if (this.props.help) {
-            helpBlock = <div className="help-block" id={htmlId + '_help'}>{this.props.help}</div>;
+            helpBlock = <small className="form-text text-muted" id={htmlId + '_help'}>{this.props.help}</small>;
         }
 
         let validationBlock = null;
         if (id) {
             const validationMsg = id && owner.getFormValidationMessage(id);
             if (validationMsg) {
-                validationBlock = <div className="help-block" id={htmlId + '_help_validation'}>{validationMsg}</div>;
+                validationBlock = <small className="form-text text-muted" id={htmlId + '_help_validation'}>{validationMsg}</small>;
             }
         }
 
@@ -194,29 +194,22 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
     // wrapInput may be used also outside forms to make a kind of fake read-only forms
     let className;
     if (owner) {
-        if (id) {
-            className = owner.addFormValidationClass('form-group', id);
-        } else {
-            className = 'form-group';
-        }
+        className = 'form-group row';
     } else {
         className = 'row ' + styles.staticFormGroup;
     }
 
     let colLeft = '';
     let colRight = '';
-    let offsetRight = '';
 
     switch (format) {
         case 'wide':
             colLeft = '';
             colRight = '';
-            offsetRight = '';
             break;
         default:
-            colLeft = 'col-sm-2';
+            colLeft = 'col-sm-2 col-form-label';
             colRight = 'col-sm-10';
-            offsetRight = 'col-sm-offset-2';
             break;
     }
 
@@ -225,20 +218,22 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
 
     let helpBlock = null;
     if (help) {
-        helpBlock = <div className={`help-block ${colRight} ${offsetRight}`} id={htmlId + '_help'}>{help}</div>;
+        helpBlock = <small className={`form-text text-muted`} id={htmlId + '_help'}>{help}</small>;
     }
 
     let validationBlock = null;
     if (id) {
         const validationMsg = id && owner.getFormValidationMessage(id);
         if (validationMsg) {
-            validationBlock = <div className={`help-block ${colRight} ${offsetRight}`} id={htmlId + '_help_validation'}>{validationMsg}</div>;
+            validationBlock = <div className="invalid-feedback" id={htmlId + '_help_validation'}>{validationMsg}</div>;
         }
     }
 
     let labelBlock = null;
     if (label) {
-        labelBlock = <label htmlFor={htmlId} className="control-label">{label}</label>;
+        labelBlock = <label className={colLeft}>{label}</label>;
+    } else {
+        labelBlock = <div className={colLeft}/>
     }
 
     if (format === 'inline') {
@@ -252,14 +247,12 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
     } else {
         return (
             <div className={className} >
-                <div className={colLeft}>
-                    {labelBlock}
-                </div>
+                {labelBlock}
                 <div className={`${colRight} ${rightContainerClass}`}>
                     {input}
+                    {helpBlock}
+                    {validationBlock}
                 </div>
-                {helpBlock}
-                {validationBlock}
             </div>
         );
     }
@@ -325,8 +318,10 @@ class InputField extends Component {
             type = 'hidden';
         }
 
+        const className = owner.addFormValidationClass('form-control', id);
+
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+            <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );
     }
 }
@@ -349,11 +344,13 @@ class CheckBox extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        return wrapInput(id, htmlId, owner, props.format, 'checkbox', props.label, props.help,
-            <label>
-                <input type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
-                {props.text}
-            </label>
+        const className = owner.addFormValidationClass('form-check-input', id);
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div className="form-group form-check my-2">
+                <input className={className} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+                <label className="form-check-label" htmlFor={htmlId}>{props.text}</label>
+            </div>
         );
     }
 }
@@ -393,12 +390,13 @@ class CheckBoxGroup extends Component {
 
         const options = [];
         for (const option of props.options) {
-            options.push(
-                <div key={option.key} className="checkbox">
-                    <label>
-                        <input type="checkbox" checked={selection.includes(option.key)} onChange={evt => this.onChange(option.key)}/>
-                        {option.label}
-                    </label>
+            const optClassName = owner.addFormValidationClass('form-check-input', id);
+            const optId = htmlId + '_' + option.key;
+
+            let number = options.push(
+                <div key={option.key} className="form-group form-check my-2">
+                    <input id={optId} type="checkbox" className={optClassName} checked={selection.includes(option.key)} onChange={evt => this.onChange(option.key)}/>
+                    <label className="form-check-label" htmlFor={optId}>{option.label}</label>
                 </div>
             );
         }
@@ -440,12 +438,13 @@ class RadioGroup extends Component {
 
         const options = [];
         for (const option of props.options) {
-            options.push(
-                <div key={option.key} className="radio">
-                    <label>
-                        <input type="radio" name={htmlId} checked={value === option.key} onChange={evt => owner.updateFormValue(id, option.key)}/>
-                        {option.label}
-                    </label>
+            const optClassName = owner.addFormValidationClass('form-check-input', id);
+            const optId = htmlId + '_' + option.key;
+
+            let number = options.push(
+                <div key={option.key} className="form-group form-check my-2">
+                    <input id={optId} type="radio" className={optClassName} name={htmlId} checked={value === option.key} onChange={evt => owner.updateFormValue(id, option.key)}/>
+                    <label className="form-check-label" htmlFor={optId}>{option.label}</label>
                 </div>
             );
         }
@@ -481,10 +480,10 @@ class TextArea extends Component {
         const owner = this.getFormStateOwner();
         const id = props.id;
         const htmlId = 'form_' + id;
-        const className = props.className || ''
+        const className = owner.addFormValidationClass('form-control ' + (props.className || '') , id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <textarea id={htmlId} placeholder={props.placeholder} value={owner.getFormValue(id) || ''} className={`form-control ${className}`} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
+            <textarea id={htmlId} placeholder={props.placeholder} value={owner.getFormValue(id) || ''} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}></textarea>
         );
     }
 }
@@ -518,7 +517,7 @@ class DatePicker extends Component {
         dateFormat: DateFormat.INTL
     }
 
-    toggleDayPicker() {
+    async toggleDayPicker() {
         this.setState({
             opened: !this.state.opened
         });
@@ -591,11 +590,15 @@ class DatePicker extends Component {
             placeholder = getDateFormatString(props.dateFormat);
         }
 
+        const className = owner.addFormValidationClass('form-control', id);
+
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <div>
                 <div className="input-group">
-                    <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className="form-control" aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
-                    <span className="input-group-addon" onClick={::this.toggleDayPicker}><Icon icon="calendar" title={t('openCalendar')}/></span>
+                    <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+                    <div className="input-group-append">
+                        <Button iconTitle={t('openCalendar')} className="btn-secondary" icon="calendar-alt" onClickAsync={::this.toggleDayPicker}/>
+                    </div>
                 </div>
                 {this.state.opened &&
                 <div className={styles.dayPickerWrapper}>
@@ -650,10 +653,7 @@ class Dropdown extends Component {
             }
         }
 
-        let className = 'form-control';
-        if (props.className) {
-            className += ' ' + props.className;
-        }
+        const className = owner.addFormValidationClass('form-control ' + (props.className || '') , id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <select id={htmlId} className={className} aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
@@ -730,8 +730,10 @@ class TreeTableSelect extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
+        const className = owner.addFormValidationClass('' , id);
+
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <TreeTable data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+            <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
         );
     }
 }
@@ -823,14 +825,16 @@ class TableSelect extends Component {
         const t = props.t;
 
         if (props.dropdown) {
+            const className = owner.addFormValidationClass('form-control' , id);
+
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div className={(props.disabled ? '' : 'input-group ') + styles.tableSelectDropdown}>
-                        <input type="text" className="form-control" value={this.state.selectedLabel} onClick={::this.toggleOpen} readOnly={!props.disabled} disabled={props.disabled}/>
+                        <input type="text" className={className} value={this.state.selectedLabel} onClick={::this.toggleOpen} readOnly={!props.disabled} disabled={props.disabled}/>
                         {!props.disabled &&
-                        <span className="input-group-btn">
-                            <Button label={t('select')} className="btn-default" onClickAsync={::this.toggleOpen}/>
-                        </span>
+                        <div className="input-group-append">
+                            <Button label={t('select')} className="btn-secondary" onClickAsync={::this.toggleOpen}/>
+                        </div>
                         }
                     </div>
                     <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
@@ -1243,9 +1247,9 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         if (this.isFormValidationShown()) {
             const error = this.getFormError(name);
             if (error) {
-                return className + ' has-error';
+                return className + ' is-invalid';
             } else {
-                return className + ' has-success';
+                return className + ' is-valid';
             }
         } else {
             return className;

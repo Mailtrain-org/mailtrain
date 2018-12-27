@@ -235,7 +235,7 @@ export default class CUD extends Component {
                     <CheckBox id="enabled" text={t('enabled')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/campaigns/${this.props.campaign.id}/triggers/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

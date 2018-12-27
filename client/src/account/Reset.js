@@ -161,7 +161,7 @@ export default class Account extends Component {
                         <InputField id="password2" label={t('confirmPassword')} type="password"/>
 
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('resetPassword')}/>
+                            <Button type="submit" className="btn-primary" icon="check" label={t('resetPassword')}/>
                         </ButtonRow>
                     </Form>
                 </div>

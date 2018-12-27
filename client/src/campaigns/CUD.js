@@ -507,21 +507,21 @@ export default class CUD extends Component {
                     <div className={campaignsStyles.entryButtons}>
                         {lsts.length > 1 &&
                         <Button
-                            className="btn-default"
+                            className="btn-secondary"
                             icon="remove"
                             title={t('remove')}
                             onClickAsync={() => this.onRemoveListEntry(lstUid)}
                         />
                         }
                         <Button
-                            className="btn-default"
+                            className="btn-secondary"
                             icon="plus"
                             title={t('insertNewEntryBeforeThisOne')}
                             onClickAsync={() => this.onAddListEntry(lstOrderIdxClosure)}
                         />
                         {lstOrderIdx > 0 &&
                         <Button
-                            className="btn-default"
+                            className="btn-secondary"
                             icon="chevron-up"
                             title={t('moveUp')}
                             onClickAsync={() => this.onListEntryMoveUp(lstOrderIdxClosure)}
@@ -529,7 +529,7 @@ export default class CUD extends Component {
                         }
                         {lstOrderIdx < lsts.length - 1 &&
                         <Button
-                            className="btn-default"
+                            className="btn-secondary"
                             icon="chevron-down"
                             title={t('moveDown')}
                             onClickAsync={() => this.onListEntryMoveDown(lstOrderIdxClosure)}
@@ -559,7 +559,7 @@ export default class CUD extends Component {
                 {lstsEditEntries}
                 <div key="newEntry" className={campaignsStyles.newEntry}>
                     <Button
-                        className="btn-default"
+                        className="btn-secondary"
                         icon="plus"
                         label={t('addList')}
                         onClickAsync={() => this.onAddListEntry(lsts.length)}
@@ -737,7 +737,7 @@ export default class CUD extends Component {
                     {templateEdit}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={saveButtonLabel}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={saveButtonLabel}/>
                         {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/campaigns/${this.props.entity.id}/delete`}/> }
                     </ButtonRow>
                 </Form>

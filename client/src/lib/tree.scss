@@ -1,3 +1,7 @@
+@import "../../static/scss/variables.scss";
+
+:global {
+
 .mt-treetable-container .fancytree-container {
     border: none;
 }
@@ -56,8 +60,11 @@
 
 
 .form-group .mt-treetable-container {
-    border: 1px solid #cccccc;
-    border-radius: 4px;
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+    padding-top: $input-padding-y;
+    padding-bottom: $input-padding-y;
+
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
     -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
@@ -65,15 +72,21 @@
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
-.form-group.has-success .mt-treetable-container {
-    border-color: #468847;
+.form-group .mt-treetable-container.is-valid {
+    border-color: $form-feedback-valid-color;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
 }
 
-.form-group.has-error .mt-treetable-container {
-    border-color: #b94a48;
+.form-group .mt-treetable-container.is-invalid {
+    border-color: $form-feedback-invalid-color;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
 }
 
+.mt-treetable-container .table td {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+}

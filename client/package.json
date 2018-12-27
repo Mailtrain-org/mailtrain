@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack --watch"
+    "watch-js": "webpack --watch",
+    "css": "npm-run-all --sequential css-compile css-minify",
+    "css-compile": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 static/scss/mailtrain.scss dist/mailtrain.css",
+    "css-minify": "cleancss --level 1 --source-map --source-map-inline-sources --output dist/mailtrain.min.css dist/mailtrain.css",
+    "watch-css": "nodemon --watch static/scss -e scss -x \"npm run css\"",
+    "watch": "npm-run-all --parallel watch-css watch-js"
   },
   "repository": {
     "type": "git",
@@ -14,9 +19,13 @@
   "license": "GPL-3.0",
   "homepage": "https://mailtrain.org/",
   "dependencies": {
+    "@coreui/coreui": "^2.1.4",
+    "@fortawesome/fontawesome-free": "^5.6.3",
+    "@material-ui/core": "^3.7.1",
+    "@material-ui/icons": "^3.0.1",
     "axios": "^0.18.0",
     "datatables.net": "^1.10.19",
-    "datatables.net-bs": "^1.10.19",
+    "datatables.net-bs4": "^1.10.19",
     "grapesjs": "^0.14.49",
     "grapesjs-mjml": "0.0.27",
     "grapesjs-preset-newsletter": "^0.2.20",
@@ -54,9 +63,12 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.4",
+    "clean-css-cli": "^4.2.1",
     "css-loader": "^1.0.1",
     "file-loader": "^2.0.0",
-    "node-sass": "^4.10.0",
+    "node-sass": "^4.11.0",
+    "nodemon": "^1.18.9",
+    "npm-run-all": "^4.1.5",
     "postcss-loader": "^3.0.0",
     "raw-loader": "^0.5.1",
     "sass-loader": "^7.1.0",

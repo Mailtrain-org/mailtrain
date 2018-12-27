@@ -451,7 +451,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
         <div>
             <AlignedRow>
                 <Button
-                    className="btn-default"
+                    className="btn-secondary"
                     onClickAsync={::owner.toggleMergeTagReference}
                     label={t('mergeTagReference')}/>
                 {owner.state.showMergeTagReference &&

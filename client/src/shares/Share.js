@@ -168,7 +168,7 @@ export default class Share extends Component {
                     <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={`rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('share')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('share')}/>
                     </ButtonRow>
                 </Form>
 

@@ -228,7 +228,7 @@ export default class CustomContent extends Component {
                     {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         <Button className="btn-danger" icon="send" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>

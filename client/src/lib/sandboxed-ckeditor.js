@@ -96,7 +96,7 @@ export class CKEditorHost extends Component {
                 <div className={styles.navbar}>
                     {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                     <div className={styles.title}>{this.props.title}</div>
-                    <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="fullscreen"/></a>
+                    <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="window-maximize"/></a>
                     <a className={styles.btn} onClick={this.props.onTestSend}><Icon icon="send"/></a>
                     {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave}><Icon icon="floppy-disk"/></a> : <span className={styles.btnDisabled}><Icon icon="floppy-disk"/></span>}
                 </div>

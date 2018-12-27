@@ -76,7 +76,7 @@ export default class Forget extends Component {
                     <InputField id="usernameOrEmail" label={t('usernameOrEmail')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('sendEmail')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('sendEmail')}/>
                     </ButtonRow>
                 </Form>
             </div>

@@ -121,7 +121,7 @@ export default class Login extends Component {
                     <CheckBox id="remember" text={t('rememberMe')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('signIn')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('signIn')}/>
                         {passwordResetLink}
                     </ButtonRow>
                 </Form>

@@ -10,11 +10,11 @@ import {
 } from './error-handling';
 import {withComponentMixins} from "./decorator-helpers";
 
-
 @withComponentMixins([
     withTranslation,
     withErrorHandling
 ])
+
 class DismissibleAlert extends Component {
     static propTypes = {
         severity: PropTypes.string.isRequired,
@@ -49,24 +49,31 @@ class Icon extends Component {
     }
 
     static defaultProps = {
-        family: 'glyphicon'
+        family: 'fas'
     }
 
     render() {
         const props = this.props;
 
-        return <span className={`${props.family} ${props.family}-${props.icon}` + (props.className ? ' ' + props.className : '')} title={props.title}></span>;
+        if (props.family === 'fas' || props.family === 'far') {
+            return <i className={`${props.family} fa-${props.icon} ${props.className || ''}`} title={props.title}></i>;
+        } else {
+            console.error(`Icon font family ${props.family} not supported. (icon: ${props.icon}, title: ${props.title})`)
+            return null;
+        }
     }
 }
 
 @withComponentMixins([
     withErrorHandling
 ])
+
 class Button extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
         label: PropTypes.string,
         icon: PropTypes.string,
+        iconTitle: PropTypes.string,
         className: PropTypes.string,
         type: PropTypes.string
     }
@@ -91,7 +98,7 @@ class Button extends Component {
 
         let icon;
         if (props.icon) {
-            icon = <Icon icon={props.icon}/>
+            icon = <Icon icon={props.icon} title={props.iconTitle}/>
         }
 
         let iconSpacer;
@@ -105,6 +112,7 @@ class Button extends Component {
     }
 }
 
+//TODO
 class DropdownMenu extends Component {
     static propTypes = {
         label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
@@ -141,6 +149,7 @@ class DropdownMenu extends Component {
     }
 }
 
+//TODO
 class DropdownMenuItem extends Component {
     static propTypes = {
         label: PropTypes.string,
@@ -151,7 +160,7 @@ class DropdownMenuItem extends Component {
     render() {
         const props = this.props;
 
-        let className = 'dropdown';
+        let className = 'nav-item dropdown';
         if (props.className) {
             className = className + ' ' + props.className;
         }
@@ -159,12 +168,12 @@ class DropdownMenuItem extends Component {
         return (
             <li className={className}>
                 {props.icon ?
-                    <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <Icon icon={props.icon}/>{' '}{props.label}{' '}<span className="caret"></span>
+                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <Icon icon={props.icon}/>{' '}{props.label}
                     </a>
                     :
-                    <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        {props.label}{' '}<span className="caret"></span>
+                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {props.label}
                     </a>
                 }
                 <ul className="dropdown-menu">
@@ -208,6 +217,7 @@ class ActionLink extends Component {
     withTranslation,
     withErrorHandling
 ])
+//TODO
 class ModalDialog extends Component {
     constructor(props) {
         super(props);
@@ -215,7 +225,7 @@ class ModalDialog extends Component {
         const t = props.t;
 
         this.state = {
-            buttons: this.props.buttons || [ { label: t('close'), className: 'btn-default', onClickAsync: null } ]
+            buttons: this.props.buttons || [ { label: t('close'), className: 'btn-secondary', onClickAsync: null } ]
         };
     }
 

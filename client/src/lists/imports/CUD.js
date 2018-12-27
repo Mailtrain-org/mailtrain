@@ -413,10 +413,10 @@ export default class CUD extends Component {
 
         const saveButtons = []
         if (!isEdit) {
-            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="ok" label={t('saveAndEditSettings')}/>);
+            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="check" label={t('saveAndEditSettings')}/>);
         } else {
-            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="ok" label={t('save')}/>);
-            saveButtons.push(<Button key="saveAndRun" className="btn-primary" icon="ok" label={t('saveAndRun')} onClickAsync={async () => await this.save(true)}/>);
+            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="check" label={t('save')}/>);
+            saveButtons.push(<Button key="saveAndRun" className="btn-primary" icon="check" label={t('saveAndRun')} onClickAsync={async () => await this.save(true)}/>);
         }
 
         return (

@@ -131,7 +131,7 @@ export default class List extends Component {
                     <InputField id="email" label={t('email')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('addToBlacklist')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('addToBlacklist')}/>
                     </ButtonRow>
                 </Form>
 

@@ -29,7 +29,7 @@ $editorNormalHeight: 800px !default;
 }
 
 .navbar {
-  background: #DE4320;
+  background: #f86c6b;
   width: 100%;
   height: $navbarHeight;
 }
@@ -44,8 +44,6 @@ $editorNormalHeight: 800px !default;
 .title {
   padding: 5px 0 5px 10px;
   font-size: 18px;
-  font-family: sans-serif;
-  font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
   font-weight: bold;
   float: left;
   color: white;
@@ -58,20 +56,29 @@ $editorNormalHeight: 800px !default;
   padding: 0px 15px;
   line-height: $navbarHeight;
   text-align: center;
-  color: white;
   font-size: 14px;
   font-weight: bold;
   font-family: sans-serif;
   cursor: pointer;
+
+  &, &:not([href]):not([tabindex]) { // This is to override reboot.scss in bootstrap
+    color: white;
+  }
 }
 
 .btn:hover {
-  background-color: #b1381e;
-  color: white;
+  background-color: #c05454;
   text-decoration: none;
+
+  &, &:not([href]):not([tabindex]) { // This is to override reboot.scss in bootstrap
+    color: white;
+  }
 }
 
 .btnDisabled {
-  color: #581c00;
   cursor: default;
+
+  &, &:not([href]):not([tabindex]) { // This is to override reboot.scss in bootstrap
+    color: #621d1d;
+  }
 }

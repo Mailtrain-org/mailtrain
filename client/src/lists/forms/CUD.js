@@ -506,8 +506,8 @@ export default class CUD extends Component {
                                     <div className={formsStyles.navbar}>
                                         {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
                                         <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
-                                        <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})}><Icon icon="remove"/></a>
-                                        <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})}><Icon icon="fullscreen"/></a>
+                                        <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})}><Icon icon="window-close"/></a>
+                                        <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})}><Icon icon="window-maximize"/></a>
                                     </div>
                                     <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
                                 </div>
@@ -524,7 +524,7 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="ok" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

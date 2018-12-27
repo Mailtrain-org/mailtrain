@@ -236,6 +236,11 @@ function createApp(appType) {
     useWith404Fallback('/mailtrain', express.static(path.join(__dirname, '..', 'client', 'dist')));
     useWith404Fallback('/locales', express.static(path.join(__dirname, '..', 'client', 'locales')));
 
+    useWith404Fallback('/static-npm/fontawesome', express.static(path.join(__dirname, '..', 'client', 'node_modules', '@fortawesome', 'fontawesome-free', 'webfonts')));
+    useWith404Fallback('/static-npm/popper.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', 'popper.js', 'dist', 'umd', 'popper.min.js')));
+    useWith404Fallback('/static-npm/bootstrap.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.min.js')));
+    useWith404Fallback('/static-npm/coreui.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', '@coreui', 'coreui', 'dist', 'js', 'coreui.min.js')));
+
 
     // Make sure flash messages are available
     // Currently, flash messages are used only from routes/subscription.js

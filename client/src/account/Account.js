@@ -207,7 +207,7 @@ export default class Account extends Component {
                         </Fieldset>
 
                         <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="ok" label={t('update')}/>
+                            <Button type="submit" className="btn-primary" icon="check" label={t('update')}/>
                         </ButtonRow>
                     </Form>
                 </div>

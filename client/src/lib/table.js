@@ -11,8 +11,8 @@ import jQuery
     from 'jquery';
 
 import 'datatables.net';
-import 'datatables.net-bs';
-import 'datatables.net-bs/css/dataTables.bootstrap.css';
+import 'datatables.net-bs4';
+import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
 
 import axios
     from './axios';

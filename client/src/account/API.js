@@ -17,6 +17,7 @@ import axios
 import {Button} from '../lib/bootstrap-components';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import styles from "./styles.scss"
 
 @withComponentMixins([
     withTranslation,
@@ -66,33 +67,44 @@ export default class API extends Component {
         }
 
         return (
-            <div>
+            <div className={styles.api}>
                 <Title>{t('api')}</Title>
 
-
-                <div className="panel panel-default">
-                    <div className="panel-body">
-                        <div className="pull-right">
-                            <Button label={this.state.accessToken ? t('resetAccessToken') : t('generateAccessToken')} icon="retweet" className="btn-info" onClickAsync={::this.resetAccessToken} />
+                <div className="card mb-3">
+                    <div className="card-body">
+                        <div className="float-right">
+                            <Button label={this.state.accessToken ? t('resetAccessToken') : t('generateAccessToken')} icon="redo" className="btn-info" onClickAsync={::this.resetAccessToken} />
                         </div>
                         {accessTokenMsg}
                     </div>
                 </div>
 
-                <div className="well">
-                    <h3>{t('notesAboutTheApi')}</h3>
+                <div className="card mb-3">
+                    <div className="card-body">
+                        <h4 className="card-title">{t('notesAboutTheApi')}</h4>
 
-                    <ul>
-                        <li>
-                            <Trans i18nKey="apiResponseIsAJsonStructureWithErrorAnd">API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.</Trans>
-                        </li>
-                        <li>
-                            <Trans i18nKey="youNeedToDefineProperContentTypeWhen">You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code> is not supported.</Trans>
-                        </li>
-                    </ul>
+                        <ul className="card-text">
+                            <li>
+                                <Trans i18nKey="apiResponseIsAJsonStructureWithErrorAnd">API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.</Trans>
+                            </li>
+                            <li>
+                                <Trans i18nKey="youNeedToDefineProperContentTypeWhen">You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code> is not supported.</Trans>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
-                <h3>POST /api/subscribe/:listId – {t('addSubscription')}</h3>
+                <div className="card mb-3">
+                    <div className="card-header">
+                        <b>POST /api/subscribe/:listId – {t('addSubscription')}</b>
+                    </div>
+                    <div className="card-body">
+                        <p className="card-text">
+                            {t('thisApiCallEitherInsertsANewSubscription')}
+                        </p>
+                    </div>
+                </div>
+                <h4>POST /api/subscribe/:listId – {t('addSubscription')}</h4>
 
                 <p>
                     {t('thisApiCallEitherInsertsANewSubscription')}
@@ -137,7 +149,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/subscribe/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
-                <h3>POST /api/unsubscribe/:listId – {t('removeSubscription')}</h3>
+                <h4>POST /api/unsubscribe/:listId – {t('removeSubscription')}</h4>
 
                 <p>
                     {t('thisApiCallMarksASubscriptionAs')}
@@ -164,7 +176,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/unsubscribe/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com'</pre>
 
-                <h3>POST /api/delete/:listId – {t('deleteSubscription')}</h3>
+                <h4>POST /api/delete/:listId – {t('deleteSubscription')}</h4>
 
                 <p>
                     {t('thisApiCallDeletesASubscription')}
@@ -191,7 +203,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/delete/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com'</pre>
 
-                <h3>POST /api/field/:listId – {t('addNewCustomField')}</h3>
+                <h4>POST /api/field/:listId – {t('addNewCustomField')}</h4>
 
                 <p>
                     {t('thisApiCallCreatesANewCustomFieldForA')}
@@ -239,7 +251,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/field/B16uVTdW?access_token=${accessToken}`)}' \
 --data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>
 
-                <h3>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h3>
+                <h4>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h4>
 
                 <p>
                     {t('thisApiCallGetListOfBlacklistedEmails')}
@@ -264,7 +276,7 @@ export default class API extends Component {
 
                 <pre>curl -XGET '{getUrl(`api/blacklist/get?access_token=${accessToken}&limit=10&start=10&search=gmail`)}' </pre>
 
-                <h3>POST /api/blacklist/add – {t('addEmailToBlacklist')}</h3>
+                <h4>POST /api/blacklist/add – {t('addEmailToBlacklist')}</h4>
 
                 <p>
                     {t('thisApiCallEitherAddEmailsToBlacklist')}
@@ -291,7 +303,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token={accessToken}`)}' \
 --data 'EMAIL=test@example.com&amp;'</pre>
 
-                <h3>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h3>
+                <h4>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h4>
 
                 <p>
                     {t('thisApiCallEitherDeleteEmailsFrom')}
@@ -318,7 +330,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/blacklist/delete?access_token=${accessToken}`)}' \
 --data 'EMAIL=test@example.com&amp;'</pre>
 
-                <h3>GET /api/lists/:email – {t('getTheListsAUserHasSubscribedTo')}</h3>
+                <h4>GET /api/lists/:email – {t('getTheListsAUserHasSubscribedTo')}</h4>
 
                 <p>
                     {t('retrieveTheListsThatTheUserWithEmailHas')}

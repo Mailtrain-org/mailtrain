@@ -22,7 +22,8 @@ function getRouter(appType) {
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
                     getTrustedUrl('mailtrain/root.js')
-                ]
+                ],
+                publicPath: getTrustedUrl()
             });
         });
     }

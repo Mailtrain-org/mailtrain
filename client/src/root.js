@@ -29,7 +29,9 @@ import settings
     from './settings/root';
 
 import {
-    MenuLink,
+    NavDropdown,
+    NavDropdownLink,
+    NavLink,
     Section
 } from "./lib/page";
 
@@ -39,7 +41,6 @@ import Home
     from "./Home";
 import {
     ActionLink,
-    DropdownMenuItem,
     Icon
 } from "./lib/bootstrap-components";
 import {Link} from "react-router-dom";
@@ -88,7 +89,7 @@ class Root extends Component {
                     const label = langDesc.getLabel(t);
 
                     languageOptions.push(
-                        <li key={lng}><ActionLink onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</ActionLink></li>
+                        <ActionLink key={lng} className="dropdown-item" onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</ActionLink>
                     )
                 }
 
@@ -105,63 +106,55 @@ class Root extends Component {
                     const link = entry.link || entry.externalLink;
 
                     if (link && path.startsWith(link)) {
-                        topLevelMenu.push(<MenuLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></MenuLink>);
+                        topLevelMenu.push(<NavLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
                     } else {
-                        topLevelMenu.push(<MenuLink key={entryKey} to={link}>{entry.title}</MenuLink>);
+                        topLevelMenu.push(<NavLink key={entryKey} to={link}>{entry.title}</NavLink>);
                     }
                 }
 
+                const languageChooser = (
+                    <NavDropdown menuClassName="dropdown-menu-right" label={currentLngCode}>
+                        {languageOptions}
+                    </NavDropdown>
+                );
+
                 return (
-                    <nav className="navbar navbar-default navbar-static-top">
-                        <div className="container-fluid">
-                            <div className="navbar-header">
-                                <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                    <span className="sr-only">{t('toggleNavigation')}</span>
-                                    <span className="icon-bar"></span>
-                                    <span className="icon-bar"></span>
-                                    <span className="icon-bar"></span>
-                                </button>
-                                <Link className="navbar-brand" to="/"><Icon icon="envelope"/> Mailtrain</Link>
+                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+                        <Link className="navbar-brand" to="/"><Icon icon="envelope"/> Mailtrain</Link>
+                        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                            <span className="navbar-toggler-icon"></span>
+                        </button>
+
+                        {mailtrainConfig.isAuthenticated ?
+                            <div className="collapse navbar-collapse" id="mtMainNavbar">
+                                <ul className="navbar-nav mr-auto">
+                                    {topLevelMenu}
+                                    <NavDropdown label={t('administration')}>
+                                        <NavDropdownLink to="/users">{t('users')}</NavDropdownLink>
+                                        <NavDropdownLink to="/namespaces">{t('namespaces')}</NavDropdownLink>
+                                        {mailtrainConfig.globalPermissions.manageSettings && <NavDropdownLink to="/settings">{t('globalSettings')}</NavDropdownLink>}
+                                        <NavDropdownLink to="/send-configurations">{t('sendConfigurations')}</NavDropdownLink>
+                                        {mailtrainConfig.globalPermissions.manageBlacklist && <NavDropdownLink to="/blacklist">{t('blacklist')}</NavDropdownLink>}
+                                        <NavDropdownLink to="/account/api">{t('api')}</NavDropdownLink>
+                                    </NavDropdown>
+                                </ul>
+                                <ul className="navbar-nav">
+                                    {languageChooser}
+                                    <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
+                                        <NavDropdownLink to="/account"><Icon icon='user'/> {t('account')}</NavDropdownLink>
+                                        <ActionLink className="dropdown-item" onClickAsync={::this.logout}><Icon icon='sign-out-alt'/> {t('logOut')}</ActionLink>
+                                    </NavDropdown>
+                                </ul>
                             </div>
-
-                            {mailtrainConfig.isAuthenticated ?
-                                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                                    <ul className="nav navbar-nav">
-                                        {topLevelMenu}
-                                        <DropdownMenuItem label={t('administration')}>
-                                            <MenuLink to="/users"><Icon icon='cog'/> {t('users')}</MenuLink>
-                                            <MenuLink to="/namespaces"><Icon icon='cog'/> {t('namespaces')}</MenuLink>
-                                            {mailtrainConfig.globalPermissions.manageSettings && <MenuLink to="/settings"><Icon icon='cog'/> {t('globalSettings')}</MenuLink>}
-                                            <MenuLink to="/send-configurations"><Icon icon='cog'/> {t('sendConfigurations')}</MenuLink>
-                                            {mailtrainConfig.globalPermissions.manageBlacklist && <MenuLink to="/blacklist"><Icon icon='ban-circle'/> {t('blacklist')}</MenuLink>}
-                                            <MenuLink to="/account/api"><Icon icon='retweet'/> {t('api')}</MenuLink>
-                                        </DropdownMenuItem>
-                                    </ul>
-
-
-                                    <ul className="nav navbar-nav navbar-right">
-                                        <DropdownMenuItem label={currentLngCode}>
-                                            {languageOptions}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem label={mailtrainConfig.user.username} icon="user">
-                                            <MenuLink to="/account"><Icon icon='user'/> {t('account')}</MenuLink>
-                                            <li>
-                                                <ActionLink onClickAsync={::this.logout}><Icon icon='log-out'/> {t('logOut')}</ActionLink>
-                                            </li>
-                                        </DropdownMenuItem>
-                                    </ul>
-                                </div>
-                                :
-                                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                                    <ul className="nav navbar-nav navbar-right">
-                                        <DropdownMenuItem label={currentLngCode}>
-                                            {languageOptions}
-                                        </DropdownMenuItem>
-                                    </ul>
-                                </div>
-                            }
-
-                        </div>
+                        :
+                            <div className="collapse navbar-collapse" id="mtMainNavbar">
+                                <ul className="navbar-nav mr-auto">
+                                </ul>
+                                <ul className="navbar-nav">
+                                    {languageChooser}
+                                </ul>
+                            </div>
+                        }
                     </nav>
                 );
             }
