@@ -68,11 +68,15 @@ export class GrapesJSHost extends Component {
         return (
             <div className={this.state.fullscreen ? styles.editorFullscreen : styles.editor}>
                 <div className={styles.navbar}>
-                    {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
-                    <div className={styles.title}>{this.props.title}</div>
-                    <a className={styles.btn} onClick={::this.toggleFullscreenAsync}><Icon icon="window-maximize"/></a>
-                    <a className={styles.btn} onClick={this.props.onTestSend}><Icon icon="send"/></a>
-                    {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave}><Icon icon="floppy-disk"/></a> : <span className={styles.btnDisabled}><Icon icon="floppy-disk"/></span>}
+                    <div className={styles.navbarLeft}>
+                        {this.state.fullscreen && <img className={styles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
+                        <div className={styles.title}>{this.props.title}</div>
+                    </div>
+                    <div className={styles.navbarRight}>
+                        {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave} title={t('Save')}><Icon icon="save"/></a> : <span className={styles.btnDisabled}><Icon icon="save"/></span>}
+                        <a className={styles.btn} onClick={this.props.onTestSend} title={t('Send test e-mail')}><Icon icon="at"/></a>
+                        <a className={styles.btn} onClick={::this.toggleFullscreenAsync} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
+                    </div>
                 </div>
                 <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="grapesjs/editor" tokenMethod="grapesjs" tokenParams={tokenData}/>
             </div>

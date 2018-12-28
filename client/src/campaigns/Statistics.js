@@ -88,7 +88,7 @@ export default class Statistics extends Component {
             const val = entity[key]
 
             return (
-                <AlignedRow label={label}><span className={styles.statsMetrics}>{val}</span>{showZoomIn && <span className={styles.zoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="zoom-in"/></Link></span>}</AlignedRow>
+                <AlignedRow label={label}><span className={styles.statsMetrics}>{val}</span>{showZoomIn && <span className={styles.zoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="search-plus"/></Link></span>}</AlignedRow>
             );
         }
 
@@ -103,7 +103,7 @@ export default class Statistics extends Component {
 
             return (
                 <AlignedRow label={label}>
-                    {showZoomIn && <span className={styles.statsProgressBarZoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="zoom-in"/></Link></span>}
+                    {showZoomIn && <span className={styles.statsProgressBarZoomIn}><Link to={`/campaigns/${entity.id}/statistics/${key}`}><Icon icon="search-plus"/></Link></span>}
                     <div className={`progress ${styles.statsProgressBar}`}>
                         <div
                             className={`progress-bar progress-bar-${progressBarClass}`}

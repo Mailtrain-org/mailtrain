@@ -88,7 +88,7 @@ fieldTypes.gpg = {
 
 fieldTypes.json = {
     validate: field => {},
-    addColumn: (table, name) => table.json(name),
+    addColumn: (table, name) => table.text(name),
     indexed: false,
     grouped: false,
     enumerated: false,
