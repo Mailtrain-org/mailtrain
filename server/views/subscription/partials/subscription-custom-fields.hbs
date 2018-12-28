@@ -49,6 +49,16 @@
         </div>
     {{/if}}
 
+    {{#if typeOption}}
+        <div class="form-group checkbox">
+            <label>{{name}}</label>
+            <label class="label-checkbox">
+                <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}}> {{field.settings.checkedLabel}}
+            </label>
+            <input type="hidden" value="0" name="{{key}}">
+        </div>
+    {{/if}}
+
     {{#if typeGpg}}
         <div class="form-group gpg {{key}}">
             <label for="{{key}}">{{name}}</label>
@@ -117,6 +127,7 @@
 
     {{#if typeCheckboxGrouped}}
         <div class="form-group checkbox">
+            <input type="hidden" value="<present>" name="{{key}}">
             <label>{{name}}</label>
             {{#each options}}
                 <label class="label-checkbox">

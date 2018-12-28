@@ -17,7 +17,7 @@ async function ajaxListTx(tx, params, queryFun, columns, options) {
             columnsNames.push(col.name);
 
             if (col.raw) {
-                columnsSelect.push(tx.raw(col.raw));
+                columnsSelect.push(tx.raw(col.raw, col.data || []));
             } else if (col.query) {
                 columnsSelect.push(function () { return col.query(this); });
             }

@@ -15,6 +15,7 @@ import {
     ACEEditor,
     Button,
     ButtonRow,
+    CheckBox,
     Dropdown,
     Fieldset,
     Form,
@@ -95,9 +96,7 @@ export default class CUD extends Component {
                     data.default_value = '';
                 }
 
-                if (data.type !== 'option') {
-                    data.group = null;
-                }
+                data.isInGroup = data.group !== null;
 
                 data.enumOptions = '';
                 data.dateFormat = DateFormat.EUR;
@@ -121,6 +120,11 @@ export default class CUD extends Component {
                     case 'birthday':
                         data.dateFormat = data.settings.dateFormat;
                         break;
+
+                    case 'option':
+                        data.checkedLabel = data.isInGroup ? '' : data.settings.checkedLabel;
+                        data.uncheckedLabel = data.isInGroup ? '' : data.settings.uncheckedLabel;
+                        break;
                 }
 
                 data.orderListBefore = data.orderListBefore.toString();
@@ -135,9 +139,12 @@ export default class CUD extends Component {
                 key: '',
                 default_value: '',
                 group: null,
+                isInGroup: false,
                 renderTemplate: '',
                 enumOptions: '',
                 dateFormat: 'eur',
+                checkedLabel: '',
+                uncheckedLabel: '',
                 orderListBefore: 'end', // possible values are <numeric id> / 'end' / 'none'
                 orderSubscribeBefore: 'end',
                 orderManageBefore: 'end'
@@ -168,7 +175,8 @@ export default class CUD extends Component {
         const type = state.getIn(['type', 'value']);
 
         const group = state.getIn(['group', 'value']);
-        if (type === 'option' && !group) {
+        const isInGroup = state.getIn(['isInGroup', 'value']);
+        if (isInGroup && !group) {
             state.setIn(['group', 'error'], t('groupHasToBeSelected'));
         } else {
             state.setIn(['group', 'error'], null);
@@ -261,7 +269,7 @@ export default class CUD extends Component {
                     data.default_value = null;
                 }
 
-                if (data.type !== 'option') {
+                if (!data.isInGroup) {
                     data.group = null;
                 }
 
@@ -284,13 +292,23 @@ export default class CUD extends Component {
                     case 'birthday':
                         data.settings.dateFormat = data.dateFormat;
                         break;
+
+                    case 'option':
+                        if (!data.isInGroup) {
+                            data.settings.checkedLabel = data.checkedLabel;
+                            data.settings.uncheckedLabel = data.uncheckedLabel;
+                        }
+                        break;
                 }
 
                 delete data.renderTemplate;
                 delete data.enumOptions;
                 delete data.dateFormat;
+                delete data.checkedLabel;
+                delete data.uncheckedLabel;
+                delete data.isInGroup;
 
-                if (data.type === 'option') {
+                if (data.group !== null) {
                     data.orderListBefore = data.orderSubscribeBefore = data.orderManageBefore = 'none';
                 } else {
                     data.orderListBefore = Number.parseInt(data.orderListBefore) || data.orderListBefore;
@@ -318,7 +336,7 @@ export default class CUD extends Component {
         const getOrderOptions = fld => {
             return [
                 {key: 'none', label: t('notVisible')},
-                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.type !== 'option').sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
+                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.group === null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
                 {key: 'end', label: t('endOfList')}
             ];
         };
@@ -327,6 +345,7 @@ export default class CUD extends Component {
         const typeOptions = Object.keys(this.fieldTypes).map(key => ({key, label: this.fieldTypes[key].label}));
 
         const type = this.getFormValue('type');
+        const isInGroup = this.getFormValue('isInGroup');
 
         let fieldSettings = null;
         switch (type) {
@@ -436,7 +455,16 @@ export default class CUD extends Component {
 
                 fieldSettings =
                     <Fieldset label={t('fieldSettings')}>
-                        <TableSelect id="group" label={t('group')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('selectGroupToWhichTheOptionsShouldBelong')}/>
+                        <CheckBox id="isInGroup" label={t('group')} text={t('Belongs to checkbox / dropdown / radio group')}/>
+                        {isInGroup &&
+                            <TableSelect id="group" label={t('Containing group')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('selectGroupToWhichTheOptionsShouldBelong')}/>
+                        }
+                        {!isInGroup &&
+                            <>
+                                <InputField id="checkedLabel" label={t('Checked label')} help={t('Label that will be displayed in list and subscription when the option is checked')}/>
+                                <InputField id="uncheckedLabel" label={t('Unchecked label')} help={t('Label that will be displayed in list and subscription when the option is unchecked')}/>
+                            </>
+                        }
                         <InputField id="default_value" label={t('defaultValue')} help={t('defaultValueUsedWhenTheFieldIsEmpty')}/>
                     </Fieldset>;
                 break;

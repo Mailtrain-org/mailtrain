@@ -215,7 +215,19 @@ fieldTypes.option = {
     grouped: false,
     enumerated: false,
     cardinality: Cardinality.SINGLE,
-    parsePostValue: (field, value) => !(['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0)
+    parsePostValue: (field, value) => {
+        if (Array.isArray(value)) {
+            // HTML checkbox does not provide any value when not checked. To detect the presence of the checkbox, we add a hidden field with the same name (see subscription-custom-fields.hbs:130).
+            // When the checkbox is selected, two values are returned and "value" is an array instead of a string. We assume the hidden field always comes after the actual value and thus take
+            // the first value in the array
+            value = value[0]
+        }
+        return !(['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0)
+    },
+    getHbsType: field => 'typeOption',
+    forHbs: (field, value) => value ? 1 : 0,
+    render: (field, value) => value ? field.settings.checkedLabel : field.settings.uncheckedLabel
+
 };
 
 fieldTypes['date'] = {
@@ -358,15 +370,15 @@ async function listDTAjax(context, listId, params) {
                 // All this is to show options always below their group parent
                 .innerJoin('custom_fields AS parent_fields', function() {
                     this.on(function() {
-                        this.on('custom_fields.type', '=', knex.raw('?', ['option']))
+                        this.onNotNull('custom_fields.group')
                             .on('custom_fields.group', '=', 'parent_fields.id');
                     }).orOn(function() {
-                        this.on('custom_fields.type', '<>', knex.raw('?', ['option']))
+                        this.orOnNull('custom_fields.group')
                             .on('custom_fields.id', '=', 'parent_fields.id');
                     });
                 })
                 .where('custom_fields.list', listId),
-            [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list' ],
+            [ 'custom_fields.id', 'custom_fields.name', 'custom_fields.type', 'custom_fields.key', 'custom_fields.order_list', 'custom_fields.group' ],
             {
                 orderByBuilder: (builder, orderColumn, orderDir) => {
                     // We use here parent_fields to keep options always below their parent group
@@ -374,13 +386,13 @@ async function listDTAjax(context, listId, params) {
                         builder
                             .orderBy(knex.raw('-parent_fields.order_list'), orderDir === 'asc' ? 'desc' : 'asc') // This is MySQL speciality. It sorts the rows in ascending order with NULL values coming last
                             .orderBy('parent_fields.name', orderDir)
-                            .orderBy(knex.raw('custom_fields.type = "option"'), 'asc')
+                            .orderBy(knex.raw('custom_fields.group is not null'), 'asc')
                     } else {
                         const parentColumn = orderColumn.replace(/^custom_fields/, 'parent_fields');
                         builder
                             .orderBy(parentColumn, orderDir)
                             .orderBy('parent_fields.name', orderDir)
-                            .orderBy(knex.raw('custom_fields.type = "option"'), 'asc');
+                            .orderBy(knex.raw('custom_fields.group is not null'), 'asc');
                     }
                 }
             }
@@ -444,8 +456,7 @@ async function serverValidate(context, listId, data) {
 
 async function _validateAndPreprocess(tx, listId, entity, isCreate) {
     enforce(entity.type === 'option' || !entity.group, 'Only option may have a group assigned');
-    enforce(entity.type !== 'option' || entity.group, 'Option must have a group assigned.');
-    enforce(entity.type !== 'option' || (entity.orderListBefore === 'none' && entity.orderSubscribeBefore === 'none' && entity.orderManageBefore === 'none'), 'Option cannot be made visible');
+    enforce(!entity.group || (entity.orderListBefore === 'none' && entity.orderSubscribeBefore === 'none' && entity.orderManageBefore === 'none'), 'Field with a group assigned cannot be made visible');
 
     enforce(!entity.group || await tx('custom_fields').where({list: listId, id: entity.group}).first(), 'Group field does not exist');
     enforce(entity.name, 'Name must be present');
@@ -638,6 +649,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
         const entry = {
             name: fld.name,
             key: fld.key,
+            field: fld,
             [type.getHbsType(fld)]: true,
             order_subscribe: fld.order_subscribe,
             order_manage: fld.order_manage,
@@ -726,6 +738,7 @@ function _fromText(listId, data, flds, isGrouped, keyName, singleCardUsesKeyName
     if (isGrouped) {
         for (const fld of flds) {
             const fldKey = fld[keyName];
+
             if (fldKey && fldKey in data) {
                 const type = fieldTypes[fld.type];
                 const fldCol = getFieldColumn(fld);

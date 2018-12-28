@@ -40,11 +40,19 @@ function parseBirthday(format, text) {
 }
 
 function formatDate(format, date) {
-    return moment.utc(date).format(dateFormatStrings[format]);
+    if (date === null) {
+        return '';
+    } else {
+        return moment.utc(date).format(dateFormatStrings[format]);
+    }
 }
 
 function formatBirthday(format, date) {
-    return moment.utc(date).format(birthdayFormatStrings[format]);
+    if (date === null) {
+        return '';
+    } else {
+        return moment.utc(date).format(birthdayFormatStrings[format]);
+    }
 }
 
 function getDateFormatString(format) {

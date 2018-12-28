@@ -2,7 +2,16 @@
 
 import React from "react";
 import {SubscriptionStatus} from "../../../../shared/lists";
-import {ACEEditor, CheckBoxGroup, DatePicker, Dropdown, InputField, RadioGroup, TextArea} from "../../lib/form";
+import {
+    ACEEditor,
+    CheckBox,
+    CheckBoxGroup,
+    DatePicker,
+    Dropdown,
+    InputField,
+    RadioGroup,
+    TextArea
+} from "../../lib/form";
 import {formatBirthday, formatDate, parseBirthday, parseDate} from "../../../../shared/date";
 import {getFieldColumn} from '../../../../shared/lists';
 import 'brace/mode/json';
@@ -124,6 +133,20 @@ export function getFieldTypes(t) {
         indexable: false
     };
 
+    const optionFieldType = {
+        form: groupedField => <CheckBox key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} text={groupedField.settings.checkedLabel} label={groupedField.name}/>,
+        assignFormData: (groupedField, data) => {
+            const value = data[getFieldColumn(groupedField)];
+            data[getFieldColumn(groupedField)] = !!value;
+        },
+        initFormData: (groupedField, data) => {
+            data[getFieldColumn(groupedField)] = false;
+        },
+        assignEntity: (groupedField, data) => {},
+        validate: (groupedField, state) => {},
+        indexable: true
+    };
+
     const enumSingleFieldType = componentType => ({
         form: groupedField => React.createElement(componentType, { key: getFieldColumn(groupedField), id: getFieldColumn(groupedField), label: groupedField.name, options: groupedField.settings.options }, null),
         assignFormData: (groupedField, data) => {
@@ -146,8 +169,7 @@ export function getFieldTypes(t) {
                 data[getFieldColumn(groupedField)] = '';
             }
         },
-        assignEntity: (groupedField, data) => {
-        },
+        assignEntity: (groupedField, data) => {},
         validate: (groupedField, state) => {},
         indexable: false
     });
@@ -176,6 +198,7 @@ export function getFieldTypes(t) {
     groupedFieldTypes.date = dateFieldType;
     groupedFieldTypes.birthday = birthdayFieldType;
     groupedFieldTypes.json = jsonFieldType;
+    groupedFieldTypes.option = optionFieldType;
     groupedFieldTypes['dropdown-enum'] = enumSingleFieldType(Dropdown);
     groupedFieldTypes['radio-enum'] = enumSingleFieldType(RadioGroup);
 

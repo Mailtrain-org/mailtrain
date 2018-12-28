@@ -323,7 +323,7 @@ async function migrateCustomForms(knex) {
 
 async function migrateCustomFields(knex) {
     // -----------------------------------------------------------------------------------------------------
-    // Move form field order to custom fileds and make all fields configurable
+    // Move form field order to custom fields and make all fields configurable
     // -----------------------------------------------------------------------------------------------------
     await knex.schema.table('custom_fields', table => {
         table.integer('order_subscribe');

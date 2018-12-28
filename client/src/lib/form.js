@@ -357,6 +357,9 @@ class CheckBox extends Component {
     }
 }
 
+@withComponentMixins([
+    withFormStateOwner
+])
 class CheckBoxGroup extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,

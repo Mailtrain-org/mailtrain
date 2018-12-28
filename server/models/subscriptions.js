@@ -76,6 +76,11 @@ fieldTypes.birthday = {
     listRender: (groupedField, value) => formatBirthday(groupedField.settings.dateFormat, value)
 };
 
+fieldTypes.option = {
+    afterJSON: (groupedField, entity) => {},
+    listRender: (groupedField, value) => value ? groupedField.settings.checkedLabel : groupedField.settings.uncheckedLabel
+};
+
 
 
 function getSubscriptionTableName(listId) {
@@ -97,7 +102,6 @@ function groupSubscription(groupedFieldsMap, entity) {
         const fieldType = fields.getFieldType(fld.type);
 
         if (fieldType.grouped) {
-
             let value = null;
 
             if (fieldType.cardinality === fields.Cardinality.SINGLE) {
@@ -273,7 +277,8 @@ async function listDTAjax(context, listId, segmentId, params) {
             } else {
                 columns.push({
                     name: listTable + '.' + fldCol,
-                    raw: 0
+                    raw: '?',
+                    data: [0]
                 })
             }
 
