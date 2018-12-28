@@ -72,7 +72,7 @@ export default class List extends Component {
 
             if (node.data.permissions.includes('share')) {
                 actions.push({
-                    label: <Icon icon="share-alt" title={t('share')}/>,
+                    label: <Icon icon="share" title={t('share')}/>,
                     link: `/namespaces/${node.key}/share`
                 });
             }

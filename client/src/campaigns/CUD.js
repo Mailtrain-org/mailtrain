@@ -508,7 +508,7 @@ export default class CUD extends Component {
                         {lsts.length > 1 &&
                         <Button
                             className="btn-secondary"
-                            icon="remove"
+                            icon="trash-alt"
                             title={t('remove')}
                             onClickAsync={() => this.onRemoveListEntry(lstUid)}
                         />
@@ -738,7 +738,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={saveButtonLabel}/>
-                        {canDelete && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/campaigns/${this.props.entity.id}/delete`}/> }
+                        {canDelete && <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/campaigns/${this.props.entity.id}/delete`}/> }
                     </ButtonRow>
                 </Form>
             </div>

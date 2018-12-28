@@ -276,7 +276,7 @@ export default class CUD extends Component {
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         {canDelete &&
-                            <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>
+                            <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>
                         }
                     </ButtonRow>
                 </Form>

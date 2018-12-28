@@ -224,7 +224,7 @@ export function tableAddDeleteButton(actions, owner, perms, deleteUrl, name, del
     if (!perms || perms.includes('delete')) {
         if (owner.tableRestActionDialogData.shown) {
             actions.push({
-                label: <Icon className={styles.iconDisabled} icon="remove" title={t('delete')}/>
+                label: <Icon className={styles.iconDisabled} icon="trash-alt" title={t('delete')}/>
             });
         } else {
             actions.push({

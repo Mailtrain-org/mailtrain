@@ -3,11 +3,12 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../../lib/i18n';
 import {
-    DropdownMenu,
+    ButtonDropdown,
     Icon
 } from '../../lib/bootstrap-components';
 import {
-    MenuLink,
+    ButtonDropdownLink,
+    NavDropdown,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -102,7 +103,7 @@ export default class List extends Component {
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('share')}/>,
+                            label: <Icon icon="share" title={t('share')}/>,
                             link: `/templates/mosaico/${data[0]}/share`
                         });
                     }
@@ -119,10 +120,10 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <DropdownMenu className="btn-primary" label={t('createMosaicoTemplate')}>
-                            <MenuLink to="/templates/mosaico/create">{t('blank')}</MenuLink>
-                            <MenuLink to="/templates/mosaico/create/versafix">{t('versafixOne')}</MenuLink>
-                        </DropdownMenu>
+                        <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createMosaicoTemplate')}>
+                            <ButtonDropdownLink to="/templates/mosaico/create">{t('blank')}</ButtonDropdownLink>
+                            <ButtonDropdownLink to="/templates/mosaico/create/versafix">{t('versafixOne')}</ButtonDropdownLink>
+                        </ButtonDropdown>
                     </Toolbar>
                 }
 

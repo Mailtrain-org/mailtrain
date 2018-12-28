@@ -238,7 +238,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="chevron-left" label={t('ok')}/>
-                        <Button className="btn-primary" icon="remove" label={t('delete')} onClickAsync={::this.deleteRule}/>
+                        <Button className="btn-primary" icon="trash-alt" label={t('delete')} onClickAsync={::this.deleteRule}/>
                     </ButtonRow>
                 </Form>
 

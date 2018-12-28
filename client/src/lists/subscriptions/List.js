@@ -137,7 +137,7 @@ export default class List extends Component {
                         tableAddRestActionButton(
                             actions, this,
                             { method: HTTPMethod.POST, url: `rest/subscriptions-unsubscribe/${this.props.list.id}/${id}`},
-                            { icon: 'off', label: t('unsubscribe') },
+                            { icon: 'power-off', label: t('unsubscribe') },
                             t('confirmUnsubscription'),
                             t('areYouSureYouWantToUnsubscribeEmail?', {email}),
                             t('unsubscribingEmail', {email}),
@@ -150,7 +150,7 @@ export default class List extends Component {
                         tableAddRestActionButton(
                             actions, this,
                             { method: HTTPMethod.POST, url: `rest/blacklist`, data: {email} },
-                            { icon: 'ban-circle', label: t('blacklist') },
+                            { icon: 'ban', label: t('blacklist') },
                             t('confirmEmailBlacklisting'),
                             t('areYouSureYouWantToBlacklistEmail?', {email}),
                             t('blacklistingEmail', {email}),
@@ -194,12 +194,13 @@ export default class List extends Component {
                     <div className="well well-sm">{list.description}</div>
                 }
 
-                <div className="well well-sm">
-                    <Form format="inline" stateOwner={this}>
-                        <Dropdown format="inline" className="input-sm" id="segment" label={t('segment')} options={segmentOptions}/>
-                    </Form>
+                <div className="card bg-light">
+                    <div className="card-body p-2">
+                        <Form format="inline" stateOwner={this}>
+                            <Dropdown format="inline" className="input-sm" id="segment" label={t('segment')} options={segmentOptions}/>
+                        </Form>
+                    </div>
                 </div>
-
 
                 <Table ref={node => this.table = node} withHeader dataUrl={dataUrl} columns={columns} />
             </div>

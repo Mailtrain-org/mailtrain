@@ -112,74 +112,32 @@ class Button extends Component {
     }
 }
 
-//TODO
-class DropdownMenu extends Component {
+class ButtonDropdown extends Component {
     static propTypes = {
         label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         noCaret: PropTypes.bool,
-        className: PropTypes.string
+        className: PropTypes.string,
+        buttonClassName: PropTypes.string,
+        menuClassName: PropTypes.string
     }
 
     render() {
         const props = this.props;
 
-        let className = 'btn dropdown-toggle';
-        if (props.className) {
-            className = className + ' ' + props.className;
-        }
-
-        let label;
-        if (this.props.noCaret) {
-            label = props.label;
-        } else {
-            label = <span>{props.label}{' '}<span className="caret"></span></span>;
-        }
+        const className = 'dropdown' + (props.className ? ' ' + props.className : '');
+        const buttonClassName = 'btn dropdown-toggle' + (props.buttonClassName ? ' ' + props.buttonClassName : '');
+        const menuClassName = 'dropdown-menu' + (props.menuClassName ? ' ' + props.menuClassName : '');
 
         return (
-            <div className="btn-group">
-                <button type="button" className={className} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {label}
+            <div className="dropdown" className={className}>
+                <button type="button" className={buttonClassName} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {props.label}
                 </button>
-                <ul className="dropdown-menu">
+                <ul className={menuClassName}>
                     {props.children}
                 </ul>
 
             </div>
-        );
-    }
-}
-
-//TODO
-class DropdownMenuItem extends Component {
-    static propTypes = {
-        label: PropTypes.string,
-        icon: PropTypes.string,
-        className: PropTypes.string
-    }
-
-    render() {
-        const props = this.props;
-
-        let className = 'nav-item dropdown';
-        if (props.className) {
-            className = className + ' ' + props.className;
-        }
-
-        return (
-            <li className={className}>
-                {props.icon ?
-                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <Icon icon={props.icon}/>{' '}{props.label}
-                    </a>
-                    :
-                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        {props.label}
-                    </a>
-                }
-                <ul className="dropdown-menu">
-                    {props.children}
-                </ul>
-            </li>
         );
     }
 }
@@ -217,7 +175,6 @@ class ActionLink extends Component {
     withTranslation,
     withErrorHandling
 ])
-//TODO
 class ModalDialog extends Component {
     constructor(props) {
         super(props);
@@ -314,8 +271,8 @@ class ModalDialog extends Component {
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" className="close" aria-label={t('close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
                             <h4 className="modal-title">{this.props.title}</h4>
+                            <button type="button" className="close" aria-label={t('close')} onClick={::this.onClose}><span aria-hidden="true">&times;</span></button>
                         </div>
                         <div className="modal-body">{this.props.children}</div>
                         <div className="modal-footer">
@@ -332,7 +289,7 @@ class ModalDialog extends Component {
 
 export {
     Button,
-    DropdownMenu,
+    ButtonDropdown,
     DropdownMenuItem,
     ActionLink,
     DismissibleAlert,

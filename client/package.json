@@ -4,13 +4,14 @@
   "description": "Self hosted email newsletter app - client components",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
+    "js": "webpack",
     "watch-js": "webpack --watch",
     "css": "npm-run-all --sequential css-compile css-minify",
     "css-compile": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 static/scss/mailtrain.scss dist/mailtrain.css",
     "css-minify": "cleancss --level 1 --source-map --source-map-inline-sources --output dist/mailtrain.min.css dist/mailtrain.css",
     "watch-css": "nodemon --watch static/scss -e scss -x \"npm run css\"",
-    "watch": "npm-run-all --parallel watch-css watch-js"
+    "watch": "npm-run-all --parallel watch-css watch-js",
+    "build": "npm-run-all --parallel css js"
   },
   "repository": {
     "type": "git",

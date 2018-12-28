@@ -223,7 +223,7 @@ export default class CUD extends Component {
                     }
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/subscriptions/${this.props.entity.id}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/lists/${this.props.list.id}/subscriptions/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

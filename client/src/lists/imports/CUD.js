@@ -11,6 +11,7 @@ import {
     withPageHelpers
 } from '../../lib/page';
 import {
+    AlignedRow,
     Button,
     ButtonRow,
     CheckBox,
@@ -336,7 +337,7 @@ export default class CUD extends Component {
             } else {
                 settingsEdit =
                     <div>
-                        <StaticField withValidation id="csvFileName" label={t('file')}><input ref={node => this.csvFile = node} type="file" onChange={::this.onFileSelected}/></StaticField>
+                        <AlignedRow label={t('file')}><input ref={node => this.csvFile = node} type="file" className="form-control-file" onChange={::this.onFileSelected}/></AlignedRow>
                         <InputField id="csvDelimiter" label={t('delimiter')}/>
                     </div>;
             }
@@ -451,7 +452,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         {saveButtons}
-                        {isEdit && <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/delete`}/>}
+                        {isEdit && <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/lists/${this.props.list.id}/imports/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>
             </div>

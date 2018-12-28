@@ -122,7 +122,7 @@ export default class List extends Component {
 
                     if (triggersCount > 0) {
                         actions.push({
-                            label: <Icon icon="flash" title={t('triggers')}/>,
+                            label: <Icon icon="bell" title={t('triggers')}/>,
                             link: `/lists/${data[0]}/triggers`
                         });
                     }

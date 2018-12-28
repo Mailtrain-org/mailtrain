@@ -3,11 +3,12 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../../lib/i18n';
 import {
-    DropdownMenu,
+    ButtonDropdown,
     Icon
 } from '../../lib/bootstrap-components';
 import {
-    MenuLink,
+    ButtonDropdownLink,
+    NavDropdown,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -85,7 +86,7 @@ export default class List extends Component {
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('share')}/>,
+                            label: <Icon icon="share" title={t('share')}/>,
                             link: `/reports/templates/${data[0]}/share`
                         });
                     }
@@ -102,12 +103,12 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <DropdownMenu className="btn-primary" label={t('createReportTemplate')}>
-                            <MenuLink to="/reports/templates/create">{t('blank')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts">{t('openCounts')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</MenuLink>
-                            <MenuLink to="/reports/templates/create/aggregated-open-counts">{t('aggregatedOpenCounts')}</MenuLink>
-                        </DropdownMenu>
+                        <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createReportTemplate')}>
+                            <ButtonDropdownLink to="/reports/templates/create">{t('blank')}</ButtonDropdownLink>
+                            <ButtonDropdownLink to="/reports/templates/create/open-counts">{t('openCounts')}</ButtonDropdownLink>
+                            <ButtonDropdownLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</ButtonDropdownLink>
+                            <ButtonDropdownLink to="/reports/templates/create/aggregated-open-counts">{t('aggregatedOpenCounts')}</ButtonDropdownLink>
+                        </ButtonDropdown>
                     </Toolbar>
                 }
 

@@ -98,7 +98,6 @@ class Breadcrumb extends Component {
     }
 }
 
-//TODO
 class SecondaryNavBar extends Component {
     static propTypes = {
         route: PropTypes.object.isRequired,
@@ -116,9 +115,10 @@ class SecondaryNavBar extends Component {
             title = entry.title;
         }
 
-        let className = '';
+        let liClassName = 'nav-item';
+        let linkClassName = 'nav-link';
         if (entry.active) {
-            className += ' active';
+            linkClassName += ' active';
         }
 
         if (entry.link) {
@@ -130,7 +130,7 @@ class SecondaryNavBar extends Component {
                 link = entry.link;
             }
 
-            return <li key={key} role="presentation" className={className}><Link to={link}>{title}</Link></li>;
+            return <li key={key} role="presentation" className={liClassName}><Link className={linkClassName} to={link}>{title}</Link></li>;
 
         } else if (entry.externalLink) {
             let externalLink;
@@ -140,10 +140,10 @@ class SecondaryNavBar extends Component {
                 externalLink = entry.externalLink;
             }
 
-            return <li key={key} role="presentation" className={className}><a href={externalLink}>{title}</a></li>;
+            return <li key={key} role="presentation" className={liClassName}><a className={linkClassName} href={externalLink}>{title}</a></li>;
 
         } else {
-            return <li key={key} role="presentation" className={className}>{title}</li>;
+            return <li key={key} role="presentation" className={liClassName}>{title}</li>;
         }
     }
 
@@ -153,7 +153,7 @@ class SecondaryNavBar extends Component {
         const keys = Object.keys(route.navs);
         const renderedElems = [];
 
-        for (const key in keys) {
+        for (const key of keys) {
             const entry = route.navs[key];
 
             let visible = true;
@@ -280,10 +280,9 @@ class RouteContent extends Component {
                     <div>
                         {primaryMenuComponent}
 
-                        <div>
-                            <SecondaryNavBar className="hidden-xs pull-right" route={route} params={params} resolved={resolved}/>
+                        <div className={styles.breadcrumbAndSecondaryNavbar}>
                             <Breadcrumb route={route} params={params} resolved={resolved}/>
-                            <SecondaryNavBar className="visible-xs" route={route} params={params} resolved={resolved}/>
+                            <SecondaryNavBar route={route} params={params} resolved={resolved}/>
                         </div>
 
                         <div className="container-fluid">
@@ -473,8 +472,7 @@ export class NavButton extends Component {
     }
 }
 
-// TODO
-export class MenuLink extends Component {
+export class ButtonDropdownLink extends Component {
     static propTypes = {
         to: PropTypes.string,
         className: PropTypes.string
@@ -483,9 +481,9 @@ export class MenuLink extends Component {
     render() {
         const props = this.props;
 
-        const clsName = "nav-item" + (props.className ? " " + props.className : "")
+        const clsName = "dropdown-item" + (props.className ? " " + props.className : "")
         return (
-            <li className={clsName}><Link to={props.to} className="nav-link">{props.children}</Link></li>
+            <Link to={props.to} className={clsName}>{props.children}</Link>
         );
     }
 }

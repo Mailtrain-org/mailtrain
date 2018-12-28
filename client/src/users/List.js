@@ -60,7 +60,7 @@ export default class List extends Component {
                 });
 
                 actions.push({
-                    label: <Icon icon="share" title={t('share')}/>,
+                    label: <Icon icon="share-square" title={t('share')}/>,
                     link: `/users/${data[0]}/shares`
                 });
 

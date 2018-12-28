@@ -144,7 +144,7 @@ export default class Files extends Component {
 
                     if (this.props.entity.permissions.includes(this.props.managePermission)) {
                         actions.push({
-                            label: <Icon icon="remove" title={t('delete')}/>,
+                            label: <Icon icon="trash-alt" title={t('delete')}/>,
                             action: () => this.deleteFile(data[0], data[1])
                         });
                     }

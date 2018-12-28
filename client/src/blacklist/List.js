@@ -108,7 +108,7 @@ export default class List extends Component {
                     tableAddRestActionButton(
                         actions, this,
                         { method: HTTPMethod.DELETE, url: `rest/blacklist/${email}`},
-                        { icon: 'remove', label: t('removeFromBlacklist') },
+                        { icon: 'trash-alt', label: t('removeFromBlacklist') },
                         t('confirmRemovalFromBlacklist'),
                         t('areYouSureYouWantToRemoveEmailFromThe', {email}),
                         t('removingEmailFromTheBlacklist', {email}),

@@ -122,18 +122,18 @@ export default class List extends Component {
                     } else if (state === ReportState.FINISHED) {
                         if (mimeType === 'text/html') {
                             viewContent = {
-                                label: <Icon icon="eye-open" title={t('view')}/>,
+                                label: <Icon icon="eye" title={t('view')}/>,
                                 link: `/reports/${id}/view`
                             };
                         } else if (mimeType === 'text/csv') {
                             viewContent = {
-                                label: <Icon icon="download-alt" title={t('download')}/>,
+                                label: <Icon icon="file-download" title={t('download')}/>,
                                 href: getUrl(`rpts/${id}/download`)
                             };
                         }
 
                         startStop = {
-                            label: <Icon icon="repeat" title={t('refreshReport')}/>,
+                            label: <Icon icon="redo" title={t('refreshReport')}/>,
                             action: (table) => this.start(table, id)
                         };
 
@@ -143,7 +143,7 @@ export default class List extends Component {
                         };
 
                         startStop = {
-                            label: <Icon icon="repeat" title={t('regenerateReport')}/>,
+                            label: <Icon icon="redo" title={t('regenerateReport')}/>,
                             action: (table) => this.start(table, id)
                         };
                     }
@@ -155,7 +155,7 @@ export default class List extends Component {
                     if (perms.includes('viewOutput')) {
                         actions.push(
                             {
-                                label: <Icon icon="modal-window" title={t('viewConsoleOutput')}/>,
+                                label: <Icon icon="tv" title={t('viewConsoleOutput')}/>,
                                 link: `/reports/${id}/output`
                             }
                         );
@@ -174,7 +174,7 @@ export default class List extends Component {
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('share')}/>,
+                            label: <Icon icon="share" title={t('share')}/>,
                             link: `/reports/${id}/share`
                         });
                     }

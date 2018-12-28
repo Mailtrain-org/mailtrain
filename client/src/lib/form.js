@@ -194,9 +194,9 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
     // wrapInput may be used also outside forms to make a kind of fake read-only forms
     let className;
     if (owner) {
-        className = 'form-group row';
+        className = 'form-group';
     } else {
-        className = 'row ' + styles.staticFormGroup;
+        className = styles.staticFormGroup;
     }
 
     let colLeft = '';
@@ -207,13 +207,15 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
             colLeft = '';
             colRight = '';
             break;
+        case 'inline':
+            colLeft = 'mr-3';
+            colRight = '';
+            break;
         default:
+            className = className + ' row';
             colLeft = 'col-sm-2 col-form-label';
             colRight = 'col-sm-10';
             break;
-    }
-
-    if (format === 'inline') {
     }
 
     let helpBlock = null;
@@ -239,7 +241,7 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
     if (format === 'inline') {
         return (
             <div className={className} >
-                {labelBlock} &nbsp; {input}
+                {labelBlock}{input}
                 {helpBlock}
                 {validationBlock}
             </div>

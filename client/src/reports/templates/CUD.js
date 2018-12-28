@@ -335,7 +335,7 @@ export default class CUD extends Component {
                             <Button type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
                             <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')}/>
                             {canDelete &&
-                                <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
+                                <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/reports/templates/${this.props.entity.id}/delete`}/>
                             }
                         </ButtonRow>
                     :

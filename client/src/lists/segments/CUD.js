@@ -357,7 +357,7 @@ export default class CUD extends Component {
                             <FormButton type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
                             <FormButton type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')}/>
 
-                            <NavButton className="btn-danger" icon="remove" label={t('delete')} linkTo={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
+                            <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
                         </ButtonRow>
                     :
                         <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
@@ -394,7 +394,7 @@ export default class CUD extends Component {
                                     generateNodeProps={data => ({
                                         buttons: [
                                             <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon icon="edit" title={t('edit')}/></ActionLink>,
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="remove" title={t('delete')}/></ActionLink>
+                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="trash-alt" title={t('delete')}/></ActionLink>
                                         ]
                                     })}
                                 />

@@ -3,11 +3,12 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {
-    DropdownMenu,
+    ButtonDropdown,
     Icon
 } from '../lib/bootstrap-components';
 import {
-    MenuLink,
+    ButtonDropdownLink,
+    NavDropdown,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -109,7 +110,7 @@ export default class List extends Component {
 
                     if (perms.includes('viewStats')) {
                         actions.push({
-                            label: <Icon icon="send" title={t('status')}/>,
+                            label: <Icon icon="envelope" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`
                         });
 
@@ -149,14 +150,14 @@ export default class List extends Component {
 
                     if (campaignType === CampaignType.TRIGGERED && perms.includes('viewTriggers')) {
                         actions.push({
-                            label: <Icon icon="flash" title={t('triggers')}/>,
+                            label: <Icon icon="bell" title={t('triggers')}/>,
                             link: `/campaigns/${data[0]}/triggers`
                         });
                     }
 
                     if (perms.includes('share')) {
                         actions.push({
-                            label: <Icon icon="share-alt" title={t('share')}/>,
+                            label: <Icon icon="share" title={t('share')}/>,
                             link: `/campaigns/${data[0]}/share`
                         });
                     }
@@ -173,11 +174,11 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {this.state.createPermitted &&
-                    <DropdownMenu className="btn-primary" label={t('createCampaign')}>
-                        <MenuLink to="/campaigns/create-regular">{t('regular')}</MenuLink>
-                        <MenuLink to="/campaigns/create-rss">{t('rss')}</MenuLink>
-                        <MenuLink to="/campaigns/create-triggered">{t('triggered')}</MenuLink>
-                    </DropdownMenu>
+                    <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createCampaign')}>
+                        <ButtonDropdownLink to="/campaigns/create-regular">{t('regular')}</ButtonDropdownLink>
+                        <ButtonDropdownLink to="/campaigns/create-rss">{t('rss')}</ButtonDropdownLink>
+                        <ButtonDropdownLink to="/campaigns/create-triggered">{t('triggered')}</ButtonDropdownLink>
+                    </ButtonDropdown>
                     }
                 </Toolbar>
 

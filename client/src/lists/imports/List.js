@@ -80,7 +80,7 @@ export default class List extends Component {
                     }
 
                     actions.push({
-                        label: <Icon icon="eye-open" title={t('detailedStatus')}/>,
+                        label: <Icon icon="eye" title={t('detailedStatus')}/>,
                         link: `/lists/${this.props.list.id}/imports/${data[0]}/status`
                     });
 
