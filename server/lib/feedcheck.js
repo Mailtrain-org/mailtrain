@@ -5,10 +5,12 @@ const log = require('./log');
 const path = require('path');
 const senders = require('./senders');
 
+let messageTid = 0;
 let feedcheckProcess;
 
 module.exports = {
-    spawn
+    spawn,
+    scheduleCheck
 };
 
 function spawn(callback) {
@@ -34,3 +36,13 @@ function spawn(callback) {
         log.error('Feed', 'Feedcheck process exited with code %s signal %s', code, signal);
     });
 }
+
+function scheduleCheck() {
+    feedcheckProcess.send({
+        type: 'scheduleCheck',
+        tid: messageTid
+    });
+
+    messageTid++;
+}
+

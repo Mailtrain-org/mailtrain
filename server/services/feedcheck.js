@@ -17,6 +17,8 @@ const dbCheckInterval = 60 * 1000;
 
 let running = false;
 
+let periodicTimeout = null;
+
 async function fetch(url) {
     const httpOptions = {
         uri: url,
@@ -161,8 +163,21 @@ async function run() {
 
     running = false;
 
-    setTimeout(run, dbCheckInterval);
+    periodicTimeout = setTimeout(run, dbCheckInterval);
 }
+
+process.on('message', msg => {
+    if (msg) {
+        const type = msg.type;
+
+        if (type === 'scheduleCheck') {
+            if (periodicTimeout) {
+                clearTimeout(periodicTimeout);
+                setImmediate(run);
+            }
+        }
+    }
+});
 
 if (config.title) {
     process.title = config.title + ': feedcheck';

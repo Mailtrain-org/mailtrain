@@ -16,6 +16,7 @@ const contextHelpers = require('../lib/context-helpers');
 const shares = require('../models/shares');
 const slugify = require('slugify');
 const passport = require('../lib/passport');
+const campaigns = require('../models/campaigns');
 
 class APIError extends Error {
     constructor(msg, status) {
@@ -277,6 +278,11 @@ router.getAsync('/blacklist/get', passport.loggedIn, async (req, res) => {
             emails
         }
     });
+});
+
+router.getAsync('/rss/fetch/:campaignCid', passport.loggedIn, async (req, res) => {
+    await campaigns.fetchRssCampaign(req.context, req.params.campaignCid);
+    return res.json();
 });
 
 

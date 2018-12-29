@@ -18,6 +18,7 @@ const subscriptions = require('./subscriptions');
 const segments = require('./segments');
 const senders = require('../lib/senders');
 const {LinkId} = require('./links');
+const feedcheck = require('../lib/feedcheck');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
@@ -921,6 +922,21 @@ async function getStatisticsOpened(context, id) {
     });
 }
 
+async function fetchRssCampaign(context, cid) {
+    return await knex.transaction(async tx => {
+
+        const campaign = await tx('campaigns').where('cid', cid).select(['id', 'type']).first();
+
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, 'fetchRss');
+
+        enforce(campaign.type === CampaignType.RSS, 'Invalid campaign type');
+
+        await tx('campaigns').where('id', campaign.id).update('last_check', null);
+
+        feedcheck.scheduleCheck();
+    });
+}
+
 module.exports.Content = Content;
 module.exports.hash = hash;
 
@@ -961,3 +977,5 @@ module.exports.disable = disable;
 module.exports.rawGetByTx = rawGetByTx;
 module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
 module.exports.getStatisticsOpened = getStatisticsOpened;
+
+module.exports.fetchRssCampaign = fetchRssCampaign;

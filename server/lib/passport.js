@@ -86,15 +86,18 @@ module.exports.loggedIn = (req, res, next) => {
 };
 
 module.exports.authByAccessToken = (req, res, next) => {
-    if (!req.query.access_token) {
+    const accessToken = req.get('access-token') || req.query.access_token
+
+    if (!accessToken) {
         res.status(403);
         res.json({
             error: 'Missing access_token',
             data: []
         });
+        return;
     }
 
-    users.getByAccessToken(req.query.access_token).then(user => {
+    users.getByAccessToken(accessToken).then(user => {
         req.user = user;
         next();
     }).catch(err => {

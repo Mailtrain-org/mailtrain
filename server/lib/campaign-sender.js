@@ -312,7 +312,6 @@ class CampaignSender {
         const sendConfiguration = this.sendConfiguration;
 
         const {html, text, attachments} = await this._getMessage(campaign, list, subscriptionGrouped, mergeTags, true);
-        console.log(html);
 
         const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
 

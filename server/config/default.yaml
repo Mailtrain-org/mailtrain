@@ -230,6 +230,10 @@ roles:
       description: All permissions
       permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings, setupAutomation]
       rootNamespaceRole: master
+    nobody:
+      name: None
+      description: No permissions
+      permissions: []
 
   namespace:
     master:
@@ -240,7 +244,7 @@ roles:
         sendConfiguration: [viewPublic, viewPrivate, edit, delete, share, sendWithoutOverrides, sendWithAllowedOverrides, sendWithAnyOverrides]
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
         customForm: [view, edit, delete, share]
-        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
         reportTemplate: [view, edit, delete, share, execute]
@@ -269,7 +273,11 @@ roles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, manageMessages]
+      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, manageMessages, fetchRss]
+    rssTrigger:
+      name: RSS Campaign Trigger
+      description: Allows triggering a fetch of an RSS campaign
+      permissions: [fetchRss]
 
   template:
     master:

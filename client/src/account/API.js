@@ -348,6 +348,26 @@ export default class API extends Component {
                 </p>
 
                 <pre>curl -XGET '{getUrl(`api/lists/test@example.com?access_token=${accessToken}`)}'</pre>
+
+
+                <h4>GET /api/rss/fetch/:campaignCid – {t('Trigger fetch of a campaign')}</h4>
+
+                <p>
+                    {t('Forces the RSS feed check to immediately check the campaign with the given CID (in :campaignCid). It works only for RSS campaigns.')}
+                </p>
+
+                <p>
+                    <strong>GET</strong> {t('arguments')}
+                </p>
+                <ul>
+                    <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
+                </ul>
+
+                <p>
+                    <strong>{t('example')}</strong>
+                </p>
+
+                <pre>curl -XGET '{getUrl(`api/rss/fetch/5OOnZKrp0?access_token=${accessToken}`)}'</pre>
             </div>
         );
     }
