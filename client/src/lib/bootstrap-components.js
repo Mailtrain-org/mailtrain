@@ -67,7 +67,6 @@ class Icon extends Component {
 @withComponentMixins([
     withErrorHandling
 ])
-
 class Button extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
