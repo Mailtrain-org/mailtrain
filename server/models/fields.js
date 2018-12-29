@@ -186,7 +186,7 @@ fieldTypes['radio-enum'] = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeRadioEnum',
     render: (field, value) => {
-        const fld = field.groupedOptions[value];
+        const fld = field.settings.options[value];
         return fld ? fld.name : '';
     }
 };
@@ -203,7 +203,7 @@ fieldTypes['dropdown-enum'] = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeDropdownEnum',
     render: (field, value) => {
-        const fld = field.groupedOptions[value];
+        const fld = field.settings.options[value];
         return fld ? fld.name : '';
     }
 };

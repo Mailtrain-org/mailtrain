@@ -19,7 +19,7 @@ let running = false;
 
 async function fetch(url) {
     const httpOptions = {
-        uri: 'http://feeds.feedwrench.com/JavaScriptJabber.rss',
+        uri: url,
         headers: {
             'user-agent': 'Mailtrain',
             'accept': 'text/html,application/xhtml+xml'
@@ -37,8 +37,13 @@ async function fetch(url) {
             link: item.link,
             content: item.description || item.summary,
             summary: item.summary || item.description,
-            image_url: item.image.url
+            imageUrl: item.image.url,
         };
+
+        if ('mt:entries-json' in item) {
+            entry.customTags = JSON.parse(item['mt:entries-json']['#'])
+        }
+
         entries.push(entry);
     }
 
@@ -140,7 +145,7 @@ async function run() {
 
             rssCampaign.data.checkStatus = checkStatus;
             await knex('campaigns').where('id', rssCampaign.id).update({
-                last_check: Date.now(),
+                last_check: new Date(),
                 data: JSON.stringify(rssCampaign.data)
             });
 
@@ -148,7 +153,7 @@ async function run() {
             log.error('Feed', err.message);
             rssCampaign.data.checkStatus = err.message;
             await knex('campaigns').where('id', rssCampaign.id).update({
-                last_check: Date.now(),
+                last_check: new Date(),
                 data: JSON.stringify(rssCampaign.data)
             });
         }

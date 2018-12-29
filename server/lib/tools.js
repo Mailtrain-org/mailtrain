@@ -150,23 +150,31 @@ function validateEmailGetMessage(result, address, language) {
 function formatMessage(campaign, list, subscription, mergeTags, message, isHTML) {
     const links = getMessageLinks(campaign, list, subscription);
 
-    const getValue = key => {
-        key = (key || '').toString().toUpperCase().trim();
-        if (links.hasOwnProperty(key)) {
-            return links[key];
+    const getValue = fullKey => {
+        const keys = (fullKey || '').split('.');
+
+        if (links.hasOwnProperty(keys[0])) {
+            return links[keys[0]];
         }
-        if (mergeTags.hasOwnProperty(key)) {
-            const value = (mergeTags[key] || '').toString();
-            const containsHTML = /<[a-z][\s\S]*>/.test(value);
-            return isHTML ? he.encode((containsHTML ? value : value.replace(/(?:\r\n|\r|\n)/g, '<br/>')), {
-                useNamedReferences: true,
-                allowUnsafeSymbols: true
-            }) : (containsHTML ? htmlToText.fromString(value) : value);
+
+        let value = mergeTags;
+        while (keys.length > 0) {
+            let key = keys.shift();
+            if (value.hasOwnProperty(key)) {
+                value = value[key];
+            } else {
+                return false;
+            }
         }
-        return false;
+
+        const containsHTML = /<[a-z][\s\S]*>/.test(value);
+        return isHTML ? he.encode((containsHTML ? value : value.replace(/(?:\r\n|\r|\n)/g, '<br/>')), {
+            useNamedReferences: true,
+            allowUnsafeSymbols: true
+        }) : (containsHTML ? htmlToText.fromString(value) : value);
     };
 
-    return message.replace(/\[([a-z0-9_]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
+    return message.replace(/\[([a-z0-9_.]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
         let value = getValue(identifier);
         if (value === false) {
             return match;

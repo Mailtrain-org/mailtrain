@@ -262,7 +262,8 @@ class CampaignSender {
             tags['RSS_ENTRY_LINK'] = rssEntry.link;
             tags['RSS_ENTRY_CONTENT'] = rssEntry.content;
             tags['RSS_ENTRY_SUMMARY'] = rssEntry.summary;
-            tags['RSS_ENTRY_IMAGE_URL'] = rssEntry.image_url;
+            tags['RSS_ENTRY_IMAGE_URL'] = rssEntry.imageUrl;
+            tags['RSS_ENTRY_CUSTOM_TAGS'] = rssEntry.customTags;
         }
 
         return tags;
@@ -311,6 +312,7 @@ class CampaignSender {
         const sendConfiguration = this.sendConfiguration;
 
         const {html, text, attachments} = await this._getMessage(campaign, list, subscriptionGrouped, mergeTags, true);
+        console.log(html);
 
         const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
 
