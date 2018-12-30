@@ -4,7 +4,7 @@ const config = require('config');
 const moment = require('moment');
 
 const knex = require('knex')({
-    client: 'mysql2',
+    client: 'mysql',
     connection: {
         ...config.mysql,
 

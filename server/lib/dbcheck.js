@@ -5,7 +5,7 @@ This module handles Mailtrain database initialization and upgrades
 */
 
 const config = require('config');
-const mysql = require('mysql2');
+const mysql = require('mysql');
 const log = require('./log');
 const fs = require('fs');
 const pathlib = require('path');

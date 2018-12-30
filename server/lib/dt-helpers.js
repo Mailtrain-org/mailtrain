@@ -28,9 +28,10 @@ async function ajaxListTx(tx, params, queryFun, columns, options) {
         const query = queryFun(tx);
         query.whereIn(columnsNames[parseInt(params.column)], params.values);
         query.select(columnsSelect);
-        query.options({rowsAsArray:true});
+        query.options({nestTables: '.'});
 
         const rows = await query;
+
         const rowsOfArray = rows.map(row => Object.keys(row).map(key => row[key]));
         return rowsOfArray;
 
@@ -78,9 +79,13 @@ async function ajaxListTx(tx, params, queryFun, columns, options) {
             }
         }
 
-        query.options({rowsAsArray:true});
+        query.options({nestTables: '.'});
 
         const rows = await query;
+
+        // Here we rely on the fact that Object.keys(row) returns the columns in the same order as they are given in the select (i.e. in columnsNames).
+        // This should work because ES2015 guarantees chronological order of keys in an object and mysql (https://github.com/mysqljs/mysql/blob/ad014c82b2cbaf47acae1cc39e5533d3cb6eb882/lib/protocol/packets/RowDataPacket.js#L43)
+        // adds them in the order of select columns.
         const rowsOfArray = rows.map(row => {
             const arr = Object.keys(row).map(field => row[field]);
 
