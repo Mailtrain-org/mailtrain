@@ -123,12 +123,12 @@ export default class RuleSettingsPane extends PureComponent {
         }
     }
 
-    populateRuleDefaults(mutState) {
+    populateRuleDefaults(mutStateData) {
         const ruleHelpers = this.ruleHelpers;
-        const type = mutState.getIn(['type','value']);
+        const type = mutStateData.getIn(['type','value']);
 
         if (!ruleHelpers.isCompositeRuleType(type)) {
-            const column = mutState.getIn(['column', 'value']);
+            const column = mutStateData.getIn(['column', 'value']);
 
             if (column) {
                 const colType = ruleHelpers.getColumnType(column);
@@ -137,7 +137,7 @@ export default class RuleSettingsPane extends PureComponent {
                     const settings = ruleHelpers.primitiveRuleTypes[colType][type];
                     if (!settings) {
                         // The existing rule type does not fit the newly changed column. This resets the rule type chooser to "--- Select ---"
-                        mutState.setIn(['type', 'value'], '');
+                        mutStateData.setIn(['type', 'value'], '');
                     }
                 }
             }

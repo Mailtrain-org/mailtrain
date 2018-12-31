@@ -64,7 +64,7 @@ export default class CUD extends Component {
                 changed: ['key'],
                 extra: ['id']
             },
-            onChange: {
+            onChangeBeforeValidation: {
                 name: ::this.onChangeName
             }
         });
@@ -77,13 +77,13 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
-    onChangeName(state, attr, oldValue, newValue) {
+    onChangeName(mutStateData, attr, oldValue, newValue) {
         const oldComputedKey = ('MERGE_' + slugify(oldValue, '_')).toUpperCase().replace(/[^A-Z0-9_]/g, '');
-        const oldKey = state.formState.getIn(['data', 'key', 'value']);
+        const oldKey = mutStateData.getIn(['key', 'value']);
 
         if (oldKey === '' || oldKey === oldComputedKey) {
             const newKey = ('MERGE_' + slugify(newValue, '_')).toUpperCase().replace(/[^A-Z0-9_]/g, '');
-            state.formState = state.formState.setIn(['data', 'key', 'value'], newKey);
+            mutStateData.setIn(['key', 'value'], newKey);
         }
     }
 

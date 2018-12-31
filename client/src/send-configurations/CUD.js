@@ -73,9 +73,9 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
-    onMailerTypeChanged(mutState, key, oldType, type) {
+    onMailerTypeChanged(mutStateDate, key, oldType, type) {
         if (type) {
-            this.mailerTypes[type].afterTypeChange(mutState);
+            this.mailerTypes[type].afterTypeChange(mutStateDate);
         }
     }
 

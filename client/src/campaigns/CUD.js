@@ -137,9 +137,9 @@ export default class CUD extends Component {
         return id;
     }
 
-    onCustomTemplateTypeChanged(mutState, key, oldType, type) {
+    onCustomTemplateTypeChanged(mutStateData, key, oldType, type) {
         if (type) {
-            this.templateTypes[type].afterTypeChange(mutState);
+            this.templateTypes[type].afterTypeChange(mutStateData);
         }
     }
 

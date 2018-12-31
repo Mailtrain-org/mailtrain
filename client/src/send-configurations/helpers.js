@@ -23,12 +23,12 @@ export const mailerTypesOrder = [
 export function getMailerTypes(t) {
     const mailerTypes = {};
 
-    function initFieldsIfMissing(mutState, mailerType) {
+    function initFieldsIfMissing(mutStateData, mailerType) {
         const initVals = mailerTypes[mailerType].initData();
 
         for (const key in initVals) {
-            if (!mutState.hasIn([key])) {
-                mutState.setIn([key, 'value'], initVals[key]);
+            if (!mutStateData.hasIn([key])) {
+                mutStateData.setIn([key, 'value'], initVals[key]);
             }
         }
     }

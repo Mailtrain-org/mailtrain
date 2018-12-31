@@ -77,9 +77,9 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
-    onTypeChanged(mutState, key, oldType, type) {
+    onTypeChanged(mutStateData, key, oldType, type) {
         if (type) {
-            this.templateTypes[type].afterTypeChange(mutState);
+            this.templateTypes[type].afterTypeChange(mutStateData);
         }
     }
 
