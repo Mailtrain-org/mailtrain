@@ -508,14 +508,6 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [TO_NAME]
-                            </th>
-                            <td>
-                                <Trans i18nKey="recipientNameAsItAppearsInEmailsToHeader">Recipient name as it appears in email's 'To' header</Trans>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
                                 [SUBSCRIPTION_ID]
                             </th>
                             <td>
