@@ -32,6 +32,12 @@ const SubscriptionSource = {
     ERASED: -6
 };
 
+const FieldWizard = {
+    NONE: 'none',
+    NAME: 'full_name',
+    FIRST_LAST_NAME: 'first_last_name'
+}
+
 function getFieldColumn(field) {
     return field.column || 'grouped_' + field.id;
 }
@@ -40,5 +46,6 @@ module.exports = {
     UnsubscriptionMode,
     SubscriptionStatus,
     SubscriptionSource,
+    FieldWizard,
     getFieldColumn
 };

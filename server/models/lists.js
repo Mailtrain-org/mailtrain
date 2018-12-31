@@ -14,7 +14,7 @@ const imports = require('./imports');
 const entitySettings = require('../lib/entity-settings');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
-const UnsubscriptionMode = require('../../shared/lists').UnsubscriptionMode;
+const {UnsubscriptionMode, FieldWizard} = require('../../shared/lists');
 
 const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
 
@@ -112,6 +112,47 @@ async function create(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
+        const fieldsToAdd = [];
+
+        const fieldWizard = entity.fieldWizard;
+        if (fieldWizard === FieldWizard.FIRST_LAST_NAME) {
+            if (entity.to_name === null) {
+                entity.to_name = '[MERGE_FIRST_NAME] [MERGE_LAST_NAME]';
+            }
+
+            fieldsToAdd.push({
+                name: 'First name',
+                key: 'MERGE_FIRST_NAME',
+                default_value: '',
+                type: 'text',
+                group: null,
+                settings: {}
+            });
+
+            fieldsToAdd.push({
+                name: 'Last name',
+                key: 'MERGE_LAST_NAME',
+                default_value: '',
+                type: 'text',
+                group: null,
+                settings: {}
+            });
+
+        } else if (fieldWizard === FieldWizard.NAME) {
+            if (entity.to_name === null) {
+                entity.to_name = '[MERGE_NAME]';
+            }
+
+            fieldsToAdd.push({
+                name: 'Name',
+                key: 'MERGE_NAME',
+                default_value: '',
+                type: 'text',
+                group: null,
+                settings: {}
+            });
+        }
+
         const filteredEntity = filterObject(entity, allowedKeys);
         filteredEntity.cid = shortid.generate();
 
@@ -147,6 +188,10 @@ async function create(context, entity) {
             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: id });
+
+        for (const fld of fieldsToAdd) {
+            await fields.createTx(tx, context, id, fld);
+        }
 
         return id;
     });

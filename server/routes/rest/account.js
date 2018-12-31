@@ -44,9 +44,6 @@ router.post('/login', passport.csrfProtection, passport.restLogin);
 router.post('/logout', passport.csrfProtection, passport.restLogout);
 
 router.postAsync('/password-reset-send', passport.csrfProtection, async (req, res) => {
-    // FIXME
-    console.log(req.locale);
-    console.log(req.cookies);
     await users.sendPasswordReset(req.locale, req.body.usernameOrEmail);
     return res.json();
 });

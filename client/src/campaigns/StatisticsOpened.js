@@ -107,8 +107,6 @@ export default class StatisticsOpened extends Component {
             { data: 5, title: t('opensCount') }
         ];
 
-        console.log(this.state.statisticsOpened);
-
         const renderNavPill = (key, label) => (
             <li role="presentation" className={agg === key ? 'active' : ''}>
                 <Link to={`/campaigns/${entity.id}/statistics/opened/${key}`}>{label}</Link>
@@ -222,8 +220,6 @@ export default class StatisticsOpened extends Component {
                 </div>
             );
         }
-
-        console.log(mailtrainConfig);
 
         return (
             <div>

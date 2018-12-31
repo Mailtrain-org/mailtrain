@@ -30,7 +30,7 @@ import {
     NamespaceSelect,
     validateNamespace
 } from '../lib/namespace';
-import {UnsubscriptionMode} from '../../../shared/lists';
+import {UnsubscriptionMode, FieldWizard} from '../../../shared/lists';
 import styles
     from "../lib/styles.scss";
 import mailtrainConfig
@@ -78,7 +78,8 @@ export default class CUD extends Component {
                 homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
                 namespace: mailtrainConfig.user.namespace,
-                to_name: '[MERGE_FIRST_NAME] [MERGE_LAST_NAME]',
+                to_name: '',
+                fieldWizard: FieldWizard.FIRST_LAST_NAME,
                 send_configuration: null,
                 listunsubscribe_disabled: false
             });
@@ -129,6 +130,10 @@ export default class CUD extends Component {
                 data.default_form = null;
             }
             delete data.form;
+
+            if (data.fieldWizard === FieldWizard.FIRST_LAST_NAME || data.fieldWizard === FieldWizard.NAME) {
+                data.to_name = null;
+            }
         });
 
         if (submitSuccessful) {
@@ -193,6 +198,32 @@ export default class CUD extends Component {
             { data: 6, title: t('namespace') }
         ];
 
+        let toNameFields;
+        if (isEdit) {
+            toNameFields = <InputField id="to_name" label={t('recipientsNameTemplate')} help={t('specifyUsingMergeTagsOfThisListHowTo')}/>;
+        } else {
+            const fieldWizardOptions = [
+                {key: FieldWizard.NONE, label: t('Empty / Custom (no fields)')},
+                {key: FieldWizard.NAME, label: t('Name (one field)')},
+                {key: FieldWizard.FIRST_LAST_NAME, label: t('First name and Last name (two fields)')},
+            ];
+
+            const fieldWizardValue = this.getFormValue('fieldWizard');
+
+            const fieldWizardSelector = <Dropdown id="fieldWizard" label={t('Representation of subscriber\'s name')} options={fieldWizardOptions} help={t('Select how the name of a subscriber will be represented. The fields in list will be created accordingly. You can always adjust the choice later by editing the list fields. If you select "Empty / Custom", provide a template below in "Recipients name template" that will be used as subscriber\'s name as it will appear in the emails\' "To" field.')}/>
+
+            if (fieldWizardValue === FieldWizard.NONE) {
+                toNameFields = (
+                    <>
+                        {fieldWizardSelector}
+                        <InputField id="to_name" label={t('recipientsNameTemplate')} help={t('specifyUsingMergeTagsOfThisListHowTo')}/>
+                    </>
+                );
+            } else {
+                toNameFields = fieldWizardSelector;
+            }
+        }
+
         return (
             <div>
                 {canDelete &&
@@ -221,7 +252,7 @@ export default class CUD extends Component {
 
                     <InputField id="contact_email" label={t('contactEmail')} help={t('contactEmailUsedInSubscriptionFormsAnd')}/>
                     <InputField id="homepage" label={t('homepage')} help={t('homepageUrlUsedInSubscriptionFormsAnd')}/>
-                    <InputField id="to_name" label={t('recipientsNameTemplate')} help={t('specifyUsingMergeTagsOfThisListHowTo')}/>
+                    {toNameFields}
                     <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
 
                     <NamespaceSelect/>

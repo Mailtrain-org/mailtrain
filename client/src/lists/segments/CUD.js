@@ -71,6 +71,10 @@ export default class CUD extends Component {
         };
 
         this.initForm();
+
+        this.onRuleSettingsPaneUpdatedHandler = ::this.onRuleSettingsPaneUpdated;
+        this.onRuleSettingsPaneCloseHandler = ::this.onRuleSettingsPaneClose;
+        this.onRuleSettingsPaneDeleteHandler = ::this.onRuleSettingsPaneDelete;
     }
 
     static propTypes = {
@@ -334,7 +338,6 @@ export default class CUD extends Component {
             }
         }
 
-
         return (
 
             <div>
@@ -411,7 +414,7 @@ export default class CUD extends Component {
                     <div className={styles.rightPane}>
                         <div className={styles.rightPaneInner}>
                             {selectedRule &&
-                                <RuleSettingsPane rule={selectedRule} fields={this.props.fields} onChange={::this.onRuleSettingsPaneUpdated} onClose={::this.onRuleSettingsPaneClose} onDelete={::this.onRuleSettingsPaneDelete} forceShowValidation={this.isFormValidationShown()}/>}
+                                <RuleSettingsPane rule={selectedRule} fields={this.props.fields} onChange={this.onRuleSettingsPaneUpdatedHandler} onClose={this.onRuleSettingsPaneCloseHandler} onDelete={this.onRuleSettingsPaneDeleteHandler} forceShowValidation={this.isFormValidationShown()}/>}
                         </div>
                     </div>
                 </div>

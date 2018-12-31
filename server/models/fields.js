@@ -532,41 +532,45 @@ async function _sortIn(tx, listId, entityId, orderListBefore, orderSubscribeBefo
     }
 }
 
+async function createTx(tx, context, listId, entity) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
+
+    await _validateAndPreprocess(tx, listId, entity, true);
+
+    const fieldType = fieldTypes[entity.type];
+
+    let columnName;
+    if (!fieldType.grouped) {
+        columnName = ('custom_' + slugify(entity.name, '_') + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '');
+    }
+
+    const filteredEntity = filterObject(entity, allowedKeysCreate);
+    filteredEntity.list = listId;
+    filteredEntity.column = columnName;
+
+    const ids = await tx('custom_fields').insert(filteredEntity);
+    const id = ids[0];
+
+    await _sortIn(tx, listId, id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
+
+    if (columnName) {
+        await knex.schema.table('subscription__' + listId, table => {
+            fieldType.addColumn(table, columnName);
+            if (fieldType.indexed) {
+                table.index(columnName);
+            }
+        });
+
+        // Altough this is a reference to an import, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
+        await knex.schema.raw('ALTER TABLE `subscription__' + listId + '` ADD `source_' + columnName +'` int(11) DEFAULT NULL');
+    }
+
+    return id;
+}
+
 async function create(context, listId, entity) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageFields');
-
-        await _validateAndPreprocess(tx, listId, entity, true);
-
-        const fieldType = fieldTypes[entity.type];
-
-        let columnName;
-        if (!fieldType.grouped) {
-            columnName = ('custom_' + slugify(entity.name, '_') + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '');
-        }
-
-        const filteredEntity = filterObject(entity, allowedKeysCreate);
-        filteredEntity.list = listId;
-        filteredEntity.column = columnName;
-
-        const ids = await tx('custom_fields').insert(filteredEntity);
-        const id = ids[0];
-
-        await _sortIn(tx, listId, id, entity.orderListBefore, entity.orderSubscribeBefore, entity.orderManageBefore);
-
-        if (columnName) {
-            await knex.schema.table('subscription__' + listId, table => {
-                fieldType.addColumn(table, columnName);
-                if (fieldType.indexed) {
-                    table.index(columnName);
-                }
-            });
-
-            // Altough this is a reference to an import, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
-            await knex.schema.raw('ALTER TABLE `subscription__' + listId + '` ADD `source_' + columnName +'` int(11) DEFAULT NULL');
-        }
-
-        return id;
+        return await createTx(tx, context, listId, entity);
     });
 }
 
@@ -833,6 +837,7 @@ module.exports.listByOrderListTx = listByOrderListTx;
 module.exports.listDTAjax = listDTAjax;
 module.exports.listGroupedDTAjax = listGroupedDTAjax;
 module.exports.create = create;
+module.exports.createTx = createTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
 module.exports.removeAllByListIdTx = removeAllByListIdTx;

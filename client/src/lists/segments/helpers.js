@@ -216,7 +216,7 @@ export function getRuleHelpers(t, fields) {
 
 
     const stringValueSettings = allowEmpty => ({
-        form: <InputField id="value" label={t('value')} />,
+        getForm: () => <InputField id="value" label={t('value')} />,
         getFormData: rule => ({
             value: rule.value
         }),
@@ -233,7 +233,7 @@ export function getRuleHelpers(t, fields) {
     });
 
     const numberValueSettings = {
-        form: <InputField id="value" label={t('value')} />,
+        getForm: () => <InputField id="value" label={t('value')} />,
         getFormData: rule => ({
             value: rule.value.toString()
         }),
@@ -253,7 +253,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const birthdayValueSettings = {
-        form: <DatePicker id="birthday" label={t('date')} birthday />,
+        getForm: () => <DatePicker id="birthday" label={t('date')} birthday />,
         getFormData: rule => ({
             birthday: formatBirthday(DateFormat.INTL, rule.value)
         }),
@@ -274,7 +274,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const dateValueSettings = {
-        form: <DatePicker id="date" label={t('date')} />,
+        getForm: () => <DatePicker id="date" label={t('date')} />,
         getFormData: rule => ({
             date: formatDate(DateFormat.INTL, rule.value)
         }),
@@ -295,7 +295,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const dateRelativeValueSettings = {
-        form:
+        getForm: () =>
             <div>
                 <InputField id="daysValue" label={t('numberOfDays')}/>
                 <Dropdown id="direction" label={t('beforeAfter')} options={[
@@ -324,7 +324,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const optionValueSettings = {
-        form: null,
+        getForm: () => null,
         getFormData: rule => ({}),
         assignRuleSettings: (rule, getter) => {},
         validate: state => {}

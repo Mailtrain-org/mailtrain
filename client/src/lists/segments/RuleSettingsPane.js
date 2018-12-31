@@ -1,6 +1,6 @@
 'use strict';
 
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import PropTypes
     from "prop-types";
 import {withTranslation} from '../../lib/i18n';
@@ -31,7 +31,7 @@ import {withComponentMixins} from "../../lib/decorator-helpers";
     withPageHelpers,
     requiresAuthenticatedUser
 ])
-export default class CUD extends Component {
+export default class RuleSettingsPane extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -136,7 +136,7 @@ export default class CUD extends Component {
                 if (type) {
                     const settings = ruleHelpers.primitiveRuleTypes[colType][type];
                     if (!settings) {
-                        // The existing rule type does not fit the newly changed column. This resets the rule type chooser to "-- Select ---"
+                        // The existing rule type does not fit the newly changed column. This resets the rule type chooser to "--- Select ---"
                         mutState.setIn(['type', 'value'], '');
                     }
                 }
@@ -212,7 +212,7 @@ export default class CUD extends Component {
 
                         const ruleType = this.getFormValue('type');
                         if (ruleType) {
-                            ruleSettings = ruleHelpers.primitiveRuleTypes[colType][ruleType].form;
+                            ruleSettings = ruleHelpers.primitiveRuleTypes[colType][ruleType].getForm();
                         }
                     }
                 }
@@ -225,8 +225,6 @@ export default class CUD extends Component {
                     {ruleSettings}
                 </div>;
         }
-
-
 
         return (
             <div className={styles.ruleOptions}>

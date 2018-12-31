@@ -1,3 +1,5 @@
+@import "../../static/scss/variables";
+
 .form { // This is here to give the styles below higher priority than Bootstrap has
   :global .DayPicker {
     border-left: 1px solid lightgray;
@@ -148,7 +150,8 @@
 }
 
 .iconDisabled {
-  color: #bf3e11;
+  color: $link-color;
+  text-decoration: $link-decoration;
 }
 
 .dependenciesList {
