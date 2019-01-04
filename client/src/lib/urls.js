@@ -15,8 +15,9 @@ function getTrustedUrl(path) {
     return mailtrainConfig.trustedUrlBase + (path || '');
 }
 
-function getSandboxUrl(path) {
-    return mailtrainConfig.sandboxUrlBase + restrictedAccessToken + '/' + (path || '');
+function getSandboxUrl(path, customRestrictedAccessToken) {
+    const localRestrictedAccessToken = customRestrictedAccessToken || restrictedAccessToken;
+    return mailtrainConfig.sandboxUrlBase + localRestrictedAccessToken + '/' + (path || '');
 }
 
 function getPublicUrl(path, opts) {
@@ -43,7 +44,7 @@ function getBaseDir() {
     if (mailtrainConfig.appType === AppType.TRUSTED) {
         return mailtrainConfig.trustedUrlBaseDir;
     } else if (mailtrainConfig.appType === AppType.SANDBOXED) {
-        return mailtrainConfig.sandboxUrlBaseDir + anonymousRestrictedAccessToken;
+        return mailtrainConfig.sandboxUrlBaseDir + restrictedAccessToken;
     } else if (mailtrainConfig.appType === AppType.PUBLIC) {
         return mailtrainConfig.publicUrlBaseDir;
     }

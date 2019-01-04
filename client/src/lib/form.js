@@ -27,6 +27,8 @@ import {
     Button,
     Icon
 } from "./bootstrap-components";
+import { SketchPicker } from 'react-color';
+
 import ACEEditorRaw
     from 'react-ace';
 import 'brace/theme/github';
@@ -495,6 +497,66 @@ class TextArea extends Component {
 
 
 @withComponentMixins([
+    withFormStateOwner
+])
+class ColorPicker extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            opened: false
+        };
+    }
+
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    }
+
+    toggle() {
+        this.setState({
+            opened: !this.state.opened
+        });
+    }
+
+    selected(value) {
+        const owner = this.getFormStateOwner();
+        const id = this.props.id;
+
+        this.setState({
+            opened: false
+        });
+
+        owner.updateFormValue(id, value.rgb);
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.getFormStateOwner();
+        const id = this.props.id;
+        const htmlId = 'form_' + id;
+        const t = props.t;
+        const color = owner.getFormValue(id);
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div>
+                <div className="input-group">
+                    <div className={styles.colorPickerSwatchWrapper} onClick={::this.toggle}>
+                        <div className={styles.colorPickerSwatchColor} style={{background: `rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`}}/>
+                    </div>
+                </div>
+                {this.state.opened &&
+                <div className={styles.colorPickerWrapper}>
+                    <SketchPicker color={color} onChange={::this.selected} />
+                </div>
+                }
+            </div>
+        );
+    }
+}
+
+@withComponentMixins([
     withTranslation,
     withFormStateOwner
 ])
@@ -897,37 +959,6 @@ class ACEEditor extends Component {
     }
 }
 
-/* Excluded. It's not very useful and just eats a lot of space in the resulting JS.
-
-@withComponentMixins([
-    withFormStateOwner
-])
-class CKEditor extends Component {
-    static propTypes = {
-        id: PropTypes.string.isRequired,
-        label: PropTypes.string,
-        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        height: PropTypes.string
-    }
-
-    render() {
-        const props = this.props;
-        const owner = this.getFormStateOwner();
-        const id = this.props.id;
-        const htmlId = 'form_' + id;
-
-        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <CKEditorRaw
-                onChange={(event, editor) => owner.updateFormValue(id, editor.getData())}
-                onInit={ editor => {
-                    editor.ui.view.editable.editableElement.style.height = props.height;
-                } }
-                data={owner.getFormValue(id)}
-            />
-        );
-    }
-}
- */
 
 const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
     const proto = InnerClass.prototype;
@@ -1378,6 +1409,7 @@ export {
     CheckBoxGroup,
     RadioGroup,
     TextArea,
+    ColorPicker,
     DatePicker,
     Dropdown,
     AlignedRow,
@@ -1387,6 +1419,5 @@ export {
     TableSelect,
     TableSelectMode,
     ACEEditor,
-    CKEditor,
     FormSendMethod
 }

@@ -2,11 +2,9 @@
 
 .form { // This is here to give the styles below higher priority than Bootstrap has
   :global .DayPicker {
-    border-left: 1px solid lightgray;
-    border-right: 1px solid lightgray;
-    border-bottom: 1px solid lightgray;
-    border-radius: 4px;
-    padding: 15px;
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+    padding: $input-padding-y $input-padding-x;
   }
 
   :global .form-horizontal .control-label {
@@ -114,11 +112,15 @@
   }
 }
 
-.dropZone {
-  padding-top: 30px;
-  padding-bottom: 30px;
-  margin-bottom: 15px;
-  margin-top: 8px;
+.colorPickerWrapper {
+  text-align: right;
+}
+
+.dropZone{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 3px;
+  margin-top: 3px;
   border: 2px solid #E6E9ED;
   border-radius: 5px;
   background-color: #FAFAD2;

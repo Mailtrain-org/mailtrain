@@ -1,7 +1,9 @@
 'use strict';
 
 const config = require('config');
-const moment = require('moment');
+const path = require('path');
+
+const knexConstructor = require('knex');
 
 const knex = require('knex')({
     client: 'mysql',
@@ -16,9 +18,9 @@ const knex = require('knex')({
         ]
     },
     migrations: {
-        directory: __dirname + '/../setup/knex/migrations'
+        directory: path.join(__dirname, '..', 'setup', 'knex', 'migrations')
     }
-//, debug: true
+    //, debug: true
 });
 
 

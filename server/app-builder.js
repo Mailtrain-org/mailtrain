@@ -234,7 +234,6 @@ function createApp(appType) {
 
     useWith404Fallback('/static', express.static(path.join(__dirname, '..', 'client', 'static')));
     useWith404Fallback('/mailtrain', express.static(path.join(__dirname, '..', 'client', 'dist')));
-    useWith404Fallback('/locales', express.static(path.join(__dirname, '..', 'client', 'locales')));
 
     useWith404Fallback('/static-npm/fontawesome', express.static(path.join(__dirname, '..', 'client', 'node_modules', '@fortawesome', 'fontawesome-free', 'webfonts')));
     useWith404Fallback('/static-npm/popper.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', 'popper.js', 'dist', 'umd', 'popper.min.js')));

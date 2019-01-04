@@ -79,6 +79,7 @@ export class UntrustedContentHost extends Component {
             resolve(msg.data.ret);
         } else if (msg.type === 'rpcRequest') {
             const ret = await this.props.onMethodAsync(msg.data.method, msg.data.params);
+            this.sendMessage('rpcResponse', {msgId: msg.data.msgId, ret});
         } else if (msg.type === 'clientHeight') {
             const newHeight = msg.data;
             this.contentNode.height = newHeight;
@@ -137,7 +138,7 @@ export class UntrustedContentHost extends Component {
             // noinspection JSIgnoredPromiseFromCall
             this.refreshAccessToken();
             this.scheduleRefreshAccessToken();
-        }, 60 * 1000);
+        }, 30 * 1000);
     }
 
     handleUpdate() {
@@ -232,7 +233,7 @@ export class UntrustedContentRoot extends Component {
     }
 
     sendMessage(type, data) {
-        window.parent.postMessage({type, data}, getTrustedUrl());
+        window.parent.postMessage({type, data}, '*');
     }
 
     componentDidMount() {
@@ -334,7 +335,7 @@ class ParentRPC {
     }
 
     sendMessage(type, data) {
-        window.parent.postMessage({type, data}, getTrustedUrl());
+        window.parent.postMessage({type, data}, '*');
     }
 }
 

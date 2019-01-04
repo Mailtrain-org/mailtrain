@@ -13,7 +13,7 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
 async function listTree(context) {
-    // FIXME - process permissions
+    enforce(!context.user.admin, 'listTree is not supposed to be called by assumed admin');
 
     const entityType = entitySettings.getEntityType('namespace');
 
@@ -64,6 +64,7 @@ async function listTree(context) {
         entry.title = row.name;
         entry.description = row.description;
         entry.permissions = row.permissions ? row.permissions.split(';') : [];
+        entry.permissions = shares.filterPermissionsByRestrictedAccessHandler(context, 'namespace', row.id, entry.permissions, 'namespaces.listTree')
     }
 
     // Prune out the inaccessible namespaces
@@ -117,19 +118,66 @@ async function getById(context, id) {
     });
 }
 
-async function create(context, entity) {
+async function getChildrenTx(tx, context, id) {
+    await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
+
+    const entityType = entitySettings.getEntityType('namespace');
+
+    const extraKeys = em.get('models.namespaces.extraKeys', []);
+
+    let children;
+    if (context.user.admin) {
+        children = await knex('namespaces')
+            .where('namespaces.namespace', id)
+            .select([
+                'namespaces.id', 'namespaces.name', 'namespaces.description', 'namespaces.namespace',
+                ...extraKeys.map(key => 'namespaces.' + key)
+            ]);
+
+    } else {
+        const rows = await knex('namespaces')
+            .leftJoin(entityType.permissionsTable, {
+                [entityType.permissionsTable + '.entity']: 'namespaces.id',
+                [entityType.permissionsTable + '.user']: context.user.id
+            })
+            .where('namespaces.namespace', id)
+            .groupBy('namespaces.id')
+            .select([
+                'namespaces.id', 'namespaces.name', 'namespaces.description', 'namespaces.namespace',
+                ...extraKeys.map(key => 'namespaces.' + key),
+                knex.raw(`GROUP_CONCAT(${entityType.permissionsTable + '.operation'} SEPARATOR \';\') as permissions`)
+            ]);
+
+        children = [];
+        for (const row of rows) {
+            row.permissions = row.permissions ? row.permissions.split(';') : [];
+            row.permissions = shares.filterPermissionsByRestrictedAccessHandler(context, 'namespace', row.id, row.permissions, 'namespaces.getChildrenTx');
+            if (row.permissions.includes('view')) {
+                children.push(row);
+            }
+        }
+    }
+
+    return children;
+}
+
+async function createTx(tx, context, entity) {
     enforce(entity.namespace, 'Parent namespace must be set');
 
+    await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createNamespace');
+
+    const ids = await tx('namespaces').insert(filterObject(entity, allowedKeys));
+    const id = ids[0];
+
+    // We don't have to rebuild all entity types, because no entity can be a child of the namespace at this moment.
+    await shares.rebuildPermissionsTx(tx, { entityTypeId: 'namespace', entityId: id });
+
+    return id;
+}
+
+async function create(context, entity) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createNamespace');
-
-        const ids = await tx('namespaces').insert(filterObject(entity, allowedKeys));
-        const id = ids[0];
-
-        // We don't have to rebuild all entity types, because no entity can be a child of the namespace at this moment.
-        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'namespace', entityId: id });
-
-        return id;
+        return await createTx(tx, context, entity);
     });
 }
 
@@ -187,6 +235,8 @@ async function remove(context, id) {
 module.exports.hash = hash;
 module.exports.listTree = listTree;
 module.exports.getById = getById;
+module.exports.getChildrenTx = getChildrenTx;
 module.exports.create = create;
+module.exports.createTx = createTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

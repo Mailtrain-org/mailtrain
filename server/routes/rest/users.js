@@ -1,9 +1,7 @@
 'use strict';
 
-const config = require('config');
 const passport = require('../../lib/passport');
 const users = require('../../models/users');
-const shares = require('../../models/shares');
 
 const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');

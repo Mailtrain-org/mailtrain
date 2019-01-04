@@ -332,8 +332,6 @@ async function rebuildPermissionsTx(tx, restriction) {
         }
         const entities = await entitiesQuery;
 
-        // TODO - process restriction.parentId
-
         const parentEntities = new Map();
         let nonChildEntities;
         if (entityType.dependentPermissions) {
@@ -541,30 +539,7 @@ async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredO
         requiredOperations = [ requiredOperations ];
     }
 
-    if (context.user.restrictedAccessHandler) {
-        const originalRequiredOperations = requiredOperations;
-        if (context.user.restrictedAccessHandler.permissions) {
-            const entityPerms = context.user.restrictedAccessHandler.permissions[entityTypeId];
-
-            if (!entityPerms) {
-                requiredOperations = [];
-            } else if (entityPerms === true) {
-                // no change to require operations
-            } else if (entityPerms instanceof Set) {
-                requiredOperations = requiredOperations.filter(perm => entityPerms.has(perm));
-            } else {
-                const allowedPerms = entityPerms[entityId];
-                if (allowedPerms) {
-                    requiredOperations = requiredOperations.filter(perm => allowedPerms.has(perm));
-                } else {
-                    requiredOperations = [];
-                }
-            }
-        } else {
-            requiredOperations = [];
-        }
-        log.verbose('check permissions with restrictedAccessHandler --  entityTypeId: ' + entityTypeId + '  entityId: ' + entityId + '  requiredOperations: [' + originalRequiredOperations + '] -> [' + requiredOperations + ']');
-    }
+    requiredOperations = filterPermissionsByRestrictedAccessHandler(context, entityTypeId, entityId, requiredOperations, 'checkPermissions');
 
     if (requiredOperations.length === 0) {
         return false;
@@ -686,8 +661,58 @@ async function getPermissionsTx(tx, context, entityTypeId, entityId) {
         .where('entity', entityId)
         .where('user', context.user.id);
 
-    return rows.map(x => x.operation);
+    const operations = rows.map(x => x.operation);
+    return filterPermissionsByRestrictedAccessHandler(context, entityTypeId, entityId, operations, 'getPermissions');
 }
+
+// If entityId is null, it means that we require that restrictedAccessHandler does not differentiate based on entityId. This is used in ajaxListWithPermissionsTx.
+function filterPermissionsByRestrictedAccessHandler(context, entityTypeId, entityId, permissions, operationMsg) {
+    if (context.user.restrictedAccessHandler) {
+        const originalOperations = permissions;
+        if (context.user.restrictedAccessHandler.permissions) {
+            const entityPerms = context.user.restrictedAccessHandler.permissions[entityTypeId];
+
+            if (!entityPerms) {
+                permissions = [];
+            } else if (entityPerms === true) {
+                // no change to operations
+            } else if (entityPerms instanceof Set) {
+                permissions = permissions.filter(perm => entityPerms.has(perm));
+            } else {
+                if (entityId) {
+                    const allowedPerms = entityPerms[entityId];
+                    if (allowedPerms) {
+                        permissions = permissions.filter(perm => allowedPerms.has(perm));
+                    } else {
+                        const allowedPerms = entityPerms['default'];
+                        if (allowedPerms) {
+                            permissions = permissions.filter(perm => allowedPerms.has(perm));
+                        } else {
+                            permissions = [];
+                        }
+                    }
+                } else {
+                    const allowedPerms = entityPerms['default'];
+                    if (allowedPerms) {
+                        permissions = permissions.filter(perm => allowedPerms.has(perm));
+                    } else {
+                        permissions = [];
+                    }
+                }
+            }
+        } else {
+            permissions = [];
+        }
+        log.verbose(operationMsg + ' with restrictedAccessHandler --  entityTypeId: ' + entityTypeId + '  entityId: ' + entityId + '  operations: [' + originalOperations + '] -> [' + permissions + ']');
+    }
+
+    return permissions;
+}
+
+function isAccessibleByRestrictedAccessHandler(context, entityTypeId, entityId, permissions, operationMsg) {
+    return filterPermissionsByRestrictedAccessHandler(context, entityTypeId, entityId, permissions, operationMsg).length > 0;
+}
+
 
 module.exports.listByEntityDTAjax = listByEntityDTAjax;
 module.exports.listByUserDTAjax = listByUserDTAjax;
@@ -710,3 +735,5 @@ module.exports.throwPermissionDenied = throwPermissionDenied;
 module.exports.regenerateRoleNamesTable = regenerateRoleNamesTable;
 module.exports.getGlobalPermissions = getGlobalPermissions;
 module.exports.getPermissionsTx = getPermissionsTx;
+module.exports.filterPermissionsByRestrictedAccessHandler = filterPermissionsByRestrictedAccessHandler;
+module.exports.isAccessibleByRestrictedAccessHandler = isAccessibleByRestrictedAccessHandler;

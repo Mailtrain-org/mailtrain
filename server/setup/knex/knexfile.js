@@ -3,6 +3,6 @@
 const config = require('./config');
 
 module.exports = {
-    client: 'mysql2',
+    client: 'mysql',
     connection: config.mysql
 };

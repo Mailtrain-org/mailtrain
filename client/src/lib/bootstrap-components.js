@@ -14,7 +14,6 @@ import {withComponentMixins} from "./decorator-helpers";
     withTranslation,
     withErrorHandling
 ])
-
 class DismissibleAlert extends Component {
     static propTypes = {
         severity: PropTypes.string.isRequired,
@@ -74,6 +73,7 @@ class Button extends Component {
         icon: PropTypes.string,
         iconTitle: PropTypes.string,
         className: PropTypes.string,
+        title: PropTypes.string,
         type: PropTypes.string
     }
 
@@ -106,7 +106,7 @@ class Button extends Component {
         }
 
         return (
-            <button type={type} className={className} onClick={::this.onClick}>{icon}{iconSpacer}{props.label}</button>
+            <button type={type} className={className} onClick={::this.onClick} title={this.props.title}>{icon}{iconSpacer}{props.label}</button>
         );
     }
 }

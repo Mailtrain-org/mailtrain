@@ -315,12 +315,12 @@ export class SectionContent extends Component {
         super(props);
 
         this.state = {
-        }
+        };
 
         this.historyUnlisten = props.history.listen((location, action) => {
             // noinspection JSIgnoredPromiseFromCall
             this.closeFlashMessage();
-        })
+        });
     }
 
     static propTypes = {

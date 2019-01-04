@@ -13,7 +13,6 @@ import {convertToFake, getLang} from '../../../shared/langs';
 import {createComponentMixin} from "./decorator-helpers";
 
 import lang_en_US_common from "../../../locales/en-US/common";
-import {withPageHelpers} from "./page-common";
 
 const resourcesCommon = {
     'en-US': lang_en_US_common,

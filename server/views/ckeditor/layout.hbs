@@ -22,7 +22,7 @@
 
     {{#if mailtrainConfig}}
         <script>
-            {{#if reactCsrfToken}}window.csfrToken = '{{reactCsrfToken}}';{{/if}}
+            {{#if reactCsrfToken}}window.csrfToken = '{{reactCsrfToken}}';{{/if}}
             window.mailtrainConfig = {{{mailtrainConfig}}};
         </script>
 

@@ -1,8 +1,8 @@
 'use strict';
 
 const { enforce } = require('./helpers');
-const shares = require('../models/shares');
 const interoperableErrors = require('../../shared/interoperable-errors');
+const shares = require('../models/shares');
 
 async function validateEntity(tx, entity) {
     enforce(entity.namespace, 'Entity namespace not set');

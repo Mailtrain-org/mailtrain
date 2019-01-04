@@ -1,11 +1,13 @@
 'use strict';
 
-import csfrToken from 'csfrToken';
+import csrfToken from 'csrfToken';
 import axios from 'axios';
 import interoperableErrors from '../../../shared/interoperable-errors';
 
 const axiosInst = axios.create({
-    headers: {'X-CSRF-TOKEN': csfrToken}
+    headers: {
+        'X-CSRF-TOKEN': csrfToken
+    }
 });
 
 const axiosWrapper = {

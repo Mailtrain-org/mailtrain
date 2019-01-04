@@ -222,7 +222,7 @@ if (LdapStrategy) {
     module.exports.isAuthMethodLocal = true;
 
     passport.use(new LocalStrategy(nodeifyFunction(async (username, password) => {
-        return await users.getByUsernameIfPasswordMatch(username, password);
+        return await users.getByUsernameIfPasswordMatch(contextHelpers.getAdminContext(), username, password);
     })));
 
     passport.serializeUser((user, done) => done(null, user.id));

@@ -93,7 +93,7 @@ module.exports = {
     },
     externals: {
         jquery: 'jQuery',
-        csfrToken: 'csfrToken',
+        csrfToken: 'csrfToken',
         mailtrainConfig: 'mailtrainConfig'
     },
     plugins: [
