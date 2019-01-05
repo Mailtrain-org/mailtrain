@@ -225,11 +225,16 @@ seleniumWebDriver:
 roles:
   global:
     master:
-      name: Master
+      name: Global Master
       admin: true
       description: All permissions
       permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings, setupAutomation]
       rootNamespaceRole: master
+    campaignsAdmin:
+      name: Campaigns Admin
+      description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
+      permissions: [setupAutomation]
+      ownNamespaceRole: campaignsAdmin
     nobody:
       name: None
       description: No permissions
@@ -250,6 +255,21 @@ roles:
         reportTemplate: [view, edit, delete, share, execute]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
         namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createReportTemplate, createTemplate, createMosaicoTemplate, createSendConfiguration, createCampaign, manageUsers]
+
+    campaignsAdmin:
+      name: Campaigns Admin
+      description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
+      permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createCampaign]
+      children:
+        sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
+        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
+        customForm: [view, edit, delete, share]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, fetchRss]
+        template: [view, edit, delete, share, viewFiles, manageFiles]
+        report: [view, edit, delete, share, execute, viewContent, viewOutput]
+        reportTemplate: [view, share, execute]
+        mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
+        namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createCampaign]
 
   sendConfiguration:
     master:

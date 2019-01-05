@@ -262,6 +262,8 @@ class RouteContent extends Component {
 
             const primaryMenuComponent = React.createElement(route.primaryMenuComponent, primaryMenuProps);
 
+            let content = null;
+
             if (resolved) {
                 const compProps = {
                     match: this.props.match,
@@ -276,10 +278,8 @@ class RouteContent extends Component {
                     panel = route.panelRender(compProps);
                 }
 
-                return (
-                    <div>
-                        {primaryMenuComponent}
-
+                content = (
+                    <>
                         <div className={styles.breadcrumbAndSecondaryNavbar}>
                             <Breadcrumb route={route} params={params} resolved={resolved}/>
                             <SecondaryNavBar route={route} params={params} resolved={resolved}/>
@@ -289,18 +289,33 @@ class RouteContent extends Component {
                             {this.props.flashMessage}
                             {panel}
                         </div>
-                    </div>
+                    </>
                 );
             } else {
-                return (
-                    <div>
-                        {primaryMenuComponent}
-                        <div className="container-fluid">
-                            {t('loading')}
-                        </div>
+                content = (
+                    <div className="container-fluid">
+                        {t('loading')}
                     </div>
                 );
             }
+
+            return (
+                <div className="app">
+                    <header className="app-header">
+                        {primaryMenuComponent}
+                    </header>
+
+                    <div className="app-body">
+                        <main className="main">
+                            {content}
+                        </main>
+                    </div>
+
+                    <footer className="app-footer">
+                        <div className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
+                    </footer>
+                </div>
+            );
         }
     }
 }
@@ -350,14 +365,14 @@ export class SectionContent extends Component {
 
     ensureAuthenticated() {
         if (!mailtrainConfig.isAuthenticated) {
-            this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
+            this.navigateTo('/login?next=' + encodeURIComponent(window.location.pathname));
         }
     }
 
     errorHandler(error) {
         if (error instanceof interoperableErrors.NotLoggedInError) {
-            if (window.location.pathname !== '/account/login') { // There may be multiple async requests failing at the same time. So we take the pathname only from the first one.
-                this.navigateTo('/account/login?next=' + encodeURIComponent(window.location.pathname));
+            if (window.location.pathname !== '/login') { // There may be multiple async requests failing at the same time. So we take the pathname only from the first one.
+                this.navigateTo('/login?next=' + encodeURIComponent(window.location.pathname));
             }
         } else if (error.response && error.response.data && error.response.data.message) {
             console.error(error);

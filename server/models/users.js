@@ -264,7 +264,7 @@ async function getByUsername(username) {
 
 async function getByUsernameIfPasswordMatch(context, username, password) {
     try {
-        const user = await _getBy('username', username, ['password']);
+        const user = await _getBy(context, 'username', username, ['password']);
 
         if (!await bcryptCompare(password, user.password)) {
             throw new interoperableErrors.IncorrectPasswordError();
@@ -324,7 +324,7 @@ async function sendPasswordReset(locale, usernameOrEmail) {
                     title: tUI('mailtrain', locale),
                     username: user.username,
                     name: user.name,
-                    confirmUrl: getTrustedUrl(`/account/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
+                    confirmUrl: getTrustedUrl(`login/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
                 }
             });
         }

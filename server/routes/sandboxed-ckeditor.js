@@ -45,7 +45,7 @@ function getRouter(appType) {
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
-                    getSandboxUrl('mailtrain/ckeditor-root.js')
+                    getSandboxUrl('client/ckeditor-root.js')
                 ],
                 publicPath: getSandboxUrl()
             });

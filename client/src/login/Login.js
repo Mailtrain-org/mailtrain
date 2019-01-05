@@ -106,7 +106,7 @@ export default class Login extends Component {
 
         let passwordResetLink;
         if (mailtrainConfig.isAuthMethodLocal) {
-            passwordResetLink = <Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('forgotYourPassword?')}</Link>;
+            passwordResetLink = <Link to={`/login/forgot/${this.getFormValue('username')}`}>{t('forgotYourPassword?')}</Link>;
         } else if (mailtrainConfig.externalPasswordResetLink) {
             passwordResetLink = <a href={mailtrainConfig.externalPasswordResetLink}>{t('forgotYourPassword?')}</a>;
         }

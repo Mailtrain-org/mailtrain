@@ -9,9 +9,9 @@ import PropTypes
 
 import jQuery
     from 'jquery';
-import '../../vendor/jquery/jquery-ui-1.12.1.min.js';
-import '../../vendor/fancytree/jquery.fancytree-all.min.js';
-import '../../vendor/fancytree/skin-bootstrap/ui.fancytree.min.css';
+import '../../static/jquery/jquery-ui-1.12.1.min.js';
+import '../../static/fancytree/jquery.fancytree-all.min.js';
+import '../../static/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.scss';
 import axios
     from './axios';

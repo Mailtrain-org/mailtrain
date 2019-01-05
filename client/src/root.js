@@ -9,6 +9,8 @@ import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './lib/i18n';
 import account
     from './account/root';
+import login
+    from './login/root';
 import blacklist
     from './blacklist/root';
 import lists
@@ -41,6 +43,7 @@ import Home
     from "./Home";
 import {
     ActionLink,
+    ButtonDropdownActionLink,
     Icon
 } from "./lib/bootstrap-components";
 import {Link} from "react-router-dom";
@@ -89,7 +92,7 @@ class Root extends Component {
                     const label = langDesc.getLabel(t);
 
                     languageOptions.push(
-                        <ActionLink key={lng} className="dropdown-item" onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</ActionLink>
+                        <ButtonDropdownActionLink key={lng} onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</ButtonDropdownActionLink>
                     )
                 }
 
@@ -166,6 +169,7 @@ class Root extends Component {
             panelComponent: Home,
             primaryMenuComponent: MainMenu,
             children: {
+                ...login.getMenus(t),
                 ...lists.getMenus(t),
                 ...reports.getMenus(t),
                 ...templates.getMenus(t),
@@ -180,15 +184,7 @@ class Root extends Component {
         };
 
         return (
-            <div>
-                <Section root='/' structure={structure}/>
-
-                <footer className="footer">
-                    <div className="container-fluid">
-                        <p className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></p>
-                    </div>
-                </footer>
-            </div>
+            <Section root='/' structure={structure}/>
         );
     }
 }

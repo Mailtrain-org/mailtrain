@@ -1,0 +1,51 @@
+$fa-font-path: "../static-npm/fontawesome";
+
+@import "./variables.scss";
+@import "node_modules/@coreui/coreui/scss/coreui.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+
+.custom-select {
+  -webkit-appearance: none; // This is a fix for Chrome
+}
+
+body.mailtrain {
+  background-color: white;
+
+  .app-header {
+    height: auto;
+    padding: 0;
+    flex: none;
+    border-bottom: 0px none;
+
+    .navbar-brand {
+      width: auto;
+      height: auto;
+      display: inline-block;
+      padding-top: $navbar-brand-padding-y;
+      padding-bottom: $navbar-brand-padding-y;
+      margin-right: $navbar-padding-x;
+    }
+
+    .nav-item {
+      min-width: 0px;
+    }
+  }
+
+  .main .container-fluid {
+    padding: 0 15px;
+  }
+
+  .navbar-dark {
+    .navbar-nav {
+      .active > .nav-link:hover {
+        color: $navbar-dark-active-color;
+      }
+    }
+  }
+
+  .gpg-text {
+    font-family: monospace;
+  }
+}

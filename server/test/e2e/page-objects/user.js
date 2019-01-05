@@ -7,9 +7,9 @@ module.exports = {
         url: '/users/login',
         elementsToWaitFor: ['submitButton'],
         elements: {
-            usernameInput: 'form[action="/account/login"] input[name="username"]',
-            passwordInput: 'form[action="/account/login"] input[name="password"]',
-            submitButton: 'form[action="/account/login"] [type=submit]'
+            usernameInput: 'form[action="/login"] input[name="username"]',
+            passwordInput: 'form[action="/login"] input[name="password"]',
+            submitButton: 'form[action="/login"] [type=submit]'
         }
     }),
 

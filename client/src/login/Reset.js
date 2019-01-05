@@ -114,7 +114,7 @@ export default class Account extends Component {
             });
 
             if (submitSuccessful) {
-                this.navigateToWithFlashMessage('/account/login', 'success', t('passwordReset-1'));
+                this.navigateToWithFlashMessage('/login', 'success', t('passwordReset-1'));
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -124,7 +124,7 @@ export default class Account extends Component {
                 this.setFormStatusMessage('danger',
                     <span>
                         <strong>{t('yourPasswordCannotBeReset')}</strong>{' '}
-                        {t('thePasswordResetTokenHasExpired')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('clickHereToRequestANewPasswordResetLink')}</Link>
+                        {t('thePasswordResetTokenHasExpired')}{' '}<Link to={`/login/forgot/${this.getFormValue('username')}`}>{t('clickHereToRequestANewPasswordResetLink')}</Link>
                     </span>
                 );
                 return;
@@ -147,7 +147,7 @@ export default class Account extends Component {
                 <div>
                     <Title>{t('thePasswordCannotBeReset')}</Title>
 
-                    <p>{t('thePasswordResetTokenHasExpired')}{' '}<Link to={`/account/forgot/${this.getFormValue('username')}`}>{t('clickHereToRequestANewPasswordResetLink')}</Link></p>
+                    <p>{t('thePasswordResetTokenHasExpired')}{' '}<Link to={`/login/forgot/${this.getFormValue('username')}`}>{t('clickHereToRequestANewPasswordResetLink')}</Link></p>
                 </div>
             );
 

@@ -201,7 +201,7 @@ function getRouter(appType) {
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
-                    getSandboxUrl('mailtrain/mosaico-root.js')
+                    getSandboxUrl('client/mosaico-root.js')
                 ],
                 publicPath: getSandboxUrl()
             });

@@ -5,7 +5,7 @@ require('./extensions-common');
 const config = require('../ivis-core/server/lib/config');
 
 module.exports = {
-    client: 'mysql2',
+    client: 'mysql',
     connection: config.mysql,
     seeds: {
         directory: '../ivis-core/server/knex/seeds'

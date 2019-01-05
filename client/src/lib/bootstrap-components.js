@@ -114,7 +114,6 @@ class Button extends Component {
 class ButtonDropdown extends Component {
     static propTypes = {
         label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        noCaret: PropTypes.bool,
         className: PropTypes.string,
         buttonClassName: PropTypes.string,
         menuClassName: PropTypes.string
@@ -165,6 +164,30 @@ class ActionLink extends Component {
 
         return (
             <a href="" className={props.className} onClick={::this.onClick}>{props.children}</a>
+        );
+    }
+}
+
+
+class ButtonDropdownActionLink extends Component {
+    static propTypes = {
+        onClickAsync: PropTypes.func,
+        className: PropTypes.string,
+        disabled: PropTypes.bool
+    }
+
+    render() {
+        const props = this.props;
+
+        let clsName = "dropdown-item ";
+        if (props.disabled) {
+            clsName += "disabled ";
+        }
+
+        clsName += props.className;
+
+        return (
+            <ActionLink className={clsName} onClickAsync={props.onClickAsync}>{props.children}</ActionLink>
         );
     }
 }
@@ -289,8 +312,8 @@ class ModalDialog extends Component {
 export {
     Button,
     ButtonDropdown,
-    DropdownMenuItem,
     ActionLink,
+    ButtonDropdownActionLink,
     DismissibleAlert,
     ModalDialog,
     Icon

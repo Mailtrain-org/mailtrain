@@ -233,9 +233,10 @@ function createApp(appType) {
     }
 
     useWith404Fallback('/static', express.static(path.join(__dirname, '..', 'client', 'static')));
-    useWith404Fallback('/mailtrain', express.static(path.join(__dirname, '..', 'client', 'dist')));
+    useWith404Fallback('/client', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
     useWith404Fallback('/static-npm/fontawesome', express.static(path.join(__dirname, '..', 'client', 'node_modules', '@fortawesome', 'fontawesome-free', 'webfonts')));
+    useWith404Fallback('/static-npm/jquery.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', 'jquery', 'dist', 'jquery.min.js')));
     useWith404Fallback('/static-npm/popper.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', 'popper.js', 'dist', 'umd', 'popper.min.js')));
     useWith404Fallback('/static-npm/bootstrap.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.min.js')));
     useWith404Fallback('/static-npm/coreui.min.js', express.static(path.join(__dirname, '..', 'client', 'node_modules', '@coreui', 'coreui', 'dist', 'js', 'coreui.min.js')));
@@ -351,7 +352,7 @@ function createApp(appType) {
 
             } else {
                 if (err instanceof interoperableErrors.NotLoggedInError) {
-                    return res.redirect(getTrustedUrl('/account/login?next=' + encodeURIComponent(req.originalUrl)));
+                    return res.redirect(getTrustedUrl('/login?next=' + encodeURIComponent(req.originalUrl)));
                 } else {
                     res.status(err.status || 500);
                     res.render('error', {
@@ -395,7 +396,7 @@ function createApp(appType) {
                 // TODO: Render interoperable errors using a special client that does internationalization of the error message
 
                 if (err instanceof interoperableErrors.NotLoggedInError) {
-                    return res.redirect(getTrustedUrl('/account/login?next=' + encodeURIComponent(req.originalUrl)));
+                    return res.redirect(getTrustedUrl('/login?next=' + encodeURIComponent(req.originalUrl)));
                 } else {
                     res.status(err.status || 500);
                     res.render('error', {

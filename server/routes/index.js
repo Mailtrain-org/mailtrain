@@ -21,7 +21,7 @@ function getRouter(appType) {
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [
-                    getTrustedUrl('mailtrain/root.js')
+                    getTrustedUrl('client/root.js')
                 ],
                 publicPath: getTrustedUrl()
             });

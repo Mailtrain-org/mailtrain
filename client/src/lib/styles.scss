@@ -1,4 +1,4 @@
-@import "../../static/scss/variables";
+@import "../scss/variables.scss";
 
 .form { // This is here to give the styles below higher priority than Bootstrap has
   :global .DayPicker {
