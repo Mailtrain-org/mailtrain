@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Icon} from '../lib/bootstrap-components';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -103,7 +103,7 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/send-configurations/create" className="btn-primary" icon="plus" label={t('createSendConfiguration')}/>
+                        <LinkButton to="/send-configurations/create" className="btn-primary" icon="plus" label={t('createSendConfiguration')}/>
                     </Toolbar>
                 }
 

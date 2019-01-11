@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Icon} from '../lib/bootstrap-components';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -117,10 +117,10 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {this.state.createPermitted &&
-                       <NavButton linkTo="/templates/create" className="btn-primary" icon="plus" label={t('createTemplate')}/>
+                       <LinkButton to="/templates/create" className="btn-primary" icon="plus" label={t('createTemplate')}/>
                     }
                     {this.state.mosaicoTemplatesPermitted &&
-                        <NavButton linkTo="/templates/mosaico" className="btn-primary" label={t('mosaicoTemplates')}/>
+                        <LinkButton to="/templates/mosaico" className="btn-primary" label={t('mosaicoTemplates')}/>
                     }
                 </Toolbar>
 

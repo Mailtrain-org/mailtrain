@@ -7,7 +7,7 @@ import {
     Icon
 } from '../lib/bootstrap-components';
 import {
-    ButtonDropdownLink,
+    DropdownLink,
     NavDropdown,
     requiresAuthenticatedUser,
     Title,
@@ -175,9 +175,9 @@ export default class List extends Component {
                 <Toolbar>
                     {this.state.createPermitted &&
                     <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createCampaign')}>
-                        <ButtonDropdownLink to="/campaigns/create-regular">{t('regular')}</ButtonDropdownLink>
-                        <ButtonDropdownLink to="/campaigns/create-rss">{t('rss')}</ButtonDropdownLink>
-                        <ButtonDropdownLink to="/campaigns/create-triggered">{t('triggered')}</ButtonDropdownLink>
+                        <DropdownLink to="/campaigns/create-regular">{t('regular')}</DropdownLink>
+                        <DropdownLink to="/campaigns/create-rss">{t('rss')}</DropdownLink>
+                        <DropdownLink to="/campaigns/create-triggered">{t('triggered')}</DropdownLink>
                     </ButtonDropdown>
                     }
                 </Toolbar>

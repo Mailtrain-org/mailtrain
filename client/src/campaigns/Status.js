@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     withPageHelpers
@@ -308,7 +308,7 @@ class SendControls extends Component {
                             :
                             <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.startAsync}/>
                         }
-                        {entity.status === CampaignStatus.PAUSED && <NavButton className="btn-secondary" icon="signal" label={t('viewStatistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>}
+                        {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
                     </ButtonRow>
                 </div>
             );
@@ -321,7 +321,7 @@ class SendControls extends Component {
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
-                        <NavButton className="btn-secondary" icon="signal" label={t('viewStatistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
+                        <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
                 </div>
             );
@@ -337,7 +337,7 @@ class SendControls extends Component {
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.startAsync}/>
                         <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
-                        <NavButton className="btn-secondary" icon="signal" label={t('viewStatistics')} linkTo={`/campaigns/${entity.id}/statistics`}/>
+                        <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
                 </div>
             );

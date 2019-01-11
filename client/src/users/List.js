@@ -3,7 +3,7 @@
 import React, {Component} from "react";
 import {withTranslation} from '../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -74,7 +74,7 @@ export default class List extends Component {
             <div>
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
-                    <NavButton linkTo="/users/create" className="btn-primary" icon="plus" label={t('createUser')}/>
+                    <LinkButton to="/users/create" className="btn-primary" icon="plus" label={t('createUser')}/>
                 </Toolbar>
 
                 <Title>{t('users')}</Title>

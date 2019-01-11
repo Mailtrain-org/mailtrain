@@ -48,7 +48,7 @@ export const withErrorHandling = createComponentMixin([{context: ParentErrorHand
         handleError(this, error);
     };
 
-    return TargetClass;
+    return {};
 });
 
 export function withAsyncErrorHandler(target, name, descriptor) {

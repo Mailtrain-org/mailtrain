@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -185,7 +185,7 @@ export default class List extends Component {
                 <Toolbar>
                     <a href={getPublicUrl(`subscription/${this.props.list.cid}`, {withLocale: true})}><Button label={t('subscriptionForm')} className="btn-secondary"/></a>
                     <a href={getUrl(`subscriptions/export/${this.props.list.id}/`+ (this.props.segmentId || 0))}><Button label={t('exportAsCsv')} className="btn-primary"/></a>
-                    <NavButton linkTo={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('addSubscriber')}/>
+                    <LinkButton to={`/lists/${this.props.list.id}/subscriptions/create`} className="btn-primary" icon="plus" label={t('addSubscriber')}/>
                 </Toolbar>
 
                 <Title>{t('subscribers')}</Title>

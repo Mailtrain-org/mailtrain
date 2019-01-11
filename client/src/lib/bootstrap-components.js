@@ -14,7 +14,7 @@ import {withComponentMixins} from "./decorator-helpers";
     withTranslation,
     withErrorHandling
 ])
-class DismissibleAlert extends Component {
+export class DismissibleAlert extends Component {
     static propTypes = {
         severity: PropTypes.string.isRequired,
         onCloseAsync: PropTypes.func
@@ -39,7 +39,7 @@ class DismissibleAlert extends Component {
     }
 }
 
-class Icon extends Component {
+export class Icon extends Component {
     static propTypes = {
         icon: PropTypes.string.isRequired,
         family: PropTypes.string,
@@ -66,7 +66,7 @@ class Icon extends Component {
 @withComponentMixins([
     withErrorHandling
 ])
-class Button extends Component {
+export class Button extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
         label: PropTypes.string,
@@ -111,7 +111,7 @@ class Button extends Component {
     }
 }
 
-class ButtonDropdown extends Component {
+export class ButtonDropdown extends Component {
     static propTypes = {
         label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         className: PropTypes.string,
@@ -143,7 +143,7 @@ class ButtonDropdown extends Component {
 @withComponentMixins([
     withErrorHandling
 ])
-class ActionLink extends Component {
+export class ActionLink extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
         className: PropTypes.string
@@ -169,7 +169,7 @@ class ActionLink extends Component {
 }
 
 
-class ButtonDropdownActionLink extends Component {
+export class DropdownActionLink extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
         className: PropTypes.string,
@@ -193,11 +193,31 @@ class ButtonDropdownActionLink extends Component {
 }
 
 
+export class DropdownDivider extends Component {
+    static propTypes = {
+        className: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        let className = 'dropdown-divider';
+        if (props.className) {
+            className = className + ' ' + props.className;
+        }
+
+        return (
+            <div className={className}/>
+        );
+    }
+}
+
+
 @withComponentMixins([
     withTranslation,
     withErrorHandling
 ])
-class ModalDialog extends Component {
+export class ModalDialog extends Component {
     constructor(props) {
         super(props);
 
@@ -307,14 +327,3 @@ class ModalDialog extends Component {
     }
 }
 
-
-
-export {
-    Button,
-    ButtonDropdown,
-    ActionLink,
-    ButtonDropdownActionLink,
-    DismissibleAlert,
-    ModalDialog,
-    Icon
-};

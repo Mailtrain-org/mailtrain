@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -78,7 +78,7 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.props.list.permissions.includes('manageFields') &&
                     <Toolbar>
-                        <NavButton linkTo={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('createField')}/>
+                        <LinkButton to={`/lists/${this.props.list.id}/fields/create`} className="btn-primary" icon="plus" label={t('createField')}/>
                     </Toolbar>
                 }
 

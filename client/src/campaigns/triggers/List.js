@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -84,7 +84,7 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {mailtrainConfig.globalPermissions.setupAutomation && this.props.campaign.permissions.includes('manageTriggers') &&
                     <Toolbar>
-                        <NavButton linkTo={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('createTrigger')}/>
+                        <LinkButton to={`/campaigns/${this.props.campaign.id}/triggers/create`} className="btn-primary" icon="plus" label={t('createTrigger')}/>
                     </Toolbar>
                 }
 

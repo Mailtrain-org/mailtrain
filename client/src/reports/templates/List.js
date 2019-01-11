@@ -7,7 +7,7 @@ import {
     Icon
 } from '../../lib/bootstrap-components';
 import {
-    ButtonDropdownLink,
+    DropdownLink,
     NavDropdown,
     requiresAuthenticatedUser,
     Title,
@@ -104,10 +104,10 @@ export default class List extends Component {
                 {this.state.createPermitted &&
                     <Toolbar>
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createReportTemplate')}>
-                            <ButtonDropdownLink to="/reports/templates/create">{t('blank')}</ButtonDropdownLink>
-                            <ButtonDropdownLink to="/reports/templates/create/open-counts">{t('openCounts')}</ButtonDropdownLink>
-                            <ButtonDropdownLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</ButtonDropdownLink>
-                            <ButtonDropdownLink to="/reports/templates/create/aggregated-open-counts">{t('aggregatedOpenCounts')}</ButtonDropdownLink>
+                            <DropdownLink to="/reports/templates/create">{t('blank')}</DropdownLink>
+                            <DropdownLink to="/reports/templates/create/open-counts">{t('openCounts')}</DropdownLink>
+                            <DropdownLink to="/reports/templates/create/open-counts-csv">{t('openCountsAsCsv')}</DropdownLink>
+                            <DropdownLink to="/reports/templates/create/aggregated-open-counts">{t('aggregatedOpenCounts')}</DropdownLink>
                         </ButtonDropdown>
                     </Toolbar>
                 }

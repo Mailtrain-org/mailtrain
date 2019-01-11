@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Component} from "react";
-import {withTranslation} from './i18n';
+import i18n, {withTranslation} from './i18n';
 import PropTypes
     from "prop-types";
 import {withRouter} from "react-router";
@@ -19,8 +19,10 @@ import {
 import interoperableErrors
     from "../../../shared/interoperable-errors";
 import {
+    ActionLink,
     Button,
     DismissibleAlert,
+    DropdownActionLink,
     Icon
 } from "./bootstrap-components";
 import mailtrainConfig
@@ -39,6 +41,7 @@ import {
     createComponentMixin,
     withComponentMixins
 } from "./decorator-helpers";
+import {getLang} from "../../../shared/langs";
 
 export { withPageHelpers }
 
@@ -98,7 +101,7 @@ class Breadcrumb extends Component {
     }
 }
 
-class SecondaryNavBar extends Component {
+class TertiaryNavBar extends Component {
     static propTypes = {
         route: PropTypes.object.isRequired,
         params: PropTypes.object.isRequired,
@@ -167,7 +170,7 @@ class SecondaryNavBar extends Component {
         }
 
         if (renderedElems.length > 1) {
-            let className = styles.secondaryNav + ' nav nav-pills';
+            let className = styles.tertiaryNav + ' nav nav-pills';
             if (this.props.className) {
                 className += ' ' + this.props.className;
             }
@@ -191,6 +194,12 @@ class RouteContent extends Component {
         if (Object.keys(props.route.resolve).length === 0) {
             this.state.resolved = {};
         }
+
+        this.sidebarAnimationNodeListener = evt => {
+            if (evt.propertyName === 'left') {
+                this.forceUpdate();
+            }
+        };
     }
 
     static propTypes = {
@@ -220,12 +229,20 @@ class RouteContent extends Component {
         }
     }
 
+    registerSidebarAnimationListener() {
+        if (this.sidebarAnimationNode) {
+            this.sidebarAnimationNode.addEventListener("transitionend", this.sidebarAnimationNodeListener);
+        }
+    }
+
     componentDidMount() {
         // noinspection JSIgnoredPromiseFromCall
         this.resolve(this.props);
+        this.registerSidebarAnimationListener();
     }
 
     componentDidUpdate() {
+        this.registerSidebarAnimationListener();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -245,6 +262,8 @@ class RouteContent extends Component {
         const params = this.props.match.params;
         const resolved = this.state.resolved;
 
+        const showSidebar = !!route.secondaryMenuComponent;
+
         if (!route.panelRender && !route.panelComponent && route.link) {
             let link;
             if (typeof route.link === 'function') {
@@ -256,12 +275,8 @@ class RouteContent extends Component {
             return <Redirect to={link}/>;
 
         } else {
-            const primaryMenuProps = {
-                location: this.props.location
-            };
-
-            const primaryMenuComponent = React.createElement(route.primaryMenuComponent, primaryMenuProps);
-
+            let primaryMenu = null;
+            let secondaryMenu = null;
             let content = null;
 
             if (resolved) {
@@ -278,11 +293,19 @@ class RouteContent extends Component {
                     panel = route.panelRender(compProps);
                 }
 
+                if (route.primaryMenuComponent) {
+                    primaryMenu = React.createElement(route.primaryMenuComponent, compProps);
+                }
+
+                if (route.secondaryMenuComponent) {
+                    secondaryMenu = React.createElement(route.secondaryMenuComponent, compProps);
+                }
+
                 content = (
                     <>
-                        <div className={styles.breadcrumbAndSecondaryNavbar}>
+                        <div className="mt-breadcrumb-and-tertiary-navbar">
                             <Breadcrumb route={route} params={params} resolved={resolved}/>
-                            <SecondaryNavBar route={route} params={params} resolved={resolved}/>
+                            <TertiaryNavBar route={route} params={params} resolved={resolved}/>
                         </div>
 
                         <div className="container-fluid">
@@ -291,6 +314,7 @@ class RouteContent extends Component {
                         </div>
                     </>
                 );
+
             } else {
                 content = (
                     <div className="container-fluid">
@@ -299,13 +323,35 @@ class RouteContent extends Component {
                 );
             }
 
+
             return (
-                <div className="app">
+                <div className={"app " + (showSidebar ? 'sidebar-lg-show' : '')}>
                     <header className="app-header">
-                        {primaryMenuComponent}
+                        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+                            {showSidebar &&
+                            <button className="navbar-toggler sidebar-toggler" data-toggle="sidebar-show" type="button">
+                                <span className="navbar-toggler-icon"/>
+                            </button>
+                            }
+
+                            <Link className="navbar-brand" to="/"><div><Icon icon="envelope"/> Mailtrain</div></Link>
+
+                            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                                <span className="navbar-toggler-icon"/>
+                            </button>
+
+                            <div className="collapse navbar-collapse" id="mtMainNavbar">
+                                {primaryMenu}
+                            </div>
+                        </nav>
                     </header>
 
                     <div className="app-body">
+                        {showSidebar &&
+                        <div className="sidebar">
+                            {secondaryMenu}
+                        </div>
+                        }
                         <main className="main">
                             {content}
                         </main>
@@ -330,6 +376,7 @@ export class SectionContent extends Component {
         super(props);
 
         this.state = {
+            flashMessageText: ''
         };
 
         this.historyUnlisten = props.history.listen((location, action) => {
@@ -457,7 +504,7 @@ export class Toolbar extends Component {
     };
 
     render() {
-        let className = 'float-right ' + styles.buttonRow;
+        let className = styles.toolbar + ' ' + styles.buttonRow;
         if (this.props.className) {
             className += ' ' + this.props.className;
         }
@@ -470,24 +517,24 @@ export class Toolbar extends Component {
     }
 }
 
-export class NavButton extends Component {
+export class LinkButton extends Component {
     static propTypes = {
         label: PropTypes.string,
         icon: PropTypes.string,
         className: PropTypes.string,
-        linkTo: PropTypes.string
+        to: PropTypes.string
     };
 
     render() {
         const props = this.props;
 
         return (
-            <Link to={props.linkTo}><Button label={props.label} icon={props.icon} className={props.className}/></Link>
+            <Link to={props.to}><Button label={props.label} icon={props.icon} className={props.className}/></Link>
         );
     }
 }
 
-export class ButtonDropdownLink extends Component {
+export class DropdownLink extends Component {
     static propTypes = {
         to: PropTypes.string,
         className: PropTypes.string
@@ -506,6 +553,8 @@ export class ButtonDropdownLink extends Component {
 export class NavLink extends Component {
     static propTypes = {
         to: PropTypes.string,
+        icon: PropTypes.string,
+        iconFamily: PropTypes.string,
         className: PropTypes.string
     }
 
@@ -513,8 +562,38 @@ export class NavLink extends Component {
         const props = this.props;
 
         const clsName = "nav-item" + (props.className ? " " + props.className : "")
+
+        let icon;
+        if (props.icon) {
+            icon = <><Icon icon={props.icon} family={props.iconFamily}/>{' '}</>;
+        }
+
         return (
-            <li className={clsName}><Link to={props.to} className="nav-link">{props.children}</Link></li>
+            <li className={clsName}><Link to={props.to} className="nav-link">{icon}{props.children}</Link></li>
+        );
+    }
+}
+
+export class NavActionLink extends Component {
+    static propTypes = {
+        onClickAsync: PropTypes.func,
+        icon: PropTypes.string,
+        iconFamily: PropTypes.string,
+        className: PropTypes.string
+    }
+
+    render() {
+        const props = this.props;
+
+        const clsName = "nav-item" + (props.className ? " " + props.className : "")
+
+        let icon;
+        if (props.icon) {
+            icon = <><Icon icon={props.icon} family={props.iconFamily}/>{' '}</>;
+        }
+
+        return (
+            <li className={clsName}><ActionLink onClickAsync={this.props.onClickAsync} className="nav-link">{icon}{props.children}</ActionLink></li>
         );
     }
 }
@@ -552,21 +631,6 @@ export class NavDropdown extends Component {
     }
 }
 
-export class NavDropdownLink extends Component {
-    static propTypes = {
-        to: PropTypes.string
-    }
-
-    render() {
-        const props = this.props;
-
-        return (
-            <Link to={props.to} className="dropdown-item">{props.children}</Link>
-        );
-    }
-}
-
-
 
 export const requiresAuthenticatedUser = createComponentMixin([], [withPageHelpers], (TargetClass, InnerClass) => {
     class RequiresAuthenticatedUser extends React.Component {
@@ -580,5 +644,29 @@ export const requiresAuthenticatedUser = createComponentMixin([], [withPageHelpe
         }
     }
 
-    return RequiresAuthenticatedUser;
+    return {
+        cls: RequiresAuthenticatedUser
+    };
 });
+
+export function getLanguageChooser(t) {
+    const languageOptions = [];
+    for (const lng of mailtrainConfig.enabledLanguages) {
+        const langDesc = getLang(lng);
+        const label = langDesc.getLabel(t);
+
+        languageOptions.push(
+            <DropdownActionLink key={lng} onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</DropdownActionLink>
+        )
+    }
+
+    const currentLngCode = getLang(i18n.language).getShortLabel(t);
+
+    const languageChooser = (
+        <NavDropdown menuClassName="dropdown-menu-right" label={currentLngCode}>
+            {languageOptions}
+        </NavDropdown>
+    );
+
+    return languageChooser;
+}

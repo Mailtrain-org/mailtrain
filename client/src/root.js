@@ -31,8 +31,9 @@ import settings
     from './settings/root';
 
 import {
+    DropdownLink,
+    getLanguageChooser,
     NavDropdown,
-    NavDropdownLink,
     NavLink,
     Section
 } from "./lib/page";
@@ -42,15 +43,13 @@ import mailtrainConfig
 import Home
     from "./Home";
 import {
-    ActionLink,
-    ButtonDropdownActionLink,
+    DropdownActionLink,
     Icon
 } from "./lib/bootstrap-components";
 import {Link} from "react-router-dom";
 import axios
     from './lib/axios';
 import {getUrl} from "./lib/urls";
-import {getLang} from "../../shared/langs";
 import {withComponentMixins} from "./lib/decorator-helpers";
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
@@ -86,18 +85,6 @@ class Root extends Component {
             }
 
             render() {
-                const languageOptions = [];
-                for (const lng of mailtrainConfig.enabledLanguages) {
-                    const langDesc = getLang(lng);
-                    const label = langDesc.getLabel(t);
-
-                    languageOptions.push(
-                        <ButtonDropdownActionLink key={lng} onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</ButtonDropdownActionLink>
-                    )
-                }
-
-                const currentLngCode = getLang(i18n.language).getShortLabel(t);
-
                 const path = this.props.location.pathname;
 
                 const topLevelItems = structure[""].children;
@@ -115,51 +102,38 @@ class Root extends Component {
                     }
                 }
 
-                const languageChooser = (
-                    <NavDropdown menuClassName="dropdown-menu-right" label={currentLngCode}>
-                        {languageOptions}
-                    </NavDropdown>
-                );
-
-                return (
-                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                        <Link className="navbar-brand" to="/"><Icon icon="envelope"/> Mailtrain</Link>
-                        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-
-                        {mailtrainConfig.isAuthenticated ?
-                            <div className="collapse navbar-collapse" id="mtMainNavbar">
-                                <ul className="navbar-nav mr-auto">
-                                    {topLevelMenu}
-                                    <NavDropdown label={t('administration')}>
-                                        <NavDropdownLink to="/users">{t('users')}</NavDropdownLink>
-                                        <NavDropdownLink to="/namespaces">{t('namespaces')}</NavDropdownLink>
-                                        {mailtrainConfig.globalPermissions.manageSettings && <NavDropdownLink to="/settings">{t('globalSettings')}</NavDropdownLink>}
-                                        <NavDropdownLink to="/send-configurations">{t('sendConfigurations')}</NavDropdownLink>
-                                        {mailtrainConfig.globalPermissions.manageBlacklist && <NavDropdownLink to="/blacklist">{t('blacklist')}</NavDropdownLink>}
-                                        <NavDropdownLink to="/account/api">{t('api')}</NavDropdownLink>
-                                    </NavDropdown>
-                                </ul>
-                                <ul className="navbar-nav">
-                                    {languageChooser}
-                                    <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
-                                        <NavDropdownLink to="/account"><Icon icon='user'/> {t('account')}</NavDropdownLink>
-                                        <ActionLink className="dropdown-item" onClickAsync={::this.logout}><Icon icon='sign-out-alt'/> {t('logOut')}</ActionLink>
-                                    </NavDropdown>
-                                </ul>
-                            </div>
-                        :
-                            <div className="collapse navbar-collapse" id="mtMainNavbar">
-                                <ul className="navbar-nav mr-auto">
-                                </ul>
-                                <ul className="navbar-nav">
-                                    {languageChooser}
-                                </ul>
-                            </div>
-                        }
-                    </nav>
-                );
+                if (mailtrainConfig.isAuthenticated) {
+                    return (
+                        <>
+                            <ul className="navbar-nav mt-navbar-nav-left">
+                                {topLevelMenu}
+                                <NavDropdown label={t('administration')}>
+                                    <DropdownLink to="/users">{t('users')}</DropdownLink>
+                                    <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>
+                                    {mailtrainConfig.globalPermissions.manageSettings && <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
+                                    <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>
+                                    {mailtrainConfig.globalPermissions.manageBlacklist && <DropdownLink to="/blacklist">{t('blacklist')}</DropdownLink>}
+                                    <DropdownLink to="/account/api">{t('api')}</DropdownLink>
+                                </NavDropdown>
+                            </ul>
+                            <ul className="navbar-nav mt-navbar-nav-right">
+                                {getLanguageChooser(t)}
+                                <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
+                                    <DropdownLink to="/account"><Icon icon='user'/> {t('account')}</DropdownLink>
+                                    <DropdownActionLink onClickAsync={::this.logout}><Icon icon='sign-out-alt'/> {t('logOut')}</DropdownActionLink>
+                                </NavDropdown>
+                            </ul>
+                        </>
+                    );
+                } else {
+                    return (
+                        <>
+                            <ul className="navbar-nav mt-navbar-nav-right">
+                                {languageChooser}
+                            </ul>
+                        </>
+                    );
+                }
             }
         }
 

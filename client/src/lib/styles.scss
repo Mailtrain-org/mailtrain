@@ -1,5 +1,9 @@
 @import "../scss/variables.scss";
 
+.toolbar {
+  float: right;
+}
+
 .form { // This is here to give the styles below higher priority than Bootstrap has
   :global .DayPicker {
     border: $input-border-width solid $input-border-color;
@@ -84,31 +88,16 @@
   margin-bottom: 20px;
 }
 
-.breadcrumbAndSecondaryNavbar {
-/*
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-*/
+.tertiaryNav {
+  justify-content: flex-end;
+  flex-grow: 1;
+  align-self: center;
 
-  :global .breadcrumb {
-    margin-bottom: 0px;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
+  margin-left: 5px;
+  margin-right: 5px;
 
-  margin-bottom: 1.5rem;
-
-  .secondaryNav {
-    justify-content: flex-end;
-
-    margin-top: 0.5rem;
-    margin-left: 5px;
-    margin-right: 5px;
-
-    :global .nav-item .nav-link {
-      padding: 3px 10px;
-    }
+  :global .nav-item .nav-link {
+    padding: 3px 10px;
   }
 }
 

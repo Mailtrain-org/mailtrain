@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -70,7 +70,7 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.props.list.permissions.includes('manageSegments') &&
                     <Toolbar>
-                        <NavButton linkTo={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('createSegment')}/>
+                        <LinkButton to={`/lists/${this.props.list.id}/segments/create`} className="btn-primary" icon="plus" label={t('createSegment')}/>
                     </Toolbar>
                 }
 

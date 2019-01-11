@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     withPageHelpers
@@ -276,7 +276,7 @@ export default class CUD extends Component {
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         {canDelete &&
-                            <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/reports/${this.props.entity.id}/delete`}/>
+                            <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/reports/${this.props.entity.id}/delete`}/>
                         }
                     </ButtonRow>
                 </Form>

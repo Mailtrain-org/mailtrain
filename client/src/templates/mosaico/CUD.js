@@ -5,7 +5,7 @@ import PropTypes
     from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     withPageHelpers
@@ -196,7 +196,7 @@ export default class CUD extends Component {
                             <Button type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
                             <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')}/>
                             {canDelete &&
-                                <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/templates/mosaico/${this.props.entity.id}/delete`}/>
+                                <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/mosaico/${this.props.entity.id}/delete`}/>
                             }
                         </ButtonRow>
                     :

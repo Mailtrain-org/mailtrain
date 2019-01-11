@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -146,8 +146,8 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/lists/create" className="btn-primary" icon="plus" label={t('createList')}/>
-                        <NavButton linkTo="/lists/forms" className="btn-primary" label={t('customForms-1')}/>
+                        <LinkButton to="/lists/create" className="btn-primary" icon="plus" label={t('createList')}/>
+                        <LinkButton to="/lists/forms" className="btn-primary" label={t('customForms-1')}/>
                     </Toolbar>
                 }
 

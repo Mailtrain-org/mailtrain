@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -89,7 +89,7 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {this.state.createPermitted &&
                     <Toolbar>
-                        <NavButton linkTo="/namespaces/create" className="btn-primary" icon="plus" label={t('createNamespace')}/>
+                        <LinkButton to="/namespaces/create" className="btn-primary" icon="plus" label={t('createNamespace')}/>
                     </Toolbar>
                 }
 

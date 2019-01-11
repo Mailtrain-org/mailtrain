@@ -7,8 +7,8 @@
     "js": "webpack",
     "watch-js": "webpack --watch",
     "css": "npm-run-all --sequential css-compile css-minify",
-    "css-compile": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 ../ivis-core/client/src/scss/ivis.scss ../ivis-core/client/dist/ivis.css",
-    "css-minify": "cleancss --level 1 --source-map --source-map-inline-sources --output ../ivis-core/client/dist/ivis.min.css ../ivis-core/client/dist/ivis.css",
+    "css-compile": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 ../ivis-core/client/src/scss/ivis.scss dist/ivis.css",
+    "css-minify": "cleancss --level 1 --source-map --source-map-inline-sources --output dist/ivis.min.css dist/ivis.css",
     "watch-css": "nodemon --watch ../ivis-core/client/src/scss -e scss -x \"npm run css\"",
     "watch": "node ../ivis-core/client/pre-build.js && npm-run-all --parallel watch-css watch-js",
     "build": "node ../ivis-core/client/pre-build.js && npm-run-all --parallel css js"

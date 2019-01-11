@@ -27,6 +27,29 @@ export function withComponentMixins(mixins, delegateFuns) {
     }
 
     return TargetClass => {
+        const ctors = [];
+
+        function TargetClassWithCtors(props, context) {
+            if (!new.target) {
+                throw new TypeError();
+            }
+
+            const self = Reflect.construct(TargetClass, [props, context], new.target);
+
+            for (const ctor of ctors) {
+                ctor(self);
+            }
+
+            return self;
+        }
+
+        TargetClassWithCtors.prototype = TargetClass.prototype;
+
+        for (const attr in TargetClass) {
+            TargetClassWithCtors[attr] = TargetClass[attr];
+        }
+
+
         class ComponentMixinsInner extends React.Component {
             render() {
                 const props = {
@@ -36,7 +59,7 @@ export function withComponentMixins(mixins, delegateFuns) {
                 delete props._decoratorInnerInstanceRefFn;
 
                 return (
-                    <TargetClass {...props}/>
+                    <TargetClassWithCtors {...props}/>
                 );
             }
         }
@@ -44,7 +67,15 @@ export function withComponentMixins(mixins, delegateFuns) {
         let DecoratedInner = ComponentMixinsInner;
 
         for (const mixin of mixinsClosure.values()) {
-            DecoratedInner = mixin.decoratorFn(DecoratedInner, TargetClass);
+            const res = mixin.decoratorFn(DecoratedInner, TargetClassWithCtors);
+
+            if (res.cls) {
+                DecoratedInner = res.cls;
+            }
+
+            if (res.ctor) {
+                ctors.push(res.ctor);
+            }
         }
 
         class ComponentMixinsOuter extends React.Component {

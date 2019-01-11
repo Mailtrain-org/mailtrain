@@ -139,5 +139,5 @@ export const withPageHelpers = createComponentMixin([{context: SectionContentCon
         return this.props.sectionContent.navigateToWithFlashMessage(path, severity, text);
     }
 
-    return TargetClass;
+    return {};
 });

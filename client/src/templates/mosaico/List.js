@@ -7,7 +7,7 @@ import {
     Icon
 } from '../../lib/bootstrap-components';
 import {
-    ButtonDropdownLink,
+    DropdownLink,
     NavDropdown,
     requiresAuthenticatedUser,
     Title,
@@ -121,8 +121,8 @@ export default class List extends Component {
                 {this.state.createPermitted &&
                     <Toolbar>
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createMosaicoTemplate')}>
-                            <ButtonDropdownLink to="/templates/mosaico/create">{t('blank')}</ButtonDropdownLink>
-                            <ButtonDropdownLink to="/templates/mosaico/create/versafix">{t('versafixOne')}</ButtonDropdownLink>
+                            <DropdownLink to="/templates/mosaico/create">{t('blank')}</DropdownLink>
+                            <DropdownLink to="/templates/mosaico/create/versafix">{t('versafixOne')}</DropdownLink>
                         </ButtonDropdown>
                     </Toolbar>
                 }

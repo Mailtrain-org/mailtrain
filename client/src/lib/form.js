@@ -74,7 +74,7 @@ const withFormStateOwner = createComponentMixin([{context: FormStateOwnerContext
         return this.props.formStateOwner;
     }
 
-    return TargetClass;
+    return {};
 });
 
 
@@ -1395,7 +1395,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         }
     };
 
-    return TargetClass;
+    return {};
 });
 
 

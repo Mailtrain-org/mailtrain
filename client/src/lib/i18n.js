@@ -62,7 +62,9 @@ export default i18n;
 
 
 export const withTranslation = createComponentMixin([], [], (TargetClass, InnerClass) => {
-    return withNamespaces()(TargetClass)
+    return {
+        cls: withNamespaces()(TargetClass)
+    }
 });
 
 export function tMark(key) {

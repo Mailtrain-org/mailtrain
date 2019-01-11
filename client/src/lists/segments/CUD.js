@@ -5,7 +5,7 @@ import PropTypes
     from "prop-types";
 import {withTranslation} from '../../lib/i18n';
 import {
-    NavButton,
+    LinkButton,
     requiresAuthenticatedUser,
     Title,
     Toolbar,
@@ -412,7 +412,7 @@ export default class CUD extends Component {
                         <Button type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
                         <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={::this.submitAndLeave}/>
 
-                        <NavButton className="btn-danger" icon="trash-alt" label={t('delete')} linkTo={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
+                        <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
                     </ButtonRow>
                     :
                     <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
