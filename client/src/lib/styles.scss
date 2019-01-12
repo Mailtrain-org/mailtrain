@@ -82,7 +82,6 @@
   background-color: white;
 }
 
-
 :global h3.legend {
   font-size: 21px;
   margin-bottom: 20px;
@@ -98,6 +97,21 @@
 
   :global .nav-item .nav-link {
     padding: 3px 10px;
+  }
+}
+
+.colorPickerSwatchWrapper {
+  padding: 7px;
+  background: #fff;
+  border: 1px solid #AAB2BD;
+  border-radius: 4px;
+  display: inline-block;
+  cursor: pointer;
+
+  .colorPickerSwatchColor {
+    width: 60px;
+    height: 18px;
+    borderRadius: 2px;
   }
 }
 

@@ -146,7 +146,8 @@ export class ButtonDropdown extends Component {
 export class ActionLink extends Component {
     static propTypes = {
         onClickAsync: PropTypes.func,
-        className: PropTypes.string
+        className: PropTypes.string,
+        href: PropTypes.string
     }
 
     @withAsyncErrorHandler
@@ -163,7 +164,7 @@ export class ActionLink extends Component {
         const props = this.props;
 
         return (
-            <a href="" className={props.className} onClick={::this.onClick}>{props.children}</a>
+            <a href={props.href || ''} className={props.className} onClick={::this.onClick}>{props.children}</a>
         );
     }
 }

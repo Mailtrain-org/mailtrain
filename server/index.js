@@ -141,7 +141,6 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
             )
         )
     );
-*/
 });
 
 
