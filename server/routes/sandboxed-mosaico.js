@@ -22,6 +22,8 @@ const mosaicoTemplates = require('../models/mosaico-templates');
 const contextHelpers = require('../lib/context-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 
+const bluebird = require('bluebird');
+
 const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 const { base } = require('../../shared/templates');
 const { AppType } = require('../../shared/app');
@@ -221,7 +223,11 @@ function getRouter(appType) {
             if (method === 'placeholder') {
                 width = sanitizeSize(width, 1, 2048, 600, false);
                 height = sanitizeSize(height, 1, 2048, 300, false);
-                image = await placeholderImage(width, height);
+                try {
+                    image = await placeholderImage(width, height);
+                } catch (err) {
+                    console.log(err);
+                }
 
             } else {
                 width = sanitizeSize(width, 1, 2048, 600, false);
