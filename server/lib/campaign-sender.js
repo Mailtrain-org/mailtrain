@@ -20,6 +20,7 @@ const htmlToText = require('html-to-text');
 const {getPublicUrl} = require('./urls');
 const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
+const shares = require('../models/shares')
 
 
 class CampaignSender {
@@ -30,7 +31,7 @@ class CampaignSender {
         let sendConfiguration, list, fieldsGrouped, campaign, subscriptionGrouped, useVerp, useVerpSenderHeader, mergeTags, attachments;
 
         await knex.transaction(async tx => {
-            sendConfiguration = await sendConfigurations.getByIdTx(tx, context, sendConfigurationId, false, true);
+            sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), sendConfigurationId, false, true);
             list = await lists.getByCidTx(tx, context, listCid);
             fieldsGrouped = await fields.listGroupedTx(tx, list.id);
 
@@ -42,7 +43,10 @@ class CampaignSender {
 
             if (campaignId) {
                 campaign = await campaigns.getByIdTx(tx, context, campaignId, false, campaigns.Content.WITHOUT_SOURCE_CUSTOM);
+                await campaigns.enforceSendPermissionTx(tx, context, campaign);
             } else {
+                await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
+
                 // This is to fake the campaign for getMessageLinks, which is called inside formatMessage
                 campaign = {
                     cid: '[CAMPAIGN_ID]'

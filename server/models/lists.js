@@ -34,14 +34,17 @@ async function listDTAjax(context, params) {
             .from('lists')
             .innerJoin('namespaces', 'namespaces.id', 'lists.namespace'),
         ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
-            { query: builder =>
-                builder.from('campaigns')
-                    .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
-                    .innerJoin('triggers', 'campaigns.id', 'triggers.campaign')
-                    .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
-                    .whereRaw('campaign_lists.list = lists.id')
-                    .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
-                    .count()
+            {
+                name: 'triggerCount',
+                query: builder =>
+                    builder.from('campaigns')
+                        .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+                        .innerJoin('triggers', 'campaigns.id', 'triggers.campaign')
+                        .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
+                        .whereRaw('campaign_lists.list = lists.id')
+                        .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
+                        .count()
+                        .as('triggerCount')
             }
         ]
     );

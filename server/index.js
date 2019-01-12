@@ -93,6 +93,24 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
     );
 */
 
+        .then(() =>
+            startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort, () =>
+                startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () =>
+                    startHTTPServer(AppType.PUBLIC, 'public', publicPort, async () => {
+
+                        await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
+
+                        privilegeHelpers.dropRootPrivileges();
+
+                        tzupdate.start();
+
+                        log.info('Service', 'All services started');
+                        appBuilder.setReady();
+                    })
+                )
+            )
+        );
+/*
     .then(() =>
         executor.spawn(() => 
             testServer(() => 
@@ -130,6 +148,7 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
             )
         )
     );
+*/
 });
 
 

@@ -19,6 +19,7 @@ const segments = require('./segments');
 const senders = require('../lib/senders');
 const {LinkId} = require('./links');
 const feedcheck = require('../lib/feedcheck');
+const contextHelpers = require('../lib/context-helpers');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
@@ -637,8 +638,15 @@ async function remove(context, id) {
 }
 
 async function enforceSendPermissionTx(tx, context, campaignId) {
-    const campaign = await getByIdTx(tx, context, campaignId, false);
-    const sendConfiguration = await sendConfigurations.getByIdTx(tx, context, campaign.send_configuration, false, false);
+    let campaign;
+
+    if (typeof campaignId === 'object') {
+        campaign = campaignId;
+    } else {
+        campaign = await getByIdTx(tx, context, campaignId, false);
+    }
+
+    const sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), campaign.send_configuration, false, false);
 
     const requiredPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
 
@@ -840,12 +848,12 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId) {
 
 async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, scheduled = null) {
     await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
-
         const entity = await tx('campaigns').where('id', campaignId).first();
         if (!entity) {
             throw new interoperableErrors.NotFoundError();
         }
+
+        await enforceSendPermissionTx(tx, context, campaign);
 
         if (!permittedCurrentStates.includes(entity.status)) {
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);

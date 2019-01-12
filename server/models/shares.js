@@ -2,7 +2,7 @@
 
 const knex = require('../lib/knex');
 const config = require('config');
-const { enforce } = require('../lib/helpers');
+const { enforce, castToInteger } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const entitySettings = require('../lib/entity-settings');
 const interoperableErrors = require('../../shared/interoperable-errors');
@@ -170,54 +170,43 @@ async function rebuildPermissionsTx(tx, restriction) {
     }
 
 
-    // Reset root and own namespace shares as per the user roles
-    const usersWithRoleInOwnNamespaceQuery = tx('users')
-        .leftJoin(namespaceEntityType.sharesTable, {
-            'users.id': `${namespaceEntityType.sharesTable}.user`,
-            'users.namespace': `${namespaceEntityType.sharesTable}.entity`
-        })
-        .select(['users.id', 'users.namespace', 'users.role as userRole', `${namespaceEntityType.sharesTable}.role`]);
+    // Reset root, own and shared namespaces shares as per the user roles
+    const usersAutoSharesQry = tx('users')
+        .select(['users.id', 'users.role', 'users.namespace']);
     if (restriction.userId) {
-        usersWithRoleInOwnNamespaceQuery.where('users.id', restriction.userId);
+        usersAutoSharesQry.where('users.id', restriction.userId);
     }
-    const usersWithRoleInOwnNamespace = await usersWithRoleInOwnNamespaceQuery;
+    const usersAutoShares = await usersAutoSharesQry;
 
-    for (const user of usersWithRoleInOwnNamespace) {
-        const roleConf = config.roles.global[user.userRole];
+    for (const user of usersAutoShares) {
+        const roleConf = config.roles.global[user.role];
 
         if (roleConf) {
-            const desiredRole = roleConf.ownNamespaceRole;
-            if (desiredRole && user.role !== desiredRole) {
-                await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: user.namespace }).del();
-                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: user.namespace, role: desiredRole, auto: true });
+            const desiredRoles = new Map();
+
+            if (roleConf.sharedNamespaces) {
+                for (const shrKey in roleConf.sharedNamespaces) {
+                    const shrRole = roleConf.sharedNamespaces[shrKey];
+                    const shrNsId = castToInteger(shrKey);
+
+                    desiredRoles.set(shrNsId, shrRole);
+                }
+            }
+
+            if (roleConf.ownNamespaceRole) {
+                desiredRoles.set(user.namespace, roleConf.ownNamespaceRole);
+            }
+
+            if (roleConf.rootNamespaceRole) {
+                desiredRoles.set(getGlobalNamespaceId(), roleConf.rootNamespaceRole);
+            }
+
+            for (const [nsId, role] of desiredRoles.entries()) {
+                await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: nsId }).del();
+                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: nsId, role: role, auto: true });
             }
         }
     }
-
-
-    const usersWithRoleInRootNamespaceQuery = tx('users')
-        .leftJoin(namespaceEntityType.sharesTable, {
-            'users.id': `${namespaceEntityType.sharesTable}.user`,
-            [`${namespaceEntityType.sharesTable}.entity`]: getGlobalNamespaceId()
-        })
-        .select(['users.id', 'users.role as userRole', `${namespaceEntityType.sharesTable}.role`]);
-    if (restriction.userId) {
-        usersWithRoleInRootNamespaceQuery.andWhere('users.id', restriction.userId);
-    }
-    const usersWithRoleInRootNamespace = await usersWithRoleInRootNamespaceQuery;
-
-    for (const user of usersWithRoleInRootNamespace) {
-        const roleConf = config.roles.global[user.userRole];
-
-        if (roleConf) {
-            const desiredRole = roleConf.rootNamespaceRole;
-            if (desiredRole && user.role !== desiredRole) {
-                await tx(namespaceEntityType.sharesTable).where({ user: user.id, entity: getGlobalNamespaceId() }).del();
-                await tx(namespaceEntityType.sharesTable).insert({ user: user.id, entity: getGlobalNamespaceId(), role: desiredRole, auto: 1 });
-            }
-        }
-    }
-
 
 
     // Build the map of all namespaces

@@ -35,6 +35,10 @@ const predefColumns = [
     {
         column: 'latest_click',
         type: 'date'
+    },
+    {
+        column: 'is_test',
+        type: 'option'
     }
 ];
 

@@ -406,6 +406,11 @@ export function getRuleHelpers(t, fields) {
             column: 'latest_click',
             name: t('latestClick'),
             type: 'date'
+        },
+        {
+            column: 'is_test',
+            name: t('Test user'),
+            type: 'option'
         }
     ];
 

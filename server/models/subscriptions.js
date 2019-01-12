@@ -262,7 +262,7 @@ async function listDTAjax(context, listId, segmentId, params) {
             listTable + '.email',
             listTable + '.status',
             listTable + '.created',
-            { name: 'blacklisted', raw: 'not isnull(blacklist.email)' }
+            { name: 'blacklisted', raw: 'not isnull(blacklist.email) as `blacklisted`' }
         ];
         const extraColumns = [];
         let listFldIdx = columns.length;
@@ -275,9 +275,11 @@ async function listDTAjax(context, listId, segmentId, params) {
             if (fld.column) {
                 columns.push(listTable + '.' + fld.column);
             } else {
+                const colName = listTable + '.' + fldCol;
+
                 columns.push({
-                    name: listTable + '.' + fldCol,
-                    raw: '?',
+                    name: colName,
+                    raw: '? as `' + colName + '`',
                     data: [0]
                 })
             }
