@@ -50,7 +50,8 @@ body.mailtrain {
       padding: 0 15px;
 
       .navbar-brand {
-        width: $sidebar-width - 30px;
+        // width: $sidebar-width - 30px;
+        width: 130px; // We don't use sidebar yet, so no need to align with it.
 
         justify-content: left;
 

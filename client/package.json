@@ -26,7 +26,7 @@
     "bootstrap": "^4.2.1",
     "datatables.net": "^1.10.19",
     "datatables.net-bs4": "^1.10.19",
-    "grapesjs": "^0.14.50",
+    "grapesjs": "0.14.49",
     "grapesjs-mjml": "0.0.27",
     "grapesjs-preset-newsletter": "^0.2.20",
     "i18next": "^13.1.0",
