@@ -129,7 +129,7 @@ class Root extends Component {
                     return (
                         <>
                             <ul className="navbar-nav mt-navbar-nav-right">
-                                {languageChooser}
+                                {getLanguageChooser(t)}
                             </ul>
                         </>
                     );
