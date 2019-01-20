@@ -651,7 +651,7 @@ async function enforceSendPermissionTx(tx, context, campaignId) {
     const requiredPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
 
     await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', campaign.send_configuration, requiredPermission);
-    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, 'send');
 }
 
 
@@ -853,7 +853,7 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             throw new interoperableErrors.NotFoundError();
         }
 
-        await enforceSendPermissionTx(tx, context, campaign);
+        await enforceSendPermissionTx(tx, context, entity);
 
         if (!permittedCurrentStates.includes(entity.status)) {
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);

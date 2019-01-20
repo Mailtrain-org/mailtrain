@@ -9,8 +9,7 @@ const bluebird = require('bluebird');
 
 const hasher = require('node-object-hash')();
 
-const mjml = require('mjml');
-const mjml2html = mjml.default;
+const mjml2html = require('mjml');
 
 const hbs = require('hbs');
 const juice = require('juice');

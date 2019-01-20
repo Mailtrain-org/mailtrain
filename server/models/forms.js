@@ -10,8 +10,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const fs = require('fs-extra');
 const path = require('path');
 
-const mjml = require('mjml');
-const mjml2html = mjml.default;
+const mjml2html = require('mjml');
 
 const lists = require('./lists');
 const dependencyHelpers = require('../lib/dependency-helpers');

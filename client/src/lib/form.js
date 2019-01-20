@@ -132,7 +132,7 @@ class Form extends Component {
                             {props.children}
                         </fieldset>
                         {!props.noStatus && statusMessageText &&
-                        <AlignedRow htmlId="form-status-message">
+                        <AlignedRow format={props.format} htmlId="form-status-message">
                             <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
                         </AlignedRow>
                         }
