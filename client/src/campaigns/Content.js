@@ -67,7 +67,8 @@ export default class CustomContent extends Component {
     }
 
     static propTypes = {
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        setPanelInFullScreen: PropTypes.func
     }
 
     loadFromEntityMutator(data) {
@@ -177,6 +178,7 @@ export default class CustomContent extends Component {
     }
 
     async setElementInFullscreen(elementInFullscreen) {
+        this.props.setPanelInFullScreen(elementInFullscreen);
         this.setState({
             elementInFullscreen
         });

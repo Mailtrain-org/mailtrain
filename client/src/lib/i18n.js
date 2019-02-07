@@ -54,8 +54,8 @@ i18n
         whitelist: mailtrainConfig.enabledLanguages,
         load: 'currentOnly',
 
-        debug: true
-    })
+        debug: false
+    });
 
 
 export default i18n;
@@ -64,7 +64,7 @@ export default i18n;
 export const withTranslation = createComponentMixin([], [], (TargetClass, InnerClass) => {
     return {
         cls: withNamespaces()(TargetClass)
-    }
+    };
 });
 
 export function tMark(key) {

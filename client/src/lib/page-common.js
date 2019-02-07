@@ -92,6 +92,8 @@ export function getRoutes(urlPrefix, resolve, parents, structure, navs, primaryM
             secondaryMenuComponent: entry.secondaryMenuComponent || secondaryMenuComponent,
             title: entry.title,
             link: entry.link,
+            panelInFullScreen: entry.panelInFullScreen,
+            insideIframe: entry.insideIframe,
             resolve: entryResolve,
             parents,
             navs: [...navs, ...entryNavs]

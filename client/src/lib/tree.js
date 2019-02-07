@@ -65,8 +65,8 @@ class TreeTable extends Component {
     }
 
     @withAsyncErrorHandler
-    async loadData(dataUrl) {
-        const response = await axios.get(getUrl(dataUrl));
+    async loadData() {
+        const response = await axios.get(getUrl(this.props.dataUrl));
         const treeData = response.data;
 
         for (const root of treeData) {
@@ -95,17 +95,6 @@ class TreeTable extends Component {
         className: PropTypes.string
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.data) {
-            this.setState({
-                treeData: nextProps.data
-            });
-        } else if (nextProps.dataUrl && this.props.dataUrl !== nextProps.dataUrl) {
-            // noinspection JSIgnoredPromiseFromCall
-            this.loadData(next.props.dataUrl);
-        }
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.selection !== nextProps.selection || this.state.treeData != nextState.treeData || this.props.className !== nextProps.className;
     }
@@ -129,7 +118,7 @@ class TreeTable extends Component {
     componentDidMount() {
         if (!this.props.data && this.props.dataUrl) {
             // noinspection JSIgnoredPromiseFromCall
-            this.loadData(this.props.dataUrl);
+            this.loadData();
         }
 
         let createNodeFn;
@@ -221,6 +210,15 @@ class TreeTable extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        if (this.props.data) {
+            this.setState({
+                treeData: this.props.data
+            });
+        } else if (this.props.dataUrl && prevProps.dataUrl !== this.props.dataUrl) {
+            // noinspection JSIgnoredPromiseFromCall
+            this.loadData();
+        }
+
         if (this.props.selection !== prevProps.selection || this.state.treeData != prevState.treeData) {
             if (this.state.treeData != prevState.treeData) {
                 this.tree.reload(this.sanitizeTreeData(this.state.treeData));

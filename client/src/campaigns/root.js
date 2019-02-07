@@ -33,6 +33,7 @@ import StatisticsOpened
     from "./StatisticsOpened";
 import StatisticsLinkClicks
     from "./StatisticsLinkClicks";
+import TemplatesCUD from "../templates/root";
 
 
 function getMenus(t) {
@@ -120,7 +121,7 @@ function getMenus(t) {
                                 campaignContent: params => `rest/campaigns-content/${params.campaignId}`
                             },
                             visible: resolved => resolved.campaign.permissions.includes('edit') && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || resolved.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN),
-                            panelRender: props => <Content entity={props.resolved.campaignContent} />
+                            panelRender: props => <Content entity={props.resolved.campaignContent} setPanelInFullScreen={props.setPanelInFullScreen} />
                         },
                         files: {
                             title: t('files'),

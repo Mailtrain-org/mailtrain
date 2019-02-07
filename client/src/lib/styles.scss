@@ -2,6 +2,7 @@
 
 .toolbar {
   float: right;
+  margin-bottom: 15px;
 }
 
 .form { // This is here to give the styles below higher priority than Bootstrap has
@@ -58,6 +59,10 @@
 .formStatus {
   padding-top: 5px;
   padding-bottom: 5px;
+}
+
+.dataTableTable {
+  overflow-x: auto;
 }
 
 .actionLinks > * {

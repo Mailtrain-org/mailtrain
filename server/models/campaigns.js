@@ -21,6 +21,9 @@ const {LinkId} = require('./links');
 const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
 
+const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
+const activityLog = require('../lib/activity-log');
+
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
@@ -533,6 +536,8 @@ async function _createTx(tx, context, entity, content) {
                 }).where('id', id);
         }
 
+        await activityLog.logEntityActivity('campaign', EntityActivityType.CREATE, id, {status: filteredEntity.status});
+
         return id;
     });
 }
@@ -591,6 +596,8 @@ async function updateWithConsistencyCheck(context, entity, content) {
         await tx('campaigns').where('id', entity.id).update(filteredEntity);
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: entity.id });
+
+        await activityLog.logEntityActivity('campaign', EntityActivityType.UPDATE, entity.id, {status: filteredEntity.status});
     });
 }
 
@@ -628,6 +635,8 @@ async function _removeTx(tx, context, id, existing = null) {
         .del();
 
     await tx('campaigns').where('id', id).del();
+
+    await activityLog.logEntityActivity('campaign', EntityActivityType.REMOVE, id);
 }
 
 
@@ -863,6 +872,8 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             status: newState,
             scheduled
         });
+
+        await activityLog.logEntityActivity('campaign', CampaignActivityType.STATUS_CHANGE, campaignId, {status: newState});
     });
 
     senders.scheduleCheck();

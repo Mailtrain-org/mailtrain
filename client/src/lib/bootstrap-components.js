@@ -74,7 +74,8 @@ export class Button extends Component {
         iconTitle: PropTypes.string,
         className: PropTypes.string,
         title: PropTypes.string,
-        type: PropTypes.string
+        type: PropTypes.string,
+        disabled: PropTypes.bool
     }
 
     @withAsyncErrorHandler
@@ -106,7 +107,7 @@ export class Button extends Component {
         }
 
         return (
-            <button type={type} className={className} onClick={::this.onClick} title={this.props.title}>{icon}{iconSpacer}{props.label}</button>
+            <button type={type} className={className} onClick={::this.onClick} title={this.props.title} disabled={this.props.disabled}>{icon}{iconSpacer}{props.label}</button>
         );
     }
 }
@@ -301,7 +302,7 @@ export class ModalDialog extends Component {
         const buttons = [];
         for (let idx = 0; idx < this.state.buttons.length; idx++) {
             const buttonSpec = this.state.buttons[idx];
-            const button = <Button key={idx} label={buttonSpec.label} className={buttonSpec.className} onClickAsync={() => this.onButtonClick(idx)} />
+            const button = <Button key={idx} label={buttonSpec.label} className={buttonSpec.className} onClickAsync={async () => this.onButtonClick(idx)} />
             buttons.push(button);
         }
 

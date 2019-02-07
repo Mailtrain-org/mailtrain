@@ -28,7 +28,7 @@ function getMenus(t) {
                             title: t('edit'),
                             link: params => `/templates/${params.templateId}/edit`,
                             visible: resolved => resolved.template.permissions.includes('edit'),
-                            panelRender: props => <TemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
+                            panelRender: props => <TemplatesCUD action={props.match.params.action} entity={props.resolved.template} setPanelInFullScreen={props.setPanelInFullScreen} />
                         },
                         files: {
                             title: t('files'),

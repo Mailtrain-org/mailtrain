@@ -38,7 +38,7 @@ export class UntrustedContentHost extends Component {
         this.contentNodeIsLoaded = false;
 
         this.state = {
-            hasAccessToken: false,
+            hasAccessToken: false
         };
 
         this.receiveMessageHandler = ::this.receiveMessage;
@@ -175,7 +175,8 @@ export class UntrustedContentHost extends Component {
 
     render() {
         return (
-            <iframe className={styles.untrustedContent + ' ' + this.props.className} ref={node => this.contentNode = node} src={getSandboxUrl(this.props.contentSrc)} onLoad={::this.contentNodeLoaded}> </iframe>
+            // The 40 px below corresponds to the height in .sandbox-loading-message
+            <iframe className={styles.untrustedContent + ' ' + this.props.className} height="40px" ref={node => this.contentNode = node} src={getSandboxUrl(this.props.contentSrc)} onLoad={::this.contentNodeLoaded}></iframe>
         );
     }
 }
@@ -218,10 +219,10 @@ export class UntrustedContentRoot extends Component {
     async receiveMessage(evt) {
         const msg = evt.data;
 
-        if (msg.type === 'initAvailable' && !this.state.initialized) {
+        if (msg.type === 'initAvailable') {
             this.sendMessage('initNeeded');
 
-        } else if (msg.type === 'init' && !this.state.initialized) {
+        } else if (msg.type === 'init') {
             setRestrictedAccessToken(msg.data.accessToken);
             this.setState({
                 initialized: true,
@@ -255,7 +256,7 @@ export class UntrustedContentRoot extends Component {
             return this.props.render(this.state.contentProps);
         } else {
             return (
-                <div>
+                <div className="sandbox-loading-message">
                     {t('loading-1')}
                 </div>
             );

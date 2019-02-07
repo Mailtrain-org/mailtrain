@@ -14,6 +14,9 @@ const imports = require('./imports');
 const entitySettings = require('../lib/entity-settings');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
+const {EntityActivityType} = require('../../shared/activity-log');
+const activityLog = require('../lib/activity-log');
+
 const {UnsubscriptionMode, FieldWizard} = require('../../shared/lists');
 
 const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
@@ -196,6 +199,8 @@ async function create(context, entity) {
             await fields.createTx(tx, context, id, fld);
         }
 
+        await activityLog.logEntityActivity('list', EntityActivityType.CREATE, id);
+
         return id;
     });
 }
@@ -221,6 +226,8 @@ async function updateWithConsistencyCheck(context, entity) {
         await tx('lists').where('id', entity.id).update(filterObject(entity, allowedKeys));
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: entity.id });
+
+        await activityLog.logEntityActivity('list', EntityActivityType.UPDATE, entity.id);
     });
 }
 
@@ -244,6 +251,8 @@ async function remove(context, id) {
 
         await tx('lists').where('id', id).del();
         await knex.schema.dropTableIfExists('subscription__' + id);
+
+        await activityLog.logEntityActivity('list', EntityActivityType.REMOVE, id);
     });
 }
 

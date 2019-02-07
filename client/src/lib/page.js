@@ -189,7 +189,9 @@ class TertiaryNavBar extends Component {
 class RouteContent extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            panelInFullScreen: props.route.panelInFullScreen
+        };
 
         if (Object.keys(props.route.resolve).length === 0) {
             this.state.resolved = {};
@@ -200,6 +202,8 @@ class RouteContent extends Component {
                 this.forceUpdate();
             }
         };
+
+        this.setPanelInFullScreen = panelInFullScreen => this.setState({ panelInFullScreen });
     }
 
     static propTypes = {
@@ -208,7 +212,9 @@ class RouteContent extends Component {
     }
 
     @withAsyncErrorHandler
-    async resolve(props) {
+    async resolve() {
+        const props = this.props;
+
         if (Object.keys(props.route.resolve).length === 0) {
             this.setState({
                 resolved: {}
@@ -237,18 +243,16 @@ class RouteContent extends Component {
 
     componentDidMount() {
         // noinspection JSIgnoredPromiseFromCall
-        this.resolve(this.props);
+        this.resolve();
         this.registerSidebarAnimationListener();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         this.registerSidebarAnimationListener();
-    }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.match.params !== nextProps.match.params && needsResolve(this.props.route, nextProps.route, this.props.match, nextProps.match)) {
+        if (this.props.match.params !== prevProps.match.params && needsResolve(prevProps.route, this.props.route, prevProps.match, this.props.match)) {
             // noinspection JSIgnoredPromiseFromCall
-            this.resolve(nextProps);
+            this.resolve();
         }
     }
 
@@ -263,6 +267,8 @@ class RouteContent extends Component {
         const resolved = this.state.resolved;
 
         const showSidebar = !!route.secondaryMenuComponent;
+
+        const panelInFullScreen = this.state.panelInFullScreen;
 
         if (!route.panelRender && !route.panelComponent && route.link) {
             let link;
@@ -283,7 +289,9 @@ class RouteContent extends Component {
                 const compProps = {
                     match: this.props.match,
                     location: this.props.location,
-                    resolved
+                    resolved,
+                    setPanelInFullScreen: this.setPanelInFullScreen,
+                    panelInFullScreen: this.state.panelInFullScreen
                 };
 
                 let panel;
@@ -301,19 +309,26 @@ class RouteContent extends Component {
                     secondaryMenu = React.createElement(route.secondaryMenuComponent, compProps);
                 }
 
-                content = (
-                    <>
-                        <div className="mt-breadcrumb-and-tertiary-navbar">
-                            <Breadcrumb route={route} params={params} resolved={resolved}/>
-                            <TertiaryNavBar route={route} params={params} resolved={resolved}/>
-                        </div>
-
-                        <div className="container-fluid">
-                            {this.props.flashMessage}
-                            {panel}
-                        </div>
-                    </>
+                const panelContent = (
+                    <div key="panel" className="container-fluid">
+                        {this.props.flashMessage}
+                        {panel}
+                    </div>
                 );
+
+                if (panelInFullScreen) {
+                    content = panelContent;
+                } else {
+                    content = (
+                        <>
+                            <div key="tertiaryNav" className="mt-breadcrumb-and-tertiary-navbar">
+                                <Breadcrumb route={route} params={params} resolved={resolved}/>
+                                <TertiaryNavBar route={route} params={params} resolved={resolved}/>
+                            </div>
+                            {panelContent}
+                        </>
+                    );
+                }
 
             } else {
                 content = (
@@ -323,45 +338,57 @@ class RouteContent extends Component {
                 );
             }
 
-
-            return (
-                <div className={"app " + (showSidebar ? 'sidebar-lg-show' : '')}>
-                    <header className="app-header">
-                        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                            {showSidebar &&
-                            <button className="navbar-toggler sidebar-toggler" data-toggle="sidebar-show" type="button">
-                                <span className="navbar-toggler-icon"/>
-                            </button>
-                            }
-
-                            <Link className="navbar-brand" to="/"><div><Icon icon="envelope"/> Mailtrain</div></Link>
-
-                            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                                <span className="navbar-toggler-icon"/>
-                            </button>
-
-                            <div className="collapse navbar-collapse" id="mtMainNavbar">
-                                {primaryMenu}
-                            </div>
-                        </nav>
-                    </header>
-
-                    <div className="app-body">
-                        {showSidebar &&
-                        <div className="sidebar">
-                            {secondaryMenu}
+            if (panelInFullScreen) {
+                return (
+                    <div key="app" className="app panel-in-fullscreen">
+                        <div key="appBody" className="app-body">
+                            <main key="main" className="main">
+                                {content}
+                            </main>
                         </div>
-                        }
-                        <main className="main">
-                            {content}
-                        </main>
                     </div>
+                );
 
-                    <footer className="app-footer">
-                        <div className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
-                    </footer>
-                </div>
-            );
+            } else {
+                return (
+                    <div key="app" className={"app " + (showSidebar ? 'sidebar-lg-show' : '')}>
+                        <header key="appHeader" className="app-header">
+                            <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+                                {showSidebar &&
+                                <button className="navbar-toggler sidebar-toggler" data-toggle="sidebar-show" type="button">
+                                    <span className="navbar-toggler-icon"/>
+                                </button>
+                                }
+
+                                <Link className="navbar-brand" to="/"><div><Icon icon="envelope"/> Mailtrain</div></Link>
+
+                                <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                                    <span className="navbar-toggler-icon"/>
+                                </button>
+
+                                <div className="collapse navbar-collapse" id="mtMainNavbar">
+                                    {primaryMenu}
+                                </div>
+                            </nav>
+                        </header>
+
+                        <div key="appBody"  className="app-body">
+                            {showSidebar &&
+                            <div key="sidebar" className="sidebar">
+                                {secondaryMenu}
+                            </div>
+                            }
+                            <main key="main" className="main">
+                                {content}
+                            </main>
+                        </div>
+
+                        <footer key="appFooter" className="app-footer">
+                            <div className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
+                        </footer>
+                    </div>
+                );
+            }
         }
     }
 }
@@ -656,7 +683,7 @@ export function getLanguageChooser(t) {
         const label = langDesc.getLabel(t);
 
         languageOptions.push(
-            <DropdownActionLink key={lng} onClickAsync={() => i18n.changeLanguage(langDesc.longCode)}>{label}</DropdownActionLink>
+            <DropdownActionLink key={lng} onClickAsync={async () => i18n.changeLanguage(langDesc.longCode)}>{label}</DropdownActionLink>
         )
     }
 

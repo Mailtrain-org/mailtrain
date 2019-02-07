@@ -52,6 +52,7 @@ import {withComponentMixins} from "../lib/decorator-helpers";
 ])
 export default class CUD extends Component {
     constructor(props) {
+console.log('constructor')
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
@@ -74,7 +75,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        setPanelInFullScreen: PropTypes.func
     }
 
     onTypeChanged(mutStateData, key, oldType, type) {
@@ -209,6 +211,7 @@ export default class CUD extends Component {
     }
 
     async setElementInFullscreen(elementInFullscreen) {
+        this.props.setPanelInFullScreen(elementInFullscreen);
         this.setState({
             elementInFullscreen
         });

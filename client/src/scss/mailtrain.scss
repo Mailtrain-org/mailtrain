@@ -1,4 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400i,700,700i|Ubuntu:300,300i,400,400i,700,700i&subset=latin-ext');
+
+$font-family-sans-serif: 'Ubuntu', sans-serif;
+$font-family-monospace: 'Ubuntu Mono', monospace;
+
 $fa-font-path: "../static-npm/fontawesome";
+$enable-print-styles: false;
 
 @import "./variables.scss";
 @import "node_modules/@coreui/coreui/scss/coreui.scss";
@@ -12,6 +18,19 @@ $fa-font-path: "../static-npm/fontawesome";
 
 body.mailtrain {
   background-color: white;
+
+  &.sandbox {
+    overflow-x: hidden;
+  }
+
+  &.inside-iframe {
+    overflow: hidden;
+  }
+
+  .sandbox-loading-message {
+    // The 40 px below corresponds to the height in in UntrustedContentHost.render
+    height: 40px;
+  }
 
   .dropdown-item {
     border-bottom: none 0px;
