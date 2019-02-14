@@ -391,10 +391,12 @@ class CampaignSender {
 
         let status;
         let response;
+        let responseId;
         try {
             const info = await mailer.sendMassMail(mail);
             status = SubscriptionStatus.SUBSCRIBED;
             response = info.response || info.messageId;
+            responseId = info.messageId.replace(/(^<|>$)/g, "") || response.split(/\s+/).pop();
 
             await knex('campaigns').where('id', campaign.id).increment('delivered');
         } catch (err) {
@@ -402,8 +404,6 @@ class CampaignSender {
             response = err.response || err.message;
             await knex('campaigns').where('id', campaign.id).increment('delivered').increment('bounced');
         }
-
-        const responseId = response.split(/\s+/).pop();
 
         const now = new Date();
 
