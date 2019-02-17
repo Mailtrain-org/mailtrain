@@ -182,7 +182,7 @@ These are the steps to start Mailtrain via docker-compose:
 
 1. Download Mailtrain's docker-compose build file
     ```
-    curl -O https://raw.githubusercontent.com/Mailtrain-org/mailtrain/master/docker-compose.yml
+    curl -O https://raw.githubusercontent.com/Mailtrain-org/mailtrain/development/docker-compose.yml
     ```
 
 2. Deploy Mailtrain via docker-compose (in the directory to which you downloaded the `docker-compose.yml` file). This will take quite some time when run for the first time. Subsequent executions will be fast.
