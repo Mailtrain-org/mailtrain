@@ -183,7 +183,6 @@ async function _renderSubscribe(req, res, list, subscription) {
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
-    data.needsJsWarning = true;
 
     data.flashMessages = await captureFlashMessages(res);
 
@@ -385,7 +384,6 @@ router.getAsync('/:lcid/manage/:ucid', passport.csrfProtection, async (req, res)
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
-    data.needsJsWarning = true;
     data.isManagePreferences = true;
     data.flashMessages = await captureFlashMessages(res);
 
@@ -435,7 +433,6 @@ router.getAsync('/:lcid/manage-address/:ucid', passport.csrfProtection, async (r
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
     data.isWeb = true;
-    data.needsJsWarning = true;
     data.isManagePreferences = true;
     data.flashMessages = await captureFlashMessages(res);
 
@@ -535,7 +532,6 @@ router.getAsync('/:lcid/unsubscribe/:ucid', passport.csrfProtection, async (req,
         const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
         data.isWeb = true;
-        data.needsJsWarning = true;
         data.flashMessages = await captureFlashMessages(res);
 
         res.send(htmlRenderer(data));

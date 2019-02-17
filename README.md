@@ -176,7 +176,6 @@ To deploy Mailtrain with Docker, you need the following three dependencies insta
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- Git - Typically already present. If not, just use the package manager of your OS distribution to install it.
 
 These are the steps to start Mailtrain via docker-compose:
 
