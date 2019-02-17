@@ -42,7 +42,6 @@ async function logCampaignTrackerActivity(activityType, campaignId, listId, subs
 
 async function logBlacklistActivity(activityType, email) {
     const data = {
-        ...extraData,
         type: activityType,
         email
     };
