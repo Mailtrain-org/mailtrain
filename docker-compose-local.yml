@@ -22,7 +22,7 @@ services:
     - mongo-data:/data/db
 
   mailtrain:
-    image: mailtrain/mailtrain:latest
+    build: .
     command: ${MAILTRAIN_SETTINGS}
     ports:
     - "3000:3000"
