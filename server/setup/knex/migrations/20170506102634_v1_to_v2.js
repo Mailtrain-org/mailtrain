@@ -528,7 +528,7 @@ async function migrateSegments(knex) {
                 case 'text':
                 case 'string':
                 case 'website':
-                    rules.push({ column: oldRule.column, value: oldSettings.value });
+                    rules.push({ type: 'like', column: oldRule.column, value: oldSettings.value });
                     break;
                 case 'number':
                     if (oldSettings.range) {
