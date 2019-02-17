@@ -96,7 +96,8 @@ class TreeTable extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.props.selection !== nextProps.selection || this.state.treeData != nextState.treeData || this.props.className !== nextProps.className;
+        return this.props.selection !== nextProps.selection || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl ||
+            this.state.treeData != nextState.treeData || this.props.className !== nextProps.className;
     }
 
     // XSS protection
