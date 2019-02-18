@@ -708,9 +708,7 @@ async function _changeStatusByMessageTx(tx, context, message, subscriptionStatus
 
         const statusField = statusFieldMapping[subscriptionStatus];
 
-        if (message.status === SubscriptionStatus.SUBSCRIBED) {
-            await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
-        }
+        await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
 
         await tx('campaign_messages')
             .where('id', message.id)
@@ -726,7 +724,11 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
     const message = await tx('campaign_messages')
         .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
         .where('campaigns.cid', campaignCid)
-        .where({subscription: subscriptionId, list: listId});
+        .where({subscription: subscriptionId, list: listId})
+        .select([
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+        ])
+        .first();
 
     if (!message) {
         throw new Error('Invalid campaign.')
