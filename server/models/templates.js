@@ -10,6 +10,7 @@ const shares = require('./shares');
 const reports = require('./reports');
 const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const {convertFileURLs} = require('../lib/campaign-content');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
 
@@ -57,12 +58,28 @@ async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
 
+        if (entity.fromSourceTemplate) {
+            const template = await getByIdTx(tx, context, entity.sourceTemplate, false);
+
+            entity.type = template.type;
+            entity.data = template.data;
+            entity.html = template.html;
+            entity.text = template.text;
+        }
+
         await _validateAndPreprocess(tx, entity);
 
         const ids = await tx('templates').insert(filterObject(entity, allowedKeys));
         const id = ids[0];
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: id });
+
+        if (entity.fromSourceTemplate) {
+            await files.copyAllTx(tx, context, 'template', 'file', entity.sourceTemplate, 'template', 'file', id);
+
+            convertFileURLs(entity, 'template', entity.sourceTemplate, 'template', id);
+            await tx('templates').update(filterObject(entity, allowedKeys)).where('id', id);
+        }
 
         return id;
     });

@@ -20,6 +20,7 @@ const senders = require('../lib/senders');
 const {LinkId} = require('./links');
 const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
+const {convertFileURLs} = require('../lib/campaign-content');
 
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
@@ -427,35 +428,6 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
         }
 
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.send_configuration, 'viewPublic');
-    }
-}
-
-function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityType, toEntityId) {
-
-    function convertText(text) {
-        if (text) {
-            const fromUrl = `/files/${fromEntityType}/file/${fromEntityId}`;
-            const toUrl = `/files/${toEntityType}/file/${toEntityId}`;
-
-            const encodedFromUrl = encodeURIComponent(fromUrl);
-            const encodedToUrl = encodeURIComponent(toUrl);
-
-            text = text.split('[URL_BASE]' + fromUrl).join('[URL_BASE]' + toUrl);
-            text = text.split('[SANDBOX_URL_BASE]' + fromUrl).join('[SANDBOX_URL_BASE]' + toUrl);
-            text = text.split('[ENCODED_URL_BASE]' + encodedFromUrl).join('[ENCODED_URL_BASE]' + encodedToUrl);
-            text = text.split('[ENCODED_SANDBOX_URL_BASE]' + encodedFromUrl).join('[ENCODED_SANDBOX_URL_BASE]' + encodedToUrl);
-        }
-
-        return text;
-    }
-
-    sourceCustom.html = convertText(sourceCustom.html);
-    sourceCustom.text = convertText(sourceCustom.text);
-
-    if (sourceCustom.type === 'mosaico' || sourceCustom.type === 'mosaicoWithFsTemplate') {
-        sourceCustom.data.model = convertText(sourceCustom.data.model);
-        sourceCustom.data.model = convertText(sourceCustom.data.model);
-        sourceCustom.data.metadata = convertText(sourceCustom.data.metadata);
     }
 }
 

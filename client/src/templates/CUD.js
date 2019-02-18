@@ -12,12 +12,12 @@ import {
 } from '../lib/page'
 import {
     Button,
-    ButtonRow,
+    ButtonRow, CheckBox,
     Dropdown,
     Form,
     FormSendMethod,
     InputField,
-    StaticField,
+    StaticField, TableSelect,
     TextArea,
     withForm
 } from '../lib/form';
@@ -41,6 +41,8 @@ import styles
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import moment
+    from 'moment';
 
 
 @withComponentMixins([
@@ -98,6 +100,10 @@ console.log('constructor')
                 description: '',
                 namespace: mailtrainConfig.user.namespace,
                 type: mailtrainConfig.editors[0],
+
+                fromSourceTemplate: false,
+                sourceTemplate: null,
+
                 text: '',
                 html: '',
                 data: {},
@@ -120,6 +126,12 @@ console.log('constructor')
         const typeKey = state.getIn(['type', 'value']);
         if (!typeKey) {
             state.setIn(['type', 'error'], t('typeMustBeSelected'));
+        }
+
+        if (state.getIn(['fromSourceTemplate', 'value']) && !state.getIn(['sourceTemplate', 'value'])) {
+            state.setIn(['sourceTemplate', 'error'], t('Source template must not be empty'));
+        } else {
+            state.setIn(['sourceTemplate', 'error'], null);
         }
 
         validateNamespace(t, state);
@@ -255,6 +267,13 @@ console.log('constructor')
             typeForm = getTypeForm(this, typeKey, isEdit);
         }
 
+        const templatesColumns = [
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
+            { data: 4, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 5, title: t('namespace') },
+        ];
 
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
@@ -281,16 +300,25 @@ console.log('constructor')
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
 
-                    {isEdit
-                    ?
-                        <StaticField id="type" className={styles.formDisabled} label={t('type')}>
-                            {typeKey && this.templateTypes[typeKey].typeName}
-                        </StaticField>
-                    :
-                        <Dropdown id="type" label={t('type')} options={typeOptions}/>
+                    {!isEdit &&
+                        <CheckBox id="fromSourceTemplate" label={t('template')} text={t('Clone from an existing template')}/>
                     }
 
-                    {typeForm}
+                    {this.getFormValue('fromSourceTemplate') ?
+                        <TableSelect key="templateSelect" id="sourceTemplate" withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
+                    :
+                        <>
+                            {isEdit ?
+                                <StaticField id="type" className={styles.formDisabled} label={t('type')}>
+                                    {typeKey && this.templateTypes[typeKey].typeName}
+                                </StaticField>
+                            :
+                                <Dropdown id="type" label={t('type')} options={typeOptions}/>
+                            }
+
+                            {typeForm}
+                        </>
+                    }
 
                     <NamespaceSelect/>
 
