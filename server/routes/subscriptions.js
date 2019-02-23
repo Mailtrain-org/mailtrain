@@ -10,8 +10,16 @@ const stringify = require('csv-stringify')
 const fields = require('../models/fields');
 const lists = require('../models/lists');
 const moment = require('moment');
+const {SubscriptionStatus} = require('../../shared/lists');
 
 router.getAsync('/export/:listId/:segmentId', passport.loggedIn, async (req, res) => {
+    const statusStrings = {
+        [SubscriptionStatus.SUBSCRIBED]: 'subscribed',
+        [SubscriptionStatus.UNSUBSCRIBED]: 'unsubscribed',
+        [SubscriptionStatus.BOUNCED]: 'bounced',
+        [SubscriptionStatus.COMPLAINED]: 'complained'
+    };
+
     const listId = castToInteger(req.params.listId);
     const segmentId = castToInteger(req.params.segmentId);
 
@@ -19,6 +27,7 @@ router.getAsync('/export/:listId/:segmentId', passport.loggedIn, async (req, res
 
     const columns = [
         {key: 'cid', header: 'cid'},
+        {key: 'status', header: 'status'},
         {key: 'hash_email', header: 'HASH_EMAIL'},
         {key: 'email', header: 'EMAIL'},
     ];
@@ -50,6 +59,8 @@ router.getAsync('/export/:listId/:segmentId', passport.loggedIn, async (req, res
     stringifier.pipe(res);
 
     for await (const subscription of subscriptions.listIterator(req.context, listId, segmentId, false)) {
+        subscription.status = statusStrings[subscription.status];
+
         stringifier.write(subscription);
     }
 
