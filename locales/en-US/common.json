@@ -929,7 +929,7 @@
   "invalidEmailAddressEmailMxRecordNotFound": "Invalid email address \"{{email}}\": MX record not found for domain",
   "invalidEmailAddressEmailAddressDomainNot": "Invalid email address \"{{email}}\": Address domain not found",
   "invalidEmailAddressEmailAddressDomain": "Invalid email address \"{{email}}\": Address domain name is required",
-  "invalidEmailGeneric": "invalidEmailGeneric",
+  "invalidEmailGeneric": "Invalid email address  \"{{email}}\"",
   "mailerPasswordChangeRequest": "Mailer password change request",
   "mailtrain": "Mailtrain",
   "emailAddressChanged": "Email address changed",

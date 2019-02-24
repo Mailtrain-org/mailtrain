@@ -410,6 +410,7 @@ export default class CUD extends Component {
         const response = await axios.post(getUrl('rest/forms-preview'), data);
 
         this.setState({
+            previewKey: formKey,
             previewContents: response.data.content,
             previewLabel: this.templateSettings[formKey].label
         });
@@ -504,10 +505,15 @@ export default class CUD extends Component {
                                 {this.state.previewContents &&
                                 <div className={this.state.previewFullscreen ? formsStyles.editorFullscreen : formsStyles.editor}>
                                     <div className={formsStyles.navbar}>
-                                        {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
-                                        <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
-                                        <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})}><Icon icon="window-close"/></a>
-                                        <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})}><Icon icon="window-maximize"/></a>
+                                        <div className={formsStyles.navbarLeft}>
+                                            {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
+                                            <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
+                                        </div>
+                                        <div className={formsStyles.navbarRight}>
+                                            <a className={formsStyles.btn} onClick={() => this.preview(this.state.previewKey)} title={t('Refresh')}><Icon icon="sync-alt"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})} title={t('Close preview')}><Icon icon="window-close"/></a>
+                                        </div>
                                     </div>
                                     <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
                                 </div>

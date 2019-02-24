@@ -92,7 +92,7 @@ export default class Status extends Component {
         const columns = [
             { data: 1, title: t('row') },
             { data: 2, title: t('email') },
-            { data: 3, title: t('reason') }
+            { data: 3, title: t('reason'), render: data => t(...JSON.parse(data)) }
         ];
 
         return (
