@@ -13,9 +13,10 @@ export function needsResolve(route, nextRoute, match, nextMatch) {
     const resolve = route.resolve;
     const nextResolve = nextRoute.resolve;
 
+    // This compares whether two objects have the same content and returns TRUE if they don't
     if (Object.keys(resolve).length === Object.keys(nextResolve).length) {
-        for (const key in resolve) {
-            if (!(key in nextResolve) ||
+        for (const key in nextResolve) {
+            if (!(key in resolve) ||
                 resolve[key](match.params) !== nextResolve[key](nextMatch.params)) {
                 return true;
             }

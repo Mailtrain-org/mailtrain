@@ -80,15 +80,16 @@ export default class CUD extends Component {
     }
 
 
+    getFormValuesMutator(data) {
+        this.mailerTypes[data.mailer_type].afterLoad(data);
+        data.verpEnabled = !!data.verp_hostname;
+        data.verp_hostname = data.verp_hostname || '';
+        data.verp_disable_sender_header = data.verpEnabled ? !!data.verp_disable_sender_header : false;
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                this.mailerTypes[data.mailer_type].afterLoad(data);
-                data.verpEnabled = !!data.verp_hostname;
-                data.verp_hostname = data.verp_hostname || '';
-                data.verp_disable_sender_header = data.verpEnabled ? !!data.verp_disable_sender_header : false;
-            });
-
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
         } else {
             this.populateFormValues({
                 name: '',
@@ -142,7 +143,7 @@ export default class CUD extends Component {
         }
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -157,7 +158,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             this.mailerTypes[data.mailer_type].beforeSave(data);
             if (!data.verpEnabled) {
                 data.verp_hostname = null;
@@ -165,8 +166,22 @@ export default class CUD extends Component {
             }
         });
 
-        if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/send-configurations', 'success', t('sendConfigurationSaved'));
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/send-configurations', 'success', t('Send configuration updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/send-configurations-private/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Send configuration updated'));
+                }
+            } else {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/send-configurations', 'success', t('Send configuration created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/send-configurations/${submitResult}/edit`, 'success', t('Send configuration created'));
+                }
+            }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -247,7 +262,8 @@ export default class CUD extends Component {
                     <hr/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete &&
                             <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/send-configurations/${this.props.entity.id}/delete`}/>
                         }

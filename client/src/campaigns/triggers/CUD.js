@@ -86,23 +86,25 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
+    getFormValuesMutator(data) {
+        data.daysAfter = (Math.round(data.seconds / (3600 * 24))).toString();
+
+        if (data.entity === Entity.SUBSCRIPTION) {
+            data.subscriptionEvent = data.event;
+        } else {
+            data.subscriptionEvent = Event[Entity.SUBSCRIPTION].CREATED;
+        }
+
+        if (data.entity === Entity.CAMPAIGN) {
+            data.campaignEvent = data.event;
+        } else {
+            data.campaignEvent = Event[Entity.CAMPAIGN].DELIVERED;
+        }
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.daysAfter = (Math.round(data.seconds / (3600 * 24))).toString();
-
-                if (data.entity === Entity.SUBSCRIPTION) {
-                    data.subscriptionEvent = data.event;
-                } else {
-                    data.subscriptionEvent = Event[Entity.SUBSCRIPTION].CREATED;
-                }
-
-                if (data.entity === Entity.CAMPAIGN) {
-                    data.campaignEvent = data.event;
-                } else {
-                    data.campaignEvent = Event[Entity.CAMPAIGN].DELIVERED;
-                }
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
 
         } else {
             this.populateFormValues({
@@ -145,7 +147,7 @@ export default class CUD extends Component {
         }
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -161,7 +163,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 data.seconds = Number.parseInt(data.daysAfter) * 3600 * 24;
 
                 if (data.entity === Entity.SUBSCRIPTION) {
@@ -171,8 +173,22 @@ export default class CUD extends Component {
                 }
             });
 
-            if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('triggerSaved'));
+            if (submitResult) {
+                if (this.props.entity) {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('Trigger updated'));
+                    } else {
+                        await this.getFormValuesFromURL(`rest/triggers/${this.props.campaign.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        this.enableForm();
+                        this.setFormStatusMessage('success', t('Trigger updated'));
+                    }
+                } else {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('Trigger created'));
+                    } else {
+                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers/${submitResult}/edit`, 'success', t('Trigger created'));
+                    }
+                }
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -235,7 +251,8 @@ export default class CUD extends Component {
                     <CheckBox id="enabled" text={t('enabled')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.campaign.id}/triggers/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

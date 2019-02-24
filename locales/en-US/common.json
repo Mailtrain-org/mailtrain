@@ -357,7 +357,7 @@
   "mjml": "MJML",
   "html": "HTML",
   "countEntriesSelected": "{{ count }} entries selected.",
-  "loading-1": "Loading...",
+  "loading-1": "Loading ...",
   "customFormMustBeSelected": "Custom form must be selected",
   "listSaved": "List saved",
   "onestepIeNoEmailWithConfirmationLink": "One-step (i.e. no email with confirmation link)",

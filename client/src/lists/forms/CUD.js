@@ -302,20 +302,22 @@ export default class CUD extends Component {
     }
 
 
-    componentDidMount() {
-        function supplyDefaults(data) {
-            for (const key in mailtrainConfig.defaultCustomFormValues) {
-                if (!data[key]) {
-                    data[key] = mailtrainConfig.defaultCustomFormValues[key];
-                }
+    supplyDefaults(data) {
+        for (const key in mailtrainConfig.defaultCustomFormValues) {
+            if (!data[key]) {
+                data[key] = mailtrainConfig.defaultCustomFormValues[key];
             }
         }
+    }
 
+    getFormValuesMutator(data) {
+        data.selectedTemplate = 'layout';
+        this.supplyDefaults(data);
+    }
+
+    componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.selectedTemplate = 'layout';
-                supplyDefaults(data);
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
 
         } else {
             const data = {
@@ -324,7 +326,7 @@ export default class CUD extends Component {
                 selectedTemplate: 'layout',
                 namespace: mailtrainConfig.user.namespace
             };
-            supplyDefaults(data);
+            this.supplyDefaults(data);
 
             this.populateFormValues(data);
         }
@@ -370,7 +372,7 @@ export default class CUD extends Component {
         }
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -385,13 +387,27 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             delete data.selectedTemplate;
             delete data.previewList;
         });
 
-        if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/lists/forms', 'success', t('formsSaved'));
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/forms/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Custom forms updated'));
+                }
+            } else {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/lists/forms/${submitResult}/edit`, 'success', t('Custom forms created'));
+                }
+            }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -530,7 +546,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

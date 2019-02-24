@@ -100,7 +100,7 @@ class Form extends Component {
         evt.preventDefault();
 
         if (this.props.onSubmitAsync) {
-            await owner.formHandleChangedError(async () => await this.props.onSubmitAsync(evt));
+            await owner.formHandleChangedError(async () => await this.props.onSubmitAsync());
         }
     }
 

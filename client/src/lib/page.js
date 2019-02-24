@@ -250,7 +250,7 @@ class RouteContent extends Component {
     componentDidUpdate(prevProps) {
         this.registerSidebarAnimationListener();
 
-        if (this.props.match.params !== prevProps.match.params && needsResolve(prevProps.route, this.props.route, prevProps.match, this.props.match)) {
+        if (this.props.location.state !== prevProps.location.state || (this.props.match.params !== prevProps.match.params && needsResolve(prevProps.route, this.props.route, prevProps.match, this.props.match))) {
             // noinspection JSIgnoredPromiseFromCall
             this.resolve();
         }
@@ -332,7 +332,7 @@ class RouteContent extends Component {
 
             } else {
                 content = (
-                    <div className="container-fluid">
+                    <div className="container-fluid my-3">
                         {t('loading')}
                     </div>
                 );

@@ -18,6 +18,7 @@ import ImportsStatus from './imports/Status';
 import ImportRunsStatus from './imports/RunStatus';
 import Share from '../shares/Share';
 import TriggersList from './TriggersList';
+import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 
 function getMenus(t) {
     return {
@@ -27,7 +28,7 @@ function getMenus(t) {
             panelComponent: ListsList,
             children: {
                 ':listId([0-9]+)': {
-                    title: resolved => t('listName', {name: resolved.list.name}),
+                    title: resolved => t('listName', {name: ellipsizeBreadcrumbLabel(resolved.list.name)}),
                     resolve: {
                         list: params => `rest/lists/${params.listId}`
                     },
@@ -78,7 +79,7 @@ function getMenus(t) {
                             panelRender: props => <FieldsList list={props.resolved.list} />,
                             children: {
                                 ':fieldId([0-9]+)': {
-                                    title: resolved => t('fieldName-1', {name: resolved.field.name}),
+                                    title: resolved => t('fieldName-1', {name: ellipsizeBreadcrumbLabel(resolved.field.name)}),
                                     resolve: {
                                         field: params => `rest/fields/${params.listId}/${params.fieldId}`,
                                         fields: params => `rest/fields/${params.listId}`
@@ -108,7 +109,7 @@ function getMenus(t) {
                             panelRender: props => <SegmentsList list={props.resolved.list} />,
                             children: {
                                 ':segmentId([0-9]+)': {
-                                    title: resolved => t('segmentName', {name: resolved.segment.name}),
+                                    title: resolved => t('segmentName', {name: ellipsizeBreadcrumbLabel(resolved.segment.name)}),
                                     resolve: {
                                         segment: params => `rest/segments/${params.listId}/${params.segmentId}`,
                                         fields: params => `rest/fields/${params.listId}`
@@ -138,7 +139,7 @@ function getMenus(t) {
                             panelRender: props => <ImportsList list={props.resolved.list} />,
                             children: {
                                 ':importId([0-9]+)': {
-                                    title: resolved => t('importName-1', {name: resolved.import.name}),
+                                    title: resolved => t('importName-1', {name: ellipsizeBreadcrumbLabel(resolved.import.name)}),
                                     resolve: {
                                         import: params => `rest/imports/${params.listId}/${params.importId}`,
                                     },
@@ -198,7 +199,7 @@ function getMenus(t) {
                     panelComponent: FormsList,
                     children: {
                         ':formsId([0-9]+)': {
-                            title: resolved => t('customFormsName', {name: resolved.forms.name}),
+                            title: resolved => t('customFormsName', {name: ellipsizeBreadcrumbLabel(resolved.forms.name)}),
                             resolve: {
                                 forms: params => `rest/forms/${params.formsId}`
                             },

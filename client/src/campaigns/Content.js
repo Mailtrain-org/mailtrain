@@ -71,7 +71,8 @@ export default class CustomContent extends Component {
         setPanelInFullScreen: PropTypes.func
     }
 
-    loadFromEntityMutator(data) {
+
+    getFormValuesMutator(data) {
         data.data_sourceCustom_type = data.data.sourceCustom.type;
         data.data_sourceCustom_data = data.data.sourceCustom.data;
         data.data_sourceCustom_html = data.data.sourceCustom.html;
@@ -80,8 +81,9 @@ export default class CustomContent extends Component {
         this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
     }
 
+
     componentDidMount() {
-        this.getFormValuesFromEntity(this.props.entity, data => this.loadFromEntityMutator(data));
+        this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
     }
 
     localValidateFormValues(state) {
@@ -95,14 +97,16 @@ export default class CustomContent extends Component {
     }
 
     async save() {
-        await this.doSave(true);
+        await this.submitHandler(CustomContent.AfterSubmitAction.STAY);
     }
 
-    async submitHandler() {
-        await this.doSave(false);
+    static AfterSubmitAction = {
+        STAY: 0,
+        LEAVE: 1,
+        STATUS: 2
     }
 
-    async doSave(stayOnPage) {
+    async submitHandler(afterSubmitAction) {
         const t = this.props.t;
 
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
@@ -114,7 +118,7 @@ export default class CustomContent extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             Object.assign(data, exportedData);
             this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
 
@@ -132,15 +136,15 @@ export default class CustomContent extends Component {
             }
         });
 
-        if (submitResponse) {
-            if (stayOnPage) {
-                await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`, data => this.loadFromEntityMutator(data));
-                this.enableForm();
-                this.clearFormStatusMessage();
-                this.setFlashMessage('success', t('campaignSaved'));
-
+        if (submitResult) {
+            if (afterSubmitAction === CustomContent.AfterSubmitAction.STATUS) {
+                this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('Campaign updated'));
+            } else if (afterSubmitAction === CustomContent.AfterSubmitAction.LEAVE) {
+                this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign updated'));
             } else {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignSaved'));
+                await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                this.enableForm();
+                this.setFormStatusMessage('success', t('Campaign updated'));
             }
         } else {
             this.enableForm();
@@ -230,8 +234,10 @@ export default class CustomContent extends Component {
                     {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        <Button className="btn-danger" icon="send" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
+                        <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
             </div>

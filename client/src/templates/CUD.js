@@ -54,7 +54,6 @@ import moment
 ])
 export default class CUD extends Component {
     constructor(props) {
-console.log('constructor')
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
@@ -87,13 +86,14 @@ console.log('constructor')
         }
     }
 
-    loadFromEntityMutator(data) {
+    getFormValuesMutator(data) {
         this.templateTypes[data.type].afterLoad(data);
     }
 
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => this.loadFromEntityMutator(data));
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+
         } else {
             this.populateFormValues({
                 name: '',
@@ -141,7 +141,11 @@ console.log('constructor')
         }
     }
 
-    async doSave(stayOnPage) {
+    async save() {
+        await this.submitHandler();
+    }
+
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let exportedData = {};
@@ -162,36 +166,31 @@ console.log('constructor')
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             Object.assign(data, exportedData);
             this.templateTypes[data.type].beforeSave(data);
         });
 
-        if (submitResponse) {
-            if (stayOnPage) {
-                await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`, data => this.loadFromEntityMutator(data));
-                this.enableForm();
-                this.clearFormStatusMessage();
-                this.setFlashMessage('success', t('templateSaved'));
-
-            } else if (this.props.entity) {
-                this.navigateToWithFlashMessage('/templates', 'success', t('templateSaved'));
-
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/templates', 'success', t('Template updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Template updated'));
+                }
             } else {
-                this.navigateToWithFlashMessage(`/templates/${submitResponse}/edit`, 'success', t('templateSaved'));
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/templates', 'success', t('Template created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/templates/${submitResult}/edit`, 'success', t('Template created'));
+                }
             }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
-    }
-
-    async save() {
-        await this.doSave(true);
-    }
-
-    async submitHandler() {
-        await this.doSave(false);
     }
 
     async extractPlainText() {
@@ -325,9 +324,10 @@ console.log('constructor')
                     {editForm}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={isEdit ? t('save') : t('saveAndEditTemplate')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>}
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/${this.props.entity.id}/delete`}/> }
-                        {isEdit && <Button className="btn-danger" icon="send" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
+                        {isEdit && <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>
                 </Form>
             </div>

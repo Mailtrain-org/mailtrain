@@ -9,6 +9,7 @@ import ReportTemplatesList from './templates/List';
 import Share from '../shares/Share';
 import {ReportState} from '../../../shared/reports';
 import mailtrainConfig from 'mailtrainConfig';
+import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 
 
 function getMenus(t) {
@@ -19,7 +20,7 @@ function getMenus(t) {
             panelComponent: ReportsList,
             children: {
                 ':reportId([0-9]+)': {
-                    title: resolved => t('reportName-1', {name: resolved.report.name}),
+                    title: resolved => t('reportName-1', {name: ellipsizeBreadcrumbLabel(resolved.report.name)}),
                     resolve: {
                         report: params => `rest/reports/${params.reportId}`
                     },
@@ -66,7 +67,7 @@ function getMenus(t) {
                     panelComponent: ReportTemplatesList,
                     children: {
                         ':templateId([0-9]+)': {
-                            title: resolved => t('templateName', {name: resolved.template.name}),
+                            title: resolved => t('templateName', {name: ellipsizeBreadcrumbLabel(resolved.template.name)}),
                             resolve: {
                                 template: params => `rest/report-templates/${params.templateId}`
                             },

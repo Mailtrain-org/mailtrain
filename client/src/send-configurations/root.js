@@ -5,6 +5,7 @@ import React from 'react';
 import CUD from './CUD';
 import List from './List';
 import Share from '../shares/Share';
+import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 
 
 function getMenus(t) {
@@ -15,7 +16,7 @@ function getMenus(t) {
             panelComponent: List,
             children: {
                 ':sendConfigurationId([0-9]+)': {
-                    title: resolved => t('templateName', {name: resolved.sendConfiguration.name}),
+                    title: resolved => t('templateName', {name: ellipsizeBreadcrumbLabel(resolved.sendConfiguration.name)}),
                     resolve: {
                         sendConfiguration: params => `rest/send-configurations-private/${params.sendConfigurationId}`
                     },
