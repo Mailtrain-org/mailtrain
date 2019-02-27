@@ -348,6 +348,37 @@ router.get('/subscriptions/:listId', (req, res) => {
     });
 });
 
+router.get('/lists', (req, res) => {
+    lists.quicklist((err, lists) => {
+        if (err) {
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        res.status(200);
+        res.json({
+            data: lists
+        });
+    });
+});
+
+router.get('/list/:id', (req, res) => {
+    lists.get(req.params.id, (err, list) => {
+        if (err) {
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+            });
+        }
+        res.status(200);
+        res.json({
+            data: list
+        });
+    });
+});
+
 router.get('/lists/:email', (req, res) => {
     lists.getListsWithEmail(req.params.email, (err, lists) => {
         if (err) {

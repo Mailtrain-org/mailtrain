@@ -40,18 +40,6 @@
     #merge-tag-reference-container table th {
         padding: 5px 20px 5px 0;
     }
-
-    /* Fixed width sidebar */
-    #gjs > .gjs-editor > .gjs-cv-canvas { width: 100% !important; padding-right: 300px !important; }
-    #gjs-pn-views, #gjs-pn-views-container { width: 300px !important; }
-    #gjs-pn-options { right: 300px !important; }
-    #gjs-pn-commands { width: 100% !important; padding-right: 310px !important; }
-
-    /* Hide the fullscreen button - doesn't work from within our iFrame */
-    #gjs-pn-options .gjs-pn-btn.fa.fa-arrows-alt { display: none !important; }
-
-    /* Hide pencil icon on image toolbar, issue #195 */
-    .gjs-toolbar > div > div.fa-pencil { display: none; }
 </style>
 
 
@@ -68,7 +56,7 @@
 <form id="test-form" class="test-form" action="/editorapi/test?editor=grapejs" method="post" style="display: none">
     <div class="putsmail-c">
         <div class="gjs-sm-property" style="font-size: 10px">
-            Hello! I'm a placerholder message.
+            Please enter the email address to send a test to:
             <span class="form-status" style="opacity: 0">
                 <i class="fa fa-refresh anim-spin" aria-hidden="true"></i>
             </span>
@@ -143,6 +131,12 @@
                 assets: [],
                 upload: '/editorapi/upload?type={{type}}&id={{resource.id}}&editor={{editor.name}}',
                 uploadText: 'Drop images here or click to upload',
+                headers: {
+                    'X-CSRF-TOKEN': '{{csrfToken}}',
+                },
+            },
+            styleManager: {
+		        clearProperties: true,
             },
             container : '#gjs',
             fromElement: false,
@@ -356,13 +350,60 @@
             // TODO: Show a spinner
             getPreparedHtml(function(html) {
                 sender.set('active', 0);
-                var modalContent = md.getContentEl();
                 var mdlDialog = document.querySelector('.gjs-mdl-dialog');
                 testContentEl.value = html;
                 mdlDialog.className += ' ' + mdlClass;
                 testContainer.style.display = 'block';
                 md.setTitle('Test your Newsletter');
-                md.setContent(testContainer);
+                
+                var modalContent = $('<div>').append(testContainer).html();
+                for(var i=0; i<100; i++) {
+                    try {
+                        md.setContent(modalContent);
+                        break;
+                    } catch(err) {}
+                }
+                
+                testContainerCopy = $(".gjs-mdl-dialog #test-form");
+                
+                var statusFormElC = document.querySelector('.gjs-mdl-dialog .form-status');
+                var statusFormEl = document.querySelector('.gjs-mdl-dialog .form-status i');
+
+                var ajaxTest = ajaxable(testContainerCopy, { headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } })
+                    .onStart(function() {
+                        statusFormEl.className = 'fa fa-refresh anim-spin';
+                        statusFormElC.style.opacity = '1';
+                        statusFormElC.className = 'form-status';
+                    })
+                    .onResponse(function(res) {
+                        if (res.data) {
+                            statusFormElC.style.opacity = '0';
+                            statusFormEl.removeAttribute('data-tooltip');
+                            md.close();
+                            toastr.success('Testmail sent');
+                        } else if (res.errors) {
+                            statusFormEl.className = 'fa fa-exclamation-circle';
+                            statusFormEl.setAttribute('data-tooltip', res.errors);
+                            statusFormElC.className = 'form-status text-danger';
+                            toastr.error(res.errors);
+                        }
+                    });
+
+                // Remember testemail address
+
+                var isValidEmail = function(email) {
+                    return /\S+@\S+\.\S+/.test(email);
+                };
+
+                if (isValidEmail(localStorage.getItem('testemail'))) {
+                    $('.gjs-mdl-dialog #test-form input[name=email]').val(localStorage.getItem('testemail'));
+                }
+
+                $('.gjs-mdl-dialog #test-form').on('submit', function() {
+                    var email = $('.gjs-mdl-dialog #test-form input[name=email]').val();
+                    isValidEmail(email) && localStorage.setItem('testemail', email);
+                });
+                
                 md.open();
                 md.getModel().once('change:open', function() {
                     mdlDialog.className = mdlDialog.className.replace(mdlClass, '');
@@ -382,43 +423,6 @@
         },
     });
 
-    var statusFormElC = document.querySelector('.form-status');
-    var statusFormEl = document.querySelector('.form-status i');
-
-    var ajaxTest = ajaxable(testContainer, { headers: { 'X-CSRF-TOKEN': '{{csrfToken}}' } })
-        .onStart(function() {
-            statusFormEl.className = 'fa fa-refresh anim-spin';
-            statusFormElC.style.opacity = '1';
-            statusFormElC.className = 'form-status';
-        })
-        .onResponse(function(res) {
-            if (res.data) {
-                statusFormElC.style.opacity = '0';
-                statusFormEl.removeAttribute('data-tooltip');
-                md.close();
-                toastr.success('Testmail sent');
-            } else if (res.errors) {
-                statusFormEl.className = 'fa fa-exclamation-circle';
-                statusFormEl.setAttribute('data-tooltip', res.errors);
-                statusFormElC.className = 'form-status text-danger';
-                toastr.error(res.errors);
-            }
-        });
-
-    // Remember testemail address
-
-    var isValidEmail = function(email) {
-        return /\S+@\S+\.\S+/.test(email);
-    };
-
-    if (isValidEmail(localStorage.getItem('testemail'))) {
-        $('#test-form input[name=email]').val(localStorage.getItem('testemail'));
-    }
-
-    $('#test-form').on('submit', function() {
-        var email = $('#test-form input[name=email]').val();
-        isValidEmail(email) && localStorage.setItem('testemail', email);
-    });
 
 
     // Merge Tag Reference command
@@ -431,7 +435,12 @@
             mdlDialog.className += ' gjs-mdl-dialog-lg';
             mergeTagReferenceContainer.style.display = 'block';
             md.setTitle('Merge tag reference');
-            md.setContent(mergeTagReferenceContainer);
+            for(var i=0; i<100; i++) {
+                try {
+                    md.setContent(mergeTagReferenceContainer);
+                    break;
+                } catch(err) {}
+            }
             md.open();
             md.getModel().once('change:open', function() {
                 mdlDialog.className = mdlDialog.className.replace('gjs-mdl-dialog-lg', '');

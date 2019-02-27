@@ -296,3 +296,41 @@
 </p>
 
 <pre>curl -XGET '{{serviceUrl}}api/lists/test@example.com?access_token={{accessToken}} </pre>
+
+<h3>GET /api/lists – {{#translate}}Get all lists{{/translate}}</h3>
+
+<p>
+  {{#translate}}Retrieve every list. {{/translate}}
+</p>
+
+<p>
+  <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+  <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+</ul>
+
+<p>
+  <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XGET '{{serviceUrl}}api/lists?access_token={{accessToken}}'</pre>
+
+<h3>GET /api/list/:id – {{#translate}}Get list by id{{/translate}}</h3>
+
+<p>
+  {{#translate}}Retrieve the list with :id {{/translate}}
+</p>
+
+<p>
+  <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+  <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+</ul>
+
+<p>
+  <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XGET '{{serviceUrl}}api/list/1?access_token={{accessToken}}'</pre>

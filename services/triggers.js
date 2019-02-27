@@ -82,8 +82,8 @@ function fireTrigger(trigger, callback) {
                 }
                 let subscriber = rows[pos++].id;
 
-                let query = 'INSERT INTO `trigger__' + trigger.id + '` (`list`, `subscription`) VALUES (?,?)';
-                let values = [trigger.list, subscriber];
+                let query = 'INSERT INTO `trigger__' + trigger.id + '` (`list`, `segment`, `subscription`) VALUES (?,?,?)';
+                let values = [trigger.list, trigger.segment, subscriber];
 
                 connection.query(query, values, (err, result) => {
                     if (err && err.code !== 'ER_DUP_ENTRY') {

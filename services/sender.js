@@ -312,7 +312,7 @@ function formatMessage(message, callback) {
                 return callback(new Error(_('List not found')));
             }
 
-            settings.list(['serviceUrl', 'verpUse', 'verpHostname'], (err, configItems) => {
+            settings.list(['serviceUrl', 'verpUse', 'verpHostname', 'xMailer'], (err, configItems) => {
                 if (err) {
                     return callback(err);
                 }
@@ -379,13 +379,18 @@ function formatMessage(message, callback) {
                                     wordwrap: 130
                                 });
 
+                                let listUnsubscribe = null;
+                                if (!list.listunsubscribeDisabled) {
+                                    listUnsubscribe = campaign.unsubscribe ? tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.unsubscribe) : url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid);
+                                }
+
                                 return callback(null, {
                                     from: {
                                         name: campaign.from,
                                         address: campaign.address
                                     },
                                     replyTo: campaign.replyTo,
-                                    xMailer: 'Mailtrain Mailer (+https://mailtrain.org)',
+                                    xMailer: configItems.xMailer ? configItems.xMailer : false,
                                     to: {
                                         name: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
                                         address: message.subscription.email
@@ -419,7 +424,7 @@ function formatMessage(message, callback) {
                                         }
                                     },
                                     list: {
-                                        unsubscribe: url.resolve(configItems.serviceUrl, '/subscription/' + list.cid + '/unsubscribe/' + message.subscription.cid)
+                                        unsubscribe: listUnsubscribe
                                     },
                                     subject: tools.formatMessage(configItems.serviceUrl, campaign, list, message.subscription, campaign.subject),
                                     html: renderedHtml,

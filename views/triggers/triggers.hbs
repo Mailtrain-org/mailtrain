@@ -64,7 +64,7 @@
                             {{description}}
                         </td>
                         <td class="text-info">
-                            <a href="/lists/view/{{list}}">{{listName}}</a>
+                            <a href="/lists/view/{{list}}">{{listName}}</a>{{#if segment}} - <a href="/lists/view/{{list}}?segment={{segment}}">{{segmentName}}</a>{{/if}}
                         </td>
                         <td class="text-info">
                             {{{formatted}}}

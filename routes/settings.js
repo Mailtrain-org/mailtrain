@@ -16,7 +16,7 @@ let _ = require('../lib/translate')._;
 
 let settings = require('../lib/models/settings');
 
-let allowedKeys = ['service_url', 'smtp_hostname', 'smtp_port', 'smtp_encryption', 'smtp_disable_auth', 'smtp_user', 'smtp_pass', 'admin_email', 'smtp_log', 'smtp_max_connections', 'smtp_max_messages', 'smtp_self_signed', 'default_from', 'default_address', 'default_subject', 'default_homepage', 'default_postaddress', 'default_sender', 'verp_hostname', 'verp_use', 'disable_wysiwyg', 'pgp_private_key', 'pgp_passphrase', 'ua_code', 'shoutout', 'disable_confirmations', 'smtp_throttling', 'dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain', 'mail_transport', 'ses_key', 'ses_secret', 'ses_region'];
+let allowedKeys = ['service_url', 'smtp_hostname', 'smtp_port', 'smtp_encryption', 'smtp_disable_auth', 'smtp_user', 'smtp_pass', 'admin_email', 'smtp_log', 'smtp_max_connections', 'smtp_max_messages', 'smtp_self_signed', 'default_from', 'default_address', 'default_subject', 'default_homepage', 'default_postaddress', 'default_sender', 'verp_hostname', 'verp_use', 'disable_wysiwyg', 'pgp_private_key', 'pgp_passphrase', 'ua_code', 'shoutout', 'disable_confirmations', 'smtp_throttling', 'dkim_api_key', 'dkim_private_key', 'dkim_selector', 'dkim_domain', 'mail_transport', 'ses_key', 'ses_secret', 'ses_region', 'x_mailer', 'default_unsubscribe'];
 
 router.all('/*', (req, res, next) => {
     if (!req.user) {
