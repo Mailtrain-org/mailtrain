@@ -181,7 +181,7 @@ www:
 
 
 mysql:
-  password: "$mysqlPassword"
+  password: "asdf1234"
 
 redis:
   enabled: true

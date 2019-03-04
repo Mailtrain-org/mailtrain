@@ -42,6 +42,7 @@ defaultLanguage: en-US
 # Enabled languages
 enabledLanguages:
 - en-US
+- es-ES
 - fk-FK
 
 # Inject custom scripts in subscription/layout.mjml.hbs
