@@ -1,0 +1,3 @@
+[2019-03-04 16:00:11.753] [renderer1] [error] Failed to watch /root/.config/Code/User for changes (Error: ENOSPC: no space left on device, watch '/root/.config/Code/User')
+[2019-03-04 16:00:11.818] [renderer1] [error] Failed to watch /home/carlos/mailtrain/=/logs/20190304T152045/output_1_20190304T160011 for changes (Error: ENOSPC: no space left on device, watch '/home/carlos/mailtrain/=/logs/20190304T152045/output_1_20190304T160011')
+[2019-03-04 16:00:12.085] [renderer1] [error] Inotify limit reached (ENOSPC)

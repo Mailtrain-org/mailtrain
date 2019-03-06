@@ -1,0 +1,43 @@
+[2019-03-04 16:00:10.320] [main] [error] [uncaught exception in main]: Failed to watch /root/.config/Code/User for changes (Error: ENOSPC: no space left on device, watch '/root/.config/Code/User')
+[2019-03-04 16:00:10.358] [main] [error] [uncaught exception in main]: Error: Unknown channel
+[2019-03-04 16:00:10.358] [main] [error] Error: Unknown channel
+    at e.onPromise (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:174:673)
+    at e.onRawMessage (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:174:363)
+    at /usr/share/code/resources/app/out/vs/code/electron-main/main.js:173:813
+    at e.fire (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:54:578)
+    at a (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:184:453)
+    at Socket._socketDataListener (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:184:674)
+    at Socket.emit (events.js:182:13)
+    at addChunk (_stream_readable.js:279:12)
+    at readableAddChunk (_stream_readable.js:264:11)
+    at Socket.Readable.push (_stream_readable.js:219:10)
+    at Pipe.onread (net.js:636:20)
+[2019-03-04 16:00:10.359] [main] [error] [uncaught exception in main]: Error: Unknown channel
+[2019-03-04 16:00:10.359] [main] [error] Error: Unknown channel
+    at e.onPromise (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:174:673)
+    at e.onRawMessage (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:174:363)
+    at /usr/share/code/resources/app/out/vs/code/electron-main/main.js:173:813
+    at e.fire (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:54:578)
+    at a (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:184:453)
+    at Socket._socketDataListener (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:184:674)
+    at Socket.emit (events.js:182:13)
+    at addChunk (_stream_readable.js:279:12)
+    at readableAddChunk (_stream_readable.js:264:11)
+    at Socket.Readable.push (_stream_readable.js:219:10)
+    at Pipe.onread (net.js:636:20)
+[2019-03-04 16:00:10.359] [main] [error] [uncaught exception in main]: Error: Unknown channel
+[2019-03-04 16:00:10.359] [main] [error] Error: Unknown channel
+    at e.onPromise (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:174:673)
+    at e.onRawMessage (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:174:363)
+    at /usr/share/code/resources/app/out/vs/code/electron-main/main.js:173:813
+    at e.fire (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:54:578)
+    at a (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:184:453)
+    at Socket._socketDataListener (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:184:674)
+    at Socket.emit (events.js:182:13)
+    at addChunk (_stream_readable.js:279:12)
+    at readableAddChunk (_stream_readable.js:264:11)
+    at Socket.Readable.push (_stream_readable.js:219:10)
+    at Pipe.onread (net.js:636:20)
+[2019-03-04 16:00:10.401] [main] [info] [storage] migrating global storage from localStorage into SQLite
+[2019-03-04 16:00:10.401] [main] [info] [storage] migrated global storage
+[2019-03-04 16:00:10.403] [main] [info] update#setState idle

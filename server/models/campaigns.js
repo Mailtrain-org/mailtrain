@@ -543,7 +543,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete');
+            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete'); //Doesn't works with filteredEntity
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
