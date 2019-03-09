@@ -17,6 +17,11 @@
     <input type="hidden" name="id" value="{{id}}" />
 </form>
 
+<form method="post" class="duplicate-form" id="campaigns-duplicate" action="/campaigns/duplicate">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="hidden" name="id" value="{{id}}" />
+</form>
+
 {{#each attachments}}
     <form method="post" id="attachment-download-{{id}}" action="/campaigns/attachment/download">
         <input type="hidden" name="_csrf" value="{{../csrfToken}}">
@@ -240,6 +245,7 @@
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <div class="pull-right">
+                    <button type="submit" form="campaigns-duplicate" class="btn btn-default"> {{#translate}}Duplicate{{/translate}}</button>
                     <button type="submit" form="campaigns-delete" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i> {{#translate}}Delete Campaign{{/translate}}</button>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> {{#translate}}Update{{/translate}}</button>

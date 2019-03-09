@@ -181,6 +181,7 @@
 </p>
 <ul>
     <li><strong>NAME</strong> – {{#translate}}field name{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)</li>
+    <li><strong>DESCRIPTION</strong> – {{#translate}}field description{{/translate}}</li>
     <li><strong>TYPE</strong> – {{#translate}}one of the following types:{{/translate}}
         <ul>
             {{#each allowedTypes}}
@@ -362,3 +363,4 @@
 
 <pre>curl -XPOST {{serviceUrl}}api/changeemail/B16uVTdW?access_token={{accessToken}} \
 --data 'EMAILOLD=test@example.com&EMAILNEW=foo@bar.com'</pre>
+

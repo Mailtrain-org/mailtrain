@@ -126,6 +126,19 @@ router.post('/create', passport.parseForm, passport.csrfProtection, (req, res) =
     });
 });
 
+router.post('/duplicate', passport.parseForm, passport.csrfProtection, (req, res) => {
+    campaigns.duplicate(req.body.id, (err, duplicated) => {
+        if (err) {
+            req.flash('danger', err && err.message || err);
+        } else if (duplicated) {
+            req.flash('success', _('Campaign duplicated'));
+        } else {
+            req.flash('info', _('Could not duplicate specified campaign'));
+        }
+        return res.redirect('/campaigns/edit/' + duplicated);
+    });
+});
+
 router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
     campaigns.get(req.params.id, false, (err, campaign) => {
         if (err || !campaign) {
