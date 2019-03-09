@@ -311,13 +311,15 @@ export default class CUD extends Component {
     }
 
     getFormValuesMutator(data) {
-        data.selectedTemplate = 'layout';
         this.supplyDefaults(data);
     }
 
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity, data => {
+                this.getFormValuesMutator(data);
+                data.selectedTemplate = 'layout';
+            });
 
         } else {
             const data = {

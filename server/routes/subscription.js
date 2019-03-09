@@ -675,7 +675,7 @@ async function webNotice(type, req, res) {
         }
     };
 
-    await injectCustomFormData(req.query.fid || list.default_form, 'web_' + type + '_notice', data);
+    await injectCustomFormData(req.query.fid || list.default_form, 'web_' + type.replace('-', '_') + '_notice', data);
 
     const htmlRenderer = await tools.getTemplate(data.template, req.locale);
 
