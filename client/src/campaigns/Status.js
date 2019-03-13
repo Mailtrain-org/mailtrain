@@ -225,6 +225,18 @@ class SendControls extends Component {
         await this.refreshEntity();
     }
 
+    async confirmStart() {
+        const t = this.props.t;
+        this.actionDialog(
+            t('confirmLaunch'),
+            t('doYouWantToLaunchTheCampaign?All'),
+            async () => {
+                await this.startAsync();
+                await this.refreshEntity();
+            }
+        );
+    }
+
     async resetAsync() {
         const t = this.props.t;
         this.actionDialog(
@@ -306,7 +318,7 @@ class SendControls extends Component {
                         {this.getFormValue('sendLater') ?
                             <Button className="btn-primary" icon="send" label={(entity.scheduled ? t('rescheduleSend') : t('scheduleSend')) + subscrInfo} onClickAsync={::this.scheduleAsync}/>
                             :
-                            <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.startAsync}/>
+                            <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.confirmStart}/>
                         }
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
                     </ButtonRow>
@@ -335,7 +347,7 @@ class SendControls extends Component {
                         {t('allMessagesSent!HitContinueIfYouYouWant')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.startAsync}/>
+                        <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.confirmStart}/>
                         <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                     </ButtonRow>
