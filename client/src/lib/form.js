@@ -339,7 +339,8 @@ class CheckBox extends Component {
         text: PropTypes.string.isRequired,
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string
+        format: PropTypes.string,
+        overrideFormat: PropTypes.bool
     }
 
     render() {
@@ -347,15 +348,28 @@ class CheckBox extends Component {
         const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
+        const overrideFormat = this.props.overrideFormat;
 
         const className = owner.addFormValidationClass('form-check-input', id);
 
-        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+        if(overrideFormat){
+            return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div className={styles.overrideCheckboxForm}>
+                <input className={className} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+                <label className={styles.checkboxText} htmlFor={htmlId}>{props.text}</label>
+            </div>
+            );
+        }
+        else{
+            return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <div className="form-group form-check my-2">
                 <input className={className} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
-                <label className="form-check-label" htmlFor={htmlId}>{props.text}</label>
+                <label className={styles.checkboxText} htmlFor={htmlId}>{props.text}</label>
             </div>
-        );
+            );
+        }
+
+        
     }
 }
 

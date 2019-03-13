@@ -609,21 +609,20 @@ export default class CUD extends Component {
 
                 const addOverridable = (id, label) => {
                     if(this.state.sendConfiguration[id + '_overridable'] == 1){
-                        sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} label={label} text={t('override')}/>);
                         if (this.getFormValue(id + '_overriden')) {
-                            sendSettings.push(<InputField key={id + '_override'} id={id + '_override'}/>);
+                            sendSettings.push(<InputField label={t(label)} key={id + '_override'} id={id + '_override'}/>);
                         } else {
                             sendSettings.push(
-                                <StaticField key={id + '_original'} id={id + '_original'} className={styles.formDisabled}>
+                                <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
                                     {this.state.sendConfiguration[id]}
                                 </StaticField>
                             );
                         }
+                        sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'}  text={t('override')} overrideFormat={true}/>);
                     }
                     else{
-                        sendSettings.push(<AlignedRow label={t(id)}></AlignedRow>);
                         sendSettings.push(
-                            <StaticField key={id + '_original'} id={id + '_original'} className={styles.formDisabled}>
+                            <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
                                 {this.state.sendConfiguration[id]}
                             </StaticField>
                         );
