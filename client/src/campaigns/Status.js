@@ -445,7 +445,7 @@ export default class Status extends Component {
             sendSettings = [];
             
             const addOverridable = (id, label) => {
-                if(this.state.sendConfiguration[id + '_overridable'] == 1){
+                if(this.state.sendConfiguration[id + '_overridable'] == 1 && entity[id + '_override'] != null){
                     sendSettings.push(<AlignedRow key={id} label={label}>{entity[id + '_override']}</AlignedRow>);
                 }
                 else{
