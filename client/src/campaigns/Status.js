@@ -443,10 +443,16 @@ export default class Status extends Component {
         let sendSettings;
         if (this.state.sendConfiguration) {
             sendSettings = [];
-
+            
             const addOverridable = (id, label) => {
-                sendSettings.push(<AlignedRow key={id} label={label}>{entity[id + '_override'] === null ? this.state.sendConfiguration[id] : entity[id + '_override']}</AlignedRow>);
+                if(this.state.sendConfiguration[id + '_overridable'] == 1){
+                    sendSettings.push(<AlignedRow key={id} label={label}>{entity[id + '_override']}</AlignedRow>);
+                }
+                else{
+                    sendSettings.push(<AlignedRow key={id} label={label}>{this.state.sendConfiguration[id]}</AlignedRow>);
+                }
             };
+
 
             addOverridable('from_name', t('fromName'));
             addOverridable('from_email', t('fromEmailAddress'));

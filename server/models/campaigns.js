@@ -76,6 +76,19 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('campaigns')
+            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+            .where('namespaces.id', namespaceId)
+            .whereNull('campaigns.parent'),
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+    );
+}
+
 async function listChildrenDTAjax(context, campaignId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -730,9 +743,9 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         ])
         .first();
 
-    if (!message) {
+    //if (!message) {
         throw new Error('Invalid campaign.')
-    }
+    //}
 
     await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
 }
@@ -934,6 +947,7 @@ module.exports.Content = Content;
 module.exports.hash = hash;
 
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;
 module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;

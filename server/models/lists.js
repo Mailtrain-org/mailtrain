@@ -53,6 +53,33 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listByNamespaceDTAjax(context, params) {
+    const campaignEntityType = entitySettings.getEntityType('campaign');
+
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'list', requiredOperations: ['view'] }],
+        params,
+        builder => builder
+            .from('lists')
+            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace'),
+        ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
+            {
+                name: 'triggerCount',
+                query: builder =>
+                    builder.from('campaigns')
+                        .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+                        .innerJoin('triggers', 'campaigns.id', 'triggers.campaign')
+                        .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
+                        .whereRaw('campaign_lists.list = lists.id')
+                        .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
+                        .count()
+                        .as('triggerCount')
+            }
+        ]
+    );
+}
+
 async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -260,6 +287,7 @@ async function remove(context, id) {
 module.exports.UnsubscriptionMode = UnsubscriptionMode;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listWithSegmentByCampaignDTAjax = listWithSegmentByCampaignDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
