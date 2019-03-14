@@ -34,6 +34,19 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listDTAjaxByNamespace(context, namespaceId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'sendConfiguration', requiredOperations: ['viewPublic'] }],
+        params,
+        builder => builder
+            .from('send_configurations')
+            .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace')
+            .where('send_configurations.namespace', namespaceId),
+        ['send_configurations.id', 'send_configurations.name', 'send_configurations.cid', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
+    );
+}
+
 async function listWithSendPermissionDTAjax(context, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -175,6 +188,7 @@ async function getSystemSendConfiguration() {
 
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listDTAjaxByNamespace = listDTAjaxByNamespace;
 module.exports.listWithSendPermissionDTAjax = listWithSendPermissionDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;

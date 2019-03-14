@@ -53,7 +53,7 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function listByNamespaceDTAjax(context, params) {
+async function listByNamespaceDTAjax(context, namespaceId, params) {
     const campaignEntityType = entitySettings.getEntityType('campaign');
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -62,7 +62,8 @@ async function listByNamespaceDTAjax(context, params) {
         params,
         builder => builder
             .from('lists')
-            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace'),
+            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace')
+            .where('lists.namespace', namespaceId),
         ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
             {
                 name: 'triggerCount',

@@ -229,6 +229,7 @@ export default class CUD extends Component {
                 [lstPrefix + 'list']: null,
                 [lstPrefix + 'segment']: null,
                 [lstPrefix + 'useSegmentation']: false,
+                [lstPrefix + 'work_list_current_namespace']: false,
                 lists: [lstUid],
 
                 send_configuration: null,
@@ -236,6 +237,7 @@ export default class CUD extends Component {
 
                 click_tracking_disabled: false,
                 open_tracking_disabled: false,
+                work_send_config_current_namespace: false,
 
                 unsubscribe_url: '',
 
@@ -521,12 +523,17 @@ export default class CUD extends Component {
         const lstsEditEntries = [];
         const lsts = this.getFormValue('lists') || [];
         let lstOrderIdx = 0;
+
+        const currentNamespace = this.getFormValue('namespace');
+        const useNamespaceSendConfig = this.getFormValue('work_send_config_current_namespace');
+
         for (const lstUid of lsts) {
             const prefix = 'lists_' + lstUid + '_';
             const lstOrderIdxClosure = lstOrderIdx;
 
             const selectedList = this.getFormValue(prefix + 'list');
-
+            const useNamespaceLists = this.getFormValue(prefix + 'work_list_current_namespace');
+            
             lstsEditEntries.push(
                 <div key={lstUid} className={campaignsStyles.entry + ' ' + campaignsStyles.entryWithButtons}>
                     <div className={campaignsStyles.entryButtons}>
@@ -562,14 +569,19 @@ export default class CUD extends Component {
                         }
                     </div>
                     <div className={campaignsStyles.entryContent}>
-                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
-
+                        {useNamespaceLists && 
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl={`rest/users-table-byNamespace/${currentNamespace}`} columns={listsColumns} selectionLabelIndex={1} />
+                        }
+                        {!useNamespaceLists && 
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionLabelIndex={1} />
+                        }
                         {(campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) &&
                             <div>
                                 <CheckBox id={prefix + 'useSegmentation'} label={t('segment')} text={t('useAParticularSegment')}/>
                                 {selectedList && this.getFormValue(prefix + 'useSegmentation') &&
                                     <TableSelect id={prefix + 'segment'} withHeader dropdown dataUrl={`rest/segments-table/${selectedList}`} columns={segmentsColumns} selectionLabelIndex={1} />
                                 }
+                                <CheckBox id={prefix + "work_list_current_namespace"} label={t('namespace')} text={t('workWithCurrentNamespace')}/>
                             </div>
                         }
                     </div>
@@ -739,10 +751,16 @@ export default class CUD extends Component {
 
                     {lstsEdit}
 
-                    <hr/>
+                    <Title>{t('sendSettings')}</Title>
 
-                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
-
+                    {useNamespaceSendConfig && 
+                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={`rest/send-configurations-table-byNamespace/${currentNamespace}`} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    }
+                    {!useNamespaceSendConfig && 
+                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={`rest/send-configurations-table`} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    }
+                    <CheckBox id="work_send_config_current_namespace" label={t('namespace')} text={t('workWithCurrentNamespace')}/>
+                   
                     {sendSettings}
 
                     <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
