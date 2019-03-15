@@ -699,20 +699,3 @@ export function getLanguageChooser(t) {
     return languageChooser;
 }
 
-export function getNamespaceChooser(t) {
-
-    const namespaceOptions = [];
-    namespaceOptions.push(
-        <DropdownLink to={`/campaigns`}>{t('All')}</DropdownLink>,
-        <DropdownLink to={`/campaigns?namespace=1`}>{t('Root')}</DropdownLink>
-    )
-   
-
-    const namespaceChooser = (
-        <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('namespaceFilter')}>
-             {namespaceOptions}
-        </ButtonDropdown>
-    );
-
-    return namespaceChooser;
-}

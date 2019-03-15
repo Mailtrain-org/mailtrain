@@ -12,8 +12,7 @@ import {
     requiresAuthenticatedUser,
     Title,
     Toolbar,
-    withPageHelpers,
-    getNamespaceChooser
+    withPageHelpers
 } from '../lib/page';
 import {
     withAsyncErrorHandler,
@@ -76,12 +75,8 @@ export default class List extends Component {
     }
 
     render() {
-        
         const t = this.props.t;
-        var pathname = window.location.href;
-        var url = new URL(pathname);
-        var namespace = url.searchParams.get("namespace");
-  
+
         const columns = [
             { data: 1, title: t('name') },
             { data: 2, title: t('id'), render: data => <code>{data}</code> },
@@ -112,7 +107,6 @@ export default class List extends Component {
                     const campaignType = data[4];
                     const status = data[5];
                     const campaignSource = data[7];
-
 
                     if (perms.includes('viewStats')) {
                         actions.push({
@@ -178,7 +172,6 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-
                 <Toolbar>
                     {this.state.createPermitted &&
                     <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createCampaign')}>
@@ -189,19 +182,10 @@ export default class List extends Component {
                     }
                 </Toolbar>
 
-                <Toolbar>
-                    {getNamespaceChooser(t)}
-                </Toolbar>
-
                 <Title>{t('campaigns')}</Title>
-                {!namespace &&
-                    <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} />
-                }
-                {!!namespace &&
-                    <Table ref={node => this.table = node} withHeader dataUrl={`rest/campaigns-namespace/${namespace}`} columns={columns} />
-                }
+
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} />
             </div>
         );
-
     }
 }

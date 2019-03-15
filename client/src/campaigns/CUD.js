@@ -581,7 +581,7 @@ export default class CUD extends Component {
                                 {selectedList && this.getFormValue(prefix + 'useSegmentation') &&
                                     <TableSelect id={prefix + 'segment'} withHeader dropdown dataUrl={`rest/segments-table/${selectedList}`} columns={segmentsColumns} selectionLabelIndex={1} />
                                 }
-                                <CheckBox id={prefix + "work_list_current_namespace"} label={t('namespace')} text={t('workWithCurrentNamespace')}/>
+                                <CheckBox id={prefix + "work_list_current_namespace"} label={t('namespaceFiltering')} text={t('workWithCurrentNamespace')}/>
                             </div>
                         }
                     </div>
@@ -759,7 +759,7 @@ export default class CUD extends Component {
                     {!useNamespaceSendConfig && 
                     <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={`rest/send-configurations-table`} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
                     }
-                    <CheckBox id="work_send_config_current_namespace" label={t('namespace')} text={t('workWithCurrentNamespace')}/>
+                    <CheckBox id="work_send_config_current_namespace" label={t('namespaceFiltering')} text={t('workWithCurrentNamespace')}/>
                    
                     {sendSettings}
 

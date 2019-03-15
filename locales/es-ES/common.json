@@ -148,6 +148,7 @@
     "description": "Descripciçon",
     "namespace": "Espacio de nombres",
     "namespace_plural": "Espacios de nombres",
+    "namespaceFiltering": "Filtrar espacio de nombres",
     "remove": "Eliminar",
     "insertNewEntryBeforeThisOne": "Insert new entry before this one",
     "moveUp": "Move up",
