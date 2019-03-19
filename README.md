@@ -35,7 +35,7 @@ Depending on how you have configured your system and Docker you may need to prep
 * Start: `docker-compose start`
 * Open [http://localhost:3000/](http://localhost:3000/) (change the host name `localhost` to the name of the host where you are deploying the system).
 * Authenticate as user `admin` with password `test`
-* Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration.
+* Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration, especially replace the value in `Service Address (URL)` from `localhost` to the actual IP or domain if installed on a server, otherwise e.g. image upload will not work.
 * Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password.
 
 ## Quick Start - Manual Install (any OS that supports Node.js)
@@ -49,7 +49,7 @@ Depending on how you have configured your system and Docker you may need to prep
   4. Run the server `NODE_ENV=production npm start`
   5. Open [http://localhost:3000/](http://localhost:3000/)
   6. Authenticate as `admin`:`test`
-  7. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration
+  7. Navigate to [http://localhost:3000/settings](http://localhost:3000/settings) and update service configuration, especially replace the value in `Service Address (URL)` from `localhost` to the actual IP or domain if installed on a server, otherwise e.g. image upload will not work.
   8. Navigate to [http://localhost:3000/users/account](http://localhost:3000/users/account) and update user information and password
 
 ## Read The Docs
