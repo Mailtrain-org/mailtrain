@@ -118,7 +118,7 @@
   "blacklistedEmails": "Blacklisted Emails",
   "createRegularCampaign": "Create Regular Campaign",
   "sendSettings": "Send settings",
-  "workWithCurrentNamespace": "Work with current namespace",
+  "workWithCampaignNamespace": "Work with campaign's namespace",
   "createRssCampaign": "Create RSS Campaign",
   "createTriggeredCampaign": "Create Triggered Campaign",
   "editRegularCampaign": "Edit Regular Campaign",

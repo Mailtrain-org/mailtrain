@@ -46,6 +46,16 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listByNamespaceDTAjax(context, params, namespaceId) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'template', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace').where('namespaces.id', namespaceId),
+        [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.created', 'namespaces.name' ]
+    );
+}
+
 async function _validateAndPreprocess(tx, entity) {
     await namespaceHelpers.validateEntity(tx, entity);
 
@@ -135,6 +145,7 @@ module.exports.hash = hash;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
