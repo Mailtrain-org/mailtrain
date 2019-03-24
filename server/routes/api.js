@@ -16,6 +16,7 @@ const contextHelpers = require('../lib/context-helpers');
 const shares = require('../models/shares');
 const slugify = require('slugify');
 const passport = require('../lib/passport');
+const TemplateSender = require('../lib/template-sender');
 const campaigns = require('../models/campaigns');
 
 class APIError extends Error {
@@ -285,5 +286,31 @@ router.getAsync('/rss/fetch/:campaignCid', passport.loggedIn, async (req, res) =
     return res.json();
 });
 
+router.postAsync('/templates/:templateId/send', async (req, res) => {
+    const input = {};
+    Object.keys(req.body).forEach(key => {
+        input[
+            (key || '')
+                .toString()
+                .trim()
+                .toUpperCase()
+        ] = req.body[key] || '';
+    });
+
+    try {
+        const templateSender = new TemplateSender({
+            templateId: req.params.templateId
+        });
+        const info = await templateSender.send({
+            email: input.EMAIL,
+            subject: input.SUBJECT,
+            locale: req.locale,
+            variables: input.VARIABLES
+        });
+        res.status(200).json({ data: info });
+    } catch (e) {
+        throw new APIError(e.message, 400);
+    }
+});
 
 module.exports = router;
