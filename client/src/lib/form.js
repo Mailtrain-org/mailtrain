@@ -340,7 +340,7 @@ class CheckBox extends Component {
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         format: PropTypes.string,
-        overrideFormat: PropTypes.bool
+        className: PropTypes.string
     }
 
     render() {
@@ -348,28 +348,15 @@ class CheckBox extends Component {
         const owner = this.getFormStateOwner();
         const id = this.props.id;
         const htmlId = 'form_' + id;
-        const overrideFormat = this.props.overrideFormat;
 
-        const className = owner.addFormValidationClass('form-check-input', id);
+        const inputClassName = owner.addFormValidationClass('form-check-input', id);
 
-        if(overrideFormat){
-            return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <div className={styles.overrideCheckboxForm}>
-                <input className={className} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
+            <div className={`form-group form-check my-2 ${this.props.className}`}>
+                <input className={inputClassName} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
                 <label className={styles.checkboxText} htmlFor={htmlId}>{props.text}</label>
             </div>
-            );
-        }
-        else{
-            return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <div className="form-group form-check my-2">
-                <input className={className} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
-                <label className={styles.checkboxText} htmlFor={htmlId}>{props.text}</label>
-            </div>
-            );
-        }
-
-        
+        );
     }
 }
 

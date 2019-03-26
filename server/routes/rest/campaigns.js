@@ -19,7 +19,7 @@ router.postAsync('/campaigns-others-by-list-table/:campaignId/:listIds', passpor
     return res.json(await campaigns.listOthersWhoseListsAreIncludedDTAjax(req.context, castToInteger(req.params.campaignId), req.params.listIds.split(';').map(x => castToInteger(x)), req.body));
 });
 
-router.postAsync('/campaigns-namespace/:namespaceId', passport.loggedIn, async (req, res) => {
+router.postAsync('/campaigns-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 

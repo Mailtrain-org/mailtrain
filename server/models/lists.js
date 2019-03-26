@@ -26,16 +26,22 @@ function hash(entity) {
 }
 
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     const campaignEntityType = entitySettings.getEntityType('campaign');
 
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'list', requiredOperations: ['view'] }],
         params,
-        builder => builder
-            .from('lists')
-            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace'),
+        builder => {
+            builder = builder
+                .from('lists')
+                .innerJoin('namespaces', 'namespaces.id', 'lists.namespace');
+            if (namespaceId) {
+                builder = builder.where('lists.namespace', namespaceId);
+            }
+            return builder;
+        },
         ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
             {
                 name: 'triggerCount',
@@ -53,32 +59,12 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function listByNamespaceDTAjax(context, namespaceId, params) {
-    const campaignEntityType = entitySettings.getEntityType('campaign');
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
 
-    return await dtHelpers.ajaxListWithPermissions(
-        context,
-        [{ entityTypeId: 'list', requiredOperations: ['view'] }],
-        params,
-        builder => builder
-            .from('lists')
-            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace')
-            .where('lists.namespace', namespaceId),
-        ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
-            {
-                name: 'triggerCount',
-                query: builder =>
-                    builder.from('campaigns')
-                        .innerJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
-                        .innerJoin('triggers', 'campaigns.id', 'triggers.campaign')
-                        .innerJoin(campaignEntityType.permissionsTable, 'campaigns.id', `${campaignEntityType.permissionsTable}.entity`)
-                        .whereRaw('campaign_lists.list = lists.id')
-                        .where(`${campaignEntityType.permissionsTable}.operation`, 'viewTriggers')
-                        .count()
-                        .as('triggerCount')
-            }
-        ]
-    );
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {

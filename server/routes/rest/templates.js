@@ -35,8 +35,8 @@ router.postAsync('/templates-table', passport.loggedIn, async (req, res) => {
     return res.json(await templates.listDTAjax(req.context, req.body));
 });
 
-router.postAsync('/templates-table-byNamespace/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await templates.listByNamespaceDTAjax(req.context, req.body, castToInteger(req.params.namespaceId)));
+router.postAsync('/templates-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await templates.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 
 router.postAsync('/template-test-send', passport.loggedIn, passport.csrfProtection, async (req, res) => {

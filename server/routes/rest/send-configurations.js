@@ -40,8 +40,8 @@ router.postAsync('/send-configurations-table', passport.loggedIn, async (req, re
     return res.json(await sendConfigurations.listDTAjax(req.context, req.body));
 });
 
-router.postAsync('/send-configurations-table-byNamespace/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await sendConfigurations.listDTAjaxByNamespace(req.context, castToInteger(req.params.namespaceId), req.body));
+router.postAsync('/send-configurations-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await sendConfigurations.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 
 router.postAsync('/send-configurations-with-send-permission-table', passport.loggedIn, async (req, res) => {

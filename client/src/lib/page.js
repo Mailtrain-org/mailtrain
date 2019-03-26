@@ -23,7 +23,6 @@ import {
     Button,
     DismissibleAlert,
     DropdownActionLink,
-    ButtonDropdown,
     Icon
 } from "./bootstrap-components";
 import mailtrainConfig
@@ -698,4 +697,3 @@ export function getLanguageChooser(t) {
 
     return languageChooser;
 }
-

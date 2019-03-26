@@ -11,7 +11,7 @@ router.postAsync('/lists-table', passport.loggedIn, async (req, res) => {
     return res.json(await lists.listDTAjax(req.context, req.body));
 });
 
-router.postAsync('/users-table-byNamespace/:namespaceId', passport.loggedIn, async (req, res) => {
+router.postAsync('/lists-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
     return res.json(await lists.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 

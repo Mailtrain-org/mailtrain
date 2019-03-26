@@ -108,7 +108,7 @@ class Root extends Component {
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
                                 <NavDropdown label={t('administration')}>
-                                    {mailtrainConfig.globalPermissions.manageUserList && <DropdownLink to="/users">{t('users')}</DropdownLink>}
+                                    {mailtrainConfig.globalPermissions.displayManageUsers && <DropdownLink to="/users">{t('users')}</DropdownLink>}
                                     <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>
                                     {mailtrainConfig.globalPermissions.manageSettings && <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
                                     <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>

@@ -36,24 +36,28 @@ async function getById(context, id, withPermissions = true) {
     });
 }
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'template', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace'),
+        builder => {
+            builder = builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace');
+            if (namespaceId) {
+                builder = builder.where('namespaces.id', namespaceId);
+            }
+            return builder;
+        },
         [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.created', 'namespaces.name' ]
     );
 }
 
-async function listByNamespaceDTAjax(context, params, namespaceId) {
-    return await dtHelpers.ajaxListWithPermissions(
-        context,
-        [{ entityTypeId: 'template', requiredOperations: ['view'] }],
-        params,
-        builder => builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace').where('namespaces.id', namespaceId),
-        [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.created', 'namespaces.name' ]
-    );
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function _validateAndPreprocess(tx, entity) {
