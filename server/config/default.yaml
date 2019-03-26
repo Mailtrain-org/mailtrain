@@ -42,6 +42,7 @@ defaultLanguage: en-US
 # Enabled languages
 enabledLanguages:
 - en-US
+- es-ES
 - fk-FK
 
 # Inject custom scripts in subscription/layout.mjml.hbs
@@ -230,7 +231,7 @@ roles:
       name: Global Master
       admin: true
       description: All permissions
-      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings, setupAutomation]
+      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageUserList, manageBlacklist, manageSettings, setupAutomation]
       rootNamespaceRole: master
     campaignsAdmin:
       name: Campaigns Admin

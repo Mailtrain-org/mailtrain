@@ -229,6 +229,7 @@ export default class CUD extends Component {
                 [lstPrefix + 'list']: null,
                 [lstPrefix + 'segment']: null,
                 [lstPrefix + 'useSegmentation']: false,
+                [lstPrefix + 'work_list_current_namespace']: false,
                 lists: [lstUid],
 
                 send_configuration: null,
@@ -236,6 +237,8 @@ export default class CUD extends Component {
 
                 click_tracking_disabled: false,
                 open_tracking_disabled: false,
+                work_send_config_current_namespace: false,
+                work_template_current_namespace: false,
 
                 unsubscribe_url: '',
 
@@ -521,12 +524,18 @@ export default class CUD extends Component {
         const lstsEditEntries = [];
         const lsts = this.getFormValue('lists') || [];
         let lstOrderIdx = 0;
+
+        const currentNamespace = this.getFormValue('namespace');
+        const useNamespaceSendConfig = this.getFormValue('work_send_config_current_namespace');
+        const useNamespaceTemplate = this.getFormValue('work_template_current_namespace');
+
         for (const lstUid of lsts) {
             const prefix = 'lists_' + lstUid + '_';
             const lstOrderIdxClosure = lstOrderIdx;
 
             const selectedList = this.getFormValue(prefix + 'list');
-
+            const useNamespaceLists = this.getFormValue(prefix + 'work_list_current_namespace');
+            
             lstsEditEntries.push(
                 <div key={lstUid} className={campaignsStyles.entry + ' ' + campaignsStyles.entryWithButtons}>
                     <div className={campaignsStyles.entryButtons}>
@@ -562,8 +571,13 @@ export default class CUD extends Component {
                         }
                     </div>
                     <div className={campaignsStyles.entryContent}>
-                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
-
+                        <CheckBox id={prefix + "work_list_current_namespace"} label={t('namespaceFiltering')} text={t('workWithCampaignNamespace')}/>
+                        {useNamespaceLists && 
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl={`rest/users-table-byNamespace/${currentNamespace}`} columns={listsColumns} selectionLabelIndex={1} />
+                        }
+                        {!useNamespaceLists && 
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionLabelIndex={1} />
+                        }
                         {(campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) &&
                             <div>
                                 <CheckBox id={prefix + 'useSegmentation'} label={t('segment')} text={t('useAParticularSegment')}/>
@@ -608,13 +622,21 @@ export default class CUD extends Component {
                 sendSettings = [];
 
                 const addOverridable = (id, label) => {
-                    sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} label={label} text={t('override')}/>);
-
-                    if (this.getFormValue(id + '_overriden')) {
-                        sendSettings.push(<InputField key={id + '_override'} id={id + '_override'}/>);
-                    } else {
+                    if(this.state.sendConfiguration[id + '_overridable'] == 1){
+                        if (this.getFormValue(id + '_overriden')) {
+                            sendSettings.push(<InputField label={t(label)} key={id + '_override'} id={id + '_override'}/>);
+                        } else {
+                            sendSettings.push(
+                                <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                                    {this.state.sendConfiguration[id]}
+                                </StaticField>
+                            );
+                        }
+                        sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'}  text={t('override')} overrideFormat={true}/>);
+                    }
+                    else{
                         sendSettings.push(
-                            <StaticField key={id + '_original'} id={id + '_original'} className={styles.formDisabled}>
+                            <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
                                 {this.state.sendConfiguration[id]}
                             </StaticField>
                         );
@@ -659,7 +681,13 @@ export default class CUD extends Component {
 
             // The "key" property here and in the TableSelect below is to tell React that these tables are different and should be rendered by different instances. Otherwise, React will use
             // only one instance, which fails because Table does not handle updates in "columns" property
-            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            if(useNamespaceTemplate){
+                templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl={`rest/templates-table-byNamespace/${currentNamespace}`}  columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            }
+            else{
+                templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            }
+            
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
@@ -731,12 +759,20 @@ export default class CUD extends Component {
 
                     {lstsEdit}
 
-                    <hr/>
+                    <Title>{t('sendSettings')}</Title>
 
-                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    <CheckBox id="work_send_config_current_namespace" label={t('namespaceFiltering')} text={t('workWithCampaignNamespace')}/>
 
+                    {useNamespaceSendConfig && 
+                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={`rest/send-configurations-table-byNamespace/${currentNamespace}`} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    }
+                    {!useNamespaceSendConfig && 
+                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={`rest/send-configurations-table`} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    }
+                    
+                   
                     {sendSettings}
-
+    
                     <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
 
                     <hr/>
@@ -744,9 +780,11 @@ export default class CUD extends Component {
                     <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
                     <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
 
-                    {sourceEdit && <hr/> }
+                    <Title>{t('template')}</Title>
 
                     {sourceEdit}
+
+                    <CheckBox id="work_template_current_namespace" label={t('namespaceFiltering')} text={t('workWithCampaignNamespace')}/>
 
                     {templateEdit}
 

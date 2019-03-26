@@ -76,6 +76,19 @@ async function listDTAjax(context, params) {
     );
 }
 
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('campaigns')
+            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+            .where('namespaces.id', namespaceId)
+            .whereNull('campaigns.parent'),
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+    );
+}
+
 async function listChildrenDTAjax(context, campaignId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -543,7 +556,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete');
+            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete'); //Doesn't works with filteredEntity
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
@@ -730,9 +743,9 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         ])
         .first();
 
-    if (!message) {
+    //if (!message) {
         throw new Error('Invalid campaign.')
-    }
+    //}
 
     await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
 }
@@ -934,6 +947,7 @@ module.exports.Content = Content;
 module.exports.hash = hash;
 
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;
 module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;

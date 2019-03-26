@@ -231,13 +231,13 @@ export default class CUD extends Component {
 
                     <Fieldset label={t('emailHeader')}>
                         <InputField id="from_email" label={t('defaultFromEmail')}/>
-                        <CheckBox id="from_email_overridable" text={t('overridable')}/>
+                        <CheckBox id="from_email_overridable" text={t('overridable')} overrideFormat={true}/>
                         <InputField id="from_name" label={t('defaultFromName')}/>
-                        <CheckBox id="from_name_overridable" text={t('overridable')}/>
+                        <CheckBox id="from_name_overridable" text={t('overridable')} overrideFormat={true}/>
                         <InputField id="reply_to" label={t('defaultReplytoEmail')}/>
-                        <CheckBox id="reply_to_overridable" text={t('overridable')}/>
+                        <CheckBox id="reply_to_overridable" text={t('overridable')} overrideFormat={true}/>
                         <InputField id="subject" label={t('subject')}/>
-                        <CheckBox id="subject_overridable" text={t('overridable')}/>
+                        <CheckBox id="subject_overridable" text={t('overridable')} overrideFormat={true}/>
                         <InputField id="x_mailer" label={t('xMailer')}/>
                     </Fieldset>
 

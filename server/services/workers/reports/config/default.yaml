@@ -11,6 +11,7 @@ defaultLanguage: en-US
 # Enabled languages
 enabledLanguages:
 - en-US
+- es-ES
 - fk-FK
 
 mysql:
