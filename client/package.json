@@ -34,7 +34,7 @@
     "i18next-browser-languagedetector": "^2.2.4",
     "immutable": "^4.0.0-rc.12",
     "juice": "^5.1.0",
-    "mjml4-in-browser": "^1.0.2",
+    "mjml4-in-browser": "^1.1.0",
     "moment": "^2.23.0",
     "moment-timezone": "^0.5.23",
     "popper.js": "^1.14.6",
