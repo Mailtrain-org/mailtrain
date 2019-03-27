@@ -73,6 +73,7 @@ redis:
 log:
   # silly|verbose|info|http|warn|error|silent
   level: info
+  sendStacktracesToClient: false
 
 www:
   # HTTP port to listen on for trusted requests (logged-in users)

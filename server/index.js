@@ -24,6 +24,7 @@ const { AppType } = require('../shared/app');
 const builtinZoneMta = require('./lib/builtin-zone-mta');
 
 const { uploadedFilesDir } = require('./lib/file-helpers');
+const { filesDir } = require('./models/files');
 
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
@@ -113,6 +114,7 @@ dbcheck(err => { // Check if database needs upgrading before starting the server
                             startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort, () =>
                                 startHTTPServer(AppType.PUBLIC, 'public', publicPort, async () => {
 
+                                    await privilegeHelpers.ensureMailtrainDir(filesDir);
                                     await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
 
                                     privilegeHelpers.dropRootPrivileges();

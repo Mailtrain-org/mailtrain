@@ -156,7 +156,6 @@ function getRouter(appType) {
         // This is a fallback to versafix-1 if the block thumbnail is not defined by the template
         router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
 
-
         fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
             return {
                 files: resp.files.map(f => ({name: f.name, url: f.url, size: f.size, thumbnailUrl: f.thumbnailUrl}))
