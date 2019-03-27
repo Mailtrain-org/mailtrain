@@ -36,14 +36,28 @@ async function getById(context, id, withPermissions = true) {
     });
 }
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'template', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace'),
+        builder => {
+            builder = builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace');
+            if (namespaceId) {
+                builder = builder.where('namespaces.id', namespaceId);
+            }
+            return builder;
+        },
         [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.created', 'namespaces.name' ]
     );
+}
+
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function _validateAndPreprocess(tx, entity) {
@@ -135,6 +149,7 @@ module.exports.hash = hash;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

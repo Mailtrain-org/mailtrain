@@ -64,16 +64,30 @@ function hash(entity, content) {
     return hasher.hash(filteredEntity);
 }
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('campaigns')
-            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
-            .whereNull('campaigns.parent'),
+        builder => {
+            builder = builder.from('campaigns')
+                .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+                .whereNull('campaigns.parent');
+            if (namespaceId) {
+                builder = builder.where('namespaces.id', namespaceId);
+            }
+            return builder;
+        },
         ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
+}
+
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listChildrenDTAjax(context, campaignId, params) {
@@ -543,7 +557,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete');
+            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete'); // XXX TB - try with entity
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
@@ -731,7 +745,7 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         .first();
 
     if (!message) {
-        throw new Error('Invalid campaign.')
+        throw new Error('Invalid campaign.');
     }
 
     await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
@@ -934,6 +948,7 @@ module.exports.Content = Content;
 module.exports.hash = hash;
 
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;
 module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;

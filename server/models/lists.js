@@ -26,16 +26,22 @@ function hash(entity) {
 }
 
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     const campaignEntityType = entitySettings.getEntityType('campaign');
 
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'list', requiredOperations: ['view'] }],
         params,
-        builder => builder
-            .from('lists')
-            .innerJoin('namespaces', 'namespaces.id', 'lists.namespace'),
+        builder => {
+            builder = builder
+                .from('lists')
+                .innerJoin('namespaces', 'namespaces.id', 'lists.namespace');
+            if (namespaceId) {
+                builder = builder.where('lists.namespace', namespaceId);
+            }
+            return builder;
+        },
         ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
             {
                 name: 'triggerCount',
@@ -51,6 +57,14 @@ async function listDTAjax(context, params) {
             }
         ]
     );
+}
+
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {
@@ -260,6 +274,7 @@ async function remove(context, id) {
 module.exports.UnsubscriptionMode = UnsubscriptionMode;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listWithSegmentByCampaignDTAjax = listWithSegmentByCampaignDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;

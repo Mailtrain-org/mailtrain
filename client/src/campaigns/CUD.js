@@ -608,13 +608,21 @@ export default class CUD extends Component {
                 sendSettings = [];
 
                 const addOverridable = (id, label) => {
-                    sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} label={label} text={t('override')}/>);
-
-                    if (this.getFormValue(id + '_overriden')) {
-                        sendSettings.push(<InputField key={id + '_override'} id={id + '_override'}/>);
-                    } else {
+                    if(this.state.sendConfiguration[id + '_overridable']){
+                        if (this.getFormValue(id + '_overriden')) {
+                            sendSettings.push(<InputField label={t(label)} key={id + '_override'} id={id + '_override'}/>);
+                        } else {
+                            sendSettings.push(
+                                <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                                    {this.state.sendConfiguration[id]}
+                                </StaticField>
+                            );
+                        }
+                        sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} text={t('override')} className={campaignsStyles.overrideCheckbox}/>);
+                    }
+                    else{
                         sendSettings.push(
-                            <StaticField key={id + '_original'} id={id + '_original'} className={styles.formDisabled}>
+                            <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
                                 {this.state.sendConfiguration[id]}
                             </StaticField>
                         );
@@ -733,20 +741,32 @@ export default class CUD extends Component {
 
                     <hr/>
 
-                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    <Fieldset label={t('sendSettings')}>
 
-                    {sendSettings}
+                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
-                    <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
+                        {sendSettings}
+
+                        <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
+                    </Fieldset>
 
                     <hr/>
 
-                    <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
-                    <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
+                    <Fieldset label={t('Tracking')}>
+                        <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
+                        <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
+                    </Fieldset>
 
-                    {sourceEdit && <hr/> }
+                    {sourceEdit &&
+                    <>
+                        <hr/>
+                        <Fieldset label={t('template')}>
+                            {sourceEdit}
+                        </Fieldset>
+                    </>
+                    }
 
-                    {sourceEdit}
+
 
                     {templateEdit}
 

@@ -339,7 +339,8 @@ class CheckBox extends Component {
         text: PropTypes.string.isRequired,
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string
+        format: PropTypes.string,
+        className: PropTypes.string
     }
 
     render() {
@@ -348,12 +349,12 @@ class CheckBox extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        const className = owner.addFormValidationClass('form-check-input', id);
+        const inputClassName = owner.addFormValidationClass('form-check-input', id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <div className="form-group form-check my-2">
-                <input className={className} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
-                <label className="form-check-label" htmlFor={htmlId}>{props.text}</label>
+            <div className={`form-group form-check my-2 ${this.props.className}`}>
+                <input className={inputClassName} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+                <label className={styles.checkboxText} htmlFor={htmlId}>{props.text}</label>
             </div>
         );
     }

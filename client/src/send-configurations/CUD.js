@@ -40,6 +40,8 @@ import {
 import styles
     from "../lib/styles.scss";
 
+import sendConfigurationsStyles from "./styles.scss";
+
 import mailtrainConfig
     from 'mailtrainConfig';
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -231,13 +233,13 @@ export default class CUD extends Component {
 
                     <Fieldset label={t('emailHeader')}>
                         <InputField id="from_email" label={t('defaultFromEmail')}/>
-                        <CheckBox id="from_email_overridable" text={t('overridable')}/>
+                        <CheckBox id="from_email_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="from_name" label={t('defaultFromName')}/>
-                        <CheckBox id="from_name_overridable" text={t('overridable')}/>
+                        <CheckBox id="from_name_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="reply_to" label={t('defaultReplytoEmail')}/>
-                        <CheckBox id="reply_to_overridable" text={t('overridable')}/>
+                        <CheckBox id="reply_to_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="subject" label={t('subject')}/>
-                        <CheckBox id="subject_overridable" text={t('overridable')}/>
+                        <CheckBox id="subject_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="x_mailer" label={t('xMailer')}/>
                     </Fieldset>
 
