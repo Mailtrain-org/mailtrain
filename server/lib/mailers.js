@@ -173,7 +173,7 @@ async function _createTransport(sendConfiguration) {
             }
         };
 
-        if (mailerType === MailerType.ZONE_MTA || mailerSettings.zoneMTAType === ZoneMTAType.BUILTIN) {
+        if (mailerType === MailerType.ZONE_MTA && mailerSettings.zoneMtaType === ZoneMTAType.BUILTIN) {
             transportOptions.host = config.builtinZoneMTA.host;
             transportOptions.port = config.builtinZoneMTA.port;
             transportOptions.secure = false;

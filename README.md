@@ -1,6 +1,6 @@
 # Mailtrain v2 (beta)
 
-[Mailtrain](http://mailtrain.org) is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).
+Mailtrain is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).
 
 ![](https://mailtrain.org/mailtrain.png)
 
@@ -176,18 +176,15 @@ To deploy Mailtrain with Docker, you need the following three dependencies insta
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- Git - Typically already present. If not, just use the package manager of your OS distribution to install it.
 
 These are the steps to start Mailtrain via docker-compose:
 
-1. Download Mailtrain using git
+1. Download Mailtrain's docker-compose build file
     ```
-    git clone https://github.com/Mailtrain-org/mailtrain.git
-    cd mailtrain
-    git checkout development
+    curl -O https://raw.githubusercontent.com/Mailtrain-org/mailtrain/development/docker-compose.yml
     ```
 
-2. Deploy Mailtrain via docker-compose (in the root directory of the Mailtrain project). This will take quite some time when run for the first time. Subsequent executions will be fast.
+2. Deploy Mailtrain via docker-compose (in the directory to which you downloaded the `docker-compose.yml` file). This will take quite some time when run for the first time. Subsequent executions will be fast.
     ```
     docker-compose up
     ```
@@ -200,6 +197,8 @@ These are the steps to start Mailtrain via docker-compose:
 3. Open the trusted endpoint http://localhost:3000
 
 4. Authenticate as `admin`:`test`
+
+The instructions above use an automatically built Docker image on DockerHub (https://hub.docker.com/r/mailtrain/mailtrain). If you want to build the Docker image yourself (e.g. when doing development), use the `docker-compose-local-build.yml` located in the project's root directory.
 
 
 ## License

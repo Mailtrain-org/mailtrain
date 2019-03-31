@@ -20,6 +20,10 @@ const senders = require('../lib/senders');
 const {LinkId} = require('./links');
 const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
+const {convertFileURLs} = require('../lib/campaign-content');
+
+const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
+const activityLog = require('../lib/activity-log');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
@@ -60,16 +64,30 @@ function hash(entity, content) {
     return hasher.hash(filteredEntity);
 }
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('campaigns')
-            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
-            .whereNull('campaigns.parent'),
+        builder => {
+            builder = builder.from('campaigns')
+                .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+                .whereNull('campaigns.parent');
+            if (namespaceId) {
+                builder = builder.where('namespaces.id', namespaceId);
+            }
+            return builder;
+        },
         ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
+}
+
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listChildrenDTAjax(context, campaignId, params) {
@@ -427,35 +445,6 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
     }
 }
 
-function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityType, toEntityId) {
-
-    function convertText(text) {
-        if (text) {
-            const fromUrl = `/files/${fromEntityType}/file/${fromEntityId}`;
-            const toUrl = `/files/${toEntityType}/file/${toEntityId}`;
-
-            const encodedFromUrl = encodeURIComponent(fromUrl);
-            const encodedToUrl = encodeURIComponent(toUrl);
-
-            text = text.split('[URL_BASE]' + fromUrl).join('[URL_BASE]' + toUrl);
-            text = text.split('[SANDBOX_URL_BASE]' + fromUrl).join('[SANDBOX_URL_BASE]' + toUrl);
-            text = text.split('[ENCODED_URL_BASE]' + encodedFromUrl).join('[ENCODED_URL_BASE]' + encodedToUrl);
-            text = text.split('[ENCODED_SANDBOX_URL_BASE]' + encodedFromUrl).join('[ENCODED_SANDBOX_URL_BASE]' + encodedToUrl);
-        }
-
-        return text;
-    }
-
-    sourceCustom.html = convertText(sourceCustom.html);
-    sourceCustom.text = convertText(sourceCustom.text);
-
-    if (sourceCustom.type === 'mosaico' || sourceCustom.type === 'mosaicoWithFsTemplate') {
-        sourceCustom.data.model = convertText(sourceCustom.data.model);
-        sourceCustom.data.model = convertText(sourceCustom.data.model);
-        sourceCustom.data.metadata = convertText(sourceCustom.data.metadata);
-    }
-}
-
 async function _createTx(tx, context, entity, content) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCampaign');
@@ -533,6 +522,8 @@ async function _createTx(tx, context, entity, content) {
                 }).where('id', id);
         }
 
+        await activityLog.logEntityActivity('campaign', EntityActivityType.CREATE, id, {status: filteredEntity.status});
+
         return id;
     });
 }
@@ -566,7 +557,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete');
+            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete'); // XXX TB - try with entity
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
@@ -591,6 +582,8 @@ async function updateWithConsistencyCheck(context, entity, content) {
         await tx('campaigns').where('id', entity.id).update(filteredEntity);
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: entity.id });
+
+        await activityLog.logEntityActivity('campaign', EntityActivityType.UPDATE, entity.id, {status: filteredEntity.status});
     });
 }
 
@@ -628,6 +621,8 @@ async function _removeTx(tx, context, id, existing = null) {
         .del();
 
     await tx('campaigns').where('id', id).del();
+
+    await activityLog.logEntityActivity('campaign', EntityActivityType.REMOVE, id);
 }
 
 
@@ -727,9 +722,7 @@ async function _changeStatusByMessageTx(tx, context, message, subscriptionStatus
 
         const statusField = statusFieldMapping[subscriptionStatus];
 
-        if (message.status === SubscriptionStatus.SUBSCRIBED) {
-            await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
-        }
+        await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
 
         await tx('campaign_messages')
             .where('id', message.id)
@@ -745,10 +738,14 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
     const message = await tx('campaign_messages')
         .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
         .where('campaigns.cid', campaignCid)
-        .where({subscription: subscriptionId, list: listId});
+        .where({subscription: subscriptionId, list: listId})
+        .select([
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+        ])
+        .first();
 
     if (!message) {
-        throw new Error('Invalid campaign.')
+        throw new Error('Invalid campaign.');
     }
 
     await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
@@ -863,6 +860,8 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             status: newState,
             scheduled
         });
+
+        await activityLog.logEntityActivity('campaign', CampaignActivityType.STATUS_CHANGE, campaignId, {status: newState});
     });
 
     senders.scheduleCheck();
@@ -949,6 +948,7 @@ module.exports.Content = Content;
 module.exports.hash = hash;
 
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;
 module.exports.listOthersWhoseListsAreIncludedDTAjax = listOthersWhoseListsAreIncludedDTAjax;

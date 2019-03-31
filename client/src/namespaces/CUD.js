@@ -77,19 +77,21 @@ export default class CUD extends Component {
 
     @withAsyncErrorHandler
     async loadTreeData() {
-        const response = await axios.get(getUrl('rest/namespaces-tree'));
-        const data = response.data;
-        for (const root of data) {
-            root.expanded = true;
-        }
+        if (!this.isEditGlobal()) {
+            const response = await axios.get(getUrl('rest/namespaces-tree'));
+            const data = response.data;
+            for (const root of data) {
+                root.expanded = true;
+            }
 
-        if (this.props.entity && !this.isEditGlobal()) {
-            this.removeNsIdSubtree(data);
-        }
+            if (this.props.entity && !this.isEditGlobal()) {
+                this.removeNsIdSubtree(data);
+            }
 
-        this.setState({
-            treeData: data
-        });
+            this.setState({
+                treeData: data
+            });
+        }
     }
 
     componentDidMount() {
@@ -103,10 +105,8 @@ export default class CUD extends Component {
             });
         }
 
-        if (!this.isEditGlobal()) {
-            // noinspection JSIgnoredPromiseFromCall
-            this.loadTreeData();
-        }
+        // noinspection JSIgnoredPromiseFromCall
+        this.loadTreeData();
     }
 
     localValidateFormValues(state) {
@@ -127,7 +127,7 @@ export default class CUD extends Component {
         }
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -143,10 +143,26 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
-            if (submitSuccessful) {
-                this.navigateToWithFlashMessage('/namespaces', 'success', t('namespaceSaved'));
+            if (submitResult) {
+                if (this.props.entity) {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace updated'));
+                    } else {
+                        await this.getFormValuesFromURL(`rest/namespaces/${this.props.entity.id}`);
+                        await this.loadTreeData();
+
+                        this.enableForm();
+                        this.setFormStatusMessage('success', t('Namespace updated'));
+                    }
+                } else {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace created'));
+                    } else {
+                        this.navigateToWithFlashMessage(`/namespaces/${submitResult}/edit`, 'success', t('Namespace created'));
+                    }
+                }
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -205,7 +221,8 @@ export default class CUD extends Component {
                     <TreeTableSelect id="namespace" label={t('parentNamespace')} data={this.state.treeData}/>}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/namespaces/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

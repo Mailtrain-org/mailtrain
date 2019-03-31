@@ -22,16 +22,30 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'sendConfiguration', requiredOperations: ['viewPublic'] }],
         params,
-        builder => builder
-            .from('send_configurations')
-            .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace'),
+        builder => {
+            builder = builder
+                .from('send_configurations')
+                .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace');
+            if (namespaceId) {
+                builder = builder.where('send_configurations.namespace', namespaceId);
+            }
+            return builder;
+        },
         ['send_configurations.id', 'send_configurations.name', 'send_configurations.cid', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
     );
+}
+
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listWithSendPermissionDTAjax(context, params) {
@@ -175,6 +189,7 @@ async function getSystemSendConfiguration() {
 
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listWithSendPermissionDTAjax = listWithSendPermissionDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;

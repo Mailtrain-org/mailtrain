@@ -33,7 +33,8 @@ import StatisticsOpened
     from "./StatisticsOpened";
 import StatisticsLinkClicks
     from "./StatisticsLinkClicks";
-
+import TemplatesCUD from "../templates/root";
+import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 
 function getMenus(t) {
     const aggLabels = {
@@ -48,7 +49,7 @@ function getMenus(t) {
             panelComponent: CampaignsList,
             children: {
                 ':campaignId([0-9]+)': {
-                    title: resolved => t('campaignName', {name: resolved.campaign.name}),
+                    title: resolved => t('campaignName', {name: ellipsizeBreadcrumbLabel(resolved.campaign.name)}),
                     resolve: {
                         campaign: params => `rest/campaigns-settings/${params.campaignId}`
                     },
@@ -120,7 +121,7 @@ function getMenus(t) {
                                 campaignContent: params => `rest/campaigns-content/${params.campaignId}`
                             },
                             visible: resolved => resolved.campaign.permissions.includes('edit') && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || resolved.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN),
-                            panelRender: props => <Content entity={props.resolved.campaignContent} />
+                            panelRender: props => <Content entity={props.resolved.campaignContent} setPanelInFullScreen={props.setPanelInFullScreen} />
                         },
                         files: {
                             title: t('files'),
@@ -141,7 +142,7 @@ function getMenus(t) {
                             panelRender: props => <TriggersList campaign={props.resolved.campaign} />,
                             children: {
                                 ':triggerId([0-9]+)': {
-                                    title: resolved => t('triggerName', {name: resolved.trigger.name}),
+                                    title: resolved => t('triggerName', {name: ellipsizeBreadcrumbLabel(resolved.trigger.name)}),
                                     resolve: {
                                         trigger: params => `rest/triggers/${params.campaignId}/${params.triggerId}`,
                                     },

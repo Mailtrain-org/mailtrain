@@ -82,6 +82,12 @@ class MosaicoSandbox extends Component {
             };
         });
 
+        // Custom convertedUrl (https://github.com/voidlabs/mosaico/blob/a359e263f1af5cf05e2c2d56c771732f2ef6c8c6/src/js/app.js#L42)
+        // which does not complain about mismatch of domains between TRUSTED and PUBLIC
+        plugins.push(viewModel => {
+            ko.bindingHandlers.wysiwygSrc.convertedUrl = (src, method, width, height) => getTrustedUrl(`mosaico/img?src=${encodeURIComponent(src)}&method=${encodeURIComponent(method)}&params=${width},${height}`);
+        });
+
         plugins.unshift(vm => {
             // This is an override of the default paths in Mosaico
             vm.logoPath = getTrustedUrl('static/mosaico/img/mosaico32.png');

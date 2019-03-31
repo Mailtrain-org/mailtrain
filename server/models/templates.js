@@ -10,6 +10,7 @@ const shares = require('./shares');
 const reports = require('./reports');
 const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const {convertFileURLs} = require('../lib/campaign-content');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
 
@@ -35,14 +36,28 @@ async function getById(context, id, withPermissions = true) {
     });
 }
 
-async function listDTAjax(context, params) {
+async function _listDTAjax(context, namespaceId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'template', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace'),
+        builder => {
+            builder = builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace');
+            if (namespaceId) {
+                builder = builder.where('namespaces.id', namespaceId);
+            }
+            return builder;
+        },
         [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.created', 'namespaces.name' ]
     );
+}
+
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, undefined, params);
+}
+
+async function listByNamespaceDTAjax(context, namespaceId, params) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function _validateAndPreprocess(tx, entity) {
@@ -57,12 +72,28 @@ async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
 
+        if (entity.fromSourceTemplate) {
+            const template = await getByIdTx(tx, context, entity.sourceTemplate, false);
+
+            entity.type = template.type;
+            entity.data = template.data;
+            entity.html = template.html;
+            entity.text = template.text;
+        }
+
         await _validateAndPreprocess(tx, entity);
 
         const ids = await tx('templates').insert(filterObject(entity, allowedKeys));
         const id = ids[0];
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: id });
+
+        if (entity.fromSourceTemplate) {
+            await files.copyAllTx(tx, context, 'template', 'file', entity.sourceTemplate, 'template', 'file', id);
+
+            convertFileURLs(entity, 'template', entity.sourceTemplate, 'template', id);
+            await tx('templates').update(filterObject(entity, allowedKeys)).where('id', id);
+        }
 
         return id;
     });
@@ -118,6 +149,7 @@ module.exports.hash = hash;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

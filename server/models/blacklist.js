@@ -6,6 +6,10 @@ const shares = require('./shares');
 const tools = require('../lib/tools');
 const { enforce } = require('../lib/helpers');
 
+const {BlacklistActivityType} = require('../../shared/activity-log');
+const activityLog = require('../lib/activity-log');
+
+
 async function listDTAjax(context, params) {
     shares.enforceGlobalPermission(context, 'manageBlacklist');
 
@@ -44,14 +48,21 @@ async function add(context, email) {
         if (!existing) {
             await tx('blacklist').insert({email});
         }
+
+        await activityLog.logBlacklistActivity(BlacklistActivityType.ADD, email);
     });
 }
 
 async function remove(context, email) {
     enforce(email, 'Email has to be set');
 
-    shares.enforceGlobalPermission(context, 'manageBlacklist');
-    await knex('blacklist').where('email', email).del();
+    return await knex.transaction(async tx => {
+        shares.enforceGlobalPermission(context, 'manageBlacklist');
+
+        await tx('blacklist').where('email', email).del();
+
+        await activityLog.logBlacklistActivity(BlacklistActivityType.REMOVE, email);
+    });
 }
 
 async function isBlacklisted(email) {

@@ -10,6 +10,8 @@ const {ImportSource, MappingType, ImportStatus, RunStatus, prepFinished, prepFin
 const fs = require('fs-extra-promise');
 const path = require('path');
 const importer = require('../lib/importer');
+const {ListActivityType} = require('../../shared/activity-log');
+const activityLog = require('../lib/activity-log');
 
 const files = require('./files');
 const filesDir = path.join(files.filesDir, 'imports');
@@ -117,6 +119,8 @@ async function create(context, listId, entity, files) {
         const ids = await tx('imports').insert(filteredEntity);
         const id = ids[0];
 
+        await activityLog.logEntityActivity('list', ListActivityType.CREATE_IMPORT, listId, {importId: id, importStatus: entity.status});
+
         return id;
     });
 
@@ -148,6 +152,8 @@ async function updateWithConsistencyCheck(context, listId, entity) {
         filteredEntity.mapping = JSON.stringify(filteredEntity.mapping);
 
         await tx('imports').where({list: listId, id: entity.id}).update(filteredEntity);
+
+        await activityLog.logEntityActivity('list', ListActivityType.UPDATE_IMPORT, listId, {importId: entity.id, importStatus: entity.status});
     });
 }
 
@@ -170,6 +176,8 @@ async function removeTx(tx, context, listId, id) {
     await tx('import_failed').whereIn('run', function() {this.from('import_runs').select('id').where('import', id)}).del();
     await tx('import_runs').where('import', id).del();
     await tx('imports').where({list: listId, id}).del();
+
+    await activityLog.logEntityActivity('list', ListActivityType.REMOVE_IMPORT, listId, {importId: id});
 }
 
 async function remove(context, listId, id) {
@@ -208,6 +216,8 @@ async function start(context, listId, id) {
             status: RunStatus.SCHEDULED,
             mapping: entity.mapping
         });
+
+        await activityLog.logEntityActivity('list', ListActivityType.IMPORT_STATUS_CHANGE, listId, {importId: id, importStatus: ImportStatus.RUN_SCHEDULED});
     });
 
     importer.scheduleCheck();
@@ -234,6 +244,8 @@ async function stop(context, listId, id) {
         await tx('import_runs').where('import', id).whereIn('status', [RunStatus.SCHEDULED, RunStatus.RUNNING]).update({
             status: RunStatus.STOPPING
         });
+
+        await activityLog.logEntityActivity('list', ListActivityType.IMPORT_STATUS_CHANGE, listId, {importId: id, importStatus: ImportStatus.RUN_STOPPING});
     });
 
     importer.scheduleCheck();

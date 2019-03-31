@@ -108,8 +108,8 @@ async function createConfig() {
             default: {
                 preferIPv6: false,
                 ignoreIPv6: true,
-                processes: 1,
-                connections: 5,
+                processes: config.builtinZoneMTA.processes,
+                connections: config.builtinZoneMTA.connections,
                 pool: 'default'
             }
         }

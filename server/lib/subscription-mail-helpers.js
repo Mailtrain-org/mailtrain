@@ -129,7 +129,7 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
     };
 
     if (list.default_form) {
-        const form = await forms.getById(contextHelpers.getAdminContext(), list.default_form);
+        const form = await forms.getById(contextHelpers.getAdminContext(), list.default_form, false);
 
         text.template = form['mail_' + template + '_text'] || text.template;
         html.template = form['mail_' + template + '_html'] || html.template;

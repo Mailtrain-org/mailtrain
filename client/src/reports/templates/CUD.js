@@ -262,15 +262,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
-    async submitAndStay() {
-        await this.formHandleChangedError(async () => await this.doSubmit(true));
-    }
-
-    async submitAndLeave() {
-        await this.formHandleChangedError(async () => await this.doSubmit(false));
-    }
-
-    async doSubmit(stay) {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -285,15 +277,23 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url);
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
-        if (submitSuccessful) {
-            if (stay) {
-                await this.getFormValuesFromURL(`rest/report-templates/${this.props.entity.id}`);
-                this.enableForm();
-                this.setFormStatusMessage('success', t('reportTemplateSaved'));
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/reports/templates', 'success', t('Report template updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/report-templates/${this.props.entity.id}`);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Report template updated'));
+                }
             } else {
-                this.navigateToWithFlashMessage('/reports/templates', 'success', t('reportTemplateSaved'));
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/reports/templates', 'success', t('Report template created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/reports/templates/${submitResult}/edit`, 'success', t('Report template created'));
+                }
             }
         } else {
             this.enableForm();
@@ -321,7 +321,7 @@ export default class CUD extends Component {
 
                 <Title>{isEdit ? t('editReportTemplate') : t('createReportTemplate')}</Title>
 
-                <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
+                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
                     <Dropdown id="mime_type" label={t('type')} options={[{key: 'text/html', label: t('html')}, {key: 'text/csv', label: t('csv')}]}/>
@@ -330,19 +330,13 @@ export default class CUD extends Component {
                     <ACEEditor id="js" height="700px" mode="javascript" label={t('dataProcessingCode')} help={<Trans i18nKey="writeTheBodyOfTheJavaScriptFunctionWith">Write the body of the JavaScript function with signature <code>async function(inputs)</code> that returns an object to be rendered by the Handlebars template below.</Trans>}/>
                     <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('renderingTemplate')} help={<Trans i18nKey="useHtmlWithHandlebarsSyntaxSee">Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>
 
-                    {isEdit ?
-                        <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
-                            <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')}/>
-                            {canDelete &&
-                                <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/reports/templates/${this.props.entity.id}/delete`}/>
-                            }
-                        </ButtonRow>
-                    :
-                        <ButtonRow>
-                            <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        </ButtonRow>
-                    }
+                    <ButtonRow>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
+                        {canDelete &&
+                            <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/reports/templates/${this.props.entity.id}/delete`}/>
+                        }
+                    </ButtonRow>
                 </Form>
             </div>
         );

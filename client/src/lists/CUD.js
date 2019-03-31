@@ -60,13 +60,16 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object
     }
-    
+
+    getFormValuesMutator(data) {
+        data.form = data.default_form ? 'custom' : 'default';
+        data.listunsubscribe_disabled = !!data.listunsubscribe_disabled;
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.form = data.default_form ? 'custom' : 'default';
-                data.listunsubscribe_disabled = !!data.listunsubscribe_disabled;
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+
         } else {
             this.populateFormValues({
                 name: '',
@@ -110,7 +113,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -125,7 +128,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             if (data.form === 'default') {
                 data.default_form = null;
             }
@@ -136,8 +139,22 @@ export default class CUD extends Component {
             }
         });
 
-        if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/lists', 'success', t('listSaved'));
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/lists', 'success', t('List updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/lists/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('List updated'));
+                }
+            } else {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/lists', 'success', t('List created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/lists/${submitResult}/edit`, 'success', t('List created'));
+                }
+            }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -260,7 +277,7 @@ export default class CUD extends Component {
                     <Dropdown id="form" label={t('forms')} options={formsOptions} help={t('webAndEmailFormsAndTemplatesUsedIn')}/>
 
                     {this.getFormValue('form') === 'custom' &&
-                        <TableSelect id="default_form" label={t('customForms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans i18nKey="theCustomFormUsedForThisListYouCanCreate">The custom form used for this list. You can create a form <a href={`/lists/forms/create/${this.props.entity.id}`}>here</a>.</Trans>}/>
+                        <TableSelect id="default_form" label={t('customForms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans i18nKey="theCustomFormUsedForThisListYouCanCreate">The custom form used for this list. You can create a form <a href={`/lists/forms/create`}>here</a>.</Trans>}/>
                     }
 
                     <CheckBox id="public_subscribe" label={t('subscription')} text={t('allowPublicUsersToSubscribeThemselves')}/>
@@ -270,7 +287,8 @@ export default class CUD extends Component {
                     <CheckBox id="listunsubscribe_disabled" label={t('unsubscribeHeader')} text={t('doNotSendListUnsubscribeHeaders')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

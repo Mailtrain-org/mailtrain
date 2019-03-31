@@ -2,6 +2,7 @@
 
 .toolbar {
   float: right;
+  margin-bottom: 15px;
 }
 
 .form { // This is here to give the styles below higher priority than Bootstrap has
@@ -60,6 +61,10 @@
   padding-bottom: 5px;
 }
 
+.dataTableTable {
+  overflow-x: auto;
+}
+
 .actionLinks > * {
   margin-right: 8px;
 }
@@ -73,7 +78,7 @@
 }
 
 .tableSelectTable.tableSelectTableHidden {
-  visibility: hidden;
+  display: none;
   height: 0px;
   margin-top: -15px;
 }
@@ -117,6 +122,10 @@
 
 .colorPickerWrapper {
   text-align: right;
+}
+
+.checkboxText{
+  padding-top: 3px;
 }
 
 .dropZone{

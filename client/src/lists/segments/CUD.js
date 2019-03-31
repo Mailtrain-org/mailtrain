@@ -119,16 +119,18 @@ export default class CUD extends Component {
         return tree;
     }
 
+    getFormValuesMutator(data) {
+        data.rootRuleType = data.settings.rootRule.type;
+        data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
+
+        this.setState({
+            rulesTree: this.getTreeFromRules(data.settings.rootRule.rules)
+        });
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.setState({
-                rulesTree: this.getTreeFromRules(this.props.entity.settings.rootRule.rules)
-            });
-
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.rootRuleType = data.settings.rootRule.type;
-                data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
 
         } else {
             this.populateFormValues({
@@ -159,7 +161,7 @@ export default class CUD extends Component {
         }
     }
 
-    async doSubmit(stay) {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -175,7 +177,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 const keep = ['name', 'settings', 'originalHash'];
 
                 data.settings.rootRule.type = data.rootRuleType;
@@ -184,20 +186,22 @@ export default class CUD extends Component {
                 delete data.selectedRule;
             });
 
-            if (submitSuccessful) {
-                if (stay) {
-                    await this.getFormValuesFromURL(`rest/segments/${this.props.list.id}/${this.props.entity.id}`, data => {
-                        data.rootRuleType = data.settings.rootRule.type;
-                        data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
+            if (submitResult) {
+                if (this.props.entity) {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment updated'));
+                    } else {
+                        await this.getFormValuesFromURL(`rest/segments/${this.props.list.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
 
-                        this.setState({
-                            rulesTree: this.getTreeFromRules(data.settings.rootRule.rules)
-                        });
-                    });
-                    this.enableForm();
-                    this.setFormStatusMessage('success', t('segmentSaved'));
+                        this.enableForm();
+                        this.setFormStatusMessage('success', t('Segment updated'));
+                    }
                 } else {
-                    this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('segmentSaved'));
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment created'));
+                    } else {
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments/${submitResult}/edit`, 'success', t('Segment created'));
+                    }
                 }
             } else {
                 this.enableForm();
@@ -206,14 +210,6 @@ export default class CUD extends Component {
         } catch (error) {
             throw error;
         }
-    }
-
-    async submitAndStay() {
-        await this.formHandleChangedError(async () => await this.doSubmit(true));
-    }
-
-    async submitAndLeave() {
-        await this.formHandleChangedError(async () => await this.doSubmit(false));
     }
 
     onRulesChanged(rulesTree) {
@@ -354,7 +350,7 @@ export default class CUD extends Component {
 
                 <Title>{isEdit ? t('editSegment') : t('createSegment')}</Title>
 
-                <Form stateOwner={this} onSubmitAsync={::this.submitAndLeave}>
+                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <h3>{t('segmentOptions')}</h3>
 
                     <InputField id="name" label={t('name')} />
@@ -407,19 +403,12 @@ export default class CUD extends Component {
                 </div>
 
                 <hr/>
-                {isEdit ?
-                    <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndStay')} onClickAsync={::this.submitAndStay}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={::this.submitAndLeave}/>
+                <ButtonRow format="wide" className={`col-12 ${styles.toolbar}`}>
+                    <Button type="submit" className="btn-primary" icon="check" label={t('save')} onClickAsync={async () => this.submitHandler(false)}/>
+                    <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
 
-                        <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/>
-                    </ButtonRow>
-                    :
-                    <ButtonRow format="wide" className={`col-xs-12 ${styles.toolbar}`}>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')} onClickAsync={::this.submitAndLeave}/>
-                    </ButtonRow>
-                }
-
+                    {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/> }
+                </ButtonRow>
             </div>
         );
     }

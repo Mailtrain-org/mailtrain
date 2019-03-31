@@ -5,6 +5,8 @@ const fork = require('child_process').fork;
 const log = require('./log');
 const path = require('path');
 const {ImportStatus, RunStatus} = require('../../shared/imports');
+const {ListActivityType} = require('../../shared/activity-log');
+const activityLog = require('./activity-log');
 
 let messageTid = 0;
 let importerProcess;
@@ -18,11 +20,17 @@ function spawn(callback) {
     log.verbose('Importer', 'Spawning importer process');
 
     knex.transaction(async tx => {
-        await tx('imports').where('status', ImportStatus.PREP_RUNNING).update({status: ImportStatus.PREP_SCHEDULED});
-        await tx('imports').where('status', ImportStatus.PREP_STOPPING).update({status: ImportStatus.PREP_FAILED});
+        const updateStatus = async (fromStatus, toStatus) => {
+            for (const impt of await tx('imports').where('status', fromStatus).select(['id', 'list'])) {
+                await tx('imports').where('id', impt.id).update({status: toStatus});
+                await activityLog.logEntityActivity('list', ListActivityType.IMPORT_STATUS_CHANGE, impt.list, {importId: impt.id, importStatus: toStatus});
+            }
+        }
 
-        await tx('imports').where('status', ImportStatus.RUN_RUNNING).update({status: ImportStatus.RUN_SCHEDULED});
-        await tx('imports').where('status', ImportStatus.RUN_STOPPING).update({status: ImportStatus.RUN_FAILED});
+        await updateStatus(ImportStatus.PREP_RUNNING, ImportStatus.PREP_SCHEDULED);
+        await updateStatus(ImportStatus.PREP_STOPPING, ImportStatus.PREP_FAILED);
+        await updateStatus(ImportStatus.RUN_RUNNING, ImportStatus.RUN_SCHEDULED);
+        await updateStatus(ImportStatus.RUN_STOPPING, ImportStatus.RUN_FAILED);
 
         await tx('import_runs').where('status', RunStatus.RUNNING).update({status: RunStatus.SCHEDULED});
         await tx('import_runs').where('status', RunStatus.STOPPING).update({status: RunStatus.FAILED});

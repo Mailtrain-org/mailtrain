@@ -8,6 +8,7 @@ import Share from '../shares/Share';
 import Files from "../lib/files";
 import MosaicoCUD from './mosaico/CUD';
 import MosaicoList from './mosaico/List';
+import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 
 
 function getMenus(t) {
@@ -18,7 +19,7 @@ function getMenus(t) {
             panelComponent: TemplatesList,
             children: {
                 ':templateId([0-9]+)': {
-                    title: resolved => t('templateName', {name: resolved.template.name}),
+                    title: resolved => t('templateName', {name: ellipsizeBreadcrumbLabel(resolved.template.name)}),
                     resolve: {
                         template: params => `rest/templates/${params.templateId}`
                     },
@@ -28,7 +29,7 @@ function getMenus(t) {
                             title: t('edit'),
                             link: params => `/templates/${params.templateId}/edit`,
                             visible: resolved => resolved.template.permissions.includes('edit'),
-                            panelRender: props => <TemplatesCUD action={props.match.params.action} entity={props.resolved.template} />
+                            panelRender: props => <TemplatesCUD action={props.match.params.action} entity={props.resolved.template} setPanelInFullScreen={props.setPanelInFullScreen} />
                         },
                         files: {
                             title: t('files'),
@@ -54,7 +55,7 @@ function getMenus(t) {
                     panelComponent: MosaicoList,
                     children: {
                         ':mosaiceTemplateId([0-9]+)': {
-                            title: resolved => t('mosaicoTemplateName', {name: resolved.mosaicoTemplate.name}),
+                            title: resolved => t('mosaicoTemplateName', {name: ellipsizeBreadcrumbLabel(resolved.mosaicoTemplate.name)}),
                             resolve: {
                                 mosaicoTemplate: params => `rest/mosaico-templates/${params.mosaiceTemplateId}`
                             },

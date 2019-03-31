@@ -218,8 +218,10 @@ EOT
 function reinstallModules {
     # Install required node packages
     for idx in client shared server zone-mta mvis/client mvis/server mvis/test-embed mvis/ivis-core/client mvis/ivis-core/server mvis/ivis-core/shared mvis/ivis-core/embedding; do
-        echo Reinstalling modules in $idx
-        (cd $idx && rm -rf node_modules && npm install)
+        if [ -d $idx ]; then
+            echo Reinstalling modules in $idx
+            (cd $idx && rm -rf node_modules && npm install)
+        fi
     done
 }
 

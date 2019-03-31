@@ -150,7 +150,7 @@ export default class Status extends Component {
                     }
 
                     actions.push({
-                        label: <Icon icon="eye-open" title={t('runStatus')}/>,
+                        label: <Icon icon="eye" title={t('runStatus')}/>,
                         link: `/lists/${this.props.list.id}/imports/${this.props.entity.id}/status/${data[0]}`
                     });
 
