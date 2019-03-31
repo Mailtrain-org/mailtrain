@@ -394,6 +394,18 @@ class CampaignSender {
         try {
             const info = await mailer.sendMassMail(mail);
             status = SubscriptionStatus.SUBSCRIBED;
+
+            /*
+                ZoneMTA
+                    info.response: 250 Message queued as 1691ad7f7ae00080fd
+                    info.messageId: <e65c9386-e899-7d01-b21e-ec03c3a9d9b4@sathyasai.org>
+
+                Postal Mail Server
+                    info.response: 250 OK
+                    info.messageId:  <xxxxxxxxx@xxx.xx> (postal messageId)
+             */
+
+            console.log(`response: ${info.response}   messageId: ${info.messageId}`);
             response = info.response || info.messageId;
 
             await knex('campaigns').where('id', campaign.id).increment('delivered');

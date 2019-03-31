@@ -302,19 +302,23 @@ export default class CUD extends Component {
     }
 
 
-    componentDidMount() {
-        function supplyDefaults(data) {
-            for (const key in mailtrainConfig.defaultCustomFormValues) {
-                if (!data[key]) {
-                    data[key] = mailtrainConfig.defaultCustomFormValues[key];
-                }
+    supplyDefaults(data) {
+        for (const key in mailtrainConfig.defaultCustomFormValues) {
+            if (!data[key]) {
+                data[key] = mailtrainConfig.defaultCustomFormValues[key];
             }
         }
+    }
 
+    getFormValuesMutator(data) {
+        this.supplyDefaults(data);
+    }
+
+    componentDidMount() {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity, data => {
+                this.getFormValuesMutator(data);
                 data.selectedTemplate = 'layout';
-                supplyDefaults(data);
             });
 
         } else {
@@ -324,7 +328,7 @@ export default class CUD extends Component {
                 selectedTemplate: 'layout',
                 namespace: mailtrainConfig.user.namespace
             };
-            supplyDefaults(data);
+            this.supplyDefaults(data);
 
             this.populateFormValues(data);
         }
@@ -370,7 +374,7 @@ export default class CUD extends Component {
         }
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -385,13 +389,27 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             delete data.selectedTemplate;
             delete data.previewList;
         });
 
-        if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/lists/forms', 'success', t('formsSaved'));
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/forms/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Custom forms updated'));
+                }
+            } else {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/lists/forms/${submitResult}/edit`, 'success', t('Custom forms created'));
+                }
+            }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -410,6 +428,7 @@ export default class CUD extends Component {
         const response = await axios.post(getUrl('rest/forms-preview'), data);
 
         this.setState({
+            previewKey: formKey,
             previewContents: response.data.content,
             previewLabel: this.templateSettings[formKey].label
         });
@@ -504,10 +523,15 @@ export default class CUD extends Component {
                                 {this.state.previewContents &&
                                 <div className={this.state.previewFullscreen ? formsStyles.editorFullscreen : formsStyles.editor}>
                                     <div className={formsStyles.navbar}>
-                                        {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
-                                        <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
-                                        <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})}><Icon icon="window-close"/></a>
-                                        <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})}><Icon icon="window-maximize"/></a>
+                                        <div className={formsStyles.navbarLeft}>
+                                            {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
+                                            <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
+                                        </div>
+                                        <div className={formsStyles.navbarRight}>
+                                            <a className={formsStyles.btn} onClick={() => this.preview(this.state.previewKey)} title={t('Refresh')}><Icon icon="sync-alt"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})} title={t('Close preview')}><Icon icon="window-close"/></a>
+                                        </div>
                                     </div>
                                     <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
                                 </div>
@@ -524,7 +548,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

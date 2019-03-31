@@ -115,8 +115,8 @@ export class TestSendModalDialog extends Component {
 
         return (
             <ModalDialog hidden={!this.props.visible} title={t('sendTestEmail')} onCloseAsync={() => this.hideModal()} buttons={[
-                { label: t('send'), className: 'btn-danger', onClickAsync: ::this.performAction },
-                { label: t('cancel'), className: 'btn-primary', onClickAsync: ::this.hideModal }
+                { label: t('send'), className: 'btn-primary', onClickAsync: ::this.performAction },
+                { label: t('cancel'), className: 'btn-danger', onClickAsync: ::this.hideModal }
             ]}>
                 <Form stateOwner={this} format="wide">
                     <TableSelect id="testUser" format="wide" label={t('subscription')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />

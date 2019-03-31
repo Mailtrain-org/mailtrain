@@ -320,93 +320,49 @@ function createApp(appType) {
 
     app.use('/', index.getRouter(appType));
 
-    // Error handlers
-    if (app.get('env') === 'development' || app.get('env') === 'test') {
-        // development error handler
-        // will print stacktrace
-        app.use((err, req, res, next) => {
-            if (!err) {
-                return next();
+    app.use((err, req, res, next) => {
+        if (!err) {
+            return next();
+        }
+
+        if (req.needsRESTJSONResponse) {
+            const resp = {
+                message: err.message,
+                error: config.sendStacktracesToClient ? err : {}
+            };
+
+            if (err instanceof interoperableErrors.InteroperableError) {
+                resp.type = err.type;
+                resp.data = err.data;
             }
 
-            if (req.needsRESTJSONResponse) {
-                const resp = {
-                    message: err.message,
-                    error: err
-                };
+            log.verbose('HTTP', err);
+            res.status(err.status || 500).json(resp);
 
-                if (err instanceof interoperableErrors.InteroperableError) {
-                    resp.type = err.type;
-                    resp.data = err.data;
-                }
+        } else if (req.needsAPIJSONResponse) {
+            const resp = {
+                error: err.message || err,
+                data: []
+            };
 
-                res.status(err.status || 500).json(resp);
+            log.verbose('HTTP', err);
+            return res.status(err.status || 500).json(resp);
 
-            } else if (req.needsAPIJSONResponse) {
-                const resp = {
-                    error: err.message || err,
-                    data: []
-                };
+        } else {
+            // TODO: Render interoperable errors using a special client that does internationalization of the error message
 
-                return res.status(err.status || 500).json(resp);
-
+            if (err instanceof interoperableErrors.NotLoggedInError) {
+                return res.redirect(getTrustedUrl('/login?next=' + encodeURIComponent(req.originalUrl)));
             } else {
-                if (err instanceof interoperableErrors.NotLoggedInError) {
-                    return res.redirect(getTrustedUrl('/login?next=' + encodeURIComponent(req.originalUrl)));
-                } else {
-                    res.status(err.status || 500);
-                    res.render('error', {
-                        message: err.message,
-                        error: err
-                    });
-                }
-            }
-
-        });
-    } else {
-        // production error handler
-        // no stacktraces leaked to user
-        app.use((err, req, res, next) => {
-            if (!err) {
-                return next();
-            }
-
-            if (req.needsRESTJSONResponse) {
-                const resp = {
+                log.verbose('HTTP', err);
+                res.status(err.status || 500);
+                res.render('error', {
                     message: err.message,
-                    error: {}
-                };
-
-                if (err instanceof interoperableErrors.InteroperableError) {
-                    resp.type = err.type;
-                    resp.data = err.data;
-                }
-
-                res.status(err.status || 500).json(resp);
-
-            } else if (req.needsAPIJSONResponse) {
-                const resp = {
-                    error: err.message || err,
-                    data: []
-                };
-
-                return res.status(err.status || 500).json(resp);
-
-            } else {
-                // TODO: Render interoperable errors using a special client that does internationalization of the error message
-
-                if (err instanceof interoperableErrors.NotLoggedInError) {
-                    return res.redirect(getTrustedUrl('/login?next=' + encodeURIComponent(req.originalUrl)));
-                } else {
-                    res.status(err.status || 500);
-                    res.render('error', {
-                        message: err.message,
-                        error: {}
-                    });
-                }
+                    error: config.sendStacktracesToClient ? err : {}
+                });
             }
-        });
-    }
+        }
+    });
 
     return app;
 }

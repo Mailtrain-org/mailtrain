@@ -87,50 +87,52 @@ export default class CUD extends Component {
         }
     }
 
+    getFormValuesMutator(data) {
+        data.settings = data.settings || {};
+
+        if (data.default_value === null) {
+            data.default_value = '';
+        }
+
+        data.isInGroup = data.group !== null;
+
+        data.enumOptions = '';
+        data.dateFormat = DateFormat.EUR;
+        data.renderTemplate = '';
+
+        switch (data.type) {
+            case 'checkbox-grouped':
+            case 'radio-grouped':
+            case 'dropdown-grouped':
+            case 'json':
+                data.renderTemplate = data.settings.renderTemplate;
+                break;
+
+            case 'radio-enum':
+            case 'dropdown-enum':
+                data.enumOptions = this.renderEnumOptions(data.settings.options);
+                data.renderTemplate = data.settings.renderTemplate;
+                break;
+
+            case 'date':
+            case 'birthday':
+                data.dateFormat = data.settings.dateFormat;
+                break;
+
+            case 'option':
+                data.checkedLabel = data.isInGroup ? '' : data.settings.checkedLabel;
+                data.uncheckedLabel = data.isInGroup ? '' : data.settings.uncheckedLabel;
+                break;
+        }
+
+        data.orderListBefore = data.orderListBefore.toString();
+        data.orderSubscribeBefore = data.orderSubscribeBefore.toString();
+        data.orderManageBefore = data.orderManageBefore.toString();
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.settings = data.settings || {};
-
-                if (data.default_value === null) {
-                    data.default_value = '';
-                }
-
-                data.isInGroup = data.group !== null;
-
-                data.enumOptions = '';
-                data.dateFormat = DateFormat.EUR;
-                data.renderTemplate = '';
-
-                switch (data.type) {
-                    case 'checkbox-grouped':
-                    case 'radio-grouped':
-                    case 'dropdown-grouped':
-                    case 'json':
-                        data.renderTemplate = data.settings.renderTemplate;
-                        break;
-
-                    case 'radio-enum':
-                    case 'dropdown-enum':
-                        data.enumOptions = this.renderEnumOptions(data.settings.options);
-                        data.renderTemplate = data.settings.renderTemplate;
-                        break;
-
-                    case 'date':
-                    case 'birthday':
-                        data.dateFormat = data.settings.dateFormat;
-                        break;
-
-                    case 'option':
-                        data.checkedLabel = data.isInGroup ? '' : data.settings.checkedLabel;
-                        data.uncheckedLabel = data.isInGroup ? '' : data.settings.uncheckedLabel;
-                        break;
-                }
-
-                data.orderListBefore = data.orderListBefore.toString();
-                data.orderSubscribeBefore = data.orderSubscribeBefore.toString();
-                data.orderManageBefore = data.orderManageBefore.toString();
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
 
         } else {
             this.populateFormValues({
@@ -248,7 +250,7 @@ export default class CUD extends Component {
     }
 
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -264,7 +266,7 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 if (data.default_value.trim() === '') {
                     data.default_value = null;
                 }
@@ -317,8 +319,22 @@ export default class CUD extends Component {
                 }
             });
 
-            if (submitSuccessful) {
-                this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('fieldSaved'));
+            if (submitResult) {
+                if (this.props.entity) {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field updated'));
+                    } else {
+                        await this.getFormValuesFromURL(`rest/fields/${this.props.list.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        this.enableForm();
+                        this.setFormStatusMessage('success', t('Field updated'));
+                    }
+                } else {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field created'));
+                    } else {
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields/${submitResult}/edit`, 'success', t('Field created'));
+                    }
+                }
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -508,7 +524,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

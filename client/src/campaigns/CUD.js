@@ -164,43 +164,45 @@ export default class CUD extends Component {
         }
     }
 
+    getFormValuesMutator(data) {
+        // The source cannot be changed once campaign is created. Thus we don't have to initialize fields for all other sources
+        if (data.source === CampaignSource.TEMPLATE) {
+            data.data_sourceTemplate = data.data.sourceTemplate;
+        }
+
+        if (data.source === CampaignSource.URL) {
+            data.data_sourceUrl = data.data.sourceUrl;
+        }
+
+        if (data.type === CampaignType.RSS) {
+            data.data_feedUrl = data.data.feedUrl;
+        }
+
+        for (const overridable of campaignOverridables) {
+            data[overridable + '_overriden'] = data[overridable + '_override'] !== null;
+        }
+
+        const lsts = [];
+        for (const lst of data.lists) {
+            const lstUid = this.getNextListEntryId();
+
+            const prefix = 'lists_' + lstUid + '_';
+
+            data[prefix + 'list'] = lst.list;
+            data[prefix + 'segment'] = lst.segment;
+            data[prefix + 'useSegmentation'] = !!lst.segment;
+
+            lsts.push(lstUid);
+        }
+        data.lists = lsts;
+
+        // noinspection JSIgnoredPromiseFromCall
+        this.fetchSendConfiguration(data.send_configuration);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                // The source cannot be changed once campaign is created. Thus we don't have to initialize fields for all other sources
-                if (data.source === CampaignSource.TEMPLATE) {
-                    data.data_sourceTemplate = data.data.sourceTemplate;
-                }
-
-                if (data.source === CampaignSource.URL) {
-                    data.data_sourceUrl = data.data.sourceUrl;
-                }
-
-                if (data.type === CampaignType.RSS) {
-                    data.data_feedUrl = data.data.feedUrl;
-                }
-
-                for (const overridable of campaignOverridables) {
-                    data[overridable + '_overriden'] = data[overridable + '_override'] !== null;
-                }
-
-                const lsts = [];
-                for (const lst of data.lists) {
-                    const lstUid = this.getNextListEntryId();
-
-                    const prefix = 'lists_' + lstUid + '_';
-
-                    data[prefix + 'list'] = lst.list;
-                    data[prefix + 'segment'] = lst.segment;
-                    data[prefix + 'useSegmentation'] = !!lst.segment;
-
-                    lsts.push(lstUid);
-                }
-                data.lists = lsts;
-
-                // noinspection JSIgnoredPromiseFromCall
-                this.fetchSendConfiguration(data.send_configuration);
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
 
             if (this.props.entity.status === CampaignStatus.SENDING) {
                 this.disableForm();
@@ -337,7 +339,13 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
-    async submitHandler() {
+    static AfterSubmitAction = {
+        STAY: 0,
+        LEAVE: 1,
+        STATUS: 2
+    }
+
+    async submitHandler(afterSubmitAction) {
         const isEdit = !!this.props.entity;
         const t = this.props.t;
 
@@ -353,7 +361,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             data.source = Number.parseInt(data.source);
 
             data.data = {};
@@ -411,14 +419,31 @@ export default class CUD extends Component {
             }
         });
 
-        if (submitResponse) {
-            const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
+        if (submitResult) {
             if (this.props.entity) {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignSaved'));
-            } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/content`, 'success', t('campaignSaved'));
+                if (afterSubmitAction === CUD.AfterSubmitAction.STATUS) {
+                    this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('Campaign updated'));
+                } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
+                    this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/campaigns-settings/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Campaign updated'));
+                }
             } else {
-                this.navigateToWithFlashMessage(`/campaigns/${submitResponse}/status`, 'success', t('campaignSaved'));
+                const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
+
+                if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+                    this.navigateToWithFlashMessage(`/campaigns/${submitResult}/content`, 'success', t('Campaign created'));
+                } else {
+                    if (afterSubmitAction === CUD.AfterSubmitAction.STATUS) {
+                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/status`, 'success', t('Campaign created'));
+                    } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
+                        this.navigateToWithFlashMessage(`/campaigns`, 'success', t('Campaign created'));
+                    } else {
+                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/edit`, 'success', t('Campaign created'));
+                    }
+                }
             }
         } else {
             this.enableForm();
@@ -583,13 +608,21 @@ export default class CUD extends Component {
                 sendSettings = [];
 
                 const addOverridable = (id, label) => {
-                    sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} label={label} text={t('override')}/>);
-
-                    if (this.getFormValue(id + '_overriden')) {
-                        sendSettings.push(<InputField key={id + '_override'} id={id + '_override'}/>);
-                    } else {
+                    if(this.state.sendConfiguration[id + '_overridable']){
+                        if (this.getFormValue(id + '_overriden')) {
+                            sendSettings.push(<InputField label={t(label)} key={id + '_override'} id={id + '_override'}/>);
+                        } else {
+                            sendSettings.push(
+                                <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                                    {this.state.sendConfiguration[id]}
+                                </StaticField>
+                            );
+                        }
+                        sendSettings.push(<CheckBox key={id + '_overriden'} id={id + '_overriden'} text={t('override')} className={campaignsStyles.overrideCheckbox}/>);
+                    }
+                    else{
                         sendSettings.push(
-                            <StaticField key={id + '_original'} id={id + '_original'} className={styles.formDisabled}>
+                            <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
                                 {this.state.sendConfiguration[id]}
                             </StaticField>
                         );
@@ -666,17 +699,6 @@ export default class CUD extends Component {
             templateEdit = <InputField id="data_sourceUrl" label={t('renderUrl')} help={t('ifAMessageIsSentThenThisUrlWillBePosTed')}/>
         }
 
-        let saveButtonLabel;
-        if (isEdit) {
-            saveButtonLabel = t('save');
-        } else if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-            saveButtonLabel = t('saveAndEditContent');
-        } else {
-            saveButtonLabel = t('saveCampaignAndGoToStatus');
-        }
-
-
-
         return (
             <div>
                 {canDelete &&
@@ -719,25 +741,45 @@ export default class CUD extends Component {
 
                     <hr/>
 
-                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                    <Fieldset label={t('sendSettings')}>
 
-                    {sendSettings}
+                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
-                    <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
+                        {sendSettings}
+
+                        <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
+                    </Fieldset>
 
                     <hr/>
 
-                    <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
-                    <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
+                    <Fieldset label={t('Tracking')}>
+                        <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
+                        <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
+                    </Fieldset>
 
-                    {sourceEdit && <hr/> }
+                    {sourceEdit &&
+                    <>
+                        <hr/>
+                        <Fieldset label={t('template')}>
+                            {sourceEdit}
+                        </Fieldset>
+                    </>
+                    }
 
-                    {sourceEdit}
+
 
                     {templateEdit}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={saveButtonLabel}/>
+                        {!isEdit && (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) ?
+                            <Button type="submit" className="btn-primary" icon="check" label={t('Save and edit content')}/>
+                        :
+                            <>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
+                            </>
+                        }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.entity.id}/delete`}/> }
                     </ButtonRow>
                 </Form>

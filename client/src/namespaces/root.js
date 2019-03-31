@@ -4,6 +4,7 @@ import React from 'react';
 import CUD from './CUD';
 import List from './List';
 import Share from '../shares/Share';
+import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 
 function getMenus(t) {
     return {
@@ -13,7 +14,7 @@ function getMenus(t) {
             panelComponent: List,
             children: {
                 ':namespaceId([0-9]+)': {
-                    title: resolved => t('namespaceName', {name: resolved.namespace.name}),
+                    title: resolved => t('namespaceName', {name: ellipsizeBreadcrumbLabel(resolved.namespace.name)}),
                     resolve: {
                         namespace: params => `rest/namespaces/${params.namespaceId}`
                     },

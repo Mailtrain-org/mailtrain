@@ -82,13 +82,16 @@ export default class CUD extends Component {
         }
     }
 
+    getFormValuesMutator(data) {
+        for (const key in data.params) {
+            data[`param_${key}`] = data.params[key];
+        }
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                for (const key in data.params) {
-                    data[`param_${key}`] = data.params[key];
-                }
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+
         } else {
             this.populateFormValues({
                 name: '',
@@ -145,7 +148,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         if (this.getFormValue('report_template') && !this.getFormValue('user_fields')) {
@@ -165,7 +168,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             const params = {};
 
             for (const spec of data.user_fields) {
@@ -178,8 +181,22 @@ export default class CUD extends Component {
             data.params = params;
         });
 
-        if (submitSuccessful) {
-            this.navigateToWithFlashMessage('/reports', 'success', t('reportSaved'));
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/reports', 'success', t('Report updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/reports/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Report updated'));
+                }
+            } else {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/reports', 'success', t('Report created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/reports/${submitResult}/edit`, 'success', t('Report created'));
+                }
+            }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -274,7 +291,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete &&
                             <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/reports/${this.props.entity.id}/delete`}/>
                         }

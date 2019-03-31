@@ -62,12 +62,14 @@ export default class CUD extends Component {
         entity: PropTypes.object
     }
 
+    getFormValuesMutator(data) {
+        data.password = '';
+        data.password2 = '';
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                data.password = '';
-                data.password2 = '';
-            });
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
         } else {
             this.populateFormValues({
                 username: '',
@@ -156,7 +158,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
-    async submitHandler() {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
@@ -172,12 +174,26 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
                 delete data.password2;
             });
 
-            if (submitSuccessful) {
-                this.navigateToWithFlashMessage('/users', 'success', t('userSaved'));
+            if (submitResult) {
+                if (this.props.entity) {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage('/users', 'success', t('User updated'));
+                    } else {
+                        await this.getFormValuesFromURL(`rest/users/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        this.enableForm();
+                        this.setFormStatusMessage('success', t('User updated'));
+                    }
+                } else {
+                    if (submitAndLeave) {
+                        this.navigateToWithFlashMessage('/users', 'success', t('User created'));
+                    } else {
+                        this.navigateToWithFlashMessage(`/users/${submitResult}/edit`, 'success', t('User created'));
+                    }
+                }
             } else {
                 this.enableForm();
                 this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
@@ -248,7 +264,8 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('deleteUser')} to={`/users/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

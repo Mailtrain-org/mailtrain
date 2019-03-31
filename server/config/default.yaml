@@ -42,6 +42,7 @@ defaultLanguage: en-US
 # Enabled languages
 enabledLanguages:
 - en-US
+- es-ES
 - fk-FK
 
 # Inject custom scripts in subscription/layout.mjml.hbs
@@ -72,6 +73,7 @@ redis:
 log:
   # silly|verbose|info|http|warn|error|silent
   level: info
+  sendStacktracesToClient: false
 
 www:
   # HTTP port to listen on for trusted requests (logged-in users)
@@ -217,6 +219,8 @@ builtinZoneMTA:
   redis: redis://localhost:6379/2
   log:
     level: warn
+  processes: 2
+  connections: 5
 
 seleniumWebDriver:
   browser: phantomjs
@@ -228,7 +232,7 @@ roles:
       name: Global Master
       admin: true
       description: All permissions
-      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings, setupAutomation]
+      permissions: [rebuildPermissions, createJavascriptWithROAccess, displayManageUsers, manageBlacklist, manageSettings, setupAutomation]
       rootNamespaceRole: master
     campaignsAdmin:
       name: Campaigns Admin

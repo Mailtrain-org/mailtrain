@@ -82,6 +82,8 @@ export default class Login extends Component {
                 /* This ensures we get config for the authenticated user */
                 window.location = nextUrl;
             } else {
+                this.enableForm();
+
                 this.setFormStatusMessage('warning', t('pleaseEnterYourCredentialsAndTryAgain'));
             }
         } catch (error) {

@@ -13,9 +13,12 @@ import {convertToFake, getLang} from '../../../shared/langs';
 import {createComponentMixin} from "./decorator-helpers";
 
 import lang_en_US_common from "../../../locales/en-US/common";
+import lang_es_ES_common from "../../../locales/es-ES/common";
+
 
 const resourcesCommon = {
     'en-US': lang_en_US_common,
+    'es-ES': lang_es_ES_common,
     'fk-FK': convertToFake(lang_en_US_common)
 };
 
@@ -54,8 +57,8 @@ i18n
         whitelist: mailtrainConfig.enabledLanguages,
         load: 'currentOnly',
 
-        debug: true
-    })
+        debug: false
+    });
 
 
 export default i18n;
@@ -64,7 +67,7 @@ export default i18n;
 export const withTranslation = createComponentMixin([], [], (TargetClass, InnerClass) => {
     return {
         cls: withNamespaces()(TargetClass)
-    }
+    };
 });
 
 export function tMark(key) {

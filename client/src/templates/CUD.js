@@ -12,12 +12,12 @@ import {
 } from '../lib/page'
 import {
     Button,
-    ButtonRow,
+    ButtonRow, CheckBox,
     Dropdown,
     Form,
     FormSendMethod,
     InputField,
-    StaticField,
+    StaticField, TableSelect,
     TextArea,
     withForm
 } from '../lib/form';
@@ -41,6 +41,8 @@ import styles
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import moment
+    from 'moment';
 
 
 @withComponentMixins([
@@ -74,7 +76,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        setPanelInFullScreen: PropTypes.func
     }
 
     onTypeChanged(mutStateData, key, oldType, type) {
@@ -83,19 +86,24 @@ export default class CUD extends Component {
         }
     }
 
-    loadFromEntityMutator(data) {
+    getFormValuesMutator(data) {
         this.templateTypes[data.type].afterLoad(data);
     }
 
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => this.loadFromEntityMutator(data));
+            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+
         } else {
             this.populateFormValues({
                 name: '',
                 description: '',
                 namespace: mailtrainConfig.user.namespace,
                 type: mailtrainConfig.editors[0],
+
+                fromSourceTemplate: false,
+                sourceTemplate: null,
+
                 text: '',
                 html: '',
                 data: {},
@@ -120,6 +128,12 @@ export default class CUD extends Component {
             state.setIn(['type', 'error'], t('typeMustBeSelected'));
         }
 
+        if (state.getIn(['fromSourceTemplate', 'value']) && !state.getIn(['sourceTemplate', 'value'])) {
+            state.setIn(['sourceTemplate', 'error'], t('Source template must not be empty'));
+        } else {
+            state.setIn(['sourceTemplate', 'error'], null);
+        }
+
         validateNamespace(t, state);
 
         if (typeKey) {
@@ -127,7 +141,11 @@ export default class CUD extends Component {
         }
     }
 
-    async doSave(stayOnPage) {
+    async save() {
+        await this.submitHandler();
+    }
+
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let exportedData = {};
@@ -148,36 +166,31 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResponse = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
             Object.assign(data, exportedData);
             this.templateTypes[data.type].beforeSave(data);
         });
 
-        if (submitResponse) {
-            if (stayOnPage) {
-                await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`, data => this.loadFromEntityMutator(data));
-                this.enableForm();
-                this.clearFormStatusMessage();
-                this.setFlashMessage('success', t('templateSaved'));
-
-            } else if (this.props.entity) {
-                this.navigateToWithFlashMessage('/templates', 'success', t('templateSaved'));
-
+        if (submitResult) {
+            if (this.props.entity) {
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/templates', 'success', t('Template updated'));
+                } else {
+                    await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    this.enableForm();
+                    this.setFormStatusMessage('success', t('Template updated'));
+                }
             } else {
-                this.navigateToWithFlashMessage(`/templates/${submitResponse}/edit`, 'success', t('templateSaved'));
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/templates', 'success', t('Template created'));
+                } else {
+                    this.navigateToWithFlashMessage(`/templates/${submitResult}/edit`, 'success', t('Template created'));
+                }
             }
         } else {
             this.enableForm();
             this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
         }
-    }
-
-    async save() {
-        await this.doSave(true);
-    }
-
-    async submitHandler() {
-        await this.doSave(false);
     }
 
     async extractPlainText() {
@@ -209,6 +222,7 @@ export default class CUD extends Component {
     }
 
     async setElementInFullscreen(elementInFullscreen) {
+        this.props.setPanelInFullScreen(elementInFullscreen);
         this.setState({
             elementInFullscreen
         });
@@ -252,6 +266,13 @@ export default class CUD extends Component {
             typeForm = getTypeForm(this, typeKey, isEdit);
         }
 
+        const templatesColumns = [
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
+            { data: 4, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 5, title: t('namespace') },
+        ];
 
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
@@ -278,25 +299,35 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
 
-                    {isEdit
-                    ?
-                        <StaticField id="type" className={styles.formDisabled} label={t('type')}>
-                            {typeKey && this.templateTypes[typeKey].typeName}
-                        </StaticField>
-                    :
-                        <Dropdown id="type" label={t('type')} options={typeOptions}/>
+                    {!isEdit &&
+                        <CheckBox id="fromSourceTemplate" label={t('template')} text={t('Clone from an existing template')}/>
                     }
 
-                    {typeForm}
+                    {this.getFormValue('fromSourceTemplate') ?
+                        <TableSelect key="templateSelect" id="sourceTemplate" withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
+                    :
+                        <>
+                            {isEdit ?
+                                <StaticField id="type" className={styles.formDisabled} label={t('type')}>
+                                    {typeKey && this.templateTypes[typeKey].typeName}
+                                </StaticField>
+                            :
+                                <Dropdown id="type" label={t('type')} options={typeOptions}/>
+                            }
+
+                            {typeForm}
+                        </>
+                    }
 
                     <NamespaceSelect/>
 
                     {editForm}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={isEdit ? t('save') : t('saveAndEditTemplate')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
+                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>}
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/${this.props.entity.id}/delete`}/> }
-                        {isEdit && <Button className="btn-danger" icon="send" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
+                        {isEdit && <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>
                 </Form>
             </div>

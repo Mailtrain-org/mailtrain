@@ -13,6 +13,7 @@ function loadLanguage(longCode) {
 }
 
 loadLanguage('en-US');
+loadLanguage('es-ES');
 resourcesCommon['fk-FK'] = convertToFake(resourcesCommon['en-US']);
 
 const resources = {};

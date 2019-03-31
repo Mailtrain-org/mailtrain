@@ -34,11 +34,15 @@ import {CodeEditorSourceType} from "./sandboxed-codeeditor-shared";
 import mjml2html
     from "mjml4-in-browser";
 
+import {registerComponents} from "./mjml-mosaico";
+
 import juice
     from "juice";
 import {withComponentMixins} from "./decorator-helpers";
 
 const refreshTimeout = 1000;
+
+registerComponents();
 
 @withComponentMixins([
     withTranslation
