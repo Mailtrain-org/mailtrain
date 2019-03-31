@@ -967,6 +967,7 @@
     "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
     "templateVariables": "Map of template variables to replace",
     "sendTransactionalEmail": "Send transactional email",
-    "sendSingleEmailByTemplateId": "Send single template by :templateId"
+    "sendSingleEmailByTemplateId": "Send single template by :templateId",
+    "sendConfigurationId": "ID of configuration used to create mailer instance"
   }
   

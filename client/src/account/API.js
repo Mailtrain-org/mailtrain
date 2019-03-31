@@ -387,6 +387,7 @@ export default class API extends Component {
                 </p>
                 <ul>
                     <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
+                    <li><strong>SEND_CONFIGURATION_ID</strong> – {t('sendConfigurationId')}</li>
                     <li><strong>SUBJECT</strong> – {t('subject')}</li>
                     <li><strong>VARIABLES</strong> – {t('templateVariables')}: <em>{"{"} FOO: bar {"}"}</em></li>
                 </ul>

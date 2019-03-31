@@ -302,9 +302,11 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
             templateId: req.params.templateId
         });
         const info = await templateSender.send({
+            context: req.context,
             email: input.EMAIL,
-            subject: input.SUBJECT,
             locale: req.locale,
+            sendConfigurationId: input.SEND_CONFIGURATION_ID,
+            subject: input.SUBJECT,
             variables: input.VARIABLES
         });
         res.status(200).json({ data: info });

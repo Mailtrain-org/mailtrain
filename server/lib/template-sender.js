@@ -1,6 +1,5 @@
 'use strict';
 
-const contextHelpers = require('./context-helpers');
 const mailers = require('./mailers');
 const templates = require('../models/templates');
 
@@ -18,9 +17,9 @@ class TemplateSender {
         this._validateMailOptions(options);
 
         const [mailer, template] = await Promise.all([
-            mailers.getOrCreateMailer(),
+            mailers.getOrCreateMailer(options.sendConfigurationId),
             templates.getById(
-                contextHelpers.getAdminContext(),
+                options.context,
                 this.templateId,
                 false
             )
@@ -43,8 +42,11 @@ class TemplateSender {
     }
 
     _validateMailOptions(options) {
-        let { email, locale } = options;
+        let { context, email, locale } = options;
 
+        if (!context) {
+            throw new Error('Missing context');
+        }
         if (!email || email.length === 0) {
             throw new Error('Missing email');
         }
