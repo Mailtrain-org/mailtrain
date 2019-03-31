@@ -348,7 +348,7 @@ function createApp(appType) {
                     data: []
                 };
 
-                return status(err.status || 500).json(resp);
+                return res.status(err.status || 500).json(resp);
 
             } else {
                 if (err instanceof interoperableErrors.NotLoggedInError) {

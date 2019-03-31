@@ -8,6 +8,10 @@ const fs = require('fs-extra-promise');
 const tryRequire = require('try-require');
 const posix = tryRequire('posix');
 
+// process.getuid and process.getgid are not supported on Windows 
+process.getuid = process.getuid || (() => 100);
+process.getgid = process.getuid || (() => 100);
+
 function _getConfigUidGid(userKey, groupKey, defaultUid, defaultGid) {
     let uid = defaultUid;
     let gid = defaultGid;
