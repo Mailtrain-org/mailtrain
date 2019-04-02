@@ -5,21 +5,26 @@ const tools = require('./tools');
 const templates = require('../models/templates');
 
 class TemplateSender {
-    constructor({ templateId, maxMails = 100 } = {}) {
-        if (!templateId) {
-            throw new Error('Cannot create template sender without templateId');
-        }
-
-        this.templateId = templateId;
-        this.maxMails = maxMails;
+    constructor(options) {
+        this.defaultOptions = {
+            maxMails: 100,
+            ...options
+        };
     }
 
-    async send(options) {
+    async send(params) {
+        const options = { ...this.defaultOptions, ...params };
         this._validateMailOptions(options);
 
         const [mailer, template] = await Promise.all([
-            mailers.getOrCreateMailer(options.sendConfigurationId),
-            templates.getById(options.context, this.templateId, false)
+            mailers.getOrCreateMailer(
+                options.sendConfigurationId
+            ),
+            templates.getById(
+                options.context,
+                options.templateId,
+                false
+            )
         ]);
 
         const html = tools.formatTemplate(
@@ -46,8 +51,11 @@ class TemplateSender {
     }
 
     _validateMailOptions(options) {
-        let { context, email, locale } = options;
+        let { context, email, locale, templateId } = options;
 
+        if (!templateId) {
+            throw new Error('Missing templateId');
+        }
         if (!context) {
             throw new Error('Missing context');
         }
@@ -57,9 +65,9 @@ class TemplateSender {
         if (typeof email === 'string') {
             email = email.split(',');
         }
-        if (email.length > this.maxMails) {
+        if (email.length > options.maxMails) {
             throw new Error(
-                `Cannot send more than ${this.maxMails} emails at once`
+                `Cannot send more than ${options.maxMails} emails at once`
             );
         }
         if (!locale) {

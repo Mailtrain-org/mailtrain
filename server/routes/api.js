@@ -299,13 +299,13 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
 
     try {
         const templateSender = new TemplateSender({
+            context: req.context,
+            locale: req.locale,
             templateId: req.params.templateId
         });
         const info = await templateSender.send({
-            context: req.context,
             data: input.DATA,
             email: input.EMAIL,
-            locale: req.locale,
             sendConfigurationId: input.SEND_CONFIGURATION_ID,
             subject: input.SUBJECT,
             variables: input.VARIABLES
