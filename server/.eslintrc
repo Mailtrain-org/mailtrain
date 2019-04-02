@@ -1,3 +1,4 @@
 {
-    "extends": "nodemailer"
+	"extends": "nodemailer",
+	"parserOptions": { "ecmaVersion": 2018 }
 }

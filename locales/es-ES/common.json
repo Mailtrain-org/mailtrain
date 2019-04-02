@@ -964,6 +964,11 @@
     "thePasswordMustContainAtLeastOne": "The password must contain at least one lowercase letter",
     "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
     "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
-    "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character"
+    "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
+    "templateData": "Data passed to template when compiling with Handlebars",
+    "templateVariables": "Map of template/subject variables to replace",
+    "sendTransactionalEmail": "Send transactional email",
+    "sendSingleEmailByTemplateId": "Send single template by :templateId",
+    "sendConfigurationId": "ID of configuration used to create mailer instance"
   }
   
