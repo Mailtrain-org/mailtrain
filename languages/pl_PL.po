@@ -1,0 +1,3737 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-07 21:44+0200\n"
+"PO-Revision-Date: 2018-10-22 12:32+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.4\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
+"Last-Translator: \n"
+"Language: pl_PL\n"
+
+#: views/archive/layout.hbs:1 views/layout.hbs:1
+#: views/subscription/layout.hbs:1 routes/index.js:11
+msgid "Self hosted email newsletter app"
+msgstr "Samodzielnie hostowana aplikacja e-mail newsletter"
+
+#: views/campaigns/bounced.hbs:1 views/campaigns/campaigns.hbs:1
+#: views/campaigns/clicked.hbs:1 views/campaigns/complained.hbs:1
+#: views/campaigns/create-rss.hbs:1 views/campaigns/create-triggered.hbs:1
+#: views/campaigns/create.hbs:1 views/campaigns/delivered.hbs:1
+#: views/campaigns/edit-rss.hbs:1 views/campaigns/edit-triggered.hbs:1
+#: views/campaigns/edit.hbs:1 views/campaigns/opened.hbs:1
+#: views/campaigns/unsubscribed.hbs:1 views/campaigns/upload-attachment.hbs:1
+#: views/campaigns/view.hbs:1 views/lists/create.hbs:1 views/lists/edit.hbs:1
+#: views/lists/fields/create.hbs:1 views/lists/fields/edit.hbs:1
+#: views/lists/fields/fields.hbs:1 views/lists/lists.hbs:1
+#: views/lists/segments/create.hbs:1 views/lists/segments/edit.hbs:1
+#: views/lists/segments/rule-configure.hbs:1
+#: views/lists/segments/rule-create.hbs:1 views/lists/segments/rule-edit.hbs:1
+#: views/lists/segments/segments.hbs:1 views/lists/segments/view.hbs:1
+#: views/lists/subscription/add.hbs:1 views/lists/subscription/edit.hbs:1
+#: views/lists/subscription/import-failed.hbs:1
+#: views/lists/subscription/import-preview.hbs:1
+#: views/lists/subscription/import.hbs:1 views/lists/view.hbs:1
+#: views/settings.hbs:1 views/templates/create.hbs:1
+#: views/templates/edit.hbs:1 views/templates/templates.hbs:1
+#: views/triggers/create-select.hbs:1 views/triggers/create.hbs:1
+#: views/triggers/edit.hbs:1 views/triggers/triggered.hbs:1
+#: views/triggers/triggers.hbs:1 views/users/account.hbs:1
+#: views/users/api.hbs:1 views/users/forgot.hbs:1 views/users/login.hbs:1
+#: views/users/reset.hbs:1 app.js:169
+msgid "Home"
+msgstr "Strona główna"
+
+#: views/campaigns/bounced.hbs:2 views/campaigns/campaigns.hbs:2
+#: views/campaigns/campaigns.hbs:7 views/campaigns/clicked.hbs:2
+#: views/campaigns/complained.hbs:2 views/campaigns/create-rss.hbs:2
+#: views/campaigns/create-triggered.hbs:2 views/campaigns/create.hbs:2
+#: views/campaigns/delivered.hbs:2 views/campaigns/edit-rss.hbs:2
+#: views/campaigns/edit-triggered.hbs:2 views/campaigns/edit.hbs:2
+#: views/campaigns/opened.hbs:2 views/campaigns/unsubscribed.hbs:2
+#: views/campaigns/upload-attachment.hbs:2 views/campaigns/view.hbs:2
+#: lib/tools.js:119 routes/campaigns.js:35
+msgid "Campaigns"
+msgstr "Kampanie"
+
+#: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
+msgid "Bounced info"
+msgstr "Informacje o odrzuconych/odbiciach"
+
+#: views/campaigns/bounced.hbs:5 views/campaigns/clicked.hbs:5
+#: views/campaigns/complained.hbs:5 views/campaigns/delivered.hbs:5
+#: views/campaigns/edit-rss.hbs:5 views/campaigns/edit-triggered.hbs:5
+#: views/campaigns/edit.hbs:5 views/campaigns/opened.hbs:5
+#: views/campaigns/unsubscribed.hbs:5 views/campaigns/upload-attachment.hbs:6
+msgid "View campaign"
+msgstr "Zobacz kampanię"
+
+#: views/campaigns/bounced.hbs:6
+msgid "Subscribers who bounced and were unsubscribed:"
+msgstr "Subskrybenci, którzy odbili wiadomość i zrezygnowali z subskrypcji:"
+
+#: views/campaigns/bounced.hbs:7 views/campaigns/clicked.hbs:13
+#: views/campaigns/complained.hbs:7 views/campaigns/delivered.hbs:7
+#: views/campaigns/opened.hbs:7 views/campaigns/unsubscribed.hbs:7
+#: views/lists/subscription/import-failed.hbs:9 views/lists/view.hbs:18
+#: views/triggers/triggered.hbs:6
+msgid "Address"
+msgstr "Adres"
+
+#: views/campaigns/bounced.hbs:8 views/campaigns/clicked.hbs:14
+#: views/campaigns/complained.hbs:8 views/campaigns/delivered.hbs:8
+#: views/campaigns/opened.hbs:8 views/campaigns/unsubscribed.hbs:8
+#: views/lists/subscription/add.hbs:6 views/lists/subscription/edit.hbs:7
+#: views/lists/subscription/import-preview.hbs:7 views/lists/view.hbs:19
+#: views/subscription/manage.hbs:4 views/subscription/subscribe.hbs:4
+#: views/triggers/triggered.hbs:7
+msgid "First Name"
+msgstr "Imię"
+
+#: views/campaigns/bounced.hbs:9 views/campaigns/clicked.hbs:15
+#: views/campaigns/complained.hbs:9 views/campaigns/delivered.hbs:9
+#: views/campaigns/opened.hbs:9 views/campaigns/unsubscribed.hbs:9
+#: views/lists/subscription/add.hbs:7 views/lists/subscription/edit.hbs:8
+#: views/lists/subscription/import-preview.hbs:8 views/lists/view.hbs:20
+#: views/subscription/manage.hbs:5 views/subscription/subscribe.hbs:5
+#: views/triggers/triggered.hbs:8
+msgid "Last Name"
+msgstr "Nazwisko"
+
+#: views/campaigns/bounced.hbs:10 views/campaigns/complained.hbs:10
+#: views/campaigns/delivered.hbs:10 views/campaigns/unsubscribed.hbs:10
+msgid "SMTP response"
+msgstr "Odpowiedź SMTP"
+
+#: views/campaigns/bounced.hbs:11
+msgid "Bounce time"
+msgstr "Czas odbicia"
+
+#: views/campaigns/campaigns.hbs:3 views/campaigns/create-triggered.hbs:24
+#: views/campaigns/create.hbs:3 views/campaigns/create.hbs:4
+#: views/campaigns/create.hbs:27
+msgid "Create Campaign"
+msgstr "Utwórz Kampanię"
+
+#: views/campaigns/campaigns.hbs:4
+msgid "Regular Campaign"
+msgstr "Zwykła kampania"
+
+#: views/campaigns/campaigns.hbs:5
+msgid "RSS Campaign"
+msgstr "Kampania RSS"
+
+#: views/campaigns/campaigns.hbs:6
+msgid "Triggered Campaign"
+msgstr "Wywołana kampania"
+
+#: views/campaigns/campaigns.hbs:8 views/campaigns/create-rss.hbs:6
+#: views/campaigns/create-triggered.hbs:5 views/campaigns/create.hbs:5
+#: views/campaigns/edit-rss.hbs:8 views/campaigns/edit-triggered.hbs:9
+#: views/campaigns/edit.hbs:10 views/campaigns/view.hbs:71
+#: views/lists/create.hbs:5 views/lists/edit.hbs:6
+#: views/lists/fields/fields.hbs:6 views/lists/lists.hbs:5
+#: views/lists/segments/segments.hbs:6 views/templates/templates.hbs:5
+#: views/triggers/triggers.hbs:5
+msgid "Name"
+msgstr "Nazwa"
+
+#: views/campaigns/campaigns.hbs:9 views/campaigns/create-rss.hbs:8
+#: views/campaigns/create-triggered.hbs:7 views/campaigns/create.hbs:7
+#: views/campaigns/edit-rss.hbs:10 views/campaigns/edit-triggered.hbs:11
+#: views/campaigns/edit.hbs:12 views/campaigns/view.hbs:72
+#: views/lists/create.hbs:7 views/lists/edit.hbs:10 views/lists/lists.hbs:8
+#: views/partials/merge-tag-reference.hbs:4 views/templates/create.hbs:9
+#: views/templates/edit.hbs:8 views/templates/templates.hbs:6
+#: views/triggers/create.hbs:7 views/triggers/edit.hbs:8
+#: views/triggers/triggers.hbs:7
+msgid "Description"
+msgstr "Opis"
+
+#: views/campaigns/campaigns.hbs:10 views/campaigns/view.hbs:73
+#: views/lists/view.hbs:21 views/lists/view.hbs:29
+#: views/triggers/triggers.hbs:6
+msgid "Status"
+msgstr "Status"
+
+#: views/campaigns/campaigns.hbs:11 views/campaigns/view.hbs:74
+#: views/lists/view.hbs:22 views/lists/view.hbs:23
+msgid "Created"
+msgstr "Utworzono"
+
+#: views/campaigns/clicked.hbs:3 views/campaigns/clicked.hbs:4
+msgid "Link info"
+msgstr "Informacje o linkach"
+
+#: views/campaigns/clicked.hbs:6 views/campaigns/view.hbs:61
+msgid "URL"
+msgstr "URL"
+
+#: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:62
+msgid "Clicks"
+msgstr "Kliknięcia"
+
+#: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:63
+msgid "% of clicks"
+msgstr "% kliknięć"
+
+#: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:64
+msgid "% of messages"
+msgstr "% wiadomości"
+
+#: views/campaigns/clicked.hbs:10 views/campaigns/view.hbs:67
+msgid "Aggregated clicks"
+msgstr "Zagregowane kliknięcia"
+
+#: views/campaigns/clicked.hbs:11
+msgid "Subscribers who clicked on a link:"
+msgstr "Subskrybenci, którzy kliknęli link:"
+
+#: views/campaigns/clicked.hbs:12
+msgid "Subscribers who clicked on this link:"
+msgstr "Subskrybenci, którzy kliknęli ten link:"
+
+#: views/campaigns/clicked.hbs:16
+msgid "First click time"
+msgstr "Czas pierwszego kliknięcia"
+
+#: views/campaigns/clicked.hbs:17
+msgid "Click count"
+msgstr "Liczba kliknięć"
+
+#: views/campaigns/complained.hbs:3 views/campaigns/complained.hbs:4
+msgid "Complained info"
+msgstr "Informacje o skargach"
+
+#: views/campaigns/complained.hbs:6
+msgid "Subscribers who complained and were unsubscribed:"
+msgstr "Subskrybenci, którzy złożyli skargę i wypisali się:"
+
+#: views/campaigns/complained.hbs:11
+msgid "Complain time"
+msgstr "Czas skargi"
+
+#: views/campaigns/create-rss.hbs:3 views/campaigns/create-rss.hbs:4
+#: views/campaigns/create-rss.hbs:20
+msgid "Create RSS Campaign"
+msgstr "Utwórz kampanię RSS"
+
+#: views/campaigns/create-rss.hbs:5 views/campaigns/edit-rss.hbs:6
+msgid ""
+"RSS campaign sets up a tracker against selected RSS feed address. Whenever a "
+"new entry is found from this feed it is sent to selected list as an email "
+"message."
+msgstr ""
+"Kampania RSS ustawia moduł śledzący na wybrany adres RSS. Za każdym razem, "
+"gdy nowy wpis zostanie znaleziony z tego kanału, zostanie wysłany na wybraną "
+"listę jako wiadomość e-mail."
+
+#: views/campaigns/create-rss.hbs:7 views/campaigns/create-triggered.hbs:6
+#: views/campaigns/create.hbs:6 views/campaigns/edit-rss.hbs:9
+#: views/campaigns/edit-triggered.hbs:10 views/campaigns/edit.hbs:11
+msgid "Campaign Name"
+msgstr "Nazwa kampanii"
+
+#: views/campaigns/create-rss.hbs:9 views/campaigns/create-triggered.hbs:8
+#: views/campaigns/create.hbs:8 views/campaigns/edit-rss.hbs:11
+#: views/campaigns/edit-triggered.hbs:12 views/campaigns/edit.hbs:13
+#: views/lists/create.hbs:8 views/lists/edit.hbs:11
+#: views/templates/create.hbs:11 views/templates/edit.hbs:10
+#: views/triggers/create.hbs:9 views/triggers/edit.hbs:10
+msgid "HTML is allowed"
+msgstr "HTML dozwolony"
+
+#: views/campaigns/create-rss.hbs:10 views/campaigns/create-triggered.hbs:9
+#: views/campaigns/create.hbs:9 views/campaigns/edit-rss.hbs:12
+#: views/campaigns/edit-triggered.hbs:13 views/campaigns/edit.hbs:14
+#: views/campaigns/view.hbs:6 views/triggers/create-select.hbs:6
+#: views/triggers/create.hbs:10 views/triggers/edit.hbs:12
+#: views/triggers/triggers.hbs:8
+msgid "List"
+msgstr "Lista"
+
+#: views/campaigns/create-rss.hbs:11 views/campaigns/create-triggered.hbs:10
+#: views/campaigns/create-triggered.hbs:13 views/campaigns/create.hbs:10
+#: views/campaigns/create.hbs:14 views/campaigns/edit-rss.hbs:13
+#: views/campaigns/edit-triggered.hbs:14 views/campaigns/edit.hbs:15
+#: views/lists/fields/create.hbs:27 views/lists/fields/edit.hbs:28
+#: views/lists/segments/create.hbs:9 views/lists/segments/edit.hbs:10
+#: views/lists/segments/rule-create.hbs:7 views/lists/subscription/add.hbs:10
+#: views/lists/subscription/add.hbs:12 views/lists/subscription/edit.hbs:11
+#: views/lists/subscription/import-preview.hbs:5
+#: views/subscription/manage.hbs:10 views/subscription/subscribe.hbs:10
+#: views/templates/create.hbs:8 views/triggers/create-select.hbs:7
+#: views/triggers/create.hbs:17 views/triggers/create.hbs:20
+#: views/triggers/create.hbs:22 views/triggers/create.hbs:26
+#: views/triggers/edit.hbs:19 views/triggers/edit.hbs:22
+#: views/triggers/edit.hbs:24 views/triggers/edit.hbs:28
+msgid "Select"
+msgstr "Wybierz"
+
+#: views/campaigns/create-rss.hbs:12 views/campaigns/create-triggered.hbs:11
+#: views/campaigns/create.hbs:11 views/campaigns/edit-rss.hbs:14
+#: views/campaigns/edit-triggered.hbs:15 views/campaigns/edit.hbs:16
+#: views/triggers/create-select.hbs:8 views/triggers/create.hbs:11
+#: views/triggers/edit.hbs:13
+msgid "subscribers"
+msgstr "subskrybenci"
+
+#: views/campaigns/create-rss.hbs:13 views/campaigns/edit-rss.hbs:15
+msgid "RSS Feed Url"
+msgstr "Adres URL kanału RSS"
+
+#: views/campaigns/create-rss.hbs:14 views/campaigns/edit-rss.hbs:16
+msgid ""
+"New entries from this RSS URL are sent out to list subscribers as email "
+"messages"
+msgstr ""
+"Nowe wpisy z tego adresu RSS są wysyłane do listy subskrybentów, jak "
+"wiadomości e-mail"
+
+#: views/campaigns/create-rss.hbs:15 views/campaigns/create-triggered.hbs:17
+#: views/campaigns/create.hbs:18 views/campaigns/edit-rss.hbs:18
+#: views/campaigns/edit-triggered.hbs:16 views/campaigns/edit.hbs:17
+#: views/campaigns/view.hbs:12
+msgid "Email \"from name\""
+msgstr "E-mail nazwa \"from\""
+
+#: views/campaigns/create-rss.hbs:16 views/campaigns/create-triggered.hbs:18
+#: views/campaigns/create.hbs:19 views/campaigns/edit-rss.hbs:19
+#: views/campaigns/edit.hbs:18 views/settings.hbs:23
+msgid "This is the name your emails will come from"
+msgstr "This is the name your emails will come from"
+
+#: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:19
+#: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
+#: views/campaigns/edit-triggered.hbs:18 views/campaigns/edit.hbs:19
+#: views/campaigns/view.hbs:13
+msgid "Email \"from\" address"
+msgstr "E-mail adres  \"from\""
+
+#: views/campaigns/create-rss.hbs:18 views/campaigns/create-triggered.hbs:20
+#: views/campaigns/edit-rss.hbs:21 views/campaigns/edit-triggered.hbs:19
+#: views/settings.hbs:25
+msgid "This is the address people will send replies to"
+msgstr "To jest adres na który ludzie będą wysyłać odpowiedzi"
+
+#: views/campaigns/create-rss.hbs:19 views/campaigns/create-triggered.hbs:23
+#: views/campaigns/create.hbs:26 views/campaigns/edit-rss.hbs:22
+#: views/campaigns/edit-triggered.hbs:22 views/campaigns/edit.hbs:25
+msgid "Disable clicked/opened tracking"
+msgstr "Wyłącz kliknięte/otwarte śledzenie"
+
+#: views/campaigns/create-triggered.hbs:3
+#: views/campaigns/create-triggered.hbs:4
+msgid "Create Triggered Campaign"
+msgstr "Utwórz uruchamianą kampanię"
+
+#: views/campaigns/create-triggered.hbs:12 views/campaigns/create.hbs:12
+#: views/campaigns/edit-triggered.hbs:7 views/campaigns/edit.hbs:7
+#: views/lists/fields/create.hbs:31 views/lists/fields/edit.hbs:33
+#: views/templates/create.hbs:13
+msgid "Template"
+msgstr "Szablon"
+
+#: views/campaigns/create-triggered.hbs:14 views/campaigns/create.hbs:15
+msgid "Selecting a template creates a campaign specific copy from it"
+msgstr "Wybranie szablonu powoduje utworzenie z niego kopii dla kampanii"
+
+#: views/campaigns/create-triggered.hbs:15 views/campaigns/create.hbs:16
+msgid "Or alternatively use an URL as the message content source:"
+msgstr "Lub alternatywnie użyj adresu URL jako źródło treści wiadomości:"
+
+#: views/campaigns/create-triggered.hbs:16 views/campaigns/create.hbs:17
+#: views/campaigns/edit-triggered.hbs:25 views/campaigns/edit.hbs:28
+msgid ""
+"If a message is sent then this URL will be POSTed to using Merge Tags as "
+"POST body. Use this if you want to generate the HTML message yourself"
+msgstr ""
+"Jeśli wiadomość zostanie wysłana, ten adres URL zostanie wysłany POST do "
+"używania merge tagów jako treść POST. Użyj tej opcji, jeśli chcesz "
+"samodzielnie wygenerować wiadomość HTML"
+
+#: views/campaigns/create-triggered.hbs:21 views/campaigns/create.hbs:24
+#: views/campaigns/edit-triggered.hbs:20 views/campaigns/edit.hbs:23
+#: views/campaigns/view.hbs:15
+msgid "Email \"subject line\""
+msgstr "E-mail temat \"from\""
+
+#: views/campaigns/create-triggered.hbs:22 views/campaigns/create.hbs:25
+#: views/campaigns/edit-triggered.hbs:21 views/campaigns/edit.hbs:24
+#: views/settings.hbs:27
+msgid "Keep it relevant and non-spammy"
+msgstr "Zachowaj to, co istotne i nie spamuj"
+
+#: views/campaigns/create.hbs:13
+msgid "Select a template:"
+msgstr "Wybierz szablon:"
+
+#: views/campaigns/create.hbs:21 views/campaigns/edit.hbs:20
+msgid ""
+"This is the address people will send replies to unless reply-to address is "
+"set"
+msgstr ""
+"To jest adres, na który ludzie będą wysyłać odpowiedzi, chyba że ustawiono "
+"adres zwrotny"
+
+#: views/campaigns/create.hbs:22 views/campaigns/edit.hbs:21
+#: views/campaigns/view.hbs:14
+msgid "Email \"reply-to\" address"
+msgstr "Email \"Odpowiedz do\""
+
+#: views/campaigns/create.hbs:23 views/campaigns/edit.hbs:22
+msgid "If set, this is the address people will send replies to"
+msgstr ""
+"Jeśli jest ustawiony, jest to adres, na który ludzie będą wysyłać odpowiedzi"
+
+#: views/campaigns/delivered.hbs:3 views/campaigns/delivered.hbs:4
+msgid "Delivered info"
+msgstr "Informacje o dostarczonych"
+
+#: views/campaigns/delivered.hbs:6
+msgid "Subscribers who received the message and did not bounce/unsubscribe:"
+msgstr ""
+"Subskrybenci, którzy otrzymali wiadomość i nie odrzucili/nie anulowali "
+"subskrypcji:"
+
+#: views/campaigns/delivered.hbs:11
+msgid "Delivery time"
+msgstr "Czas dostarczenia"
+
+#: views/campaigns/edit-rss.hbs:3 views/campaigns/edit-rss.hbs:4
+msgid "Edit RSS Campaign"
+msgstr "Edytuj kampanię RSS"
+
+#: views/campaigns/edit-rss.hbs:7 views/campaigns/edit-triggered.hbs:8
+#: views/campaigns/edit.hbs:9 views/settings.hbs:4 views/users/account.hbs:6
+msgid "General Settings"
+msgstr "Ustawienia główne"
+
+#: views/campaigns/edit-rss.hbs:17
+msgid ""
+"Use special merge tag [RSS_ENTRY] to mark the position for the RSS post "
+"content. Additionally you can use any valid merge tag as well."
+msgstr ""
+"Użyj specjalnego merge tagu [RSS_ENTRY], aby oznaczyć pozycję treści "
+"wiadomości RSS. Dodatkowo mżesz użyć dowolnego innego merge tagu."
+
+#: views/campaigns/edit-rss.hbs:23 views/campaigns/edit-triggered.hbs:26
+#: views/campaigns/edit.hbs:34
+msgid "Delete Campaign"
+msgstr "Usuń kampanię"
+
+#: views/campaigns/edit-rss.hbs:24 views/campaigns/edit-triggered.hbs:27
+#: views/campaigns/edit.hbs:35 views/lists/edit.hbs:13
+#: views/lists/fields/edit.hbs:39 views/lists/segments/edit.hbs:14
+#: views/lists/segments/rule-edit.hbs:38 views/lists/subscription/edit.hbs:17
+#: views/settings.hbs:99 views/templates/edit.hbs:12
+#: views/triggers/edit.hbs:30 views/users/account.hbs:18
+msgid "Update"
+msgstr "Zaktualizuj"
+
+#: views/campaigns/edit-triggered.hbs:3 views/campaigns/edit-triggered.hbs:4
+msgid "Edit Triggered Campaign"
+msgstr "Edytuj kampanię uruchamianą"
+
+#: views/campaigns/edit-triggered.hbs:6 views/campaigns/edit.hbs:6
+msgid "General"
+msgstr "Główne"
+
+#: views/campaigns/edit-triggered.hbs:17
+msgid "his is the name your emails will come from"
+msgstr "Nazwa, z której będą wysyłane wszystkie e-maile."
+
+#: views/campaigns/edit-triggered.hbs:23 views/campaigns/edit.hbs:26
+msgid "Template Settings"
+msgstr "Ustawienia szablonu"
+
+#: views/campaigns/edit-triggered.hbs:24 views/campaigns/edit.hbs:27
+msgid "Template URL"
+msgstr "Adres URL szablonu"
+
+#: views/campaigns/edit.hbs:3 views/campaigns/edit.hbs:4
+#: views/campaigns/upload-attachment.hbs:3
+#: views/campaigns/upload-attachment.hbs:5 views/campaigns/view.hbs:3
+msgid "Edit Campaign"
+msgstr "Edytuj kampanie"
+
+#: views/campaigns/edit.hbs:8 views/campaigns/edit.hbs:29
+msgid "Attachments"
+msgstr "Załączniki"
+
+#: views/campaigns/edit.hbs:30
+msgid "File"
+msgstr "Plik"
+
+#: views/campaigns/edit.hbs:31
+msgid "Size"
+msgstr "Rozmiar"
+
+#: views/campaigns/edit.hbs:32 views/campaigns/view.hbs:66
+#: views/lists/fields/fields.hbs:12 views/lists/view.hbs:32
+msgid "No data available in table"
+msgstr "Brak danych w tabeli"
+
+#: views/campaigns/edit.hbs:33 views/campaigns/upload-attachment.hbs:4
+msgid "Add Attachment"
+msgstr "Dodaj załącznik"
+
+#: views/campaigns/opened.hbs:3 views/campaigns/opened.hbs:4
+msgid "Opened info"
+msgstr "Informacje o otwarciach"
+
+#: views/campaigns/opened.hbs:6
+msgid "Subscribers who opened this message:"
+msgstr "Subskrybenci, którzy otworzyli tę wiadomość:"
+
+#: views/campaigns/opened.hbs:10
+msgid "First open"
+msgstr "Pierwsze otwarcie"
+
+#: views/campaigns/opened.hbs:11
+msgid "Opened count"
+msgstr "Liczba otwarć"
+
+#: views/campaigns/unsubscribed.hbs:3 views/campaigns/unsubscribed.hbs:4
+msgid "Unsubscribed info"
+msgstr "Informacje o anulowaniach subskrypcji"
+
+#: views/campaigns/unsubscribed.hbs:6
+msgid "Subscribers who unsubscribed:"
+msgstr "Subskrybenci, którzy anulowali subskrypcję:"
+
+#: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:26
+#: views/lists/subscription/import.hbs:10 routes/lists.js:171
+msgid "Unsubscribed"
+msgstr "Anulowano subskrypcję"
+
+#: views/campaigns/upload-attachment.hbs:7
+msgid "Upload"
+msgstr "Prześlij"
+
+#: views/campaigns/view.hbs:4
+msgid "Overview"
+msgstr "Przegląd"
+
+#: views/campaigns/view.hbs:5
+msgid "Links"
+msgstr "Linków"
+
+#: views/campaigns/view.hbs:7
+msgid "Feed URL"
+msgstr "Url czytnika"
+
+#: views/campaigns/view.hbs:8
+msgid "Last check"
+msgstr "Ostatnie sprawdzenie"
+
+#: views/campaigns/view.hbs:9
+msgid "Not yet checked"
+msgstr "Jeszcze nie sprawdzone"
+
+#: views/campaigns/view.hbs:10
+msgid "activate campaign to start checking feed for new messages"
+msgstr ""
+"aktywuj kampanię, aby rozpocząć sprawdzanie kanału dla nowych wiadomości"
+
+#: views/campaigns/view.hbs:11
+msgid "RSS status"
+msgstr "Status RSS"
+
+#: views/campaigns/view.hbs:16
+msgid "Preview campaign as"
+msgstr "Podgląd kampanii jako"
+
+#: views/campaigns/view.hbs:17
+msgid "Add new test user"
+msgstr "Dodaj użytkownika testowego"
+
+#: views/campaigns/view.hbs:18
+msgid "No test users yet, create one here"
+msgstr "Brak użytkowników testowych, utwórz je tutaj"
+
+#: views/campaigns/view.hbs:19
+msgid "Go"
+msgstr "Dalej"
+
+#: views/campaigns/view.hbs:20 lib/models/triggers.js:25
+msgid "Delivered"
+msgstr "Dostarczone"
+
+#: views/campaigns/view.hbs:21
+msgid "List subscribers who received this message"
+msgstr "Lista subskrybentów, którzy otrzymali tę wiadomość"
+
+#: views/campaigns/view.hbs:22 routes/lists.js:171
+msgid "Bounced"
+msgstr "Odbite"
+
+#: views/campaigns/view.hbs:23
+msgid "List subscribers who bounced"
+msgstr "Lista użytkowników którzy odbili"
+
+#: views/campaigns/view.hbs:24
+msgid "Complaints"
+msgstr "Skargi"
+
+#: views/campaigns/view.hbs:25
+msgid "List subscribers who complained for this message"
+msgstr "Lista subskrybentów, którzy złożyli skargę na tę wiadomość"
+
+#: views/campaigns/view.hbs:27
+msgid "List subscribers who unsubscribed after this message"
+msgstr "Lista subskrybentów, którzy anulowali subskrypcję po tej wiadomości"
+
+#: views/campaigns/view.hbs:28
+msgid "Opened"
+msgstr "Otwarto"
+
+#: views/campaigns/view.hbs:29
+msgid "List subscribers who opened this message"
+msgstr "Lista subskrybentów, którzy otworzyli tę wiadomość"
+
+#: views/campaigns/view.hbs:30
+msgid "Clicked"
+msgstr "Kliknięto"
+
+#: views/campaigns/view.hbs:31 views/campaigns/view.hbs:68
+msgid "List subscribers who clicked on a link"
+msgstr "Lista subskrybentów, którzy kliknęli w link"
+
+#: views/campaigns/view.hbs:32
+msgid ""
+"Are you sure? This action would start sending messages to the selected list"
+msgstr ""
+"Jesteś pewny? Ta czynność rozpocznie wysyłanie wiadomości do wybranej listy"
+
+#: views/campaigns/view.hbs:33
+msgid "Delay sending"
+msgstr "Opóźnienie wysyłania"
+
+#: views/campaigns/view.hbs:34
+msgid "hours"
+msgstr "godziny"
+
+#: views/campaigns/view.hbs:35
+msgid "minutes"
+msgstr "minuty"
+
+#: views/campaigns/view.hbs:36
+msgid "Send to subscribers:"
+msgstr "Wyślij do subskrybentów:"
+
+#: views/campaigns/view.hbs:37
+msgid "Are you sure? This action would reset scheduling"
+msgstr "Jesteś pewny? Ta czynność zresetuje harmonogram"
+
+#: views/campaigns/view.hbs:38
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: views/campaigns/view.hbs:39
+msgid "Sending scheduled"
+msgstr "Wysyłanie harmonogramu"
+
+#: views/campaigns/view.hbs:40 views/campaigns/view.hbs:52
+msgid "Pause"
+msgstr "Pauza"
+
+#: views/campaigns/view.hbs:41 routes/campaigns.js:264
+msgid "Sending"
+msgstr "Wysyłanie"
+
+#: views/campaigns/view.hbs:42 views/campaigns/view.hbs:46
+msgid ""
+"Are you sure? This action would resume sending messages to the selected list"
+msgstr ""
+"Jesteś pewny? Ta czynność wznowi wysyłanie wiadomości do wybranej listy"
+
+#: views/campaigns/view.hbs:43 views/campaigns/view.hbs:47
+msgid "Are you sure? This action would reset all stats about current progress"
+msgstr ""
+"Jesteś pewny? Ta czynność zresetuje wszystkie statystyki dotyczące bieżącego "
+"postępu"
+
+#: views/campaigns/view.hbs:44
+msgid "Resume"
+msgstr "Wznów"
+
+#: views/campaigns/view.hbs:45 views/campaigns/view.hbs:49
+msgid "Reset"
+msgstr "Resetuj"
+
+#: views/campaigns/view.hbs:48
+msgid "Continue"
+msgstr "Kontynuuj"
+
+#: views/campaigns/view.hbs:50
+msgid ""
+"All messages sent! Hit \"Continue\" if you you want to send this campaign to "
+"new subscribers"
+msgstr ""
+"Wszystkie wiadomości wysłane! Kliknij \"Kontynuuj\", jeśli chcesz wysłać tę "
+"kampanię do nowych subskrybentów"
+
+#: views/campaigns/view.hbs:51
+msgid ""
+"Are you sure? This action would pause sending new entries in RSS feed as "
+"email messages to the selected list"
+msgstr ""
+"Jesteś pewny? Ta czynność wstrzyma wysyłanie wiadomości o nowych wpisach w "
+"kanale RSS do wybranej listy"
+
+#: views/campaigns/view.hbs:53 views/campaigns/view.hbs:57
+msgid "Campaign status:"
+msgstr "Status kampanii:"
+
+#: views/campaigns/view.hbs:54
+msgid "ACTIVE"
+msgstr "AKTYWNE"
+
+#: views/campaigns/view.hbs:55
+msgid ""
+"Are you sure? This action would start sending new entries in RSS feed as "
+"email messages to the selected list"
+msgstr ""
+"Jesteś pewny? Ta czynność rozpocznie wysyłanie wiadomości o nowych wpisach w "
+"kanale RSS do wybranej listy"
+
+#: views/campaigns/view.hbs:56
+msgid "Activate"
+msgstr "Aktywuj"
+
+#: views/campaigns/view.hbs:58
+msgid "INACTIVE"
+msgstr "NIEAKTYWNE"
+
+#: views/campaigns/view.hbs:59
+msgid ""
+"This is a triggered campaign. Messages are only sent to subscribers that hit "
+"some trigger that invokes this campaign"
+msgstr ""
+"To jest kampania wyzwalana. Wiadomości są wysyłane tylko do subskrybentów, "
+"którzy natrafili na jakiś wyzwalacz, który wywołuje tę kampanię"
+
+#: views/campaigns/view.hbs:60
+msgid "see more"
+msgstr "zobacz więcej"
+
+#: views/campaigns/view.hbs:65
+msgid "List subscribers who clicked this link"
+msgstr "Lista subskrybentów, którzy kliknęli link"
+
+#: views/campaigns/view.hbs:69
+msgid ""
+"Clicks are counted as unique subscribers that clicked on a specific link or "
+"on any link (in aggregated view)"
+msgstr ""
+"Kliknięcia są liczone jako unikalni subskrybenci, którzy kliknęli określony "
+"link lub dowolny link (w widoku zbiorczym)"
+
+#: views/campaigns/view.hbs:70
+msgid ""
+"If a new entry is found from campaign feed a new subcampaign is created of "
+"that entry and it will be listed here"
+msgstr ""
+"Jeśli zostanie znaleziony nowy wpis z kanału kampanii, zostanie utworzona "
+"nowa kampania podrzędna dla tego wpisu i zostanie ona tutaj wymieniona"
+
+#: views/emails/confirm-html.hbs:1 views/emails/confirm-html.hbs:2
+#: views/emails/confirm-text.hbs:1
+msgid "Please Confirm Subscription"
+msgstr "Proszę potwierdź subskrypcję"
+
+#: views/emails/confirm-html.hbs:3 views/emails/confirm-text.hbs:2
+msgid "Yes, subscribe me to this list"
+msgstr "Tak, zapisz mnie na listę"
+
+#: views/emails/confirm-html.hbs:4
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"subscribed if you don't click the confirmation link above."
+msgstr ""
+"Jeśli przez pomyłkę otrzymałeś tego e-maila, po prostu go usuń. Nie będziesz "
+"subskrybowany, jeśli nie klikniesz w link potwierdzający."
+
+#: views/emails/confirm-html.hbs:5 views/emails/confirm-text.hbs:4
+#: views/emails/subscription-confirmed-html.hbs:7
+#: views/emails/subscription-confirmed-text.hbs:7
+#: views/emails/unsubscribe-confirmed-html.hbs:5
+#: views/emails/unsubscribe-confirmed-text.hbs:5
+msgid "For questions about this list, please contact:"
+msgstr "W przypadku pytań dotyczących tej listy, prosimy o kontakt:"
+
+#: views/emails/confirm-text.hbs:3
+msgid ""
+"If you received this email by mistake, simply delete it. You won't be "
+"subscribed unless you click the confirmation link above."
+msgstr ""
+"Jeśli przez pomyłkę otrzymałeś tego e-maila, po prostu go usuń. Nie będziesz "
+"subskrybowany, chyba że klikniesz link powyżej."
+
+#: views/emails/password-reset-html.hbs:1
+#: views/emails/password-reset-html.hbs:2
+#: views/emails/password-reset-text.hbs:1
+msgid "Change your password"
+msgstr "Zmień hasło"
+
+#: views/emails/password-reset-html.hbs:3
+#: views/emails/password-reset-text.hbs:2
+msgid "We have received a password change request for your Mailtrain account:"
+msgstr "Otrzymaliśmy prośbę o zmianę hasła dla Twojego konta Mailtrain:"
+
+#: views/emails/password-reset-html.hbs:4
+#: views/emails/password-reset-text.hbs:3
+msgid "Reset password"
+msgstr "Zresetuj hasło"
+
+#: views/emails/password-reset-html.hbs:5
+#: views/emails/password-reset-text.hbs:4
+msgid ""
+"If you did not ask to change your password, then you can ignore this email "
+"and your password will not be changed."
+msgstr ""
+"Jeśli nie poprosiłeś o zmianę hasła, możesz zignorować ten e-mail, a Twoje "
+"hasło nie zostanie zmienione."
+
+#: views/emails/rss-html.hbs:1 views/emails/stationery-html.hbs:3
+#: views/emails/stationery-text.hbs:3
+msgid "Preferences"
+msgstr "Preferencje"
+
+#: views/emails/rss-html.hbs:2 views/emails/stationery-html.hbs:4
+#: views/emails/stationery-text.hbs:4 views/lists/subscription/edit.hbs:15
+#: views/subscription/manage.hbs:12 views/subscription/unsubscribe.hbs:1
+#: views/subscription/unsubscribe.hbs:4 routes/lists.js:253
+msgid "Unsubscribe"
+msgstr "Anuluj subskrypcję"
+
+#: views/emails/rss-html.hbs:3 views/emails/stationery-html.hbs:5
+#: views/emails/stationery-text.hbs:5
+msgid "View this email in your browser"
+msgstr "Zobacz ten email w Twojej przeglądarce"
+
+#: views/emails/stationery-html.hbs:1 views/emails/stationery-text.hbs:1
+msgid "Hey [FIRST_NAME/Customer],"
+msgstr "Cześć [FIRST_NAME/Customer],"
+
+#: views/emails/stationery-html.hbs:2 views/emails/stationery-text.hbs:2
+msgid "Cheers,"
+msgstr "Pozdrowienia,"
+
+#: views/emails/subscription-confirmed-html.hbs:1
+#: views/emails/subscription-confirmed-text.hbs:1
+#: views/subscription/subscribed.hbs:1
+msgid "Subscription Confirmed"
+msgstr "Subskrypcja została potwierdzona"
+
+#: views/emails/subscription-confirmed-html.hbs:2
+#: views/emails/subscription-confirmed-text.hbs:2
+#: views/subscription/subscribed.hbs:2
+msgid "Your subscription to our list has been confirmed."
+msgstr "Twoja subskrypcja naszej listy została potwierdzona."
+
+#: views/emails/subscription-confirmed-html.hbs:3
+#: views/emails/subscription-confirmed-text.hbs:3
+msgid "If you want to modify your subscription then you can:"
+msgstr "Jeśli chcesz zmodyfikować swoją subskrypcję, możesz:"
+
+#: views/emails/subscription-confirmed-html.hbs:4
+#: views/emails/subscription-confirmed-text.hbs:4
+#: views/subscription/subscribed.hbs:6
+msgid "manage your preferences"
+msgstr "zarządzaj swoimi preferencjami"
+
+#: views/emails/subscription-confirmed-html.hbs:5
+#: views/emails/subscription-confirmed-text.hbs:5
+#: views/subscription/subscribed.hbs:5 views/users/login.hbs:10
+msgid "or"
+msgstr "lub"
+
+#: views/emails/subscription-confirmed-html.hbs:6
+#: views/emails/subscription-confirmed-text.hbs:6
+msgid "unsubscribe here"
+msgstr "anuluj subskrypcję tutaj"
+
+#: views/emails/unsubscribe-confirmed-html.hbs:1
+#: views/emails/unsubscribe-confirmed-text.hbs:1
+msgid "You are now unsubscribed"
+msgstr "Anulowałeś subskrypcję"
+
+#: views/emails/unsubscribe-confirmed-html.hbs:2
+#: views/emails/unsubscribe-confirmed-text.hbs:2
+msgid "We have removed your email address from our list."
+msgstr "Usunęliśmy Twój adres e-mail z naszej listy."
+
+#: views/emails/unsubscribe-confirmed-html.hbs:3
+#: views/emails/unsubscribe-confirmed-text.hbs:3
+msgid "If you unsubscribed by mistake, you can re-subscribe at:"
+msgstr ""
+"Jeśli anulujesz subskrypcję przez pomyłkę, możesz ponownie zasubskrybować na:"
+
+#: views/emails/unsubscribe-confirmed-html.hbs:4
+#: views/emails/unsubscribe-confirmed-text.hbs:4
+#: views/lists/subscription/add.hbs:16 routes/lists.js:253
+msgid "Subscribe"
+msgstr "Subskrybuj"
+
+#: views/index.hbs:1
+msgid "Official Mailtrain Partners"
+msgstr "Oficjalni partnerzy Mailtrain"
+
+#: views/index.hbs:2
+msgid "Free, open source mail server solution"
+msgstr "Darmowe, o otwartym kodzie źródłowym rozwiązanie serwera poczty"
+
+#: views/index.hbs:3
+msgid ""
+"A reliable SMTP server, easy integration, and 12,000 messages a month free"
+msgstr ""
+"Niezawodny serwer SMTP, łatwa integracja i 12 000 wiadomości miesięcznie za "
+"darmo"
+
+#: views/index.hbs:4
+msgid "List management"
+msgstr "Zarządzanie listamie"
+
+#: views/index.hbs:5
+msgid ""
+"Mailtrain allows you to easily manage even very large lists. Million "
+"subscribers? Not a problem. You can add subscribers manually, through the "
+"API or import from a CSV file. All lists come with support for custom fields "
+"and merge tags as well."
+msgstr ""
+"Mailtrain pozwala w łatwy sposób zarządzać nawet bardzo dużymi listami. "
+"Milion subskrybentów? Żaden problem. Możesz dodawać subskrybentów ręcznie, "
+"za pośrednictwem interfejsu API lub importować z pliku CSV. Wszystkie listy "
+"zawierają również obsługę pól niestandardowych i znaczników scalających."
+
+#: views/index.hbs:6
+msgid "Custom fields"
+msgstr "Pola niestandardowe"
+
+#: views/index.hbs:7
+msgid ""
+"Text fields, numbers, drop downs or checkboxes, Mailtrain has them all. "
+"Every custom field can be included in the generated newsletters through "
+"merge tags."
+msgstr ""
+"Pola tekstowe, cyfry, listy rozwijane lub pola wyboru, Mailtrain ma je "
+"wszystkie. Każde niestandardowe pole może być zawarte w wygenerowanych "
+"newsletterach za pomocą merge tagów."
+
+#: views/index.hbs:8
+msgid "List segmentation"
+msgstr "Segmentacja listy"
+
+#: views/index.hbs:9
+msgid ""
+"Send messages only to list subscribers that match predefined segmentation "
+"rules. No need to create separate lists with small differences."
+msgstr ""
+"Wysyłaj wiadomości tylko dla subskrybentów, którzy pasują do "
+"predefiniowanych reguł segmentacji. Nie trzeba tworzyć oddzielnych list z "
+"małymi różnicami."
+
+#: views/index.hbs:10
+msgid "Donate to author"
+msgstr "Przekaż darowiznę autorowi"
+
+#: views/index.hbs:11
+msgid ""
+"If you really like Mailtrain or your business benefits from it financially "
+"then I would really appreciate a small donation to keep the Mailtrain "
+"development engines running. You can either use Bitcoin or PayPal for "
+"donations. My Bitcoin wallet is <code>15Z8ADxhssKUiwP3jbbqJwA21744KMCfTM</"
+"code>"
+msgstr ""
+"Jeśli naprawdę lubisz Mailtrain lub Twoja firma czerpie z teg korzyści "
+"finansowe będę naprawdę wdzięczny za niewielką darowiznę, aby utrzymać "
+"rozwój Mailtrain. Możesz użyć Bitcoin lub PayPal do darowizn. Mój portfel "
+"Bitcoin to <code>15Z8ADxhssKUiwP3jbbqJwA21744KMCfTM</code>"
+
+#: views/index.hbs:12
+msgid "or donate using PayPal"
+msgstr "lub przekaż darowiznę za pomocą PayPal"
+
+#: views/index.hbs:13
+msgid "RSS Campaigns"
+msgstr "Kampanie RSS"
+
+#: views/index.hbs:14
+msgid ""
+"Setup Mailtrain to track RSS feeds and if a new entry is detected in a feed "
+"then Mailtrain auto-generates a new campaign using entry data as message "
+"contents and sends it to selected subscribers."
+msgstr ""
+"Przygotuj Mailtrain do śledzenia kanałów RSS i jeśli wykryty zostanie nowy "
+"wpis w kanale, Mailtrain automatycznie generuje nową kampanię, wykorzystując "
+"dane wejściowe jako treść wiadomości i wysyła je do wybranych subskrybentów."
+
+#: views/index.hbs:15
+msgid "GPG Encryption"
+msgstr "Szyfrowanie GPG"
+
+#: views/index.hbs:16
+msgid ""
+"If a list has a custom field for a GPG Public Key set then subscribers can "
+"upload their GPG public key to receive encrypted messages from the list."
+msgstr ""
+"Jeśli lista ma niestandardowe pole dla zestawu kluczy publicznych GPG, "
+"subskrybenci mogą przesłać swój klucz publiczny GPG, aby otrzymywać "
+"zaszyfrowane wiadomości z listy."
+
+#: views/index.hbs:17
+msgid "Click stats"
+msgstr "Statystyki kliknięć"
+
+#: views/index.hbs:18
+msgid ""
+"After a campaign is sent, check individual click statistics for every link "
+"included in the message."
+msgstr ""
+"Po wysłaniu kampanii sprawdź statystyki poszczególnych kliknięć dla każdego "
+"linku zawartego w wiadomości."
+
+#: views/index.hbs:19
+msgid "Open source"
+msgstr "Open source"
+
+#: views/index.hbs:20
+msgid "Mailtrain is available under GPLv3 license and completely open source."
+msgstr "Mailtrain jest dostępny na licencji GPLv3 i całkowicie open source."
+
+#: views/index.hbs:21
+msgid "Send via any provider"
+msgstr "Wyślij przez dowolnego dostawcę"
+
+#: views/index.hbs:22
+msgid ""
+"Mailtrain recommends <a href=\"https://sendpulse.com/?"
+"utm_source=mailtrain&utm_medium=providerlist\">SendPulse</a> even though you "
+"can use any provider that supports SMTP protocol to send out your "
+"newsletters. Bounce and complaints handling via webhooks is supported for "
+"SES, SparkPost, SendGrid and Mailgun, also for Postfix and ZoneMTA."
+msgstr ""
+"Mailtrain recommends <a href=\"https://sendpulse.com/?"
+"utm_source=mailtrain&utm_medium=providerlist\">SendPulse</a> even though you "
+"can use any provider that supports SMTP protocol to send out your "
+"newsletters. Bounce and complaints handling via webhooks is supported for "
+"SES, SparkPost, SendGrid and Mailgun, also for Postfix and ZoneMTA."
+"Odbieranie i obsługa skarg za pośrednictwem webhooków jest obsługiwane dla "
+"SES, SparkPost, SendGrid i Mailgun, także dla Postfix i ZoneMTA."
+
+#: views/index.hbs:23
+msgid "Trigger based automation"
+msgstr "Automatyzacja oparta na wyzwalaczach"
+
+#: views/index.hbs:24
+msgid ""
+"Define automation triggers to send specific messages when a user activates "
+"the trigger."
+msgstr ""
+"Zdefiniuj wyzwalacze automatyzacji, aby wysłać określone komunikaty, gdy "
+"użytkownik aktywuje wyzwalacz."
+
+#: views/layout.hbs:2
+msgid "Toggle navigation"
+msgstr "Przełącz nawigację"
+
+#: views/layout.hbs:3
+msgid "Wiki"
+msgstr "Wiki"
+
+#: views/layout.hbs:4
+msgid "Blog"
+msgstr "Blog"
+
+#: views/layout.hbs:5 views/users/account.hbs:2 views/users/account.hbs:3
+msgid "Account"
+msgstr "Konto"
+
+#: views/layout.hbs:6 views/settings.hbs:2 views/settings.hbs:3
+msgid "Settings"
+msgstr "Ustawienia"
+
+#: views/layout.hbs:7 views/users/api.hbs:2 views/users/api.hbs:3
+msgid "API"
+msgstr "API"
+
+#: views/layout.hbs:8
+msgid "Log out"
+msgstr "Wyloguj"
+
+#: views/layout.hbs:9 views/users/forgot.hbs:2 views/users/login.hbs:2
+#: views/users/login.hbs:3 views/users/login.hbs:9 views/users/reset.hbs:2
+msgid "Sign in"
+msgstr "Zaloguj się"
+
+#: views/layout.hbs:10
+msgid "Self hosted newsletter app built on top of Nodemailer"
+msgstr ""
+"Samodzielnie hostowana aplikacja e-mail newsletter zbudowana na bazie "
+"Nodemailera"
+
+#: views/layout.hbs:11 views/layout.hbs:13
+msgid "Source on GitHub"
+msgstr "Źródło na GitHub"
+
+#: views/layout.hbs:12
+msgid "Subscribe to our newsletter"
+msgstr "Zapisz się do naszego newslettera"
+
+#: views/lists/create.hbs:2 views/lists/edit.hbs:2
+#: views/lists/fields/create.hbs:2 views/lists/fields/edit.hbs:2
+#: views/lists/fields/fields.hbs:2 views/lists/lists.hbs:2
+#: views/lists/lists.hbs:4 views/lists/segments/create.hbs:2
+#: views/lists/segments/edit.hbs:2 views/lists/segments/rule-configure.hbs:2
+#: views/lists/segments/rule-create.hbs:2 views/lists/segments/rule-edit.hbs:2
+#: views/lists/segments/segments.hbs:2 views/lists/segments/view.hbs:2
+#: views/lists/subscription/add.hbs:2 views/lists/subscription/edit.hbs:2
+#: views/lists/subscription/import-failed.hbs:2
+#: views/lists/subscription/import-preview.hbs:2
+#: views/lists/subscription/import.hbs:2 views/lists/view.hbs:2
+#: lib/tools.js:111
+msgid "Lists"
+msgstr "Listy"
+
+#: views/lists/create.hbs:3 views/lists/create.hbs:4 views/lists/create.hbs:9
+#: views/lists/lists.hbs:3
+msgid "Create List"
+msgstr "Utwórz listę"
+
+#: views/lists/create.hbs:6 views/lists/edit.hbs:7
+msgid "List Name"
+msgstr "Nazwa listy"
+
+#: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:7
+msgid "Edit List"
+msgstr "Edytuj listę"
+
+#: views/lists/edit.hbs:5
+msgid "View List"
+msgstr "Wyświetl listę"
+
+#: views/lists/edit.hbs:8
+msgid "List ID"
+msgstr "ID listy"
+
+#: views/lists/edit.hbs:9
+msgid "This is the list ID displayed to the subscribers"
+msgstr "To jest ID listy wyświetlany dla subskrybentów"
+
+#: views/lists/edit.hbs:12
+msgid "Delete List"
+msgstr "Usuń listę"
+
+#: views/lists/fields/create.hbs:3 views/lists/fields/edit.hbs:3
+#: views/lists/fields/fields.hbs:3 views/lists/fields/fields.hbs:5
+#: views/lists/view.hbs:5
+msgid "Custom Fields"
+msgstr "Pola niestandardowe"
+
+#: views/lists/fields/create.hbs:4
+msgid "Create Field"
+msgstr "Utwórz pole"
+
+#: views/lists/fields/create.hbs:5 views/lists/fields/fields.hbs:4
+msgid "Create Custom Field"
+msgstr "Utwórz pole niestandardowe"
+
+#: views/lists/fields/create.hbs:6 views/lists/fields/create.hbs:7
+#: views/lists/fields/edit.hbs:7 views/lists/fields/edit.hbs:8
+msgid "Field Name"
+msgstr "Nazwa pola"
+
+#: views/lists/fields/create.hbs:8 views/lists/fields/edit.hbs:9
+msgid "Field Type"
+msgstr "Typ pola"
+
+#: views/lists/fields/create.hbs:9 views/lists/fields/edit.hbs:10
+#: lib/models/fields.js:17
+msgid "Text"
+msgstr "Tekst"
+
+#: views/lists/fields/create.hbs:10 views/lists/fields/edit.hbs:11
+#: lib/models/fields.js:21
+msgid "Number"
+msgstr "Numer"
+
+#: views/lists/fields/create.hbs:11 views/lists/fields/edit.hbs:12
+#: lib/models/fields.js:18
+msgid "Website"
+msgstr "Strona www"
+
+#: views/lists/fields/create.hbs:12 views/lists/fields/edit.hbs:13
+#: lib/models/fields.js:20
+msgid "GPG Public Key"
+msgstr "Klucz publiczny GPG"
+
+#: views/lists/fields/create.hbs:13 views/lists/fields/edit.hbs:14
+#: lib/models/fields.js:19
+msgid "Multi-line text"
+msgstr "Tekst wielowierszowy"
+
+#: views/lists/fields/create.hbs:14 views/lists/fields/edit.hbs:15
+msgid "JSON"
+msgstr "JSON"
+
+#: views/lists/fields/create.hbs:15 views/lists/fields/edit.hbs:16
+msgid "Date"
+msgstr "Data"
+
+#: views/lists/fields/create.hbs:16 views/lists/fields/edit.hbs:17
+msgid "Date (MM/DD/YYYY)"
+msgstr "Data (MM/DD/YYYY)"
+
+#: views/lists/fields/create.hbs:17 views/lists/fields/edit.hbs:18
+#: lib/models/fields.js:26
+msgid "Date (DD/MM/YYYY)"
+msgstr "Data (DD/MM/YYYY)"
+
+#: views/lists/fields/create.hbs:18 views/lists/fields/edit.hbs:19
+msgid "Birthday"
+msgstr "Urodziny"
+
+#: views/lists/fields/create.hbs:19 views/lists/fields/edit.hbs:20
+#: lib/models/fields.js:27
+msgid "Birthday (MM/DD)"
+msgstr "Urodziny (MM/DD)"
+
+#: views/lists/fields/create.hbs:20 views/lists/fields/edit.hbs:21
+#: lib/models/fields.js:28
+msgid "Birthday (DD/MM)"
+msgstr "Urodziny (DD/MM)"
+
+#: views/lists/fields/create.hbs:21 views/lists/fields/edit.hbs:22
+msgid "Grouped"
+msgstr "Grouped."
+
+#: views/lists/fields/create.hbs:22 views/lists/fields/edit.hbs:23
+msgid "Drop Downs"
+msgstr "Listy rozwijane"
+
+#: views/lists/fields/create.hbs:23 views/lists/fields/edit.hbs:24
+#: lib/models/fields.js:22
+msgid "Radio Buttons"
+msgstr "Radio Buttons"
+
+#: views/lists/fields/create.hbs:24 views/lists/fields/edit.hbs:25
+#: lib/models/fields.js:23
+msgid "Checkboxes"
+msgstr "Checkboxes"
+
+#: views/lists/fields/create.hbs:25 views/lists/fields/edit.hbs:26
+msgid "Option for a group value"
+msgstr "Opcja dla wartości grupy"
+
+#: views/lists/fields/create.hbs:26 views/lists/fields/edit.hbs:27
+msgid "Group"
+msgstr "Grupa"
+
+#: views/lists/fields/create.hbs:28 views/lists/fields/edit.hbs:29
+msgid "Required for group options"
+msgstr "Wymagane w przypadku opcji grupowych"
+
+#: views/lists/fields/create.hbs:29 views/lists/fields/create.hbs:30
+#: views/lists/fields/edit.hbs:35 views/lists/fields/edit.hbs:36
+#: views/lists/fields/fields.hbs:9
+msgid "Default merge tag value"
+msgstr "Domyślna wartość merge tag"
+
+#: views/lists/fields/create.hbs:32 views/lists/fields/edit.hbs:34
+msgid ""
+"For group elements like checkboxes you can control the appearance of the "
+"merge tag with an optional template. The template uses handlebars syntax and "
+"you can find all values from <code>{{values}}</code> array, for example "
+"<code>{{#each values}} {{this}} {{/each}}</code>. If template is not defined "
+"then multiple values are joined with commas. You can also use this template "
+"to render JSON values (if the JSON is an array then the array is exposed as "
+"<code>values</code>, otherwise you can access the JSON keys directly)."
+msgstr ""
+"W przypadku elementów grupy, takich jak checkboxy, można kontrolować wygląd "
+"merge tagów za pomocą opcjonalnego szablonu. Szablon używa składni "
+"handlebars i możesz znaleźć wszystkie wartości z tablicy <code>{{values}}</"
+"code>, na przykład <code> {{#each values}} {{this}} {{/each}} </code>. Jeśli "
+"szablon nie jest zdefiniowany, wiele wartości jest łączonych przecinkami. "
+"Możesz również użyć tego szablonu do renderowania wartości JSON (jeśli JSON "
+"jest tablicą, wtedy tablica jest wyświetlana jako <code>values</code>, w "
+"przeciwnym razie możesz uzyskać bezpośredni dostęp do kluczy JSON)."
+
+#: views/lists/fields/create.hbs:33 views/lists/fields/edit.hbs:37
+msgid "Visible"
+msgstr "Widoczny"
+
+#: views/lists/fields/create.hbs:34
+msgid "Add Field"
+msgstr "Dodaj pole"
+
+#: views/lists/fields/edit.hbs:4
+msgid "Edit Field"
+msgstr "Edytuj pole"
+
+#: views/lists/fields/edit.hbs:5
+msgid "Edit Custom Field"
+msgstr "Edytuj pole niestandardowe"
+
+#: views/lists/fields/edit.hbs:6
+msgid "Back to fields"
+msgstr "Powrót do pól"
+
+#: views/lists/fields/edit.hbs:30 views/lists/fields/fields.hbs:8
+#: views/partials/merge-tag-reference.hbs:3
+msgid "Merge tag"
+msgstr "Merge tag"
+
+#: views/lists/fields/edit.hbs:31
+msgid "Merge Tag"
+msgstr "Merge Tag"
+
+#: views/lists/fields/edit.hbs:32
+msgid "Put this tag in your content:"
+msgstr "Umieść ten tag w swojej treści:"
+
+#: views/lists/fields/edit.hbs:38
+msgid "Delete Field"
+msgstr "Usuń pole"
+
+#: views/lists/fields/fields.hbs:7 views/lists/view.hbs:25
+msgid "Type"
+msgstr "Typ"
+
+#: views/lists/fields/fields.hbs:10 views/lists/fields/fields.hbs:11
+#: views/lists/lists.hbs:9 views/lists/segments/segments.hbs:8
+#: views/lists/segments/view.hbs:12 views/templates/templates.hbs:7
+#: views/triggers/triggers.hbs:14 routes/campaigns.js:287
+#: routes/campaigns.js:576 routes/campaigns.js:626 routes/lists.js:222
+#: routes/triggers.js:297
+msgid "Edit"
+msgstr "Edytuj"
+
+#: views/lists/lists.hbs:6
+msgid "ID"
+msgstr "ID"
+
+#: views/lists/lists.hbs:7
+msgid "Subscribers"
+msgstr "Subskrybenci"
+
+#: views/lists/segments/create.hbs:3 views/lists/segments/edit.hbs:3
+#: views/lists/segments/rule-configure.hbs:3
+#: views/lists/segments/rule-create.hbs:3 views/lists/segments/rule-edit.hbs:3
+#: views/lists/segments/segments.hbs:3 views/lists/segments/segments.hbs:5
+#: views/lists/segments/view.hbs:3 views/lists/view.hbs:6
+#: views/lists/view.hbs:13
+msgid "Segments"
+msgstr "Segmenty"
+
+#: views/lists/segments/create.hbs:4 views/lists/segments/create.hbs:5
+#: views/lists/segments/rule-configure.hbs:4
+#: views/lists/segments/rule-create.hbs:4 views/lists/segments/rule-edit.hbs:4
+#: views/lists/segments/segments.hbs:4
+msgid "Create Segment"
+msgstr "Utwórz segment"
+
+#: views/lists/segments/create.hbs:6 views/lists/segments/create.hbs:7
+#: views/lists/segments/edit.hbs:7 views/lists/segments/edit.hbs:8
+msgid "Segment Name"
+msgstr "Nazwa segmentu"
+
+#: views/lists/segments/create.hbs:8 views/lists/segments/edit.hbs:9
+msgid "Rule match"
+msgstr "Dopasowanie reguł"
+
+#: views/lists/segments/create.hbs:10 views/lists/segments/edit.hbs:11
+msgid "All rules must match"
+msgstr "Wszystkie reguły muszą się zgadzać"
+
+#: views/lists/segments/create.hbs:11 views/lists/segments/edit.hbs:12
+msgid "Any rule can match"
+msgstr "Każda reguła może się zgadzać"
+
+#: views/lists/segments/create.hbs:12
+msgid "Add Segment"
+msgstr "Dodaj segment"
+
+#: views/lists/segments/edit.hbs:4 views/lists/segments/edit.hbs:5
+#: views/lists/segments/view.hbs:6 views/lists/view.hbs:11
+msgid "Edit Segment"
+msgstr "Edytuj segment"
+
+#: views/lists/segments/edit.hbs:6
+msgid "Back to segments"
+msgstr "Powrót do segmentów"
+
+#: views/lists/segments/edit.hbs:13
+msgid "Delete Segment"
+msgstr "Usuń segment"
+
+#: views/lists/segments/rule-configure.hbs:5
+#: views/lists/segments/rule-create.hbs:5 views/lists/segments/rule-edit.hbs:5
+#: views/lists/segments/view.hbs:4
+msgid "Create Rule"
+msgstr "Utwórz regułę"
+
+#: views/lists/segments/rule-configure.hbs:6
+#: views/lists/segments/rule-create.hbs:6 views/lists/segments/rule-edit.hbs:6
+#: views/lists/segments/view.hbs:10
+msgid "Rule"
+msgstr "Reguła"
+
+#: views/lists/segments/rule-configure.hbs:7
+#: views/lists/segments/rule-configure.hbs:8
+#: views/lists/segments/rule-configure.hbs:10
+#: views/lists/segments/rule-configure.hbs:13
+#: views/lists/segments/rule-configure.hbs:25
+#: views/lists/segments/rule-configure.hbs:30
+#: views/lists/segments/rule-edit.hbs:7 views/lists/segments/rule-edit.hbs:8
+#: views/lists/segments/rule-edit.hbs:10 views/lists/segments/rule-edit.hbs:15
+#: views/lists/segments/rule-edit.hbs:29 views/lists/segments/rule-edit.hbs:34
+#: views/lists/segments/view.hbs:11
+msgid "Value"
+msgstr "Wartość"
+
+#: views/lists/segments/rule-configure.hbs:9
+#: views/lists/segments/rule-edit.hbs:9
+msgid ""
+"Use % for wildcard character, e.g. \"%test\" to match all values that end "
+"with \"test\""
+msgstr ""
+"Użyj % dla znaku wieloznacznego, np. \"%test\", aby dopasować wszystkie "
+"wartości, które kończą się na \"test\""
+
+#: views/lists/segments/rule-configure.hbs:11
+#: views/lists/segments/rule-configure.hbs:14
+#: views/lists/segments/rule-configure.hbs:26
+#: views/lists/segments/rule-edit.hbs:11 views/lists/segments/rule-edit.hbs:16
+#: views/lists/segments/rule-edit.hbs:30
+msgid "Use exact match"
+msgstr "Użyj ścisłego dopasowania"
+
+#: views/lists/segments/rule-configure.hbs:12
+#: views/lists/segments/rule-configure.hbs:15
+#: views/lists/segments/rule-configure.hbs:27
+#: views/lists/segments/rule-edit.hbs:12 views/lists/segments/rule-edit.hbs:17
+#: views/lists/segments/rule-edit.hbs:31
+msgid "Use range match"
+msgstr "Użyj dopasowania zakresu"
+
+#: views/lists/segments/rule-configure.hbs:16
+#: views/lists/segments/rule-edit.hbs:20
+msgid "Use relative range match"
+msgstr "Użyj względnego dopasowania zakresu"
+
+#: views/lists/segments/rule-configure.hbs:17
+#: views/lists/segments/rule-configure.hbs:28
+#: views/lists/segments/rule-edit.hbs:13 views/lists/segments/rule-edit.hbs:18
+#: views/lists/segments/rule-edit.hbs:21 views/lists/segments/rule-edit.hbs:32
+msgid "From"
+msgstr "Od"
+
+#: views/lists/segments/rule-configure.hbs:18
+#: views/lists/segments/rule-configure.hbs:22
+#: views/lists/segments/rule-edit.hbs:22 views/lists/segments/rule-edit.hbs:26
+msgid "days"
+msgstr "dni"
+
+#: views/lists/segments/rule-configure.hbs:19
+#: views/lists/segments/rule-configure.hbs:23
+#: views/lists/segments/rule-edit.hbs:23 views/lists/segments/rule-edit.hbs:27
+msgid "before today"
+msgstr "przed dzisiaj"
+
+#: views/lists/segments/rule-configure.hbs:20
+#: views/lists/segments/rule-configure.hbs:24
+#: views/lists/segments/rule-edit.hbs:24 views/lists/segments/rule-edit.hbs:28
+msgid "after today"
+msgstr "po dzisiaj"
+
+#: views/lists/segments/rule-configure.hbs:21
+#: views/lists/segments/rule-configure.hbs:29
+#: views/lists/segments/rule-edit.hbs:14 views/lists/segments/rule-edit.hbs:19
+#: views/lists/segments/rule-edit.hbs:25 views/lists/segments/rule-edit.hbs:33
+msgid "to"
+msgstr "do"
+
+#: views/lists/segments/rule-configure.hbs:31
+#: views/lists/segments/rule-edit.hbs:35 lib/models/segments.js:156
+#: lib/models/segments.js:418
+msgid "Selected"
+msgstr "Wybrano"
+
+#: views/lists/segments/rule-configure.hbs:32
+#: views/lists/segments/rule-edit.hbs:36 lib/models/segments.js:156
+#: lib/models/segments.js:418
+msgid "Not selected"
+msgstr "Nie wybrano"
+
+#: views/lists/segments/rule-configure.hbs:33
+msgid "Add Rule"
+msgstr "Dodaj regułę"
+
+#: views/lists/segments/rule-create.hbs:8
+#: views/lists/subscription/import.hbs:12 views/triggers/create-select.hbs:9
+msgid "Next"
+msgstr "Dalej"
+
+#: views/lists/segments/rule-edit.hbs:37
+msgid "Delete Rule"
+msgstr "Usuń regułę"
+
+#: views/lists/segments/segments.hbs:7
+msgid "Match"
+msgstr "Dopasowanie"
+
+#: views/lists/segments/view.hbs:5 views/lists/view.hbs:12
+msgid "Segment"
+msgstr "Segment"
+
+#: views/lists/segments/view.hbs:7
+msgid "Match rules"
+msgstr "Reguły dopasowania"
+
+#: views/lists/segments/view.hbs:8
+msgid "Matching subscribers"
+msgstr "Dopasowani subskrybenci"
+
+#: views/lists/segments/view.hbs:9
+msgid "show"
+msgstr "pokaż"
+
+#: views/lists/subscription/add.hbs:3 views/lists/subscription/add.hbs:4
+msgid "Add subscriber"
+msgstr "Dodaj subskrybenta"
+
+#: views/lists/subscription/add.hbs:5 views/subscription/manage.hbs:2
+#: views/subscription/subscribe.hbs:3 views/users/account.hbs:7
+msgid "Email Address"
+msgstr "Adres e-mail"
+
+#: views/lists/subscription/add.hbs:8 views/lists/subscription/edit.hbs:9
+#: views/settings.hbs:82 views/settings.hbs:97 views/subscription/manage.hbs:7
+#: views/subscription/subscribe.hbs:7
+msgid "Begins with"
+msgstr "Zaczyna się"
+
+#: views/lists/subscription/add.hbs:9 views/lists/subscription/edit.hbs:10
+msgid ""
+"Insert a GPG public key that will be used to encrypt messages sent this "
+"subscriber"
+msgstr ""
+"Wstaw klucz publiczny GPG, który będzie używany do szyfrowania wiadomości "
+"wysłanych przez tego subskrybenta"
+
+#: views/lists/subscription/add.hbs:11 views/lists/subscription/edit.hbs:12
+#: views/lists/subscription/import-preview.hbs:9
+msgid "Timezone"
+msgstr "Strefa czasowa"
+
+#: views/lists/subscription/add.hbs:13 views/lists/subscription/edit.hbs:13
+msgid "Test user?"
+msgstr "Użytkownik testowy?"
+
+#: views/lists/subscription/add.hbs:14 views/lists/subscription/edit.hbs:14
+msgid ""
+"If checked then this subscription can be used for previewing campaign "
+"messages"
+msgstr ""
+"Jeśli ta opcja jest zaznaczona, można użyć tej subskrypcji do przeglądania "
+"wiadomości kampanii"
+
+#: views/lists/subscription/add.hbs:15
+msgid ""
+"This person will not receive a confirmation email so make sure that you have "
+"permission to email them."
+msgstr ""
+"Ta osoba nie otrzyma e-maila z potwierdzeniem, więc upewnij się, że masz "
+"uprawnienia do e-maila."
+
+#: views/lists/subscription/edit.hbs:3 views/lists/subscription/edit.hbs:4
+msgid "Edit subscriber"
+msgstr "Edytuj subskrybenta"
+
+#: views/lists/subscription/edit.hbs:5
+#: views/lists/subscription/import-failed.hbs:5
+msgid "Back to list"
+msgstr "Powrót do listy"
+
+#: views/lists/subscription/edit.hbs:6
+#: views/lists/subscription/import-preview.hbs:6
+#: views/subscription/unsubscribe.hbs:3 lib/helpers.js:26
+#: lib/models/segments.js:11
+msgid "Email address"
+msgstr "Adres e-mail"
+
+#: views/lists/subscription/edit.hbs:16
+msgid "Delete Subscription"
+msgstr "Usuń subskrypcję"
+
+#: views/lists/subscription/import-failed.hbs:3
+msgid "Import status"
+msgstr "Status importu"
+
+#: views/lists/subscription/import-failed.hbs:4
+msgid "Failed addresses"
+msgstr "Nieudane adresy"
+
+#: views/lists/subscription/import-failed.hbs:6
+msgid "see here"
+msgstr "zobacz tutaj"
+
+#: views/lists/subscription/import-failed.hbs:10
+msgid "Fail reason"
+msgstr "Przyczyna niepowodzenia"
+
+#: views/lists/subscription/import-preview.hbs:3
+#: views/lists/subscription/import-preview.hbs:4
+#: views/lists/subscription/import.hbs:3 views/lists/subscription/import.hbs:4
+msgid "Import subscribers"
+msgstr "Zaimportuj subskrybentów"
+
+#: views/lists/subscription/import-preview.hbs:10 views/users/api.hbs:27
+#: views/users/api.hbs:35 views/users/api.hbs:43 views/users/api.hbs:55
+msgid "Example"
+msgstr "Przykład"
+
+#: views/lists/subscription/import-preview.hbs:11
+msgid "Start import"
+msgstr "Rozpocznij importowanie"
+
+#: views/lists/subscription/import.hbs:5
+msgid "CSV File"
+msgstr "Plik CSV"
+
+#: views/lists/subscription/import.hbs:6
+msgid "CSV delimiter"
+msgstr "Separator CSV"
+
+#: views/lists/subscription/import.hbs:7
+msgid "Categorize the imported subscribers as"
+msgstr "Skategoryzuj importowanych subskrybentów jako"
+
+#: views/lists/subscription/import.hbs:8 routes/lists.js:171
+msgid "Subscribed"
+msgstr "Subskrybuje"
+
+#: views/lists/subscription/import.hbs:9
+msgid "Regular subscriber addresses"
+msgstr "Regularne adresy subskrybentów"
+
+#: views/lists/subscription/import.hbs:11
+msgid "Suppressed emails that will be unsubscribed from your list"
+msgstr "Pomijane e-maile, które zostaną wypisane z listy"
+
+#: views/lists/view.hbs:3
+msgid "Subscription Form"
+msgstr "Formularz subskrypcji"
+
+#: views/lists/view.hbs:4
+msgid "List Actions"
+msgstr "Lista akcji"
+
+#: views/lists/view.hbs:8 views/triggers/create-select.hbs:3
+#: views/triggers/create-select.hbs:4 views/triggers/create.hbs:3
+#: views/triggers/create.hbs:4 views/triggers/create.hbs:27
+#: views/triggers/triggers.hbs:3
+msgid "Create Trigger"
+msgstr "Utwórz wyzwalacz"
+
+#: views/lists/view.hbs:9
+msgid "Add Subscriber"
+msgstr "Dodaj subskrybenta"
+
+#: views/lists/view.hbs:10
+msgid "Import Subscribers"
+msgstr "Importuj subskrybentów"
+
+#: views/lists/view.hbs:14
+msgid "Create New Segment"
+msgstr "Utwórz nowy segment"
+
+#: views/lists/view.hbs:15
+msgid "Filter"
+msgstr "Filtr"
+
+#: views/lists/view.hbs:16
+msgid "Subscriptions"
+msgstr "Subskrypcje"
+
+#: views/lists/view.hbs:17
+msgid "Imports"
+msgstr "Import"
+
+#: views/lists/view.hbs:24 routes/campaigns.js:266 routes/lists.js:265
+msgid "Finished"
+msgstr "Skończone"
+
+#: views/lists/view.hbs:26
+msgid "Added"
+msgstr "Dodany"
+
+#: views/lists/view.hbs:27
+msgid "Updated"
+msgstr "Zaktualizowano"
+
+#: views/lists/view.hbs:28
+msgid "Failed"
+msgstr "Nie powiodło się"
+
+#: views/lists/view.hbs:30
+msgid ""
+"Are you sure? This action should only be called to resolve stalled imports"
+msgstr ""
+"Jesteś pewny? Ta czynność powinna byś wywołana tylko w celu rozwiązania "
+"impasu importu."
+
+#: views/lists/view.hbs:31
+msgid "Restart"
+msgstr "Uruchom ponownie"
+
+#: views/partials/codeeditor.hbs:1 views/partials/summernote.hbs:1
+msgid "Template content (HTML)"
+msgstr "Zawartość szablonu (HTML)"
+
+#: views/partials/html-preview.hbs:1
+msgid "Toggle HTML preview"
+msgstr "Przełącz podgląd HTML"
+
+#: views/partials/merge-tag-reference.hbs:1
+msgid "Merge tag reference"
+msgstr "Odniesienie merge tag"
+
+#: views/partials/merge-tag-reference.hbs:2
+msgid ""
+"Merge tags are tags that are replaced before sending out the message. The "
+"format of the merge tag is the following: <code>[TAG_NAME]</code> or "
+"<code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional "
+"text value used when <code>TAG_NAME</code> is empty."
+msgstr ""
+"Merge tagi są tagami, które są zastępowane przed wysłaniem wiadomości. "
+"Format merge tagu jest następujący: <code>[TAG_NAME]</code> lub "
+"<code>[TAG_NAME/fallback]</code> gdzie <code>fallback</code> jest opcjonalną "
+"wartością tekstową używaną, gdy <code>TAG_NAME</code> jest pusty."
+
+#: views/partials/plaintext.hbs:1
+msgid "Template content (plaintext)"
+msgstr "Treść szablonu (zwykły tekst)"
+
+#: views/settings.hbs:5
+msgid "Service Address (URL)"
+msgstr "Adres usługi (URL)"
+
+#: views/settings.hbs:6
+msgid "Enter the URL this service can be reached from"
+msgstr "Wprowadź adres URL, z którego można uzyskać tę usługę"
+
+#: views/settings.hbs:7
+msgid "Admin Email"
+msgstr "E-mail Administratora"
+
+#: views/settings.hbs:8
+msgid ""
+"Enter the email address that will be used as \"from\" for system messages"
+msgstr ""
+"Wprowadź adres e-mail, który będzie używany jako \"from \" dla wiadomości "
+"systemowych"
+
+#: views/settings.hbs:9
+msgid "Disable WYSIWYG editor"
+msgstr "Wyłącz edytor WYSIWYG"
+
+#: views/settings.hbs:10
+msgid "If checked then message editor displays HTML code without the preview"
+msgstr "Jeśli zaznaczone, edytor wiadomości wyświetla kod HTML bez podglądu"
+
+#: views/settings.hbs:11
+msgid "Disable subscription confirmation messages"
+msgstr "Wyłącz wiadomości potwierdzające subskrypcję"
+
+#: views/settings.hbs:12
+msgid ""
+"If checked then do not send a confirmation message that states the "
+"subscriber is now subscribed or unsubscribed. This does not disable double "
+"opt-in messages."
+msgstr ""
+"Jeśli jest zaznaczone, nie wysyłaj wiadomości potwierdzającej, że "
+"subskrybent jest teraz subskrybowany lub nie subskrybowany. Nie wyłącza to "
+"podwójnych wiadomości opt-in."
+
+#: views/settings.hbs:13
+msgid "Tracking ID"
+msgstr "Identyfikator śledzenia"
+
+#: views/settings.hbs:14
+msgid "Enter Google Analytics tracking code"
+msgstr "Wpisz kod śledzenia Google Analytics"
+
+#: views/settings.hbs:15
+msgid "Frontpage shout out"
+msgstr ""
+
+#: views/settings.hbs:16
+msgid "HTML code shown in the front page header section"
+msgstr "Kod HTML wyświetlany w sekcji nagłówka na pierwszej stronie"
+
+#: views/settings.hbs:17
+msgid "Campaign defaults"
+msgstr "Domyślne ustawienia kampanii"
+
+#: views/settings.hbs:18
+msgid "Sender name"
+msgstr "Nazwa nadawcy"
+
+#: views/settings.hbs:19
+msgid "Sender name, eg. My Awesome Company Ltd."
+msgstr "Nazwa nadawcy, np. My Awesome Company Ltd."
+
+#: views/settings.hbs:20
+msgid "Default address"
+msgstr "Domyślny adres"
+
+#: views/settings.hbs:21
+msgid ""
+"Contact address to provide, eg. 1234 Main Street, Anywhere, MA 01234, USA"
+msgstr ""
+"Adres kontaktowy do dostarczenia, np. 1234 Main Street, Anywhere, MA 01234, "
+"USA"
+
+#: views/settings.hbs:22
+msgid "Default \"from name\""
+msgstr "Domyślna nazwa \"from\""
+
+#: views/settings.hbs:24
+msgid "Default \"from\" email"
+msgstr "Domyślny e-mail \"from\""
+
+#: views/settings.hbs:26
+msgid "Default \"subject line\""
+msgstr "Domyślny temat \"from\""
+
+#: views/settings.hbs:28
+msgid "Default homepage (URL)"
+msgstr "Domyślna strona główna (URL)"
+
+#: views/settings.hbs:29
+msgid "URL to redirect the subscribed users to, eg. http://example.com/"
+msgstr "Adres URL do przekierowania subskrybentów do, np. http://example.com/"
+
+#: views/settings.hbs:30
+msgid "Mailer Settings"
+msgstr "Ustawienia Mailera"
+
+#: views/settings.hbs:31
+msgid "These settings are required to send out e-mail messages"
+msgstr "Te ustawienia są wymagane do wysyłania wiadomości e-mail"
+
+#: views/settings.hbs:32
+msgid "SMTP"
+msgstr "SMTP"
+
+#: views/settings.hbs:33
+msgid "AWS SES"
+msgstr "AWS SES"
+
+#: views/settings.hbs:34
+msgid "Use SMTP for sending mail"
+msgstr "Użyj SMTP do wysyłania poczty"
+
+#: views/settings.hbs:35
+msgid "Hostname"
+msgstr "Nazwa hosta"
+
+#: views/settings.hbs:36
+msgid "Port"
+msgstr "Port"
+
+#: views/settings.hbs:37
+msgid "Port, eg. 465. Autodetected if left blank"
+msgstr "Port, np. 465. Autodetekcja, jeśli pozostanie pusta"
+
+#: views/settings.hbs:38
+msgid "Encryption"
+msgstr "Szyfrowanie"
+
+#: views/settings.hbs:39
+msgid "Disable SMTP authentication"
+msgstr "Wyłącz uwierzytelnianie SMTP"
+
+#: views/settings.hbs:40 views/users/forgot.hbs:9 views/users/login.hbs:4
+#: views/users/login.hbs:5
+msgid "Username"
+msgstr "Nazwa użytkownika"
+
+#: views/settings.hbs:41
+msgid "Username, eg. myaccount@example.com"
+msgstr "Nazwa użytkownika, np. myaccount@example.com"
+
+#: views/settings.hbs:42 views/settings.hbs:43 views/users/login.hbs:6
+#: views/users/login.hbs:7
+msgid "Password"
+msgstr "Hasło"
+
+#: views/settings.hbs:44
+msgid "Use SES API for sending mail"
+msgstr "Użyj interfejsu API SES do wysyłania poczty"
+
+#: views/settings.hbs:45
+msgid "Access Key"
+msgstr "Access Key"
+
+#: views/settings.hbs:46
+msgid "AWS Access Key Id"
+msgstr "AWS Access Key Id"
+
+#: views/settings.hbs:47
+msgid "Secret Key"
+msgstr "Secret Key"
+
+#: views/settings.hbs:48
+msgid "AWS Secret Access Key"
+msgstr "AWS Secret Access Key"
+
+#: views/settings.hbs:49
+msgid "Region"
+msgstr "Region"
+
+#: views/settings.hbs:50
+msgid "Checking"
+msgstr "Sprawdzanie"
+
+#: views/settings.hbs:51
+msgid "Check Mailer config"
+msgstr "Sprawdź konfigurację Mailera"
+
+#: views/settings.hbs:52
+msgid "Don't have an SMTP account yet? Create a free SendPulse account"
+msgstr "Nie masz jeszcze konta SMTP? Utwórz darmowe konto SendPulse"
+
+#: views/settings.hbs:53
+msgid "here"
+msgstr "tutaj"
+
+#: views/settings.hbs:54
+msgid "Advanced Mailer settings"
+msgstr "Zaawansowane ustawienia Mailera"
+
+#: views/settings.hbs:55
+msgid "Log SMTP transactions"
+msgstr "Loguj transakcje SMTP"
+
+#: views/settings.hbs:56
+msgid "Allow self-signed certificates"
+msgstr "Zezwalaj na certyfikaty z podpisem własnym"
+
+#: views/settings.hbs:57
+msgid "Max connections"
+msgstr "Maks. połączeń"
+
+#: views/settings.hbs:58
+msgid "The count of max connections, eg. 10"
+msgstr "Liczba maksymalnych połączeń, np. 10"
+
+#: views/settings.hbs:59
+msgid ""
+"The count of maximum simultaneous connections to make against the SMTP "
+"server (defaults to 5). This limit is per sending process."
+msgstr ""
+"Liczba maksymalnych równoczesnych połączeń z serwerem SMTP (domyślnie 5). "
+"Ten limit dotyczy procesu wysyłania."
+
+#: views/settings.hbs:60
+msgid "Max messages"
+msgstr "Maks. wiadomości"
+
+#: views/settings.hbs:61
+msgid "The count of max messages, eg. 100"
+msgstr "Liczba maksymalnych wiadomości, np. 100"
+
+#: views/settings.hbs:62
+msgid ""
+"he number of messages to send through a single connection before the "
+"connection is closed and reopened (defaults to 100)"
+msgstr ""
+"Liczba wiadomości do wysłania za pośrednictwem jednego połączenia, zanim "
+"połączenie zostanie zamknięty i ponownie otwarty (domyślnie 100)"
+
+#: views/settings.hbs:63
+msgid "Throttling"
+msgstr "Dławienie (Throttling)"
+
+#: views/settings.hbs:64
+msgid "Messages per hour eg. 1000"
+msgstr "Wiadomości na godzinę, np. 1000"
+
+#: views/settings.hbs:65
+msgid ""
+"Maximum number of messages to send in an hour. Leave empty or zero for no "
+"throttling. If your provider uses a different speed limit (messages/minute "
+"or messages/second) then convert this limit into messages/hour (1m/s => "
+"3600m/h). This limit is per sending process."
+msgstr ""
+"Maksymalna liczba wiadomości do wysłania w ciągu godziny. Pozostaw puste lub "
+"zero dla barku dławienia. Jeśli Twój dostawca wykorzystuje inny limit "
+"prędkości (wiadomości/minutę lub wiadomości/sekundę), zamień ten limit na "
+"wiadomości/godzinę (1m/s => 3600m/h). Ten limit dotyczy procesu wysyłania."
+
+#: views/settings.hbs:66
+msgid "VERP bounce handling"
+msgstr "Obsługa odbijania VERP"
+
+#: views/settings.hbs:67
+msgid ""
+"Mailtrain is able to use VERP based routing to detect bounces. In this case "
+"the message is sent to the recipient using a custom VERP address as the "
+"return path of the message. If the message is not accepted a bounce email is "
+"sent to this special VERP address and thus a bounce is detected."
+msgstr ""
+"Mailtrain może wykorzystywać routing oparty na VERP do wykrywania odbić. W "
+"takim przypadku wiadomość zostanie wysłana do adresata przy użyciu "
+"niestandardowego adresu VERP jako ścieżki powrotnej wiadomości. Jeśli "
+"wiadomość nie zostanie przyjęta, wiadomość odrzucona wiadomość zostanie "
+"wysłana na specjalny adres VERP, a tym samym wykryte zostanie odrzucenie."
+
+#: views/settings.hbs:68
+msgid ""
+"To get VERP working you need to set up a DNS MX record that points to your "
+"Mailtrain hostname. You must also ensure that Mailtrain VERP interface is "
+"available from port 25 of your server (port 25 usually requires root user "
+"privileges). This way if anyone tries to send email to someuser@verp-"
+"hostname then the email should end up to this server."
+msgstr ""
+"Aby uruchomić działanie VERP, musisz skonfigurować rekord MX DNS, który "
+"wskazuje twoją nazwę hosta Mailtrain. Musisz także upewnić się, że interfejs "
+"Mailtrain VERP jest dostępny z portu 25 serwera (port 25 zwykle wymaga "
+"uprawnień użytkownika root). W ten sposób, jeśli ktoś spróbuje wysłać "
+"wiadomość e-mail do someuser@verp-hostname, wówczas wiadomość e-mail powinna "
+"dotrzeć do tego serwera."
+
+#: views/settings.hbs:69
+msgid ""
+"VERP usually only works if you are using your own SMTP server. Regular relay "
+"services (SES, SparkPost, Gmail etc.) tend to remove the VERP address from "
+"the message."
+msgstr ""
+"VERP zwykle działa tylko wtedy, gdy używasz własnego serwera SMTP. Regularne "
+"usługi przekazywania (SES, SparkPost, Gmail itp.) Mają tendencję do usuwania "
+"adresu VERP z wiadomości."
+
+#: views/settings.hbs:70
+msgid "Use VERP to catch bounces"
+msgstr "Użyj VERP do wykrycia odbicia"
+
+#: views/settings.hbs:71
+msgid "Server hostname"
+msgstr "Nazwa hosta serwera"
+
+#: views/settings.hbs:72
+msgid "The VERP server hostname, eg. bounces.example.com"
+msgstr "Nazwa hosta serwera VERP, np. bounces.example.com"
+
+#: views/settings.hbs:73
+msgid ""
+"VERP bounce handling server hostname. This hostname is used in the SMTP "
+"envelope FROM address and the MX DNS records should point to this server"
+msgstr ""
+"Nazwa hosta serwera obsługi odrzutów VERP. Ta nazwa hosta jest używana w "
+"SMTP jako \"od\", a rekordy MX DNS powinny wskazywać na ten serwer"
+
+#: views/settings.hbs:74
+msgid ""
+"VERP bounce handling server is not enabled. Modify your server configuration "
+"file and restart server to enable it"
+msgstr ""
+"Serwer obsługi odrzutów VERP nie jest włączony. Zmodyfikuj plik "
+"konfiguracyjny serwera i zrestartuj serwer, aby go włączyć."
+
+#: views/settings.hbs:75
+msgid "GPG Signing"
+msgstr "Podpis GPG"
+
+#: views/settings.hbs:76
+msgid ""
+"Only messages that are encrypted can be signed. Subsribers who have not set "
+"up a GPG public key in their profile receive normal email messages. Users "
+"with GPG key set receive encrypted messages and if you have signing key also "
+"set, the messages are signed with this key."
+msgstr ""
+"Tylko wiadomości, które są zaszyfrowane, mogą być podpisane. Subskrybenci, "
+"którzy nie ustawili klucza publicznego GPG w swoim profilu, otrzymują zwykłe "
+"wiadomości e-mail. Użytkownicy z zestawem kluczy GPG otrzymują zaszyfrowane "
+"wiadomości i jeśli masz ustawiony również klucz podpisu, wiadomości są "
+"podpisywane tym kluczem."
+
+#: views/settings.hbs:77
+msgid ""
+"Do not use sensitive keys here. The private key and passphrase are not "
+"encrypted in the database."
+msgstr ""
+"Nie używaj tutaj wrażliwych kluczy. Klucz prywatny i hasło nie są szyfrowane "
+"w bazie danych."
+
+#: views/settings.hbs:78
+msgid "Private Key Passphrase"
+msgstr "Hasło klucza prywatnego"
+
+#: views/settings.hbs:79
+msgid "Passphrase for the key if set"
+msgstr "Hasło dla klucza, jeśli jest ustawione"
+
+#: views/settings.hbs:80
+msgid "Only fill this if your private key is encrypted with a passphrase"
+msgstr "Wypełnij to tylko, jeśli Twój klucz prywatny jest zaszyfrowany hasłem"
+
+#: views/settings.hbs:81
+msgid "GPG Private Key"
+msgstr "Klucz prywatny GPG"
+
+#: views/settings.hbs:83
+msgid ""
+"This value is optional. If you do not provide a private key GPG encrypted "
+"messages are sent without signing."
+msgstr ""
+"Ta wartość jest opcjonalna. Jeśli nie podasz klucza prywatnego GPG, "
+"zaszyfrowane wiadomości są wysyłane bez podpisu."
+
+#: views/settings.hbs:84
+msgid "DKIM Signing by ZoneMTA"
+msgstr "Podpisywanie DKIM przez ZoneMTA"
+
+#: views/settings.hbs:85
+msgid ""
+"If you are using ZoneMTA then Mailtrain can provide a DKIM key for signing "
+"all outgoing messages. Other services usually provide their own means to "
+"DKIM sign your messages"
+msgstr ""
+"Jeśli używasz ZoneMTA, Mailtrain może dostarczyć klucz DKIM do podpisania "
+"wszystkich wychodzących wiadomości. Inne usługi zwykle zapewniają własne "
+"środki do podpisywania wiadomości przez DKIM"
+
+#: views/settings.hbs:86
+msgid ""
+"Do not use sensitive keys here. The private key is not encrypted in the "
+"database."
+msgstr ""
+"Nie używaj tutaj wrażliwych kluczy. Klucz prywatny nie jest zaszyfrowany w "
+"bazie danych."
+
+#: views/settings.hbs:87
+msgid "ZoneMTA DKIM API Key"
+msgstr "Klucz API ZoneMTA DKIM"
+
+#: views/settings.hbs:88
+msgid "Some secret value"
+msgstr "Tajna wartość"
+
+#: views/settings.hbs:89
+msgid ""
+"Secret value known to ZoneMTA for requesting DKIM key information. If this "
+"value was generated by the Mailtrain installation script then you can keep "
+"it as it is"
+msgstr ""
+"Tajna wartość znana ZoneMTA dla żądań klucza DKIM. Jeśli ta wartość została "
+"wygenerowana przez skrypt instalacyjny Mailtrain, możesz zachować ją w "
+"niezmienionym stanie"
+
+#: views/settings.hbs:90
+msgid "DKIM domain"
+msgstr "Domena DKIM"
+
+#: views/settings.hbs:91
+msgid "Domain name for the DKIM key"
+msgstr "Nazwa domeny dla klucza DKIM"
+
+#: views/settings.hbs:92
+msgid "Leave blank to use the sender email address domain"
+msgstr "Pozostaw puste, aby użyć domeny adresu e-mail nadawcy"
+
+#: views/settings.hbs:93 views/settings.hbs:94
+msgid "DKIM key selector"
+msgstr "Selektor klucza DKIM"
+
+#: views/settings.hbs:95
+msgid "Signing is disabled without a valid selector value"
+msgstr "Podpisywanie jest wyłączone bez prawidłowej wartości selektora"
+
+#: views/settings.hbs:96
+msgid "DKIM Private Key"
+msgstr "Klucz prywatny DKIM"
+
+#: views/settings.hbs:98
+msgid ""
+"This value is optional. If you do not provide a private key then messages "
+"are not signed."
+msgstr ""
+"Ta wartość jest opcjonalna. Jeśli nie dostarczysz klucza prywatnego, "
+"wiadomości nie będą podpisane."
+
+#: views/subscription/confirm-notice.hbs:1 views/subscription/subscribe.hbs:1
+msgid "Warning!"
+msgstr "Ostrzeżenie!"
+
+#: views/subscription/confirm-notice.hbs:2
+msgid "If JavaScript was not enabled then no confirmation message was sent"
+msgstr "Jeśli JavaScript nie był włączony, nie wysłano żadnego potwierdzenia"
+
+#: views/subscription/confirm-notice.hbs:3
+msgid "Almost finished."
+msgstr "Prawie gotowe."
+
+#: views/subscription/confirm-notice.hbs:4
+msgid ""
+"We need to confirm your email address. To complete the subscription process, "
+"please click the link in the email we just sent you."
+msgstr ""
+"Musimy potwierdzić swój adres e-mail. Aby zakończyć proces subskrypcji, "
+"kliknij link w wiadomości e-mail, którą właśnie wysłaliśmy."
+
+#: views/subscription/confirm-notice.hbs:5
+#: views/subscription/unsubscribe-notice.hbs:3
+#: views/subscription/updated-notice.hbs:3
+msgid "return to our website"
+msgstr "powrót do strony"
+
+#: views/subscription/manage-address.hbs:1
+msgid "Update your Email Address"
+msgstr "Zaktualizuj swój adres e-mail"
+
+#: views/subscription/manage-address.hbs:2
+msgid "Existing Email Address"
+msgstr "Istniejący adres e-mail"
+
+#: views/subscription/manage-address.hbs:3
+msgid "New Email Address"
+msgstr "Nowy adres e-mail"
+
+#: views/subscription/manage-address.hbs:4
+msgid "Your new email address"
+msgstr "Twój nowy adres e-mail"
+
+#: views/subscription/manage-address.hbs:5
+msgid ""
+"You will receive a confirmation request to your new email address that you "
+"need to accept before your email is actually changed"
+msgstr ""
+"Otrzymasz prośbę o potwierdzenie na nowy adres e-mail, który musisz "
+"zaakceptować przed faktyczną zmianą adresu e-mail"
+
+#: views/subscription/manage-address.hbs:6
+msgid "Update Email Address"
+msgstr "Zaktualizuj adres e-mail"
+
+#: views/subscription/manage.hbs:1
+msgid "Update your preferences"
+msgstr "Zaktualizuj swoje preferencje"
+
+#: views/subscription/manage.hbs:3
+msgid "want to change it?"
+msgstr "chcesz to zmienić?"
+
+#: views/subscription/manage.hbs:6 views/subscription/subscribe.hbs:6
+msgid "Download signature verification key"
+msgstr "Pobierz klucz weryfikacji podpisu"
+
+#: views/subscription/manage.hbs:8 views/subscription/subscribe.hbs:8
+msgid ""
+"Insert your GPG public key here to encrypt messages sent to your address"
+msgstr ""
+"Wstaw tutaj swój publiczny klucz GPG, aby zaszyfrować wiadomości wysłane na "
+"Twój adres"
+
+#: views/subscription/manage.hbs:9 views/subscription/subscribe.hbs:9
+msgid "optional"
+msgstr "opcjonalny"
+
+#: views/subscription/manage.hbs:11
+msgid "Update Profile"
+msgstr "Zaktualizuj profil"
+
+#: views/subscription/subscribe.hbs:2
+msgid "JavaScript must be enabled in order for the subscription form to work"
+msgstr ""
+"Aby formularz subskrypcji działał, musi być włączona obsługa JavaScript"
+
+#: views/subscription/subscribe.hbs:11
+msgid "Subscribe to list"
+msgstr "Zapisz się do listy"
+
+#: views/subscription/subscribed.hbs:3
+msgid "Thank you for subscribing!"
+msgstr "Dziękujemy za subskrypcję!"
+
+#: views/subscription/subscribed.hbs:4
+msgid "continue to our website"
+msgstr "przejdź na naszą stronę internetową"
+
+#: views/subscription/unsubscribe-notice.hbs:1
+msgid "Unsubscribe Successful"
+msgstr "Anulowanie subskrypcji przebiegło pomyślnie"
+
+#: views/subscription/unsubscribe-notice.hbs:2
+msgid "You have been removed from:"
+msgstr "Zostałeś usunięty z:"
+
+#: views/subscription/unsubscribe.hbs:2
+msgid "Enter your email address to unsubscribe from:"
+msgstr "Wpisz swój adres e-mail, aby zrezygnować z subskrypcji:"
+
+#: views/subscription/updated-notice.hbs:1
+msgid "Profile Updated"
+msgstr "Profil zaktualizowany"
+
+#: views/subscription/updated-notice.hbs:2
+msgid "Your profile information has been updated."
+msgstr "Twoje informacje profilowe zostały zaktualizowane."
+
+#: views/templates/create.hbs:2 views/templates/edit.hbs:2
+#: views/templates/templates.hbs:2 views/templates/templates.hbs:4
+#: lib/tools.js:115
+msgid "Templates"
+msgstr "Szablony"
+
+#: views/templates/create.hbs:3 views/templates/create.hbs:4
+#: views/templates/create.hbs:12 views/templates/templates.hbs:3
+msgid "Create Template"
+msgstr "Utwórz szablon"
+
+#: views/templates/create.hbs:5 views/templates/edit.hbs:6
+msgid "Template name"
+msgstr "Nazwa szablonu"
+
+#: views/templates/create.hbs:6 views/templates/edit.hbs:7
+msgid "Name for this template, eg. Newsletter"
+msgstr "Nazwa tego szablonu, np. Newsletter"
+
+#: views/templates/create.hbs:7
+msgid "HTML Editor"
+msgstr "Edytor HTML"
+
+#: views/templates/create.hbs:10 views/templates/edit.hbs:9
+msgid "Optional comments about this template"
+msgstr "Opcjonalne komentarze na temat tego szablonu"
+
+#: views/templates/edit.hbs:3 views/templates/edit.hbs:4
+msgid "Edit Template"
+msgstr "Edytuj szablon"
+
+#: views/templates/edit.hbs:5
+msgid "Back to templates"
+msgstr "Powrót do szablonów"
+
+#: views/templates/edit.hbs:11
+msgid "Delete Template"
+msgstr "Usuń Szablon"
+
+#: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2
+#: views/triggers/edit.hbs:2 views/triggers/triggered.hbs:2
+#: views/triggers/triggers.hbs:2 views/triggers/triggers.hbs:4
+msgid "Automation Triggers"
+msgstr "Automatyczne wyzwalacze"
+
+#: views/triggers/create-select.hbs:5
+msgid "Select a list for the trigger"
+msgstr "Wybierz listę dla wyzwalacza"
+
+#: views/triggers/create.hbs:5 views/triggers/edit.hbs:6
+msgid "Trigger name"
+msgstr "Nazwa wyzwalacza"
+
+#: views/triggers/create.hbs:6 views/triggers/edit.hbs:7
+msgid "Name for this trigger, eg. Inactive subscribers"
+msgstr "Nazwa tego wyzwalacza, np. Nieaktywni subskrybenci"
+
+#: views/triggers/create.hbs:8 views/triggers/edit.hbs:9
+msgid "Optional comments about this trigger"
+msgstr "Opcjonalne komentarze na temat tego wyzwalacza"
+
+#: views/triggers/create.hbs:12 views/triggers/edit.hbs:14
+msgid "Trigger rule"
+msgstr "Reguła wyzwalacza"
+
+#: views/triggers/create.hbs:13 views/triggers/edit.hbs:15
+msgid "Trigger fires"
+msgstr "Aktywacja wyzwalacza"
+
+#: views/triggers/create.hbs:14 views/triggers/edit.hbs:16
+msgid "days after:"
+msgstr "dni po:"
+
+#: views/triggers/create.hbs:15 views/triggers/edit.hbs:17
+msgid "Subscription"
+msgstr "Subskrypcja"
+
+#: views/triggers/create.hbs:16 views/triggers/create.hbs:21
+#: views/triggers/edit.hbs:18 views/triggers/edit.hbs:23
+msgid "Event"
+msgstr "Zdarzenie"
+
+#: views/triggers/create.hbs:18 views/triggers/create.hbs:19
+#: views/triggers/create.hbs:25 views/triggers/edit.hbs:20
+#: views/triggers/edit.hbs:21 views/triggers/edit.hbs:27
+msgid "Campaign"
+msgstr "Kampania"
+
+#: views/triggers/create.hbs:23 views/triggers/edit.hbs:25
+msgid "Trigger action"
+msgstr "Czynność wyzwalacza"
+
+#: views/triggers/create.hbs:24 views/triggers/edit.hbs:26
+msgid "Send campaign"
+msgstr "Wyślij kampanię"
+
+#: views/triggers/edit.hbs:3 views/triggers/edit.hbs:4
+msgid "Edit Trigger"
+msgstr "Edycja wyzwalacza"
+
+#: views/triggers/edit.hbs:5
+msgid "Back to triggers"
+msgstr "Powrót do wyzwalaczy"
+
+#: views/triggers/edit.hbs:11
+msgid "Trigger is enabled"
+msgstr "Wyzwalacz jest włączony"
+
+#: views/triggers/edit.hbs:29
+msgid "Delete Trigger"
+msgstr "Usuń wyzwalacz"
+
+#: views/triggers/triggered.hbs:3
+msgid "Triggered"
+msgstr "Wywołany"
+
+#: views/triggers/triggered.hbs:4
+msgid "Triggered subscribers"
+msgstr "Wywołani subskrybenci"
+
+#: views/triggers/triggered.hbs:5
+msgid "Subscribers who caused this trigger to fire"
+msgstr "Subskrybenci, którzy spowodowali uruchomienie tego wyzwalacza"
+
+#: views/triggers/triggered.hbs:9
+msgid "Triggered time"
+msgstr "Czas wywołanych"
+
+#: views/triggers/triggers.hbs:9
+msgid "Trigger"
+msgstr "Wyzwalacz"
+
+#: views/triggers/triggers.hbs:10
+msgid "Target Campaign"
+msgstr "Cel kampanii"
+
+#: views/triggers/triggers.hbs:11
+msgid "Triggered count"
+msgstr "Liczba wyzwoleń"
+
+#: views/triggers/triggers.hbs:12
+msgid "Enabled"
+msgstr "Włączone"
+
+#: views/triggers/triggers.hbs:13
+msgid "Disabled"
+msgstr "Wyłączone"
+
+#: views/users/account.hbs:4
+msgid "This account is managed through LDAP."
+msgstr "To konto jest zarządzane przez LDAP."
+
+#: views/users/account.hbs:5
+msgid "Associated Email Address"
+msgstr "Powiązany adres e-mail"
+
+#: views/users/account.hbs:8
+msgid "Your e-mail address"
+msgstr "Twój adres e-mail"
+
+#: views/users/account.hbs:9
+msgid ""
+"This address is used for account recovery in case you lose your password"
+msgstr "Ten adres służy do odzyskiwania konta na wypadek utraty hasła"
+
+#: views/users/account.hbs:10
+msgid "Password change"
+msgstr "Zmiana hasła"
+
+#: views/users/account.hbs:11
+msgid ""
+"You only need to fill out this form if you want to change your current "
+"password"
+msgstr "Wypełnij ten formularz, jeśli chcesz zmienić swoje obecne hasło"
+
+#: views/users/account.hbs:12 views/users/account.hbs:13
+msgid "Current Password"
+msgstr "Aktualne hasło"
+
+#: views/users/account.hbs:14 views/users/account.hbs:15
+#: views/users/reset.hbs:6 views/users/reset.hbs:7
+msgid "New Password"
+msgstr "Nowe hasło"
+
+#: views/users/account.hbs:16
+msgid "Confirm Password"
+msgstr "Powtórz hasło"
+
+#: views/users/account.hbs:17 views/users/reset.hbs:8
+msgid "Confirm New Password"
+msgstr "Potwierdź nowe hasło"
+
+#: views/users/api.hbs:4
+msgid "Are you sure? Resetting would invalidate the currently existing token."
+msgstr "Jesteś pewny? Zresetowanie unieważni istniejący token."
+
+#: views/users/api.hbs:5
+msgid "Are you sure?"
+msgstr "Jesteś pewny?"
+
+#: views/users/api.hbs:6
+msgid "Reset Access Token"
+msgstr "Zresetuj Access Token"
+
+#: views/users/api.hbs:7
+msgid "Generate Access Token"
+msgstr "Wygeneruj Access Token"
+
+#: views/users/api.hbs:8
+msgid "Personal access token:"
+msgstr "Osobisty Access Token:"
+
+#: views/users/api.hbs:9
+msgid "Access token not yet generated"
+msgstr "Access token nie został jeszcze wygenerowany"
+
+#: views/users/api.hbs:10
+msgid "Notes about the API"
+msgstr "Uwagi na temat interfejsu API"
+
+#: views/users/api.hbs:11
+msgid ""
+"API response is a JSON structure with <code>error</code> and <code>data</"
+"code> properties. If the response <code>error</code> has a value set then "
+"the request failed."
+msgstr ""
+"Odpowiedź API to struktura JSON z właściwościami <code>error</ code> i "
+"<code>data</ code>. Jeśli odpowiedź <code>error</ code> ma ustawioną "
+"wartość, to żądanie nie powiodło się."
+
+#: views/users/api.hbs:12
+msgid ""
+"You need to define proper <code>Content-Type</code> when making a request. "
+"You can either use <code>application/x-www-form-urlencoded</code> for normal "
+"form data or <code>application/json</code> for a JSON payload. Using "
+"<code>multipart/form-data</code> is not supported."
+msgstr ""
+"Musisz zdefiniować właściwy <code>Content-Type</code> podczas wysyłania "
+"zapytania. Możesz użyć <code>application/x-www-form-urlencoded</code> dla "
+"normalnych danych formularza lub <code> application/json</code> dla JSON "
+"payload. Używanie <code>multipart/form-data</code> nie jest obsługiwane."
+
+#: views/users/api.hbs:13
+msgid "Add subscription"
+msgstr "Dodaj subskrypcję"
+
+#: views/users/api.hbs:14
+msgid ""
+"This API call either inserts a new subscription or updates existing. Fields "
+"not included are left as is, so if you update only LAST_NAME value, then "
+"FIRST_NAME is kept untouched for an existing subscription."
+msgstr ""
+"To wywołanie API wprowadza nową subskrypcję lub aktualizacje istniejące. "
+"Pola nieuwzględnione pozostają bez zmian, więc jeśli zaktualizujesz tylko "
+"wartość LAST_NAME, to FIRST_NAME pozostanie nietknięte dla istniejącej "
+"subskrypcji."
+
+#: views/users/api.hbs:15 views/users/api.hbs:17 views/users/api.hbs:30
+#: views/users/api.hbs:32 views/users/api.hbs:38 views/users/api.hbs:40
+#: views/users/api.hbs:46 views/users/api.hbs:48
+msgid "arguments"
+msgstr "argumenty"
+
+#: views/users/api.hbs:16 views/users/api.hbs:31 views/users/api.hbs:39
+#: views/users/api.hbs:47
+msgid "your personal access token"
+msgstr "twój osobisty token dostępu"
+
+#: views/users/api.hbs:18 views/users/api.hbs:33 views/users/api.hbs:41
+msgid "subscriber's email address"
+msgstr "subscriber's email addressadres e-mail subskrybenta"
+
+#: views/users/api.hbs:19 views/users/api.hbs:34 views/users/api.hbs:42
+#: views/users/api.hbs:50
+msgid "required"
+msgstr "wymagany"
+
+#: views/users/api.hbs:20
+msgid "subscriber's first name"
+msgstr "imię subskrybenta"
+
+#: views/users/api.hbs:21
+msgid "subscriber's last name"
+msgstr "nazwisko subskrybenta"
+
+#: views/users/api.hbs:22
+msgid ""
+"subscriber's timezone (eg. \"Europe/Tallinn\", \"PST\" or \"UTC\"). If not "
+"set defaults to \"UTC\""
+msgstr ""
+"strefa czasowa subskrybenta (np. \"Europa/Tallinn\", \"PST\" lub \"UTC\"). "
+"Jeśli nie jest ustawiony domyślnie „UTC”"
+
+#: views/users/api.hbs:23
+msgid ""
+"custom field value. Use yes/no for option group values (checkboxes, radios, "
+"drop downs)"
+msgstr ""
+"niestandardowa wartość pola. Użyj wartości tak/nie dla wartości grup opcji "
+"(checkbox, radio, lista rozwijana)"
+
+#: views/users/api.hbs:24
+msgid "Additional POST arguments"
+msgstr "Dodatkowe argumenty POST"
+
+#: views/users/api.hbs:25
+msgid ""
+"set to \"yes\" if you want to make sure the email is marked as subscribed "
+"even if it was previously marked as unsubscribed. If the email was already "
+"unsubscribed/blocked then subscription status is not changed"
+msgstr ""
+"ustawić na \"tak \", jeśli chcesz się upewnić, że wiadomość e-mail została "
+"oznaczona jako zasubskrybowana, nawet jeśli została wcześniej oznaczona jako "
+"niesubskrybowana. Jeśli e-mail został już wypisany/zablokowane, status "
+"subskrypcji nie zostanie zmieniony"
+
+#: views/users/api.hbs:26
+msgid ""
+"set to \"yes\" if you want to send confirmation email to the subscriber "
+"before actually marking as subscribed"
+msgstr ""
+"ustaw na \"tak\", jeśli chcesz wysłać wiadomość e-mail z potwierdzeniem do "
+"subskrybenta, zanim faktycznie zostaniesz oznaczony jako zasubskrybowany"
+
+#: views/users/api.hbs:28
+msgid "Remove subscription"
+msgstr "Usuń subskrypcję"
+
+#: views/users/api.hbs:29
+msgid "This API call marks a subscription as unsubscribed"
+msgstr "To wywołanie API oznacza subskrypcję jako niesubskrybowaną"
+
+#: views/users/api.hbs:36
+msgid "Delete subscription"
+msgstr "Usuń subskrypcję"
+
+#: views/users/api.hbs:37
+msgid "This API call deletes a subscription"
+msgstr "To wywołanie API usuwa subskrypcję"
+
+#: views/users/api.hbs:44
+msgid "Add new custom field"
+msgstr "Dodaj nowe niestandardowe pole"
+
+#: views/users/api.hbs:45
+msgid "This API call creates a new custom field for a list."
+msgstr "To wywołanie API tworzy nowe niestandardowe pole dla listy."
+
+#: views/users/api.hbs:49
+msgid "field name"
+msgstr "nazwa pola"
+
+#: views/users/api.hbs:51
+msgid "one of the following types:"
+msgstr "jeden z następujących typów:"
+
+#: views/users/api.hbs:52
+msgid ""
+"If the type is 'option' then you also need to specify the parent element ID"
+msgstr "Jeśli typ to \"option\", musisz również podać ID elementu nadrzędnego"
+
+#: views/users/api.hbs:53
+msgid ""
+"Template for the group element. If not set, then values of the elements are "
+"joined with commas"
+msgstr ""
+"Szablon dla elementu grupy. Jeśli nie jest ustawione, wartości elementów są "
+"połączone przecinkami"
+
+#: views/users/api.hbs:54
+msgid ""
+"if not visible then the subscriber can not view or modify this value at the "
+"profile page"
+msgstr ""
+"jeśli niewidoczny, subskrybent nie może wyświetlić ani zmodyfikować tej "
+"wartości na stronie profilu"
+
+#: views/users/forgot.hbs:3 views/users/reset.hbs:3
+msgid "Password Reset"
+msgstr "Resetowanie hasła"
+
+#: views/users/forgot.hbs:4
+msgid "Reset your password?"
+msgstr "Nie pamiętasz hasła?"
+
+#: views/users/forgot.hbs:5
+msgid "Accounts are managed through LDAP."
+msgstr "Konta są zarządzane przez LDAP."
+
+#: views/users/forgot.hbs:6 views/users/reset.hbs:10
+msgid "Reset Password"
+msgstr "Resetuj hasło"
+
+#: views/users/forgot.hbs:7
+msgid ""
+"Please provide the username or email address that you used when you signed "
+"up for your Mailtrain account."
+msgstr ""
+"Podaj nazwę użytkownika lub adres e-mail użyty podczas rejestracji konta "
+"Mailtrain."
+
+#: views/users/forgot.hbs:8
+msgid "We will send you an email that will allow you to reset your password."
+msgstr "Wyślemy Ci wiadomość e-mail, która pozwoli Ci zresetować hasło."
+
+#: views/users/forgot.hbs:10
+msgid "Username or email address"
+msgstr "Nazwa użytkownika lub adres e-mail"
+
+#: views/users/forgot.hbs:11
+msgid "Send verification email"
+msgstr "Wyślij email weryfikacyjny"
+
+#: views/users/login.hbs:8
+msgid "Remember me"
+msgstr "Zapamiętaj mnie"
+
+#: views/users/login.hbs:11 views/users/login.hbs:12
+msgid "Forgot password?"
+msgstr "Zapomniałeś hasła?"
+
+#: views/users/reset.hbs:4
+msgid "Choose your new password"
+msgstr "Wybierz nowe hasło"
+
+#: views/users/reset.hbs:5
+msgid "Please enter a new password."
+msgstr "Wprowadź nowe hasło."
+
+#: lib/feed.js:31
+msgid "Bad status code %s"
+msgstr "Nieprawidłowy kod statusu %s"
+
+#: lib/helpers.js:17
+msgid "URL that points to the unsubscribe page"
+msgstr "Adres URL wskazujący stronę rezygnacji z subskrypcji"
+
+#: lib/helpers.js:20
+msgid "URL that points to the preferences page of the subscriber"
+msgstr "Adres URL wskazujący stronę preferencji subskrybenta"
+
+#: lib/helpers.js:23
+msgid "URL to preview the message in a browser"
+msgstr "URL, aby wyświetlić podgląd wiadomości w przeglądarce"
+
+#: lib/helpers.js:29 lib/models/segments.js:31
+msgid "First name"
+msgstr "Imię"
+
+#: lib/helpers.js:32 lib/models/segments.js:35
+msgid "Last name"
+msgstr "Nazwisko"
+
+#: lib/helpers.js:35
+msgid "Full name (first and last name combined)"
+msgstr "Imię i nazwisko"
+
+#: lib/helpers.js:38
+msgid "Unique ID that identifies the recipient"
+msgstr "Unikalny identyfikator identyfikujący odbiorcę"
+
+#: lib/helpers.js:41
+msgid "Unique ID that identifies the list used for this campaign"
+msgstr "Unikalny identyfikator identyfikujący listę użytą w tej kampanii"
+
+#: lib/helpers.js:44
+msgid "Unique ID that identifies current campaign"
+msgstr "Unikalny identyfikator identyfikujący bieżącą kampanię"
+
+#: lib/mailer.js:215
+msgid "Invalid mail transport"
+msgstr "Nieprawidłowy transport poczty"
+
+#: lib/models/campaigns.js:271 lib/models/campaigns.js:298
+#: lib/models/campaigns.js:371 lib/models/campaigns.js:494
+#: lib/models/campaigns.js:752 lib/models/campaigns.js:881
+msgid "Missing Campaign ID"
+msgstr "Brakujący identyfikator kampanii"
+
+#: lib/models/campaigns.js:407
+msgid "Emtpy or too large attahcment"
+msgstr "Pusty lub zbyt duży załącznik"
+
+#: lib/models/campaigns.js:573 lib/models/campaigns.js:761
+msgid "Campaign Name must be set"
+msgstr "Nazwa kampanii musi być ustawiona"
+
+#: lib/models/campaigns.js:577
+msgid "RSS URL must be set and needs to be a valid URL"
+msgstr ""
+"Adres URL kanału RSS musi być ustawiony i musi być prawidłowym adresem URL"
+
+#: lib/models/campaigns.js:730
+msgid "Selected template not found"
+msgstr "Nie znaleziono wybranego szablonu"
+
+#: lib/models/campaigns.js:1082
+msgid "Invalid or missing message ID"
+msgstr "Nieprawidłowy lub brakujący ID wiadomości"
+
+#: lib/models/fields.js:24
+msgid "Drop Down"
+msgstr "Lista rozwijana"
+
+#: lib/models/fields.js:25
+msgid "Date (MM/DD/YYY)"
+msgstr "Data (MM/DD/YYYY)"
+
+#: lib/models/fields.js:29
+msgid "JSON value for custom rendering"
+msgstr "Wartość JSON dla renderowania niestandardowego"
+
+#: lib/models/fields.js:30
+msgid "Option"
+msgstr "Opcja"
+
+#: lib/models/fields.js:53 lib/models/fields.js:98 lib/models/fields.js:123
+#: lib/models/lists.js:81 lib/models/lists.js:175 lib/models/lists.js:212
+#: lib/models/segments.js:43 lib/models/segments.js:176
+#: lib/models/subscriptions.js:88 lib/models/subscriptions.js:640
+#: lib/models/subscriptions.js:703 lib/models/subscriptions.js:889
+#: lib/models/subscriptions.js:992 lib/models/subscriptions.js:1046
+#: lib/models/subscriptions.js:1109 lib/models/subscriptions.js:1152
+msgid "Missing List ID"
+msgstr "Brakujący ID listy"
+
+#: lib/models/fields.js:129
+msgid "Option field requires a group to be selected"
+msgstr "Pole opcji wymaga wyboru grupy"
+
+#: lib/models/fields.js:149 lib/models/fields.js:199
+msgid "Missing Field ID"
+msgstr "Brakujący ID pola"
+
+#: lib/models/fields.js:153 lib/models/segments.js:185
+#: lib/models/segments.js:225
+msgid "Field Name must be set"
+msgstr "Nazwa pola musi być ustawiona"
+
+#: lib/models/fields.js:216
+msgid "Custom field not found"
+msgstr "Nie znaleziono pola niestandardowego"
+
+#: lib/models/fields.js:289
+msgid "Unknown column type %s"
+msgstr "Nieznany typ kolumny %s"
+
+#: lib/models/fields.js:293
+msgid "Missing column name"
+msgstr "Brakująca nazwa kolumny"
+
+#: lib/models/fields.js:297
+msgid "Missing list ID"
+msgstr "Brakujący ID listy"
+
+#: lib/models/fields.js:305
+msgid "Provided List ID not found"
+msgstr "Nie znaleziono ID listy dostarczonych"
+
+#: lib/models/links.js:328 routes/campaigns.js:541 routes/campaigns.js:590
+#: services/sender.js:304
+msgid "Campaign not found"
+msgstr "Nie znaleziono kampanii"
+
+#: lib/models/links.js:336 routes/lists.js:146 services/sender.js:311
+msgid "List not found"
+msgstr "Nie znaleziono listy"
+
+#: lib/models/links.js:344
+msgid "Subscription not found"
+msgstr "Nie znaleziono subskrypcji"
+
+#: lib/models/lists.js:117 lib/models/lists.js:179
+msgid "List Name must be set"
+msgstr "Nazwa listy musi być ustawiona"
+
+#: lib/models/lists.js:241
+msgid "Missing List CID"
+msgstr "Brakujący CID listy"
+
+#: lib/models/segments.js:15
+msgid "Signup country"
+msgstr "Kraj rejestracji"
+
+#: lib/models/segments.js:19 lib/models/triggers.js:11
+msgid "Sign up date"
+msgstr "Data rejestracji"
+
+#: lib/models/segments.js:23 lib/models/triggers.js:15
+msgid "Latest open"
+msgstr "Ostatnie otwarcie"
+
+#: lib/models/segments.js:27 lib/models/triggers.js:19
+msgid "Latest click"
+msgstr "Ostatnie kliknięcie"
+
+#: lib/models/segments.js:69 lib/models/segments.js:216
+#: lib/models/segments.js:256 lib/models/segments.js:278
+msgid "Missing Segment ID"
+msgstr "Brakujący ID segmentu"
+
+#: lib/models/segments.js:85 lib/models/segments.js:549
+#: lib/models/segments.js:658
+msgid "Segment not found"
+msgstr "Nie znaleziono segmentu"
+
+#: lib/models/segments.js:146 lib/models/segments.js:147
+#: lib/models/segments.js:408 lib/models/segments.js:409
+msgid "%s days after today"
+msgstr "%s dni po dzisiejszym dniu"
+
+#: lib/models/segments.js:146 lib/models/segments.js:147
+#: lib/models/segments.js:408 lib/models/segments.js:409
+msgid "%s days before today"
+msgstr "%s dni przed dzisiejszym dniem"
+
+#: lib/models/segments.js:148 lib/models/segments.js:410
+msgid "today"
+msgstr "dziś"
+
+#: lib/models/segments.js:189 lib/models/segments.js:229
+msgid "Invalid segment rule type"
+msgstr "Nieprawidłowy typ reguły segmentu"
+
+#: lib/models/segments.js:289 lib/models/segments.js:454
+#: routes/segments.js:266 routes/segments.js:300 routes/segments.js:370
+#: routes/segments.js:381
+msgid "Selected segment not found"
+msgstr "Nie znaleziono wybranego segmentu"
+
+#: lib/models/segments.js:294 lib/models/segments.js:459
+#: routes/segments.js:272 routes/segments.js:306 routes/segments.js:387
+msgid "Invalid rule type"
+msgstr "Nieprawidłowy typ reguły"
+
+#: lib/models/segments.js:358 lib/models/segments.js:434
+#: lib/models/segments.js:524
+msgid "Missing Rule ID"
+msgstr "Brakujący ID reguły"
+
+#: lib/models/segments.js:374
+msgid "Specified rule not found"
+msgstr "Nie znaleziono określonej reguły"
+
+#: lib/models/segments.js:385
+msgid "Specified segment not found"
+msgstr "Nie znaleziono określonego segmentu"
+
+#: lib/models/segments.js:445
+msgid "Selected rule not found"
+msgstr "Nie znaleziono wybranej reguły"
+
+#: lib/models/subscriptions.js:233
+msgid "%s: Please Confirm Subscription"
+msgstr "%s: Potwierdź subskrypcję"
+
+#: lib/models/subscriptions.js:324
+msgid "Could not save subscription"
+msgstr "Nie można zapisać subskrypcji"
+
+#: lib/models/subscriptions.js:507 lib/models/subscriptions.js:537
+msgid "Missing Subscription ID"
+msgstr "Brakujący ID subskrypcji"
+
+#: lib/models/subscriptions.js:565
+msgid "Missing Subscription email address"
+msgstr "Brak adresu e-mail subskrypcji"
+
+#: lib/models/subscriptions.js:644 lib/models/subscriptions.js:893
+#: lib/models/subscriptions.js:1156
+msgid "Missing subscription ID"
+msgstr "Brakujący ID subskrypcji"
+
+#: lib/models/subscriptions.js:707
+msgid "Missing email address"
+msgstr "Brakujący adres e-mail"
+
+#: lib/models/subscriptions.js:996 lib/models/subscriptions.js:1050
+#: lib/models/subscriptions.js:1086
+msgid "Missing Import ID"
+msgstr "Brakujący ID importu"
+
+#: lib/models/subscriptions.js:1178
+msgid "Unknown subscription ID"
+msgstr "Nieznany ID subskrypcji"
+
+#: lib/models/subscriptions.js:1183
+msgid "Nothing seems to be changed"
+msgstr "Wydaje się, że nic nie zostało zmienione"
+
+#: lib/models/subscriptions.js:1197
+msgid "This address is already registered by someone else"
+msgstr "Ten adres jest już zarejestrowany przez inną osobę"
+
+#: lib/models/templates.js:51 lib/models/templates.js:122
+#: lib/models/templates.js:163
+msgid "Missing Template ID"
+msgstr "Brakujący ID szablonu"
+
+#: lib/models/templates.js:80 lib/models/templates.js:126
+msgid "Template Name must be set"
+msgstr "Nazwa szablonu musi być ustawiona"
+
+#: lib/models/triggers.js:28
+msgid "Has Opened"
+msgstr "Otwarte"
+
+#: lib/models/triggers.js:31
+msgid "Has Clicked"
+msgstr "Kliknięte"
+
+#: lib/models/triggers.js:34
+msgid "Not Opened"
+msgstr "Nie otwarte"
+
+#: lib/models/triggers.js:37
+msgid "Not Clicked"
+msgstr "Nie kliknięte"
+
+#: lib/models/triggers.js:174 lib/models/triggers.js:211
+msgid "Missing or invalid list ID"
+msgstr "Brakujący lub nieprawidłowy ID listy"
+
+#: lib/models/triggers.js:178 lib/models/triggers.js:263
+msgid "Days in the past are not allowed"
+msgstr "Dni w przeszłości są niedozwolone"
+
+#: lib/models/triggers.js:182 lib/models/triggers.js:203
+#: lib/models/triggers.js:267 lib/models/triggers.js:288
+msgid "Missing or invalid trigger rule"
+msgstr "Brakująca lub nieprawidłowa reguła wyzwalacza"
+
+#: lib/models/triggers.js:189 lib/models/triggers.js:274
+msgid "Invalid subscription configuration"
+msgstr "ieprawidłowa konfiguracja subskrypcji"
+
+#: lib/models/triggers.js:196 lib/models/triggers.js:281
+msgid "Invalid campaign configuration"
+msgstr "Nieprawidłowa konfiguracja kampanii"
+
+#: lib/models/triggers.js:199 lib/models/triggers.js:284
+msgid "A campaing can not be a target for itself"
+msgstr "Kampania nie może być celem samym w sobie"
+
+#: lib/models/triggers.js:232
+msgid "Could not store trigger row"
+msgstr "Nie można zapisać wiersza wyzwalacza"
+
+#: lib/models/triggers.js:249
+msgid "Missing or invalid Trigger ID"
+msgstr "Brakujący lub nieprawidłowy ID wyzwalacza"
+
+#: lib/models/triggers.js:316
+msgid "Missing Trigger ID"
+msgstr "Brakujący ID wyzwalacza"
+
+#: lib/models/users.js:103
+msgid "Could not store user row"
+msgstr "Nie można zapisać wiersza użytkownika"
+
+#: lib/models/users.js:173
+msgid "Email Address must be set"
+msgstr "Adres e-mail musi być ustawiony"
+
+#: lib/models/users.js:184
+msgid "Failed to check user data"
+msgstr "Nie można sprawdzić danych użytkownika"
+
+#: lib/models/users.js:195
+msgid ""
+"Can't change email as another user with the same email address already exists"
+msgstr ""
+"Nie można zmienić adresu e-mail, ponieważ inny użytkownik o tym samym "
+"adresie e-mail już istnieje"
+
+#: lib/models/users.js:212
+msgid "Incorrect current password"
+msgstr "Nieprawidłowe aktualne hasło"
+
+#: lib/models/users.js:216
+msgid "New password not set"
+msgstr "Nowe hasło nie zostało ustawione"
+
+#: lib/models/users.js:220
+msgid "Passwords do not match"
+msgstr "Hasła nie pasują do siebie"
+
+#: lib/models/users.js:258
+msgid "User ID not set"
+msgstr "Nie ustawiono ID użytkownika"
+
+#: lib/models/users.js:286
+msgid "Username must be set"
+msgstr "Nazwa użytkownika musi być ustawiona"
+
+#: lib/models/users.js:323
+msgid "Mailer password change request"
+msgstr "Żądanie zmiany hasła Mailera"
+
+#: lib/models/users.js:347 lib/models/users.js:367
+msgid "Missing username or reset token"
+msgstr "Brakująca nazwa użytkownika lub token reset"
+
+#: lib/models/users.js:371
+msgid "Invalid new password"
+msgstr "Nieprawidłowe nowe hasło"
+
+#: lib/passport.js:38
+msgid "%s  logged out"
+msgstr "%s  Wylogowany"
+
+#: lib/passport.js:51
+msgid "Failed to authenticate user"
+msgstr "Nie udało się uwierzytelnić użytkownika"
+
+#: lib/passport.js:67
+msgid "Logged in as %s"
+msgstr "Zalogowano jako %s"
+
+#: lib/passport.js:125
+msgid "Incorrect username or password"
+msgstr "Nieprawidłowa nazwa użytkownika lub hasło"
+
+#: lib/tools.js:123
+msgid "Automation"
+msgstr "Automatyzacja"
+
+#: lib/tools.js:133
+msgid "Blocked email address \"%s\""
+msgstr "Zablokowany adres e-mail \"%s\""
+
+#: lib/tools.js:142
+msgid "Invalid email address \"%s\"."
+msgstr "Nieprawidłowy adres e-mail \"%s\"."
+
+#: lib/tools.js:145
+msgid "MX record not found for domain"
+msgstr "Nie znaleziono rekordu MX dla domeny"
+
+#: lib/tools.js:148
+msgid "Address domain not found"
+msgstr "Nie znaleziono domeny"
+
+#: lib/tools.js:151
+msgid "Address domain name is required"
+msgstr "Nazwa domeny adresu jest wymagana"
+
+#: routes/archive.js:31 routes/archive.js:43 routes/archive.js:55 app.js:211
+msgid "Not Found"
+msgstr "Nie znaleziono"
+
+#: routes/archive.js:110 services/sender.js:447
+msgid "Received status code %s from %s"
+msgstr "Otrzymano kod statusu %s z %s"
+
+#: routes/archive.js:134 routes/campaigns.js:131 routes/campaigns.js:295
+#: routes/campaigns.js:390 routes/campaigns.js:435 routes/campaigns.js:475
+#: routes/campaigns.js:739 routes/campaigns.js:762 routes/campaigns.js:781
+#: routes/campaigns.js:803 routes/triggers.js:146
+msgid "Could not find campaign with specified ID"
+msgstr "Nie można znaleźć kampanii z określonym ID"
+
+#: routes/archive.js:142 routes/campaigns.js:789
+msgid "Attachment not found"
+msgstr "Załącznik nie znaleziony"
+
+#: routes/campaigns.js:26 routes/fields.js:13 routes/lists.js:49
+#: routes/segments.js:13 routes/settings.js:23 routes/templates.js:17
+#: routes/triggers.js:18 routes/users.js:75 routes/users.js:120
+msgid "Need to be logged in to access restricted content"
+msgstr "Musisz być zalogowany, aby uzyskać dostęp do zastrzeżonych treści"
+
+#: routes/campaigns.js:117
+msgid "Could not create campaign"
+msgstr "Nie można utworzyć kampanii"
+
+#: routes/campaigns.js:120
+msgid "Campaign “%s” created"
+msgstr "Kampania “%s” utworzona"
+
+#: routes/campaigns.js:204
+msgid "content from an RSS entry"
+msgstr "treść z wpisu RSS"
+
+#: routes/campaigns.js:220
+msgid "Campaign settings updated"
+msgstr "Zaktualizowano ustawienia kampanii"
+
+#: routes/campaigns.js:222
+msgid "Campaign settings not updated"
+msgstr "Ustawienia kampanii nie zostały zaktualizowane"
+
+#: routes/campaigns.js:238 routes/campaigns.js:639
+msgid "Campaign deleted"
+msgstr "Kampania usunięta"
+
+#: routes/campaigns.js:240 routes/campaigns.js:641
+msgid "Could not delete specified campaign"
+msgstr "Nie można usunąć określonej kampanii"
+
+#: routes/campaigns.js:259
+msgid "Idling"
+msgstr "Bezczynność"
+
+#: routes/campaigns.js:262
+msgid "Scheduled"
+msgstr "Planowane"
+
+#: routes/campaigns.js:268
+msgid "Paused"
+msgstr "Wstrzymane"
+
+#: routes/campaigns.js:270
+msgid "Inactive"
+msgstr "Nieaktywny"
+
+#: routes/campaigns.js:272
+msgid "Active"
+msgstr "Aktywny"
+
+#: routes/campaigns.js:274
+msgid "Other"
+msgstr "Inny"
+
+#: routes/campaigns.js:429
+msgid "Unknown status selector"
+msgstr "Nieznany status selektora"
+
+#: routes/campaigns.js:657
+msgid "Scheduled sending"
+msgstr "Wysyłanie zaplanowanych"
+
+#: routes/campaigns.js:659
+msgid "Could not schedule sending"
+msgstr "Nie można zaplanować wysyłania"
+
+#: routes/campaigns.js:671
+msgid "Sending resumed"
+msgstr "Wysyłanie zostało wznowione"
+
+#: routes/campaigns.js:673
+msgid "Could not resume sending"
+msgstr "Nie można wznowić wysyłania"
+
+#: routes/campaigns.js:685
+msgid "Sending reset"
+msgstr "Wysyłam reset"
+
+#: routes/campaigns.js:687
+msgid "Could not reset sending"
+msgstr "Nie można zresetować wysyłania"
+
+#: routes/campaigns.js:699 routes/campaigns.js:727
+msgid "Sending paused"
+msgstr "Wysyłanie wstrzymane"
+
+#: routes/campaigns.js:701 routes/campaigns.js:729
+msgid "Could not pause sending"
+msgstr "Nie można wstrzymać wysyłania"
+
+#: routes/campaigns.js:713
+msgid "Sending activated"
+msgstr "Wysyłanie aktywowane"
+
+#: routes/campaigns.js:715
+msgid "Could not activate sending"
+msgstr "Nie można aktywować wysyłania"
+
+#: routes/campaigns.js:750
+msgid "Attachment uploaded"
+msgstr "Przesłano załącznik"
+
+#: routes/campaigns.js:752
+msgid "Could not store attachment"
+msgstr "Nie można zapisać załącznika"
+
+#: routes/campaigns.js:769
+msgid "Attachment deleted"
+msgstr "Załącznik usunięty"
+
+#: routes/campaigns.js:771
+msgid "Could not delete attachment"
+msgstr "Nie można usunąć załącznika"
+
+#: routes/fields.js:28 routes/fields.js:64 routes/fields.js:118
+#: routes/segments.js:28 routes/segments.js:59 routes/segments.js:102
+#: routes/segments.js:151 routes/segments.js:223 routes/segments.js:255
+#: routes/segments.js:289 routes/segments.js:336 routes/segments.js:359
+msgid "Selected list ID not found"
+msgstr "Nie znaleziono wybranego ID listy"
+
+#: routes/fields.js:102
+msgid "Could not create custom field"
+msgstr "Nie można utworzyć pola niestandardowego"
+
+#: routes/fields.js:129
+msgid "Selected field not found"
+msgstr "Nie znaleziono wybranego pola"
+
+#: routes/fields.js:165
+msgid "Field settings updated"
+msgstr "Zaktualizowano ustawienia pola"
+
+#: routes/fields.js:167
+msgid "Field settings not updated"
+msgstr "Ustawienia pola nie zostały zaktualizowane"
+
+#: routes/fields.js:183
+msgid "Custom field deleted"
+msgstr "Pole niestandardowe usunięte"
+
+#: routes/fields.js:185
+msgid "Could not delete specified field"
+msgstr "Nie można usunąć określonego pola"
+
+#: routes/links.js:40
+msgid "Oops, we couldn't find a link for the URL you clicked"
+msgstr "Ups, nie mogliśmy znaleźć linku dla URL który kliknąłeś"
+
+#: routes/lists.js:90
+msgid "Could not create list"
+msgstr "Nie można utworzyć listy"
+
+#: routes/lists.js:93
+msgid "List created"
+msgstr "Utworzono listę"
+
+#: routes/lists.js:101 routes/lists.js:236 routes/lists.js:301
+#: routes/lists.js:340 routes/lists.js:409 routes/lists.js:434
+#: routes/lists.js:479 routes/lists.js:501 routes/lists.js:530
+#: routes/lists.js:609 routes/lists.js:666 routes/lists.js:693
+msgid "Could not find list with specified ID"
+msgstr "Nie można znaleźć listy o określonym ID"
+
+#: routes/lists.js:115
+msgid "List settings updated"
+msgstr "Zaktualizowano ustawienia listy"
+
+#: routes/lists.js:117
+msgid "List settings not updated"
+msgstr "Nie zaktualizowano ustawień listy"
+
+#: routes/lists.js:133
+msgid "List deleted"
+msgstr "Lista usunięta"
+
+#: routes/lists.js:135
+msgid "Could not delete specified list"
+msgstr "Nie można usunąć określonej listy"
+
+#: routes/lists.js:171
+msgid "Unknown"
+msgstr "Nieznany"
+
+#: routes/lists.js:171
+msgid "Complained"
+msgstr "Skarżący"
+
+#: routes/lists.js:202
+msgid "Invalid key"
+msgstr "Klucz niewłaściwy"
+
+#: routes/lists.js:204
+msgid "Expired key"
+msgstr "Klucz wygasł"
+
+#: routes/lists.js:206
+msgid "Revoked key"
+msgstr "Klucz odwołany"
+
+#: routes/lists.js:256
+msgid "Initializing"
+msgstr "Inicjowanie"
+
+#: routes/lists.js:259
+msgid "Initialized"
+msgstr "Zainicjowano"
+
+#: routes/lists.js:262
+msgid "Importing"
+msgstr "Importowanie"
+
+#: routes/lists.js:268
+msgid "Errored"
+msgstr "Błędne"
+
+#: routes/lists.js:346 routes/lists.js:415 routes/lists.js:440
+msgid "Could not find subscriber with specified ID"
+msgstr "Nie można znaleźć subskrybenta o podanym ID"
+
+#: routes/lists.js:392
+msgid "Could not add subscription"
+msgstr "Nie można dodać subskrypcji"
+
+#: routes/lists.js:397
+msgid "%s was successfully added to your list"
+msgstr "%s został pomyślnie dodany do twojej listy"
+
+#: routes/lists.js:399
+msgid "%s was not added to your list"
+msgstr "%s nie został dodany do Twojej listy"
+
+#: routes/lists.js:421
+msgid "Could not unsubscribe user"
+msgstr "Nie można anulować subskrypcji użytkownika"
+
+#: routes/lists.js:424
+msgid "%s was successfully unsubscribed from your list"
+msgstr "%s został pomyślnie wypisany z listy"
+
+#: routes/lists.js:444
+msgid "%s was successfully removed from your list"
+msgstr "%s został pomyślnie usunięty z Twojej listy"
+
+#: routes/lists.js:456
+msgid "Another subscriber with email address %s already exists"
+msgstr "Inny subskrybent z adresem e-mail %s już istnieje"
+
+#: routes/lists.js:463
+msgid "Subscription settings updated"
+msgstr "Zaktualizowano ustawienia subskrypcji"
+
+#: routes/lists.js:465
+msgid "Subscription settings not updated"
+msgstr "Ustawienia subskrypcji nie zostały zaktualizowane"
+
+#: routes/lists.js:507 routes/lists.js:615 routes/lists.js:651
+#: routes/lists.js:679 routes/lists.js:699
+msgid "Could not find import data with specified ID"
+msgstr "Nie można znaleźć danych importu o podanym ID"
+
+#: routes/lists.js:538
+msgid "Could not process CSV"
+msgstr "Nie można przetworzyć pliku CSV"
+
+#: routes/lists.js:547
+msgid "Could not create importer"
+msgstr "Nie można utworzyć importera"
+
+#: routes/lists.js:598
+msgid "Empty file"
+msgstr "Pusty plik"
+
+#: routes/lists.js:655
+msgid "Import started"
+msgstr "Rozpoczęto importowanie"
+
+#: routes/lists.js:683
+msgid "Import restarted"
+msgstr "Import został zrestartowany"
+
+#: routes/segments.js:86
+msgid "Could not create segment"
+msgstr "Nie można utworzyć segmentu"
+
+#: routes/segments.js:89
+msgid "Segment created"
+msgstr "Utworzono segment"
+
+#: routes/segments.js:113
+msgid "Selected segment ID not found"
+msgstr "Nie znaleziono ID wybranego segmentu"
+
+#: routes/segments.js:188
+msgid "Segment settings updated"
+msgstr "Zaktualizowane ustawienia segmentów"
+
+#: routes/segments.js:190
+msgid "Segment settings not updated"
+msgstr "Ustawienia segmentu nie zostały zaktualizowane"
+
+#: routes/segments.js:206
+msgid "Segment deleted"
+msgstr "Segment usunięty"
+
+#: routes/segments.js:208
+msgid "Could not delete specified segment"
+msgstr "Nie można usunąć określonego segmentu"
+
+#: routes/segments.js:342
+msgid "Could not create rule"
+msgstr "Nie można utworzyć reguły"
+
+#: routes/segments.js:345
+msgid "Rule created"
+msgstr "Dodano regułę"
+
+#: routes/segments.js:410
+msgid "Rule settings updated"
+msgstr "Zaktualizowano ustawienia reguły"
+
+#: routes/segments.js:412
+msgid "Rule settings not updated"
+msgstr "Nie zaktualizowano ustawień reguły"
+
+#: routes/segments.js:428
+msgid "Rule deleted"
+msgstr "Usunięto regułę"
+
+#: routes/segments.js:430
+msgid "Could not delete specified rule"
+msgstr "Nie można usunąć określonej reguły"
+
+#: routes/settings.js:39
+msgid "Use TLS"
+msgstr "Użyj TLS"
+
+#: routes/settings.js:40
+msgid "usually selected for port 465"
+msgstr "zazwyczaj wybierany port 465"
+
+#: routes/settings.js:44
+msgid "Use STARTTLS"
+msgstr "Użyj STARTTLS"
+
+#: routes/settings.js:45
+msgid "usually selected for port 587 and 25"
+msgstr "zazwyczaj wybierany port 587 i 25"
+
+#: routes/settings.js:49
+msgid "Do not use encryption"
+msgstr "Nie używaj szyfrowania"
+
+#: routes/settings.js:115
+msgid "Settings updated"
+msgstr "Zaktualizowano ustawienia"
+
+#: routes/settings.js:173
+msgid "Invalid mail transport type"
+msgstr "Nieprawidłowy typ transportu poczty"
+
+#: routes/settings.js:184
+msgid "Invalid Access Key"
+msgstr "Nieprawidłowy klucz dostępu"
+
+#: routes/settings.js:187
+msgid "Invalid AWS credentials"
+msgstr "Nieprawidłowe dane uwierzytelniające AWS"
+
+#: routes/settings.js:190
+msgid "Connection refused, check hostname and port."
+msgstr "Połączenie odrzucone, sprawdź nazwę hosta i port."
+
+#: routes/settings.js:195
+msgid ""
+"Did not receive greeting message from server. This might happen when "
+"connecting to a TLS port without using TLS."
+msgstr ""
+"Nie otrzymano wiadomości powitalnej z serwera. Może się to zdarzyć podczas "
+"łączenia się z portem TLS bez korzystania z TLS."
+
+#: routes/settings.js:197
+msgid "Did not receive greeting message from server."
+msgstr "Nie otrzymano wiadomości powitalnej z serwera."
+
+#: routes/settings.js:200
+msgid ""
+"Connection timed out. Check your firewall settings, destination port is "
+"probably blocked."
+msgstr ""
+"Przekroczono limit czasu połączenia. Sprawdź ustawienia zapory, port "
+"docelowy jest prawdopodobnie zablokowany."
+
+#: routes/settings.js:205
+msgid "Authentication not accepted, server expects STARTTLS to be used."
+msgstr ""
+"Uwierzytelnianie nie jest akceptowane, serwer oczekuje, że zostanie użyty "
+"STARTTLS."
+
+#: routes/settings.js:207
+msgid "Authentication failed, check username and password."
+msgstr "Uwierzytelnianie nie powiodło się, sprawdź nazwę użytkownika i hasło."
+
+#: routes/settings.js:217
+msgid "Failed Mailer verification."
+msgstr "Weryfikacja Mailera nie powiodła się."
+
+#: routes/settings.js:217
+msgid "Server responded with: \"%s\""
+msgstr "Odpowiedź serwera: \"%s\""
+
+#: routes/settings.js:221
+msgid "Mailer settings verified, ready to send some mail!"
+msgstr "Ustawienia Mailera zweryfikowane, gotowe do wysłania wiadomości!"
+
+#: routes/subscription.js:22
+msgid "Selected subscription not found"
+msgstr "Nie znaleziono wybranej subskrypcji"
+
+#: routes/subscription.js:32 routes/subscription.js:103
+#: routes/subscription.js:141 routes/subscription.js:166
+#: routes/subscription.js:191 routes/subscription.js:232
+#: routes/subscription.js:270 routes/subscription.js:317
+#: routes/subscription.js:339 routes/subscription.js:368
+#: routes/subscription.js:392 routes/subscription.js:424
+msgid "Selected list not found"
+msgstr "Nie znaleziono wybranej listy"
+
+#: routes/subscription.js:78 routes/subscription.js:472
+msgid "%s: Subscription Confirmed"
+msgstr "%s: Potwierdzono subskrypcję"
+
+#: routes/subscription.js:217
+msgid "Email address not set"
+msgstr "Adres e-mail nie jest ustawiony"
+
+#: routes/subscription.js:255
+msgid "Could not store confirmation data"
+msgstr "Nie można zapisać danych potwierdzających"
+
+#: routes/subscription.js:284 routes/subscription.js:349
+#: routes/subscription.js:402
+msgid "Subscription not found from this list"
+msgstr "Nie znaleziono subskrypcji z tej listy"
+
+#: routes/subscription.js:383
+msgid "Email address updated, check your mailbox for verification instructions"
+msgstr ""
+"Adres e-mail zaktualizowany, sprawdź skrzynkę pocztową, aby uzyskać "
+"instrukcje dotyczące weryfikacji"
+
+#: routes/subscription.js:499 routes/subscription.js:515
+msgid "Public key is not set"
+msgstr "Klucz publiczny nie jest ustawiony"
+
+#: routes/templates.js:98
+msgid "Could not create template"
+msgstr "Nie można utworzyć szablonu"
+
+#: routes/templates.js:101
+msgid "Template created"
+msgstr "Szablon utworzony"
+
+#: routes/templates.js:109
+msgid "Could not find template with specified ID"
+msgstr "Nie można znaleźć szablonu z określonym ID"
+
+#: routes/templates.js:140
+msgid "Template settings updated"
+msgstr "Zaktualizowano ustawienia szablonu"
+
+#: routes/templates.js:142
+msgid "Template settings not updated"
+msgstr "Ustawienia szablonów nie zostały zaktualizowane"
+
+#: routes/templates.js:158
+msgid "Template deleted"
+msgstr "Szablon usunięty"
+
+#: routes/templates.js:160
+msgid "Could not delete specified template"
+msgstr "Nie można usunąć określonego szablonu"
+
+#: routes/triggers.js:62 routes/triggers.js:79 routes/triggers.js:154
+msgid "Could not find selected list"
+msgstr "Nie można znaleźć wybranej listy"
+
+#: routes/triggers.js:131
+msgid "Could not create trigger"
+msgstr "Nie można utworzyć wyzwalacza"
+
+#: routes/triggers.js:138
+msgid "Trigger “%s” created"
+msgstr "Wyzwalacz “%s” został utworzony"
+
+#: routes/triggers.js:214
+msgid "Trigger settings updated"
+msgstr "Zaktualizowano ustawienia wyzwalacza"
+
+#: routes/triggers.js:216
+msgid "Trigger settings not updated"
+msgstr "Ustawienia wyzwalacza nie zostały zaktualizowane"
+
+#: routes/triggers.js:228
+msgid "Trigger deleted"
+msgstr "Wyzwalacz został usunięty"
+
+#: routes/triggers.js:230
+msgid "Could not delete specified trigger"
+msgstr "Nie można usunąć określonego wyzwalacza"
+
+#: routes/triggers.js:242
+msgid "Could not find trigger with specified ID"
+msgstr "Nie można znaleźć wyzwalacza z określonym ID"
+
+#: routes/triggers.js:255
+msgid "Trigger not found"
+msgstr "Wyzwalacz nie został znaleziony"
+
+#: routes/users.js:32
+msgid ""
+"An email with password reset instructions has been sent to your email "
+"address, if it exists on our system."
+msgstr ""
+"E-mail z instrukcjami resetowania hasła został wysłany na Twój adres e-mail, "
+"jeśli istnieje w naszym systemie."
+
+#: routes/users.js:46 routes/users.js:64
+msgid "Unknown or expired reset token"
+msgstr "Token resetowania nieznany lub wygasł"
+
+#: routes/users.js:66
+msgid "Your password has been changed successfully"
+msgstr "Twoje hasło zostało zmienione"
+
+#: routes/users.js:87
+msgid "User data not found"
+msgstr "Nie znaleziono danych użytkownika"
+
+#: routes/users.js:110
+msgid "Access token updated"
+msgstr "Zaktualizowano token dostępu"
+
+#: routes/users.js:112
+msgid "Access token not updated"
+msgstr "Nie zaktualizowano tokenu dostępu"
+
+#: routes/users.js:139
+msgid "Account information updated"
+msgstr "Informacje o koncie zostały zaktualizowane"
+
+#: routes/users.js:141
+msgid "Account information not updated"
+msgstr "Informacje o koncie nie zostały zaktualizowane"
+
+#: services/feedcheck.js:51
+msgid "Feed error: %s"
+msgstr "RSS błąd: %s"
+
+#: services/feedcheck.js:54
+msgid "Found %s new campaign messages from feed"
+msgstr "Znaleziono %s nowych wiadomości kampanii z kanału"
+
+#: services/feedcheck.js:56
+msgid "Found nothing new from the feed"
+msgstr "Nie znaleziono nic nowego w kanale"
+
+#: services/feedcheck.js:143
+msgid "RSS entry %s"
+msgstr "Wpis RSS %s"
+
+#: services/importer.js:243
+msgid "Could not access import file"
+msgstr "Nie można uzyskać dostępu do pliku importu"
+
+#: services/triggers.js:51
+msgid "Unknown trigger type %s"
+msgstr "Nieznany typ wyzwalacza %s"
