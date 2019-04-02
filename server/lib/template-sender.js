@@ -1,6 +1,7 @@
 'use strict';
 
 const mailers = require('./mailers');
+const tools = require('./tools');
 const templates = require('../models/templates');
 
 class TemplateSender {
@@ -21,11 +22,13 @@ class TemplateSender {
             templates.getById(options.context, this.templateId, false)
         ]);
 
-        const html = this._substituteVariables(
+        const html = tools.formatTemplate(
             template.html,
-            options.variables
+            null,
+            options.variables,
+            true
         );
-        const subject = this._substituteVariables(
+        const subject = tools.formatTemplate(
             options.subject || template.description || template.name,
             options.variables
         );
@@ -62,17 +65,6 @@ class TemplateSender {
         if (!locale) {
             throw new Error('Missing locale');
         }
-    }
-
-    _substituteVariables(html, variables) {
-        if (!variables) {
-            return html;
-        }
-        return Object.keys(variables).reduce(
-            (res, key) =>
-                res.replace(new RegExp(`\\[${key}\\]`, 'gmi'), variables[key]),
-            html
-        );
     }
 }
 
