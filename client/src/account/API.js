@@ -389,7 +389,8 @@ export default class API extends Component {
                     <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
                     <li><strong>SEND_CONFIGURATION_ID</strong> – {t('sendConfigurationId')}</li>
                     <li><strong>SUBJECT</strong> – {t('subject')}</li>
-                    <li><strong>VARIABLES</strong> – {t('templateVariables')}: <em>{"{"} FOO: bar {"}"}</em></li>
+                    <li><strong>DATA</strong> – {t('templateData')}: <em>{'{'} "any": ["type", {'{'}"of": "data"{'}'}] {'}'}</em></li>
+                    <li><strong>VARIABLES</strong> – {t('templateVariables')}: <em>{'{'} "FOO": "bar" {'}'}</em></li>
                 </ul>
 
                 <p>

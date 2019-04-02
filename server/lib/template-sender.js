@@ -18,24 +18,25 @@ class TemplateSender {
 
         const [mailer, template] = await Promise.all([
             mailers.getOrCreateMailer(options.sendConfigurationId),
-            templates.getById(
-                options.context,
-                this.templateId,
-                false
-            )
+            templates.getById(options.context, this.templateId, false)
         ]);
 
         const html = this._substituteVariables(
             template.html,
             options.variables
         );
+        const subject = this._substituteVariables(
+            options.subject || template.description || template.name,
+            options.variables
+        );
         return mailer.sendTransactionalMail(
             {
                 to: options.email,
-                subject: options.subject
+                subject
             },
             {
                 html: { template: html },
+                data: options.data,
                 locale: options.locale
             }
         );
@@ -64,13 +65,14 @@ class TemplateSender {
     }
 
     _substituteVariables(html, variables) {
-        if (!variables) return html;
-        return Object.keys(variables).reduce((res, key) => {
-            return res.replace(
-                new RegExp(`\\[${key}\\]`, 'gmi'),
-                variables[key]
-            );
-        }, html);
+        if (!variables) {
+            return html;
+        }
+        return Object.keys(variables).reduce(
+            (res, key) =>
+                res.replace(new RegExp(`\\[${key}\\]`, 'gmi'), variables[key]),
+            html
+        );
     }
 }
 
