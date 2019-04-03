@@ -10,6 +10,7 @@ const gm = require('gm').subClass({
     imageMagick: true
 });
 const users = require('../models/users');
+const capitalize = require('capitalize');
 
 const fs = require('fs-extra')
 
@@ -51,7 +52,7 @@ users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entit
 });
 
 
-async function placeholderImage(width, height) {
+async function placeholderImage(width, height, labelText, labelColor) {
     const magick = gm(width, height, '#707070');
     const streamAsync = bluebird.promisify(magick.stream.bind(magick));
 
@@ -72,11 +73,14 @@ async function placeholderImage(width, height) {
         }
     }
 
+    labelText = labelText || `${width} x ${height}`;
+    labelColor = labelColor || '#B0B0B0';
+
     // text
     magick
-        .fill('#B0B0B0')
+        .fill(labelColor)
         .fontSize(20)
-        .drawText(0, 0, width + ' x ' + height, 'center');
+        .drawText(0, 0, labelText, 'center');
 
     const stream = await streamAsync('png');
 
@@ -155,6 +159,17 @@ function getRouter(appType) {
 
         // This is a fallback to versafix-1 if the block thumbnail is not defined by the template
         router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
+
+        // This is the final fallback for a block thumbnail, so that at least something gets returned
+        router.getAsync('/templates/:mosaicoTemplateId/edres/:fileName', async (req, res, next) => {
+            let labelText = req.params.fileName.replace(/\.png$/, '');
+            labelText = labelText.replace(/[_]/g, ' ');
+            labelText = capitalize.words(labelText);
+
+            const image = await placeholderImage(340, 100, labelText, '#ffffff');
+            res.set('Content-Type', 'image/' + image.format);
+            image.stream.pipe(res);
+        });
 
         fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
             return {

@@ -52,6 +52,7 @@ export function getTemplateTypes(t) {
                 owner.setFormStatusMessage('success', t('MJML is valid.'));
             }
         } catch (err) {
+            console.log(err);
             owner.setFormStatusMessage('danger', t('Invalid MJML.'));
         }
     }

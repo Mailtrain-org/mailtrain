@@ -123,6 +123,7 @@ export default class List extends Component {
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createMosaicoTemplate')}>
                             <DropdownLink to="/templates/mosaico/create">{t('blank')}</DropdownLink>
                             <DropdownLink to="/templates/mosaico/create/versafix">{t('versafixOne')}</DropdownLink>
+                            <DropdownLink to="/templates/mosaico/create/mjml-sample">{t('MJML Sample')}</DropdownLink>
                         </ButtonDropdown>
                     </Toolbar>
                 }

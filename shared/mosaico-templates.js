@@ -1532,10 +1532,218 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '</body>\n' +
     '</html>\n';
 
+const mjmlSample = '<mjml>\n' +
+    '  <mj-head>\n' +
+    '    <mj-attributes>\n' +
+    '      <mj-body background-color="white"/>\n' +
+    '      <mj-section padding="0px 0px" />\n' +
+    '      <mj-text padding="0px 10px" />\n' +
+    '      <mj-image padding="10px 10px" alt="" />\n' +
+    '      <mj-mosaico-image padding="10px 10px" alt="" />\n' +
+    '      <mj-mosaico-button align="left" background-color="#e85034" color="#fff" border-radius="24px" font-size="11px" />\n' +
+    '      \n' +
+    '      <mj-class name="header-section" margin-top="10px" background-color="#e85034" padding-top="5px" padding-bottom="5px" full-width="full-width" css-class="header"/>\n' +
+    '\n' +
+    '      <mj-class name="banner-section" padding-top="10px" />\n' +
+    '\n' +
+    '      <mj-class name="feature-section" padding-top="10px" padding-bottom="15px" css-class="feature" />\n' +
+    '      \n' +
+    '      <mj-class name="divider-section" background-color="#e85034" vertical-align="middle" full-width="full-width" padding-top="10px" padding-bottom="5px" css-class="divider"/>\n' +
+    '\n' +
+    '      <mj-class name="article-section" padding-top="10px" padding-bottom="10px" css-class="article" />\n' +
+    '\n' +
+    '      <mj-class name="links-section" padding-top="0px" padding-bottom="0px" background-color="#e85034" vertical-align="middle" full-width="full-width" />\n' +
+    '      <mj-social font-size="12px" font-family="arial,helvetica neue,helvetica,sans-serif" icon-size="30px" mode="horizontal" />\n' +
+    '      <mj-social-element text-padding="4px 15px 4px 0px" padding="8px" alt="" color="white"/>\n' +
+    '      \n' +
+    '      <mj-class name="footer-section" padding-top="30px"/>\n' +
+    '      <mj-class name="footer-text" css-class="footer" />\n' +
+    '    </mj-attributes>\n' +
+    '    \n' +
+    '    <mj-mosaico-property property-id="leftImage" label="Left Image" type="image" />\n' +
+    '    <mj-mosaico-property property-id="middleImage" label="Middle Image" type="image" />\n' +
+    '    <mj-mosaico-property property-id="rightImage" label="Right Image" type="image" />\n' +
+    '    <mj-mosaico-property property-id="readMoreLink" label="Button" type="link" />\n' +
+    '    \n' +
+    '    <mj-style>\n' +
+    '      p {\n' +
+    '        font-family: Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif;\n' +
+    '        font-size: 12px;\n' +
+    '        color: #9da3a3;\n' +
+    '        margin-top: 8px;\n' +
+    '      }\n' +
+    '      \n' +
+    '      h2 {\n' +
+    '        margin: 5px 0px 0px 0px;\n' +
+    '        font-size: 15px;\n' +
+    '        font-weight: normal;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .header a {\n' +
+    '        text-decoration: none;\n' +
+    '        color: white;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .feature p {\n' +
+    '        text-align: center;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .feature h2 {\n' +
+    '        color: #e85034;\n' +
+    '        text-align: center;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .divider h2 {\n' +
+    '        color: white;\n' +
+    '        text-align: center;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .divider p {\n' +
+    '        color: #f8d5d1;\n' +
+    '        text-align: center;\n' +
+    '      }\n' +
+    '\n' +
+    '      .article h2 {\n' +
+    '        font-weight: bold;\n' +
+    '        margin-top: 10px;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .article p {\n' +
+    '        color: #45474e;\n' +
+    '      }\n' +
+    '\n' +
+    '      .footer a {\n' +
+    '        color: #3A3A3A;\n' +
+    '      }\n' +
+    '\n' +
+    '      .footer p {\n' +
+    '        font-family: arial,helvetica neue,helvetica,sans-serif;\n' +
+    '        font-size: 12px;\n' +
+    '        text-align: center;\n' +
+    '      }\n' +
+    '    </mj-style>\n' +
+    '  </mj-head>\n' +
+    '  \n' +
+    '  <mj-body>\n' +
+    '    \n' +
+    '    <mj-section mj-class="header-section">\n' +
+    '      <mj-column>\n' +
+    '        <mj-text align="left"><a href="https://lists.example.org/subscription/[LIST_ID]?locale=en-US">Subscribe</a></mj-text>\n' +
+    '      </mj-column>\n' +
+    '      <mj-column>\n' +
+    '        <mj-text align="right"><a href="[LINK_BROWSER]">View&nbsp;in&nbsp;browser</a></mj-text>\n' +
+    '      </mj-column>\n' +
+    '    </mj-section>\n' +
+    '    \n' +
+    '    <mj-mosaico-block block-id="banner" label="Banner">\n' +
+    '      <mj-section mj-class="banner-section">\n' +
+    '        <mj-column>\n' +
+    '          <mj-mosaico-image property-id="image" placeholder-height="400" href="https://www.example.com/xxx" />\n' +
+    '        </mj-column>\n' +
+    '      </mj-section>\n' +
+    '    </mj-mosaico-block>\n' +
+    '\n' +
+    '    <mj-mosaico-container>\n' +
+    '      \n' +
+    '      <mj-mosaico-block block-id="feature_section" label="Feature">\n' +
+    '        <mj-section mj-class="feature-section">\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="leftImage" placeholder-height="150" href-editable="true" />\n' +
+    '            <mj-text>\n' +
+    '              <h2 mj-mosaico-editable="leftTitleText">Lorem ipsum dolor</h2>\n' +
+    '              <div mj-mosaico-editable="leftBodyText">\n' +
+    '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend sagittis nunc, et fermentum est ullamcorper dignissim.</p>\n' +
+    '              </div>\n' +
+    '            </mj-text>\n' +
+    '          </mj-column>\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="middleImage" placeholder-height="150" href-editable="true" />\n' +
+    '            <mj-text>\n' +
+    '              <h2 mj-mosaico-editable="middleTitleText">Lorem ipsum dolor</h2>\n' +
+    '              <div mj-mosaico-editable="leftBodyText">\n' +
+    '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend sagittis nunc, et fermentum est ullamcorper dignissim.</p>\n' +
+    '              </div>\n' +
+    '            </mj-text>\n' +
+    '          </mj-column>\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="rightImage" placeholder-height="150" href-editable="true" />\n' +
+    '            <mj-text>\n' +
+    '              <h2 mj-mosaico-editable="rightTitleText">Lorem ipsum dolor</h2>\n' +
+    '              <div mj-mosaico-editable="leftBodyText">\n' +
+    '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend sagittis nunc, et fermentum est ullamcorper dignissim.</p>\n' +
+    '              </div>\n' +
+    '            </mj-text>\n' +
+    '          </mj-column>\n' +
+    '        </mj-section>\n' +
+    '      </mj-mosaico-block>\n' +
+    '\n' +
+    '      <mj-mosaico-block block-id="divider_section" label="Divider">\n' +
+    '        <mj-section mj-class="divider-section">\n' +
+    '          <mj-column>\n' +
+    '            <mj-text>\n' +
+    '              <h2 mj-mosaico-editable="titleText">Lorem ipsum dolor</h2>\n' +
+    '            </mj-text>\n' +
+    '            <mj-divider border-color="white" border-width="1px" padding-bottom="10px" padding-top="15px"></mj-divider>\n' +
+    '            <mj-text>\n' +
+    '              <div mj-mosaico-editable="bodyText">\n' +
+    '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>\n' +
+    '              </div>\n' +
+    '            </mj-text>\n' +
+    '          </mj-column>\n' +
+    '        </mj-section>\n' +
+    '      </mj-mosaico-block>    \n' +
+    '    \n' +
+    '      <mj-mosaico-block block-id="article_section" label="Article">\n' +
+    '        <mj-section mj-class="article-section">\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="image" placeholder-height="280" href-editable="true" />\n' +
+    '          </mj-column>\n' +
+    '          <mj-column>\n' +
+    '            <mj-text>\n' +
+    '              <h2 mj-mosaico-editable="titleText">Lorem ipsum dolor</h2>\n' +
+    '              <div mj-mosaico-editable="bodyText">\n' +
+    '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>\n' +
+    '              </div>\n' +
+    '            </mj-text>\n' +
+    '            <mj-mosaico-button property-id="readMoreLink" font-family="Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif" padding-left="10px" padding-bottom="15px" padding-top="15px">Read more ...</mj-mosaico-button>\n' +
+    '          </mj-column>\n' +
+    '        </mj-section>\n' +
+    '      </mj-mosaico-block>  \n' +
+    '      \n' +
+    '    </mj-mosaico-container>    \n' +
+    '\n' +
+    '    <mj-section mj-class="links-section">\n' +
+    '      <mj-column>\n' +
+    '        <mj-social border-radius="5px">\n' +
+    '          <mj-social-element name="facebook" href="[LINK_BROWSER]">Share on Facebook</mj-social-element>\n' +
+    '          <mj-social-element  name="twitter" href="[LINK_BROWSER]">Tweet</mj-social-element>\n' +
+    '        </mj-social>       \n' +
+    '      </mj-column>\n' +
+    '    </mj-section>\n' +
+    '    \n' +
+    '    <mj-section mj-class="footer-section">\n' +
+    '      <mj-column>\n' +
+    '        <mj-text mj-class="footer-text">\n' +
+    '          <p>This email was sent to <a href="mailto:[EMAIL]">[EMAIL]</a><p>\n' +
+    '          <p> &nbsp; <a href="[LINK_UNSUBSCRIBE]">Unsubscribe&nbsp;from&nbsp;this&nbsp;list</a> &nbsp;  &nbsp; <a href="[LINK_PREFERENCES]">Update&nbsp;subscription&nbsp;preferences</a> &nbsp; </p>\n' +
+    '          <p>Your address XXXXXX</p>\n' +
+    '        </mj-text>\n' +
+    '      </mj-column>\n' +
+    '    </mj-section>\n' +
+    '    \n' +
+    '  </mj-body>\n' +
+    '</mjml>';
+
+
 function getVersafix() {
     return versafix;
 }
 
+function getMJMLSample() {
+    return mjmlSample;
+}
+
 module.exports = {
-    getVersafix
+    getVersafix,
+    getMJMLSample
 };

@@ -47,6 +47,7 @@
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "bounce-handler": "7.3.2-fork.3",
+    "capitalize": "^2.0.0",
     "compression": "^1.7.3",
     "config": "^3.0.1",
     "connect-flash": "^0.1.1",

@@ -27,7 +27,7 @@ import {
 } from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 
-import {getVersafix} from "../../../../shared/mosaico-templates";
+import {getVersafix, getMJMLSample} from "../../../../shared/mosaico-templates";
 import {
     getTemplateTypes,
     getTemplateTypesOrder
@@ -85,6 +85,15 @@ export default class CUD extends Component {
                     namespace: mailtrainConfig.user.namespace,
                     type: 'html',
                     html: getVersafix()
+                });
+
+            } else if (wizard === 'mjml-sample') {
+                this.populateFormValues({
+                    name: '',
+                    description: '',
+                    namespace: mailtrainConfig.user.namespace,
+                    type: 'mjml',
+                    mjml: getMJMLSample()
                 });
 
             } else {
@@ -183,7 +192,7 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
-                    {isEdit ?
+                    {isEdit || this.props.wizard ?
                         <StaticField id="type" className={styles.formDisabled} label={t('type')}>
                             {typeKey && this.templateTypes[typeKey].typeName}
                         </StaticField>
