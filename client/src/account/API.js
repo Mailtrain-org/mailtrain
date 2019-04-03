@@ -368,6 +368,37 @@ export default class API extends Component {
                 </p>
 
                 <pre>curl -XGET '{getUrl(`api/rss/fetch/5OOnZKrp0?access_token=${accessToken}`)}'</pre>
+
+                <h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4>
+
+                <p>
+                    {t('sendSingleEmailByTemplateId')}
+                </p>
+
+                <p>
+                    <strong>GET</strong> {t('arguments')}
+                </p>
+                <ul>
+                    <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
+                </ul>
+
+                <p>
+                    <strong>POST</strong> {t('arguments')}
+                </p>
+                <ul>
+                    <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
+                    <li><strong>SEND_CONFIGURATION_ID</strong> – {t('sendConfigurationId')}</li>
+                    <li><strong>SUBJECT</strong> – {t('subject')}</li>
+                    <li><strong>DATA</strong> – {t('templateData')}: <em>{'{'} "any": ["type", {'{'}"of": "data"{'}'}] {'}'}</em></li>
+                    <li><strong>VARIABLES</strong> – {t('templateVariables')}: <em>{'{'} "FOO": "bar" {'}'}</em></li>
+                </ul>
+
+                <p>
+                    <strong>{t('example')}</strong>
+                </p>
+
+                <pre>curl -XPOST '{getUrl(`api/templates/1/send?access_token={accessToken}`)}' \
+--data 'EMAIL=test@example.com&amp;SUBJECT=Test&amp;VARIABLES[FOO]=bar&amp;VARIABLES[TEST]=example'</pre>
             </div>
         );
     }

@@ -14,6 +14,7 @@ const mjml2html = require('mjml');
 const hbs = require('hbs');
 const juice = require('juice');
 const he = require('he');
+const htmlToText = require('html-to-text');
 
 const fs = require('fs-extra');
 
@@ -148,13 +149,20 @@ function validateEmailGetMessage(result, address, language) {
 
 function formatMessage(campaign, list, subscription, mergeTags, message, isHTML) {
     const links = getMessageLinks(campaign, list, subscription);
+    return formatTemplate(message, links, mergeTags, isHTML);
+}
+
+function formatTemplate(template, links, mergeTags, isHTML) {
+    if (!links && !mergeTags) { return template; }
 
     const getValue = fullKey => {
         const keys = (fullKey || '').split('.');
 
-        if (links.hasOwnProperty(keys[0])) {
+        if (links && links.hasOwnProperty(keys[0])) {
             return links[keys[0]];
         }
+
+        if (!mergeTags) { return false; }
 
         let value = mergeTags;
         while (keys.length > 0) {
@@ -173,7 +181,7 @@ function formatMessage(campaign, list, subscription, mergeTags, message, isHTML)
         }) : (containsHTML ? htmlToText.fromString(value) : value);
     };
 
-    return message.replace(/\[([a-z0-9_.]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
+    return template.replace(/\[([a-z0-9_.]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
         let value = getValue(identifier);
         if (value === false) {
             return match;
@@ -229,6 +237,7 @@ module.exports = {
     getTemplate,
     prepareHtml,
     getMessageLinks,
-    formatMessage
+    formatMessage,
+    formatTemplate
 };
 
