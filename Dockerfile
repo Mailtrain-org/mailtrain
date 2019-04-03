@@ -1,12 +1,16 @@
-FROM node:10.14-jessie
+FROM node:10.14-alpine
 
-RUN apt-get update && apt-get install -y pwgen netcat
+RUN apk add --update pwgen netcat-openbsd python make gcc git g++ bash
 
 # First install dependencies
 COPY server/package.json /app/server/package.json
+COPY server/package-lock.json /app/server/package-lock.json
 COPY client/package.json /app/client/package.json
+COPY client/package-lock.json /app/client/package-lock.json
 COPY shared/package.json /app/shared/package.json
+COPY shared/package-lock.json /app/shared/package-lock.json
 COPY zone-mta/package.json /app/zone-mta/package.json
+COPY zone-mta/package-lock.json /app/zone-mta/package-lock.json
 
 WORKDIR /app/
 
