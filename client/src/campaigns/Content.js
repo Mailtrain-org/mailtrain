@@ -33,6 +33,7 @@ import styles
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import {ContentModalDialog} from "../lib/modals";
 
 
 @withComponentMixins([
@@ -58,12 +59,20 @@ export default class CustomContent extends Component {
         this.state = {
             showMergeTagReference: false,
             elementInFullscreen: false,
-            showTestSendModal: false
+            showTestSendModal: false,
+            showExportModal: false,
+            exportModalContentType: null,
+            exportModalTitle: ''
         };
 
         this.initForm();
 
         this.sendModalGetDataHandler = ::this.sendModalGetData;
+        this.exportModalGetContentHandler = ::this.exportModalGetContent;
+
+        // This is needed here because if this is passed as an anonymous function, it will reset the editorNode to null with each render.
+        // This becomes a problem when Show HTML button is pressed because that one tries to access the editorNode while it is null.
+        this.editorNodeRefHandler = node => this.editorNode = node;
     }
 
     static propTypes = {
@@ -204,6 +213,19 @@ export default class CustomContent extends Component {
         };
     }
 
+    showExportModal(contentType, title) {
+        this.setState({
+            showExportModal: true,
+            exportModalContentType: contentType,
+            exportModalTitle: title
+        });
+    }
+
+    async exportModalGetContent() {
+        const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
+        return await this.templateTypes[customTemplateTypeKey].exportContent(this, this.state.exportModalContentType);
+    }
+
     render() {
         const t = this.props.t;
 
@@ -220,6 +242,12 @@ export default class CustomContent extends Component {
                     onHide={() => this.setState({showTestSendModal: false})}
                     getDataAsync={this.sendModalGetDataHandler}
                     entity={this.props.entity}
+                />
+                <ContentModalDialog
+                    title={this.state.exportModalTitle}
+                    visible={this.state.showExportModal}
+                    onHide={() => this.setState({showExportModal: false})}
+                    getContentAsync={this.exportModalGetContentHandler}
                 />
 
                 <Title>{t('editCustomContent')}</Title>

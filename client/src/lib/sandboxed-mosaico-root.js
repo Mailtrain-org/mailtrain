@@ -3,27 +3,15 @@
 import './public-path';
 
 import React, {Component} from 'react';
-import ReactDOM
-    from 'react-dom';
+import ReactDOM from 'react-dom';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './i18n';
-import {
-    parentRPC,
-    UntrustedContentRoot
-} from './untrusted';
-import PropTypes
-    from "prop-types";
-import {
-    getPublicUrl,
-    getSandboxUrl,
-    getTrustedUrl
-} from "./urls";
-import {
-    base,
-    unbase
-} from "../../../shared/templates";
+import {parentRPC, UntrustedContentRoot} from './untrusted';
+import PropTypes from "prop-types";
+import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
+import {base, unbase} from "../../../shared/templates";
 import {withComponentMixins} from "./decorator-helpers";
-
+import juice from "juice";
 
 @withComponentMixins([
     withTranslation
@@ -49,8 +37,29 @@ class MosaicoSandbox extends Component {
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
+
+
+        /* juice is called to inline css styles of situations like this
+            <style type="text/css" data-inline="true">
+                [data-ko-block=introBlock] .text p {
+                    font-family: merriweather,georgia,times new roman,serif; font-size: 14px; text-align: justify; line-height: 150%; color: #3A3A3A; margin-top: 8px;
+                }
+            </style>
+
+            ...
+
+            <div style="Margin:0px auto;max-width:600px;" data-ko-block="introBlock">
+                ...
+                <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;" data-ko-editable="text" class="text">
+                    <p>XXX</p>
+                </div>
+                ...
+            </div>
+         */
+        const html = juice(this.viewModel.exportHTML());
+
         return {
-            html: unbase(this.viewModel.exportHTML(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
+            html: unbase(html, trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
             model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase, publicUrlBase),
             metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase, publicUrlBase)
         };

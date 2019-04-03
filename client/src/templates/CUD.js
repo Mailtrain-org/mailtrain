@@ -1,48 +1,33 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page'
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
     Button,
-    ButtonRow, CheckBox,
+    ButtonRow,
+    CheckBox,
     Dropdown,
     Form,
     FormSendMethod,
     InputField,
-    StaticField, TableSelect,
+    StaticField,
+    TableSelect,
     TextArea,
     withForm
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {
-    NamespaceSelect,
-    validateNamespace
-} from '../lib/namespace';
-import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig
-    from 'mailtrainConfig';
-import {
-    getEditForm,
-    getTemplateTypes,
-    getTypeForm
-} from './helpers';
-import axios
-    from '../lib/axios';
-import styles
-    from "../lib/styles.scss";
+import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
+import mailtrainConfig from 'mailtrainConfig';
+import {getEditForm, getTemplateTypes, getTypeForm} from './helpers';
+import axios from '../lib/axios';
+import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import moment
-    from 'moment';
+import moment from 'moment';
 
 
 @withComponentMixins([
@@ -62,6 +47,9 @@ export default class CUD extends Component {
             showMergeTagReference: false,
             elementInFullscreen: false,
             showTestSendModal: false,
+            showExportModal: false,
+            exportModalContentType: null,
+            exportModalTitle: ''
         };
 
         this.initForm({
@@ -71,6 +59,11 @@ export default class CUD extends Component {
         });
 
         this.sendModalGetDataHandler = ::this.sendModalGetData;
+        this.exportModalGetContentHandler = ::this.exportModalGetContent;
+
+        // This is needed here because if this is passed as an anonymous function, it will reset the editorNode to null with each render.
+        // This becomes a problem when Show HTML button is pressed because that one tries to access the editorNode while it is null.
+        this.editorNodeRefHandler = node => this.editorNode = node;
     }
 
     static propTypes = {
@@ -244,6 +237,19 @@ export default class CUD extends Component {
         };
     }
 
+    showExportModal(contentType, title) {
+        this.setState({
+            showExportModal: true,
+            exportModalContentType: contentType,
+            exportModalTitle: title
+        });
+    }
+
+    async exportModalGetContent() {
+        const typeKey = this.getFormValue('type');
+        return await this.templateTypes[typeKey].exportContent(this, this.state.exportModalContentType);
+    }
+
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
@@ -281,6 +287,13 @@ export default class CUD extends Component {
                         visible={this.state.showTestSendModal}
                         onHide={() => this.setState({showTestSendModal: false})}
                         getDataAsync={this.sendModalGetDataHandler}/>
+                }
+                {isEdit &&
+                    <ContentModalDialog
+                        title={this.state.exportModalTitle}
+                        visible={this.state.showExportModal}
+                        onHide={() => this.setState({showExportModal: false})}
+                        getContentAsync={this.exportModalGetContentHandler}/>
                 }
                 {canDelete &&
                     <DeleteModalDialog

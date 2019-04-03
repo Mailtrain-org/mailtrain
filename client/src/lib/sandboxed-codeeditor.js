@@ -23,7 +23,9 @@ export class CodeEditorHost extends Component {
             fullscreen: false,
             preview: true,
             wrap: true
-        }
+        };
+
+        this.contentNodeRefHandler = node => this.contentNode = node;
     }
 
     static propTypes = {
@@ -35,6 +37,7 @@ export class CodeEditorHost extends Component {
         onSave: PropTypes.func,
         canSave: PropTypes.bool,
         onTestSend: PropTypes.func,
+        onShowExport: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 
@@ -96,11 +99,12 @@ export class CodeEditorHost extends Component {
                         <a className={styles.btn} onClick={::this.toggleWrapAsync} title={this.state.wrap ? t('Disable word wrap') : t('Enable word wrap')}>{this.state.wrap ? 'WRAP': 'NOWRAP'}</a>
                         {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave} title={t('Save')}><Icon icon="save"/></a> : <span className={styles.btnDisabled}><Icon icon="floppy-disk"/></span>}
                         <a className={styles.btn} onClick={this.props.onTestSend} title={t('Send test e-mail')}><Icon icon="at"/></a>
+                        <a className={styles.btn} onClick={() => this.props.onShowExport('html', 'HTML')} title={t('Show HTML')}><Icon icon="file-code"/></a>
                         <a className={styles.btn} onClick={::this.togglePreviewAsync} title={this.state.preview ? t('Hide preview'): t('Show preview')}><Icon icon={this.state.preview ? 'eye-slash': 'eye'}/></a>
                         <a className={styles.btn} onClick={::this.toggleFullscreenAsync} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
                     </div>
                 </div>
-                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="codeeditor/editor" tokenMethod="codeeditor" tokenParams={tokenData}/>
+                <UntrustedContentHost ref={this.contentNodeRefHandler} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="codeeditor/editor" tokenMethod="codeeditor" tokenParams={tokenData}/>
             </div>
         );
     }

@@ -42,6 +42,7 @@ export class UntrustedContentHost extends Component {
         };
 
         this.receiveMessageHandler = ::this.receiveMessage;
+        this.contentNodeRefHandler = node => this.contentNode = node;
 
         this.rpcCounter = 0;
         this.rpcResolves = new Map();
@@ -176,7 +177,7 @@ export class UntrustedContentHost extends Component {
     render() {
         return (
             // The 40 px below corresponds to the height in .sandbox-loading-message
-            <iframe className={styles.untrustedContent + ' ' + this.props.className} height="40px" ref={node => this.contentNode = node} src={getSandboxUrl(this.props.contentSrc)} onLoad={::this.contentNodeLoaded}></iframe>
+            <iframe className={styles.untrustedContent + ' ' + this.props.className} height="40px" ref={this.contentNodeRefHandler} src={getSandboxUrl(this.props.contentSrc)} onLoad={::this.contentNodeLoaded}></iframe>
         );
     }
 }

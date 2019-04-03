@@ -229,7 +229,7 @@ function getRouter(appType) {
                 }
 
             } else {
-                width = sanitizeSize(width, 1, 2048, 600, false);
+                width = sanitizeSize(width, 1, 2048, 600, true);
                 height = sanitizeSize(height, 1, 2048, 300, true);
 
                 let filePath;

@@ -3,46 +3,27 @@
 import './public-path';
 
 import React, {Component} from 'react';
-import ReactDOM
-    from 'react-dom';
+import ReactDOM from 'react-dom';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './i18n';
-import {
-    parentRPC,
-    UntrustedContentRoot
-} from './untrusted';
-import PropTypes
-    from "prop-types";
-import styles
-    from "./sandboxed-codeeditor.scss";
-import {
-    getPublicUrl,
-    getSandboxUrl,
-    getTrustedUrl
-} from "./urls";
-import {
-    base,
-    unbase
-} from "../../../shared/templates";
-import ACEEditorRaw
-    from 'react-ace';
+import {parentRPC, UntrustedContentRoot} from './untrusted';
+import PropTypes from "prop-types";
+import styles from "./sandboxed-codeeditor.scss";
+import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
+import {base, unbase} from "../../../shared/templates";
+import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 import 'brace/mode/html';
 import {CodeEditorSourceType} from "./sandboxed-codeeditor-shared";
 
-import mjml2html
-    from "mjml4-in-browser";
+import mjml2html from "./mjml";
 
-import {registerComponents} from "./mjml-mosaico";
+import juice from "juice";
 
-import juice
-    from "juice";
 import {withComponentMixins} from "./decorator-helpers";
 
 const refreshTimeout = 1000;
-
-registerComponents();
 
 @withComponentMixins([
     withTranslation
@@ -148,15 +129,19 @@ class CodeEditorSandbox extends Component {
     }
 
     getHtml() {
-        let previewContents;
+        let contents;
         if (this.props.sourceType === CodeEditorSourceType.MJML) {
-            const res = mjml2html(this.state.source);
-            previewContents = res.html;
+            try {
+                const res = mjml2html(this.state.source);
+                contents = res.html;
+            } catch (err) {
+                contents = '';
+            }
         } else if (this.props.sourceType === CodeEditorSourceType.HTML) {
-            previewContents = juice(this.state.source);
+            contents = juice(this.state.source);
         }
 
-        return previewContents;
+        return contents;
     }
 
     onCodeChanged(data) {

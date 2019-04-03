@@ -16,7 +16,7 @@ import {
     Dropdown,
     Form,
     FormSendMethod,
-    InputField,
+    InputField, StaticField,
     TextArea,
     withForm
 } from '../../lib/form';
@@ -33,6 +33,7 @@ import {
     getTemplateTypesOrder
 } from "./helpers";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import styles from "../../lib/styles.scss";
 
 @withComponentMixins([
     withTranslation,
@@ -67,7 +68,7 @@ export default class CUD extends Component {
     }
 
     getFormValuesMutator(data) {
-        this.templateTypes[data.type].afterLoad(data);
+        this.templateTypes[data.type].afterLoad(this, data);
     }
 
     componentDidMount() {
@@ -132,7 +133,7 @@ export default class CUD extends Component {
         this.setFormStatusMessage('info', t('saving'));
 
         const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            this.templateTypes[data.type].beforeSave(data);
+            this.templateTypes[data.type].beforeSave(this, data);
         });
 
         if (submitResult) {
@@ -163,10 +164,6 @@ export default class CUD extends Component {
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const typeKey = this.getFormValue('type');
-        let form = null;
-        if (typeKey) {
-            form = this.templateTypes[typeKey].getForm(this);
-        }
 
         return (
             <div>
@@ -186,15 +183,22 @@ export default class CUD extends Component {
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
-                    <Dropdown id="type" label={t('type')} options={this.typeOptions}/>
+                    {isEdit ?
+                        <StaticField id="type" className={styles.formDisabled} label={t('type')}>
+                            {typeKey && this.templateTypes[typeKey].typeName}
+                        </StaticField>
+                        :
+                        <Dropdown id="type" label={t('type')} options={this.typeOptions}/>
+                    }
                     <NamespaceSelect/>
 
-                    {form}
+                    {isEdit && typeKey && this.templateTypes[typeKey].getForm(this)}
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/mosaico/${this.props.entity.id}/delete`}/>}
+                        {isEdit && typeKey && this.templateTypes[typeKey].getButtons(this)}
                     </ButtonRow>
                 </Form>
             </div>

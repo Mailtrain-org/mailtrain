@@ -11,6 +11,7 @@ import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
+import {GrapesJSSourceType} from "./sandboxed-grapesjs-shared";
 
 @withComponentMixins([
     withTranslation
@@ -21,7 +22,9 @@ export class GrapesJSHost extends Component {
 
         this.state = {
             fullscreen: false
-        }
+        };
+
+        this.contentNodeRefHandler = node => this.contentNode = node;
     }
 
     static propTypes = {
@@ -34,6 +37,7 @@ export class GrapesJSHost extends Component {
         onSave: PropTypes.func,
         canSave: PropTypes.bool,
         onTestSend: PropTypes.func,
+        onShowExport: PropTypes.func,
         onFullscreenAsync: PropTypes.func
     }
 
@@ -75,10 +79,12 @@ export class GrapesJSHost extends Component {
                     <div className={styles.navbarRight}>
                         {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave} title={t('Save')}><Icon icon="save"/></a> : <span className={styles.btnDisabled}><Icon icon="save"/></span>}
                         <a className={styles.btn} onClick={this.props.onTestSend} title={t('Send test e-mail')}><Icon icon="at"/></a>
+                        <a className={styles.btn} onClick={() => this.props.onShowExport('html', 'HTML')} title={t('Show HTML')}><Icon icon="file-code"/></a>
+                        {this.props.sourceType === GrapesJSSourceType.MJML && <a className={styles.btn} onClick={() => this.props.onShowExport('mjml', 'MJML')} title={t('Show MJML')}>MJML</a>}
                         <a className={styles.btn} onClick={::this.toggleFullscreenAsync} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
                     </div>
                 </div>
-                <UntrustedContentHost ref={node => this.contentNode = node} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="grapesjs/editor" tokenMethod="grapesjs" tokenParams={tokenData}/>
+                <UntrustedContentHost ref={this.contentNodeRefHandler} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="grapesjs/editor" tokenMethod="grapesjs" tokenParams={tokenData}/>
             </div>
         );
     }

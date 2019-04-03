@@ -3,39 +3,21 @@
 import React, {Component} from 'react';
 import {withTranslation} from './i18n';
 import axios, {HTTPMethod} from './axios';
-import Immutable
-    from 'immutable';
-import PropTypes
-    from 'prop-types';
-import interoperableErrors
-    from '../../../shared/interoperable-errors';
+import Immutable from 'immutable';
+import PropTypes from 'prop-types';
+import interoperableErrors from '../../../shared/interoperable-errors';
 import {withPageHelpers} from './page'
-import {
-    ParentErrorHandlerContext,
-    withAsyncErrorHandler,
-    withErrorHandling
-} from './error-handling';
-import {
-    TreeSelectMode,
-    TreeTable
-} from './tree';
-import {
-    Table,
-    TableSelectMode
-} from './table';
-import {
-    Button,
-    Icon
-} from "./bootstrap-components";
-import { SketchPicker } from 'react-color';
+import {withAsyncErrorHandler, withErrorHandling} from './error-handling';
+import {TreeSelectMode, TreeTable} from './tree';
+import {Table, TableSelectMode} from './table';
+import {Button} from "./bootstrap-components";
+import {SketchPicker} from 'react-color';
 
-import ACEEditorRaw
-    from 'react-ace';
+import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
 import 'brace/ext/searchbox';
 
-import DayPicker
-    from 'react-day-picker';
+import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 import {
     birthdayYear,
@@ -48,15 +30,10 @@ import {
     parseDate
 } from '../../../shared/date';
 
-import styles
-    from "./styles.scss";
-import moment
-    from "moment";
+import styles from "./styles.scss";
+import moment from "moment";
 import {getUrl} from "./urls";
-import {
-    createComponentMixin,
-    withComponentMixins
-} from "./decorator-helpers";
+import {createComponentMixin, withComponentMixins} from "./decorator-helpers";
 
 
 const FormState = {
@@ -133,7 +110,7 @@ class Form extends Component {
                         </fieldset>
                         {!props.noStatus && statusMessageText &&
                         <AlignedRow format={props.format} htmlId="form-status-message">
-                            <p className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</p>
+                            <div className={`alert alert-${statusMessageSeverity} ${styles.formStatus}`} role="alert">{statusMessageText}</div>
                         </AlignedRow>
                         }
                     </FormStateOwnerContext.Provider>
@@ -149,7 +126,7 @@ class Form extends Component {
 class Fieldset extends Component {
     static propTypes = {
         id: PropTypes.string,
-        label: PropTypes.string,
+        label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         flat: PropTypes.bool,
         className: PropTypes.string
@@ -282,6 +259,11 @@ class StaticField extends Component {
         const htmlId = 'form_' + id;
 
         let className = 'form-control';
+
+        if (props.withValidation) {
+            className = owner.addFormValidationClass(className, id);
+        }
+
         if (props.className) {
             className += ' ' + props.className;
         }
@@ -336,7 +318,7 @@ class InputField extends Component {
 class CheckBox extends Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
-        text: PropTypes.string.isRequired,
+        text: PropTypes.string,
         label: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         format: PropTypes.string,
@@ -661,7 +643,7 @@ class DatePicker extends Component {
         const className = owner.addFormValidationClass('form-control', id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <div>
+            <>
                 <div className="input-group">
                     <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
                     <div className="input-group-append">
@@ -680,7 +662,7 @@ class DatePicker extends Component {
                     />
                 </div>
                 }
-            </div>
+            </>
         );
     }
 }
@@ -995,7 +977,12 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
             let payloadNotEmpty = false;
 
             for (const attr of settings.serverValidation.extra || []) {
-                payload[attr] = mutState.getIn(['data', attr, 'value']);
+                if (typeof attr === 'string') {
+                    payload[attr] = mutState.getIn(['data', attr, 'value']);
+                } else {
+                    const data = mutState.get('data').map(attr => attr.get('value')).toJS();
+                    payload[attr.key] = attr.data(data);
+                }
             }
 
             for (const attr of settings.serverValidation.changed) {

@@ -3,31 +3,17 @@
 import './public-path';
 
 import React, {Component} from 'react';
-import ReactDOM
-    from 'react-dom';
+import ReactDOM from 'react-dom';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './i18n';
-import {
-    parentRPC,
-    UntrustedContentRoot
-} from './untrusted';
-import PropTypes
-    from "prop-types";
-import {
-    getPublicUrl,
-    getSandboxUrl,
-    getTrustedUrl
-} from "./urls";
-import {
-    base,
-    unbase
-} from "../../../shared/templates";
-import mjml2html
-    from "mjml4-in-browser";
+import {parentRPC, UntrustedContentRoot} from './untrusted';
+import PropTypes from "prop-types";
+import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
+import {base, unbase} from "../../../shared/templates";
+import mjml2html from "./mjml";
 
 import 'grapesjs/dist/css/grapes.min.css';
-import grapesjs
-    from 'grapesjs';
+import grapesjs from 'grapesjs';
 
 import 'grapesjs-mjml';
 
@@ -36,8 +22,7 @@ import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 
 import "./sandboxed-grapesjs.scss";
 
-import axios
-    from './axios';
+import axios from './axios';
 import {GrapesJSSourceType} from "./sandboxed-grapesjs-shared";
 import {withComponentMixins} from "./decorator-helpers";
 

@@ -70,7 +70,7 @@ class Root extends Component {
     render() {
         const t = this.props.t;
 
-        const structure = {};
+        let structure;
 
         // The MainMenu component is defined here in order to avoid recreating menu structure on every change in the main menu
         // This is because Root component depends only on the language, thus it is redrawn (and the structure is recomputed) only when the language changes
@@ -87,7 +87,7 @@ class Root extends Component {
             render() {
                 const path = this.props.location.pathname;
 
-                const topLevelItems = structure[""].children;
+                const topLevelItems = structure.children;
 
                 const topLevelMenu = [];
 
@@ -137,7 +137,7 @@ class Root extends Component {
             }
         }
 
-        structure[''] ={
+        structure = {
             title: t('home'),
             link: '/',
             panelComponent: Home,
