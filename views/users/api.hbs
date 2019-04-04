@@ -181,6 +181,7 @@
 </p>
 <ul>
     <li><strong>NAME</strong> – {{#translate}}field name{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)</li>
+    <li><strong>DESCRIPTION</strong> – {{#translate}}field description{{/translate}}</li>
     <li><strong>TYPE</strong> – {{#translate}}one of the following types:{{/translate}}
         <ul>
             {{#each allowedTypes}}
@@ -334,3 +335,32 @@
 </p>
 
 <pre>curl -XGET '{{serviceUrl}}api/list/1?access_token={{accessToken}}'</pre>
+
+<h3>POST /api/changeemail/:listId – {{#translate}}Change email of existing list subscriber{{/translate}}</h3>
+
+<p>
+    {{#translate}}This API call changes the email address of an existing list subscriber.{{/translate}}
+</p>
+
+<p>
+    <strong>GET</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>access_token</strong> – {{#translate}}your personal access token{{/translate}}
+</ul>
+
+<p>
+    <strong>POST</strong> {{#translate}}arguments{{/translate}}
+</p>
+<ul>
+    <li><strong>EMAILOLD</strong> – {{#translate}}subscriber's old email address{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)
+    <li><strong>EMAILNEW</strong> – {{#translate}}subscriber's new email address{{/translate}} (<em>{{#translate}}required{{/translate}}</em>)
+</ul>
+
+<p>
+    <strong>{{#translate}}Example{{/translate}}</strong>
+</p>
+
+<pre>curl -XPOST {{serviceUrl}}api/changeemail/B16uVTdW?access_token={{accessToken}} \
+--data 'EMAILOLD=test@example.com&EMAILNEW=foo@bar.com'</pre>
+

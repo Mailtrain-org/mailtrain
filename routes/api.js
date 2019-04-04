@@ -419,6 +419,7 @@ router.post('/field/:listId', (req, res) => {
 
         let field = {
             name: (input.NAME || '').toString().trim(),
+            description: (input.DESCRIPTION || '').toString().trim(),
             defaultValue: (input.DEFAULT || '').toString().trim() || null,
             type: (input.TYPE || '').toString().toLowerCase().trim(),
             group: Number(input.GROUP) || null,
@@ -521,6 +522,113 @@ router.get('/blacklist/get', (req, res) => {
             emails: data
           }
       });
+    });
+});
+
+router.post('/changeemail/:listId', (req, res) => {
+    let input = {};
+    Object.keys(req.body).forEach(key => {
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+    });
+    if (!(input.EMAILOLD) || (input.EMAILOLD === ''))  {
+      res.status(500);
+      return res.json({
+          error: 'EMAILOLD argument is required',
+          data: []
+      });
+    }
+    if (!(input.EMAILNEW) || (input.EMAILNEW === ''))  {
+      res.status(500);
+      return res.json({
+          error: 'EMAILNEW argument is required',
+          data: []
+      });
+    }
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            log.error('API', err);
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+        blacklist.isblacklisted(input.EMAILNEW, (err, blacklisted) =>{
+          if (err) {
+              res.status(500);
+              return res.json({
+                  error: err.message || err,
+                  data: []
+              });
+          }
+          if (blacklisted) {
+            res.status(500);
+            return res.json({
+                error: 'New email is blacklisted',
+                data: []
+            });
+          }
+
+          subscriptions.getByEmail(list.id, input.EMAILOLD, (err, subscription) => {
+              if (err) {
+                  res.status(500);
+                  return res.json({
+                      error: err.message || err,
+                      data: []
+                  });
+              }
+
+              if (!subscription) {
+                  res.status(404);
+                  return res.json({
+                      error: 'Subscription with given old email not found',
+                      data: []
+                  });
+              }
+
+              subscriptions.updateAddressCheck(list, subscription.cid, input.EMAILNEW, null, (err, old, valid) => {
+                  if (err) {
+                      res.status(500);
+                      return res.json({
+                          error: err.message || err,
+                          data: []
+                      });
+                  }
+
+                  if (!valid) {
+                      res.status(500);
+                      return res.json({
+                          error: 'New email not valid',
+                          data: []
+                      });
+                  }
+
+                  subscriptions.updateAddress(list.id, subscription.id, input.EMAILNEW, (err) => {
+                      if (err) {
+                          res.status(500);
+                          return res.json({
+                              error: err.message || err,
+                              data: []
+                          });
+                      }
+                      res.status(200);
+                      res.json({
+                          data: {
+                              id: subscription.id,
+                              changedemail: true
+                          }
+                      });
+                  });
+              });
+          });
+        });
     });
 });
 

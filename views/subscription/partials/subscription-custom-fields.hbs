@@ -134,9 +134,12 @@
             <label>{{name}}</label>
             <input type="hidden" name="origin_{{key}}" value="webform">
             {{#each options}}
+                <p>
                 <label class="label-checkbox">
                     <input type="checkbox" name="{{column}}" value="1" {{#if value}} checked {{/if}}> {{name}}
                 </label>
+                <span class="help-block">{{description}}</span>
+                </p>
             {{/each}}
         </div>
     {{/if}}
