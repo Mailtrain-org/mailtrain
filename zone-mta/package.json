@@ -14,9 +14,9 @@
         "node": ">=10.0.0"
     },
     "dependencies": {
-        "zone-mta": "1.13.3",
-        "zonemta-delivery-counters": "1.0.1",
-        "zonemta-limiter": "1.0.0",
-        "zonemta-loop-breaker": "1.0.2"
+        "zone-mta": "^1.16.0",
+        "zonemta-delivery-counters": "^1.0.1",
+        "zonemta-limiter": "^1.0.0",
+        "zonemta-loop-breaker": "^1.0.2"
     }
 }

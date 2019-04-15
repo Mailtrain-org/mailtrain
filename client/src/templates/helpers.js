@@ -253,10 +253,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     const grapesJSSourceTypes = getGrapesJSSourceTypeOptions(t);
     const grapesJSSourceTypeLabels = {};
-    for ({
-        key,
-        label
-    } of grapesJSSourceTypes) {
+    for (const { key, label } of grapesJSSourceTypes) {
         grapesJSSourceTypeLabels[key] = label;
     }
 
