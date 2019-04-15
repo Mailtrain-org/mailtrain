@@ -253,8 +253,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     const grapesJSSourceTypes = getGrapesJSSourceTypeOptions(t);
     const grapesJSSourceTypeLabels = {};
-    for (const { key, label } of grapesJSSourceTypes) {
-        grapesJSSourceTypeLabels[key] = label;
+    for (const srcType of grapesJSSourceTypes) {
+        grapesJSSourceTypeLabels[srcType.key] = srcType.label;
     }
 
     templateTypes.grapesjs = {
@@ -389,11 +389,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     const codeEditorSourceTypes = getCodeEditorSourceTypeOptions(t);
     const codeEditorSourceTypeLabels = {};
-    for ({
-        key,
-        label
-    } of codeEditorSourceTypes) {
-        codeEditorSourceTypeLabels[key] = label;
+    for (const srcType of codeEditorSourceTypes) {
+        codeEditorSourceTypeLabels[srcType.key] = srcType.label;
     }
 
     templateTypes.codeeditor = {
