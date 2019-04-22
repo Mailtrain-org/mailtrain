@@ -23,6 +23,7 @@ const bluebird = require('bluebird');
 const shares = require('./models/shares');
 const { AppType } = require('../shared/app');
 const builtinZoneMta = require('./lib/builtin-zone-mta');
+const klawSync = require('klaw-sync');
 
 const { uploadedFilesDir } = require('./lib/file-helpers');
 const { reportFilesDir } = require('./lib/report-helpers');
@@ -96,8 +97,17 @@ async function init() {
     await startHTTPServer(AppType.PUBLIC, 'public', publicPort);
 
     await privilegeHelpers.ensureMailtrainDir(filesDir);
+
+    // Update owner of all files under 'files' dir. This should not be necessary, but when files are copied over,
+    // the ownership needs to be fixed.
+    for (const dirEnt of klawSync(filesDir, {})) {
+        await privilegeHelpers.ensureMailtrainOwner(dirEnt.path);
+    }
+
+
     await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
     await privilegeHelpers.ensureMailtrainDir(reportFilesDir);
+
 
     privilegeHelpers.dropRootPrivileges();
 

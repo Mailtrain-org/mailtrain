@@ -50,13 +50,18 @@ function getConfigROUidGid() {
 
 function ensureMailtrainOwner(file, callback) {
     const ids = getConfigUidGid();
-    fs.chown(file, ids.uid, ids.gid, callback);
+
+    if (callback) {
+        fs.chown(file, ids.uid, ids.gid, callback);
+    } else {
+        return fs.chownAsync(file, ids.uid, ids.gid);
+    }
 }
 
-async function ensureMailtrainDir(dir, recursive) {
+async function ensureMailtrainDir(dir) {
     const ids = getConfigUidGid();
     await fs.ensureDir(dir);
-    await fs.chownAsync(dir, ids.uid, ids.gid);
+    await ensureMailtrainOwner(dir);
 }
 
 function dropRootPrivileges() {

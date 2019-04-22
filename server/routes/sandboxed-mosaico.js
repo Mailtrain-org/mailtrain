@@ -227,14 +227,32 @@ async function getRouter(appType) {
 
     } else if (appType === AppType.TRUSTED || appType === AppType.PUBLIC) { // Mosaico editor loads the images from TRUSTED endpoint. This is hard to change because the index.html has to come from TRUSTED.
                                                                             // So we serve /mosaico/img under both endpoints. There is no harm in it.
-        router.getAsync('/img', await fileCache('mosaico-images', config.mosaico.fileCache.images), async (req, res) => {
+
+        const trustedUrlPrefix = getTrustedUrl();
+        const publicUrlPrefix = getPublicUrl();
+        const imgCacheFileName = req => {
+            const method = req.query.method || '';
+            const params = req.query.params || '';
+            const src = req.query.src || '';
+
+            if (method === 'placeholder') {
+                return `${method}_${params}`;
+            } else if (src.startsWith(trustedUrlPrefix)) {
+                return `${src.substring(trustedUrlPrefix.length)}_${method}_${params}`;
+            } else if (src.startsWith(publicUrlPrefix)) {
+                return `${src.substring(publicUrlPrefix.length)}_${method}_${params}`;
+            } else {
+                return null;
+            }
+        };
+
+
+        router.getAsync('/img', await fileCache('mosaico-images', config.mosaico.fileCache.images, imgCacheFileName), async (req, res) => {
             const method = req.query.method;
             const params = req.query.params;
             let [width, height] = params.split(',');
             let image;
 
-
-            // FIXME - cache the generated files !!!
 
             if (method === 'placeholder') {
                 width = sanitizeSize(width, 1, 2048, 600, false);

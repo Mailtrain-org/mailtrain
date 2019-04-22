@@ -179,8 +179,10 @@ mosaico:
   fileCache:
     blockThumbnails:
       maxSize: 100 # megabytes
+      pruneInterval: 60 # seconds
     images:
       maxSize: 1024 # megabytes
+      pruneInterval: 60 # seconds
 
 
 grapesjs:
