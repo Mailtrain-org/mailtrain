@@ -118,7 +118,7 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
 
 
 
-function createApp(appType) {
+async function createApp(appType) {
     const app = express();
 
     function install404Fallback(url) {
@@ -273,10 +273,10 @@ function createApp(appType) {
         useWith404Fallback('/files', files);
     }
 
-    useWith404Fallback('/mosaico', sandboxedMosaico.getRouter(appType));
-    useWith404Fallback('/ckeditor', sandboxedCKEditor.getRouter(appType));
-    useWith404Fallback('/grapesjs', sandboxedGrapesJS.getRouter(appType));
-    useWith404Fallback('/codeeditor', sandboxedCodeEditor.getRouter(appType));
+    useWith404Fallback('/mosaico', await sandboxedMosaico.getRouter(appType));
+    useWith404Fallback('/ckeditor', await sandboxedCKEditor.getRouter(appType));
+    useWith404Fallback('/grapesjs', await sandboxedGrapesJS.getRouter(appType));
+    useWith404Fallback('/codeeditor', await sandboxedCodeEditor.getRouter(appType));
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
         useWith404Fallback('/subscriptions', subscriptions);
@@ -318,7 +318,7 @@ function createApp(appType) {
         install404Fallback('/rest');
     }
 
-    app.use('/', index.getRouter(appType));
+    app.use('/', await index.getRouter(appType));
 
     app.use((err, req, res, next) => {
         if (!err) {

@@ -53,7 +53,7 @@ function ensureMailtrainOwner(file, callback) {
     fs.chown(file, ids.uid, ids.gid, callback);
 }
 
-async function ensureMailtrainDir(dir) {
+async function ensureMailtrainDir(dir, recursive) {
     const ids = getConfigUidGid();
     await fs.ensureDir(dir);
     await fs.chownAsync(dir, ids.uid, ids.gid);

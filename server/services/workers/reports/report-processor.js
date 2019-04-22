@@ -1,9 +1,9 @@
 'use strict';
 
 const reports = require('../../../models/reports');
-const reportTemplates = require('../../../models/report-templates');
 const lists = require('../../../models/lists');
 const subscriptions = require('../../../models/subscriptions');
+const { SubscriptionSource, SubscriptionStatus } = require('../../../../shared/lists');
 const campaigns = require('../../../models/campaigns');
 const handlebars = require('handlebars');
 const hbs = require('hbs');
@@ -50,9 +50,11 @@ async function main() {
         }
 
         const campaignsProxy = {
+            getCampaignStatistics: reports.getCampaignStatistics,
             getCampaignOpenStatistics: reports.getCampaignOpenStatistics,
             getCampaignClickStatistics: reports.getCampaignClickStatistics,
             getCampaignLinkClickStatistics: reports.getCampaignLinkClickStatistics,
+            getCampaignStatisticsStream: reports.getCampaignStatisticsStream,
             getCampaignOpenStatisticsStream: reports.getCampaignOpenStatisticsStream,
             getCampaignClickStatisticsStream: reports.getCampaignClickStatisticsStream,
             getCampaignLinkClickStatisticsStream: reports.getCampaignLinkClickStatisticsStream,
@@ -71,17 +73,45 @@ async function main() {
             knex,
             process,
             inputs,
+            SubscriptionSource,
+            SubscriptionStatus,
 
-            renderCsvFromStream: async (readable, opts) => {
-                const stringifier = csvStringify(opts);
-
+            renderCsvFromStream: async (readable, opts, transform) => {
                 const finished = new Promise((success, fail) => {
-                    stringifier.on('finish', () => success())
-                    stringifier.on('error', (err) => fail(err))
-                });
+                    let lastReadable = readable;
 
-                stringifier.pipe(process.stdout);
-                readable.pipe(stringifier);
+                    const stringifier = csvStringify(opts);
+
+                    stringifier.on('finish', () => success());
+                    stringifier.on('error', err => fail(err));
+
+                    if (transform) {
+                        const rowTransform = new stream.Transform({
+                            objectMode: true,
+                            transform(row, encoding, callback) {
+                                async function performTransform() {
+                                    try {
+                                        const newRow = await transform(row, encoding);
+                                        callback(null, newRow);
+                                    } catch (err) {
+                                        callback(err);
+                                    }
+                                }
+
+                                // noinspection JSIgnoredPromiseFromCall
+                                performTransform();
+                            }
+                        });
+
+                        lastReadable.on('error', err => fail(err));
+                        lastReadable.pipe(rowTransform);
+
+                        lastReadable = rowTransform;
+                    }
+
+                    stringifier.pipe(process.stdout);
+                    lastReadable.pipe(stringifier);
+                });
 
                 await finished;
             },

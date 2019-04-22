@@ -4,7 +4,7 @@ const passport = require('../../lib/passport');
 
 const bluebird = require('bluebird');
 const premailerApi = require('premailer-api');
-const premailerPrepareAsync = bluebird.promisify(premailerApi.prepare);
+const premailerPrepareAsync = bluebird.promisify(premailerApi.prepare.bind(premailerApi));
 
 const router = require('../../lib/router-async').create();
 

@@ -6,6 +6,7 @@ const log = require('./log');
 const path = require('path');
 const fs = require('fs-extra')
 const crypto = require('crypto');
+const bluebird = require('bluebird');
 
 let zoneMtaProcess;
 
@@ -155,6 +156,6 @@ function spawn(callback) {
     }
 }
 
-module.exports.spawn = spawn;
+module.exports.spawn = bluebird.promisify(spawn);
 module.exports.getUsername = getUsername;
 module.exports.getPassword = getPassword;

@@ -130,23 +130,17 @@ export default class CUD extends Component {
                         '    "maxOccurences": 1\n' +
                         '  }\n' +
                         ']',
-                    js:
-                        'const sampleRowTransform = new stream.Transform({\n' +
-                        '  objectMode: true,\n' +
-                        '  transform(row, encoding, callback) {\n' +
-                        '    callback(null, row)\n' +
-                        '  }\n' +
-                        '})\n' +
+                    js: 'const results = await campaigns.getCampaignOpenStatisticsStream(inputs.campaign, [\'subscription:email\', \'tracker:count\'], null, (query, col) => query.where(col(\'subscription:status\'), SubscriptionStatus.SUBSCRIBED));\n' +
                         '\n' +
-                        'const results = await campaigns.getCampaignOpenStatisticsStream(inputs.campaign, [\'subscription:email\', \'tracker:count\'])\n' +
-                        '\n' +
-                        'results.pipe(sampleRowTransform)\n' +
-                        '\n' +
-                        'await renderCsvFromStream(sampleRowTransform, {\n' +
-                        '  header: true,\n' +
-                        '  columns: [ { key: \'subscription:email\', header: \'Email\' }, { key: \'tracker:count\', header: \'Open count\' } ],\n' +
-                        '  delimiter: \',\'\n' +
-                        '})',
+                        'await renderCsvFromStream(\n' +
+                        '  results, \n' +
+                        '  {\n' +
+                        '    header: true,\n' +
+                        '    columns: [ { key: \'subscription:email\', header: \'Email\' }, { key: \'tracker:count\', header: \'Open count\' } ],\n' +
+                        '    delimiter: \',\'\n' +
+                        '  },\n' +
+                        '  async (row, encoding) => row\n' +
+                        ');',
                     hbs: ''
                 });
 
@@ -167,9 +161,9 @@ export default class CUD extends Component {
                         '  }\n' +
                         ']',
                     js:
-                        'const results = await campaigns.getCampaignOpenStatistics(inputs.campaign, ["field:country", "count_opened", "count_all"], query =>\n' +
+                        'const results = await campaigns.getCampaignOpenStatistics(inputs.campaign, ["field:country", "count_opened", "count_all"], (query, col) =>\n' +
                         '  query.count("* AS count_all")\n' +
-                        '    .select(knex.raw("SUM(IF(`tracker:count` IS NULL, 0, 1)) AS count_opened"))\n' +
+                        '    .select(knex.raw("SUM(IF(`" + col(tracker:count) +"` IS NULL, 0, 1)) AS count_opened"))\n' +
                         '    .groupBy("field:country")\n' +
                         ')\n' +
                         '\n' +

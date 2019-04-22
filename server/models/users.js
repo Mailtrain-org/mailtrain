@@ -16,8 +16,8 @@ const { tUI } = require('../lib/translate');
 const bluebird = require('bluebird');
 
 const bcrypt = require('bcrypt-nodejs');
-const bcryptHash = bluebird.promisify(bcrypt.hash);
-const bcryptCompare = bluebird.promisify(bcrypt.compare);
+const bcryptHash = bluebird.promisify(bcrypt.hash.bind(bcrypt));
+const bcryptCompare = bluebird.promisify(bcrypt.compare.bind(bcrypt));
 
 const mailers = require('../lib/mailers');
 

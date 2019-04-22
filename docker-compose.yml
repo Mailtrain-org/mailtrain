@@ -30,12 +30,10 @@ services:
     - "3004:3004"
     volumes:
     - mailtrain-files:/app/server/files
-    - mailtrain-reports:/app/protected/reports
 
 volumes:
   mysql-data:
   redis-data:
   mongo-data:
   mailtrain-files:
-  mailtrain-reports:
 

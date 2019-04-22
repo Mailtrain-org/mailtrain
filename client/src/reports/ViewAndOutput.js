@@ -45,12 +45,14 @@ export default class ViewAndOutput extends Component {
                 url: 'rest/report-content',
                 getTitle: name => t('reportName', { name }),
                 loading: t('loadingReport'),
+                finishedStates: new Set([ReportState.FINISHED]),
                 getContent: content => <div dangerouslySetInnerHTML={{ __html: content }}/>
             },
             output: {
                 url: 'rest/report-output',
                 getTitle: name => t('outputForReportName', { name }),
                 loading: t('loadingReportOutput'),
+                finishedStates: new Set([ReportState.FINISHED, ReportState.FAILED]),
                 getContent: content => <pre>{content}</pre>
             }
         }
@@ -108,7 +110,7 @@ export default class ViewAndOutput extends Component {
         if (this.state.report) {
             let reportContent = null;
 
-            if (this.state.report.state === ReportState.FINISHED) {
+            if (viewType.finishedStates.has(this.state.report.state)) {
                 reportContent = viewType.getContent(this.state.content);
             } else if (this.state.report.state === ReportState.SCHEDULED || this.state.report.state === ReportState.PROCESSING) {
                 reportContent = <div className="alert alert-info" role="alert">{t('reportIsBeingGenerated')}</div>;

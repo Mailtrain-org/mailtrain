@@ -334,7 +334,7 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
 
     await injectCustomFormData(req.query.fid || list.default_form, 'web_subscribe', data);
 
-    const renderAsync = bluebird.promisify(res.render);
+    const renderAsync = bluebird.promisify(res.render.bind(res));
     const html = await renderAsync('subscription/widget-subscribe', data);
 
     const response = {

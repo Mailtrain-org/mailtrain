@@ -7,6 +7,7 @@ const {MailerError} = require('../lib/mailers');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
 const {SubscriptionStatus} = require('../../shared/lists');
+const bluebird = require('bluebird');
 
 const BounceHandler = require('bounce-handler').BounceHandler;
 const SMTPServer = require('smtp-server').SMTPServer;
@@ -85,7 +86,7 @@ const server = new SMTPServer({
     onData: onData
 });
 
-module.exports = callback => {
+function spawn(callback) {
     if (!config.verp.enabled) {
         return setImmediate(callback);
     }
@@ -131,7 +132,7 @@ module.exports = callback => {
             started = true;
             return setImmediate(callback);
         }
-        let host = hosts[pos++];
+        const host = hosts[pos++];
         server.listen(config.verp.port, host, () => {
             if (started) {
                 return server.close();
@@ -142,4 +143,6 @@ module.exports = callback => {
     };
 
     startNextHost();
-};
+}
+
+module.exports.spawn = bluebird.promisify(spawn);

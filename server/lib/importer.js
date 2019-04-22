@@ -7,14 +7,10 @@ const path = require('path');
 const {ImportStatus, RunStatus} = require('../../shared/imports');
 const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('./activity-log');
+const bluebird = require('bluebird');
 
 let messageTid = 0;
 let importerProcess;
-
-module.exports = {
-    spawn,
-    scheduleCheck
-};
 
 function spawn(callback) {
     log.verbose('Importer', 'Spawning importer process');
@@ -65,4 +61,5 @@ function scheduleCheck() {
     messageTid++;
 }
 
-
+module.exports.spawn = bluebird.promisify(spawn);
+module.exports.scheduleCheck = scheduleCheck;

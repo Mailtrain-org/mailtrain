@@ -176,6 +176,12 @@ mosaico:
   # Inject custom scripts
   # customscripts:
   # - /mosaico/custom/my-mosaico-plugin.js
+  fileCache:
+    blockThumbnails:
+      maxSize: 100 # megabytes
+    images:
+      maxSize: 1024 # megabytes
+
 
 grapesjs:
 # Installed templates

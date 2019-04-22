@@ -33,7 +33,7 @@ users.registerRestrictedAccessTokenMethod('codeeditor', async ({entityTypeId, en
 });
 
 
-function getRouter(appType) {
+async function getRouter(appType) {
     const router = routerFactory.create();
 
     if (appType === AppType.SANDBOXED) {

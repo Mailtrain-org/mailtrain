@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "moment": "^2.23.0",
-    "moment-timezone": "^0.5.23",
+    "moment-timezone": "^0.5.25",
     "owasp-password-strength-test": "github:bures/owasp-password-strength-test"
   },
   "devDependencies": {

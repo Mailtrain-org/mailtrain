@@ -10,6 +10,7 @@ const log = require('./log');
 const fs = require('fs');
 const pathlib = require('path');
 const Handlebars = require('handlebars');
+const bluebird = require('bluebird');
 
 const highestLegacySchemaVersion = 33;
 
@@ -136,8 +137,30 @@ function runInitial(callback) {
     }, callback);
 }
 
-function runUpdates(callback, runCount) {
-    runCount = Number(runCount) || 0;
+function applyUpdate(update, callback) {
+    getSql(update.path, update.data, (err, sql) => {
+        if (err) {
+            return callback(err);
+        }
+
+        db.getConnection((err, connection) => {
+            if (err) {
+                return callback(err);
+            }
+
+            connection.query(sql, err => {
+                connection.release();
+                if (err) {
+                    return callback(err);
+                }
+
+                return callback(null, true);
+            });
+        });
+    });
+}
+
+function runUpdates(runCount, callback) {
     listTables((err, tables) => {
         if (err) {
             return callback(err);
@@ -148,7 +171,7 @@ function runUpdates(callback, runCount) {
                 return callback(new Error('Settings table not found from database'));
             }
             log.info('sql', 'SQL not set up, initializing');
-            return runInitial(runUpdates.bind(null, callback, ++runCount));
+            return runInitial(runUpdates.bind(null, ++runCount, callback));
         }
 
         getSchemaVersion((err, schemaVersion) => {
@@ -196,37 +219,13 @@ function runUpdates(callback, runCount) {
     });
 }
 
-function applyUpdate(update, callback) {
-    getSql(update.path, update.data, (err, sql) => {
-        if (err) {
-            return callback(err);
-        }
+const runUpdatesAsync = bluebird.promisify(runUpdates);
+const dbEndAsync = bluebird.promisify(db.end.bind(db));
 
-        db.getConnection((err, connection) => {
-            if (err) {
-                return callback(err);
-            }
-
-            connection.query(sql, err => {
-                connection.release();
-                if (err) {
-                    return callback(err);
-                }
-
-                return callback(null, true);
-            });
-        });
-    });
+async function dbcheck() {
+    await runUpdatesAsync(0);
+    await dbEndAsync();
+    log.info('sql', 'Database check completed');
 }
 
-module.exports = callback => {
-    runUpdates(err => {
-        if (err) {
-            return callback(err);
-        }
-        db.end(() => {
-            log.info('sql', 'Database check completed');
-            return callback(null, true);
-        });
-    });
-};
+module.exports = dbcheck;

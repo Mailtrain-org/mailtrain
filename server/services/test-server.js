@@ -5,6 +5,7 @@ const config = require('config');
 const crypto = require('crypto');
 const humanize = require('humanize');
 const http = require('http');
+const bluebird = require('bluebird');
 
 const SMTPServer = require('smtp-server').SMTPServer;
 const simpleParser = require('mailparser').simpleParser;
@@ -22,7 +23,7 @@ const mailstore = {
     },
     getMail(address, callback) {
         if (!this.accounts[address] || this.accounts[address].length === 0) {
-            let err = new Error('No mail for ' + address);
+            const err = new Error('No mail for ' + address);
             err.status = 404;
             return callback(err);
         }
@@ -55,8 +56,8 @@ const server = new SMTPServer({
 
     // Setup authentication
     onAuth: (auth, session, callback) => {
-        let username = config.testServer.username;
-        let password = config.testServer.password;
+        const username = config.testServer.username;
+        const password = config.testServer.password;
 
         // check username and password
         if (auth.username === username && auth.password === password) {
@@ -80,15 +81,13 @@ const server = new SMTPServer({
     // Validate RCPT TO envelope address. Example allows all addresses that do not start with 'deny'
     // If this method is not set, all addresses are allowed
     onRcptTo: (address, session, callback) => {
-        let err;
-
         if (/^deny/i.test(address.address)) {
             return callback(new Error('Not accepted'));
         }
 
         // Reject messages larger than 100 bytes to an over-quota user
         if (/^full/i.test(address.address) && Number(session.envelope.mailFrom.args.SIZE) > 100) {
-            err = new Error('Insufficient channel storage: ' + address.address);
+            const err = new Error('Insufficient channel storage: ' + address.address);
             err.responseCode = 452;
             return callback(err);
         }
@@ -98,7 +97,7 @@ const server = new SMTPServer({
 
     // Handle message stream
     onData: (stream, session, callback) => {
-        let hash = crypto.createHash('md5');
+        const hash = crypto.createHash('md5');
         let message = '';
         stream.on('data', chunk => {
             hash.update(chunk);
@@ -107,9 +106,8 @@ const server = new SMTPServer({
             }
         });
         stream.on('end', () => {
-            let err;
             if (stream.sizeExceeded) {
-                err = new Error('Error: message exceeds fixed maximum message size 10 MB');
+                const err = new Error('Error: message exceeds fixed maximum message size 10 MB');
                 err.responseCode = 552;
                 return callback(err);
             }
@@ -129,15 +127,15 @@ server.on('error', err => {
     log.error('Test SMTP', err.stack);
 });
 
-let mailBoxServer = http.createServer((req, res) => {
-    let renderer = data => (
+const mailBoxServer = http.createServer((req, res) => {
+    const renderer = data => (
         '<!doctype html><html><head><title>' + data.title + '</title></head><body>' + data.body + '</body></html>'
     );
 
-    let address = req.url.substring(1);
+    const address = req.url.substring(1);
     mailstore.getMail(address, (err, mail) => {
         if (err) {
-            let html = renderer({
+            const html = renderer({
                 title: 'error',
                 body: err.message || err
             });
@@ -155,7 +153,7 @@ let mailBoxServer = http.createServer((req, res) => {
         delete mail.textAsHtml;
         delete mail.attachments;
 
-        let script = '<script> var mailObject = ' + JSON.stringify(mail) + '; console.log(mailObject); </script>';
+        const script = '<script> var mailObject = ' + JSON.stringify(mail) + '; console.log(mailObject); </script>';
         html = html.replace(/<\/body\b/i, match => script + match);
         html = html.replace(/target="_blank"/g, 'target="_self"');
 
@@ -168,7 +166,7 @@ mailBoxServer.on('error', err => {
     log.error('Test SMTP Mailbox Server', err);
 });
 
-module.exports = callback => {
+function spawn(callback) {
     if (config.testServer.enabled) {
         server.listen(config.testServer.port, config.testServer.host, () => {
             log.info('Test SMTP', 'Server listening on port %s', config.testServer.port);
@@ -194,4 +192,6 @@ module.exports = callback => {
     } else {
         setImmediate(callback);
     }
-};
+}
+
+module.exports.spawn = bluebird.promisify(spawn);

@@ -11,9 +11,10 @@ function nameToFileName(name) {
         replace(/--*/g, '-');
 }
 
+const reportFilesDir = path.join(__dirname, '..', 'files', 'reports');
 
 function getReportFileBase(report) {
-    return path.join(__dirname, '..', 'protected', 'reports', report.id + '-' + nameToFileName(report.name));
+    return path.join(reportFilesDir, report.id + '-' + nameToFileName(report.name));
 }
 
 function getReportContentFile(report) {
@@ -28,5 +29,6 @@ function getReportOutputFile(report) {
 module.exports = {
     getReportContentFile,
     getReportOutputFile,
-    nameToFileName
+    nameToFileName,
+    reportFilesDir
 };

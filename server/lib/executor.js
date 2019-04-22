@@ -3,16 +3,11 @@
 const fork = require('child_process').fork;
 const log = require('./log');
 const path = require('path');
+const bluebird = require('bluebird');
 
 const requestCallbacks = {};
 let messageTid = 0;
 let executorProcess;
-
-module.exports = {
-    spawn,
-    start,
-    stop
-};
 
 function spawn(callback) {
     log.verbose('Executor', 'Spawning executor process');
@@ -81,3 +76,6 @@ function stop(tid) {
     });
 }
 
+module.exports.spawn = bluebird.promisify(spawn);
+module.exports.start = start;
+module.exports.stop = stop;

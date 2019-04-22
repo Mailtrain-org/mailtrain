@@ -31,6 +31,8 @@ const { AppType } = require('../../shared/app');
 
 const {castToInteger} = require('../lib/helpers');
 
+const { fileCache } = require('../lib/file-cache');
+
 
 users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entityId}) => {
     if (entityTypeId === 'template') {
@@ -131,7 +133,7 @@ function sanitizeSize(val, min, max, defaultVal, allowNull) {
 
 
 
-function getRouter(appType) {
+async function getRouter(appType) {
     const router = routerFactory.create();
     
     if (appType === AppType.SANDBOXED) {
@@ -161,14 +163,14 @@ function getRouter(appType) {
         router.use('/templates/:mosaicoTemplateId/edres', express.static(path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'templates', 'versafix-1', 'edres')));
 
         // This is the final fallback for a block thumbnail, so that at least something gets returned
-        router.getAsync('/templates/:mosaicoTemplateId/edres/:fileName', async (req, res, next) => {
+        router.getAsync('/templates/:mosaicoTemplateId/edres/:fileName', await fileCache('mosaico-block-thumbnails', config.mosaico.fileCache.blockThumbnails, req => req.params.fileName), async (req, res) => {
             let labelText = req.params.fileName.replace(/\.png$/, '');
             labelText = labelText.replace(/[_]/g, ' ');
             labelText = capitalize.words(labelText);
 
             const image = await placeholderImage(340, 100, labelText, '#ffffff');
             res.set('Content-Type', 'image/' + image.format);
-            image.stream.pipe(res);
+            image.stream.pipe(res.fileCacheResponse);
         });
 
         fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
@@ -225,7 +227,7 @@ function getRouter(appType) {
 
     } else if (appType === AppType.TRUSTED || appType === AppType.PUBLIC) { // Mosaico editor loads the images from TRUSTED endpoint. This is hard to change because the index.html has to come from TRUSTED.
                                                                             // So we serve /mosaico/img under both endpoints. There is no harm in it.
-        router.getAsync('/img', async (req, res) => {
+        router.getAsync('/img', await fileCache('mosaico-images', config.mosaico.fileCache.images), async (req, res) => {
             const method = req.query.method;
             const params = req.query.params;
             let [width, height] = params.split(',');
@@ -248,7 +250,7 @@ function getRouter(appType) {
                 height = sanitizeSize(height, 1, 2048, 300, true);
 
                 let filePath;
-                const url = req.query.src;
+                const url = req.query.src || '';
 
                 const mosaicoLegacyUrlPrefix = getTrustedUrl(`mosaico/uploads/`);
                 if (url.startsWith(mosaicoLegacyUrlPrefix)) {
@@ -262,7 +264,7 @@ function getRouter(appType) {
             }
 
             res.set('Content-Type', 'image/' + image.format);
-            image.stream.pipe(res);
+            image.stream.pipe(res.fileCacheResponse);
         });
     }
 

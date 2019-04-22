@@ -6,6 +6,7 @@ const net = require('net');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
 const { SubscriptionStatus } = require('../../shared/lists');
+const bluebird = require('bluebird');
 
 const seenIds = new Set();
 
@@ -33,7 +34,7 @@ async function readNextChunks() {
             try {
                 const match = /\bstatus=(bounced|sent)\b/.test(line) && line.match(/\bpostfix\/\w+\[\d+\]:\s*([^:]+).*?status=(\w+)/);
                 if (match) {
-                    let queueId = match[1];
+                    const queueId = match[1];
                     let queued = '';
                     let queuedAs = '';
 
@@ -41,7 +42,7 @@ async function readNextChunks() {
                         seenIds.add(queueId);
 
                         // Losacno: Check for local requeue
-                        let status = match[2];
+                        const status = match[2];
                         log.verbose('POSTFIXBOUNCE', 'Checking message %s for local requeue (status: %s)', queueId, status);
                         if (status === 'sent') {
                             // Save new queueId to update message's previous queueId (thanks @mfechner )
@@ -82,7 +83,7 @@ async function readNextChunks() {
     }
 }
 
-module.exports = callback => {
+function spawn(callback) {
     if (!config.postfixbounce.enabled) {
         return setImmediate(callback);
     }
@@ -122,4 +123,7 @@ module.exports = callback => {
         log.info('POSTFIXBOUNCE', 'Server listening on port %s', config.postfixbounce.port);
         setImmediate(callback);
     });
-};
+}
+
+module.exports.spawn = bluebird.promisify(spawn);
+
