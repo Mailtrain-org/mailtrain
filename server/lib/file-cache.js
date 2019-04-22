@@ -16,7 +16,7 @@ const fileCacheFilesDir = path.join(filesDir, 'cache');
 
 const fileCaches = new Map();
 
-async function _fileCache(typeId, cacheConfig, fileNameGen) {
+async function _fileCache(typeId, cacheConfig, keyGen) {
     if (fileCaches.has(typeId)) {
         return fileCaches.get(typeId);
     }
@@ -70,8 +70,8 @@ async function _fileCache(typeId, cacheConfig, fileNameGen) {
     setInterval(pruneCache, cacheConfig.pruneInterval * 1000);
 
 
-    const handleCache = async (fileName, res, next) => {
-        const fileEntry = await knex('file_cache').where('type', typeId).where('url', fileName).first();
+    const handleCache = async (key, res, next) => {
+        const fileEntry = await knex('file_cache').where('type', typeId).where('key', key).first();
 
         if (fileEntry) {
             res.sendFile(
@@ -127,10 +127,10 @@ async function _fileCache(typeId, cacheConfig, fileNameGen) {
                         fileStream.end(null, null, async () => {
                             try {
                                 await knex.transaction(async tx => {
-                                    const existingFileEntry = await knex('file_cache').where('type', typeId).where('url', fileName).first();
+                                    const existingFileEntry = await knex('file_cache').where('type', typeId).where('key', key).first();
 
                                     if (!existingFileEntry) {
-                                        const ids = await tx('file_cache').insert({type: typeId, url: fileName, mimetype: res.getHeader('Content-Type'), size: fileSize});
+                                        const ids = await tx('file_cache').insert({type: typeId, key, mimetype: res.getHeader('Content-Type'), size: fileSize});
                                         await fs.moveAsync(tmpFilePath, getLocalFileName(ids[0]), {});
                                         mayNeedPruning = true;
                                     } else {
@@ -152,7 +152,7 @@ async function _fileCache(typeId, cacheConfig, fileNameGen) {
                     if (fileStream) {
                         fileStream.destroy(err);
                         fs.unlink(tmpFilePath, () => {
-                            cachedFiles.delete(fileName);
+                            cachedFiles.delete(key);
                             callback();
                         });
                     } else {
@@ -166,14 +166,14 @@ async function _fileCache(typeId, cacheConfig, fileNameGen) {
     };
 
     const thisFileCache = (req, res, next) => {
-        const fileName = fileNameGen ? fileNameGen(req) : req.url.substring(1);
+        const key = keyGen ? keyGen(req) : req.url.substring(1);
 
-        if (fileName === null) { // null fileName means we don't attempt to cache
+        if (key === null) { // null key means we don't attempt to cache
             res.fileCacheResponse = res;
             next();
 
         } else {
-            handleCache(fileName, res, next).catch(err => next(err));
+            handleCache(key, res, next).catch(err => next(err));
         }
     };
 

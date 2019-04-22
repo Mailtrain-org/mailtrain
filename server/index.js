@@ -87,15 +87,6 @@ async function init() {
     await shares.regenerateRoleNamesTable();
     await shares.rebuildPermissions();
 
-    await executor.spawn();
-    await testServer.spawn();
-    await verpServer.spawn();
-    await builtinZoneMta.spawn();
-
-    await startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort);
-    await startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort);
-    await startHTTPServer(AppType.PUBLIC, 'public', publicPort);
-
     await privilegeHelpers.ensureMailtrainDir(filesDir);
 
     // Update owner of all files under 'files' dir. This should not be necessary, but when files are copied over,
@@ -104,10 +95,17 @@ async function init() {
         await privilegeHelpers.ensureMailtrainOwner(dirEnt.path);
     }
 
-
     await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
     await privilegeHelpers.ensureMailtrainDir(reportFilesDir);
 
+    await executor.spawn();
+    await testServer.spawn();
+    await verpServer.spawn();
+    await builtinZoneMta.spawn();
+
+    await startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort);
+    await startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort);
+    await startHTTPServer(AppType.PUBLIC, 'public', publicPort);
 
     privilegeHelpers.dropRootPrivileges();
 
