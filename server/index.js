@@ -86,12 +86,10 @@ async function init() {
     await shares.regenerateRoleNamesTable();
     await shares.rebuildPermissions();
 
-    /*
     await executor.spawn();
     await testServer.spawn();
     await verpServer.spawn();
     await builtinZoneMta.spawn();
-    */
 
     await startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort);
     await startHTTPServer(AppType.SANDBOXED, 'sandbox', sandboxPort);
@@ -103,7 +101,6 @@ async function init() {
 
     privilegeHelpers.dropRootPrivileges();
 
-    /*
     tzupdate.start();
 
     await importer.spawn();
@@ -116,7 +113,6 @@ async function init() {
     await postfixBounceServer.spawn();
 
     await reportProcessor.init();
-    */
 
     log.info('Service', 'All services started');
     appBuilder.setReady();
