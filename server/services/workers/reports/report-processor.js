@@ -6,14 +6,11 @@ const subscriptions = require('../../../models/subscriptions');
 const { SubscriptionSource, SubscriptionStatus } = require('../../../../shared/lists');
 const campaigns = require('../../../models/campaigns');
 const handlebars = require('handlebars');
-const hbs = require('hbs');
 const vm = require('vm');
 const log = require('../../../lib/log');
-const fs = require('fs');
 const knex = require('../../../lib/knex');
 const contextHelpers = require('../../../lib/context-helpers');
-
-const csvStringify = require('csv-stringify');
+const {renderCsvFromStream} = require('../../../lib/report-helpers');
 const stream = require('stream');
 
 async function main() {
@@ -75,46 +72,7 @@ async function main() {
             inputs,
             SubscriptionSource,
             SubscriptionStatus,
-
-            renderCsvFromStream: async (readable, opts, transform) => {
-                const finished = new Promise((success, fail) => {
-                    let lastReadable = readable;
-
-                    const stringifier = csvStringify(opts);
-
-                    stringifier.on('finish', () => success());
-                    stringifier.on('error', err => fail(err));
-
-                    if (transform) {
-                        const rowTransform = new stream.Transform({
-                            objectMode: true,
-                            transform(row, encoding, callback) {
-                                async function performTransform() {
-                                    try {
-                                        const newRow = await transform(row, encoding);
-                                        callback(null, newRow);
-                                    } catch (err) {
-                                        callback(err);
-                                    }
-                                }
-
-                                // noinspection JSIgnoredPromiseFromCall
-                                performTransform();
-                            }
-                        });
-
-                        lastReadable.on('error', err => fail(err));
-                        lastReadable.pipe(rowTransform);
-
-                        lastReadable = rowTransform;
-                    }
-
-                    stringifier.pipe(process.stdout);
-                    lastReadable.pipe(stringifier);
-                });
-
-                await finished;
-            },
+            renderCsvFromStream: (readable, opts, transform) => renderCsvFromStream(readable, process.stdout, opts, transform),
 
             render: data => {
                 const hbsTmpl = handlebars.compile(report.hbs);

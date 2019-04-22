@@ -1,26 +1,17 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import axios
-    from "../lib/axios";
+import {Trans} from 'react-i18next';
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import axios from "../lib/axios";
 import {getUrl} from "../lib/urls";
 import {AlignedRow} from "../lib/form";
 import {Icon} from "../lib/bootstrap-components";
 
-import styles
-    from "./styles.scss";
+import styles from "./styles.scss";
 import {Link} from "react-router-dom";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -128,6 +119,14 @@ export default class Statistics extends Component {
                 {renderMetricsWithProgress('unsubscribed', t('unsubscribed'), 'warning')}
                 {!entity.open_tracking_disabled && renderMetricsWithProgress('opened', t('opened'), 'success')}
                 {!entity.click_tracking_disabled && renderMetricsWithProgress('clicks', t('clicked'), 'success')}
+
+                <hr/>
+
+                <h3>{t('Quick Reports')}</h3>
+                <small className="text-muted"><Trans>Below, you can download pre-made reports related to this campaign. Each link generates a CSV file that can be viewed in a spreadsheet editor. Custom reports and reports that cover more than one campaign can be created through <Link to="/reports">Reports</Link> functionality of Mailtrain.</Trans></small>
+                <ul className="list-unstyled my-3">
+                    <li><a href={getUrl(`quick-rpts/open-and-click-counts/${entity.id}`)}>Open and click counts per currently subscribed subscriber</a></li>
+                </ul>
            </div>
         );
     }

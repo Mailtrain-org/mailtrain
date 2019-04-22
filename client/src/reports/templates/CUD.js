@@ -163,8 +163,8 @@ export default class CUD extends Component {
                     js:
                         'const results = await campaigns.getCampaignOpenStatistics(inputs.campaign, ["field:country", "count_opened", "count_all"], (query, col) =>\n' +
                         '  query.count("* AS count_all")\n' +
-                        '    .select(knex.raw("SUM(IF(`" + col(tracker:count) +"` IS NULL, 0, 1)) AS count_opened"))\n' +
-                        '    .groupBy("field:country")\n' +
+                        '    .select(knex.raw("SUM(IF(`" + col("tracker:count") +"` IS NULL, 0, 1)) AS count_opened"))\n' +
+                        '    .groupBy(col("field:country"))\n' +
                         ')\n' +
                         '\n' +
                         'for (const row of results) {\n' +

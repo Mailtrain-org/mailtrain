@@ -2,38 +2,17 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
-import {
-    ButtonDropdown,
-    Icon
-} from '../lib/bootstrap-components';
-import {
-    DropdownLink,
-    NavDropdown,
-    requiresAuthenticatedUser,
-    Title,
-    Toolbar,
-    withPageHelpers
-} from '../lib/page';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
+import {ButtonDropdown, Icon} from '../lib/bootstrap-components';
+import {DropdownLink, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
-import moment
-    from 'moment';
-import {
-    CampaignSource,
-    CampaignStatus,
-    CampaignType
-} from "../../../shared/campaigns";
+import moment from 'moment';
+import {CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
 import {checkPermissions} from "../lib/permissions";
 import {getCampaignLabels} from "./helpers";
-import {
-    tableAddDeleteButton,
-    tableRestActionDialogInit,
-    tableRestActionDialogRender
-} from "../lib/modals";
+import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import styles from "./styles.scss";
 
 @withComponentMixins([
     withTranslation,
@@ -79,7 +58,7 @@ export default class List extends Component {
 
         const columns = [
             { data: 1, title: t('name') },
-            { data: 2, title: t('id'), render: data => <code>{data}</code> },
+            { data: 2, title: t('id'), render: data => <code>{data}</code>, className: styles.tblCol_id },
             { data: 3, title: t('description') },
             { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
             {
@@ -101,6 +80,7 @@ export default class List extends Component {
             { data: 8, title: t('created'), render: data => moment(data).fromNow() },
             { data: 9, title: t('namespace') },
             {
+                className: styles.tblCol_buttons,
                 actions: data => {
                     const actions = [];
                     const perms = data[10];

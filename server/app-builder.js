@@ -21,6 +21,7 @@ const api = require('./routes/api');
 
 // These are routes for the new React-based client
 const reports = require('./routes/reports');
+const quickReports = require('./routes/quick-reports');
 const subscriptions = require('./routes/subscriptions');
 const subscription = require('./routes/subscription');
 const sandboxedMosaico = require('./routes/sandboxed-mosaico');
@@ -285,6 +286,8 @@ async function createApp(appType) {
         if (config.reports && config.reports.enabled === true) {
             useWith404Fallback('/rpts', reports); // This needs to be different from "reports", which is already used by the UI
         }
+
+        useWith404Fallback('/quick-rpts', quickReports);
 
         // API endpoints
         useWith404Fallback('/api', api);

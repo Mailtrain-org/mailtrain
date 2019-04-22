@@ -276,6 +276,7 @@ class Table extends Component {
 
         const dtOptions = {
             columns,
+            autoWidth: false,
             pageLength: this.props.pageLength,
             dom: // This overrides Bootstrap 4 settings. It may need to be updated if there are updates in the DataTables Bootstrap 4 plugin.
                 "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +

@@ -5,6 +5,7 @@ const reports = require('../models/reports');
 const reportHelpers = require('../lib/report-helpers');
 const shares = require('../models/shares');
 const contextHelpers = require('../lib/context-helpers');
+const {castToInteger} = require('../lib/helpers');
 
 const router = require('../lib/router-async').create();
 
@@ -14,9 +15,10 @@ const fileSuffixes = {
 };
 
 router.getAsync('/:id/download', passport.loggedIn, async (req, res) => {
-    await shares.enforceEntityPermission(req.context, 'report', req.params.id, 'viewContent');
+    const reportId = castToInteger(req.params.id);
+    await shares.enforceEntityPermission(req.context, 'report', reportId, 'viewContent');
 
-    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), req.params.id, false);
+    const report = await reports.getByIdWithTemplate(contextHelpers.getAdminContext(), reportId, false);
 
     if (report.state == reports.ReportState.FINISHED) {
         const headers = {

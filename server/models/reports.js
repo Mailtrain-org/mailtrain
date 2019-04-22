@@ -148,10 +148,8 @@ async function bulkChangeState(oldState, newState) {
     return await knex('reports').where('state', oldState).update('state', newState);
 }
 
-async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, asStream) {
-    const subsQrys = [];
-
-    const commonFieldsMapping = {};
+async function getCampaignCommonListFields(campaign) {
+    const listFields = {};
     let firstIteration = true;
     for (const cpgList of campaign.lists) {
         const cpgListId = cpgList.list;
@@ -165,16 +163,122 @@ async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, a
                For the time being, we don't group options and we don't expand enums. We just provide it as it is in the DB. */
             if (fld.column) {
                 const fldKey = 'field:' + fld.key.toLowerCase();
-                if (firstIteration || commonFieldsMapping[fldKey]) {
-                    commonFieldsMapping[fldKey] = 'subscriptions.' + fld.column;
+
+                if (firstIteration) {
+                    listFields[fldKey] = {
+                        key: fld.key,
+                        name: fld.name,
+                        description: fld.description
+                    };
+                }
+
+                if (fldKey in listFields) {
                     assignedFlds.add(fldKey);
                 }
             }
         }
 
-        for (const fldKey in commonFieldsMapping) {
+        for (const fldKey in listFields) {
             if (!assignedFlds.has(fldKey)) {
-                delete commonFieldsMapping[fldKey];
+                delete listFields[fldKey];
+            }
+        }
+
+        firstIteration = false;
+    }
+
+    return listFields;
+}
+
+async function _getCampaignStatistics(campaign, select, joins, unionQryFn, listQryFn, asStream) {
+    const subsQrys = [];
+    joins = joins || [];
+
+    const knexJoinFns = [];
+
+    const commonFieldsMapping = {
+        'subscription:status': 'subscriptions.status',
+        'subscription:id': 'subscriptions.id',
+        'subscription:cid': 'subscriptions.cid',
+        'subscription:email': 'subscriptions.email'
+    };
+
+    for (const join of joins) {
+        const prefix = join.prefix;
+        const type = join.type;
+        const onConditions = join.onConditions || {};
+
+        const getConds = (alias, cpgListId) => {
+            const conds = {
+                [alias + '.campaign']: knex.raw('?', [campaign.id]),
+                [alias + '.list']: knex.raw('?', [cpgListId]),
+                [alias + '.subscription']: 'subscriptions.id',
+            };
+
+            for (const onConditionKey in onConditions) {
+                conds[alias + '.' + onConditionKey] = onConditions[onConditionKey];
+            }
+
+            return conds;
+        };
+
+        if (type === 'messages') {
+            const alias = 'campaign_messages_' + prefix;
+
+            commonFieldsMapping[`${prefix}:status`] = alias + '.status';
+
+            knexJoinFns.push((qry, cpgListId) => qry.leftJoin('campaign_messages AS ' + alias, getConds(alias, cpgListId)));
+
+        } else if (type === 'links') {
+            const alias = 'campaign_links_' + prefix;
+
+            commonFieldsMapping[`${prefix}:count`] = {raw: 'COALESCE(`' + alias + '`.`count`, 0)'};
+            commonFieldsMapping[`${prefix}:link`] = alias + '.link';
+            commonFieldsMapping[`${prefix}:country`] = alias + '.country';
+            commonFieldsMapping[`${prefix}:deviceType`] = alias + '.device_type';
+
+            knexJoinFns.push((qry, cpgListId) => qry.leftJoin('campaign_links AS ' + alias, getConds(alias, cpgListId)));
+
+        } else {
+            throw new Error(`Unknown join type "${type}"`);
+        }
+    }
+
+
+    const listsFields = {};
+    const permittedListFields = new Set();
+    let firstIteration = true;
+    for (const cpgList of campaign.lists) {
+        const cpgListId = cpgList.list;
+
+        const listFields = {};
+        listsFields[cpgListId] = listFields;
+
+        const flds = await fields.list(contextHelpers.getAdminContext(), cpgListId);
+
+        const assignedFlds = new Set();
+
+        for (const fld of flds) {
+            /* Dropdown and checkbox groups have field.column == null
+               For the time being, we don't group options and we don't expand enums. We just provide it as it is in the DB. */
+            if (fld.column) {
+                const fldKey = 'field:' + fld.key.toLowerCase();
+
+                listFields[fldKey] = 'subscriptions.' + fld.column;
+
+                if (firstIteration) {
+                    permittedListFields.add(fldKey);
+                }
+
+                if (permittedListFields.has(fldKey)) {
+                    assignedFlds.add(fldKey);
+                }
+            }
+        }
+
+        for (const fldKey in [...permittedListFields]) {
+            if (!assignedFlds.has(fldKey)) {
+                permittedListFields.delete(fldKey);
             }
         }
 
@@ -183,36 +287,29 @@ async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, a
 
     for (const cpgList of campaign.lists) {
         const cpgListId = cpgList.list;
+        const listFields = listsFields[cpgListId];
 
-        const campaignFieldsMapping = {
-            'list:id': {raw: knex.raw('?', [cpgListId])},
-            'tracker:count': {raw: 'COALESCE(`campaign_links`.`count`, 0)'},
-            'tracker:country': 'campaign_links.country',
-            'tracker:deviceType': 'campaign_links.device_type',
-            'tracker:status': 'campaign_messages.status',
-            'subscription:status': 'subscriptions.status',
-            'subscription:id': 'subscriptions.id',
-            'subscription:cid': 'subscriptions.cid',
-            'subscription:email': 'subscriptions.email'
-        };
+        for (const fldKey in listFields) {
+            if (!permittedListFields.has(fldKey)) {
+                delete listFields[fldKey];
+            }
+        }
+    }
+
+
+    for (const cpgList of campaign.lists) {
+        const cpgListId = cpgList.list;
 
         const fieldsMapping = {
             ...commonFieldsMapping,
-            ...campaignFieldsMapping
+            ...listsFields[cpgListId],
+            'list:id': {raw: knex.raw('?', [cpgListId])}
         };
-
-        const getColIdIfExists = (colId, getter) => {
-            if (colId in fieldsMapping) {
-                return getter(colId);
-            } else {
-                throw new Error(`Unknown column id ${colId}`);
-            }
-        }
 
         const getSelField = item => {
             const itemMapping = fieldsMapping[item];
             if (typeof itemMapping === 'string') {
-                return fieldsMapping[item] + ' AS ' + item;
+                return itemMapping + ' AS ' + item;
             } else if (itemMapping.raw) {
                 return knex.raw(fieldsMapping[item].raw + ' AS `' + item + '`');
             }
@@ -230,23 +327,22 @@ async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, a
             }
         }
 
-        let query = knex(`subscription__${cpgListId} AS subscriptions`)
-            .leftJoin('campaign_messages', {
-                'campaign_messages.campaign': knex.raw('?', [campaign.id]),
-                'campaign_messages.list': knex.raw('?', [cpgListId]),
-                'campaign_messages.subscription': 'subscriptions.id'
-            })
-            .leftJoin('campaign_links', {
-                'campaign_links.campaign': knex.raw('?', [campaign.id]),
-                'campaign_links.list': knex.raw('?', [cpgListId]),
-                'campaign_links.subscription': 'subscriptions.id'
-            })
-            .select(selFields);
+        let query = knex(`subscription__${cpgListId} AS subscriptions`).select(selFields);
+
+        for (const knexJoinFn of knexJoinFns) {
+            query = knexJoinFn(query, cpgListId);
+        }
 
         if (listQryFn) {
             query = listQryFn(
                 query,
-                colId => getColIdIfExists(colId, x => fieldsMapping[x])
+                colId => {
+                    if (colId in fieldsMapping) {
+                        return fieldsMapping[colId];
+                    } else {
+                        throw new Error(`Unknown column id ${colId}`);
+                    }
+                }
             );
         }
 
@@ -256,13 +352,21 @@ async function _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, a
     if (subsQrys.length > 0) {
         let subsSql, subsBindings;
 
+        const fieldsSet = new Set([...Object.keys(commonFieldsMapping), ...permittedListFields, 'list:id']);
+
         const applyUnionQryFn = (subsSql, subsBindings) => {
             if (unionQryFn) {
                 return unionQryFn(
                     knex.from(function() {
                         return knex.raw('(' + subsSql + ')', subsBindings);
                     }),
-                    colId => getColIdIfExists(colId, x => x)
+                    colId => {
+                        if (fieldsSet.has(colId)) {
+                            return colId;
+                        } else {
+                            throw new Error(`Unknown column id ${colId}`);
+                        }
+                    }
                 );
             } else {
                 return knex.raw(subsSql, subsBindings);
@@ -311,10 +415,11 @@ async function _getCampaignOpenStatistics(campaign, select, unionQryFn, listQryF
     return await _getCampaignStatistics(
         campaign,
         select,
+        [{type: 'messages', prefix: 'tracker'}, {type: 'links', prefix: 'tracker'}],
         unionQryFn,
         (qry, col) => listQryFn(
             qry.where(function() {
-                this.whereNull('campaign_links.link').orWhere('campaign_links.link', LinkId.OPEN)
+                this.whereNull(col('tracker:link')).orWhere(col('tracker:link'), LinkId.OPEN)
             }),
             col
         ),
@@ -330,10 +435,11 @@ async function _getCampaignClickStatistics(campaign, select, unionQryFn, listQry
     return await _getCampaignStatistics(
         campaign,
         select,
+        [{type: 'messages', prefix: 'tracker'}, {type: 'links', prefix: 'tracker'}],
         unionQryFn,
         (qry, col) => listQryFn(
             qry.where(function() {
-                this.whereNull('campaign_links.link').orWhere('campaign_links.link', LinkId.GENERAL_CLICK)
+                this.whereNull(col('tracker:link')).orWhere(col('tracker:link'), LinkId.GENERAL_CLICK)
             }),
             col
         ),
@@ -349,10 +455,11 @@ async function _getCampaignLinkClickStatistics(campaign, select, unionQryFn, lis
     return await _getCampaignStatistics(
         campaign,
         select,
+        [{type: 'messages', prefix: 'tracker'}, {type: 'links', prefix: 'tracker'}],
         unionQryFn,
         (qry, col) => listQryFn(
             qry.where(function() {
-                this.whereNull('campaign_links.link').orWhere('campaign_links.link', '>', LinkId.GENERAL_CLICK)
+                this.whereNull(col('tracker:link')).orWhere(col('tracker:link'), '>', LinkId.GENERAL_CLICK)
             }),
             col
         ),
@@ -360,12 +467,12 @@ async function _getCampaignLinkClickStatistics(campaign, select, unionQryFn, lis
     );
 }
 
-async function getCampaignStatistics(campaign, select, unionQryFn, listQryFn) {
-    return await _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, false);
+async function getCampaignStatistics(campaign, select, joins, unionQryFn, listQryFn) {
+    return await _getCampaignStatistics(campaign, select, joins, unionQryFn, listQryFn, false);
 }
 
-async function getCampaignStatisticsStream(campaign, select, unionQryFn, listQryFn) {
-    return await _getCampaignStatistics(campaign, select, unionQryFn, listQryFn, true);
+async function getCampaignStatisticsStream(campaign, select, joins, unionQryFn, listQryFn) {
+    return await _getCampaignStatistics(campaign, select, joins, unionQryFn, listQryFn, true);
 }
 
 async function getCampaignOpenStatistics(campaign, select, unionQryFn, listQryFn) {
@@ -405,6 +512,7 @@ module.exports.remove = remove;
 module.exports.updateFields = updateFields;
 module.exports.listByState = listByState;
 module.exports.bulkChangeState = bulkChangeState;
+module.exports.getCampaignCommonListFields = getCampaignCommonListFields;
 module.exports.getCampaignStatistics = getCampaignStatistics;
 module.exports.getCampaignStatisticsStream = getCampaignStatisticsStream;
 module.exports.getCampaignOpenStatistics = getCampaignOpenStatistics;
