@@ -170,7 +170,7 @@ router.get('/confirm/unsubscribe/:cid', (req, res, next) => {
 });
 
 router.get('/:cid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.cid, (err, list) => {
+    lists.getByCidOrName(req.params.cid, (err, list) => {
         if (!err) {
             if (!list) {
                 err = new Error(_('Selected list not found'));
@@ -281,7 +281,7 @@ router.get('/:cid/widget', cors(corsOptions), (req, res, next) => {
         });
     };
 
-    lists.getByCid(req.params.cid, (err, list) => {
+    lists.getByCidOrName(req.params.cid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -376,7 +376,7 @@ router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, r
         let addressTest = !req.body.address;
         let testsPass = subTimeTest && addressTest;
 
-        lists.getByCid(req.params.cid, (err, list) => {
+        lists.getByCidOrName(req.params.cid, (err, list) => {
             if (!err) {
                 if (!list) {
                     err = new Error(_('Selected list not found'));
@@ -454,7 +454,7 @@ router.post('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, (req, r
 });
 
 router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
+    lists.getByCidOrName(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -530,7 +530,7 @@ router.get('/:lcid/manage/:ucid', passport.csrfProtection, (req, res, next) => {
 });
 
 router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
+    lists.getByCidOrName(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -561,7 +561,7 @@ router.post('/:lcid/manage', passport.parseForm, passport.csrfProtection, (req, 
 });
 
 router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
+    lists.getByCidOrName(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -621,7 +621,7 @@ router.get('/:lcid/manage-address/:ucid', passport.csrfProtection, (req, res, ne
 });
 
 router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
+    lists.getByCidOrName(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -677,7 +677,7 @@ router.post('/:lcid/manage-address', passport.parseForm, passport.csrfProtection
 });
 
 router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
+    lists.getByCidOrName(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -755,7 +755,7 @@ router.get('/:lcid/unsubscribe/:ucid', passport.csrfProtection, (req, res, next)
 });
 
 router.post('/:lcid/unsubscribe', passport.parseForm, passport.csrfProtection, (req, res, next) => {
-    lists.getByCid(req.params.lcid, (err, list) => {
+    lists.getByCidOrName(req.params.lcid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;
@@ -892,7 +892,7 @@ router.post('/publickey', passport.parseForm, (req, res, next) => {
 
 
 function webNotice(type, req, res, next) {
-    lists.getByCid(req.params.cid, (err, list) => {
+    lists.getByCidOrName(req.params.cid, (err, list) => {
         if (!err && !list) {
             err = new Error(_('Selected list not found'));
             err.status = 404;

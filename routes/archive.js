@@ -33,7 +33,7 @@ router.get('/:campaign/:list/:subscription', passport.csrfProtection, (req, res,
                 return next(err);
             }
 
-            lists.getByCid(req.params.list, (err, list) => {
+            lists.getByCidOrName(req.params.list, (err, list) => {
                 if (err) {
                     req.flash('danger', err.message || err);
                     return res.redirect('/');

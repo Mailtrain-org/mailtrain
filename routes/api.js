@@ -41,12 +41,12 @@ router.all('/*', (req, res, next) => {
 
 });
 
-router.post('/subscribe/:listId', (req, res) => {
+router.post('/subscribe/:list', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
-    lists.getByCid(req.params.listId, (err, list) => {
+    lists.getByCidOrName(req.params.list, (err, list) => {
         if (err) {
             log.error('API', err);
             res.status(500);
@@ -181,12 +181,12 @@ router.post('/subscribe/:listId', (req, res) => {
     });
 });
 
-router.post('/unsubscribe/:listId', (req, res) => {
+router.post('/unsubscribe/:list', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
-    lists.getByCid(req.params.listId, (err, list) => {
+    lists.getByCidOrName(req.params.list, (err, list) => {
         if (err) {
             res.status(500);
             return res.json({
@@ -246,12 +246,12 @@ router.post('/unsubscribe/:listId', (req, res) => {
     });
 });
 
-router.post('/delete/:listId', (req, res) => {
+router.post('/delete/:list', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
-    lists.getByCid(req.params.listId, (err, list) => {
+    lists.getByCidOrName(req.params.list, (err, list) => {
         if (err) {
             res.status(500);
             return res.json({
@@ -315,11 +315,11 @@ router.post('/delete/:listId', (req, res) => {
     });
 });
 
-router.get('/subscriptions/:listId', (req, res) => {
+router.get('/subscriptions/:list', (req, res) => {
     let start = parseInt(req.query.start || 0, 10);
     let limit = parseInt(req.query.limit || 10000, 10);
 
-    lists.getByCid(req.params.listId, (err, list) => {
+    lists.getByCidOrName(req.params.list, (err, list) => {
 	if (err) {
             res.status(500);
             return res.json({
@@ -395,12 +395,12 @@ router.get('/lists/:email', (req, res) => {
     });
 });
 
-router.post('/field/:listId', (req, res) => {
+router.post('/field/:list', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
-    lists.getByCid(req.params.listId, (err, list) => {
+    lists.getByCidOrName(req.params.list, (err, list) => {
         if (err) {
             log.error('API', err);
             res.status(500);
@@ -525,7 +525,7 @@ router.get('/blacklist/get', (req, res) => {
     });
 });
 
-router.post('/changeemail/:listId', (req, res) => {
+router.post('/changeemail/:list', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
@@ -544,7 +544,7 @@ router.post('/changeemail/:listId', (req, res) => {
           data: []
       });
     }
-    lists.getByCid(req.params.listId, (err, list) => {
+    lists.getByCidOrName(req.params.list, (err, list) => {
         if (err) {
             log.error('API', err);
             res.status(500);

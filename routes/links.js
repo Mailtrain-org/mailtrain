@@ -67,7 +67,7 @@ router.get('/:campaign/:list/:subscription/:link', (req, res) => {
         }
 
         // url might include variables, need to rewrite those just as we do with message content
-        lists.getByCid(req.params.list, (err, list) => {
+        lists.getByCidOrName(req.params.list, (err, list) => {
             if (err) {
                 req.flash('danger', err.message || err);
                 return res.redirect('/');
