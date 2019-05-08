@@ -1,16 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {Trans} from 'react-i18next';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page'
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
     Button,
     ButtonRow,
@@ -24,26 +18,18 @@ import {
     withForm
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {
-    NamespaceSelect,
-    validateNamespace
-} from '../lib/namespace';
+import {NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 
 import {getMailerTypes} from "./helpers";
 
-import {
-    getSystemSendConfigurationId,
-    MailerType
-} from "../../../shared/send-configurations";
+import {getSystemSendConfigurationId, MailerType} from "../../../shared/send-configurations";
 
-import styles
-    from "../lib/styles.scss";
+import styles from "../lib/styles.scss";
 
 import sendConfigurationsStyles from "./styles.scss";
 
-import mailtrainConfig
-    from 'mailtrainConfig';
+import mailtrainConfig from 'mailtrainConfig';
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 

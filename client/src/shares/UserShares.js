@@ -1,21 +1,12 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
-import axios
-    from '../lib/axios';
+import axios from '../lib/axios';
 import {Icon} from "../lib/bootstrap-components";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";

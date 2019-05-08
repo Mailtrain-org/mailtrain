@@ -1,35 +1,24 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page'
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
     Button,
     ButtonRow,
+    filterData,
     Form,
     FormSendMethod,
     StaticField,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import mailtrainConfig
-    from 'mailtrainConfig';
-import {
-    getEditForm,
-    getTemplateTypes,
-    getTypeForm,
-    ResourceType
-} from '../templates/helpers';
-import axios
-    from '../lib/axios';
-import styles
-    from "../lib/styles.scss";
+import mailtrainConfig from 'mailtrainConfig';
+import {getEditForm, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import axios from '../lib/axios';
+import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -65,7 +54,11 @@ export default class CustomContent extends Component {
             exportModalTitle: ''
         };
 
-        this.initForm();
+        this.initForm({
+            loadMutator: ::this.getFormValuesMutator,
+            submitMutator: ::this.submitFormValuesMutator,
+            getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
+        });
 
         this.sendModalGetDataHandler = ::this.sendModalGetData;
         this.exportModalGetContentHandler = ::this.exportModalGetContent;
@@ -90,9 +83,32 @@ export default class CustomContent extends Component {
         this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
     }
 
+    submitFormValuesMutator(data) {
+        this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
+
+        data.data.sourceCustom = {
+            type: data.data_sourceCustom_type,
+            data: data.data_sourceCustom_data,
+            html: data.data_sourceCustom_html,
+            text: data.data_sourceCustom_text
+        };
+
+        return filterData(data, ['data']);
+    }
+
+    async getPreSubmitFormValuesUpdater() {
+        const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
+        const exportedData = await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
+
+        return mutStateData => {
+            for (const key in exportedData) {
+                mutStateData.setIn([key, 'value'], exportedData[key]);
+            }
+        };
+    }
 
     componentDidMount() {
-        this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+        this.getFormValuesFromEntity(this.props.entity);
     }
 
     localValidateFormValues(state) {
@@ -115,11 +131,9 @@ export default class CustomContent extends Component {
         STATUS: 2
     }
 
+    @withFormErrorHandlers
     async submitHandler(afterSubmitAction) {
         const t = this.props.t;
-
-        const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
-        const exportedData = await this.templateTypes[customTemplateTypeKey].exportHTMLEditorData(this);
 
         const sendMethod = FormSendMethod.PUT;
         const url = `rest/campaigns-content/${this.props.entity.id}`;
@@ -127,23 +141,7 @@ export default class CustomContent extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            Object.assign(data, exportedData);
-            this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
-
-            data.data.sourceCustom = {
-                type: data.data_sourceCustom_type,
-                data: data.data_sourceCustom_data,
-                html: data.data_sourceCustom_html,
-                text: data.data_sourceCustom_text
-            };
-
-            for (const key in data) {
-                if (key.startsWith('data_')) {
-                    delete data[key];
-                }
-            }
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (afterSubmitAction === CustomContent.AfterSubmitAction.STATUS) {
@@ -151,7 +149,7 @@ export default class CustomContent extends Component {
             } else if (afterSubmitAction === CustomContent.AfterSubmitAction.LEAVE) {
                 this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign updated'));
             } else {
-                await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`);
                 this.enableForm();
                 this.setFormStatusMessage('success', t('Campaign updated'));
             }

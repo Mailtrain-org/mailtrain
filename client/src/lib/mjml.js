@@ -1,8 +1,8 @@
 'use strict';
 
-import { mergeWith, isArray } from 'lodash';
+import {isArray, mergeWith} from 'lodash';
 import kebabCase from 'lodash/kebabCase';
-import mjml2html, {defaultSkeleton, BodyComponent, HeadComponent, components, dependencies} from "mjml4-in-browser";
+import mjml2html, {BodyComponent, components, defaultSkeleton, dependencies, HeadComponent} from "mjml4-in-browser";
 
 export { BodyComponent, HeadComponent };
 

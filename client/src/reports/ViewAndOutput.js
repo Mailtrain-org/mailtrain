@@ -2,24 +2,13 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    Toolbar,
-    withPageHelpers
-} from '../lib/page'
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import axios
-    from '../lib/axios';
+import {requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page'
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import axios from '../lib/axios';
 import {ReportState} from '../../../shared/reports';
 import {getUrl} from "../lib/urls";
 import {Button} from "../lib/bootstrap-components";
-import {Link} from "react-router-dom";
-import PropTypes
-    from "prop-types";
+import PropTypes from "prop-types";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([

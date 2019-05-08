@@ -3,30 +3,22 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Trans} from 'react-i18next';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page'
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
     Button,
     ButtonRow,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import passwordValidator
-    from '../../../shared/password-validator';
-import interoperableErrors
-    from '../../../shared/interoperable-errors';
-import mailtrainConfig
-    from 'mailtrainConfig';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import passwordValidator from '../../../shared/password-validator';
+import interoperableErrors from '../../../shared/interoperable-errors';
+import mailtrainConfig from 'mailtrainConfig';
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([
@@ -45,6 +37,8 @@ export default class Account extends Component {
         this.state = {};
 
         this.initForm({
+            loadMutator: ::this.getFormValuesMutator,
+            submitMutator: ::this.submitFormValuesMutator,
             serverValidation: {
                 url: 'rest/account-validate',
                 changed: ['email', 'currentPassword']
@@ -52,13 +46,19 @@ export default class Account extends Component {
         });
     }
 
+    getFormValuesMutator(data) {
+        data.password = '';
+        data.password2 = '';
+        data.currentPassword = '';
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['name', 'email', 'password', 'currentPassword']);
+    }
+
     @withAsyncErrorHandler
     async loadFormValues() {
-        await this.getFormValuesFromURL('rest/account', data => {
-            data.password = '';
-            data.password2 = '';
-            data.currentPassword = '';
-        });
+        await this.getFormValuesFromURL('rest/account');
     }
 
     componentDidMount() {
@@ -127,6 +127,7 @@ export default class Account extends Component {
         state.setIn(['password2', 'error'], password !== password2 ? t('passwordsMustMatch') : null);
     }
 
+    @withFormErrorHandlers
     async submitHandler() {
         const t = this.props.t;
 
@@ -134,9 +135,7 @@ export default class Account extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('updatingUserProfile'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/account', data => {
-                delete data.password2;
-            });
+            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/account');
 
             if (submitSuccessful) {
                 this.setFlashMessage('success', t('userProfileUpdated'));

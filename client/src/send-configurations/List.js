@@ -3,27 +3,13 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Icon} from '../lib/bootstrap-components';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    Toolbar,
-    withPageHelpers
-} from '../lib/page';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
+import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
-import moment
-    from 'moment';
+import moment from 'moment';
 import {getMailerTypes} from './helpers';
 import {checkPermissions} from "../lib/permissions";
-import {
-    tableAddDeleteButton,
-    tableRestActionDialogInit,
-    tableRestActionDialogRender
-} from "../lib/modals";
+import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 

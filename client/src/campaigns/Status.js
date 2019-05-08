@@ -1,52 +1,20 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
-import {
-    AlignedRow,
-    ButtonRow,
-    CheckBox,
-    DatePicker,
-    Form,
-    InputField,
-    TableSelect,
-    withForm
-} from '../lib/form';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
+import {AlignedRow, ButtonRow, CheckBox, DatePicker, Form, InputField, TableSelect, withForm} from '../lib/form';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {getCampaignLabels} from './helpers';
 import {Table} from "../lib/table";
-import {
-    Button,
-    Icon,
-    ModalDialog
-} from "../lib/bootstrap-components";
-import axios
-    from "../lib/axios";
-import {
-    getPublicUrl,
-    getUrl
-} from "../lib/urls";
-import interoperableErrors
-    from '../../../shared/interoperable-errors';
-import {
-    CampaignStatus,
-    CampaignType
-} from "../../../shared/campaigns";
-import moment
-    from 'moment';
-import campaignsStyles
-    from "./styles.scss";
+import {Button, Icon, ModalDialog} from "../lib/bootstrap-components";
+import axios from "../lib/axios";
+import {getPublicUrl, getUrl} from "../lib/urls";
+import interoperableErrors from '../../../shared/interoperable-errors';
+import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import moment from 'moment';
+import campaignsStyles from "./styles.scss";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 

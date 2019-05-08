@@ -1,14 +1,7 @@
 'use strict';
 
-import React
-    from "react";
-import {
-    ACEEditor,
-    AlignedRow,
-    Dropdown,
-    StaticField,
-    TableSelect
-} from "../lib/form";
+import React from "react";
+import {ACEEditor, AlignedRow, Dropdown, StaticField, TableSelect} from "../lib/form";
 import 'brace/mode/text';
 import 'brace/mode/html';
 
@@ -17,36 +10,17 @@ import {CKEditorHost} from "../lib/sandboxed-ckeditor";
 import {GrapesJSHost} from "../lib/sandboxed-grapesjs";
 import {CodeEditorHost} from "../lib/sandboxed-codeeditor";
 
-import {
-    getGrapesJSSourceTypeOptions,
-    GrapesJSSourceType
-} from "../lib/sandboxed-grapesjs-shared";
+import {getGrapesJSSourceTypeOptions, GrapesJSSourceType} from "../lib/sandboxed-grapesjs-shared";
 
-import {
-    CodeEditorSourceType,
-    getCodeEditorSourceTypeOptions
-} from "../lib/sandboxed-codeeditor-shared";
+import {CodeEditorSourceType, getCodeEditorSourceTypeOptions} from "../lib/sandboxed-codeeditor-shared";
 
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
-import {
-    getPublicUrl,
-    getSandboxUrl,
-    getTrustedUrl
-} from "../lib/urls";
-import mailtrainConfig
-    from 'mailtrainConfig';
-import {
-    ActionLink,
-    Button
-} from "../lib/bootstrap-components";
+import {getSandboxUrl} from "../lib/urls";
+import mailtrainConfig from 'mailtrainConfig';
+import {ActionLink, Button} from "../lib/bootstrap-components";
 import {Trans} from "react-i18next";
 
-import styles
-    from "../lib/styles.scss";
-import {
-    base,
-    unbase
-} from "../../../shared/templates";
+import styles from "../lib/styles.scss";
 
 export const ResourceType = {
     TEMPLATE: 'template',

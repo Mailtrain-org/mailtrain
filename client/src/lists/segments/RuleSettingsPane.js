@@ -1,27 +1,15 @@
 'use strict';
 
 import React, {PureComponent} from "react";
-import PropTypes
-    from "prop-types";
+import PropTypes from "prop-types";
 import {withTranslation} from '../../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    withPageHelpers
-} from "../../lib/page";
-import {
-    Button,
-    ButtonRow,
-    Dropdown,
-    Form,
-    TableSelect,
-    withForm
-} from "../../lib/form";
+import {requiresAuthenticatedUser, withPageHelpers} from "../../lib/page";
+import {Button, ButtonRow, Dropdown, Form, TableSelect, withForm} from "../../lib/form";
 import {withErrorHandling} from "../../lib/error-handling";
 import {getRuleHelpers} from "./helpers";
 import {getFieldTypes} from "../fields/helpers";
 
-import styles
-    from "./CUD.scss";
+import styles from "./CUD.scss";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 @withComponentMixins([

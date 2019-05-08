@@ -1,15 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../../lib/page';
 import {
     AlignedRow,
     Button,
@@ -26,12 +20,8 @@ import {
 import {withErrorHandling} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
 import {getTriggerTypes} from './helpers';
-import {
-    Entity,
-    Event
-} from '../../../../shared/triggers';
-import moment
-    from 'moment';
+import {Entity, Event} from '../../../../shared/triggers';
+import moment from 'moment';
 import {getCampaignLabels} from "../helpers";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 

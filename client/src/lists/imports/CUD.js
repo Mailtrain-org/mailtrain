@@ -1,15 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../../lib/page';
 import {
     AlignedRow,
     Button,
@@ -24,27 +18,15 @@ import {
     TextArea,
     withForm
 } from '../../lib/form';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../../lib/error-handling';
+import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
 import {getImportLabels} from './helpers';
-import {
-    ImportSource,
-    inProgress,
-    MappingType,
-    prepInProgress
-} from '../../../../shared/imports';
-import axios
-    from "../../lib/axios";
+import {ImportSource, inProgress, MappingType, prepInProgress} from '../../../../shared/imports';
+import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import listStyles
-    from "../styles.scss";
-import styles
-    from "../../lib/styles.scss";
-import interoperableErrors
-    from "../../../../shared/interoperable-errors";
+import listStyles from "../styles.scss";
+import styles from "../../lib/styles.scss";
+import interoperableErrors from "../../../../shared/interoperable-errors";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 

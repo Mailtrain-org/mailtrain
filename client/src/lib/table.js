@@ -1,29 +1,21 @@
 'use strict';
 
 import React, {Component} from 'react';
-import ReactDOMServer
-    from 'react-dom/server';
-import PropTypes
-    from 'prop-types';
+import ReactDOMServer from 'react-dom/server';
+import PropTypes from 'prop-types';
 import {withTranslation} from './i18n';
 
-import jQuery
-    from 'jquery';
+import jQuery from 'jquery';
 
 import 'datatables.net';
 import 'datatables.net-bs4';
 import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
 
-import axios
-    from './axios';
+import axios from './axios';
 
 import {withPageHelpers} from './page'
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from './error-handling';
-import styles
-    from "./styles.scss";
+import {withAsyncErrorHandler, withErrorHandling} from './error-handling';
+import styles from "./styles.scss";
 import {getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 

@@ -1,30 +1,16 @@
 'use strict';
 
 import React, {Component} from "react";
-import PropTypes
-    from "prop-types";
+import PropTypes from "prop-types";
 import {withTranslation} from './i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from "./page";
+import {requiresAuthenticatedUser, Title, withPageHelpers} from "./page";
 import {withErrorHandling} from "./error-handling";
 import {Table} from "./table";
-import Dropzone
-    from "react-dropzone";
-import {
-    Icon,
-    ModalDialog
-} from "./bootstrap-components";
-import axios
-    from './axios';
-import styles
-    from "./styles.scss";
-import {
-    getPublicUrl,
-    getUrl
-} from "./urls";
+import Dropzone from "react-dropzone";
+import {Icon, ModalDialog} from "./bootstrap-components";
+import axios from './axios';
+import styles from "./styles.scss";
+import {getPublicUrl, getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 
 @withComponentMixins([

@@ -3,30 +3,16 @@
 import './public-path';
 
 import React, {Component} from 'react';
-import ReactDOM
-    from 'react-dom';
+import ReactDOM from 'react-dom';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './i18n';
-import {
-    parentRPC,
-    UntrustedContentRoot
-} from './untrusted';
-import PropTypes
-    from "prop-types";
-import styles
-    from "./sandboxed-ckeditor.scss";
-import {
-    getPublicUrl,
-    getSandboxUrl,
-    getTrustedUrl
-} from "./urls";
-import {
-    base,
-    unbase
-} from "../../../shared/templates";
+import {parentRPC, UntrustedContentRoot} from './untrusted';
+import PropTypes from "prop-types";
+import styles from "./sandboxed-ckeditor.scss";
+import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
+import {base, unbase} from "../../../shared/templates";
 
-import CKEditor
-    from "react-ckeditor-component";
+import CKEditor from "react-ckeditor-component";
 
 import {initialHeight} from "./sandboxed-ckeditor-shared";
 import {withComponentMixins} from "./decorator-helpers";

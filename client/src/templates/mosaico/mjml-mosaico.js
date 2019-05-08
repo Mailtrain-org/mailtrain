@@ -2,7 +2,7 @@
 
 import htmlparser from 'htmlparser2'
 import min from 'lodash/min';
-import mjml, {MJML, BodyComponent, HeadComponent} from "../../lib/mjml";
+import {BodyComponent, HeadComponent, MJML} from "../../lib/mjml";
 import shortid from "shortid";
 
 function getId() {

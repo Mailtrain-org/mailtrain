@@ -3,52 +3,27 @@
 import './lib/public-path';
 
 import React, {Component} from 'react';
-import ReactDOM
-    from 'react-dom';
+import ReactDOM from 'react-dom';
 import {I18nextProvider} from 'react-i18next';
 import i18n, {withTranslation} from './lib/i18n';
-import account
-    from './account/root';
-import login
-    from './login/root';
-import blacklist
-    from './blacklist/root';
-import lists
-    from './lists/root';
-import namespaces
-    from './namespaces/root';
-import reports
-    from './reports/root';
-import campaigns
-    from './campaigns/root';
-import templates
-    from './templates/root';
-import users
-    from './users/root';
-import sendConfigurations
-    from './send-configurations/root';
-import settings
-    from './settings/root';
+import account from './account/root';
+import login from './login/root';
+import blacklist from './blacklist/root';
+import lists from './lists/root';
+import namespaces from './namespaces/root';
+import reports from './reports/root';
+import campaigns from './campaigns/root';
+import templates from './templates/root';
+import users from './users/root';
+import sendConfigurations from './send-configurations/root';
+import settings from './settings/root';
 
-import {
-    DropdownLink,
-    getLanguageChooser,
-    NavDropdown,
-    NavLink,
-    Section
-} from "./lib/page";
+import {DropdownLink, getLanguageChooser, NavDropdown, NavLink, Section} from "./lib/page";
 
-import mailtrainConfig
-    from 'mailtrainConfig';
-import Home
-    from "./Home";
-import {
-    DropdownActionLink,
-    Icon
-} from "./lib/bootstrap-components";
-import {Link} from "react-router-dom";
-import axios
-    from './lib/axios';
+import mailtrainConfig from 'mailtrainConfig';
+import Home from "./Home";
+import {DropdownActionLink, Icon} from "./lib/bootstrap-components";
+import axios from './lib/axios';
 import {getUrl} from "./lib/urls";
 import {withComponentMixins} from "./lib/decorator-helpers";
 

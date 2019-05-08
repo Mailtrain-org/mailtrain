@@ -1,39 +1,21 @@
 'use strict';
 
-import React
-    from 'react';
+import React from 'react';
 
-import Status
-    from './Status';
-import Statistics
-    from './Statistics';
-import CampaignsCUD
-    from './CUD';
-import Content
-    from './Content';
-import CampaignsList
-    from './List';
-import Share
-    from '../shares/Share';
-import Files
-    from "../lib/files";
-import {
-    CampaignSource,
-    CampaignStatus,
-    CampaignType
-} from "../../../shared/campaigns";
-import TriggersCUD
-    from './triggers/CUD';
-import TriggersList
-    from './triggers/List';
-import StatisticsSubsList
-    from "./StatisticsSubsList";
+import Status from './Status';
+import Statistics from './Statistics';
+import CampaignsCUD from './CUD';
+import Content from './Content';
+import CampaignsList from './List';
+import Share from '../shares/Share';
+import Files from "../lib/files";
+import {CampaignSource, CampaignType} from "../../../shared/campaigns";
+import TriggersCUD from './triggers/CUD';
+import TriggersList from './triggers/List';
+import StatisticsSubsList from "./StatisticsSubsList";
 import {SubscriptionStatus} from "../../../shared/lists";
-import StatisticsOpened
-    from "./StatisticsOpened";
-import StatisticsLinkClicks
-    from "./StatisticsLinkClicks";
-import TemplatesCUD from "../templates/root";
+import StatisticsOpened from "./StatisticsOpened";
+import StatisticsLinkClicks from "./StatisticsLinkClicks";
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 
 function getMenus(t) {

@@ -1,13 +1,10 @@
 'use strict';
 
-import React, {Component} from 'react';
-import i18n
-    from 'i18next';
+import React from 'react';
+import i18n from 'i18next';
 import {withNamespaces} from "react-i18next";
-import LanguageDetector
-    from 'i18next-browser-languagedetector';
-import mailtrainConfig
-    from 'mailtrainConfig';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import mailtrainConfig from 'mailtrainConfig';
 
 import {convertToFake, getLang} from '../../../shared/langs';
 import {createComponentMixin} from "./decorator-helpers";

@@ -1,15 +1,10 @@
 'use strict';
 
-import React
-    from 'react';
-import Login
-    from './Login';
-import Reset
-    from './Forgot';
-import ResetLink
-    from './Reset';
-import mailtrainConfig
-    from 'mailtrainConfig';
+import React from 'react';
+import Login from './Login';
+import Reset from './Forgot';
+import ResetLink from './Reset';
+import mailtrainConfig from 'mailtrainConfig';
 
 
 function getMenus(t) {

@@ -1,37 +1,28 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../../lib/page'
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../../lib/page'
 import {
     Button,
     ButtonRow,
     Dropdown,
+    filterData,
     Form,
     FormSendMethod,
-    InputField, StaticField,
+    InputField,
+    StaticField,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {
-    NamespaceSelect,
-    validateNamespace
-} from '../../lib/namespace';
+import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 
-import {getVersafix, getMJMLSample} from "../../../../shared/mosaico-templates";
-import {
-    getTemplateTypes,
-    getTemplateTypesOrder
-} from "./helpers";
+import {getMJMLSample, getVersafix} from "../../../../shared/mosaico-templates";
+import {getTemplateTypes, getTemplateTypesOrder} from "./helpers";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import styles from "../../lib/styles.scss";
 
@@ -58,7 +49,10 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        this.initForm();
+        this.initForm({
+            loadMutator: ::this.getFormValuesMutator,
+            submitMutator: ::this.submitFormValuesMutator
+        });
     }
 
     static propTypes = {
@@ -71,9 +65,14 @@ export default class CUD extends Component {
         this.templateTypes[data.type].afterLoad(this, data);
     }
 
+    submitFormValuesMutator(data) {
+        this.templateTypes[data.type].beforeSave(this, data);
+        return filterData(data, ['name', 'description', 'type', 'data', 'namespace']);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             const wizard = this.props.wizard;
@@ -126,6 +125,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -141,16 +141,14 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            this.templateTypes[data.type].beforeSave(this, data);
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('Mosaico template updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/mosaico-templates/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/mosaico-templates/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Mosaico template updated'));
                 }

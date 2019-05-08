@@ -2,31 +2,16 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    Toolbar,
-    withPageHelpers
-} from '../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page';
 import {Table} from '../lib/table';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import moment
-    from 'moment';
-import axios
-    from '../lib/axios';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import moment from 'moment';
+import axios from '../lib/axios';
 import {ReportState} from '../../../shared/reports';
 import {Icon} from "../lib/bootstrap-components";
 import {checkPermissions} from "../lib/permissions";
 import {getUrl} from "../lib/urls";
-import {
-    tableAddDeleteButton,
-    tableRestActionDialogInit,
-    tableRestActionDialogRender
-} from "../lib/modals";
+import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([

@@ -1,16 +1,10 @@
 'use strict';
 
-import React, { Component } from 'react';
-import { withTranslation } from '../lib/i18n';
-import {
-    withPageHelpers,
-    Title,
-    requiresAuthenticatedUser
-} from '../lib/page'
-import {
-    withForm, Form, FormSendMethod, InputField, ButtonRow, Button
-} from '../lib/form';
-import { withErrorHandling, withAsyncErrorHandler } from '../lib/error-handling';
+import React, {Component} from 'react';
+import {withTranslation} from '../lib/i18n';
+import {Title, withPageHelpers} from '../lib/page'
+import {Button, ButtonRow, Form, FormSendMethod, InputField, withForm, withFormErrorHandlers} from '../lib/form';
+import {withErrorHandling} from '../lib/error-handling';
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([
@@ -45,6 +39,7 @@ export default class Forget extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler() {
         const t = this.props.t;
 

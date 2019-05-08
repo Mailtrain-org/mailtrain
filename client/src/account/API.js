@@ -3,17 +3,9 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Trans} from 'react-i18next';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page'
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import axios
-    from '../lib/axios';
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import axios from '../lib/axios';
 import {Button} from '../lib/bootstrap-components';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";

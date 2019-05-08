@@ -2,29 +2,13 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
-import {
-    Title,
-    withPageHelpers
-} from '../lib/page'
+import {Title, withPageHelpers} from '../lib/page'
 import {Link} from 'react-router-dom'
-import {
-    Button,
-    ButtonRow,
-    Form,
-    FormSendMethod,
-    InputField,
-    withForm
-} from '../lib/form';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import passwordValidator
-    from '../../../shared/password-validator';
-import axios
-    from '../lib/axios';
-import interoperableErrors
-    from '../../../shared/interoperable-errors';
+import {Button, ButtonRow, Form, FormSendMethod, InputField, withForm, withFormErrorHandlers} from '../lib/form';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import passwordValidator from '../../../shared/password-validator';
+import axios from '../lib/axios';
+import interoperableErrors from '../../../shared/interoperable-errors';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -102,6 +86,7 @@ export default class Account extends Component {
         state.setIn(['password2', 'error'], password !== password2 ? t('passwordsMustMatch') : null);
     }
 
+    @withFormErrorHandlers
     async submitHandler() {
         const t = this.props.t;
 

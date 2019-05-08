@@ -1,15 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {Trans} from 'react-i18next';
 import {withTranslation} from '../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
 import {
     Button,
     ButtonRow,
@@ -18,7 +13,8 @@ import {
     FormSendMethod,
     InputField,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -51,6 +47,7 @@ export default class Update extends Component {
         const t = this.props.t;
     }
 
+    @withFormErrorHandlers
     async submitHandler() {
         const t = this.props.t;
 

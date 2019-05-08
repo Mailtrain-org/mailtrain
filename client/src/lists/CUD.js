@@ -1,40 +1,31 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {Trans} from 'react-i18next';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
 import {
     Button,
     ButtonRow,
     CheckBox,
-    Dropdown, filterData,
+    Dropdown,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     StaticField,
     TableSelect,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {DeleteModalDialog} from '../lib/modals';
-import {
-    NamespaceSelect,
-    validateNamespace
-} from '../lib/namespace';
-import {UnsubscriptionMode, FieldWizard} from '../../../shared/lists';
-import styles
-    from "../lib/styles.scss";
-import mailtrainConfig
-    from 'mailtrainConfig';
+import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
+import styles from "../lib/styles.scss";
+import mailtrainConfig from 'mailtrainConfig';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -128,6 +119,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 

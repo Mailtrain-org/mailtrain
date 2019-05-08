@@ -1,16 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {Trans} from 'react-i18next';
 import {withTranslation} from '../../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../../lib/page';
 import {
     ACEEditor,
     Button,
@@ -28,17 +22,10 @@ import {
 import {withErrorHandling} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
 import {getFieldTypes} from './helpers';
-import validators
-    from '../../../../shared/validators';
-import slugify
-    from 'slugify';
-import {
-    DateFormat,
-    parseBirthday,
-    parseDate
-} from '../../../../shared/date';
-import styles
-    from "../../lib/styles.scss";
+import validators from '../../../../shared/validators';
+import slugify from 'slugify';
+import {DateFormat, parseBirthday, parseDate} from '../../../../shared/date';
+import styles from "../../lib/styles.scss";
 import 'brace/mode/json';
 import 'brace/mode/handlebars';
 import {withComponentMixins} from "../../lib/decorator-helpers";

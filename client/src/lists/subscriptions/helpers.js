@@ -1,7 +1,7 @@
 'use strict';
 
 import React from "react";
-import {SubscriptionStatus} from "../../../../shared/lists";
+import {getFieldColumn, SubscriptionStatus} from "../../../../shared/lists";
 import {
     ACEEditor,
     CheckBox,
@@ -13,7 +13,6 @@ import {
     TextArea
 } from "../../lib/form";
 import {formatBirthday, formatDate, parseBirthday, parseDate} from "../../../../shared/date";
-import {getFieldColumn} from '../../../../shared/lists';
 import 'brace/mode/json';
 
 export function getSubscriptionStatusLabels(t) {

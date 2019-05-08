@@ -1,9 +1,6 @@
 'use strict';
 
-import {
-    CampaignStatus,
-    CampaignType
-} from "../../../shared/campaigns";
+import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
 
 export function getCampaignLabels(t) {
 

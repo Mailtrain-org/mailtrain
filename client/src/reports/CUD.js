@@ -1,15 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
 import {
     Button,
     ButtonRow,
@@ -22,21 +16,12 @@ import {
     TextArea,
     withForm
 } from '../lib/form';
-import axios
-    from '../lib/axios';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import moment
-    from 'moment';
-import {
-    NamespaceSelect,
-    validateNamespace
-} from '../lib/namespace';
+import axios from '../lib/axios';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import moment from 'moment';
+import {NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig
-    from 'mailtrainConfig';
+import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
 

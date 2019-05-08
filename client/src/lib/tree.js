@@ -1,28 +1,20 @@
 'use strict';
 
 import React, {Component} from 'react';
-import ReactDOMServer
-    from 'react-dom/server';
+import ReactDOMServer from 'react-dom/server';
 import {withTranslation} from './i18n';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 
-import jQuery
-    from 'jquery';
+import jQuery from 'jquery';
 import '../../static/jquery/jquery-ui-1.12.1.min.js';
 import '../../static/fancytree/jquery.fancytree-all.min.js';
 import '../../static/fancytree/skin-bootstrap/ui.fancytree.min.css';
 import './tree.scss';
-import axios
-    from './axios';
+import axios from './axios';
 
 import {withPageHelpers} from './page'
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from './error-handling';
-import styles
-    from "./styles.scss";
+import {withAsyncErrorHandler, withErrorHandling} from './error-handling';
+import styles from "./styles.scss";
 import {getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 

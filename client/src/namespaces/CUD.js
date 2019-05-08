@@ -1,36 +1,15 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
-import {
-    Button,
-    ButtonRow,
-    Form,
-    FormSendMethod,
-    InputField,
-    TextArea,
-    TreeTableSelect,
-    withForm
-} from '../lib/form';
-import axios
-    from '../lib/axios';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import interoperableErrors
-    from '../../../shared/interoperable-errors';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
+import {Button, ButtonRow, Form, FormSendMethod, InputField, TextArea, TreeTableSelect, withForm} from '../lib/form';
+import axios from '../lib/axios';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import interoperableErrors from '../../../shared/interoperable-errors';
 import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig
-    from 'mailtrainConfig';
+import mailtrainConfig from 'mailtrainConfig';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";

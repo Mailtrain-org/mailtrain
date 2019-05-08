@@ -1,46 +1,22 @@
 'use strict';
 
 import React, {Component} from "react";
-import PropTypes
-    from "prop-types";
+import PropTypes from "prop-types";
 import {withTranslation} from '../../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    Toolbar,
-    withPageHelpers
-} from "../../lib/page";
-import {
-    Button as FormButton,
-    ButtonRow,
-    Dropdown,
-    Form,
-    FormSendMethod,
-    InputField,
-    withForm
-} from "../../lib/form";
+import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../../lib/page";
+import {ButtonRow, Dropdown, Form, FormSendMethod, InputField, withForm} from "../../lib/form";
 import {withErrorHandling} from "../../lib/error-handling";
 import {DeleteModalDialog} from "../../lib/modals";
 
-import styles
-    from "./CUD.scss";
+import styles from "./CUD.scss";
 import {DragDropContext} from "react-dnd";
-import HTML5Backend
-    from "react-dnd-html5-backend";
-import TouchBackend
-    from "react-dnd-touch-backend";
-import SortableTree
-    from "react-sortable-tree";
+import HTML5Backend from "react-dnd-html5-backend";
+import TouchBackend from "react-dnd-touch-backend";
+import SortableTree from "react-sortable-tree";
 import 'react-sortable-tree/style.css';
-import {
-    ActionLink,
-    Button,
-    Icon
-} from "../../lib/bootstrap-components";
+import {ActionLink, Button, Icon} from "../../lib/bootstrap-components";
 import {getRuleHelpers} from "./helpers";
-import RuleSettingsPane
-    from "./RuleSettingsPane";
+import RuleSettingsPane from "./RuleSettingsPane";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 // https://stackoverflow.com/a/4819886/1601953

@@ -2,24 +2,14 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {ModalDialog} from "../lib/bootstrap-components";
-import {
-    requiresAuthenticatedUser,
-    withPageHelpers
-} from "../lib/page";
-import {
-    Form,
-    TableSelect,
-    withForm
-} from "../lib/form";
+import {requiresAuthenticatedUser, withPageHelpers} from "../lib/page";
+import {Form, TableSelect, withForm} from "../lib/form";
 import {withErrorHandling} from "../lib/error-handling";
-import moment
-    from "moment";
+import moment from "moment";
 import {getMailerTypes} from "../send-configurations/helpers";
-import axios
-    from '../lib/axios';
+import axios from '../lib/axios';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
 

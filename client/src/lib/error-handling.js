@@ -1,7 +1,6 @@
 'use strict';
 
 import React from "react";
-import PropTypes from 'prop-types';
 import {createComponentMixin} from "./decorator-helpers";
 
 function handleError(that, error) {

@@ -8,14 +8,16 @@ import {
     Button,
     ButtonRow,
     CheckBox,
-    Dropdown, filterData,
+    Dropdown,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     StaticField,
     TableSelect,
     TextArea,
-    withForm, withFormErrorHandlers
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../lib/namespace';
@@ -28,7 +30,6 @@ import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import moment from 'moment';
-import {FieldWizard} from "../../../shared/lists";
 
 
 @withComponentMixins([

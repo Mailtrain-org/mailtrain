@@ -1,19 +1,14 @@
 'use strict';
 
 import React, {Component} from "react";
-import { withTranslation } from '../lib/i18n';
+import {withTranslation} from '../lib/i18n';
 import {requiresAuthenticatedUser, Title, withPageHelpers} from "../lib/page";
-import {withAsyncErrorHandler, withErrorHandling} from "../lib/error-handling";
+import {withErrorHandling} from "../lib/error-handling";
 import {Table} from "../lib/table";
-import {ButtonRow, Form, InputField, withForm, FormSendMethod} from "../lib/form";
-import {Button, Icon} from "../lib/bootstrap-components";
-import axios, {HTTPMethod} from "../lib/axios";
-import {getUrl} from "../lib/urls";
-import {
-    tableAddRestActionButton,
-    tableRestActionDialogInit,
-    tableRestActionDialogRender
-} from "../lib/modals";
+import {ButtonRow, Form, FormSendMethod, InputField, withForm} from "../lib/form";
+import {Button} from "../lib/bootstrap-components";
+import {HTTPMethod} from "../lib/axios";
+import {tableAddRestActionButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([

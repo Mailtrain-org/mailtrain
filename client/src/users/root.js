@@ -1,13 +1,9 @@
 'use strict';
 
-import React
-    from 'react';
-import CUD
-    from './CUD';
-import List
-    from './List';
-import UserShares
-    from '../shares/UserShares';
+import React from 'react';
+import CUD from './CUD';
+import List from './List';
+import UserShares from '../shares/UserShares';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 
 function getMenus(t) {

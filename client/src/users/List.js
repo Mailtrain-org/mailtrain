@@ -2,22 +2,11 @@
 
 import React, {Component} from "react";
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    Toolbar,
-    withPageHelpers
-} from "../lib/page";
+import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../lib/page";
 import {Table} from "../lib/table";
-import mailtrainConfig
-    from "mailtrainConfig";
+import mailtrainConfig from "mailtrainConfig";
 import {Icon} from "../lib/bootstrap-components";
-import {
-    tableAddDeleteButton,
-    tableRestActionDialogInit,
-    tableRestActionDialogRender
-} from "../lib/modals";
+import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([

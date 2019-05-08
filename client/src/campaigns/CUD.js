@@ -1,15 +1,9 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page'
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
     AlignedRow,
     Button,
@@ -17,45 +11,27 @@ import {
     CheckBox,
     Dropdown,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     StaticField,
     TableSelect,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import {
-    NamespaceSelect,
-    validateNamespace
-} from '../lib/namespace';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import {NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig
-    from 'mailtrainConfig';
-import {
-    getTemplateTypes,
-    getTypeForm,
-    ResourceType
-} from '../templates/helpers';
-import axios
-    from '../lib/axios';
-import styles
-    from "../lib/styles.scss";
-import campaignsStyles
-    from "./styles.scss";
+import mailtrainConfig from 'mailtrainConfig';
+import {getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import axios from '../lib/axios';
+import styles from "../lib/styles.scss";
+import campaignsStyles from "./styles.scss";
 import {getUrl} from "../lib/urls";
-import {
-    campaignOverridables,
-    CampaignSource,
-    CampaignStatus,
-    CampaignType
-} from "../../../shared/campaigns";
-import moment
-    from 'moment';
+import {campaignOverridables, CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels} from "./helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -116,6 +92,8 @@ export default class CUD extends Component {
         this.nextListEntryId = 0;
 
         this.initForm({
+            loadMutator: ::this.getFormValuesMutator,
+            submitMutator: ::this.submitFormValuesMutator,
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
             },
@@ -200,9 +178,76 @@ export default class CUD extends Component {
         this.fetchSendConfiguration(data.send_configuration);
     }
 
+    submitFormValuesMutator(data) {
+        const isEdit = !!this.props.entity;
+
+        data.source = Number.parseInt(data.source);
+
+        data.data = {};
+        if (data.source === CampaignSource.TEMPLATE || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+            data.data.sourceTemplate = data.data_sourceTemplate;
+        }
+
+        if (data.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+            data.data.sourceCampaign = data.data_sourceCampaign;
+        }
+
+        if (!isEdit && data.source === CampaignSource.CUSTOM) {
+            this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
+
+            data.data.sourceCustom = {
+                type: data.data_sourceCustom_type,
+                data: data.data_sourceCustom_data,
+                html: data.data_sourceCustom_html,
+                text: data.data_sourceCustom_text
+            }
+        }
+
+        if (data.source === CampaignSource.URL) {
+            data.data.sourceUrl = data.data_sourceUrl;
+        }
+
+        if (data.type === CampaignType.RSS) {
+            data.data.feedUrl = data.data_feedUrl;
+        }
+
+        for (const overridable of campaignOverridables) {
+            if (!data[overridable + '_overriden']) {
+                data[overridable + '_override'] = null;
+            }
+            delete data[overridable + '_overriden'];
+        }
+
+        const lsts = [];
+        for (const lstUid of data.lists) {
+            const prefix = 'lists_' + lstUid + '_';
+
+            const useSegmentation = data[prefix + 'useSegmentation'] && (data.type === CampaignType.REGULAR || data.type === CampaignType.RSS);
+
+            lsts.push({
+                list: data[prefix + 'list'],
+                segment: useSegmentation ? data[prefix + 'segment'] : null
+            });
+        }
+        data.lists = lsts;
+
+        for (const key in data) {
+            if (key.startsWith('data_') || key.startsWith('lists_')) {
+                delete data[key];
+            }
+        }
+
+        return filterData(data, [
+            'name', 'description', 'segment', 'namespace', 'send_configuration',
+            'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override',
+            'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url',
+            'type', 'source', 'parent', 'lists'
+        ]);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
             if (this.props.entity.status === CampaignStatus.SENDING) {
                 this.disableForm();
@@ -345,8 +390,8 @@ export default class CUD extends Component {
         STATUS: 2
     }
 
+    @withFormErrorHandlers
     async submitHandler(afterSubmitAction) {
-        const isEdit = !!this.props.entity;
         const t = this.props.t;
 
         let sendMethod, url;
@@ -361,63 +406,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            data.source = Number.parseInt(data.source);
-
-            data.data = {};
-            if (data.source === CampaignSource.TEMPLATE || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                data.data.sourceTemplate = data.data_sourceTemplate;
-            }
-
-            if (data.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-                data.data.sourceCampaign = data.data_sourceCampaign;
-            }
-
-            if (!isEdit && data.source === CampaignSource.CUSTOM) {
-                this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
-
-                data.data.sourceCustom = {
-                    type: data.data_sourceCustom_type,
-                    data: data.data_sourceCustom_data,
-                    html: data.data_sourceCustom_html,
-                    text: data.data_sourceCustom_text
-                }
-            }
-
-            if (data.source === CampaignSource.URL) {
-                data.data.sourceUrl = data.data_sourceUrl;
-            }
-
-            if (data.type === CampaignType.RSS) {
-                data.data.feedUrl = data.data_feedUrl;
-            }
-
-            for (const overridable of campaignOverridables) {
-                if (!data[overridable + '_overriden']) {
-                    data[overridable + '_override'] = null;
-                }
-                delete data[overridable + '_overriden'];
-            }
-
-            const lsts = [];
-            for (const lstUid of data.lists) {
-                const prefix = 'lists_' + lstUid + '_';
-
-                const useSegmentation = data[prefix + 'useSegmentation'] && (data.type === CampaignType.REGULAR || data.type === CampaignType.RSS);
-
-                lsts.push({
-                    list: data[prefix + 'list'],
-                    segment: useSegmentation ? data[prefix + 'segment'] : null
-                });
-            }
-            data.lists = lsts;
-
-            for (const key in data) {
-                if (key.startsWith('data_') || key.startsWith('lists_')) {
-                    delete data[key];
-                }
-            }
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {
@@ -426,7 +415,7 @@ export default class CUD extends Component {
                 } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
                     this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/campaigns-settings/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/campaigns-settings/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Campaign updated'));
                 }

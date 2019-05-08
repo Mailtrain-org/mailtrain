@@ -1,16 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {HTTPMethod} from '../../lib/axios';
 import {withTranslation} from '../../lib/i18n';
-import {
-    LinkButton,
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../../lib/page';
+import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../../lib/page';
 import {
     AlignedRow,
     Button,
@@ -24,15 +18,10 @@ import {
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
 import {RestActionModalDialog} from "../../lib/modals";
-import interoperableErrors
-    from '../../../../shared/interoperable-errors';
+import interoperableErrors from '../../../../shared/interoperable-errors';
 import {SubscriptionStatus} from '../../../../shared/lists';
-import {
-    getFieldTypes,
-    getSubscriptionStatusLabels
-} from './helpers';
-import moment
-    from 'moment-timezone';
+import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
+import moment from 'moment-timezone';
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 @withComponentMixins([

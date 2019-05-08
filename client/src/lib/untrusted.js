@@ -1,27 +1,13 @@
 'use strict';
 
 import React, {Component} from "react";
-import PropTypes
-    from "prop-types";
+import PropTypes from "prop-types";
 import {withTranslation} from './i18n';
-import {
-    requiresAuthenticatedUser,
-    withPageHelpers
-} from "./page";
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from "./error-handling";
-import axios
-    from "./axios";
-import styles
-    from "./styles.scss";
-import {
-    getSandboxUrl,
-    getTrustedUrl,
-    getUrl,
-    setRestrictedAccessToken
-} from "./urls";
+import {requiresAuthenticatedUser, withPageHelpers} from "./page";
+import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
+import axios from "./axios";
+import styles from "./styles.scss";
+import {getSandboxUrl, getUrl, setRestrictedAccessToken} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 
 @withComponentMixins([

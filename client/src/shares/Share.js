@@ -1,31 +1,14 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../lib/page';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../lib/error-handling';
-import {
-    Button,
-    ButtonRow,
-    Form,
-    FormSendMethod,
-    TableSelect,
-    withForm
-} from '../lib/form';
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
+import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import {Button, ButtonRow, Form, FormSendMethod, TableSelect, withForm, withFormErrorHandlers} from '../lib/form';
 import {Table} from '../lib/table';
-import axios
-    from '../lib/axios';
-import mailtrainConfig
-    from 'mailtrainConfig';
+import axios from '../lib/axios';
+import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -91,6 +74,7 @@ export default class Share extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler() {
         const t = this.props.t;
 

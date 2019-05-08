@@ -1,25 +1,15 @@
 'use strict';
 
 import React, {Component} from 'react';
-import PropTypes
-    from 'prop-types';
+import PropTypes from 'prop-types';
 import {withTranslation} from '../../lib/i18n';
-import {
-    requiresAuthenticatedUser,
-    Title,
-    withPageHelpers
-} from '../../lib/page';
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../../lib/page';
 import {AlignedRow} from '../../lib/form';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from '../../lib/error-handling';
+import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
 import {getImportLabels} from './helpers';
-import axios
-    from "../../lib/axios";
+import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import moment
-    from "moment";
+import moment from "moment";
 import {runStatusInProgress} from "../../../../shared/imports";
 import {Table} from "../../lib/table";
 import {withComponentMixins} from "../../lib/decorator-helpers";

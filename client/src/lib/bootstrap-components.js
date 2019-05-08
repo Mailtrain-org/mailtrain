@@ -2,12 +2,8 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from './i18n';
-import PropTypes
-    from 'prop-types';
-import {
-    withAsyncErrorHandler,
-    withErrorHandling
-} from './error-handling';
+import PropTypes from 'prop-types';
+import {withAsyncErrorHandler, withErrorHandling} from './error-handling';
 import {withComponentMixins} from "./decorator-helpers";
 
 @withComponentMixins([

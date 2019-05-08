@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import {ImportSource, MappingType, ImportStatus, RunStatus} from '../../../../shared/imports';
+import {ImportSource, ImportStatus, MappingType, RunStatus} from '../../../../shared/imports';
 
 export function getImportLabels(t) {
 

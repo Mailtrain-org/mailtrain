@@ -1,11 +1,8 @@
 'use strict';
 
-import React
-    from 'react';
-import Account
-    from './Account';
-import API
-    from './API';
+import React from 'react';
+import Account from './Account';
+import API from './API';
 
 
 function getMenus(t) {

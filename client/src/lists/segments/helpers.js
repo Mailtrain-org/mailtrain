@@ -2,8 +2,8 @@
 
 import React from 'react';
 import {DatePicker, Dropdown, InputField} from "../../lib/form";
-import { parseDate, parseBirthday, formatDate, formatBirthday, DateFormat, birthdayYear, getDateFormatString, getBirthdayFormatString } from '../../../../shared/date';
-import { tMark } from "../../lib/i18n";
+import {DateFormat, formatBirthday, formatDate, parseBirthday, parseDate} from '../../../../shared/date';
+import {tMark} from "../../lib/i18n";
 
 export function getRuleHelpers(t, fields) {
 

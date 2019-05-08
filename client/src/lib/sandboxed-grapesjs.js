@@ -2,10 +2,8 @@
 
 import React, {Component} from 'react';
 import {withTranslation} from './i18n';
-import PropTypes
-    from "prop-types";
-import styles
-    from "./sandboxed-grapesjs.scss";
+import PropTypes from "prop-types";
+import styles from "./sandboxed-grapesjs.scss";
 
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
