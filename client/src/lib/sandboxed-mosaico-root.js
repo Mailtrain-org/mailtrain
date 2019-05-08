@@ -13,6 +13,7 @@ import {base, unbase} from "../../../shared/templates";
 import {withComponentMixins} from "./decorator-helpers";
 import juice from "juice";
 
+
 @withComponentMixins([
     withTranslation
 ])
@@ -56,7 +57,8 @@ class MosaicoSandbox extends Component {
                 ...
             </div>
          */
-        const html = juice(this.viewModel.exportHTML());
+        let html = this.viewModel.exportHTML();
+        html = juice(html);
 
         return {
             html: unbase(html, trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
@@ -99,7 +101,7 @@ class MosaicoSandbox extends Component {
 
         plugins.unshift(vm => {
             // This is an override of the default paths in Mosaico
-            vm.logoPath = getTrustedUrl('static/mosaico/img/mosaico32.png');
+            vm.logoPath = getTrustedUrl('static/mosaico/rs/img/mosaico32.png');
             vm.logoUrl = '#';
         });
 

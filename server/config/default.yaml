@@ -30,9 +30,9 @@ gdpr:
 
 # Enabled HTML editors
 editors:
-- grapesjs
 - mosaico
 - mosaicoWithFsTemplate
+- grapesjs
 - ckeditor4
 - codeeditor
 
@@ -270,7 +270,7 @@ roles:
 
     campaignsAdmin:
       name: Campaigns Admin
-      description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
+      description: In the respective namespace, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
       permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createCampaign]
       children:
         sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
@@ -283,17 +283,34 @@ roles:
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
         namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createCampaign]
 
+    campaignsCreator:
+      name: Campaigns Creator
+      description: In the respective namespace, the user has all permissions for templates and campaigns.
+      permissions: [view, createTemplate, createCampaign]
+      children:
+        sendConfiguration: [viewPublic]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, fetchRss]
+        template: [view, edit, delete, share, viewFiles, manageFiles]
+
   sendConfiguration:
     master:
       name: Master
       description: All permissions
       permissions: [viewPublic, viewPrivate, edit, delete, share, sendWithoutOverrides, sendWithAllowedOverrides, sendWithAnyOverrides]
+    campaignsCreator:
+      name: Campaigns Creator
+      description: The user can only use the send configuration in setting up a campaign. However, this gives no permission to send.
+      permissions: [viewPublic]
 
   list:
     master:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
+    campaignsCreator:
+      name: Campaigns Creator
+      description: The user can only use the list in setting up a campaign. However, this gives no permission to view subscriptions or to send to the list.
+      permissions: [view, viewFields, viewSegments]
 
   customForm:
     master:
@@ -306,6 +323,10 @@ roles:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, manageMessages, fetchRss]
+    campaignsCreator:
+      name: Campaigns Creator
+      description: The user can setup the campaign but cannot send it.
+      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, fetchRss]
     rssTrigger:
       name: RSS Campaign Trigger
       description: Allows triggering a fetch of an RSS campaign

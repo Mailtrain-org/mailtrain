@@ -15,7 +15,7 @@ import {
     Button,
     ButtonRow,
     CheckBox,
-    Dropdown,
+    Dropdown, filterData,
     Form,
     FormSendMethod,
     InputField,
@@ -51,7 +51,10 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        this.initForm();
+        this.initForm({
+            loadMutator: ::this.getFormValuesMutator,
+            submitMutator: ::this.submitFormValuesMutator
+        });
 
         this.mailerTypes = getMailerTypes(props.t);
     }
@@ -66,9 +69,21 @@ export default class CUD extends Component {
         data.listunsubscribe_disabled = !!data.listunsubscribe_disabled;
     }
 
+    submitFormValuesMutator(data) {
+        if (data.form === 'default') {
+            data.default_form = null;
+        }
+
+        if (data.fieldWizard === FieldWizard.FIRST_LAST_NAME || data.fieldWizard === FieldWizard.NAME) {
+            data.to_name = null;
+        }
+
+        return filterData(data, ['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             this.populateFormValues({
@@ -128,23 +143,14 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            if (data.form === 'default') {
-                data.default_form = null;
-            }
-            delete data.form;
-
-            if (data.fieldWizard === FieldWizard.FIRST_LAST_NAME || data.fieldWizard === FieldWizard.NAME) {
-                data.to_name = null;
-            }
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/lists', 'success', t('List updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/lists/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/lists/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('List updated'));
                 }
@@ -288,7 +294,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

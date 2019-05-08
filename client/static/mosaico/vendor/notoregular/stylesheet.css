@@ -1,7 +1,0 @@
-@font-face {
-	font-family: 'Noto Sans';
-	font-style: normal;
-	font-weight: 400;
-	src: url('./noto-sans-400-normal.eot');
-	src: local('Noto Sans'), local('NotoSans'), url('./noto-sans-400-normal.eot#iefix') format('embedded-opentype'), url('./noto-sans-400-normal.woff') format('woff'), url('./noto-sans-400-normal.ttf') format('truetype');
-}

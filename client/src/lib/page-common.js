@@ -3,7 +3,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {Redirect, Route, Switch} from "react-router-dom";
-import {withRouter} from "react-router";
 import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
 import axios from "../lib/axios";
 import {getUrl} from "./urls";
@@ -362,15 +361,23 @@ export const withPageHelpers = createComponentMixin([{context: SectionContentCon
 
     InnerClass.prototype.navigateTo = function(path) {
         return this.props.sectionContent.navigateTo(path);
-    }
+    };
 
     InnerClass.prototype.navigateBack = function() {
         return this.props.sectionContent.navigateBack();
-    }
+    };
 
     InnerClass.prototype.navigateToWithFlashMessage = function(path, severity, text) {
         return this.props.sectionContent.navigateToWithFlashMessage(path, severity, text);
-    }
+    };
+
+    InnerClass.prototype.registerBeforeUnloadHandlers = function(handlers) {
+        return this.props.sectionContent.registerBeforeUnloadHandlers(handlers);
+    };
+
+    InnerClass.prototype.deregisterBeforeUnloadHandlers = function(handlers) {
+        return this.props.sectionContent.deregisterBeforeUnloadHandlers(handlers);
+    };
 
     return {};
 });

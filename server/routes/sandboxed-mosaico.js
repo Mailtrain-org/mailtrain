@@ -206,7 +206,7 @@ async function getRouter(appType) {
             const lang = req.locale.language;
             if (lang && lang !== 'en') {
                 try {
-                    const file = path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'lang', 'mosaico-' + lang + '.json');
+                    const file = path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'rs', 'lang', 'mosaico-' + lang + '.json');
                     languageStrings = await fs.readFile(file, 'utf8');
                 } catch (err) {
                 }

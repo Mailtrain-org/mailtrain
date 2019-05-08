@@ -8,14 +8,14 @@ import {
     Button,
     ButtonRow,
     CheckBox,
-    Dropdown,
+    Dropdown, filterData,
     Form,
     FormSendMethod,
     InputField,
     StaticField,
     TableSelect,
     TextArea,
-    withForm
+    withForm, withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../lib/namespace';
@@ -28,6 +28,7 @@ import {getUrl} from "../lib/urls";
 import {TestSendModalDialog} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import moment from 'moment';
+import {FieldWizard} from "../../../shared/lists";
 
 
 @withComponentMixins([
@@ -53,6 +54,9 @@ export default class CUD extends Component {
         };
 
         this.initForm({
+            loadMutator: ::this.getFormValuesMutator,
+            submitMutator: ::this.submitFormValuesMutator,
+            getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
             onChangeBeforeValidation: {
                 type: ::this.onTypeChanged
             }
@@ -83,9 +87,28 @@ export default class CUD extends Component {
         this.templateTypes[data.type].afterLoad(data);
     }
 
+    submitFormValuesMutator(data) {
+        this.templateTypes[data.type].beforeSave(data);
+        return filterData(data, ['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
+    }
+
+    async getPreSubmitFormValuesUpdater() {
+        let exportedData = {};
+        if (this.props.entity) {
+            const typeKey = this.getFormValue('type');
+            exportedData = await this.templateTypes[typeKey].exportHTMLEditorData(this);
+        }
+
+        return mutStateData => {
+            for (const key in exportedData) {
+                mutStateData.setIn([key, 'value'], exportedData[key]);
+            }
+        };
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             this.populateFormValues({
@@ -138,14 +161,9 @@ export default class CUD extends Component {
         await this.submitHandler();
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
-
-        let exportedData = {};
-        if (this.props.entity) {
-            const typeKey = this.getFormValue('type');
-            exportedData = await this.templateTypes[typeKey].exportHTMLEditorData(this);
-        }
 
         let sendMethod, url;
         if (this.props.entity) {
@@ -159,17 +177,14 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            Object.assign(data, exportedData);
-            this.templateTypes[data.type].beforeSave(data);
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/templates', 'success', t('Template updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Template updated'));
                 }
@@ -338,7 +353,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(true)}/>}
+                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>}
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/${this.props.entity.id}/delete`}/> }
                         {isEdit && <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>

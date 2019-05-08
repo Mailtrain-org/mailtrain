@@ -199,7 +199,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
                     initialMetadata={owner.getFormValue(prefix + 'mosaicoData').metadata}
-                    templatePath={getSandboxUrl(`static/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/index.html`)}
+                    templatePath={getSandboxUrl(`static/mosaico/templates/${owner.getFormValue(prefix + 'mosaicoFsTemplate')}/template-${owner.getFormValue(prefix + 'mosaicoFsTemplate')}.html`)}
                     entityTypeId={entityTypeId}
                     title={t('mosaicoTemplateDesigner')}
                     onSave={::owner.save}

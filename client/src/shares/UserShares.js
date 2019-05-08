@@ -93,9 +93,13 @@ export default class UserShares extends Component {
 
                 {renderSharesTable('namespace', t('namespaces'))}
                 {renderSharesTable('list', t('lists'))}
+                {renderSharesTable('template', t('Templates'))}
+                {renderSharesTable('mosaicoTemplate', t('Mosaico Templates'))}
+                {renderSharesTable('campaign', t('Campaigns'))}
                 {renderSharesTable('customForm', t('customForms-1'))}
                 {renderSharesTable('report', t('reports'))}
                 {renderSharesTable('reportTemplate', t('reportTemplates'))}
+                {renderSharesTable('sendConfiguration', t('Send Configurations'))}
             </div>
         );
     }

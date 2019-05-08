@@ -301,7 +301,7 @@ export class ModalDialog extends Component {
             buttons = [];
             for (let idx = 0; idx < this.props.buttons.length; idx++) {
                 const buttonSpec = this.props.buttons[idx];
-                const button = <Button key={idx} label={buttonSpec.label} className={buttonSpec.className} onClickAsync={async () => this.onButtonClick(idx)} />
+                const button = <Button key={idx} label={buttonSpec.label} className={buttonSpec.className} onClickAsync={async () => await this.onButtonClick(idx)} />
                 buttons.push(button);
             }
         }

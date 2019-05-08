@@ -776,8 +776,8 @@ export default class CUD extends Component {
                         :
                             <>
                                 <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
                             </>
                         }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.entity.id}/delete`}/> }

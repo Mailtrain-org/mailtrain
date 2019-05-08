@@ -331,11 +331,41 @@ class PanelRoute extends Component {
 }
 
 
+export class BeforeUnloadListeners {
+    constructor() {
+        this.listeners = new Set();
+    }
+
+    register(listener) {
+        this.listeners.add(listener);
+    }
+
+    deregister(listener) {
+        this.listeners.delete(listener);
+    }
+
+    shouldUnloadBeCancelled() {
+        for (const lst of this.listeners) {
+            if (lst.handler()) return true;
+        }
+
+        return false;
+    }
+
+    async shouldUnloadBeCancelledAsync() {
+        for (const lst of this.listeners) {
+            if (await lst.handlerAsync()) return true;
+        }
+
+        return false;
+    }
+}
+
 @withRouter
 @withComponentMixins([
     withTranslation,
     withErrorHandling
-])
+], ['onNavigationConfirmationDialog'])
 export class SectionContent extends Component {
     constructor(props) {
         super(props);
@@ -348,11 +378,43 @@ export class SectionContent extends Component {
             // noinspection JSIgnoredPromiseFromCall
             this.closeFlashMessage();
         });
+
+        this.beforeUnloadListeners = new BeforeUnloadListeners();
+        this.beforeUnloadHandler = ::this.onBeforeUnload;
+        this.historyUnblock = null;
     }
 
     static propTypes = {
         structure: PropTypes.object.isRequired,
         root: PropTypes.string.isRequired
+    }
+
+    onBeforeUnload(event) {
+        if (this.beforeUnloadListeners.shouldUnloadBeCancelled()) {
+            event.preventDefault();
+            event.returnValue = '';
+        }
+    }
+
+    onNavigationConfirmationDialog(message, callback) {
+        this.beforeUnloadListeners.shouldUnloadBeCancelledAsync().then(res => {
+            if (res) {
+                const allowTransition = window.confirm(message);
+                callback(allowTransition);
+            } else {
+                callback(true);
+            }
+        });
+    }
+
+    componentDidMount() {
+        window.addEventListener('beforeunload', this.beforeUnloadHandler);
+        this.historyUnblock = this.props.history.block('Changes you made may not be saved. Are you sure you want to leave this page?');
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+        this.historyUnblock();
     }
 
     setFlashMessage(severity, text) {
@@ -379,6 +441,14 @@ export class SectionContent extends Component {
         if (!mailtrainConfig.isAuthenticated) {
             this.navigateTo('/login?next=' + encodeURIComponent(window.location.pathname));
         }
+    }
+
+    registerBeforeUnloadHandlers(handlers) {
+        this.beforeUnloadListeners.register(handlers);
+    }
+
+    deregisterBeforeUnloadHandlers(handlers) {
+        this.beforeUnloadListeners.deregister(handlers);
     }
 
     errorHandler(error) {
@@ -440,11 +510,17 @@ export class SectionContent extends Component {
 export class Section extends Component {
     constructor(props) {
         super(props);
+        this.getUserConfirmationHandler = ::this.onGetUserConfirmation;
+        this.sectionContent = null;
     }
 
     static propTypes = {
         structure: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
         root: PropTypes.string.isRequired
+    }
+
+    onGetUserConfirmation(message, callback) {
+        this.sectionContent.onNavigationConfirmationDialog(message, callback);
     }
 
     render() {
@@ -454,8 +530,8 @@ export class Section extends Component {
         }
 
         return (
-            <Router basename={getBaseDir()}>
-                <SectionContent root={this.props.root} structure={structure} />
+            <Router basename={getBaseDir()} getUserConfirmation={this.getUserConfirmationHandler}>
+                <SectionContent wrappedComponentRef={node => this.sectionContent = node} root={this.props.root} structure={structure} />
             </Router>
         );
     }

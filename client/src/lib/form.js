@@ -12,6 +12,7 @@ import {TreeSelectMode, TreeTable} from './tree';
 import {Table, TableSelectMode} from './table';
 import {Button} from "./bootstrap-components";
 import {SketchPicker} from 'react-color';
+import deepEqual from "fast-deep-equal";
 
 import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
@@ -49,11 +50,20 @@ export const FormStateOwnerContext = React.createContext(null);
 const withFormStateOwner = createComponentMixin([{context: FormStateOwnerContext, propName: 'formStateOwner'}], [], (TargetClass, InnerClass) => {
     InnerClass.prototype.getFormStateOwner = function() {
         return this.props.formStateOwner;
-    }
+    };
 
     return {};
 });
 
+export function withFormErrorHandlers(target, name, descriptor) {
+    const asyncFn = descriptor.value;
+
+    descriptor.value = async function(...args) {
+        await this.formHandleErrors(async () => await asyncFn.apply(this, args));
+    };
+
+    return descriptor;
+}
 
 @withComponentMixins([
     withTranslation,
@@ -61,11 +71,28 @@ const withFormStateOwner = createComponentMixin([{context: FormStateOwnerContext
     withPageHelpers
 ])
 class Form extends Component {
+    constructor(props) {
+        super(props);
+
+        this.beforeUnloadHandlers = {
+            handler: () => this.props.stateOwner.isFormChanged(),
+            handlerAsync: async () => await this.props.stateOwner.isFormChangedAsync()
+        };
+    }
+
     static propTypes = {
         stateOwner: PropTypes.object.isRequired,
         onSubmitAsync: PropTypes.func,
         format: PropTypes.string,
         noStatus: PropTypes.bool
+    }
+
+    componentDidMount() {
+        this.registerBeforeUnloadHandlers(this.beforeUnloadHandlers);
+    }
+
+    componentWillUnmount() {
+        this.deregisterBeforeUnloadHandlers(this.beforeUnloadHandlers);
     }
 
     @withAsyncErrorHandler
@@ -77,7 +104,7 @@ class Form extends Component {
         evt.preventDefault();
 
         if (this.props.onSubmitAsync) {
-            await owner.formHandleChangedError(async () => await this.props.onSubmitAsync());
+            await this.props.onSubmitAsync();
         }
     }
 
@@ -952,6 +979,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         isDisabled: false,
         statusMessageText: '',
         data: Immutable.Map(),
+        savedData: Immutable.Map(),
         isServerValidationRunning: false
     });
 
@@ -1061,12 +1089,14 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         });
     };
 
-    proto.getFormValuesFromEntity = function(entity, mutator) {
+    proto.getFormValuesFromEntity = function(entity) {
+        const settings = this.state.formSettings;
         const data = Object.assign({}, entity);
 
         data.originalHash = data.hash;
         delete data.hash;
 
+        const mutator = settings.loadMutator;
         if (mutator) {
             mutator(data);
         }
@@ -1074,7 +1104,8 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         this.populateFormValues(data);
     };
 
-    proto.getFormValuesFromURL = async function(url, mutator) {
+    proto.getFormValuesFromURL = async function(url) {
+        const settings = this.state.formSettings;
         setTimeout(() => {
             this.setState(previousState => {
                 if (previousState.formState.get('state') === FormState.Loading) {
@@ -1092,6 +1123,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         data.originalHash = data.hash;
         delete data.hash;
 
+        const mutator = settings.loadMutator;
         if (mutator) {
             const newData = mutator(data);
 
@@ -1103,12 +1135,26 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         this.populateFormValues(data);
     };
 
-    proto.validateAndSendFormValuesToURL = async function(method, url, mutator) {
+    proto.validateAndSendFormValuesToURL = async function(method, url) {
+        const settings = this.state.formSettings;
         await this.waitForFormServerValidated();
 
         if (this.isFormWithoutErrors()) {
+            if (settings.getPreSubmitUpdater) {
+                const preSubmitUpdater = await settings.getPreSubmitUpdater();
+
+                await new Promise((resolve, reject) => {
+                    this.setState(previousState => ({
+                        formState: previousState.formState.withMutations(mutState => {
+                            mutState.update('data', stateData => stateData.withMutations(preSubmitUpdater));
+                        })
+                    }), resolve);
+                });
+            }
+
             let data = this.getFormValues();
 
+            const mutator = settings.submitMutator;
             if (mutator) {
                 const newData = mutator(data);
                 if (newData !== undefined) {
@@ -1117,6 +1163,12 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
             }
 
             const response = await axios.method(method, getUrl(url), data);
+
+            await new Promise((resolve, reject) => {
+                this.setState(previousState => ({
+                    formState: previousState.formState.set('savedData', previousState.formState.get('data'))
+                }), resolve);
+            });
 
             return response.data || true;
 
@@ -1139,6 +1191,8 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
                         }));
                     }
                 }));
+
+                mutState.set('savedData', mutState.get('data'));
 
                 validateFormState(this, mutState);
             })
@@ -1263,6 +1317,57 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         return this.state.formState.get('state') === FormState.Ready;
     };
 
+    const _isFormChanged = self => {
+        const settings = self.state.formSettings;
+
+        const mutateData = data => {
+            if (settings.submitMutator) {
+                const newData = settings.submitMutator(data);
+                if (newData !== undefined) {
+                    data = newData;
+                }
+            }
+
+            return data;
+        };
+
+        const currentData = mutateData(self.state.formState.get('data').map(attr => attr.get('value')).toJS());
+        const savedData = mutateData(self.state.formState.get('savedData').map(attr => attr.get('value')).toJS());
+
+        return !deepEqual(currentData, savedData);
+    };
+
+    proto.isFormChanged = function() {
+        const settings = this.state.formSettings;
+        
+        if (settings.getPreSubmitUpdater) {
+            // getPreSubmitUpdater is an async function. We cannot do anything async here. So to be on the safe side,
+            // we simply assume that the form has been changed. 
+            return true;
+        }
+
+        return _isFormChanged(this);
+    };
+
+    proto.isFormChangedAsync = async function() {
+        const settings = this.state.formSettings;
+
+        if (settings.getPreSubmitUpdater) {
+            const preSubmitUpdater = await settings.getPreSubmitUpdater();
+
+            await new Promise((resolve, reject) => {
+                this.setState(previousState => ({
+                    formState: previousState.formState.withMutations(mutState => {
+                        mutState.update('data', stateData => stateData.withMutations(preSubmitUpdater));
+                    })
+                }), resolve);
+            });
+        }
+
+        return _isFormChanged(this);
+
+    };
+    
     proto.isFormValidationShown = function() {
         return this.state.formState.get('isValidationShown');
     };
@@ -1341,7 +1446,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         return this.state.formState.get('isDisabled');
     };
 
-    proto.formHandleChangedError = async function(fn) {
+    proto.formHandleErrors = async function(fn) {
         const t = this.props.t;
         try {
             await fn();
@@ -1386,6 +1491,23 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
     return {};
 });
 
+function filterData(obj, allowedKeys) {
+    const result = {};
+    for (const key in obj) {
+        if (key === 'originalHash') {
+            result[key] = obj[key];
+        } else {
+            for (const allowedKey of allowedKeys) {
+                if ((typeof allowedKey === 'function' && allowedKey(key)) || allowedKey === key) {
+                    result[key] = obj[key];
+                    break;
+                }
+            }
+        }
+    }
+
+    return result;
+}
 
 export {
     withForm,
@@ -1407,5 +1529,6 @@ export {
     TableSelect,
     TableSelectMode,
     ACEEditor,
-    FormSendMethod
+    FormSendMethod,
+    filterData
 }

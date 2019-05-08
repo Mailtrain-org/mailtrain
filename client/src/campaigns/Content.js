@@ -263,8 +263,8 @@ export default class CustomContent extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
                         <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
