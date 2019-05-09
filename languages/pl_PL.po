@@ -3735,3 +3735,7 @@ msgstr "Nie można uzyskać dostępu do pliku importu"
 #: services/triggers.js:51
 msgid "Unknown trigger type %s"
 msgstr "Nieznany typ wyzwalacza %s"
+
+#: views/subscription/widget-subscribe.hbs:3
+msgid "It looks like you are already subscribed to this list."
+msgstr "Wygląda na to, że już jesteś zapisany/a."
