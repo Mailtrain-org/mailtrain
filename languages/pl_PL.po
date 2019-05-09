@@ -3,12 +3,12 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-03-07 21:44+0200\n"
-"PO-Revision-Date: 2018-10-22 12:32+0100\n"
+"PO-Revision-Date: 2019-05-09 14:02+0200\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.4\n"
+"X-Generator: Poedit 2.2.1\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
 "|| n%100>14) ? 1 : 2);\n"
 "Last-Translator: \n"
@@ -37,13 +37,12 @@ msgstr "Samodzielnie hostowana aplikacja e-mail newsletter"
 #: views/lists/subscription/import-failed.hbs:1
 #: views/lists/subscription/import-preview.hbs:1
 #: views/lists/subscription/import.hbs:1 views/lists/view.hbs:1
-#: views/settings.hbs:1 views/templates/create.hbs:1
-#: views/templates/edit.hbs:1 views/templates/templates.hbs:1
-#: views/triggers/create-select.hbs:1 views/triggers/create.hbs:1
-#: views/triggers/edit.hbs:1 views/triggers/triggered.hbs:1
-#: views/triggers/triggers.hbs:1 views/users/account.hbs:1
-#: views/users/api.hbs:1 views/users/forgot.hbs:1 views/users/login.hbs:1
-#: views/users/reset.hbs:1 app.js:169
+#: views/settings.hbs:1 views/templates/create.hbs:1 views/templates/edit.hbs:1
+#: views/templates/templates.hbs:1 views/triggers/create-select.hbs:1
+#: views/triggers/create.hbs:1 views/triggers/edit.hbs:1
+#: views/triggers/triggered.hbs:1 views/triggers/triggers.hbs:1
+#: views/users/account.hbs:1 views/users/api.hbs:1 views/users/forgot.hbs:1
+#: views/users/login.hbs:1 views/users/reset.hbs:1 app.js:169
 msgid "Home"
 msgstr "Strona główna"
 
@@ -429,8 +428,8 @@ msgstr "Usuń kampanię"
 #: views/campaigns/edit.hbs:35 views/lists/edit.hbs:13
 #: views/lists/fields/edit.hbs:39 views/lists/segments/edit.hbs:14
 #: views/lists/segments/rule-edit.hbs:38 views/lists/subscription/edit.hbs:17
-#: views/settings.hbs:99 views/templates/edit.hbs:12
-#: views/triggers/edit.hbs:30 views/users/account.hbs:18
+#: views/settings.hbs:99 views/templates/edit.hbs:12 views/triggers/edit.hbs:30
+#: views/users/account.hbs:18
 msgid "Update"
 msgstr "Zaktualizuj"
 
@@ -2911,14 +2910,13 @@ msgstr "dziś"
 msgid "Invalid segment rule type"
 msgstr "Nieprawidłowy typ reguły segmentu"
 
-#: lib/models/segments.js:289 lib/models/segments.js:454
-#: routes/segments.js:266 routes/segments.js:300 routes/segments.js:370
-#: routes/segments.js:381
+#: lib/models/segments.js:289 lib/models/segments.js:454 routes/segments.js:266
+#: routes/segments.js:300 routes/segments.js:370 routes/segments.js:381
 msgid "Selected segment not found"
 msgstr "Nie znaleziono wybranego segmentu"
 
-#: lib/models/segments.js:294 lib/models/segments.js:459
-#: routes/segments.js:272 routes/segments.js:306 routes/segments.js:387
+#: lib/models/segments.js:294 lib/models/segments.js:459 routes/segments.js:272
+#: routes/segments.js:306 routes/segments.js:387
 msgid "Invalid rule type"
 msgstr "Nieprawidłowy typ reguły"
 
