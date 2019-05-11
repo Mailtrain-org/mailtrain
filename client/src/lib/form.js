@@ -1079,7 +1079,10 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
     proto.initForm = function(settings) {
         const state = this.state || {};
         state.formState = cleanFormState;
-        state.formSettings = settings || {};
+        state.formSettings = {
+            leaveConfirmation: true,
+            ...(settings || {})
+        };
         this.state = state;
     };
 
@@ -1164,11 +1167,13 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
 
             const response = await axios.method(method, getUrl(url), data);
 
-            await new Promise((resolve, reject) => {
-                this.setState(previousState => ({
-                    formState: previousState.formState.set('savedData', previousState.formState.get('data'))
-                }), resolve);
-            });
+            if (settings.leaveConfirmation) {
+                await new Promise((resolve, reject) => {
+                    this.setState(previousState => ({
+                        formState: previousState.formState.set('savedData', previousState.formState.get('data'))
+                    }), resolve);
+                });
+            }
 
             return response.data || true;
 
@@ -1180,6 +1185,8 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
 
 
     proto.populateFormValues = function(data) {
+        const settings = this.state.formSettings;
+
         this.setState(previousState => ({
             formState: previousState.formState.withMutations(mutState => {
                 mutState.set('state', FormState.Ready);
@@ -1192,7 +1199,9 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
                     }
                 }));
 
-                mutState.set('savedData', mutState.get('data'));
+                if (settings.leaveConfirmation) {
+                    mutState.set('savedData', mutState.get('data'));
+                }
 
                 validateFormState(this, mutState);
             })
@@ -1339,7 +1348,9 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
 
     proto.isFormChanged = function() {
         const settings = this.state.formSettings;
-        
+
+        if (!settings.leaveConfirmation) return false;
+
         if (settings.getPreSubmitUpdater) {
             // getPreSubmitUpdater is an async function. We cannot do anything async here. So to be on the safe side,
             // we simply assume that the form has been changed. 
@@ -1351,6 +1362,8 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
 
     proto.isFormChangedAsync = async function() {
         const settings = this.state.formSettings;
+
+        if (!settings.leaveConfirmation) return false;
 
         if (settings.getPreSubmitUpdater) {
             const preSubmitUpdater = await settings.getPreSubmitUpdater();
