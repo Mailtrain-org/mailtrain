@@ -33,7 +33,9 @@ export default class Login extends Component {
 
         this.state = {};
 
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     componentDidMount() {

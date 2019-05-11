@@ -23,7 +23,9 @@ export default class Share extends Component {
     constructor(props) {
         super(props);
 
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     static propTypes = {

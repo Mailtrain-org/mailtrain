@@ -39,8 +39,6 @@ export default class CUD extends Component {
         this.state = {};
 
         this.initForm({
-            loadMutator: ::this.getFormValuesMutator,
-            submitMutator: ::this.submitFormValuesMutator,
             serverValidation: {
                 url: 'rest/users-validate',
                 changed: mailtrainConfig.isAuthMethodLocal ? ['username', 'email'] : ['username'],

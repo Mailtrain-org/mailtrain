@@ -1096,7 +1096,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         data.originalHash = data.hash;
         delete data.hash;
 
-        const mutator = settings.loadMutator;
+        const mutator = this.getFormValuesMutator;
         if (mutator) {
             mutator(data);
         }
@@ -1123,7 +1123,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         data.originalHash = data.hash;
         delete data.hash;
 
-        const mutator = settings.loadMutator;
+        const mutator = this.getFormValuesMutator;
         if (mutator) {
             const newData = mutator(data);
 
@@ -1154,7 +1154,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
 
             let data = this.getFormValues();
 
-            const mutator = settings.submitMutator;
+            const mutator = this.submitFormValuesMutator;
             if (mutator) {
                 const newData = mutator(data);
                 if (newData !== undefined) {
@@ -1321,8 +1321,8 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         const settings = self.state.formSettings;
 
         const mutateData = data => {
-            if (settings.submitMutator) {
-                const newData = settings.submitMutator(data);
+            if (self.submitFormValuesMutator) {
+                const newData = self.submitFormValuesMutator(data);
                 if (newData !== undefined) {
                     data = newData;
                 }

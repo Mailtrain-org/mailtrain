@@ -42,6 +42,7 @@ export default class List extends Component {
         this.fieldTypes = getFieldTypes(t);
 
         this.initForm({
+            leaveConfirmation: false,
             onChange: {
                 segment: (newState, key, oldValue, value) => {
                     this.navigateTo(`/lists/${this.props.list.id}/subscriptions` + (value ? '?segment=' + value : ''));

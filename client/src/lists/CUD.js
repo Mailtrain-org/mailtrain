@@ -42,10 +42,7 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        this.initForm({
-            loadMutator: ::this.getFormValuesMutator,
-            submitMutator: ::this.submitFormValuesMutator
-        });
+        this.initForm();
 
         this.mailerTypes = getMailerTypes(props.t);
     }

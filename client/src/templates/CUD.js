@@ -55,8 +55,6 @@ export default class CUD extends Component {
         };
 
         this.initForm({
-            loadMutator: ::this.getFormValuesMutator,
-            submitMutator: ::this.submitFormValuesMutator,
             getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
             onChangeBeforeValidation: {
                 type: ::this.onTypeChanged

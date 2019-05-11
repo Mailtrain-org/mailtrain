@@ -34,7 +34,9 @@ export default class Account extends Component {
             resetTokenValidationState: ResetTokenValidationState.PENDING
         };
 
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     @withAsyncErrorHandler

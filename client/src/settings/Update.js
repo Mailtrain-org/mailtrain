@@ -9,6 +9,7 @@ import {
     Button,
     ButtonRow,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
@@ -37,6 +38,10 @@ export default class Update extends Component {
 
     static propTypes = {
         entity: PropTypes.object
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['adminEmail', 'uaCode', 'mapsApiKey', 'shoutout', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);
     }
 
     componentDidMount() {

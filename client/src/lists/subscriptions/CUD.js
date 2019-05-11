@@ -11,15 +11,17 @@ import {
     ButtonRow,
     CheckBox,
     Dropdown,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
 import {RestActionModalDialog} from "../../lib/modals";
 import interoperableErrors from '../../../../shared/interoperable-errors';
-import {SubscriptionStatus} from '../../../../shared/lists';
+import {getFieldColumn, SubscriptionStatus} from '../../../../shared/lists';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
 import moment from 'moment-timezone';
 import {withComponentMixins} from "../../lib/decorator-helpers";
@@ -67,9 +69,23 @@ export default class CUD extends Component {
         }
     }
 
+    submitFormValuesMutator(data) {
+        data.status = parseInt(data.status);
+        data.tz = data.tz || null;
+
+        const allowedCols = ['email', 'tz', 'is_test', 'status'];
+
+        for (const fld of this.props.fieldsGrouped) {
+            this.fieldTypes[fld.type].assignEntity(fld, data);
+            allowedCols.push(getFieldColumn(fld));
+        }
+
+        return filterData(data, allowedCols);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             const data = {
@@ -106,6 +122,7 @@ export default class CUD extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -122,21 +139,14 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                data.status = parseInt(data.status);
-                data.tz = data.tz || null;
-
-                for (const fld of this.props.fieldsGrouped) {
-                    this.fieldTypes[fld.type].assignEntity(fld, data);
-                }
-            });
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
                         this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/subscriptions`, 'success', t('Subscription updated'));
                     } else {
-                        await this.getFormValuesFromURL(`rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        await this.getFormValuesFromURL(`rest/subscriptions/${this.props.list.id}/${this.props.entity.id}`);
                         this.enableForm();
                         this.setFormStatusMessage('success', t('Subscription updated'));
                     }

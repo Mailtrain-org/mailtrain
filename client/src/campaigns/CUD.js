@@ -92,8 +92,6 @@ export default class CUD extends Component {
         this.nextListEntryId = 0;
 
         this.initForm({
-            loadMutator: ::this.getFormValuesMutator,
-            submitMutator: ::this.submitFormValuesMutator,
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
             },

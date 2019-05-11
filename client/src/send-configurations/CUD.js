@@ -10,12 +10,14 @@ import {
     ButtonRow,
     CheckBox,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     StaticField,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../lib/namespace';
@@ -75,9 +77,15 @@ export default class CUD extends Component {
         data.verp_disable_sender_header = data.verpEnabled ? !!data.verp_disable_sender_header : false;
     }
 
+    submitFormValuesMutator(data) {
+        return filterData(data, ['name', 'description', 'from_email', 'from_email_overridable', 'from_name',
+            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable', 'x_mailer',
+            'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
         } else {
             this.populateFormValues({
                 name: '',
@@ -131,6 +139,7 @@ export default class CUD extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -159,7 +168,7 @@ export default class CUD extends Component {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/send-configurations', 'success', t('Send configuration updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/send-configurations-private/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/send-configurations-private/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Send configuration updated'));
                 }

@@ -4,7 +4,16 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {withTranslation} from '../../lib/i18n';
 import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from "../../lib/page";
-import {ButtonRow, Dropdown, Form, FormSendMethod, InputField, withForm} from "../../lib/form";
+import {
+    ButtonRow,
+    Dropdown,
+    filterData,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm,
+    withFormErrorHandlers
+} from "../../lib/form";
 import {withErrorHandling} from "../../lib/error-handling";
 import {DeleteModalDialog} from "../../lib/modals";
 
@@ -104,9 +113,14 @@ export default class CUD extends Component {
         });
     }
 
+    submitFormValuesMutator(data) {
+        data.settings.rootRule.type = data.rootRuleType;
+        return filterData(data, ['name', 'settings']);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             this.populateFormValues({
@@ -137,6 +151,7 @@ export default class CUD extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -153,21 +168,14 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                const keep = ['name', 'settings', 'originalHash'];
-
-                data.settings.rootRule.type = data.rootRuleType;
-
-                delete data.rootRuleType;
-                delete data.selectedRule;
-            });
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
                         this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment updated'));
                     } else {
-                        await this.getFormValuesFromURL(`rest/segments/${this.props.list.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        await this.getFormValuesFromURL(`rest/segments/${this.props.list.id}/${this.props.entity.id}`);
 
                         this.enableForm();
                         this.setFormStatusMessage('success', t('Segment updated'));

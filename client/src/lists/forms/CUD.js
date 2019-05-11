@@ -12,12 +12,14 @@ import {
     ButtonRow,
     Dropdown,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     TableSelect,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
@@ -293,14 +295,38 @@ export default class CUD extends Component {
 
     getFormValuesMutator(data) {
         this.supplyDefaults(data);
+        data.selectedTemplate = data.selectedTemplate || 'layout';
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['name', 'description', 'layout', 'form_input_style', 'namespace',
+            'web_subscribe',
+            'web_confirm_subscription_notice',
+            'mail_confirm_subscription_html',
+            'mail_confirm_subscription_text',
+            'mail_already_subscribed_html',
+            'mail_already_subscribed_text',
+            'web_subscribed_notice',
+            'mail_subscription_confirmed_html',
+            'mail_subscription_confirmed_text',
+            'web_manage',
+            'web_manage_address',
+            'web_updated_notice',
+            'web_unsubscribe',
+            'web_confirm_unsubscription_notice',
+            'mail_confirm_unsubscription_html',
+            'mail_confirm_unsubscription_text',
+            'mail_confirm_address_change_html',
+            'mail_confirm_address_change_text',
+            'web_unsubscribed_notice',
+            'mail_unsubscription_confirmed_html',
+            'mail_unsubscription_confirmed_text', 'web_manual_unsubscribe_notice', 'web_privacy_policy_notice'
+        ]);
     }
 
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, data => {
-                this.getFormValuesMutator(data);
-                data.selectedTemplate = 'layout';
-            });
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             const data = {
@@ -355,6 +381,7 @@ export default class CUD extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -370,17 +397,14 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            delete data.selectedTemplate;
-            delete data.previewList;
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/forms/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/forms/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Custom forms updated'));
                 }

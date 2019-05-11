@@ -30,6 +30,7 @@ export default class RuleSettingsPane extends PureComponent {
         this.state = {};
 
         this.initForm({
+            leaveConfirmation: false,
             onChangeBeforeValidation: ::this.populateRuleDefaults,
             onChange: ::this.onFormChange
         });

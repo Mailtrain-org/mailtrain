@@ -12,12 +12,14 @@ import {
     CheckBox,
     Dropdown,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     StaticField,
     TableSelect,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
@@ -117,9 +119,58 @@ export default class CUD extends Component {
         data.orderManageBefore = data.orderManageBefore.toString();
     }
 
+    submitFormValuesMutator(data) {
+        if (data.default_value.trim() === '') {
+            data.default_value = null;
+        }
+
+        if (!data.isInGroup) {
+            data.group = null;
+        }
+
+        data.settings = {};
+        switch (data.type) {
+            case 'checkbox-grouped':
+            case 'radio-grouped':
+            case 'dropdown-grouped':
+            case 'json':
+                data.settings.renderTemplate = data.renderTemplate;
+                break;
+
+            case 'radio-enum':
+            case 'dropdown-enum':
+                data.settings.options = this.parseEnumOptions(data.enumOptions).options;
+                data.settings.renderTemplate = data.renderTemplate;
+                break;
+
+            case 'date':
+            case 'birthday':
+                data.settings.dateFormat = data.dateFormat;
+                break;
+
+            case 'option':
+                if (!data.isInGroup) {
+                    data.settings.checkedLabel = data.checkedLabel;
+                    data.settings.uncheckedLabel = data.uncheckedLabel;
+                }
+                break;
+        }
+
+        if (data.group !== null) {
+            data.orderListBefore = data.orderSubscribeBefore = data.orderManageBefore = 'none';
+        } else {
+            data.orderListBefore = Number.parseInt(data.orderListBefore) || data.orderListBefore;
+            data.orderSubscribeBefore = Number.parseInt(data.orderSubscribeBefore) || data.orderSubscribeBefore;
+            data.orderManageBefore = Number.parseInt(data.orderManageBefore) || data.orderManageBefore;
+        }
+
+        return filterData(data, ['name', 'key', 'default_value', 'type', 'group', 'settings',
+            'orderListBefore', 'orderSubscribeBefore', 'orderManageBefore']);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             this.populateFormValues({
@@ -237,6 +288,7 @@ export default class CUD extends Component {
     }
 
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -253,65 +305,14 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                if (data.default_value.trim() === '') {
-                    data.default_value = null;
-                }
-
-                if (!data.isInGroup) {
-                    data.group = null;
-                }
-
-                data.settings = {};
-                switch (data.type) {
-                    case 'checkbox-grouped':
-                    case 'radio-grouped':
-                    case 'dropdown-grouped':
-                    case 'json':
-                        data.settings.renderTemplate = data.renderTemplate;
-                        break;
-
-                    case 'radio-enum':
-                    case 'dropdown-enum':
-                        data.settings.options = this.parseEnumOptions(data.enumOptions).options;
-                        data.settings.renderTemplate = data.renderTemplate;
-                        break;
-
-                    case 'date':
-                    case 'birthday':
-                        data.settings.dateFormat = data.dateFormat;
-                        break;
-
-                    case 'option':
-                        if (!data.isInGroup) {
-                            data.settings.checkedLabel = data.checkedLabel;
-                            data.settings.uncheckedLabel = data.uncheckedLabel;
-                        }
-                        break;
-                }
-
-                delete data.renderTemplate;
-                delete data.enumOptions;
-                delete data.dateFormat;
-                delete data.checkedLabel;
-                delete data.uncheckedLabel;
-                delete data.isInGroup;
-
-                if (data.group !== null) {
-                    data.orderListBefore = data.orderSubscribeBefore = data.orderManageBefore = 'none';
-                } else {
-                    data.orderListBefore = Number.parseInt(data.orderListBefore) || data.orderListBefore;
-                    data.orderSubscribeBefore = Number.parseInt(data.orderSubscribeBefore) || data.orderSubscribeBefore;
-                    data.orderManageBefore = Number.parseInt(data.orderManageBefore) || data.orderManageBefore;
-                }
-            });
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
                         this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field updated'));
                     } else {
-                        await this.getFormValuesFromURL(`rest/fields/${this.props.list.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        await this.getFormValuesFromURL(`rest/fields/${this.props.list.id}/${this.props.entity.id}`);
                         this.enableForm();
                         this.setFormStatusMessage('success', t('Field updated'));
                     }

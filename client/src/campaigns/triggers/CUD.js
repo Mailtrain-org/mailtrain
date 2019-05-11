@@ -10,6 +10,7 @@ import {
     ButtonRow,
     CheckBox,
     Dropdown,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
@@ -42,7 +43,6 @@ export default class CUD extends Component {
         this.campaignTypeLabels = getCampaignLabels(props.t);
 
         const {entityLabels, eventLabels} = getTriggerTypes(props.t);
-        this.entityLabels = entityLabels;
 
         this.entityOptions = [
             {key: Entity.SUBSCRIPTION, label: entityLabels[Entity.SUBSCRIPTION]},
@@ -90,6 +90,10 @@ export default class CUD extends Component {
         } else {
             data.campaignEvent = Event[Entity.CAMPAIGN].DELIVERED;
         }
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['name', 'description', 'entity', 'event', 'seconds', 'enabled', 'source_campaign']);
     }
 
     componentDidMount() {

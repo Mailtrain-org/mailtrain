@@ -28,7 +28,9 @@ import {withComponentMixins} from "../lib/decorator-helpers";
 class TestUser extends Component {
     constructor(props) {
         super(props);
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     static propTypes = {
@@ -94,7 +96,9 @@ class TestUser extends Component {
 class SendControls extends Component {
     constructor(props) {
         super(props);
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     static propTypes = {

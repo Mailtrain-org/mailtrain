@@ -4,7 +4,18 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
 import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
-import {Button, ButtonRow, Form, FormSendMethod, InputField, TextArea, TreeTableSelect, withForm} from '../lib/form';
+import {
+    Button,
+    ButtonRow,
+    filterData,
+    Form,
+    FormSendMethod,
+    InputField,
+    TextArea,
+    TreeTableSelect,
+    withForm,
+    withFormErrorHandlers
+} from '../lib/form';
 import axios from '../lib/axios';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
@@ -33,6 +44,10 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['name', 'description', 'namespace']);
     }
 
     isEditGlobal() {
@@ -106,6 +121,7 @@ export default class CUD extends Component {
         }
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 

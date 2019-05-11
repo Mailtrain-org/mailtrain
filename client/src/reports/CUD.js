@@ -8,13 +8,15 @@ import {
     Button,
     ButtonRow,
     Fieldset,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     TableSelect,
     TableSelectMode,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../lib/form';
 import axios from '../lib/axios';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
@@ -73,9 +75,22 @@ export default class CUD extends Component {
         }
     }
 
+    submitFormValuesMutator(data) {
+        const params = {};
+
+        for (const spec of data.user_fields) {
+            const fldId = `param_${spec.id}`;
+            params[spec.id] = data[fldId];
+        }
+
+        data.params = params;
+
+        return filterData(data, ['name', 'description', 'report_template', 'params', 'namespace']);
+    }
+
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             this.populateFormValues({
@@ -133,6 +148,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
@@ -153,25 +169,14 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            const params = {};
-
-            for (const spec of data.user_fields) {
-                const fldId = `param_${spec.id}`;
-                params[spec.id] = data[fldId];
-                delete data[fldId];
-            }
-
-            delete data.user_fields;
-            data.params = params;
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/reports', 'success', t('Report updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/reports/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                    await this.getFormValuesFromURL(`rest/reports/${this.props.entity.id}`);
                     this.enableForm();
                     this.setFormStatusMessage('success', t('Report updated'));
                 }

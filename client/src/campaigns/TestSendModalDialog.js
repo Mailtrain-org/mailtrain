@@ -26,7 +26,9 @@ export class TestSendModalDialog extends Component {
 
         this.mailerTypes = getMailerTypes(props.t);
 
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     static propTypes = {

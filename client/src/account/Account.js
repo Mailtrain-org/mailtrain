@@ -37,8 +37,6 @@ export default class Account extends Component {
         this.state = {};
 
         this.initForm({
-            loadMutator: ::this.getFormValuesMutator,
-            submitMutator: ::this.submitFormValuesMutator,
             serverValidation: {
                 url: 'rest/account-validate',
                 changed: ['email', 'currentPassword']

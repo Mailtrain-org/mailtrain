@@ -10,11 +10,13 @@ import {
     Button,
     ButtonRow,
     Dropdown,
+    filterData,
     Form,
     FormSendMethod,
     InputField,
     TextArea,
-    withForm
+    withForm,
+    withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
@@ -45,6 +47,10 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
         entity: PropTypes.object
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['name', 'description', 'mime_type', 'user_fields', 'js', 'hbs', 'namespace']);
     }
 
     componentDidMount() {
@@ -246,6 +252,7 @@ export default class CUD extends Component {
         validateNamespace(t, state);
     }
 
+    @withFormErrorHandlers
     async submitHandler(submitAndLeave) {
         const t = this.props.t;
 

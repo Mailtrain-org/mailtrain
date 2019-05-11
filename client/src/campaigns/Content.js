@@ -55,8 +55,6 @@ export default class CustomContent extends Component {
         };
 
         this.initForm({
-            loadMutator: ::this.getFormValuesMutator,
-            submitMutator: ::this.submitFormValuesMutator,
             getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
         });
 

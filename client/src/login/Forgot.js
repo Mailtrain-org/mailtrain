@@ -19,7 +19,9 @@ export default class Forget extends Component {
 
         this.state = {};
 
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: false
+        });
     }
 
     componentDidMount() {

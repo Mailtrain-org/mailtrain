@@ -28,6 +28,7 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
 
         this.initForm({
+            leaveConfirmation: false,
             serverValidation: {
                 url: 'rest/blacklist-validate',
                 changed: ['email']
