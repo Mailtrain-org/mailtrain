@@ -13,13 +13,28 @@ const ellipsize = require('ellipsize');
 const camelCase = require('camelcase');
 const slugify = require('slugify');
 const readline = require('readline');
+const deepKeys = require('deep-keys');
+const fsExtra = require('fs-extra');
 
-const localeFile = 'en-US/common.json';
+const localeMain = 'en-US/common.json';
+const localeMainPrevious = 'en-US-previous/common.json';
+const localeTranslations = ['es-ES/common.json', 'pt-BR/common.json'];
 const searchDirs = [
     '../client/src',
     '../server',
     '../shared'
 ];
+
+const todoMarker = " - TODO: update line above and then delete this line to mark that the translation has been fixed";
+
+const renamedKeys = new Map();
+const keysWithChangedValue = new Set();
+const resDict = {};
+let anyUpdatesToResDict = false;
+
+const origResDict = JSON.parse(fs.readFileSync(localeMain));
+const prevResDict = JSON.parse(fs.readFileSync(localeMainPrevious));
+
 
 function findAllVariantsByPrefixInDict(dict, keyPrefix) {
     const keyElems = keyPrefix.split('.');
@@ -205,7 +220,7 @@ function parseJsxTrans(fragment) {
     }
 
     let value;
-    const originalValue = findInDict(originalResDict, originalKey);
+    const originalValue = findInDict(origResDict, originalKey);
 
     if (originalValue === undefined) {
         value = convValue;
@@ -217,7 +232,7 @@ function parseJsxTrans(fragment) {
 
     const replacement = `${match[1] || ''}<Trans i18nKey="${key}">${jsxStr.substring(expr.openingElement.end, expr.closingElement.start)}</Trans>`;
 
-    return { key, originalKey, value, replacement };
+    return { key, originalKey, value, replacement, originalValue };
 }
 
 
@@ -227,7 +242,7 @@ function parseHbsTranslate(fragment) {
     const originalKey = match[4];
 
     let value;
-    const originalValue = findInDict(originalResDict, originalKey);
+    const originalValue = findInDict(origResDict, originalKey);
 
     if (originalValue === undefined) {
         value = originalKey;
@@ -239,7 +254,7 @@ function parseHbsTranslate(fragment) {
 
     const replacement = `${match[1] || ''}${match[3]}${key}${match[5]}`;
 
-    return { key, originalKey, value, replacement };
+    return { key, originalKey, value, replacement, originalValue };
 }
 
 function parseT(fragment) {
@@ -252,11 +267,8 @@ function parseT(fragment) {
         return null;
     }
 
-    // console.log(`${fragment}`);
-    // console.log(`    |${match[1]}|${match[2]}|${match[4]}|${match[5]}|${match[6]}|  -  ${JSON.stringify(spec)}`);
-
     let value;
-    const originalValue = findInDict(originalResDict, originalKey);
+    const originalValue = findInDict(origResDict, originalKey);
 
     if (originalValue === undefined) {
         value = originalKey;
@@ -268,12 +280,9 @@ function parseT(fragment) {
 
     const replacement = `${match[1]}${match[2]}${match[4]}${key}${match[6]}`;
 
-    return { key, originalKey, value, originalValue, replacement };
+    return { key, originalKey, value, replacement, originalValue };
 }
 
-const renamedKeys = new Map();
-const resDict = {};
-let anyUpdatesToResDict = false;
 
 function processFile(file) {
     let source = fs.readFileSync(file, 'utf8');
@@ -284,26 +293,36 @@ function processFile(file) {
             for (const fragment of fragments) {
                 const parseStruct = parseFun(fragment);
                 if (parseStruct) {
-                    const {key, originalKey, value, originalValue, replacement} = parseStruct;
-                    // console.log(`${key} <- ${originalKey} | ${value} <- ${originalValue} | ${fragment} -> ${replacement}`);
+                    const {key, originalKey, value, replacement, originalValue} = parseStruct;
 
                     source = source.split(fragment).join(replacement);
                     setInDict(resDict, key, value);
 
-                    const variants = originalKey ? findAllVariantsByPrefixInDict(originalResDict, originalKey + '_') : [];
+                    let valueChanged = false;
+
+                    const variants = originalKey ? findAllVariantsByPrefixInDict(origResDict, originalKey + '_') : [];
                     for (const variant of variants) {
-                        setInDict(resDict, key + '_' + variant, findInDict(originalResDict, originalKey + '_' + variant));
-                    }
+                        const variantKey = originalKey + '_' + variant;
+                        const variantValue = findInDict(origResDict, variantKey);
+                        const prevVariantValue = findInDict(prevResDict, variantKey);
 
-                    if (originalKey !== key) {
-                        renamedKeys.set(originalKey, key);
+                        setInDict(resDict, key + '_' + variant, variantValue);
 
-                        for (const variant of variants) {
-                            renamedKeys.set(originalKey + '_' + variant, key + '_' + variant);
+                        if (prevVariantValue !== variantValue) {
+                            keysWithChangedValue.add(variantKey);
+                            anyUpdates = true;
                         }
                     }
 
-                    if (originalKey !== key || originalValue !== value) {
+                    if (originalKey !== key && originalValue !== undefined) {
+                        renamedKeys.set(key, originalKey);
+
+                        for (const variant of variants) {
+                            renamedKeys.set(key + '_' + variant, originalKey + '_' + variant);
+                        }
+                    }
+
+                    if (originalKey !== key) {
                         anyUpdates = true;
                     }
                 }
@@ -331,11 +350,10 @@ function processFile(file) {
     }
 }
 
-const originalResDict = JSON.parse(fs.readFileSync(localeFile));
 
 function run() {
     for (const dir of searchDirs) {
-        const files = klawSync(dir, { nodir: true, filter: allowedDirOrFile })
+        const files = klawSync(dir, { nodir: true, filter: allowedDirOrFile });
 
         for (const file of files) {
             processFile(file.path);
@@ -343,8 +361,58 @@ function run() {
     }
 
     if (anyUpdatesToResDict) {
-        console.log(`Updating ${localeFile}`);
-        fs.writeFileSync(localeFile, JSON.stringify(resDict, null, 2));
+        console.log(`Updating ${localeMain}`);
+        fsExtra.copySync(localeMain, localeMainPrevious);
+        fs.writeFileSync(localeMain, JSON.stringify(resDict, null, 2));
+    }
+
+    const mainKeys = deepKeys(resDict);
+
+    for (const localeTranslation of localeTranslations) {
+        const origTransResDict = JSON.parse(fs.readFileSync(localeTranslation));
+
+        const origTransKeys = deepKeys(origTransResDict);
+        let isEq = origTransKeys.length === mainKeys.size;
+        if (isEq) {
+            for (const origKey in origTransKeys) {
+                if (!mainKeys.has(origKey)) {
+                    isEq = false;
+                    break;
+                }
+            }
+        }
+
+        if (!isEq || anyUpdatesToResDict) {
+            console.log(`Updating ${localeTranslation}`);
+
+            const transResDict = {};
+
+            for (const key of mainKeys) {
+                let origKey = key;
+
+                if (renamedKeys.has(key)) {
+                    origKey = renamedKeys.get(key);
+                }
+
+                const origValue = findInDict(origTransResDict, origKey);
+                const origTodoValue = findInDict(origTransResDict, origKey + todoMarker);
+                const prevMainValue = findInDict(prevResDict, origKey);
+                const mainValue = findInDict(resDict, key);
+                const isChanged = keysWithChangedValue.has(key);
+
+                if (origValue === undefined || (isChanged && prevMainValue === origValue)) {
+                    setInDict(transResDict, key, mainValue);
+                } else {
+                    setInDict(transResDict, key, origValue);
+                }
+
+                if (isChanged || origValue === undefined || origTodoValue !== undefined) {
+                    setInDict(transResDict, key + todoMarker, mainValue);
+                }
+            }
+
+            fs.writeFileSync(localeTranslation, JSON.stringify(transResDict, null, 2));
+        }
     }
 }
 

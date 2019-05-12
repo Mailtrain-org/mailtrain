@@ -89,13 +89,13 @@ export default class UserShares extends Component {
                 {tableRestActionDialogRender(this)}
                 <Title>{t('sharesForUserUsername', {username: this.props.user.username})}</Title>
 
-                {renderSharesTable('namespace', t('namespaces'), t('namespace_lc'))}
-                {renderSharesTable('list', t('lists'), t('list_lc'))}
-                {renderSharesTable('template', t('Templates'), t('template_lc'))}
+                {renderSharesTable('namespace', t('namespaces'), t('namespace-lc'))}
+                {renderSharesTable('list', t('lists'), t('list-lc'))}
+                {renderSharesTable('template', t('Templates'), t('template-lc'))}
                 {renderSharesTable('mosaicoTemplate', t('Mosaico Templates'), t('Mosaico template'))}
-                {renderSharesTable('campaign', t('Campaigns'), t('campaign_lc'))}
+                {renderSharesTable('campaign', t('Campaigns'), t('campaign-lc'))}
                 {renderSharesTable('customForm', t('customForms-1', t('custom forms')))}
-                {renderSharesTable('report', t('reports'), t('report_lc'))}
+                {renderSharesTable('report', t('reports'), t('report-lc'))}
                 {renderSharesTable('reportTemplate', t('reportTemplates'), t('report template'))}
                 {renderSharesTable('sendConfiguration', t('Send Configurations'), t('send configuration'))}
             </div>
