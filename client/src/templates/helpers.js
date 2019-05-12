@@ -103,14 +103,19 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html, metadata, model} = await owner.editorNode.exportState();
-            return {
-                [prefix + 'html']: html,
-                [prefix + 'mosaicoData']: {
-                    metadata,
-                    model
-                }
-            };
+            const state = await owner.editorNode.exportState();
+            // If the sandbox is still loading, the exportState returns null.
+            if (state) {
+                return {
+                    [prefix + 'html']: state.html,
+                    [prefix + 'mosaicoData']: {
+                        metadata: state.metadata,
+                        model: state.model
+                    }
+                };
+            } else {
+                return null;
+            }
         },
         exportContent: async (owner, contentType) => {
             const {html, metadata, model} = await owner.editorNode.exportState();
@@ -184,14 +189,19 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html, metadata, model} = await owner.editorNode.exportState();
-            return {
-                [prefix + 'html']: html,
-                [prefix + 'mosaicoData']: {
-                    metadata,
-                    model
-                }
-            };
+            const state = await owner.editorNode.exportState();
+            // If the sandbox is still loading, the exportState returns null.
+            if (state) {
+                return {
+                    [prefix + 'html']: state.html,
+                    [prefix + 'mosaicoData']: {
+                        metadata: state.metadata,
+                        model: state.model
+                    }
+                };
+            } else {
+                return null;
+            }
         },
         exportContent: async (owner, contentType) => {
             const {html, metadata, model} = await owner.editorNode.exportState();
@@ -265,14 +275,19 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html, source, style} = await owner.editorNode.exportState();
-            return {
-                [prefix + 'html']: html,
-                [prefix + 'grapesJSData']: {
-                    source,
-                    style
-                }
-            };
+            const state = await owner.editorNode.exportState();
+            // If the sandbox is still loading, the exportState returns null.
+            if (state) {
+                return {
+                    [prefix + 'html']: state.html,
+                    [prefix + 'grapesJSData']: {
+                        source: state.source,
+                        style: state.style
+                    }
+                };
+            } else {
+                return null;
+            }
         },
         exportContent: async (owner, contentType) => {
             const {html, source, style} = await owner.editorNode.exportState();
@@ -326,13 +341,18 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html, source} = await owner.editorNode.exportState();
-            return {
-                [prefix + 'html']: html,
-                [prefix + 'ckeditor4Data']: {
-                    source
-                }
-            };
+            const state = await owner.editorNode.exportState();
+            // If the sandbox is still loading, the exportState returns null.
+            if (state) {
+                return {
+                    [prefix + 'html']: state.html,
+                    [prefix + 'ckeditor4Data']: {
+                        source: state.source
+                    }
+                };
+            } else {
+                return null;
+            }
         },
         exportContent: async (owner, contentType) => {
             const {html, source} = await owner.editorNode.exportState();
@@ -401,13 +421,18 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 />
             </AlignedRow>,
         exportHTMLEditorData: async owner => {
-            const {html, source} = await owner.editorNode.exportState();
-            return {
-                [prefix + 'html']: html,
-                [prefix + 'codeEditorData']: {
-                    source
-                }
-            };
+            const state = await owner.editorNode.exportState();
+            // If the sandbox is still loading, the exportState returns null.
+            if (state) {
+                return {
+                    [prefix + 'html']: state.html,
+                    [prefix + 'codeEditorData']: {
+                        source: state.source
+                    }
+                };
+            } else {
+                return null;
+            }
         },
         exportContent: async (owner, contentType) => {
             const {html, source} = await owner.editorNode.exportState();

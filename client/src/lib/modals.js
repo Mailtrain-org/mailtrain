@@ -197,10 +197,22 @@ export function tableRestActionDialogInit(owner) {
 
 
 function _hide(owner, dontRefresh = false) {
-    owner.tableRestActionDialogData = {};
+    const refreshTables = owner.tableRestActionDialogData.refreshTables;
+
     owner.setState({ tableRestActionDialogShown: false });
+
     if (!dontRefresh) {
-        owner.table.refresh();
+        owner.tableRestActionDialogData = {};
+
+        if (refreshTables) {
+            refreshTables();
+        } else {
+            owner.table.refresh();
+        }
+    } else {
+        // _hide is called twice: (1) at performing action, and at (2) success. Here we keep the refreshTables
+        // reference till it is really needed in step #2.
+        owner.tableRestActionDialogData = { refreshTables };
     }
 }
 
@@ -268,14 +280,19 @@ export function tableAddRestActionButton(actions, owner, action, button, title, 
                     actionData: action.data,
                     actionInProgressMsg: actionInProgressMsg,
                     actionDoneMsg: actionDoneMsg,
-                    onErrorAsync: onErrorAsync
+                    onErrorAsync: onErrorAsync,
+                    refreshTables: action.refreshTables
                 };
 
                 owner.setState({
                     tableRestActionDialogShown: true
                 });
 
-                owner.table.refresh();
+                if (action.refreshTables) {
+                    action.refreshTables();
+                } else {
+                    owner.table.refresh();
+                }
             }
         });
     }
