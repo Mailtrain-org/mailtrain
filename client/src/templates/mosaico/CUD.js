@@ -143,17 +143,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('Mosaico template updated'));
+                    this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('mosaicoTemplateUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/mosaico-templates/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Mosaico template updated'));
+                    this.setFormStatusMessage('success', t('mosaicoTemplateUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('Mosaico template created'));
+                    this.navigateToWithFlashMessage('/templates/mosaico', 'success', t('mosaicoTemplateCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/templates/mosaico/${submitResult}/edit`, 'success', t('Mosaico template created'));
+                    this.navigateToWithFlashMessage(`/templates/mosaico/${submitResult}/edit`, 'success', t('mosaicoTemplateCreated'));
                 }
             }
         } else {
@@ -200,7 +200,7 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/mosaico/${this.props.entity.id}/delete`}/>}
                         {isEdit && typeKey && this.templateTypes[typeKey].getButtons(this)}
                     </ButtonRow>

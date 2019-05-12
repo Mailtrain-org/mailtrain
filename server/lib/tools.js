@@ -142,7 +142,7 @@ function validateEmailGetMessage(result, address, language) {
             case 12:
                 return t('invalidEmailAddressEmailAddressDomain', {email: address});
             default:
-                return t('invalidEmailGeneric', {email: address});
+                return t('invalidEmailAddressEmail', {email: address});
         }
     }
 }

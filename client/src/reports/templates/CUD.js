@@ -273,17 +273,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/reports/templates', 'success', t('Report template updated'));
+                    this.navigateToWithFlashMessage('/reports/templates', 'success', t('reportTemplateUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/report-templates/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Report template updated'));
+                    this.setFormStatusMessage('success', t('reportTemplateUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/reports/templates', 'success', t('Report template created'));
+                    this.navigateToWithFlashMessage('/reports/templates', 'success', t('reportTemplateCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/reports/templates/${submitResult}/edit`, 'success', t('Report template created'));
+                    this.navigateToWithFlashMessage(`/reports/templates/${submitResult}/edit`, 'success', t('reportTemplateCreated'));
                 }
             }
         } else {
@@ -322,8 +322,8 @@ export default class CUD extends Component {
                     <ACEEditor id="hbs" height="700px" mode="handlebars" label={t('renderingTemplate')} help={<Trans i18nKey="useHtmlWithHandlebarsSyntaxSee">Use HTML with Handlebars syntax. See documentation <a href="http://handlebarsjs.com/">here</a>.</Trans>}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete &&
                             <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/reports/templates/${this.props.entity.id}/delete`}/>
                         }

@@ -170,17 +170,17 @@ export default class CUD extends Component {
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('Trigger updated'));
+                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('triggerUpdated'));
                     } else {
                         await this.getFormValuesFromURL(`rest/triggers/${this.props.campaign.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
                         this.enableForm();
-                        this.setFormStatusMessage('success', t('Trigger updated'));
+                        this.setFormStatusMessage('success', t('triggerUpdated'));
                     }
                 } else {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('Trigger created'));
+                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('triggerCreated'));
                     } else {
-                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers/${submitResult}/edit`, 'success', t('Trigger created'));
+                        this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers/${submitResult}/edit`, 'success', t('triggerCreated'));
                     }
                 }
             } else {
@@ -245,8 +245,8 @@ export default class CUD extends Component {
                     <CheckBox id="enabled" text={t('enabled')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.campaign.id}/triggers/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

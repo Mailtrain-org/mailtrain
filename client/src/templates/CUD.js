@@ -144,7 +144,7 @@ export default class CUD extends Component {
         }
 
         if (state.getIn(['fromSourceTemplate', 'value']) && !state.getIn(['sourceTemplate', 'value'])) {
-            state.setIn(['sourceTemplate', 'error'], t('Source template must not be empty'));
+            state.setIn(['sourceTemplate', 'error'], t('sourceTemplateMustNotBeEmpty'));
         } else {
             state.setIn(['sourceTemplate', 'error'], null);
         }
@@ -181,17 +181,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/templates', 'success', t('Template updated'));
+                    this.navigateToWithFlashMessage('/templates', 'success', t('templateUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/templates/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Template updated'));
+                    this.setFormStatusMessage('success', t('templateUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/templates', 'success', t('Template created'));
+                    this.navigateToWithFlashMessage('/templates', 'success', t('templateCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/templates/${submitResult}/edit`, 'success', t('Template created'));
+                    this.navigateToWithFlashMessage(`/templates/${submitResult}/edit`, 'success', t('templateCreated'));
                 }
             }
         } else {
@@ -327,7 +327,7 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('description')}/>
 
                     {!isEdit &&
-                        <CheckBox id="fromSourceTemplate" label={t('template')} text={t('Clone from an existing template')}/>
+                        <CheckBox id="fromSourceTemplate" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
                     }
 
                     {this.getFormValue('fromSourceTemplate') ?
@@ -351,8 +351,8 @@ export default class CUD extends Component {
                     {editForm}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>}
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>}
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/${this.props.entity.id}/delete`}/> }
                         {isEdit && <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>

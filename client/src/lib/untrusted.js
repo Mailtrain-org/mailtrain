@@ -244,7 +244,7 @@ export class UntrustedContentRoot extends Component {
         } else {
             return (
                 <div className="sandbox-loading-message">
-                    {t('loading-1')}
+                    {t('loading')}
                 </div>
             );
         }

@@ -40,7 +40,7 @@ export function getTemplateTypes(t) {
             if (res.errors.length > 0) {
                 const msg = (
                     <div>
-                        <p>{t('Invalid MJML')}</p>
+                        <p>{t('invalidMjml')}</p>
                         <ul className={styles.errorsList}>
                             {res.errors.map((err, idx) => <li key={idx}>Line {err.line}: {err.message}</li>)}
                         </ul>
@@ -49,11 +49,11 @@ export function getTemplateTypes(t) {
 
                 owner.setFormStatusMessage('danger', msg);
             } else {
-                owner.setFormStatusMessage('success', t('MJML is valid.'));
+                owner.setFormStatusMessage('success', t('mjmlIsValid'));
             }
         } catch (err) {
             console.log(err);
-            owner.setFormStatusMessage('danger', t('Invalid MJML.'));
+            owner.setFormStatusMessage('danger', t('invalidMjml-1'));
         }
     }
 
@@ -88,7 +88,7 @@ export function getTemplateTypes(t) {
         typeName: t('mjml'),
         getForm: owner => (
             <>
-                <ContentModalDialog visible={!!owner.state.exportModalVisible} title={t('HTML')} getContentAsync={async () => generateHtmlFromMjml(owner)} onHide={() => setExportModalVisibility(owner, false)}/>
+                <ContentModalDialog visible={!!owner.state.exportModalVisible} title={t('html')} getContentAsync={async () => generateHtmlFromMjml(owner)} onHide={() => setExportModalVisibility(owner, false)}/>
                 <ACEEditor id="mjml" height="700px" mode="xml" label={t('templateContent')}/>
             </>
         ),
@@ -105,8 +105,8 @@ export function getTemplateTypes(t) {
         },
         getButtons: owner => (
             <>
-                <Button className="btn-success" icon="check-circle" label={t('Validate')} onClickAsync={async () => validateMjml(owner)}/>
-                <Button className="btn-success" icon="file-code" label={t('Show HTML')} onClickAsync={async () => setExportModalVisibility(owner, true)}/>
+                <Button className="btn-success" icon="check-circle" label={t('validate')} onClickAsync={async () => validateMjml(owner)}/>
+                <Button className="btn-success" icon="file-code" label={t('showHtml')} onClickAsync={async () => setExportModalVisibility(owner, true)}/>
             </>
         )
     };

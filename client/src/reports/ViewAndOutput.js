@@ -32,7 +32,7 @@ export default class ViewAndOutput extends Component {
         this.viewTypes = {
             view: {
                 url: 'rest/report-content',
-                getTitle: name => t('reportName', { name }),
+                getTitle: name => t('reportName-1', { name }),
                 loading: t('loadingReport'),
                 finishedStates: new Set([ReportState.FINISHED]),
                 getContent: content => <div dangerouslySetInnerHTML={{ __html: content }}/>

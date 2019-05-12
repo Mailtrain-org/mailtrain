@@ -124,11 +124,11 @@ export default class Share extends Component {
                                 this.usersTableSelect.refresh();
                             }
                         },
-                        { icon: 'trash-alt', label: t('Unshare') },
-                        t('Confirm Unsharing'),
-                        t('Are you sure you want to remove the share to user "{{username}}"?', {username}),
-                        t('Removing share for user "{{username}}"', {username}),
-                        t('Share for user "{{username}}" removed', {username}),
+                        { icon: 'trash-alt', label: t('unshare') },
+                        t('confirmUnsharing'),
+                        t('areYouSureYouWantToRemoveTheShareToUser', {username}),
+                        t('removingShareForUserUsername', {username}),
+                        t('shareForUserUsernameRemoved', {username}),
                         null
                     );
                 }

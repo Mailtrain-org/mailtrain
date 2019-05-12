@@ -63,7 +63,7 @@ export default class List extends Component {
                     </Toolbar>
                 }
 
-                <Title>{t('Segments')}</Title>
+                <Title>{t('segments')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl={`rest/segments-table/${this.props.list.id}`} columns={columns} />
             </div>

@@ -122,8 +122,8 @@ export default class Statistics extends Component {
 
                 <hr/>
 
-                <h3>{t('Quick Reports')}</h3>
-                <small className="text-muted"><Trans>Below, you can download pre-made reports related to this campaign. Each link generates a CSV file that can be viewed in a spreadsheet editor. Custom reports and reports that cover more than one campaign can be created through <Link to="/reports">Reports</Link> functionality of Mailtrain.</Trans></small>
+                <h3>{t('quickReports')}</h3>
+                <small className="text-muted"><Trans i18nKey="belowYouCanDownloadPremadeReportsRelated">Below, you can download pre-made reports related to this campaign. Each link generates a CSV file that can be viewed in a spreadsheet editor. Custom reports and reports that cover more than one campaign can be created through <Link to="/reports">Reports</Link> functionality of Mailtrain.</Trans></small>
                 <ul className="list-unstyled my-3">
                     <li><a href={getUrl(`quick-rpts/open-and-click-counts/${entity.id}`)}>Open and click counts per currently subscribed subscriber</a></li>
                 </ul>

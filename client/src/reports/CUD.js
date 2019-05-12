@@ -174,17 +174,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/reports', 'success', t('Report updated'));
+                    this.navigateToWithFlashMessage('/reports', 'success', t('reportUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/reports/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Report updated'));
+                    this.setFormStatusMessage('success', t('reportUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/reports', 'success', t('Report created'));
+                    this.navigateToWithFlashMessage('/reports', 'success', t('reportCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/reports/${submitResult}/edit`, 'success', t('Report created'));
+                    this.navigateToWithFlashMessage(`/reports/${submitResult}/edit`, 'success', t('reportCreated'));
                 }
             }
         } else {
@@ -281,8 +281,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete &&
                             <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/reports/${this.props.entity.id}/delete`}/>
                         }

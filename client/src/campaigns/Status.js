@@ -201,7 +201,7 @@ class SendControls extends Component {
         const t = this.props.t;
         this.actionDialog(
             t('confirmLaunch'),
-            t('doYouWantToLaunchTheCampaign?All'),
+            t('doYouWantToLaunchTheCampaign?'),
             async () => {
                 await this.startAsync();
                 await this.refreshEntity();
@@ -281,7 +281,7 @@ class SendControls extends Component {
                         {this.getFormValue('sendLater') &&
                             <div>
                                 <DatePicker id="date" label={t('date')} />
-                                <InputField id="time" label={t('time')} help={t('enter24hourTimeInFormatHhmmEg1348')}/>
+                                <InputField id="time" label={t('time')} help={t('enter24HourTimeInFormatHhmmEg1348')}/>
                                 {/* TODO: Timezone selector */}
                             </div>
                         }

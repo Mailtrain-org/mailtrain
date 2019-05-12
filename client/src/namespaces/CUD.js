@@ -143,19 +143,19 @@ export default class CUD extends Component {
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace updated'));
+                        this.navigateToWithFlashMessage('/namespaces', 'success', t('namespaceUpdated'));
                     } else {
                         await this.getFormValuesFromURL(`rest/namespaces/${this.props.entity.id}`);
                         await this.loadTreeData();
 
                         this.enableForm();
-                        this.setFormStatusMessage('success', t('Namespace updated'));
+                        this.setFormStatusMessage('success', t('namespaceUpdated'));
                     }
                 } else {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage('/namespaces', 'success', t('Namespace created'));
+                        this.navigateToWithFlashMessage('/namespaces', 'success', t('namespaceCreated'));
                     } else {
-                        this.navigateToWithFlashMessage(`/namespaces/${submitResult}/edit`, 'success', t('Namespace created'));
+                        this.navigateToWithFlashMessage(`/namespaces/${submitResult}/edit`, 'success', t('namespaceCreated'));
                     }
                 }
             } else {
@@ -216,8 +216,8 @@ export default class CUD extends Component {
                     <TreeTableSelect id="namespace" label={t('parentNamespace')} data={this.state.treeData}/>}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/namespaces/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

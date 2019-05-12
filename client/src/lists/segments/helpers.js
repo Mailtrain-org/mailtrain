@@ -409,7 +409,7 @@ export function getRuleHelpers(t, fields) {
         },
         {
             column: 'is_test',
-            name: t('Test user'),
+            name: t('testUser'),
             type: 'option'
         }
     ];

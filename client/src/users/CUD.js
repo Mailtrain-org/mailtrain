@@ -174,17 +174,17 @@ export default class CUD extends Component {
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage('/users', 'success', t('User updated'));
+                        this.navigateToWithFlashMessage('/users', 'success', t('userUpdated'));
                     } else {
                         await this.getFormValuesFromURL(`rest/users/${this.props.entity.id}`);
                         this.enableForm();
-                        this.setFormStatusMessage('success', t('User updated'));
+                        this.setFormStatusMessage('success', t('userUpdated'));
                     }
                 } else {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage('/users', 'success', t('User created'));
+                        this.navigateToWithFlashMessage('/users', 'success', t('userCreated'));
                     } else {
-                        this.navigateToWithFlashMessage(`/users/${submitResult}/edit`, 'success', t('User created'));
+                        this.navigateToWithFlashMessage(`/users/${submitResult}/edit`, 'success', t('userCreated'));
                     }
                 }
             } else {
@@ -257,8 +257,8 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('deleteUser')} to={`/users/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

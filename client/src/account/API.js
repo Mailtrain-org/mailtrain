@@ -342,10 +342,10 @@ export default class API extends Component {
                 <pre>curl -XGET '{getUrl(`api/lists/test@example.com?access_token=${accessToken}`)}'</pre>
 
 
-                <h4>GET /api/rss/fetch/:campaignCid – {t('Trigger fetch of a campaign')}</h4>
+                <h4>GET /api/rss/fetch/:campaignCid – {t('triggerFetchOfACampaign')}</h4>
 
                 <p>
-                    {t('Forces the RSS feed check to immediately check the campaign with the given CID (in :campaignCid). It works only for RSS campaigns.')}
+                    {t('forcesTheRssFeedCheckToImmediatelyCheck')}
                 </p>
 
                 <p>
@@ -364,7 +364,7 @@ export default class API extends Component {
                 <h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4>
 
                 <p>
-                    {t('sendSingleEmailByTemplateId')}
+                    {t('sendSingleEmailByTemplateWithGiven')}
                 </p>
 
                 <p>
@@ -379,10 +379,10 @@ export default class API extends Component {
                 </p>
                 <ul>
                     <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
-                    <li><strong>SEND_CONFIGURATION_ID</strong> – {t('sendConfigurationId')}</li>
+                    <li><strong>SEND_CONFIGURATION_ID</strong> – {t('idOfConfigurationUsedToCreateMailer')}</li>
                     <li><strong>SUBJECT</strong> – {t('subject')}</li>
-                    <li><strong>DATA</strong> – {t('templateData')}: <em>{'{'} "any": ["type", {'{'}"of": "data"{'}'}] {'}'}</em></li>
-                    <li><strong>VARIABLES</strong> – {t('templateVariables')}: <em>{'{'} "FOO": "bar" {'}'}</em></li>
+                    <li><strong>DATA</strong> – {t('dataPassedToTemplateWhenCompilingWith')}: <em>{'{'} "any": ["type", {'{'}"of": "data"{'}'}] {'}'}</em></li>
+                    <li><strong>VARIABLES</strong> – {t('mapOfTemplatesubjectVariablesToReplace')}: <em>{'{'} "FOO": "bar" {'}'}</em></li>
                 </ul>
 
                 <p>

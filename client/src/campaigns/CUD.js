@@ -409,26 +409,26 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (afterSubmitAction === CUD.AfterSubmitAction.STATUS) {
-                    this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('Campaign updated'));
+                    this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('campaignUpdated'));
                 } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
-                    this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign updated'));
+                    this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/campaigns-settings/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Campaign updated'));
+                    this.setFormStatusMessage('success', t('campaignUpdated'));
                 }
             } else {
                 const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
 
                 if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-                    this.navigateToWithFlashMessage(`/campaigns/${submitResult}/content`, 'success', t('Campaign created'));
+                    this.navigateToWithFlashMessage(`/campaigns/${submitResult}/content`, 'success', t('campaignCreated'));
                 } else {
                     if (afterSubmitAction === CUD.AfterSubmitAction.STATUS) {
-                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/status`, 'success', t('Campaign created'));
+                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/status`, 'success', t('campaignCreated'));
                     } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
-                        this.navigateToWithFlashMessage(`/campaigns`, 'success', t('Campaign created'));
+                        this.navigateToWithFlashMessage(`/campaigns`, 'success', t('campaignCreated'));
                     } else {
-                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/edit`, 'success', t('Campaign created'));
+                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/edit`, 'success', t('campaignCreated'));
                     }
                 }
             }
@@ -739,7 +739,7 @@ export default class CUD extends Component {
 
                     <hr/>
 
-                    <Fieldset label={t('Tracking')}>
+                    <Fieldset label={t('tracking')}>
                         <CheckBox id="open_tracking_disabled" text={t('disableOpenedTracking')}/>
                         <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
                     </Fieldset>
@@ -759,12 +759,12 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         {!isEdit && (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) ?
-                            <Button type="submit" className="btn-primary" icon="check" label={t('Save and edit content')}/>
+                            <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
                         :
                             <>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
                             </>
                         }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.entity.id}/delete`}/> }

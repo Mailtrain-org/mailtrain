@@ -150,7 +150,7 @@ export default class Files extends Component {
                         { label: t('no'), className: 'btn-primary', onClickAsync: ::this.hideDeleteFile },
                         { label: t('yes'), className: 'btn-danger', onClickAsync: ::this.performDeleteFile }
                     ]}>
-                    {t('filesareYouSureToDeleteFile', {name: this.state.fileToDeleteName})}
+                    {t('areYouSureYouWantToDeleteTheFile?', {name: this.state.fileToDeleteName})}
                 </ModalDialog>
 
                 {this.props.title && <Title>{this.props.title}</Title>}

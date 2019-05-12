@@ -166,17 +166,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/send-configurations', 'success', t('Send configuration updated'));
+                    this.navigateToWithFlashMessage('/send-configurations', 'success', t('sendConfigurationUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/send-configurations-private/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Send configuration updated'));
+                    this.setFormStatusMessage('success', t('sendConfigurationUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/send-configurations', 'success', t('Send configuration created'));
+                    this.navigateToWithFlashMessage('/send-configurations', 'success', t('sendConfigurationCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/send-configurations/${submitResult}/edit`, 'success', t('Send configuration created'));
+                    this.navigateToWithFlashMessage(`/send-configurations/${submitResult}/edit`, 'success', t('sendConfigurationCreated'));
                 }
             }
         } else {
@@ -259,8 +259,8 @@ export default class CUD extends Component {
                     <hr/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete &&
                             <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/send-configurations/${this.props.entity.id}/delete`}/>
                         }

@@ -402,17 +402,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms updated'));
+                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('customFormsUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/forms/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Custom forms updated'));
+                    this.setFormStatusMessage('success', t('customFormsUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('Custom forms created'));
+                    this.navigateToWithFlashMessage('/lists/forms', 'success', t('customFormsCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/lists/forms/${submitResult}/edit`, 'success', t('Custom forms created'));
+                    this.navigateToWithFlashMessage(`/lists/forms/${submitResult}/edit`, 'success', t('customFormsCreated'));
                 }
             }
         } else {
@@ -533,9 +533,9 @@ export default class CUD extends Component {
                                             <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
                                         </div>
                                         <div className={formsStyles.navbarRight}>
-                                            <a className={formsStyles.btn} onClick={() => this.preview(this.state.previewKey)} title={t('Refresh')}><Icon icon="sync-alt"/></a>
-                                            <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
-                                            <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})} title={t('Close preview')}><Icon icon="window-close"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.preview(this.state.previewKey)} title={t('refresh')}><Icon icon="sync-alt"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})} title={t('maximizeEditor')}><Icon icon="window-maximize"/></a>
+                                            <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})} title={t('closePreview')}><Icon icon="window-close"/></a>
                                         </div>
                                     </div>
                                     <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
@@ -553,8 +553,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

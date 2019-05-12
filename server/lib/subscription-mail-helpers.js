@@ -26,7 +26,7 @@ async function sendSubscriptionConfirmed(locale, list, email, subscription) {
         unsubscribeUrl: '/subscription/' + list.cid + '/unsubscribe/' + subscription.cid
     };
 
-    await _sendMail(list, email, 'subscription_confirmed', locale, tMark('subscriptionconfirmed'), relativeUrls, subscription);
+    await _sendMail(list, email, 'subscription_confirmed', locale, tMark('subscriptionConfirmed'), relativeUrls, subscription);
 }
 
 async function sendAlreadySubscribed(locale, list, email, subscription) {

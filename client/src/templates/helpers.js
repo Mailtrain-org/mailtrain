@@ -248,11 +248,11 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 return <StaticField
                     id={prefix + 'grapesJSSourceType'}
                     className={styles.formDisabled}
-                    label={t('Content')}>{grapesJSSourceTypeLabels[owner.getFormValue(prefix + 'grapesJSSourceType')]}</StaticField>;
+                    label={t('content')}>{grapesJSSourceTypeLabels[owner.getFormValue(prefix + 'grapesJSSourceType')]}</StaticField>;
             } else {
                 return <Dropdown
                     id={prefix + 'grapesJSSourceType'}
-                    label={t('Content')}
+                    label={t('content')}
                     options={grapesJSSourceTypes}/>;
             }
         },

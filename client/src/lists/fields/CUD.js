@@ -310,17 +310,17 @@ export default class CUD extends Component {
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field updated'));
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('fieldUpdated'));
                     } else {
                         await this.getFormValuesFromURL(`rest/fields/${this.props.list.id}/${this.props.entity.id}`);
                         this.enableForm();
-                        this.setFormStatusMessage('success', t('Field updated'));
+                        this.setFormStatusMessage('success', t('fieldUpdated'));
                     }
                 } else {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('Field created'));
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields`, 'success', t('fieldCreated'));
                     } else {
-                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields/${submitResult}/edit`, 'success', t('Field created'));
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/fields/${submitResult}/edit`, 'success', t('fieldCreated'));
                     }
                 }
             } else {
@@ -459,14 +459,14 @@ export default class CUD extends Component {
 
                 fieldSettings =
                     <Fieldset label={t('fieldSettings')}>
-                        <CheckBox id="isInGroup" label={t('group')} text={t('Belongs to checkbox / dropdown / radio group')}/>
+                        <CheckBox id="isInGroup" label={t('group')} text={t('belongsToCheckboxDropdownRadioGroup')}/>
                         {isInGroup &&
-                            <TableSelect id="group" label={t('Containing group')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('selectGroupToWhichTheOptionsShouldBelong')}/>
+                            <TableSelect id="group" label={t('containingGroup')} withHeader dropdown dataUrl={`rest/fields-grouped-table/${this.props.list.id}`} columns={fieldsGroupedColumns} selectionLabelIndex={1} help={t('selectGroupToWhichTheOptionsShouldBelong')}/>
                         }
                         {!isInGroup &&
                             <>
-                                <InputField id="checkedLabel" label={t('Checked label')} help={t('Label that will be displayed in list and subscription when the option is checked')}/>
-                                <InputField id="uncheckedLabel" label={t('Unchecked label')} help={t('Label that will be displayed in list and subscription when the option is unchecked')}/>
+                                <InputField id="checkedLabel" label={t('checkedLabel')} help={t('labelThatWillBeDisplayedInListAnd')}/>
+                                <InputField id="uncheckedLabel" label={t('uncheckedLabel')} help={t('labelThatWillBeDisplayedInListAnd-1')}/>
                             </>
                         }
                         <InputField id="default_value" label={t('defaultValue')} help={t('defaultValueUsedWhenTheFieldIsEmpty')}/>
@@ -512,8 +512,8 @@ export default class CUD extends Component {
                     }
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                         {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/fields/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

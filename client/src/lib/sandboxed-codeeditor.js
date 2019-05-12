@@ -94,12 +94,12 @@ export class CodeEditorHost extends Component {
                         <div className={styles.title}>{this.props.title}</div>
                     </div>
                     <div className={styles.navbarRight}>
-                        <a className={styles.btn} onClick={::this.toggleWrapAsync} title={this.state.wrap ? t('Disable word wrap') : t('Enable word wrap')}>{this.state.wrap ? 'WRAP': 'NOWRAP'}</a>
-                        {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave} title={t('Save')}><Icon icon="save"/></a> : <span className={styles.btnDisabled}><Icon icon="floppy-disk"/></span>}
-                        <a className={styles.btn} onClick={this.props.onTestSend} title={t('Send test e-mail')}><Icon icon="at"/></a>
-                        <a className={styles.btn} onClick={() => this.props.onShowExport('html', 'HTML')} title={t('Show HTML')}><Icon icon="file-code"/></a>
-                        <a className={styles.btn} onClick={::this.togglePreviewAsync} title={this.state.preview ? t('Hide preview'): t('Show preview')}><Icon icon={this.state.preview ? 'eye-slash': 'eye'}/></a>
-                        <a className={styles.btn} onClick={::this.toggleFullscreenAsync} title={t('Maximize editor')}><Icon icon="window-maximize"/></a>
+                        <a className={styles.btn} onClick={::this.toggleWrapAsync} title={this.state.wrap ? t('disableWordWrap') : t('enableWordWrap')}>{this.state.wrap ? 'WRAP': 'NOWRAP'}</a>
+                        {this.props.canSave ? <a className={styles.btn} onClick={this.props.onSave} title={t('save')}><Icon icon="save"/></a> : <span className={styles.btnDisabled}><Icon icon="floppy-disk"/></span>}
+                        <a className={styles.btn} onClick={this.props.onTestSend} title={t('sendTestEmail-1')}><Icon icon="at"/></a>
+                        <a className={styles.btn} onClick={() => this.props.onShowExport('html', 'HTML')} title={t('showHtml')}><Icon icon="file-code"/></a>
+                        <a className={styles.btn} onClick={::this.togglePreviewAsync} title={this.state.preview ? t('hidePreview'): t('showPreview')}><Icon icon={this.state.preview ? 'eye-slash': 'eye'}/></a>
+                        <a className={styles.btn} onClick={::this.toggleFullscreenAsync} title={t('maximizeEditor')}><Icon icon="window-maximize"/></a>
                     </div>
                 </div>
                 <UntrustedContentHost ref={this.contentNodeRefHandler} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="codeeditor/editor" tokenMethod="codeeditor" tokenParams={tokenData}/>

@@ -62,11 +62,11 @@ export default class UserShares extends Component {
                                         }
                                     }
                                 },
-                                { icon: 'trash-alt', label: t('Unshare') },
-                                t('Confirm Unsharing'),
-                                t('Are you sure you want to remove the sharing of the {{typeName}} "{{name}}"?', {typeName, name}),
-                                t('Removing sharing of the {{typeName}} "{{name}}"', {typeName, name}),
-                                t('Sharing of the {{typeName}} "{{name}}" removed', {typeName, name}),
+                                { icon: 'trash-alt', label: t('unshare') },
+                                t('confirmUnsharing'),
+                                t('areYouSureYouWantToRemoveTheSharingOfThe', {typeName, name}),
+                                t('removingSharingOfTheTypeNameName', {typeName, name}),
+                                t('sharingOfTheTypeNameNameRemoved', {typeName, name}),
                                 null
                             );
                         }
@@ -89,15 +89,15 @@ export default class UserShares extends Component {
                 {tableRestActionDialogRender(this)}
                 <Title>{t('sharesForUserUsername', {username: this.props.user.username})}</Title>
 
-                {renderSharesTable('namespace', t('namespaces'), t('namespace-lc'))}
-                {renderSharesTable('list', t('lists'), t('list-lc'))}
-                {renderSharesTable('template', t('Templates'), t('template-lc'))}
-                {renderSharesTable('mosaicoTemplate', t('Mosaico Templates'), t('Mosaico template'))}
-                {renderSharesTable('campaign', t('Campaigns'), t('campaign-lc'))}
-                {renderSharesTable('customForm', t('customForms-1', t('custom forms')))}
-                {renderSharesTable('report', t('reports'), t('report-lc'))}
-                {renderSharesTable('reportTemplate', t('reportTemplates'), t('report template'))}
-                {renderSharesTable('sendConfiguration', t('Send Configurations'), t('send configuration'))}
+                {renderSharesTable('namespace', t('namespaces'), t('namespace-1'))}
+                {renderSharesTable('list', t('lists'), t('list-1'))}
+                {renderSharesTable('template', t('templates'), t('template-1'))}
+                {renderSharesTable('mosaicoTemplate', t('mosaicoTemplates'), t('mosaicoTemplate'))}
+                {renderSharesTable('campaign', t('campaigns'), t('campaign-1'))}
+                {renderSharesTable('customForm', t('customForms-1', t('customForms-2')))}
+                {renderSharesTable('report', t('reports'), t('report-1'))}
+                {renderSharesTable('reportTemplate', t('reportTemplates'), t('reportTemplate-2'))}
+                {renderSharesTable('sendConfiguration', t('sendConfigurations-1'), t('sendConfiguration-1'))}
             </div>
         );
     }

@@ -173,18 +173,18 @@ export default class CUD extends Component {
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment updated'));
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('segmentUpdated'));
                     } else {
                         await this.getFormValuesFromURL(`rest/segments/${this.props.list.id}/${this.props.entity.id}`);
 
                         this.enableForm();
-                        this.setFormStatusMessage('success', t('Segment updated'));
+                        this.setFormStatusMessage('success', t('segmentUpdated'));
                     }
                 } else {
                     if (submitAndLeave) {
-                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('Segment created'));
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments`, 'success', t('segmentCreated'));
                     } else {
-                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments/${submitResult}/edit`, 'success', t('Segment created'));
+                        this.navigateToWithFlashMessage(`/lists/${this.props.list.id}/segments/${submitResult}/edit`, 'success', t('segmentCreated'));
                     }
                 }
             } else {
@@ -389,7 +389,7 @@ export default class CUD extends Component {
                 <hr/>
                 <ButtonRow format="wide" className={`col-12 ${styles.toolbar}`}>
                     <Button type="submit" className="btn-primary" icon="check" label={t('save')} onClickAsync={async () => await this.submitHandler(false)}/>
-                    <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                    <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
 
                     {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/> }
                 </ButtonRow>

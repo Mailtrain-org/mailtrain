@@ -143,13 +143,13 @@ export default class CustomContent extends Component {
 
         if (submitResult) {
             if (afterSubmitAction === CustomContent.AfterSubmitAction.STATUS) {
-                this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('Campaign updated'));
+                this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('campaignUpdated'));
             } else if (afterSubmitAction === CustomContent.AfterSubmitAction.LEAVE) {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('Campaign updated'));
+                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignUpdated'));
             } else {
                 await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`);
                 this.enableForm();
-                this.setFormStatusMessage('success', t('Campaign updated'));
+                this.setFormStatusMessage('success', t('campaignUpdated'));
             }
         } else {
             this.enableForm();
@@ -258,9 +258,9 @@ export default class CustomContent extends Component {
                     {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and leave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('Save and go to status')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
                         <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
