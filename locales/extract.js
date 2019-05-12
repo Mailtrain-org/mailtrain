@@ -224,6 +224,7 @@ function parseJsxTrans(fragment) {
 
     if (originalValue === undefined) {
         value = convValue;
+        originalKey = undefined;
     } else {
         value = originalValue;
     }
@@ -232,20 +233,21 @@ function parseJsxTrans(fragment) {
 
     const replacement = `${match[1] || ''}<Trans i18nKey="${key}">${jsxStr.substring(expr.openingElement.end, expr.closingElement.start)}</Trans>`;
 
-    return { key, originalKey, value, replacement, originalValue };
+    return { key, originalKey, value, replacement };
 }
 
 
 function parseHbsTranslate(fragment) {
     const match = fragment.match(hbsTranslateMatcher);
     const spec = parseSpec(match[2]);
-    const originalKey = match[4];
+    let originalKey = match[4];
 
     let value;
     const originalValue = findInDict(origResDict, originalKey);
 
     if (originalValue === undefined) {
         value = originalKey;
+        originalKey = undefined;
     } else {
         value = originalValue;
     }
@@ -260,7 +262,7 @@ function parseHbsTranslate(fragment) {
 function parseT(fragment) {
     const match = fragment.match(tMatcher);
 
-    const originalKey = match[5];
+    let originalKey = match[5];
     const spec = parseSpec(match[3]);
 
     if (spec.ignore) {
@@ -272,6 +274,7 @@ function parseT(fragment) {
 
     if (originalValue === undefined) {
         value = originalKey;
+        originalKey = undefined;
     } else {
         value = originalValue;
     }
@@ -293,14 +296,17 @@ function processFile(file) {
             for (const fragment of fragments) {
                 const parseStruct = parseFun(fragment);
                 if (parseStruct) {
-                    const {key, originalKey, value, replacement, originalValue} = parseStruct;
+                    const {key, originalKey, value, replacement} = parseStruct;
 
                     source = source.split(fragment).join(replacement);
                     setInDict(resDict, key, value);
 
-                    let valueChanged = false;
+                    if (originalKey === undefined || findInDict(prevResDict, originalKey) !== value) {
+                        keysWithChangedValue.add(key);
+                        anyUpdates = true;
+                    }
 
-                    const variants = originalKey ? findAllVariantsByPrefixInDict(origResDict, originalKey + '_') : [];
+                    const variants = originalKey !== undefined ? findAllVariantsByPrefixInDict(origResDict, originalKey + '_') : [];
                     for (const variant of variants) {
                         const variantKey = originalKey + '_' + variant;
                         const variantValue = findInDict(origResDict, variantKey);
@@ -314,7 +320,7 @@ function processFile(file) {
                         }
                     }
 
-                    if (originalKey !== key && originalValue !== undefined) {
+                    if (originalKey !== undefined && originalKey !== key) {
                         renamedKeys.set(key, originalKey);
 
                         for (const variant of variants) {
@@ -360,9 +366,10 @@ function run() {
         }
     }
 
+    fsExtra.copySync(localeMain, localeMainPrevious);
+
     if (anyUpdatesToResDict) {
         console.log(`Updating ${localeMain}`);
-        fsExtra.copySync(localeMain, localeMainPrevious);
         fs.writeFileSync(localeMain, JSON.stringify(resDict, null, 2));
     }
 
