@@ -300,7 +300,11 @@ function processFile(file) {
                     source = source.split(fragment).join(replacement);
                     setInDict(resDict, key, value);
 
-                    if (originalKey === undefined || findInDict(prevResDict, originalKey) !== value) {
+                    if (
+                        // If a key is formed from a value (e.g. t('Refresh') ) and and the same time already present in common.json, originalKey is undefined. Therefore the additional test here
+                        (originalKey === undefined && findInDict(origResDict, key) !== value) ||
+                        (originalKey !== undefined && findInDict(prevResDict, originalKey) !== value)
+                    ) {
                         keysWithChangedValue.add(key);
                         anyUpdates = true;
                     }
