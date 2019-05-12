@@ -14,10 +14,9 @@ const camelCase = require('camelcase');
 const slugify = require('slugify');
 const readline = require('readline');
 const deepKeys = require('deep-keys');
-const fsExtra = require('fs-extra');
 
 const localeMain = 'en-US/common.json';
-const localeMainPrevious = 'en-US-previous/common.json';
+const localeMainPrevious = 'en-US-last-run/common.json';
 const localeTranslations = ['es-ES/common.json', 'pt-BR/common.json'];
 const searchDirs = [
     '../client/src',
@@ -366,11 +365,12 @@ function run() {
         }
     }
 
-    fsExtra.copySync(localeMain, localeMainPrevious);
-
     if (anyUpdatesToResDict) {
         console.log(`Updating ${localeMain}`);
         fs.writeFileSync(localeMain, JSON.stringify(resDict, null, 2));
+
+        console.log(`Updating ${localeMainPrevious}`);
+        fs.writeFileSync(localeMainPrevious, JSON.stringify(resDict, null, 2));
     }
 
     const mainKeys = deepKeys(resDict);
