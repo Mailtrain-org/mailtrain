@@ -1,11 +1,11 @@
 'use strict';
 
-const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
-    '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
+const versafix = '<!DOCTYPE html>\n' +
+    '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">\n' +
     '<head>\n' +
-    '  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />\n' +
-    '  <meta name="viewport" content="initial-scale=1.0" />\n' +
-    '  <meta name="format-detection" content="telephone=no" />\n' +
+    '  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n' +
+    '  <meta name="viewport" content="initial-scale=1.0">\n' +
+    '  <meta name="format-detection" content="telephone=no">\n' +
     '  <title style="-ko-bind-text: @titleText">TITLE</title>\n' +
     '  <style type="text/css">\n' +
     '    @supports -ko-blockdefs {\n' +
@@ -32,6 +32,8 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '\n' +
     '      height { label: Height; widget: integer }\n' +
     '      imageHeight { label: Image Height; extend: height; }\n' +
+    '      lineHeight { label: Line Height; widget: select; options: normal=Normal|150%=1.5 Lines|200%=Double; }\n' +
+    '\n' +
     '      spacerSize { label: Height; widget: integer; max: 90; min: 4; }\n' +
     '      align { label: Alignment; widget: select; options:left=Left|right=Right|center=Center}\n' +
     '      alt {\n' +
@@ -39,18 +41,20 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '        widget: text;\n' +
     '        help: Alternative text will be shown on email clients that does not download image automatically;\n' +
     '      }\n' +
-    '      sponsor { label: Sponsor; properties: visible=true; }\n' +
-    '      titleText { label: HTML Title; extend: text; }\n' +
+    '      sponsor { label: Sponsor; properties: visible=true src url alt; category: hidden }\n' +
+    '      titleText {label:Title Text;category: hidden;}\n' +
     '      gutterVisible { label: Show Gutter; extend: visible }\n' +
-    '      socialIconType { label: Icon Version;widget: select; options:bw=Black and White|colors=Colors; }\n' +
+    '      socialIconType { label: Icon Version; widget: select; options: bw=Black and White|colors=Colors; }\n' +
+    '      bigSocialIconType { label: Icon Version; widget: select; options:bw=Black and White|colors=Colors|rdcol=Rounded Colors|rdbl=Rounded Black; }\n' +
+    '      bigSocialIconSize { label: Icon Size; widget: select; options: 32=Small|48=Big; }\n' +
     '\n' +
     '      preheaderLinkOption {\n' +
     '        label: Unsubscribe Link;\n' +
     '        widget: select;\n' +
-    '        options: [LINK_PREFERENCES]=Preferences|[LINK_UNSUBSCRIBE]=Unsubscribe|none=None;\n' +
+    '        options: [profile_link]=Profile|[unsubscribe_link]=Unsubscribe|none=None;\n' +
     '        help: If -None- is selected, preHeader text will be shown;\n' +
     '      }\n' +
-    '\n' +
+    '     \n' +
     '      hrStyle { label: Separator Style;properties:color hrWidth hrHeight; }\n' +
     '      hrStyle:preview { height: 200%; width: 200%; bottom: 20px; -ko-border-bottom: @[hrHeight]px solid @color; }\n' +
     '      preheaderVisible { label: Show Preheader; extend: visible; help: Preheader block is the first one on the top of the page. It contains web version link and optionally unsubscribe link or a preheader text that will be shown as a preview on some email clients; }\n' +
@@ -61,13 +65,13 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '      image { label: Image; properties: src url alt }\n' +
     '      backgroundColor { label: Background Color; extend: color }\n' +
     '      buttonLink { label: Button; extend: link }\n' +
-    '\n' +
+    '      \n' +
     '      /* texts and links */\n' +
-    '      textStyle { label: Text; properties: face color size }\n' +
+    '      textStyle { label: Text; properties: face color size align }\n' +
     '      textStyle:preview { -ko-bind-text: @[\'AaZz\']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }\n' +
     '      linkStyle { label: Link; properties: face color size decoration=none }\n' +
     '      linkStyle:preview { -ko-bind-text: @[\'Link\']; -ko-font-size: @[size]px; -ko-font-family: @face; -ko-color: @color; -ko-text-decoration: @[decoration] }\n' +
-    '      longTextStyle { label: Paragraph; properties: face color size linksColor   }\n' +
+    '      longTextStyle { label: Paragraph; properties: face color size lineHeight align linksColor   }\n' +
     '      longTextStyle:preview { -ko-bind-text: @[\'AaZz\']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }\n' +
     '      bigButtonStyle { label: Big Button; extend: buttonStyle }\n' +
     '      titleTextStyle { label: Title; extend: textStyle }\n' +
@@ -76,15 +80,15 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '\n' +
     '      externalTextStyle { label: Alternative Text; extend: textStyle }\n' +
     '      externalTextStyle:preview { -ko-bind-text: @[\'AaZz\']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }\n' +
-    '\n' +
+    '     \n' +
     '      bigTitleStyle { label: Title; properties: face color size align}\n' +
     '      bigTitleStyle:preview { -ko-bind-text: @[\'AaZz\']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }\n' +
     '      /* buttons */\n' +
     '      buttonStyle color { label: Text Color; extend: color }\n' +
     '      buttonStyle size { label: Text Size; extend: size }\n' +
-    '      buttonStyle { label: Button; properties: face color size buttonColor radius }\n' +
+    '      buttonStyle { label: Button; properties: face color size align buttonColor radius }\n' +
     '      buttonStyle:preview { -ko-bind-text: @[\'Button\']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; -ko-background-color: @buttonColor; padding-left: 5px; -ko-border-radius: @[radius]px; }\n' +
-    '\n' +
+    '      \n' +
     '      /* contents */\n' +
     '      preheaderText {label: PreHeader Text; extend:text; help: This text will be shown on some email clients as a preview of the email contents;}\n' +
     '      leftImage { label: Left Image; extend: image }\n' +
@@ -109,35 +113,72 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '      frameTheme:preview { -ko-background-color: @[backgroundColor] }\n' +
     '      template preheaderText { label: Preheader; }\n' +
     '\n' +
-    '      template { label: Page; theme: frameTheme ;properties:  preheaderVisible=true; version: 1.0.6; }\n' +
+    '      template { label: Page; theme: frameTheme; properties: preheaderVisible=true; version: 1.1.19; }\n' +
     '\n' +
     '      footerBlock { label: Unsubscribe Block; theme: frameTheme }\n' +
+    '      \n' +
+    '      fbVisible { label: Facebook; extend: visible }\n' +
+    '      twVisible { label: Twitter; extend: visible }\n' +
+    '      ggVisible { label: Google+; extend: visible }\n' +
+    '      inVisible { label: LinkedIn; extend: visible }\n' +
+    '      piVisible { label: Pinterest; extend: visible }\n' +
+    '      flVisible { label: Flickr; extend: visible }\n' +
+    '      viVisible { label: Vimeo; extend: visible }\n' +
+    '      webVisible { label: Website; extend: visible }\n' +
+    '      waVisible { label: Whatsapp; extend: visible }\n' +
+    '      tgVisible { label: Telegram; extend: visible }\n' +
+    '      instVisible { label: Instagram; extend: visible }\n' +
+    '      youVisible { label: YouTube; extend: visible }\n' +
+    '      fbUrl { label: Facebook Link; extend: url }\n' +
+    '      twUrl { label: Twitter Link; extend: url}\n' +
+    '      ggUrl { label: Google+ Link; extend: url}\n' +
+    '      inUrl { label: LinkedIn Link; extend: url}\n' +
+    '      piUrl { label: Pinterest Link; extend: url}\n' +
+    '      flUrl { label: Flickr Link; extend: url}\n' +
+    '      viUrl { label: Vimeo Link; extend: url}\n' +
+    '      webUrl { label: Website Link; extend: url}\n' +
+    '      waUrl { label: Whatsapp Link; extend: url}\n' +
+    '      tgUrl { label: Telegram Link; extend: url}\n' +
+    '      instUrl { label: Instagram Link; extend: url}\n' +
+    '      youUrl { label: YouTube Link; extend: url}\n' +
     '\n' +
-    '      socialBlock fbVisible { label: Facebook; }\n' +
-    '      socialBlock twVisible { label: Twitter }\n' +
-    '      socialBlock ggVisible { label: Google+ }\n' +
-    '      socialBlock inVisible { label: LinkedIn }\n' +
-    '      socialBlock flVisible { label: Flickr }\n' +
-    '      socialBlock viVisible { label: Vimeo }\n' +
-    '      socialBlock webVisible { label: Website }\n' +
-    '      socialBlock instVisible { label: Instagram }\n' +
-    '      socialBlock youVisible { label: YouTube }\n' +
-    '      socialBlock fbUrl { label: Facebook Link}\n' +
-    '      socialBlock twUrl { label: Twitter Link}\n' +
-    '      socialBlock ggUrl { label: Google+ Link}\n' +
-    '      socialBlock inUrl { label: LinkedIn Link}\n' +
-    '      socialBlock flUrl { label: Flickr Link}\n' +
-    '      socialBlock viUrl { label: Vimeo Link}\n' +
-    '      socialBlock webUrl { label: Website Link}\n' +
-    '      socialBlock instUrl { label: Instagram Link}\n' +
-    '      socialBlock youUrl { label: YouTube Link}\n' +
     '      socialBlock {\n' +
     '        label: Social Block;\n' +
-    '        properties: socialIconType=colors fbVisible=true fbUrl twVisible=true twUrl ggVisible=true ggUrl webVisible=false webUrl inVisible=false inUrl flVisible=false flUrl viVisible=false viUrl instVisible=false instUrl youVisible=false youUrl longTextStyle longText backgroundColor;\n' +
+    '        properties: socialIconType=colors fbVisible=true fbUrl twVisible=true twUrl ggVisible=true ggUrl webVisible=false webUrl waVisible=false waUrl tgVisible=false tgUrl inVisible=false inUrl piVisible=false piUrl flVisible=false flUrl viVisible=false viUrl instVisible=false instUrl youVisible=false youUrl longTextStyle longText backgroundColor;\n' +
     '        variant:socialIconType;\n' +
     '        theme: frameTheme\n' +
     '      }\n' +
     '\n' +
+    '      bigSocialBlock {\n' +
+    '        label: Big Social Block;\n' +
+    '        properties: bigSocialIconType=rdcol bigSocialIconSize=48 fbVisible=true fbUrl twVisible=true twUrl ggVisible=true ggUrl webVisible=false webUrl waVisible=false waUrl tgVisible=false tgUrl inVisible=true inUrl piVisible=false piUrl flVisible=false flUrl viVisible=false viUrl instVisible=true instUrl youVisible=true youUrl longTextStyle longText;\n' +
+    '        variant: bigSocialIconType;\n' +
+    '        theme: contentTheme\n' +
+    '      }\n' +
+    '\n' +
+    '\n' +
+    '      shareButtonStyle iconColorType { label: Icon Color; widget: select; options: brand=Brand|white=White|black=Black; }\n' +
+    '      shareButtonStyle color { label: Text Color; extend: color }\n' +
+    '      shareButtonStyle size { label: Text Size; widget: select; options: 10|11|12|13|14|15|16|18|20|22|25; }\n' +
+    '      shareButtonStyle { label: Share Button; properties: face iconColorType=black color size align buttonColor radius }\n' +
+    '      shareButtonStyle:preview { -ko-bind-text: @[\'Button\']; -ko-font-family: @face; -ko-color: @[\'black\']; -ko-font-size: @[size]px; -ko-background-color: @[\'#CCCCCC\']; padding-left: 5px; -ko-border-radius: @[radius]px; }\n' +
+    '\n' +
+    '      shareButtonType { label: Button Version;widget: select; options:reverse=Brand buttons|simple=Brand icons|custom=Custom buttons; }\n' +
+    '      shareBlock fbVisible { label: Facebook; }\n' +
+    '      shareBlock twVisible { label: Twitter }\n' +
+    '      shareBlock inVisible { label: LinkedIn }\n' +
+    '      shareBlock ggVisible { label: Google+ }\n' +
+    '      shareBlock piVisible { label: Pinterest }\n' +
+    '      /* shareBlock shareUrlType { label: Share URL; widget: select; options:newsletter=Newsletter|custom=Custom;} */\n' +
+    '      shareBlock customUrl { label: Share Link; }\n' +
+    '      shareBlock {\n' +
+    '        label: Share Block;\n' +
+    '        /* shareUrlType=newsletter */\n' +
+    '        properties: shareButtonType=reverse fbVisible=true twVisible=true inVisible=false ggVisible=true piVisible=false customUrl;\n' +
+    '        variant: shareButtonType;\n' +
+    '        theme: contentTheme;\n' +
+    '      }\n' +
+    '      \n' +
     '      preheaderBlock { label:Preheader Block;  theme: frameTheme}\n' +
     '\n' +
     '      sideArticleBlock imagePos {label:Image position;widget:select; options: left=Left|right=Right; }\n' +
@@ -146,35 +187,35 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '\n' +
     '      textBlock { label: Text Block; properties: backgroundColor longTextStyle longText; theme: contentTheme}\n' +
     '\n' +
-    '      singleArticleBlock { label: Image/Text Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  image  longText buttonLink;theme: contentTheme}\n' +
+    '      singleArticleBlock imageWidth { label: Image Size; widget: select; options: 166=Small|258=Medium|350=Big|534=Full }\n' +
+    '      singleArticleBlock { label: Image/Text Block; properties: titleVisible=true buttonVisible=true imageVisible=true imageWidth=534 titleTextStyle longTextStyle buttonStyle  image  longText buttonLink; theme: contentTheme}\n' +
     '\n' +
-    '      doubleArticleBlock { label: 2 Columns Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  leftImage  leftLongText leftButtonLink rightImage  rightLongText rightButtonLink; theme: contentTheme}\n' +
+    '      fixedImageHeightVisible { label: Fix image height; extend: visible; }\n' +
+    '      externalBackgroundVisible { label: Transparent background; extend: visible; }\n' +
     '\n' +
-    '      tripleArticleBlock { label: 3 Columns Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true titleTextStyle longTextStyle buttonStyle  leftImage  leftLongText leftButtonLink middleImage  middleLongText middleButtonLink rightImage  rightLongText rightButtonLink; theme: contentTheme}\n' +
+    '      doubleArticleBlock { label: 2 Columns Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true fixedImageHeightVisible=true titleTextStyle longTextStyle buttonStyle  leftImage  leftLongText leftButtonLink rightImage  rightLongText rightButtonLink; theme: contentTheme}\n' +
     '\n' +
-    '      logoBlock imageWidth { label: Image Size; widget: select; options: 166=Small|258=Medium|350=Big; variant:imageWidth;}\n' +
-    '      logoBlock { label: Logo Block; properties: image imageWidth=258; variant: imageWidth; theme: contentTheme}\n' +
-    '\n' +
+    '      tripleArticleBlock { label: 3 Columns Block; properties: backgroundColor titleVisible=true buttonVisible=true imageVisible=true fixedImageHeightVisible=true titleTextStyle longTextStyle buttonStyle  leftImage  leftLongText leftButtonLink middleImage  middleLongText middleButtonLink rightImage  rightLongText rightButtonLink; theme: contentTheme}\n' +
+    '      \n' +
+    '      logoBlock longTextStyle { label: Alternative Text; }\n' +
+    '      logoBlock imageWidth { label: Image Size; widget: select; options: 166=Small|258=Medium|350=Big }\n' +
+    '      logoBlock { label: Logo Block; properties: externalBackgroundVisible=true image imageWidth=258; variant: externalBackgroundVisible; theme: contentTheme}\n' +
+    '      \n' +
     '      titleBlock { label: Title; theme: contentTheme}\n' +
     '\n' +
-    '      imageBlock longTextStyle {\n' +
-    '        label: Alternative Text;\n' +
-    '      }\n' +
+    '      imageBlock longTextStyle { label: Alternative Text; }\n' +
     '      imageBlock { label: Image; properties: gutterVisible=false; variant: gutterVisible; theme: contentTheme }\n' +
     '\n' +
-    '      doubleImageBlock longTextStyle {\n' +
-    '        label: Alternative Text;\n' +
-    '      }\n' +
-    '      doubleImageBlock { label: Two Image Gallery Block; properties: gutterVisible=false; variant: gutterVisible; theme: contentTheme }\n' +
+    '      doubleImageBlock longTextStyle { label: Alternative Text; }\n' +
+    '      doubleImageBlock { label: Two Image Gallery; properties: gutterVisible=false fixedImageHeightVisible=true; variant: gutterVisible; theme: contentTheme }\n' +
     '\n' +
-    '      tripleImageBlock longTextStyle {\n' +
-    '        label: Alternative Text;\n' +
-    '      }\n' +
-    '      tripleImageBlock { label: Three Image Gallery Block;properties:gutterVisible=false;variant:gutterVisible; theme: contentTheme}\n' +
+    '      tripleImageBlock longTextStyle { label: Alternative Text; }\n' +
+    '      tripleImageBlock { label: Three Image Gallery;properties:gutterVisible=false fixedImageHeightVisible=true; variant: gutterVisible; theme: contentTheme}\n' +
     '\n' +
     '      buttonBlock { label: Button Block; theme: contentTheme}\n' +
     '      hrBlock { label: Separator Block;  theme: contentTheme}\n' +
-    '      spacerBlock { label: Spacer Block;  theme: contentTheme}\n' +
+    '      /* imageSeparatorBlock { label: Image Separator Block;  theme: contentTheme} */\n' +
+    '      spacerBlock { label: Spacer Block; properties: externalBackgroundVisible=true; theme: contentTheme}\n' +
     '\n' +
     '      spacerBlock:preview,\n' +
     '      logoBlock:preview { -ko-background-color: @[externalBackgroundColor] }\n' +
@@ -190,59 +231,21 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '      footerBlock:preview,\n' +
     '      socialBlock:preview,\n' +
     '      buttonBlock:preview,\n' +
-    '      titleBlock:preview,\n' +
-    '      socialshareBlock:preview { -ko-background-color: @[backgroundColor] }\n' +
+    '      titleBlock:preview { -ko-background-color: @[backgroundColor] }\n' +
     '    }\n' +
     '  </style>\n' +
     '  <style type="text/css" data-inline="true">\n' +
-    '    body { Margin: 0; padding: 0; }\n' +
+    '    body { margin: 0; padding: 0; }\n' +
     '    img { border: 0px; display: block; }\n' +
     '\n' +
     '    .socialLinks { font-size: 6px; }\n' +
     '    .socialLinks a {\n' +
     '      display: inline-block;\n' +
     '    }\n' +
-    '    .socialIcon {\n' +
-    '      display: inline-block;\n' +
-    '      vertical-align: top;\n' +
-    '      padding-bottom: 0px;\n' +
-    '      border-radius: 100%;\n' +
-    '    }\n' +
-    '    .oldwebkit { max-width: 570px; }\n' +
-    '    td.vb-outer { padding-left: 9px; padding-right: 9px; }\n' +
-    '    table.vb-container, table.vb-row, table.vb-content {\n' +
-    '      border-collapse: separate;\n' +
-    '    }\n' +
-    '    table.vb-row {\n' +
-    '      border-spacing: 9px;\n' +
-    '    }\n' +
-    '    table.vb-row.halfpad {\n' +
-    '      border-spacing: 0;\n' +
-    '      padding-left: 9px;\n' +
-    '      padding-right: 9px;\n' +
-    '    }\n' +
-    '    table.vb-row.fullwidth {\n' +
-    '      border-spacing: 0;\n' +
-    '      padding: 0;\n' +
-    '    }\n' +
-    '    table.vb-container {\n' +
-    '      padding-left: 18px;\n' +
-    '      padding-right: 18px;\n' +
-    '    }\n' +
-    '    table.vb-container.fullpad {\n' +
-    '      border-spacing: 18px;\n' +
-    '      padding-left: 0;\n' +
-    '      padding-right: 0;\n' +
-    '    }\n' +
-    '    table.vb-container.halfpad {\n' +
-    '      border-spacing: 9px;\n' +
-    '      padding-left: 9px;\n' +
-    '      padding-right: 9px;\n' +
-    '    }\n' +
-    '    table.vb-container.fullwidth {\n' +
-    '      padding-left: 0;\n' +
-    '      padding-right: 0;\n' +
-    '    }\n' +
+    '\n' +
+    '    .long-text p { margin: 1em 0px; }\n' +
+    '    .long-text p:last-child { margin-bottom: 0px; }\n' +
+    '    .long-text p:first-child { margin-top: 0px; }\n' +
     '  </style>\n' +
     '  <style type="text/css">\n' +
     '    /* yahoo, hotmail */\n' +
@@ -255,13 +258,16 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '      -ko-background-color: @[_theme_.frameTheme.backgroundColor]\n' +
     '    }\n' +
     '\n' +
+    '    /* outlook/office365 add buttons outside not-linked images and safari have 2px margin */\n' +
+    '    [o365] button { margin: 0 !important; }\n' +
+    '\n' +
     '    /* outlook */\n' +
     '    table { mso-table-rspace: 0pt; mso-table-lspace: 0pt; }\n' +
     '    #outlook a { padding: 0; }\n' +
     '    img { outline: none; text-decoration: none; border: none; -ms-interpolation-mode: bicubic; }\n' +
     '    a img { border: none; }\n' +
     '\n' +
-    '    @media screen and (max-device-width: 600px), screen and (max-width: 600px) {\n' +
+    '    @media screen and (max-width: 600px) {\n' +
     '      table.vb-container, table.vb-row {\n' +
     '        width: 95% !important;\n' +
     '      }\n' +
@@ -269,104 +275,76 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '      .mobile-hide { display: none !important; }\n' +
     '      .mobile-textcenter { text-align: center !important; }\n' +
     '\n' +
-    '      .mobile-full {\n' +
-    '        float: none !important;\n' +
+    '      .mobile-full { \n' +
     '        width: 100% !important;\n' +
     '        max-width: none !important;\n' +
-    '        padding-right: 0 !important;\n' +
-    '        padding-left: 0 !important;\n' +
-    '      }\n' +
-    '      img.mobile-full {\n' +
-    '        width: 100% !important;\n' +
-    '        max-width: none !important;\n' +
-    '        height: auto !important;\n' +
     '      }\n' +
     '    }\n' +
+    '    /* previously used also screen and (max-device-width: 600px) but Yahoo Mail doesn\'t support multiple queries */\n' +
     '  </style>\n' +
     '  <style type="text/css" data-inline="true">\n' +
-    '    [data-ko-block=tripleArticleBlock] .links-color a,\n' +
-    '    [data-ko-block=tripleArticleBlock] .links-color a:link,\n' +
+    '    [data-ko-block=tripleArticleBlock] .links-color a, \n' +
+    '    [data-ko-block=tripleArticleBlock] .links-color a:link, \n' +
     '    [data-ko-block=tripleArticleBlock] .links-color a:visited,\n' +
     '    [data-ko-block=tripleArticleBlock] .links-color a:hover {\n' +
     '      color: #3f3f3f;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=tripleArticleBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=tripleArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=tripleArticleBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
-    '    [data-ko-block=doubleArticleBlock] .links-color a,\n' +
-    '    [data-ko-block=doubleArticleBlock] .links-color a:link,\n' +
+    '    [data-ko-block=doubleArticleBlock] .links-color a, \n' +
+    '    [data-ko-block=doubleArticleBlock] .links-color a:link, \n' +
     '    [data-ko-block=doubleArticleBlock] .links-color a:visited,\n' +
     '    [data-ko-block=doubleArticleBlock] .links-color a:hover {\n' +
     '      color: #3f3f3f;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=doubleArticleBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=doubleArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=doubleArticleBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
-    '    [data-ko-block=singleArticleBlock] .links-color a,\n' +
-    '    [data-ko-block=singleArticleBlock] .links-color a:link,\n' +
+    '    [data-ko-block=singleArticleBlock] .links-color a, \n' +
+    '    [data-ko-block=singleArticleBlock] .links-color a:link, \n' +
     '    [data-ko-block=singleArticleBlock] .links-color a:visited,\n' +
     '    [data-ko-block=singleArticleBlock] .links-color a:hover {\n' +
     '      color: #3f3f3f;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=singleArticleBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=singleArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=singleArticleBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
-    '    [data-ko-block=textBlock] .links-color a,\n' +
-    '    [data-ko-block=textBlock] .links-color a:link,\n' +
+    '    [data-ko-block=textBlock] .links-color a, \n' +
+    '    [data-ko-block=textBlock] .links-color a:link, \n' +
     '    [data-ko-block=textBlock] .links-color a:visited,\n' +
     '    [data-ko-block=textBlock] .links-color a:hover {\n' +
     '      color: #3f3f3f;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=textBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=textBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=textBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
-    '    [data-ko-block=sideArticleBlock] .links-color a,\n' +
-    '    [data-ko-block=sideArticleBlock] .links-color a:link,\n' +
+    '    [data-ko-block=sideArticleBlock] .links-color a, \n' +
+    '    [data-ko-block=sideArticleBlock] .links-color a:link, \n' +
     '    [data-ko-block=sideArticleBlock] .links-color a:visited,\n' +
     '    [data-ko-block=sideArticleBlock] .links-color a:hover {\n' +
     '      color: #3f3f3f;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=sideArticleBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=sideArticleBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=sideArticleBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
-    '    [data-ko-block=socialBlock] .links-color a,\n' +
-    '    [data-ko-block=socialBlock] .links-color a:link,\n' +
+    '    [data-ko-block=socialBlock] .links-color a, \n' +
+    '    [data-ko-block=socialBlock] .links-color a:link, \n' +
     '    [data-ko-block=socialBlock] .links-color a:visited,\n' +
     '    [data-ko-block=socialBlock] .links-color a:hover {\n' +
     '      color: #cccccc;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=socialBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=socialBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=socialBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
-    '    [data-ko-block=footerBlock] .links-color a,\n' +
-    '    [data-ko-block=footerBlock] .links-color a:link,\n' +
+    '    [data-ko-block=footerBlock] .links-color a, \n' +
+    '    [data-ko-block=footerBlock] .links-color a:link, \n' +
     '    [data-ko-block=footerBlock] .links-color a:visited,\n' +
     '    [data-ko-block=footerBlock] .links-color a:hover {\n' +
     '      color: #cccccc;\n' +
     '      -ko-color: @longTextStyle.linksColor;\n' +
     '      text-decoration: underline;\n' +
     '    }\n' +
-    '    [data-ko-block=footerBlock] .long-text p { Margin: 1em 0px; }\n' +
-    '    [data-ko-block=footerBlock] .long-text p:last-child { Margin-bottom: 0px; }\n' +
-    '    [data-ko-block=footerBlock] .long-text p:first-child { Margin-top: 0px; }\n' +
     '\n' +
     '    [data-ko-block=doubleImageBlock] a,\n' +
     '    [data-ko-block=doubleImageBlock] a:link,\n' +
@@ -393,1144 +371,1228 @@ const versafix = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     '      text-decoration: underline;\n' +
     '    }\n' +
     '  </style>\n' +
+    '  \n' +
     '</head>\n' +
+    '<!--[if !(gte mso 16)]-->\n' +
     '<body bgcolor="#3f3f3f" text="#919191" alink="#cccccc" vlink="#cccccc" style="background-color: #3f3f3f; color: #919191;\n' +
     '  -ko-background-color: @_theme_.frameTheme.backgroundColor; -ko-attr-bgcolor: @_theme_.frameTheme.backgroundColor; -ko-color: @_theme_.frameTheme.longTextStyle.color;\n' +
     '  -ko-attr-text: @_theme_.frameTheme.longTextStyle.color; -ko-attr-alink: @_theme_.frameTheme.longTextStyle.linksColor;\n' +
-    '  -ko-attr-vlink: @_theme_.frameTheme.longTextStyle.linksColor">\n' +
+    '  -ko-attr-vlink: @_theme_.frameTheme.longTextStyle.linksColor"><!--<![endif]--><center>\n' +
     '\n' +
-    '  <center>\n' +
-    '\n' +
-    '  <!-- preheaderBlock -->\n' +
     '  <div data-ko-display="preheaderVisible" data-ko-wrap="false">\n' +
     '\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#3f3f3f"\n' +
-    '    style="background-color: #3f3f3f; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor" data-ko-block="preheaderBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#3f3f3f"\n' +
-    '        style="background-color: #3f3f3f; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor">\n' +
-    '        <div style="display: none; font-size:1px; color: #333333; line-height: 1px; max-height:0px; max-width: 0px; opacity: 0; overflow: hidden;\n' +
+    '    \n' +
+    '    <!-- preheaderBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#3f3f3f" style="background-color: #3f3f3f; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]" data-ko-block="preheaderBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <div data-ko-display="preheaderLinkOption neq \'none\'" style="display: none; font-size:1px; line-height: 1px; max-height:0px; max-width: 0px; opacity: 0; overflow: hidden; \n' +
     '          -ko-bind-text: @preheaderText"></div>\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="0" class="vb-row halfpad" bgcolor="#3f3f3f"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #3f3f3f; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td align="center" valign="top" bgcolor="#3f3f3f" style="font-size: 0; background-color: #3f3f3f;\n' +
-    '              -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor" align="left">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%;" align="left">\n' +
-    '                      <tr>\n' +
-    '                        <td width="100%" valign="top" align="left" style="font-weight: normal; text-align:left; font-size: 13px;\n' +
-    '                          font-family: Arial, Helvetica, sans-serif; color: #ffffff;\n' +
-    '                          -ko-font-size: @[linkStyle.size]px; -ko-color: @linkStyle.color; -ko-font-family: @linkStyle.face">\n' +
-    '                          <a data-ko-display="preheaderLinkOption neq \'none\'" data-ko-editable="unsubscribeText" href="[LINK_PREFERENCES]"\n' +
-    '                             style="text-decoration: underline; color: #ffffff; -ko-attr-href: @preheaderLinkOption;\n' +
-    '                             -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration">Preferences</a>\n' +
-    '                          <span data-ko-display="preheaderLinkOption eq \'none\'" style="font-size: 13px;color: #919191; font-weight: normal; text-align:center;\n' +
-    '                            font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color;\n' +
-    '                            -ko-font-family: @longTextStyle.face; -ko-bind-text: @preheaderText; display: none"></span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]>\n' +
-    '</td><td align="left" valign="top" width="276">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full mobile-hide">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%; text-align: right;" align="left">\n' +
-    '                      <tr>\n' +
-    '                        <td width="100%" valign="top" style="font-weight: normal;  font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #ffffff;\n' +
-    '                      -ko-font-size: @[linkStyle.size]px; -ko-color: @linkStyle.color; -ko-font-family: @linkStyle.face">\n' +
-    '                      <span style="color: #ffffff; text-decoration: underline;\n' +
-    '                        -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration">\n' +
-    '                          <a data-ko-editable="webversionText" href="[LINK_BROWSER]"\n' +
-    '                          style="text-decoration: underline; color: #ffffff;\n' +
-    '                           -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration">View in your browser</a>\n' +
-    '                         </span>\n' +
-    '                       </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]>\n' +
-    '</td></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0; padding: 0 9px"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '            <tr data-ko-display="preheaderLinkOption neq \'none\'"><td width="100%" valign="top" style="font-weight: normal; color: #ffffff; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[linkStyle.size]px; -ko-color: @linkStyle.color; -ko-font-family: @linkStyle.face" align="left"><a style="color: #ffffff; text-decoration: underline; -ko-attr-href: @[preheaderLinkOption]; -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration" href="[unsubscribe_link]" data-ko-editable="unsubscribeText">Unsubscribe</a></td></tr>\n' +
+    '            <tr data-ko-display="preheaderLinkOption eq \'none\'" style="display: none">\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #919191; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align" align="left"><span style="font-weight: normal; -ko-bind-text: @preheaderText"></span></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276" class="mobile-hide"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full mobile-hide"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '            <tr><td width="100%" valign="top" style="font-weight: normal; color: #ffffff; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: right; -ko-font-size: @[linkStyle.size]px; -ko-color: @linkStyle.color; -ko-font-family: @linkStyle.face" align="right"><a style="color: #ffffff; text-decoration: underline; -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration" href="[show_link]" data-ko-editable="webversionText">View in your browser</a></td></tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /preheaderBlock -->\n' +
+    '    \n' +
     '\n' +
     '  </div>\n' +
-    '  <!-- /preheaderBlock -->\n' +
     '\n' +
     '  <div data-ko-container="main" data-ko-wrap="false">\n' +
     '\n' +
-    '  <!-- logoBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="logoBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" style="width: 100%; max-width: 570px" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad">\n' +
-    '          <tr>\n' +
-    '            <td valign="top" align="center">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="258" style="-ko-attr-width: @[imageWidth]"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:258px; -ko-max-width: @[imageWidth]px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '                    <a data-ko-link="image.url" href="" style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #f3f3f3;\n' +
-    '                      text-decoration: none; -ko-font-size: @[externalTextStyle.size]px;\n' +
-    '                      -ko-font-family: @externalTextStyle.face; -ko-color: @externalTextStyle.color"><img\n' +
-    '                       data-ko-editable="image.src" width="258" data-ko-placeholder-height="150"\n' +
-    '                        style="-ko-attr-alt: @image.alt; width: 100%; max-width: 258px; -ko-attr-width: @imageWidth; -ko-max-width: @[imageWidth]px;"\n' +
-    '                        src="[PLACEHOLDER_258x150]" vspace="0" hspace="0" border="0" alt="" /></a>\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '\n' +
-    '      </td>\n' +
+    '    \n' +
+    '    <!-- logoBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="logoBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <div data-ko-wrap="false" style="width: 100%;" data-ko-display="externalBackgroundVisible"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="vertical-align:top; width:100%; max-width: 276px; -mru-width: 0px; -ko-max-width: @[18 + Math.round(imageWidth) + \'px\']"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; -ko-attr-width: @[18 + Math.round(imageWidth)]; mso-cellspacing: 9px; border-spacing: 9px" width="276">\n' +
+    '          \n' +
+    '          <tr><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px; -ko-width: @[imageWidth]px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #f3f3f3; font-size: 18px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[externalTextStyle.size]px; -ko-color: @externalTextStyle.color; -ko-font-family: @externalTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 258px; -ko-attr-width: @[imageWidth]; -ko-max-width: @[imageWidth]px; height: auto" data-ko-editable="image.src" width="258" data-ko-placeholder-height="150" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C150"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '        \n' +
+    '        </table></div></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /logoBlock  -->\n' +
-    '\n' +
-    '  <!-- sideArticleBlock  -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="sideArticleBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td align="center" class="mobile-row" valign="top" style="font-size: 0;">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<div data-ko-display="imagePos eq \'left\'" data-ko-wrap="false" style="width: 100%; max-width:184px; -ko-max-width:@[18 + Math.round(imageWidth)]px; display:inline-block" class="mobile-full">\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184" style="-ko-attr-width: @[18 + Math.round(imageWidth)]"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:184px; -ko-max-width:@[18 + Math.round(imageWidth)]px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%; -ko-attr-width: @[18 + Math.round(imageWidth)]" align="left">\n' +
-    '                      <tr>\n' +
-    '                        <td width="100%" valign="top" align="left" class="links-color">\n' +
-    '                          <a data-ko-link="image.url" href="">\n' +
-    '                            <img data-ko-editable="image.src" border="0" hspace="0" vspace="0" width="166"\n' +
-    '                              data-ko-placeholder-height="130" class="mobile-full" alt=""\n' +
-    '                              src="[PLACEHOLDER_166x130]"\n' +
-    '                              style="vertical-align: top; width: 100%; height: auto; -ko-attr-width: @imageWidth; max-width: 166px; -ko-max-width: @[imageWidth]px; -ko-attr-alt: @image.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<![endif]--></div><!--[if (gte mso 9)|(lte ie 8)]>\n' +
-    '<td align="left" valign="top" width="368" style="-ko-attr-width: @[570 - 2 * 18 - Math.round(imageWidth)]">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:368px; -ko-max-width: @[570 - 2 * 18 - Math.round(imageWidth)]px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="368" style="width: 100%; -ko-attr-width: @[570 - 2 * 18 - Math.round(imageWidth)]" align="left">\n' +
-    '                      <tr data-ko-display="titleVisible">\n' +
-    '                        <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                          -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                          <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color" data-ko-editable="titleText">\n' +
-    '                          Title\n' +
-    '                          </span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr>\n' +
-    '                        <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="longText" class="long-text links-color">\n' +
-    '                          <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="buttonVisible">\n' +
-    '                        <td valign="top">\n' +
-    '                          <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full" style="padding-top: 4px">\n' +
-    '                            <tr>\n' +
-    '                              <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                                style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                                padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                                -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                                -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                                -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color;">\n' +
-    '                                <a data-ko-editable="buttonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                                  -ko-color: @buttonStyle.color; -ko-attr-href: @buttonLink.url">BUTTON</a>\n' +
-    '                              </td>\n' +
-    '                            </tr>\n' +
-    '                          </table>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<![endif]--><div data-ko-display="imagePos eq \'right\'" data-ko-wrap="false" style="width: 100%; max-width:184px; -ko-max-width:@[18 + Math.round(imageWidth)]px; display:inline-block; display: none;" class="mobile-full"><!--[if (gte mso 9)|(lte ie 8)]>\n' +
-    '<td data-ko-display="imagePos eq \'right\'" align="left" valign="top" width="184" style="display: none; -ko-attr-width: @[18 + Math.round(imageWidth)]">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:184px; -ko-max-width:@[18 + Math.round(imageWidth)]px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%; -ko-attr-width: @[18 + Math.round(imageWidth)]" align="left">\n' +
-    '                      <tr>\n' +
-    '                        <td width="100%" valign="top" align="left" class="links-color">\n' +
-    '                          <a data-ko-link="image.url" href="">\n' +
-    '                            <img data-ko-editable="image.src" border="0" hspace="0" vspace="0" width="166" data-ko-placeholder-height="130" class="mobile-full"\n' +
-    '                              src="[PLACEHOLDER_166x130]" class="mobile-full"\n' +
-    '                              alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-width: @imageWidth; max-width: 166px; -ko-max-width: @[imageWidth]px; -ko-attr-alt: @image.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="externalBackgroundVisible eq false"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="vertical-align:top; width:100%; max-width: 276px; -mru-width: 0px; -ko-max-width: @[18 + Math.round(imageWidth) + \'px\']"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; -ko-attr-width: @[18 + Math.round(imageWidth)]; mso-cellspacing: 9px; border-spacing: 9px" width="276">\n' +
+    '          \n' +
+    '          <tr><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px; -ko-width: @[imageWidth]px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 258px; -ko-attr-width: @[imageWidth]; -ko-max-width: @[imageWidth]px; height: auto" data-ko-editable="image.src" width="258" data-ko-placeholder-height="150" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C150"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '        \n' +
+    '        </table></div></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /sideArticleBlock -->\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /logoBlock -->\n' +
+    '    \n' +
     '\n' +
-    '  <!-- singleArticleBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="singleArticleBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr data-ko-display="imageVisible">\n' +
-    '            <td width="100%" valign="top" align="left" class="links-color">\n' +
-    '              <a data-ko-link="image.url" href="">\n' +
-    '                <img data-ko-editable="image.src" border="0" hspace="0" vspace="0" width="534" data-ko-placeholder-height="200"\n' +
-    '                  src="[PLACEHOLDER_534x200]" class="mobile-full"\n' +
-    '                  alt="" style="vertical-align:top; max-width:534px; width: 100%; height: auto;\n' +
-    '                  -ko-attr-alt: @image.alt" />\n' +
-    '              </a>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '          <tr><td><table align="left" border="0" cellpadding="0" cellspacing="0" width="100%">\n' +
+    '    \n' +
+    '    <!-- sideArticleBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="sideArticleBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '          --><div data-ko-wrap="false" style="display:inline-block; width: 100%; max-width: 184px; -mru-width: 0px; -ko-max-width: @[18 + Math.round(imageWidth) + \'px\']; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (true ? 18 + Math.round(imageWidth) : 184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full" data-ko-display="imagePos eq \'left\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="imagePos eq \'left\'" width="184" style="-ko-attr-width: @[18 + Math.round(imageWidth)]"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; -ko-max-width: @[18 + Math.round(imageWidth) + \'px\']; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (true ? 18 + Math.round(imageWidth) : 184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; -ko-attr-width: @[18 + Math.round(imageWidth)]; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '            <tr><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px; -ko-width: @[imageWidth]px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 166px; -ko-attr-width: @[imageWidth]; -ko-max-width: @[imageWidth]px; height: auto" data-ko-editable="image.src" width="166" data-ko-placeholder-height="130" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C130"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="368" style="-ko-attr-width: @[570 - 2 * 18 - Math.round(imageWidth)]"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 368px; -mru-width: 0px; -ko-max-width: @[570 - 2 * 18 - Math.round(imageWidth) + \'px\']; min-width: calc(368 * 100% / 552); -ko-min-width: @[\'calc(\' + (true ? 570 - 2 * 18 - Math.round(imageWidth) : 368) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; -ko-attr-width: @[570 - 2 * 18 - Math.round(imageWidth)]; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="368" align="left">\n' +
+    '          \n' +
     '            <tr data-ko-display="titleVisible">\n' +
-    '              <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color" data-ko-editable="text">\n' +
-    '               Section Title\n' +
-    '                </span>\n' +
-    '              </td>\n' +
-    '            </tr>\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="titleText">Title</span></td>\n' +
+    '    </tr>\n' +
+    '            <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="longText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p></td></tr>\n' +
+    '            <tr data-ko-display="buttonVisible">\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @buttonLink.url"><span data-ko-wrap="false" data-ko-editable="buttonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><div data-ko-wrap="false" style="display:inline-block; display: none; width: 100%; max-width: 184px; -mru-width: 0px; -ko-max-width: @[18 + Math.round(imageWidth) + \'px\']; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (true ? 18 + Math.round(imageWidth) : 184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full" data-ko-display="imagePos eq \'right\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="imagePos eq \'right\'" style="display: none; -ko-attr-width: @[18 + Math.round(imageWidth)]" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; -ko-max-width: @[18 + Math.round(imageWidth) + \'px\']; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (true ? 18 + Math.round(imageWidth) : 184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; -ko-attr-width: @[18 + Math.round(imageWidth)]; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '            <tr><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px; -ko-width: @[imageWidth]px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 166px; -ko-attr-width: @[imageWidth]; -ko-max-width: @[imageWidth]px; height: auto" data-ko-editable="image.src" width="166" data-ko-placeholder-height="130" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C130"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div><!--\n' +
+    '        --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /sideArticleBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- singleArticleBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="singleArticleBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="vertical-align:top; width:100%; max-width: 552px; -mru-width: 0px"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px" width="552">\n' +
+    '          \n' +
+    '          <tr data-ko-display="imageVisible"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 534px; -mru-width: 0px; -ko-width: @[imageWidth]px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 534px; -ko-attr-width: @[imageWidth]; -ko-max-width: @[imageWidth]px; height: auto" data-ko-editable="image.src" width="534" data-ko-placeholder-height="150" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=534%2C150"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '          <tr data-ko-display="titleVisible">\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="text">Section Title</span></td>\n' +
+    '    </tr>\n' +
+    '          <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="longText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p></td></tr>\n' +
+    '          <tr data-ko-display="buttonVisible">\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @buttonLink.url"><span data-ko-wrap="false" data-ko-editable="buttonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        \n' +
+    '        </table></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /singleArticleBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- titleBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="titleBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0; padding: 0 9px"><div style="vertical-align:top; width:100%; max-width: 552px; -mru-width: 0px"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px" width="552">\n' +
+    '          \n' +
+    '          <tr>\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 22px; font-family: Arial, Helvetica, sans-serif; text-align: center; -ko-font-size: @[bigTitleStyle.size]px; -ko-color: @bigTitleStyle.color; -ko-font-family: @bigTitleStyle.face; -ko-text-align: @bigTitleStyle.align; -ko-attr-align: @bigTitleStyle.align" align="center"><span style="font-weight: normal" data-ko-editable="text">Section Title</span></td>\n' +
+    '    </tr>\n' +
+    '        \n' +
+    '        </table></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /titleBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- textBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="textBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="18" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 18px; border-spacing: 18px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-container">\n' +
+    '        \n' +
+    '        <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="longText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p>\n' +
+    '          <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p></td></tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /textBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- tripleArticleBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="tripleArticleBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '            <tr data-ko-display="imageVisible and fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 166px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="leftImage.src" width="166" height="90" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C90"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            <tr data-ko-display="imageVisible and fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 166px; height: auto" data-ko-editable="leftImage.src" width="166" data-ko-placeholder-height="90" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C100"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
     '            <tr data-ko-display="titleVisible">\n' +
-    '              <td height="9" style="font-size:1px; line-height: 1px;">&nbsp;</td>\n' +
-    '            </tr>\n' +
-    '            <tr>\n' +
-    '              <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                data-ko-editable="longText" class="long-text links-color">\n' +
-    '                <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>\n' +
-    '              </td>\n' +
-    '            </tr>\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="leftTitleText">Title</span></td>\n' +
+    '    </tr>\n' +
+    '            <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="leftLongText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p></td></tr>\n' +
     '            <tr data-ko-display="buttonVisible">\n' +
-    '              <td height="13" style="font-size:1px; line-height: 1px;">&nbsp;</td>\n' +
-    '            </tr>\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @leftButtonLink.url"><span data-ko-wrap="false" data-ko-editable="leftButtonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '            <tr data-ko-display="imageVisible and fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="middleImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[middleImage.alt == \'\' ? null : middleImage.alt]; width: 100%; max-width: 166px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="middleImage.src" width="166" height="90" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C90"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            <tr data-ko-display="imageVisible and fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="middleImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[middleImage.alt == \'\' ? null : middleImage.alt]; width: 100%; max-width: 166px; height: auto" data-ko-editable="middleImage.src" width="166" data-ko-placeholder-height="70" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C100"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            <tr data-ko-display="titleVisible">\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="middleTitleText">Title</span></td>\n' +
+    '    </tr>\n' +
+    '            <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="middleLongText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p></td></tr>\n' +
     '            <tr data-ko-display="buttonVisible">\n' +
-    '              <td valign="top">\n' +
-    '                <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full">\n' +
-    '                  <tr>\n' +
-    '                    <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                      style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                      padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                      -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                      -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                      -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color; ">\n' +
-    '                      <a data-ko-editable="buttonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                        -ko-color: @buttonStyle.color; -ko-attr-href: @buttonLink.url">BUTTON</a>\n' +
-    '                    </td>\n' +
-    '                  </tr>\n' +
-    '                </table>\n' +
-    '              </td>\n' +
-    '            </tr>\n' +
-    '          </table></td></tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @middleButtonLink.url"><span data-ko-wrap="false" data-ko-editable="middleButtonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /singleArticleBlock -->\n' +
-    '\n' +
-    '  <!-- TitleBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="titleBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td bgcolor="#ffffff" align="center"\n' +
-    '              style="background-color: #ffffff; font-size: 22px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align: center;\n' +
-    '              -ko-attr-align: @bigTitleStyle.align; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;\n' +
-    '              -ko-font-size: @[bigTitleStyle.size]px; -ko-font-family: @bigTitleStyle.face; -ko-color: @bigTitleStyle.color; -ko-text-align: @bigTitleStyle.align">\n' +
-    '              <span data-ko-editable="text">Section Title</span>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '            <tr data-ko-display="imageVisible and fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 166px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="rightImage.src" width="166" height="90" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C90"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            <tr data-ko-display="imageVisible and fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 166px; height: auto" data-ko-editable="rightImage.src" width="166" data-ko-placeholder-height="110" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C100"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            <tr data-ko-display="titleVisible">\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="rightTitleText">Title</span></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /TitleBlock -->\n' +
-    '\n' +
-    '  <!-- textBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="textBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '              -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '              data-ko-editable="longText" class="long-text links-color">\n' +
-    '              <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p>\n' +
-    '              <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '            <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="rightLongText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p></td></tr>\n' +
+    '            <tr data-ko-display="buttonVisible">\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @rightButtonLink.url"><span data-ko-wrap="false" data-ko-editable="rightButtonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /textBlock -->\n' +
-    '\n' +
-    '  <!-- tripleArticleBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="tripleArticleBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td align="center" valign="top" class="mobile-row" style="font-size: 0">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%" align="left">\n' +
-    '                      <tr data-ko-display="imageVisible">\n' +
-    '                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">\n' +
-    '                          <a data-ko-link="leftImage.url" href="">\n' +
-    '                            <img data-ko-editable="leftImage.src" border="0" hspace="0" vspace="0" width="166" height="90"\n' +
-    '                              src="[PLACEHOLDER_166x90]" class="mobile-full"\n' +
-    '                             alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;\n' +
-    '                               -ko-attr-alt: @leftImage.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="titleVisible">\n' +
-    '                        <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                          -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                          <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color" data-ko-editable="leftTitleText">Title\n' +
-    '                          </span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr>\n' +
-    '                        <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="leftLongText" class="long-text links-color">\n' +
-    '                          <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="buttonVisible">\n' +
-    '                        <td valign="top">\n' +
-    '                          <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full" style="padding-top: 4px">\n' +
-    '                            <tr>\n' +
-    '                              <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                                style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                                padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                                -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                                -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                                -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color; ">\n' +
-    '                                <a data-ko-editable="leftButtonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                                  -ko-color: @buttonStyle.color; -ko-attr-href: @leftButtonLink.url">BUTTON</a>\n' +
-    '                              </td>\n' +
-    '                            </tr>\n' +
-    '                          </table>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="184">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%" align="left">\n' +
-    '                      <tr data-ko-display="imageVisible">\n' +
-    '                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">\n' +
-    '                          <a data-ko-link="middleImage.url">\n' +
-    '                            <img data-ko-editable="middleImage.src" border="0" hspace="0" vspace="0" width="166" height="90"\n' +
-    '                              src="[PLACEHOLDER_166x90]" class="mobile-full"\n' +
-    '                              alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;\n' +
-    '                              -ko-attr-alt: @middleImage.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="titleVisible">\n' +
-    '                        <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                          -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                          <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color"  data-ko-editable="middleTitleText">\n' +
-    '                         Title\n' +
-    '                          </span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr>\n' +
-    '                        <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="middleLongText" class="long-text links-color">\n' +
-    '                          <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="buttonVisible">\n' +
-    '                        <td valign="top">\n' +
-    '                          <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full" style="padding-top: 4px">\n' +
-    '                            <tr>\n' +
-    '                              <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                                style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                                padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                                -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                                -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                                -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color; ">\n' +
-    '                                <a data-ko-editable="middleButtonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                                  -ko-color: @buttonStyle.color; -ko-attr-href: @middleButtonLink.url">BUTTON</a>\n' +
-    '                              </td>\n' +
-    '                            </tr>\n' +
-    '                          </table>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="184">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="184" style="width: 100%" align="right">\n' +
-    '                      <tr data-ko-display="imageVisible">\n' +
-    '                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">\n' +
-    '                          <a data-ko-link="rightImage.url">\n' +
-    '                            <img data-ko-editable="rightImage.src" border="0" hspace="0" vspace="0" width="166" height="90"\n' +
-    '                              src="[PLACEHOLDER_166x90]" class="mobile-full"\n' +
-    '                              alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;\n' +
-    '                              -ko-attr-alt: @rightImage.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="titleVisible">\n' +
-    '                        <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                          -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                          <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color" data-ko-editable="rightTitleText">\n' +
-    '                         Title\n' +
-    '                          </span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr>\n' +
-    '                        <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="rightLongText" class="long-text links-color">\n' +
-    '                          <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="buttonVisible">\n' +
-    '                        <td valign="top">\n' +
-    '                          <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full" style="padding-top: 4px">\n' +
-    '                            <tr>\n' +
-    '                              <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                                style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                                padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                                -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                                -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                                -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color;">\n' +
-    '                                <a data-ko-editable="rightButtonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                                  -ko-color: @buttonStyle.color; -ko-attr-href: @rightButtonLink.url">BUTTON</a>\n' +
-    '                              </td>\n' +
-    '                            </tr>\n' +
-    '                          </table>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /tripleArticleBlock -->\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /tripleArticleBlock -->\n' +
+    '    \n' +
     '\n' +
-    '  <!-- doubleArticleBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="doubleArticleBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td align="center" valign="top" style="font-size: 0">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%" align="left">\n' +
-    '                      <tr data-ko-display="imageVisible">\n' +
-    '                        <td width="100%" align="left" class="links-color" style="padding-bottom: 9px">\n' +
-    '                          <a data-ko-link="leftImage.url">\n' +
-    '                            <img data-ko-editable="leftImage.src" border="0" hspace="0" vspace="0" width="258" height="100"\n' +
-    '                              src="[PLACEHOLDER_258x100]" class="mobile-full"\n' +
-    '                              alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;\n' +
-    '                              -ko-attr-alt: @leftImage.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="titleVisible">\n' +
-    '                        <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                          -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                          <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color" data-ko-editable="leftTitleText">\n' +
-    '                          Title\n' +
-    '                          </span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr>\n' +
-    '                        <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="leftLongText" class="long-text links-color">\n' +
-    '                          <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. </p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="buttonVisible">\n' +
-    '                        <td valign="top">\n' +
-    '                          <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full" style="padding-top: 4px;">\n' +
-    '                            <tr>\n' +
-    '                              <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                                style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                                padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                                -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                                -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                                -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color; ">\n' +
-    '                                <a data-ko-editable="leftButtonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                                  -ko-color: @buttonStyle.color; -ko-attr-href: @leftButtonLink.url">BUTTON</a>\n' +
-    '                              </td>\n' +
-    '                            </tr>\n' +
-    '                          </table>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="276">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%" align="right">\n' +
-    '                      <tr data-ko-display="imageVisible">\n' +
-    '                        <td width="100%" valign="top" align="left" class="links-color" style="padding-bottom: 9px">\n' +
-    '                          <a data-ko-link="rightImage.url">\n' +
-    '                            <img data-ko-editable="rightImage.src" border="0" hspace="0" vspace="0" width="258" height="100"\n' +
-    '                              src="[PLACEHOLDER_258x100]" class="mobile-full"\n' +
-    '                              alt="" style="vertical-align:top; width: 100%; height: auto; -ko-attr-height: @imageHeight;\n' +
-    '                              -ko-attr-alt: @rightImage.alt" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="titleVisible">\n' +
-    '                        <td style="font-size: 18px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; text-align:left;\n' +
-    '                          -ko-font-size: @[titleTextStyle.size]px; -ko-font-family: @titleTextStyle.face; -ko-color: @titleTextStyle.color">\n' +
-    '                          <span style="color: #3f3f3f; -ko-color: @titleTextStyle.color" data-ko-editable="rightTitleText">\n' +
-    '                         Title\n' +
-    '                          </span>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr>\n' +
-    '                        <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="rightLongText" class="long-text links-color">\n' +
-    '                          <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                      <tr data-ko-display="buttonVisible">\n' +
-    '                        <td valign="top">\n' +
-    '                          <table cellpadding="0" border="0" align="left" cellspacing="0" class="mobile-full" style="padding-top: 4px;">\n' +
-    '                            <tr>\n' +
-    '                              <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="26"\n' +
-    '                                style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align:center; color: #3f3f3f; font-weight: normal;\n' +
-    '                                padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                                -ko-border-radius: @[buttonStyle.radius]px;\n' +
-    '                                -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor;\n' +
-    '                                -ko-font-size: @[buttonStyle.size]px; -ko-font-family: @buttonStyle.face; -ko-color: @buttonStyle.color; ">\n' +
-    '                                <a data-ko-editable="rightButtonLink.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                                  -ko-color: @buttonStyle.color; -ko-attr-href: @rightButtonLink.url">BUTTON</a>\n' +
-    '                              </td>\n' +
-    '                            </tr>\n' +
-    '                          </table>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '    \n' +
+    '    <!-- doubleArticleBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="doubleArticleBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="imageVisible and fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 258px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="leftImage.src" width="258" height="100" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C100"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="imageVisible and fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 258px; height: auto" data-ko-editable="leftImage.src" width="258" data-ko-placeholder-height="120" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C120"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="titleVisible">\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="leftTitleText">Title</span></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /doubleArticleBlock -->\n' +
-    '\n' +
-    '  <!-- hrBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="hrBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td valign="top" bgcolor="#ffffff" style="background-color: #ffffff;\n' +
-    '              -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor" align="center">\n' +
-    '              <table width="100%" cellspacing="0" cellpadding="0" border="0"\n' +
-    '                style="width:100%; -ko-width: @[hrStyle.hrWidth]%; -ko-attr-width: @[hrStyle.hrWidth]%">\n' +
-    '                <tr>\n' +
-    '                  <td width="100%" height="1" style="font-size:1px; line-height: 1px; width: 100%; background-color: #3f3f3f;\n' +
-    '                  -ko-background-color: @hrStyle.color; -ko-attr-height: @hrStyle.hrHeight; -ko-line-height: @[hrStyle.hrHeight]px">&nbsp;</td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '              <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="leftLongText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p></td></tr>\n' +
+    '              <tr data-ko-display="buttonVisible">\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @leftButtonLink.url"><span data-ko-wrap="false" data-ko-editable="leftButtonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /hrBlock -->\n' +
-    '\n' +
-    '  <!-- buttonBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor"  data-ko-block="buttonBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td valign="top" bgcolor="#ffffff" style="background-color: #ffffff;\n' +
-    '              -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor" align="center">\n' +
-    '\n' +
-    '              <table cellpadding="0" border="0" align="center" cellspacing="0" class="mobile-full">\n' +
-    '                <tr>\n' +
-    '                  <td width="auto" valign="middle" bgcolor="#bfbfbf" align="center" height="50"\n' +
-    '                    style="font-size:22px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; font-weight: normal;\n' +
-    '                    padding-left: 14px; padding-right: 14px; background-color: #bfbfbf; border-radius: 4px;\n' +
-    '                    -ko-attr-bgcolor: @bigButtonStyle.buttonColor; -ko-background-color: @bigButtonStyle.buttonColor;\n' +
-    '                     -ko-border-radius: @[bigButtonStyle.radius]px;\n' +
-    '                    -ko-font-size: @[bigButtonStyle.size]px; -ko-font-family: @bigButtonStyle.face; -ko-color: @bigButtonStyle.color; ">\n' +
-    '                    <a data-ko-link="link.url" data-ko-editable="link.text" href="" style="text-decoration: none; color: #3f3f3f; font-weight: normal;\n' +
-    '                      -ko-color: @bigButtonStyle.color;">BUTTON</a>\n' +
-    '                  </td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="imageVisible and fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 258px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="rightImage.src" width="258" height="100" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C100"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="imageVisible and fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color" style="padding-bottom: 9px"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 258px; height: auto" data-ko-editable="rightImage.src" width="258" data-ko-placeholder-height="120" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C120"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="titleVisible">\n' +
+    '      <td width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 18px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[titleTextStyle.size]px; -ko-color: @titleTextStyle.color; -ko-font-family: @titleTextStyle.face; -ko-text-align: @titleTextStyle.align; -ko-attr-align: @titleTextStyle.align" align="left"><span style="font-weight: normal" data-ko-editable="rightTitleText">Title</span></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /buttonBlock -->\n' +
-    '\n' +
-    '  <!-- imageBlock  -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf;\n' +
-    '    -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="imageBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" valign="top" align="center">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table data-ko-display="gutterVisible eq false" width="570" class="vb-container fullwidth" cellpadding="0" border="0" bgcolor="#ffffff" align="center"\n' +
-    '          cellspacing="0" style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td valign="top" align="center">\n' +
-    '              <a data-ko-link="image.url" href="" style="text-decoration: none;"><img data-ko-editable="image.src"\n' +
-    '                  hspace="0" border="0" vspace="0" width="570" data-ko-placeholder-height="200"\n' +
-    '                  src="[PLACEHOLDER_570x200]" class="mobile-full"\n' +
-    '                  alt="" style="max-width: 570px; display: block; border-radius: 0px; width: 100%; height: auto; font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px;\n' +
-    '                  -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color; -ko-attr-alt: @image.alt;" /></a>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        <table data-ko-display="gutterVisible" width="570" class="vb-container fullpad" cellpadding="0" border="0" bgcolor="#ffffff" align="center"\n' +
-    '          cellspacing="18" style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor; display: none;">\n' +
-    '          <tr>\n' +
-    '            <td valign="top" align="center">\n' +
-    '              <a data-ko-link="image.url" href="" style="text-decoration: none;"><img data-ko-editable="image.src"\n' +
-    '                  hspace="0" border="0" vspace="0" width="534" data-ko-placeholder-height="280"\n' +
-    '                  src="[PLACEHOLDER_534x280]" class="mobile-full"\n' +
-    '                  alt="" style="max-width: 534px; display: block; border-radius: 0px; width: 100%; height: auto; font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px;\n' +
-    '                  -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color; -ko-attr-alt: @image.alt;" /></a>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '              <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; line-height: normal; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-text-align: @longTextStyle.align; -ko-attr-align: @longTextStyle.align; -ko-line-height: @[longTextStyle.lineHeight]" align="left" data-ko-editable="rightLongText"><p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p></td></tr>\n' +
+    '              <tr data-ko-display="buttonVisible">\n' +
+    '      <td valign="top" align="left" style="-ko-attr-align: @buttonStyle.align"><table role="presentation" cellpadding="6" border="0" align="left" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 6px 6px 6px 6px; padding-top: 4px; -ko-attr-align: @buttonStyle.align"><tr data-ko-display="buttonVisible">\n' +
+    '        <td width="auto" valign="middle" align="left" style="text-align:center; font-weight: normal; padding: 6px; padding-left: 18px; padding-right: 18px; background-color: #bfbfbf; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[buttonStyle.radius]px; -ko-attr-bgcolor: @buttonStyle.buttonColor; -ko-background-color: @buttonStyle.buttonColor; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-align: @buttonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[buttonStyle.size]px; -ko-color: @buttonStyle.color; -ko-font-family: @buttonStyle.face; -ko-attr-href: @rightButtonLink.url"><span data-ko-wrap="false" data-ko-editable="rightButtonLink.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- imageBlock -->\n' +
-    '\n' +
-    '  <!-- doubleImageBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf;\n' +
-    '    -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="doubleImageBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" align="center" valign="top" bgcolor="#bfbfbf"\n' +
-    '        style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor">\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table data-ko-display="gutterVisible eq false" width="570" class="vb-container fullwidth" cellpadding="0" border="0" bgcolor="#ffffff" align="center"\n' +
-    '          cellspacing="0" style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor;">\n' +
-    '          <tr>\n' +
-    '            <td valign="top" align="center" class="mobile-row" style="font-size: 0">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="285"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:285px; vertical-align:top; width:100%; width:100%; " class="mobile-full">\n' +
-    '              <a data-ko-link="leftImage.url" href="" style="text-decoration: none;"><img data-ko-editable="leftImage.src"\n' +
-    '                  hspace="0" align="left" border="0" vspace="0" width="285" height="180" class="mobile-full"\n' +
-    '                  src="[PLACEHOLDER_285x180]"\n' +
-    '                  alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                  -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="285">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:285px; vertical-align:top; width:100%; width:100%; " class="mobile-full">\n' +
-    '              <a data-ko-link="rightImage.url" href="" style="text-decoration: none;"><img data-ko-editable="rightImage.src"\n' +
-    '                  hspace="0" align="right" border="0" vspace="0" width="285" height="180" class="mobile-full"\n' +
-    '                  src="[PLACEHOLDER_285x180]"\n' +
-    '                  alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                  -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        <table data-ko-display="gutterVisible" width="570" class="vb-row fullpad" border="0" cellpadding="0" cellspacing="9" bgcolor="#ffffff"\n' +
-    '            style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor; display: none;">\n' +
-    '          <tr>\n' +
-    '            <td align="center" valign="top" bgcolor="#ffffff" style="background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor; font-size: 0">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '              <table class="vb-content" width="276" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="left">\n' +
-    '                <tr>\n' +
-    '                  <td valign="top">\n' +
-    '                    <a data-ko-link="leftImage.url" href="" style="text-decoration: none;">\n' +
-    '                      <img data-ko-editable="leftImage.src"\n' +
-    '                        hspace="0" align="left" border="0" vspace="0" width="258" height="180"\n' +
-    '                        src="[PLACEHOLDER_258x180]" class="mobile-full"\n' +
-    '                        alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                        font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                        -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>\n' +
-    '                  </td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="276">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '              <table class="vb-content" width="276" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="right">\n' +
-    '                <tr>\n' +
-    '                  <td valign="top">\n' +
-    '                    <a data-ko-link="rightImage.url" href="" style="text-decoration: none;"><img data-ko-editable="rightImage.src"\n' +
-    '                        hspace="0" align="right" border="0" vspace="0" width="258" height="180"\n' +
-    '                        src="[PLACEHOLDER_258x180]" class="mobile-full"\n' +
-    '                        alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                        font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                        -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>\n' +
-    '                  </td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /doubleImageBlock -->\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /doubleArticleBlock -->\n' +
+    '    \n' +
     '\n' +
-    '  <!--  tripleImageBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf;\n' +
-    '    -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="tripleImageBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" valign="top" align="center" style="">\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table data-ko-display="gutterVisible eq false" width="570" class="vb-container fullwidth" cellpadding="0" border="0" bgcolor="#ffffff" align="center"\n' +
-    '          cellspacing="0" style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor;">\n' +
+    '    \n' +
+    '    <!-- hrBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="hrBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0; padding: 0 9px"><div style="vertical-align:top; width:100%; max-width: 552px; -mru-width: 0px"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px" width="552">\n' +
+    '          \n' +
     '          <tr>\n' +
-    '            <td valign="top" align="center" class="mobile-row" style="font-size: 0">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="190"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:190px; vertical-align:top; width:100%; " class="mobile-full">\n' +
-    '              <a data-ko-link="leftImage.url" href="" style="text-decoration: none;"><img data-ko-editable="leftImage.src"\n' +
-    '                  hspace="0" align="left" border="0" vspace="0" width="190" height="160" class="mobile-full"\n' +
-    '                  src="[PLACEHOLDER_190x160]"\n' +
-    '                  alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                  -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="190">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:190px; vertical-align:top; width:100%; " class="mobile-full">\n' +
-    '              <a data-ko-link="middleImage.url" href="" style="text-decoration: none;"><img data-ko-editable="middleImage.src"\n' +
-    '                  hspace="0" align="left" border="0" vspace="0" width="190" height="160" class="mobile-full"\n' +
-    '                  src="[PLACEHOLDER_190x160]"\n' +
-    '                  alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                  -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @middleImage.alt;" /></a>\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="190">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:190px; vertical-align:top; width:100%; " class="mobile-full">\n' +
-    '              <a data-ko-link="rightImage.url" href="" style="text-decoration: none;"><img data-ko-editable="rightImage.src"\n' +
-    '                  hspace="0" align="right" border="0" vspace="0" width="190" height="160" class="mobile-full"\n' +
-    '                  src="[PLACEHOLDER_190x160]"\n' +
-    '                  alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                  font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                  -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        <table data-ko-display="gutterVisible" width="570" border="0" cellpadding="0" cellspacing="9" bgcolor="#ffffff" class="vb-row fullpad"\n' +
-    '          style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor; display: none;">\n' +
-    '          <tr>\n' +
-    '            <td align="center" valign="top" bgcolor="#ffffff" style="font-size: 0; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '              <table class="vb-content" width="184" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="left">\n' +
-    '                <tr>\n' +
-    '                  <td valign="top">\n' +
-    '                    <a data-ko-link="leftImage.url" href="" style="text-decoration: none;"><img data-ko-editable="leftImage.src"\n' +
-    '                      hspace="0" align="left" border="0" vspace="0" width="166" height="160"\n' +
-    '                      src="[PLACEHOLDER_166x160]" class="mobile-full"\n' +
-    '                      alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                      font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                      -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @leftImage.alt;" /></a>\n' +
-    '                  </td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="184">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '              <table class="vb-content" width="184" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="left">\n' +
-    '                <tr>\n' +
-    '                  <td valign="top">\n' +
-    '                    <a data-ko-link="middleImage.url" href="" style="text-decoration: none"><img data-ko-editable="middleImage.src"\n' +
-    '                      hspace="0" align="left" border="0" vspace="0" width="166" height="160"\n' +
-    '                      src="[PLACEHOLDER_166x160]" class="mobile-full"\n' +
-    '                      alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                      font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                      -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @middleImage.alt;" /></a>\n' +
-    '                  </td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="184">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:184px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '              <table class="vb-content" width="184" style="width: 100%" border="0" cellpadding="0" cellspacing="9" align="right">\n' +
-    '                <tr>\n' +
-    '                  <td valign="top">\n' +
-    '                    <a data-ko-link="rightImage.url" href="" style="text-decoration: none"><img data-ko-editable="rightImage.src"\n' +
-    '                      hspace="0" align="right" border="0" vspace="0" width="166" height="160"\n' +
-    '                      src="[PLACEHOLDER_166x160]" class="mobile-full"\n' +
-    '                      alt="" style="display: block; border-radius: 0px; width: 100%; height: auto;font-size: 13px;\n' +
-    '                      font-family: Arial, Helvetica, sans-serif; color: #3f3f3f; -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face;\n' +
-    '                      -ko-color: @longTextStyle.color; -ko-attr-height: @imageHeight; -ko-attr-alt: @rightImage.alt;" /></a>\n' +
-    '                  </td>\n' +
-    '                </tr>\n' +
-    '              </table>\n' +
-    '\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '      <td valign="top" align="center"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-spacing: 0; width: 100%; -ko-width: @[hrStyle.hrWidth]%; -ko-attr-width: @[hrStyle.hrWidth]%"><tr>\n' +
+    '        <td width="100%" height="1" style="padding: 0; font-size:1px; line-height: 1px; max-height: 1px; width: 100%; background-color: #3f3f3f; line-height: 1px; max-height: 1px; overflow: hidden; -ko-background-color: @hrStyle.color; -ko-attr-height: @hrStyle.hrHeight; -ko-line-height: @[hrStyle.hrHeight]px; -ko-max-height: @[hrStyle.hrHeight]px">&nbsp;</td>\n' +
+    '      </tr></table></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /tripleImageBlock -->\n' +
-    '\n' +
-    '  <!-- spacerBlock -->\n' +
-    '  <table class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf"\n' +
-    '    style="background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor; -ko-attr-bgcolor: @externalBackgroundColor" data-ko-block="spacerBlock">\n' +
-    '    <tr>\n' +
-    '      <td class="vb-outer" valign="top" align="center" bgcolor="#bfbfbf" height="24"\n' +
-    '        style="-ko-attr-height: @spacerSize; height: 24px; -ko-height: @[spacerSize]px; background-color: #bfbfbf; -ko-background-color: @externalBackgroundColor;\n' +
-    '        -ko-attr-bgcolor: @externalBackgroundColor; font-size:1px; line-height: 1px;">&nbsp;</td>\n' +
+    '        \n' +
+    '        </table></div></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /spacerBlock -->\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /hrBlock -->\n' +
+    '    \n' +
     '\n' +
-    '  <!-- socialBlock -->\n' +
-    '  <table width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#3f3f3f"\n' +
-    '    style="background-color: #3f3f3f; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor"  data-ko-block="socialBlock">\n' +
-    '    <tr>\n' +
-    '      <td align="center" valign="top" bgcolor="#3f3f3f" style="background-color: #3f3f3f;\n' +
-    '        -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" style="width: 100%; max-width: 570px" border="0" cellpadding="0" cellspacing="9" class="vb-row fullpad" align="center">\n' +
-    '          <tr>\n' +
-    '            <td valign="top"  align="center" style="font-size: 0;">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]-->\n' +
-    '<div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%" align="left">\n' +
-    '                      <tr>\n' +
-    '                        <td valign="middle" align="left"\n' +
-    '                          style="font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #919191; text-align:left;\n' +
-    '                          -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"\n' +
-    '                          data-ko-editable="longText" class="long-text links-color mobile-textcenter">\n' +
-    '                          <p>Address and <a href="">Contacts</a></p>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div><!--[if (gte mso 9)|(lte ie 8)]></td>\n' +
-    '<td align="left" valign="top" width="276">\n' +
-    '<![endif]--><div style="display:inline-block; max-width:276px; vertical-align:top; width:100%;" class="mobile-full">\n' +
-    '\n' +
-    '                    <table class="vb-content" border="0" cellspacing="9" cellpadding="0" width="276" style="width: 100%" align="right">\n' +
-    '                      <tr>\n' +
-    '                        <td align="right" valign="middle" class="links-color socialLinks mobile-textcenter" data-ko-display="socialIconType eq \'colors\'">\n' +
-    '                          <span data-ko-display="fbVisible" data-ko-wrap="false">&nbsp;</span>\n' +
-    '                          <a data-ko-display="fbVisible" href="" style="-ko-attr-href: @fbUrl">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/facebook_ok.png" alt="Facebook" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="twVisible" data-ko-wrap="false">&nbsp;</span>\n' +
-    '                          <a data-ko-display="twVisible" href="" style="-ko-attr-href: @twUrl">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/twitter_ok.png" alt="Twitter" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="ggVisible" data-ko-wrap="false">&nbsp;</span>\n' +
-    '                          <a data-ko-display="ggVisible" href="" style="-ko-attr-href: @ggUrl">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/google+_ok.png" alt="Google+" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="webVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="webVisible" href="" style="-ko-attr-href: @webUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/web_ok.png" alt="Web" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="inVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="inVisible" href="" style="-ko-attr-href: @inUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/linkedin_ok.png" alt="Linkedin" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="flVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="flVisible" href="" style="-ko-attr-href: @flUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/flickr_ok.png" alt="Flickr" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="viVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="viVisible" href="" style="-ko-attr-href: @viUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/vimeo_ok.png" alt="Vimeo" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="instVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="instVisible" href="" style="-ko-attr-href: @instUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/instagram_ok.png" alt="Instagram" border="0"  class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="youVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="youVisible" href="" style="-ko-attr-href: @youUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/youtube_ok.png" alt="Youtube" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                        <td align="right" valign="middle" class="links-color socialLinks mobile-textcenter" data-ko-display="socialIconType eq \'bw\'"\n' +
-    '                          style="display: none">\n' +
-    '                          <span data-ko-display="fbVisible" data-ko-wrap="false">&nbsp;</span>\n' +
-    '                          <a data-ko-display="fbVisible" href="" style="-ko-attr-href: @fbUrl">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/facebook_bw_ok.png" alt="Facebook" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="twVisible" data-ko-wrap="false">&nbsp;</span>\n' +
-    '                          <a data-ko-display="twVisible" href="" style="-ko-attr-href: @twUrl">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/twitter_bw_ok.png" alt="Twitter" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="ggVisible" data-ko-wrap="false">&nbsp;</span>\n' +
-    '                          <a data-ko-display="ggVisible" href="" style="-ko-attr-href: @ggUrl">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/google+_bw_ok.png" alt="Google+" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="webVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="webVisible" href="" style="-ko-attr-href: @webUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/web_bw_ok.png" alt="Web" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="inVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="inVisible" href="" style="-ko-attr-href: @inUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/linkedin_bw_ok.png" alt="Linkedin" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="flVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="flVisible" href="" style="-ko-attr-href: @flUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/flickr_bw_ok.png" alt="Flickr" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="viVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="viVisible" href="" style="-ko-attr-href: @viUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/vimeo_bw_ok.png" alt="Vimeo" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="instVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="instVisible" href="" style="-ko-attr-href: @instUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/instagram_bw_ok.png" alt="Instagram" border="0"  class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                          <span data-ko-display="youVisible" data-ko-wrap="false" style="display: none">&nbsp;</span>\n' +
-    '                          <a data-ko-display="youVisible" href="" style="-ko-attr-href: @youUrl; display: none">\n' +
-    '                            <img src="[URL_BASE]/static/mosaico/templates/versafix-1/img/social_def/youtube_bw_ok.png" alt="Youtube" border="0" class="socialIcon" />\n' +
-    '                          </a>\n' +
-    '                        </td>\n' +
-    '                      </tr>\n' +
-    '                    </table>\n' +
-    '\n' +
-    '</div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td><![endif]-->\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]-->\n' +
-    '\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '    \n' +
+    '    <!-- buttonBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="buttonBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="18" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 18px; border-spacing: 18px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-container">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td valign="top" align="center" style="-ko-attr-align: @bigButtonStyle.align"><table role="presentation" cellpadding="12" border="0" align="center" cellspacing="0" style="border-spacing: 0; mso-padding-alt: 12px 12px 12px 12px; -ko-attr-align: @bigButtonStyle.align"><tr>\n' +
+    '        <td width="auto" valign="middle" align="center" style="text-align:center; font-weight: normal; padding: 12px; padding-left: 14px; padding-right: 14px; background-color: #bfbfbf; color: #3f3f3f; font-size: 22px; font-family: Arial, Helvetica, sans-serif; border-radius: 4px; -ko-border-radius: @[bigButtonStyle.radius]px; -ko-attr-bgcolor: @bigButtonStyle.buttonColor; -ko-background-color: @bigButtonStyle.buttonColor; -ko-font-size: @[bigButtonStyle.size]px; -ko-color: @bigButtonStyle.color; -ko-font-family: @bigButtonStyle.face; -ko-attr-align: @bigButtonStyle.align" bgcolor="#bfbfbf"><a href="" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 22px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[bigButtonStyle.size]px; -ko-color: @bigButtonStyle.color; -ko-font-family: @bigButtonStyle.face; -ko-attr-href: @link.url"><span data-ko-wrap="false" data-ko-editable="link.text">BUTTON</span></a></td>\n' +
+    '      </tr></table></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /socialBlock -->\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /buttonBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- imageBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="imageBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <div data-ko-wrap="false" style="width: 100%;" data-ko-display="gutterVisible eq false"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-container">\n' +
+    '        \n' +
+    '        <tr><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 570px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 570px; height: auto" data-ko-editable="image.src" width="570" data-ko-placeholder-height="200" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=570%2C200" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="gutterVisible"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="18" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 18px; border-spacing: 18px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-container">\n' +
+    '        \n' +
+    '        <tr><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 534px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="image.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[image.alt == \'\' ? null : image.alt]; width: 100%; max-width: 534px; height: auto" data-ko-editable="image.src" width="534" data-ko-placeholder-height="280" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=534%2C280"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /imageBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- doubleImageBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="doubleImageBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <div data-ko-wrap="false" style="width: 100%;" data-ko-display="gutterVisible eq false"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 570px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="285"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 285px; -mru-width: 0px; min-width: calc(285 * 100% / 570); -ko-min-width: @[\'calc(\' + (285) * 100 / 570 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(570 * 570px - 570 * 100%); -ko-width: @[\'calc(\'+ 570 * 570 + \'px - \' + 570 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="0" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; -yandex-p: calc(2px - 3%)" width="285" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 285px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 285px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="leftImage.src" width="285" height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=285%2C180" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 285px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 285px; height: auto" data-ko-editable="leftImage.src" width="285" data-ko-placeholder-height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=285%2C180" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="285"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 285px; -mru-width: 0px; min-width: calc(285 * 100% / 570); -ko-min-width: @[\'calc(\' + (285) * 100 / 570 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(570 * 570px - 570 * 100%); -ko-width: @[\'calc(\'+ 570 * 570 + \'px - \' + 570 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="0" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; -yandex-p: calc(2px - 3%)" width="285" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 285px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 285px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="rightImage.src" width="285" height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=285%2C180" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 285px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 285px; height: auto" data-ko-editable="rightImage.src" width="285" data-ko-placeholder-height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=285%2C180" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="gutterVisible"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 258px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="leftImage.src" width="258" height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C180"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 258px; height: auto" data-ko-editable="leftImage.src" width="258" data-ko-placeholder-height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C180"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '      --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 258px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="rightImage.src" width="258" height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C180"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 258px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 258px; height: auto" data-ko-editable="rightImage.src" width="258" data-ko-placeholder-height="180" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=258%2C180"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '      --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /doubleImageBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- tripleImageBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="tripleImageBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <div data-ko-wrap="false" style="width: 100%;" data-ko-display="gutterVisible eq false"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 570px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="190"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 190px; -mru-width: 0px; min-width: calc(190 * 100% / 570); -ko-min-width: @[\'calc(\' + (190) * 100 / 570 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(570 * 570px - 570 * 100%); -ko-width: @[\'calc(\'+ 570 * 570 + \'px - \' + 570 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="0" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; -yandex-p: calc(2px - 3%)" width="190" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 190px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 190px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="leftImage.src" width="190" height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=190%2C160" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 190px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 190px; height: auto" data-ko-editable="leftImage.src" width="190" data-ko-placeholder-height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=190%2C160" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '       --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="190"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 190px; -mru-width: 0px; min-width: calc(190 * 100% / 570); -ko-min-width: @[\'calc(\' + (190) * 100 / 570 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(570 * 570px - 570 * 100%); -ko-width: @[\'calc(\'+ 570 * 570 + \'px - \' + 570 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="0" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; -yandex-p: calc(2px - 3%)" width="190" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 190px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="middleImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[middleImage.alt == \'\' ? null : middleImage.alt]; width: 100%; max-width: 190px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="middleImage.src" width="190" height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=190%2C160" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 190px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="middleImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[middleImage.alt == \'\' ? null : middleImage.alt]; width: 100%; max-width: 190px; height: auto" data-ko-editable="middleImage.src" width="190" data-ko-placeholder-height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=190%2C160" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '       --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="190"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 190px; -mru-width: 0px; min-width: calc(190 * 100% / 570); -ko-min-width: @[\'calc(\' + (190) * 100 / 570 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(570 * 570px - 570 * 100%); -ko-width: @[\'calc(\'+ 570 * 570 + \'px - \' + 570 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="0" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; -yandex-p: calc(2px - 3%)" width="190" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 190px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 190px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="rightImage.src" width="190" height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=190%2C160" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 190px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 190px; height: auto" data-ko-editable="rightImage.src" width="190" data-ko-placeholder-height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=190%2C160" class="mobile-full"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '       --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="gutterVisible"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 166px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="leftImage.src" width="166" height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C160"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="leftImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[leftImage.alt == \'\' ? null : leftImage.alt]; width: 100%; max-width: 166px; height: auto" data-ko-editable="leftImage.src" width="166" data-ko-placeholder-height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C160"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="middleImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[middleImage.alt == \'\' ? null : middleImage.alt]; width: 100%; max-width: 166px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="middleImage.src" width="166" height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C160"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="middleImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[middleImage.alt == \'\' ? null : middleImage.alt]; width: 100%; max-width: 166px; height: auto" data-ko-editable="middleImage.src" width="166" data-ko-placeholder-height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C160"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '            --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="184"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 184px; -mru-width: 0px; min-width: calc(184 * 100% / 552); -ko-min-width: @[\'calc(\' + (184) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="184" align="left">\n' +
+    '          \n' +
+    '              <tr data-ko-display="fixedImageHeightVisible"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 166px; height: auto; -ko-attr-height: @[imageHeight]" data-ko-editable="rightImage.src" width="166" height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C160"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '              <tr data-ko-display="fixedImageHeightVisible eq false" style="display: none"><td width="100%" valign="top" align="center" class="links-color"><!--[if (lte ie 8)]><div style="display: inline-block; width: 166px; -mru-width: 0px"><![endif]--><a href="" data-ko-link="rightImage.url"><img alt="" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face; -ko-attr-alt: @[rightImage.alt == \'\' ? null : rightImage.alt]; width: 100%; max-width: 166px; height: auto" data-ko-editable="rightImage.src" width="166" data-ko-placeholder-height="160" src="https://mosaico.io/srv/f-default/img?method=placeholder&params=166%2C160"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '            \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /tripleImageBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- bigSocialBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="bigSocialBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="18" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 18px; border-spacing: 18px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-container links-color socialLinks mobile-textcenter">\n' +
+    '        \n' +
+    '        <tr data-ko-display="bigSocialIconType eq \'colors\'" style="display: none"><td width="100%" valign="top" style="font-weight: normal; text-align: center" align="center" class="links-color socialLinks mobile-textcenter">\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="fbVisible">&nbsp;</span><a href="" data-ko-display="fbVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #3b5998; border-radius: 50px; -ko-attr-href: @[fbUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fb-colors-96.png" width="48" height="48" alt="Facebook"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="twVisible">&nbsp;</span><a href="" data-ko-display="twVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #4099FF; border-radius: 50px; -ko-attr-href: @[twUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tw-colors-96.png" width="48" height="48" alt="Twitter"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="ggVisible">&nbsp;</span><a href="" data-ko-display="ggVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #d34836; border-radius: 50px; -ko-attr-href: @[ggUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/gg-colors-96.png" width="48" height="48" alt="Google"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="webVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="webVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #606060; border-radius: 50px; -ko-attr-href: @[webUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/web-colors-96.png" width="48" height="48" alt="Web"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="waVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="waVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #25d366; border-radius: 50px; -ko-attr-href: @[waUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/wa-colors-96.png" width="48" height="48" alt="Whatsapp"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="tgVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="tgVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #2da5e1; border-radius: 50px; -ko-attr-href: @[tgUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tg-colors-96.png" width="48" height="48" alt="Telegram"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="inVisible">&nbsp;</span><a href="" data-ko-display="inVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #007bb6; border-radius: 50px; -ko-attr-href: @[inUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/in-colors-96.png" width="48" height="48" alt="Linkedin"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="piVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="piVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #C92228; border-radius: 50px; -ko-attr-href: @[piUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/pi-colors-96.png" width="48" height="48" alt="Pinterest"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="flVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="flVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #ff0084; border-radius: 50px; -ko-attr-href: @[flUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fl-colors-96.png" width="48" height="48" alt="Flickr"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="viVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="viVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #45bbff; border-radius: 50px; -ko-attr-href: @[viUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/vi-colors-96.png" width="48" height="48" alt="Vimeo"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="instVisible">&nbsp;</span><a href="" data-ko-display="instVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #bc2a8d; border-radius: 50px; -ko-attr-href: @[instUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/inst-colors-96.png" width="48" height="48" alt="Instagram"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="youVisible">&nbsp;</span><a href="" data-ko-display="youVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #cd201f; border-radius: 50px; -ko-attr-href: @[youUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/you-colors-96.png" width="48" height="48" alt="Youtube"></a>\n' +
+    '          \n' +
+    '        </td></tr>\n' +
+    '        <tr data-ko-display="bigSocialIconType eq \'bw\'" style="display: none"><td width="100%" valign="top" style="font-weight: normal; text-align: center" align="center" class="links-color socialLinks mobile-textcenter">\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="fbVisible">&nbsp;</span><a href="" data-ko-display="fbVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[fbUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fb-bw-96.png" width="48" height="48" alt="Facebook"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="twVisible">&nbsp;</span><a href="" data-ko-display="twVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[twUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tw-bw-96.png" width="48" height="48" alt="Twitter"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="ggVisible">&nbsp;</span><a href="" data-ko-display="ggVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[ggUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/gg-bw-96.png" width="48" height="48" alt="Google"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="webVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="webVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[webUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/web-bw-96.png" width="48" height="48" alt="Web"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="waVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="waVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[waUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/wa-bw-96.png" width="48" height="48" alt="Whatsapp"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="tgVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="tgVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[tgUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tg-bw-96.png" width="48" height="48" alt="Telegram"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="inVisible">&nbsp;</span><a href="" data-ko-display="inVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[inUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/in-bw-96.png" width="48" height="48" alt="Linkedin"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="piVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="piVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[piUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/pi-bw-96.png" width="48" height="48" alt="Pinterest"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="flVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="flVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[flUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fl-bw-96.png" width="48" height="48" alt="Flickr"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="viVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="viVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[viUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/vi-bw-96.png" width="48" height="48" alt="Vimeo"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="instVisible">&nbsp;</span><a href="" data-ko-display="instVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[instUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/inst-bw-96.png" width="48" height="48" alt="Instagram"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="youVisible">&nbsp;</span><a href="" data-ko-display="youVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[youUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/you-bw-96.png" width="48" height="48" alt="Youtube"></a>\n' +
+    '          \n' +
+    '        </td></tr>\n' +
+    '        <tr data-ko-display="bigSocialIconType eq \'rdcol\'"><td width="100%" valign="top" style="font-weight: normal; text-align: center" align="center" class="links-color socialLinks mobile-textcenter">\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="fbVisible">&nbsp;</span><a href="" data-ko-display="fbVisible" style="border-radius: 50px; -ko-attr-href: @[fbUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fb-rdcol-96.png" width="48" height="48" alt="Facebook"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="twVisible">&nbsp;</span><a href="" data-ko-display="twVisible" style="border-radius: 50px; -ko-attr-href: @[twUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tw-rdcol-96.png" width="48" height="48" alt="Twitter"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="ggVisible">&nbsp;</span><a href="" data-ko-display="ggVisible" style="border-radius: 50px; -ko-attr-href: @[ggUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/gg-rdcol-96.png" width="48" height="48" alt="Google"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="webVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="webVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[webUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/web-rdcol-96.png" width="48" height="48" alt="Web"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="waVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="waVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[waUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/wa-rdcol-96.png" width="48" height="48" alt="Whatsapp"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="tgVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="tgVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[tgUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tg-rdcol-96.png" width="48" height="48" alt="Telegram"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="inVisible">&nbsp;</span><a href="" data-ko-display="inVisible" style="border-radius: 50px; -ko-attr-href: @[inUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/in-rdcol-96.png" width="48" height="48" alt="Linkedin"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="piVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="piVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[piUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/pi-rdcol-96.png" width="48" height="48" alt="Pinterest"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="flVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="flVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[flUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fl-rdcol-96.png" width="48" height="48" alt="Flickr"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="viVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="viVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[viUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/vi-rdcol-96.png" width="48" height="48" alt="Vimeo"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="instVisible">&nbsp;</span><a href="" data-ko-display="instVisible" style="border-radius: 50px; -ko-attr-href: @[instUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/inst-rdcol-96.png" width="48" height="48" alt="Instagram"></a>\n' +
+    '          \n' +
+    '            <span data-ko-wrap="false" data-ko-display="youVisible">&nbsp;</span><a href="" data-ko-display="youVisible" style="border-radius: 50px; -ko-attr-href: @[youUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/you-rdcol-96.png" width="48" height="48" alt="Youtube"></a>\n' +
+    '          \n' +
+    '        </td></tr>\n' +
+    '        <tr data-ko-display="bigSocialIconType eq \'rdbl\'" style="display: none"><td width="100%" valign="top" style="font-weight: normal; text-align: center" align="center" class="links-color socialLinks mobile-textcenter">\n' +
+    '           <span data-ko-wrap="false" data-ko-display="fbVisible">&nbsp;</span><a href="" data-ko-display="fbVisible" style="border-radius: 50px; -ko-attr-href: @[fbUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fb-rdbl-96.png" width="48" height="48" alt="Facebook"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="twVisible">&nbsp;</span><a href="" data-ko-display="twVisible" style="border-radius: 50px; -ko-attr-href: @[twUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tw-rdbl-96.png" width="48" height="48" alt="Twitter"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="ggVisible">&nbsp;</span><a href="" data-ko-display="ggVisible" style="border-radius: 50px; -ko-attr-href: @[ggUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/gg-rdbl-96.png" width="48" height="48" alt="Google"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="webVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="webVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[webUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/web-rdbl-96.png" width="48" height="48" alt="Web"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="waVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="waVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[waUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/wa-rdbl-96.png" width="48" height="48" alt="Whatsapp"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="tgVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="tgVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[tgUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/tg-rdbl-96.png" width="48" height="48" alt="Telegram"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="inVisible">&nbsp;</span><a href="" data-ko-display="inVisible" style="border-radius: 50px; -ko-attr-href: @[inUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/in-rdbl-96.png" width="48" height="48" alt="Linkedin"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="piVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="piVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[piUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/pi-rdbl-96.png" width="48" height="48" alt="Pinterest"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="flVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="flVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[flUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/fl-rdbl-96.png" width="48" height="48" alt="Flickr"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="viVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="viVisible" style="display: none; border-radius: 50px; -ko-attr-href: @[viUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/vi-rdbl-96.png" width="48" height="48" alt="Vimeo"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="instVisible">&nbsp;</span><a href="" data-ko-display="instVisible" style="border-radius: 50px; -ko-attr-href: @[instUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/inst-rdbl-96.png" width="48" height="48" alt="Instagram"></a>\n' +
+    '           <span data-ko-wrap="false" data-ko-display="youVisible">&nbsp;</span><a href="" data-ko-display="youVisible" style="border-radius: 50px; -ko-attr-href: @[youUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px; -ko-attr-width: @[bigSocialIconSize]; -ko-attr-height: @[bigSocialIconSize]" src="img/icons/you-rdbl-96.png" width="48" height="48" alt="Youtube"></a>\n' +
+    '          \n' +
+    '        </td></tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /bigSocialBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- shareBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="shareBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <div data-ko-wrap="false" style="width: 100%;" data-ko-display="shareButtonType eq \'reverse\'"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr><![endif]--><!--\n' +
+    '        -->\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="fbVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="fbVisible"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #3b5998; border-radius: 4px; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#3b5998"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/fb-white-96.png" alt="Facebook" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="fbText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="twVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="twVisible"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #4099FF; border-radius: 4px; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#4099FF"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/tw-white-96.png" alt="Twitter" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="twText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="inVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="inVisible" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #007bb6; border-radius: 4px; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#007bb6"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/in-white-96.png" alt="LinkedIn" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="inText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="ggVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="ggVisible"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #d34836; border-radius: 4px; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#d34836"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/gg-white-96.png" alt="Google+" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="ggText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="piVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="piVisible" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #C92228; border-radius: 4px; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#C92228"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/pi-white-96.png" alt="Pinterest" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #FFFFFF; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="piText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '        <!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="shareButtonType eq \'simple\'"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr><![endif]--><!--\n' +
+    '        -->\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="fbVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="fbVisible"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #FFFFFF; border-radius: 4px" bgcolor="#FFFFFF"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/fb-coloured-96.png" alt="Facebook" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="fbText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="twVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="twVisible"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #FFFFFF; border-radius: 4px" bgcolor="#FFFFFF"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/tw-coloured-96.png" alt="Twitter" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="twText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="inVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="inVisible" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #FFFFFF; border-radius: 4px" bgcolor="#FFFFFF"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/in-coloured-96.png" alt="LinkedIn" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="inText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="ggVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="ggVisible"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #FFFFFF; border-radius: 4px" bgcolor="#FFFFFF"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/gg-coloured-96.png" alt="Google+" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="ggText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="piVisible"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="piVisible" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #FFFFFF; border-radius: 4px" bgcolor="#FFFFFF"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/pi-coloured-96.png" alt="Pinterest" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #000000; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="piText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '        <!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="shareButtonType eq \'custom\'"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0"><tr><![endif]--><!--\n' +
+    '        -->\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="fbVisible and shareButtonStyle.iconColorType eq \'brand\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="fbVisible and shareButtonStyle.iconColorType eq \'brand\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/fb-coloured-96.png" alt="Facebook" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="fbText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="fbVisible and shareButtonStyle.iconColorType eq \'white\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="fbVisible and shareButtonStyle.iconColorType eq \'white\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/fb-white-96.png" alt="Facebook" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="fbText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="fbVisible and shareButtonStyle.iconColorType eq \'black\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="fbVisible and shareButtonStyle.iconColorType eq \'black\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/fb-black-96.png" alt="Facebook" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.facebook.com/sharer/sharer.php?u=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="fbText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="twVisible and shareButtonStyle.iconColorType eq \'brand\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="twVisible and shareButtonStyle.iconColorType eq \'brand\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/tw-coloured-96.png" alt="Twitter" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="twText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="twVisible and shareButtonStyle.iconColorType eq \'white\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="twVisible and shareButtonStyle.iconColorType eq \'white\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/tw-white-96.png" alt="Twitter" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="twText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="twVisible and shareButtonStyle.iconColorType eq \'black\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="twVisible and shareButtonStyle.iconColorType eq \'black\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/tw-black-96.png" alt="Twitter" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://twitter.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="twText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="inVisible and shareButtonStyle.iconColorType eq \'brand\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="inVisible and shareButtonStyle.iconColorType eq \'brand\'" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/in-coloured-96.png" alt="LinkedIn" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="inText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="inVisible and shareButtonStyle.iconColorType eq \'white\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="inVisible and shareButtonStyle.iconColorType eq \'white\'" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/in-white-96.png" alt="LinkedIn" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="inText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="inVisible and shareButtonStyle.iconColorType eq \'black\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="inVisible and shareButtonStyle.iconColorType eq \'black\'" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/in-black-96.png" alt="LinkedIn" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://www.linkedin.com/shareArticle?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="inText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="ggVisible and shareButtonStyle.iconColorType eq \'brand\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="ggVisible and shareButtonStyle.iconColorType eq \'brand\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/gg-coloured-96.png" alt="Google+" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="ggText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="ggVisible and shareButtonStyle.iconColorType eq \'white\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="ggVisible and shareButtonStyle.iconColorType eq \'white\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/gg-white-96.png" alt="Google+" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="ggText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block" class="mobile-full" data-ko-display="ggVisible and shareButtonStyle.iconColorType eq \'black\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="ggVisible and shareButtonStyle.iconColorType eq \'black\'"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/gg-black-96.png" alt="Google+" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://plus.google.com/share?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="ggText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="piVisible and shareButtonStyle.iconColorType eq \'brand\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="piVisible and shareButtonStyle.iconColorType eq \'brand\'" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/pi-coloured-96.png" alt="Pinterest" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="piText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="piVisible and shareButtonStyle.iconColorType eq \'white\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="piVisible and shareButtonStyle.iconColorType eq \'white\'" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/pi-white-96.png" alt="Pinterest" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="piText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '            <div data-ko-wrap="false" style="display:inline-block; display: none" class="mobile-full" data-ko-display="piVisible and shareButtonStyle.iconColorType eq \'black\'"><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" data-ko-display="piVisible and shareButtonStyle.iconColorType eq \'black\'" style="display: none"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" align="center">\n' +
+    '          \n' +
+    '              <tr>\n' +
+    '      <td valign="top" style="line-height: 24px;"><table role="presentation" cellpadding="0" border="0" align="center" cellspacing="6" style="border-spacing: 0; mso-cellspacing: 6px; border-collapse: separate; border-spacing: 6px; background-color: #bfbfbf; border-radius: 4px; -ko-attr-bgcolor: @shareButtonStyle.buttonColor; -ko-background-color: @shareButtonStyle.buttonColor; -ko-border-radius: @[shareButtonStyle.radius]px;" bgcolor="#bfbfbf"><tr>\n' +
+    '        <td class="shareIcon" valign="middle" style="font-weight: normal; padding-left: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;" width="24"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><img style="display: block" src="img/icons/pi-black-96.png" alt="Pinterest" width="24" height="24"></a></td>\n' +
+    '        <td width="auto" valign="middle" style="font-weight: normal; padding-right: 4px; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face; line-height: 24px;"><a href="http://pinterest.com/pin/find/?url=%5Bpermlink_urlenc%5D" style="text-decoration: none; font-weight: normal; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-color: @shareButtonStyle.color; -ko-font-size: @[shareButtonStyle.size]px; -ko-font-family: @shareButtonStyle.face"><span data-ko-wrap="false" data-ko-editable="piText">Share\n' +
+    '            </span></a></td>\n' +
+    '      </tr></table></td>\n' +
+    '    </tr>\n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--></div>\n' +
+    '          \n' +
+    '        <!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /shareBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '    \n' +
+    '    <!-- spacerBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#bfbfbf" style="background-color: #bfbfbf; -ko-background-color: @[externalBackgroundColor]; -ko-attr-bgcolor: @[externalBackgroundColor]" data-ko-block="spacerBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0; font-size:1px; height: 1px; height: 24px; -ko-height: @[spacerSize]px; -ko-attr-height: @[spacerSize]" height="24">\n' +
+    '      <div data-ko-wrap="false" style="width: 100%; display: none" data-ko-display="externalBackgroundVisible eq false"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; background-color: #ffffff; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]; max-width: 570px; -mru-width: 0px" bgcolor="#ffffff" width="570" class="vb-container">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '        <td width="100%" height="24" style="padding: 0; font-size:1px; line-height: 1px; width: 100%; line-height: 24px; -ko-line-height: @[spacerSize]px; -ko-attr-height: @[spacerSize]">&nbsp;</td>\n' +
+    '      </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]--></div>\n' +
+    '      <div data-ko-display="externalBackgroundVisible" data-ko-wrap="false">&nbsp;</div>\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /spacerBlock -->\n' +
+    '    \n' +
+    '\n' +
+    '\n' +
+    '    \n' +
+    '    <!-- socialBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#3f3f3f" style="background-color: #3f3f3f; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]" data-ko-block="socialBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '      <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="9" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; max-width: 570px; -mru-width: 0px" width="570" class="vb-row">\n' +
+    '        \n' +
+    '        <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0"><div style="width:100%; max-width: 552px; -mru-width: 0px"><!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="552"><tr><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '            <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #919191; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: left; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face" align="left" data-ko-editable="longText"><p>Address and <a href="">Contacts</a></p></td></tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '          --><!--[if (gte mso 9)|(lte ie 8)]><td align="left" valign="top" width="276"><![endif]--><!--\n' +
+    '      --><div style="display:inline-block; vertical-align:top; width: 100%; max-width: 276px; -mru-width: 0px; min-width: calc(276 * 100% / 552); -ko-min-width: @[\'calc(\' + (276) * 100 / 552 + \'%)\']; max-width: calc(100%); -ko-max-width: @[\'calc(100%)\']; width: calc(552 * 552px - 552 * 100%); -ko-width: @[\'calc(\'+ 552 * 552 + \'px - \' + 552 * 100 +\'%)\']" class="mobile-full"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px; -yandex-p: calc(2px - 3%)" width="276" align="left">\n' +
+    '          \n' +
+    '            <tr data-ko-display="socialIconType eq \'colors\'"><td width="100%" valign="top" style="font-weight: normal; text-align: right" align="right" class="links-color socialLinks mobile-textcenter">\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="fbVisible">&nbsp;</span><a href="" data-ko-display="fbVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #3b5998; border-radius: 50px; -ko-attr-href: @[fbUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/fb-colors-96.png" width="32" height="32" alt="Facebook"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="twVisible">&nbsp;</span><a href="" data-ko-display="twVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #4099FF; border-radius: 50px; -ko-attr-href: @[twUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/tw-colors-96.png" width="32" height="32" alt="Twitter"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="ggVisible">&nbsp;</span><a href="" data-ko-display="ggVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #d34836; border-radius: 50px; -ko-attr-href: @[ggUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/gg-colors-96.png" width="32" height="32" alt="Google"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="webVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="webVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #606060; border-radius: 50px; -ko-attr-href: @[webUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/web-colors-96.png" width="32" height="32" alt="Web"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="waVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="waVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #25d366; border-radius: 50px; -ko-attr-href: @[waUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/wa-colors-96.png" width="32" height="32" alt="Whatsapp"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="tgVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="tgVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #2da5e1; border-radius: 50px; -ko-attr-href: @[tgUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/tg-colors-96.png" width="32" height="32" alt="Telegram"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="inVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="inVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #007bb6; border-radius: 50px; -ko-attr-href: @[inUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/in-colors-96.png" width="32" height="32" alt="Linkedin"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="piVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="piVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #C92228; border-radius: 50px; -ko-attr-href: @[piUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/pi-colors-96.png" width="32" height="32" alt="Pinterest"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="flVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="flVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #ff0084; border-radius: 50px; -ko-attr-href: @[flUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/fl-colors-96.png" width="32" height="32" alt="Flickr"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="viVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="viVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #45bbff; border-radius: 50px; -ko-attr-href: @[viUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/vi-colors-96.png" width="32" height="32" alt="Vimeo"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="instVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="instVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #bc2a8d; border-radius: 50px; -ko-attr-href: @[instUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/inst-colors-96.png" width="32" height="32" alt="Instagram"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="youVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="youVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #cd201f; border-radius: 50px; -ko-attr-href: @[youUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/you-colors-96.png" width="32" height="32" alt="Youtube"></a>\n' +
+    '              \n' +
+    '            </td></tr>\n' +
+    '            <tr data-ko-display="socialIconType eq \'bw\'" style="display: none"><td width="100%" valign="top" style="font-weight: normal; text-align: right" align="right" class="links-color socialLinks mobile-textcenter">\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="fbVisible">&nbsp;</span><a href="" data-ko-display="fbVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[fbUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/fb-bw-96.png" width="32" height="32" alt="Facebook"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="twVisible">&nbsp;</span><a href="" data-ko-display="twVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[twUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/tw-bw-96.png" width="32" height="32" alt="Twitter"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="ggVisible">&nbsp;</span><a href="" data-ko-display="ggVisible" style="background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[ggUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/gg-bw-96.png" width="32" height="32" alt="Google"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="webVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="webVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[webUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/web-bw-96.png" width="32" height="32" alt="Web"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="waVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="waVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[waUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/wa-bw-96.png" width="32" height="32" alt="Whatsapp"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="tgVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="tgVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[tgUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/tg-bw-96.png" width="32" height="32" alt="Telegram"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="inVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="inVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[inUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/in-bw-96.png" width="32" height="32" alt="Linkedin"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="piVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="piVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[piUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/pi-bw-96.png" width="32" height="32" alt="Pinterest"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="flVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="flVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[flUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/fl-bw-96.png" width="32" height="32" alt="Flickr"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="viVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="viVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[viUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/vi-bw-96.png" width="32" height="32" alt="Vimeo"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="instVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="instVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[instUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/inst-bw-96.png" width="32" height="32" alt="Instagram"></a>\n' +
+    '              \n' +
+    '                <span data-ko-wrap="false" data-ko-display="youVisible" style="display: none">&nbsp;</span><a href="" data-ko-display="youVisible" style="display: none; background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7), #818181; border-radius: 50px; -ko-attr-href: @[youUrl]"><img border="0" style="display: inline-block; vertical-align: top; padding-bottom: 0px" src="img/icons/you-bw-96.png" width="32" height="32" alt="Youtube"></a>\n' +
+    '              \n' +
+    '            </td></tr>\n' +
+    '          \n' +
+    '        </table><!--\n' +
+    '      --></div><!--[if (gte mso 9)|(lte ie 8)]></td><![endif]--><!--\n' +
+    '        --><!--\n' +
+    '      --><!--[if (gte mso 9)|(lte ie 8)]></tr></table><![endif]--></div></td>\n' +
+    '    </tr>\n' +
+    '      \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '    </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /socialBlock -->\n' +
+    '    \n' +
     '\n' +
     '  </div>\n' +
     '\n' +
-    '  <!-- footerBlock -->\n' +
-    '  <table width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#3f3f3f"\n' +
-    '    style="background-color: #3f3f3f; -ko-background-color: @backgroundColor; -ko-attr-bgcolor: @backgroundColor"  data-ko-block="footerBlock">\n' +
-    '    <tr>\n' +
-    '      <td align="center" valign="top" bgcolor="#3f3f3f" style="background-color: #3f3f3f;\n' +
-    '        -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor">\n' +
-    '\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]><table align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]-->\n' +
-    '        <div class="oldwebkit">\n' +
-    '        <table width="570" style="width: 100%; max-width: 570px" border="0" cellpadding="0" cellspacing="9" class="vb-container halfpad" align="center">\n' +
-    '          <tr>\n' +
-    '            <td data-ko-editable="longText" class="long-text links-color"\n' +
-    '                style="text-align:center; font-size: 13px;color: #919191; font-weight: normal; text-align:center; font-family: Arial, Helvetica, sans-serif;\n' +
-    '                -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face"><p>Email sent to <a href="mailto:[EMAIL]">[EMAIL]</a></p></td>\n' +
-    '          </tr>\n' +
-    '          <tr>\n' +
-    '            <td style="text-align: center;">\n' +
-    '              <a style="text-decoration: underline; color: #ffffff; text-align: center; font-size: 13px;\n' +
-    '                font-weight: normal; font-family: Arial, Helvetica, sans-serif;\n' +
-    '                -ko-text-decoration: @linkStyle.decoration; -ko-color: @[Color.readability(linkStyle.color, backgroundColor) gt 2 ? linkStyle.color : (Color.isReadable(\'#ffffff\', backgroundColor) ? \'#ffffff\' : \'#000000\')]; -ko-font-size: @[linkStyle.size]px; -ko-font-family: @linkStyle.face"\n' +
-    '                href="[LINK_UNSUBSCRIBE]"><span data-ko-editable="disiscrivitiText">Unsubscribe</span></a>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '\n' +
-    '          <tr data-ko-display="_root_.sponsor.visible" style="display: none;text-align:center">\n' +
-    '            <td align="center">\n' +
-    '                <a href="http://www.void.it" target="_blank" rel="noreferrer"><img border="0" hspace="0" vspace="0" src="[URL_BASE]/static/mosaico/templates/versafix-1/img/sponsor.gif" alt="sponsor"\n' +
-    '                  style="Margin:auto;display:inline !important;" /></a>\n' +
-    '            </td>\n' +
-    '          </tr>\n' +
-    '        </table>\n' +
-    '        </div>\n' +
-    '<!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
-    '      </td>\n' +
+    '  \n' +
+    '    <!-- footerBlock -->\n' +
+    '    <table role="presentation" class="vb-outer" width="100%" cellpadding="0" border="0" cellspacing="0" bgcolor="#3f3f3f" style="background-color: #3f3f3f; -ko-background-color: @[backgroundColor]; -ko-attr-bgcolor: @[backgroundColor]" data-ko-block="footerBlock">\n' +
+    '      <tr><td class="vb-outer" align="center" valign="top" style="padding-left: 9px; padding-right: 9px; font-size: 0">\n' +
+    '    <!--[if (gte mso 9)|(lte ie 8)]><table role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="570"><tr><td align="center" valign="top"><![endif]--><!--\n' +
+    '      --><div style="margin: 0 auto; max-width: 570px; -mru-width: 0px"><table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 0px; border-spacing: 0px; max-width: 570px; -mru-width: 0px" width="570" class="vb-row">\n' +
+    '        \n' +
+    '      <tr>\n' +
+    '      <td align="center" valign="top" style="font-size: 0; padding: 0 9px"><div style="vertical-align:top; width:100%; max-width: 552px; -mru-width: 0px"><!--\n' +
+    '        --><table role="presentation" class="vb-content" border="0" cellspacing="9" cellpadding="0" style="border-collapse: separate; width: 100%; mso-cellspacing: 9px; border-spacing: 9px" width="552">\n' +
+    '          \n' +
+    '        <tr><td class="long-text links-color" width="100%" valign="top" style="font-weight: normal; color: #919191; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: center; -ko-font-size: @[longTextStyle.size]px; -ko-color: @longTextStyle.color; -ko-font-family: @longTextStyle.face" align="center" data-ko-editable="longText"><p>Email sent to <a href="mailto:[mail]">[mail]</a></p></td></tr>\n' +
+    '        <tr><td width="100%" valign="top" style="font-weight: normal; color: #ffffff; font-size: 13px; font-family: Arial, Helvetica, sans-serif; text-align: center; -ko-font-size: @[linkStyle.size]px; -ko-color: @linkStyle.color; -ko-font-family: @linkStyle.face" align="center"><a style="color: #ffffff; -ko-color: @[Color.readability(linkStyle.color, backgroundColor) gt 2 ? linkStyle.color : (Color.isReadable(\'#ffffff\', backgroundColor) ? \'#ffffff\' : \'#000000\')]; text-decoration: underline; -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration" href="[unsubscribe_link]" data-ko-editable="disiscrivitiText">Unsubscribe</a></td></tr>\n' +
+    '        <tr data-ko-display="_root_.sponsor.visible" style="display: none; text-align: center"><td width="100%" valign="top" align="center" class="links-color" style="text-align: center"><!--[if (lte ie 8)]><div style="display: inline-block; width: 170px; -mru-width: 0px"><![endif]--><a href="" style="-ko-attr-href: @_root_.sponsor.url"><img alt="sponsor" border="0" hspace="0" align="center" vspace="0" style="vertical-align:top; height: auto; margin: 0 auto; color: #3f3f3f; font-size: 13px; font-family: Arial, Helvetica, sans-serif; -ko-attr-src: @_root_.sponsor.src; -ko-attr-alt: @[_root_.sponsor.alt == \'\' ? null : _root_.sponsor.alt]; width: 100%; max-width: 170px" width="170" src="img/sponsor.gif"></a><!--[if (lte ie 8)]></div><![endif]--></td></tr>\n' +
+    '        </table></div></td>\n' +
     '    </tr>\n' +
-    '  </table>\n' +
-    '  <!-- /footerBlock -->\n' +
-    '\n' +
-    '  </center>\n' +
-    '</body>\n' +
-    '</html>\n';
+    '    \n' +
+    '      </table></div><!--\n' +
+    '    --><!--[if (gte mso 9)|(lte ie 8)]></td></tr></table><![endif]-->\n' +
+    '  </td></tr>\n' +
+    '    </table>\n' +
+    '    <!-- /footerBlock -->\n' +
+    '    \n' +
+    '</center><!--[if !(gte mso 16)]--></body><!--<![endif]--></html>';
 
 const mjmlSample = '<mjml>\n' +
     '  <mj-head>\n' +

@@ -199,8 +199,14 @@ export default class CUD extends Component {
                     {isEdit && typeKey && this.templateTypes[typeKey].getForm(this)}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        {isEdit ?
+                        <>
+                            <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                            <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        </>
+                        :
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
+                        }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/mosaico/${this.props.entity.id}/delete`}/>}
                         {isEdit && typeKey && this.templateTypes[typeKey].getButtons(this)}
                     </ButtonRow>

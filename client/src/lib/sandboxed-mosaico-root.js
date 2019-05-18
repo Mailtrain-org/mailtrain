@@ -57,7 +57,7 @@ class MosaicoSandbox extends Component {
                 ...
             </div>
          */
-        let html = this.viewModel.exportHTML();
+        let html = this.viewModel.export();
         html = juice(html);
 
         return {
@@ -86,6 +86,18 @@ class MosaicoSandbox extends Component {
             viewModel.originalExportHTML = viewModel.exportHTML;
             viewModel.exportHTML = () => {
                 let html = viewModel.originalExportHTML();
+
+                // Chrome workaround begin -----------------------------------------------------------------------------------
+                // Chrome v. 74 (and likely other versions too) has problem with how KO sets data during export.
+                // As the result, the images that have been in the template from previous editing (i.e. before page refresh)
+                // get lost. The code below refreshes the KO binding, thus effectively reloading the images.
+                const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+                if (isChrome) {
+                    ko.cleanNode(document.body);
+                    ko.applyBindings(viewModel, document.body);
+                }
+                // Chrome workaround end -------------------------------------------------------------------------------------
+
                 for (const portRender of window.mosaicoHTMLPostRenderers) {
                     html = postRender(html);
                 }
