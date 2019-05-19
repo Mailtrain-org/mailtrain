@@ -57,18 +57,21 @@ export default class List extends Component {
         segmentId: PropTypes.string
     }
 
-    updateSegmentSelection(props) {
+    componentDidMount() {
         this.populateFormValues({
-            segment: props.segmentId || ''
+            segment: this.props.segmentId || ''
         });
     }
 
-    componentDidMount() {
-        this.updateSegmentSelection(this.props);
-    }
-
     componentDidUpdate() {
-        this.updateSegmentSelection(this.props);
+        const segmentId = this.props.segmentId || '';
+
+        if (this.getFormValue('segment') !== segmentId) {
+            // Populate is used here because it does not invoke onChange
+            this.populateFormValues({
+                segment: segmentId
+            });
+        }
     }
 
     render() {

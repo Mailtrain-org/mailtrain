@@ -13,8 +13,6 @@ const uploads = multer();
 
 
 router.postAsync('/aws', async (req, res) => {
-    console.log(req.body);
-
     if (typeof req.body === 'string') {
         req.body = JSON.parse(req.body);
     }

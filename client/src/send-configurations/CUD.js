@@ -78,6 +78,12 @@ export default class CUD extends Component {
     }
 
     submitFormValuesMutator(data) {
+        this.mailerTypes[data.mailer_type].beforeSave(data);
+        if (!data.verpEnabled) {
+            data.verp_hostname = null;
+            data.verp_disable_sender_header = false;
+        }
+
         return filterData(data, ['name', 'description', 'from_email', 'from_email_overridable', 'from_name',
             'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable', 'x_mailer',
             'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
@@ -155,13 +161,7 @@ export default class CUD extends Component {
         this.disableForm();
         this.setFormStatusMessage('info', t('saving'));
 
-        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-            this.mailerTypes[data.mailer_type].beforeSave(data);
-            if (!data.verpEnabled) {
-                data.verp_hostname = null;
-                data.verp_disable_sender_header = false;
-            }
-        });
+        const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
         if (submitResult) {
             if (this.props.entity) {

@@ -4,7 +4,16 @@ import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Title, withPageHelpers} from '../lib/page'
 import {Link} from 'react-router-dom'
-import {Button, ButtonRow, Form, FormSendMethod, InputField, withForm, withFormErrorHandlers} from '../lib/form';
+import {
+    Button,
+    ButtonRow,
+    filterData,
+    Form,
+    FormSendMethod,
+    InputField,
+    withForm,
+    withFormErrorHandlers
+} from '../lib/form';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import passwordValidator from '../../../shared/password-validator';
 import axios from '../lib/axios';
@@ -37,6 +46,10 @@ export default class Account extends Component {
         this.initForm({
             leaveConfirmation: false
         });
+    }
+
+    submitFormValuesMutator(data) {
+        return filterData(data, ['password']);
     }
 
     @withAsyncErrorHandler
@@ -96,9 +109,7 @@ export default class Account extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('resettingPassword'));
 
-            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/password-reset', data => {
-                delete data.password2;
-            });
+            const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/password-reset');
 
             if (submitSuccessful) {
                 this.navigateToWithFlashMessage('/login', 'success', t('passwordReset-1'));

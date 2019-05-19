@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('config');
+const log = require('./log');
 const mailers = require('./mailers');
 const knex = require('./knex');
 const subscriptions = require('../models/subscriptions');
@@ -20,8 +21,7 @@ const htmlToText = require('html-to-text');
 const {getPublicUrl} = require('./urls');
 const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
-const shares = require('../models/shares')
-
+const shares = require('../models/shares');
 
 class CampaignSender {
     constructor() {
@@ -83,7 +83,7 @@ class CampaignSender {
 
         const getOverridable = key => {
             return sendConfiguration[key];
-        }
+        };
 
         const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
 
@@ -95,7 +95,7 @@ class CampaignSender {
             replyTo: getOverridable('reply_to'),
             xMailer: sendConfiguration.x_mailer ? sendConfiguration.x_mailer : false,
             to: {
-                name: tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
+                name: list.to_name === null ? undefined : tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
                 address: subscriptionGrouped.email
             },
             sender: useVerpSenderHeader ? campaignAddress + '@' + sendConfiguration.verp_hostname : false,
@@ -336,7 +336,7 @@ class CampaignSender {
             } else {
                 return sendConfiguration[key] || '';
             }
-        }
+        };
 
         const mail = {
             from: {
@@ -346,7 +346,7 @@ class CampaignSender {
             replyTo: getOverridable('reply_to'),
             xMailer: sendConfiguration.x_mailer ? sendConfiguration.x_mailer : false,
             to: {
-                name: tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
+                name: list.to_name === null ? undefined : tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
                 address: subscriptionGrouped.email
             },
             sender: this.useVerpSenderHeader ? campaignAddress + '@' + sendConfiguration.verp_hostname : false,
@@ -391,24 +391,49 @@ class CampaignSender {
 
         let status;
         let response;
-        let responseId;
+        let responseId = null;
         try {
             const info = await mailer.sendMassMail(mail);
             status = SubscriptionStatus.SUBSCRIBED;
 
-            /*
-                ZoneMTA
+            log.verbose('CampaignSender', `response: ${info.response}   messageId: ${info.messageId}`);
+
+            let match;
+            if ((match = info.response.match(/^250 Message queued as ([0-9a-f]+)$/))) {
+                /*
+                    ZoneMTA
                     info.response: 250 Message queued as 1691ad7f7ae00080fd
                     info.messageId: <e65c9386-e899-7d01-b21e-ec03c3a9d9b4@sathyasai.org>
+                 */
+                response = info.response;
+                responseId = match[1];
 
-                Postal Mail Server
+            } else if ((match = info.messageId.match(/^<([^>@]*)@.*amazonses\.com>$/))) {
+                /*
+                    AWS SES
+                    info.response: 0102016ad2244c0a-955492f2-9194-4cd1-bef9-70a45906a5a7-000000
+                    info.messageId: <0102016ad2244c0a-955492f2-9194-4cd1-bef9-70a45906a5a7-000000@eu-west-1.amazonses.com>
+                 */
+                response = info.response;
+                responseId = match[1];
+
+            } else if (info.response.match(/^250 OK$/) && (match = info.messageId.match(/^<([^>]*)>$/))) {
+                /*
+                    Postal Mail Server
                     info.response: 250 OK
                     info.messageId:  <xxxxxxxxx@xxx.xx> (postal messageId)
-             */
+                 */
+                response = info.response;
+                responseId = match[1];
 
-            console.log(`response: ${info.response}   messageId: ${info.messageId}`);
-            response = info.response || info.messageId;
-            responseId = info.messageId.replace(/(^<|>$)/g, "") || response.split(/\s+/).pop();
+            } else {
+                /*
+                    Fallback - Mailtrain v1 behavior
+                 */
+                response = info.response || info.messageId;
+                responseId = response.split(/\s+/).pop();
+            }
+
 
             await knex('campaigns').where('id', campaign.id).increment('delivered');
         } catch (err) {
@@ -416,6 +441,7 @@ class CampaignSender {
             response = err.response || err.message;
             await knex('campaigns').where('id', campaign.id).increment('delivered').increment('bounced');
         }
+
 
         const now = new Date();
 

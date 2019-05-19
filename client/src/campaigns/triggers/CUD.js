@@ -93,6 +93,14 @@ export default class CUD extends Component {
     }
 
     submitFormValuesMutator(data) {
+        data.seconds = Number.parseInt(data.daysAfter) * 3600 * 24;
+
+        if (data.entity === Entity.SUBSCRIPTION) {
+            data.event = data.subscriptionEvent;
+        } else if (data.entity === Entity.CAMPAIGN) {
+            data.event = data.campaignEvent;
+        }
+
         return filterData(data, ['name', 'description', 'entity', 'event', 'seconds', 'enabled', 'source_campaign']);
     }
 
@@ -157,22 +165,14 @@ export default class CUD extends Component {
             this.disableForm();
             this.setFormStatusMessage('info', t('saving'));
 
-            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url, data => {
-                data.seconds = Number.parseInt(data.daysAfter) * 3600 * 24;
-
-                if (data.entity === Entity.SUBSCRIPTION) {
-                    data.event = data.subscriptionEvent;
-                } else if (data.entity === Entity.CAMPAIGN) {
-                    data.event = data.campaignEvent;
-                }
-            });
+            const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
 
             if (submitResult) {
                 if (this.props.entity) {
                     if (submitAndLeave) {
                         this.navigateToWithFlashMessage(`/campaigns/${this.props.campaign.id}/triggers`, 'success', t('triggerUpdated'));
                     } else {
-                        await this.getFormValuesFromURL(`rest/triggers/${this.props.campaign.id}/${this.props.entity.id}`, ::this.getFormValuesMutator);
+                        await this.getFormValuesFromURL(`rest/triggers/${this.props.campaign.id}/${this.props.entity.id}`);
                         this.enableForm();
                         this.setFormStatusMessage('success', t('triggerUpdated'));
                     }
