@@ -98,7 +98,7 @@ export default class CUD extends Component {
 
     componentDidMount() {
         if (this.props.entity) {
-            this.getFormValuesFromEntity(this.props.entity, ::this.getFormValuesMutator);
+            this.getFormValuesFromEntity(this.props.entity);
 
         } else {
             this.populateFormValues({

@@ -983,6 +983,19 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         isServerValidationRunning: false
     });
 
+    const getSaveData = (self, formStateData) => {
+        let data = formStateData.map(attr => attr.get('value')).toJS();
+
+        if (self.submitFormValuesMutator) {
+            const newData = self.submitFormValuesMutator(data);
+            if (newData !== undefined) {
+                data = newData;
+            }
+        }
+
+        return data;
+    };
+
     // formValidateResolve is called by "validateForm" once client receives validation response from server that does not
     // trigger another server validation
     let formValidateResolve = null;
@@ -1100,7 +1113,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         delete data.hash;
 
         if (this.getFormValuesMutator) {
-            this.getFormValuesMutator(data);
+            this.getFormValuesMutator(data, this.getFormValues());
         }
 
         this.populateFormValues(data);
@@ -1126,7 +1139,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         delete data.hash;
 
         if (this.getFormValuesMutator) {
-            const newData = this.getFormValuesMutator(data);
+            const newData = this.getFormValuesMutator(data, this.getFormValues());
 
             if (newData !== undefined) {
                 data = newData;
@@ -1167,7 +1180,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
             if (settings.leaveConfirmation) {
                 await new Promise((resolve, reject) => {
                     this.setState(previousState => ({
-                        formState: previousState.formState.set('savedData', previousState.formState.get('data'))
+                        formState: previousState.formState.set('savedData', getSaveData(this, previousState.formState.get('data')))
                     }), resolve);
                 });
             }
@@ -1197,7 +1210,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
                 }));
 
                 if (settings.leaveConfirmation) {
-                    mutState.set('savedData', mutState.get('data'));
+                    mutState.set('savedData', getSaveData(this, mutState.get('data')));
                 }
 
                 validateFormState(this, mutState);
@@ -1304,6 +1317,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
     };
 
     proto.getFormValues = function(name) {
+        if (!this.state || !this.state.formState) return undefined;
         return this.state.formState.get('data').map(attr => attr.get('value')).toJS();
     };
 
@@ -1324,21 +1338,8 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
     };
 
     const _isFormChanged = self => {
-        const settings = self.state.formSettings;
-
-        const mutateData = data => {
-            if (self.submitFormValuesMutator) {
-                const newData = self.submitFormValuesMutator(data);
-                if (newData !== undefined) {
-                    data = newData;
-                }
-            }
-
-            return data;
-        };
-
-        const currentData = mutateData(self.state.formState.get('data').map(attr => attr.get('value')).toJS());
-        const savedData = mutateData(self.state.formState.get('savedData').map(attr => attr.get('value')).toJS());
+        const currentData = getSaveData(self, self.state.formState.get('data'));
+        const savedData = self.state.formState.get('savedData');
 
         return !deepEqual(currentData, savedData);
     };

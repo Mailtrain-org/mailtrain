@@ -67,8 +67,8 @@ export default class List extends Component {
         this.updateSegmentSelection(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.updateSegmentSelection(nextProps);
+    componentDidUpdate() {
+        this.updateSegmentSelection(this.props);
     }
 
     render() {

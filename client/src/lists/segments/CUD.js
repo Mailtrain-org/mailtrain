@@ -27,6 +27,7 @@ import {ActionLink, Button, Icon} from "../../lib/bootstrap-components";
 import {getRuleHelpers} from "./helpers";
 import RuleSettingsPane from "./RuleSettingsPane";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import clone from "clone";
 
 // https://stackoverflow.com/a/4819886/1601953
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
@@ -41,7 +42,7 @@ const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
 ])
 export default class CUD extends Component {
     // The code below keeps the segment settings in form value. However, it uses it as a mutable datastructure.
-    // After initilization, segment settings is never set using setState. This is OK we update the state.rulesTree
+    // After initilization, segment settings is never set using setState. This is OK since we update the state.rulesTree
     // from the segment settings on relevant events (changes in the tree and closing the rule settings pane).
 
     constructor(props) {
@@ -104,9 +105,9 @@ export default class CUD extends Component {
         return tree;
     }
 
-    getFormValuesMutator(data) {
+    getFormValuesMutator(data, originalData) {
         data.rootRuleType = data.settings.rootRule.type;
-        data.selectedRule = null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
+        data.selectedRule = (originalData && originalData.selectedRule) || null; // Validation errors of the selected rule are attached to this which makes sure we don't submit the segment if the opened rule has errors
 
         this.setState({
             rulesTree: this.getTreeFromRules(data.settings.rootRule.rules)
@@ -115,6 +116,10 @@ export default class CUD extends Component {
 
     submitFormValuesMutator(data) {
         data.settings.rootRule.type = data.rootRuleType;
+
+        // We have to clone the data here otherwise the form change detection doesn't work. This is because we use the state as a mutable structure.
+        data = clone(data);
+
         return filterData(data, ['name', 'settings']);
     }
 

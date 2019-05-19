@@ -31,8 +31,7 @@ export default class RuleSettingsPane extends PureComponent {
 
         this.initForm({
             leaveConfirmation: false,
-            onChangeBeforeValidation: ::this.populateRuleDefaults,
-            onChange: ::this.onFormChange
+            onChangeBeforeValidation: ::this.populateRuleDefaults
         });
     }
 
@@ -45,7 +44,8 @@ export default class RuleSettingsPane extends PureComponent {
         forceShowValidation: PropTypes.bool.isRequired
     }
 
-    updateStateFromProps(props, populateForm) {
+    updateStateFromProps(populateForm) {
+        const props = this.props;
         if (populateForm) {
             const rule = props.rule;
             const ruleHelpers = this.ruleHelpers;
@@ -74,15 +74,32 @@ export default class RuleSettingsPane extends PureComponent {
         if (props.forceShowValidation) {
             this.showFormValidation();
         }
-        
     }
     
     componentDidMount() {
-        this.updateStateFromProps(this.props, true);
+        this.updateStateFromProps(true);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.updateStateFromProps(nextProps, this.props.rule !== nextProps.rule);
+    componentDidUpdate(prevProps) {
+        this.updateStateFromProps(this.props.rule !== prevProps.rule);
+
+        if (this.isFormWithoutErrors()) {
+            const rule = this.props.rule;
+            const ruleHelpers = this.ruleHelpers;
+
+            rule.type = this.getFormValue('type');
+
+            if (!ruleHelpers.isCompositeRuleType(rule.type)) {
+                rule.column = this.getFormValue('column');
+
+                const settings = this.ruleHelpers.getRuleTypeSettings(rule);
+                settings.assignRuleSettings(rule, key => this.getFormValue(key));
+            }
+
+            this.props.onChange(false);
+        } else {
+            this.props.onChange(true);
+        }
     }
 
     localValidateFormValues(state) {
@@ -95,16 +112,17 @@ export default class RuleSettingsPane extends PureComponent {
 
         const ruleType = state.getIn(['type', 'value']);
         if (!ruleHelpers.isCompositeRuleType(ruleType)) {
-            const column = state.getIn(['column', 'value']);
+            if (!ruleType) {
+                state.setIn(['type', 'error'], t('typeMustBeSelected'));
+            }
 
+            const column = state.getIn(['column', 'value']);
             if (column) {
                 const colType = ruleHelpers.getColumnType(column);
 
                 if (ruleType) {
                     const settings = ruleHelpers.primitiveRuleTypes[colType][ruleType];
                     settings.validate(state);
-                } else {
-                    state.setIn(['type', 'error'], t('typeMustBeSelected'));
                 }
             } else {
                 state.setIn(['column', 'error'], t('fieldMustBeSelected'));
@@ -130,28 +148,6 @@ export default class RuleSettingsPane extends PureComponent {
                     }
                 }
             }
-        }
-    }
-
-    onFormChange(newState) {
-        const noErrors = !newState.formState.get('data').find(attr => attr.get('error'));
-
-        if (noErrors) {
-            const rule = this.props.rule;
-            const ruleHelpers = this.ruleHelpers;
-
-            rule.type = newState.formState.getIn(['data','type','value']);
-
-            if (!ruleHelpers.isCompositeRuleType(rule.type)) {
-                rule.column = newState.formState.getIn(['data','column','value']);
-
-                const settings = this.ruleHelpers.getRuleTypeSettings(rule);
-                settings.assignRuleSettings(rule, key => newState.formState.getIn(['data', key, 'value']));
-            }
-
-            this.props.onChange(false);
-        } else {
-            this.props.onChange(true);
         }
     }
 

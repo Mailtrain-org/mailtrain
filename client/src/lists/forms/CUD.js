@@ -81,10 +81,8 @@ export default class CUD extends Component {
                 changed: this.serverValidatedFields
             },
             onChange: {
-                previewList: () => {
-                    this.setState({
-                        previewContents: null
-                    });
+                previewList: (newState, key, oldValue, newValue) => {
+                    newState.formState.setIn(['data', 'previewContents', 'value'], null);
                 }
             }
         });
@@ -293,9 +291,9 @@ export default class CUD extends Component {
         }
     }
 
-    getFormValuesMutator(data) {
+    getFormValuesMutator(data, originalData) {
         this.supplyDefaults(data);
-        data.selectedTemplate = data.selectedTemplate || 'layout';
+        data.selectedTemplate = (originalData && originalData.selectedTemplate) || 'layout';
     }
 
     submitFormValuesMutator(data) {
