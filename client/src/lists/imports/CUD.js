@@ -123,7 +123,11 @@ export default class CUD extends Component {
         if (!isEdit) {
             if (data.source === ImportSource.CSV_FILE) {
                 data.settings.csv = {};
-                formData.append('csvFile', this.csvFile.files[0]);
+
+                // This test needs to be here because this function is also called by the form change detection mechanism
+                if (this.csvFile && this.csvFile.files && this.csvFile.files.length > 0) {
+                    formData.append('csvFile', this.csvFile.files[0]);
+                }
                 data.settings.csv.delimiter = data.csvDelimiter.trim();
             }
 
@@ -172,6 +176,7 @@ export default class CUD extends Component {
         formData.append('entity', JSON.stringify(
             filterData(data, ['name', 'description', 'source', 'settings', 'mapping_type', 'mapping'])
         ));
+        // TODO - form change detection cannot cope with FormData
 
         return formData;
     }
@@ -271,13 +276,15 @@ export default class CUD extends Component {
                 if (!isEdit) {
                     this.navigateTo(`/lists/${this.props.list.id}/imports/${submitResponse}/edit`);
                 } else {
-                    try {
-                        await axios.post(getUrl(`rest/import-start/${this.props.list.id}/${this.props.entity.id}`));
-                    } catch (err) {
-                        if (err instanceof interoperableErrors.InvalidStateError) {
-                            // Just mask the fact that it's not possible to start anything and refresh instead.
-                        } else {
-                            throw err;
+                    if (runAfterSave) {
+                        try {
+                            await axios.post(getUrl(`rest/import-start/${this.props.list.id}/${this.props.entity.id}`));
+                        } catch (err) {
+                            if (err instanceof interoperableErrors.InvalidStateError) {
+                                // Just mask the fact that it's not possible to start anything and refresh instead.
+                            } else {
+                                throw err;
+                            }
                         }
                     }
 

@@ -47,7 +47,7 @@ export default class List extends Component {
             { data: 2, title: t('description') },
             { data: 3, title: t('source'), render: data => this.importSourceLabels[data], sortable: false, searchable: false },
             { data: 4, title: t('status'), render: data => this.importStatusLabels[data], sortable: false, searchable: false },
-            { data: 5, title: t('lastRun'), render: data => moment(data).fromNow() },
+            { data: 5, title: t('lastRun'), render: data => data ? moment(data).fromNow() : t('never') },
             {
                 actions: data => {
                     const actions = [];
