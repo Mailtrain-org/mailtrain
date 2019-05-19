@@ -254,4 +254,39 @@ router.postAsync('/zone-mta/sender-config/:sendConfigurationCid', async (req, re
     });
 });
 
+
+router.postAsync('/postal', async (req, res) => {
+
+    if (typeof req.body === 'string') {
+        req.body = JSON.parse(req.body);
+    }
+
+    switch (req.body.event) {
+
+        case 'MessageDeliveryFailed':
+            if (req.body.payload.message && req.body.payload.message.message_id) {
+                const message = await campaigns.getMessageByResponseId(req.body.payload.message.message_id);
+                if (message) {
+                    await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, req.body.payload.status === 'HardFail');
+                    log.verbose('Postal', 'Marked message %s as bounced', req.body.payload.message.message_id);
+                }
+            }
+            break;
+
+        case 'MessageBounced':
+            if (req.body.payload.original_message && req.body.payload.original_message.message_id) {
+                const message = await campaigns.getMessageByResponseId(req.body.payload.original_message.message_id);
+                if (message) {
+                    await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                    log.verbose('Postal', 'Marked message %s as bounced', req.body.payload.original_message.message_id);
+                }
+            }
+            break;
+    }
+
+    res.json({
+        success: true
+    });
+});
+
 module.exports = router;
