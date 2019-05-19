@@ -24,6 +24,7 @@
     "@fortawesome/fontawesome-free": "^5.6.3",
     "axios": "^0.18.0",
     "bootstrap": "^4.2.1",
+    "clone": "^2.1.2",
     "datatables.net": "^1.10.19",
     "datatables.net-bs4": "^1.10.19",
     "ellipsize": "^0.1.0",
