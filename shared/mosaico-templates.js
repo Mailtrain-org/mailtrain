@@ -1594,6 +1594,7 @@ const versafix = '<!DOCTYPE html>\n' +
     '    \n' +
     '</center><!--[if !(gte mso 16)]--></body><!--<![endif]--></html>';
 
+
 const mjmlSample = '<mjml>\n' +
     '  <mj-head>\n' +
     '    <mj-attributes>\n' +
@@ -1620,12 +1621,16 @@ const mjmlSample = '<mjml>\n' +
     '      \n' +
     '      <mj-class name="footer-section" padding-top="30px"/>\n' +
     '      <mj-class name="footer-text" css-class="footer" />\n' +
+    '      \n' +
+    '      <mj-class name="caption-text" css-class="caption" />\n' +
     '    </mj-attributes>\n' +
     '    \n' +
     '    <mj-mosaico-property property-id="leftImage" label="Left Image" type="image" />\n' +
     '    <mj-mosaico-property property-id="middleImage" label="Middle Image" type="image" />\n' +
     '    <mj-mosaico-property property-id="rightImage" label="Right Image" type="image" />\n' +
     '    <mj-mosaico-property property-id="readMoreLink" label="Button" type="link" />\n' +
+    '\n' +
+    '    <mj-mosaico-property property-id="captionVisible" label="Caption Visible" type="visible"/>\n' +
     '    \n' +
     '    <mj-style>\n' +
     '      p {\n' +
@@ -1682,6 +1687,12 @@ const mjmlSample = '<mjml>\n' +
     '        font-family: arial,helvetica neue,helvetica,sans-serif;\n' +
     '        font-size: 12px;\n' +
     '        text-align: center;\n' +
+    '      }\n' +
+    '      \n' +
+    '      .caption p {\n' +
+    '        font-size: 10px;\n' +
+    '        text-align: center;\n' +
+    '        margin-top: 0px;\n' +
     '      }\n' +
     '    </mj-style>\n' +
     '  </mj-head>\n' +
@@ -1759,6 +1770,11 @@ const mjmlSample = '<mjml>\n' +
     '        <mj-section mj-class="article-section">\n' +
     '          <mj-column>\n' +
     '            <mj-mosaico-image property-id="image" placeholder-height="280" href-editable="true" />\n' +
+    '            <mj-mosaico-conditional-display property-id="captionVisible">\n' +
+    '              <mj-text mj-class="caption-text">\n' +
+    '                <div mj-mosaico-editable="captionText"></div>\n' +
+    '              </mj-text>\n' +
+    '            </mj-mosaico-conditional-display>\n' +
     '          </mj-column>\n' +
     '          <mj-column>\n' +
     '            <mj-text>\n' +
@@ -1771,6 +1787,52 @@ const mjmlSample = '<mjml>\n' +
     '          </mj-column>\n' +
     '        </mj-section>\n' +
     '      </mj-mosaico-block>  \n' +
+    '\n' +
+    '      <mj-mosaico-block block-id="text_section" label="Text">\n' +
+    '        <mj-section>\n' +
+    '          <mj-column>\n' +
+    '            <mj-text>\n' +
+    '              <div mj-mosaico-editable="text">\n' +
+    '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>\n' +
+    '              </div>\n' +
+    '            </mj-text>\n' +
+    '          </mj-column>\n' +
+    '        </mj-section>\n' +
+    '      </mj-mosaico-block>\n' +
+    '      \n' +
+    '      <mj-mosaico-block block-id="image_section" label="Image">\n' +
+    '        <mj-section>\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="image" placeholder-height="400" href-editable="false" />\n' +
+    '            <mj-mosaico-conditional-display property-id="captionVisible">\n' +
+    '              <mj-text mj-class="caption-text">\n' +
+    '                <div mj-mosaico-editable="captionText"></div>\n' +
+    '              </mj-text>\n' +
+    '            </mj-mosaico-conditional-display>\n' +
+    '          </mj-column>\n' +
+    '        </mj-section>\n' +
+    '      </mj-mosaico-block>\n' +
+    '      \n' +
+    '      <mj-mosaico-block block-id="image_left_and_right_section" label="Image Left and Right">\n' +
+    '        <mj-section>\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="leftImage" placeholder-height="250" href-editable="false" />\n' +
+    '            <mj-mosaico-conditional-display property-id="leftCaptionVisible" label="Left Caption Visible">\n' +
+    '              <mj-text mj-class="caption-text">\n' +
+    '                <div mj-mosaico-editable="leftCaptionText"></div>\n' +
+    '              </mj-text>\n' +
+    '            </mj-mosaico-conditional-display>\n' +
+    '          </mj-column>\n' +
+    '          <mj-column>\n' +
+    '            <mj-mosaico-image property-id="rightImage" placeholder-height="250" href-editable="false" />\n' +
+    '            <mj-mosaico-conditional-display property-id="rightCaptionVisible" label="Right Caption Visible">\n' +
+    '              <mj-text mj-class="caption-text">\n' +
+    '                <div mj-mosaico-editable="rightCaptionText"></div>\n' +
+    '              </mj-text>\n' +
+    '            </mj-mosaico-conditional-display>\n' +
+    '          </mj-column>\n' +
+    '        </mj-section>\n' +
+    '      </mj-mosaico-block>\n' +
     '      \n' +
     '    </mj-mosaico-container>    \n' +
     '\n' +
