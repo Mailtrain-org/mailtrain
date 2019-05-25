@@ -17,6 +17,7 @@ const shares = require('../models/shares');
 const { tLog } = require('../lib/translate');
 const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
+require('../lib/fork');
 
 
 const csvparse = require('csv-parse');

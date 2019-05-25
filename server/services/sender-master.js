@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('config');
-const fork = require('child_process').fork;
+const fork = require('../lib/fork').fork;
 const log = require('../lib/log');
 const path = require('path');
 const knex = require('../lib/knex');
@@ -11,6 +11,7 @@ const campaigns = require('../models/campaigns');
 const builtinZoneMta = require('../lib/builtin-zone-mta');
 const {CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
+require('../lib/fork');
 
 
 let messageTid = 0;

@@ -12,6 +12,7 @@ const knex = require('../../../lib/knex');
 const contextHelpers = require('../../../lib/context-helpers');
 const {renderCsvFromStream} = require('../../../lib/report-helpers');
 const stream = require('stream');
+require('../../../lib/fork');
 
 async function main() {
     try {

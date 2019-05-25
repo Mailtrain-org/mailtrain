@@ -10,5 +10,10 @@ module.exports.init = (app, done) => {
         type: 'zone-mta-started'
     });
 
+    process.on('message', msg => {
+        if (msg === 'exit') {
+            process.exit();        }
+    });
+
     done();
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-const fork = require('child_process').fork;
+const fork = require('./fork').fork;
 const log = require('./log');
 const path = require('path');
 const knex = require('./knex');

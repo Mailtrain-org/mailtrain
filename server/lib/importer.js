@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('./knex');
-const fork = require('child_process').fork;
+const fork = require('./fork').fork;
 const log = require('./log');
 const path = require('path');
 const {ImportStatus, RunStatus} = require('../../shared/imports');

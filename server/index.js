@@ -38,17 +38,6 @@ if (config.title) {
     process.title = config.title;
 }
 
-/*
-const cleanExit = () => process.exit();
-process.on('SIGINT', cleanExit); // catch ctrl-c
-process.on('SIGTERM', cleanExit); // catch kill
-
-process.on('exit', function() {
-    // TODO
-});
- */
-
-
 async function startHTTPServer(appType, appName, port) {
     const app = await appBuilder.createApp(appType);
     app.set('port', port);

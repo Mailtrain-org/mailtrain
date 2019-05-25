@@ -5,6 +5,7 @@ const log = require('../lib/log');
 const mailers = require('../lib/mailers');
 const CampaignSender = require('../lib/campaign-sender');
 const {enforce} = require('../lib/helpers');
+require('../lib/fork');
 
 const workerId = Number.parseInt(process.argv[2]);
 let running = false;

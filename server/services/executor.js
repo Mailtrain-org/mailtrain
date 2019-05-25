@@ -6,7 +6,7 @@
 
 const config = require('config');
 const reportHelpers = require('../lib/report-helpers');
-const fork = require('child_process').fork;
+const fork = require('../lib/fork').fork;
 const path = require('path');
 const log = require('../lib/log');
 const fs = require('fs');

@@ -8,6 +8,7 @@ const { CampaignType, CampaignStatus, CampaignSource } = require('../../shared/c
 const util = require('util');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
+require('../lib/fork');
 
 const { tLog } = require('../lib/translate');
 
