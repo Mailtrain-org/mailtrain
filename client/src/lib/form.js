@@ -987,7 +987,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         let data = formStateData.map(attr => attr.get('value')).toJS();
 
         if (self.submitFormValuesMutator) {
-            const newData = self.submitFormValuesMutator(data);
+            const newData = self.submitFormValuesMutator(data, false);
             if (newData !== undefined) {
                 data = newData;
             }
@@ -1169,7 +1169,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
             let data = this.getFormValues();
 
             if (this.submitFormValuesMutator) {
-                const newData = this.submitFormValuesMutator(data);
+                const newData = this.submitFormValuesMutator(data, true);
                 if (newData !== undefined) {
                     data = newData;
                 }

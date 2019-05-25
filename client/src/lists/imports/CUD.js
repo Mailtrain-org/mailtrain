@@ -23,7 +23,7 @@ import {
 import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
 import {DeleteModalDialog} from "../../lib/modals";
 import {getImportLabels} from './helpers';
-import {ImportSource, inProgress, MappingType, prepInProgress} from '../../../../shared/imports';
+import {ImportSource, inProgress, MappingType, prepInProgress, prepFinished} from '../../../../shared/imports';
 import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
 import listStyles from "../styles.scss";
@@ -113,21 +113,31 @@ export default class CUD extends Component {
         data.mapping_fields_email_column = emailMapping.column || '';
     }
 
-    submitFormValuesMutator(data) {
+    submitFormValuesMutator(data, isSubmit) {
         const isEdit = !!this.props.entity;
 
         data.source = Number.parseInt(data.source);
         data.settings = {};
 
-        const formData = new FormData();
+        let formData, csvFileSelected = false;
+        if (isSubmit) {
+            formData = new FormData();
+
+        }
+
         if (!isEdit) {
             if (data.source === ImportSource.CSV_FILE) {
                 data.settings.csv = {};
 
                 // This test needs to be here because this function is also called by the form change detection mechanism
                 if (this.csvFile && this.csvFile.files && this.csvFile.files.length > 0) {
-                    formData.append('csvFile', this.csvFile.files[0]);
+                    if (isSubmit) {
+                        formData.append('csvFile', this.csvFile.files[0]);
+                    } else {
+                        csvFileSelected = true;
+                    }
                 }
+
                 data.settings.csv.delimiter = data.csvDelimiter.trim();
             }
 
@@ -173,12 +183,21 @@ export default class CUD extends Component {
             data.mapping = mapping;
         }
 
-        formData.append('entity', JSON.stringify(
-            filterData(data, ['name', 'description', 'source', 'settings', 'mapping_type', 'mapping'])
-        ));
-        // TODO - form change detection cannot cope with FormData
+        if (isSubmit) {
+            formData.append('entity', JSON.stringify(
+                filterData(data, ['name', 'description', 'source', 'settings', 'mapping_type', 'mapping'])
+            ));
 
-        return formData;
+            return formData;
+
+        } else {
+            const filteredData = filterData(data, ['name', 'description', 'source', 'settings', 'mapping_type', 'mapping']);
+            if (csvFileSelected) {
+                filteredData.csvFileSelected = true;
+            }
+
+            return filteredData;
+        }
     }
 
     initFromEntity(entity) {
@@ -406,8 +425,10 @@ export default class CUD extends Component {
         if (!isEdit) {
             saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="check" label={t('saveAndEditSettings')}/>);
         } else {
-            saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="check" label={t('save')}/>);
-            saveButtons.push(<Button key="saveAndRun" className="btn-primary" icon="check" label={t('saveAndRun')} onClickAsync={async () => await this.save(true)}/>);
+            if (prepFinished(status)) {
+                saveButtons.push(<Button key="default" type="submit" className="btn-primary" icon="check" label={t('save')}/>);
+                saveButtons.push(<Button key="saveAndRun" className="btn-primary" icon="check" label={t('saveAndRun')} onClickAsync={async () => await this.save(true)}/>);
+            }
         }
 
         return (

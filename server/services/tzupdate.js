@@ -48,7 +48,4 @@ function start() {
     lastCheck = curUtcDate;
 }
 
-module.exports = {
-    start
-};
-
+module.exports.start = start;

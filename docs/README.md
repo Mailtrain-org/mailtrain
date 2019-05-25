@@ -4,7 +4,7 @@
 
 ![](http://mailtrain.org/mailtrain.png)
 
-FIXME: The info below needs to be updated !!!
+# FIXME: The info below needs to be updated to v2 !!!
 
 
 ## Features
@@ -266,7 +266,7 @@ Mailtrain uses webhooks integration to detect bounces and spam complaints. Curre
   * **SendGrid** – use `http://domain/webhooks/sendgrid` as the webhook URL for bounces and complaints ([instructions](https://github.com/Mailtrain-org/mailtrain/wiki/Setting-up-Webhooks-for-SendGrid))
   * **Mailgun** – use `http://domain/webhooks/mailgun` as the webhook URL for bounces and complaints ([instructions](https://github.com/Mailtrain-org/mailtrain/wiki/Setting-up-Webhooks-for-Mailgun))
   * **ZoneMTA** – use `http://domain/webhooks/zone-mta` as the webhook URL for bounces. If you install Mailtrain with the included installation script then this route gets set up automatically during the installation process
-  * **Postfix** – This is not a webhook but a TCP server on port 5699 to listen for piped Postfix logs. Enable it with the `[postfixbounce]` config option. To use it, pipe the log to that port using *tail*: `tail -F /var/log/mail.log | nc localhost 5699 -` (if Mailtrain restarts then you need to re-establish the *tail* pipe), alternatively you could send the log with a cron job periodically `tail -n 100 | nc localhost 5699 -`.
+  * **Postfix** – This is not a webhook but a TCP server on port 5699 to listen for piped Postfix logs. Enable it with the `[postfixBounce]` config option. To use it, pipe the log to that port using *tail*: `tail -F /var/log/mail.log | nc localhost 5699 -` (if Mailtrain restarts then you need to re-establish the *tail* pipe), alternatively you could send the log with a cron job periodically `tail -n 100 | nc localhost 5699 -`.
 
 Additionally Mailtrain (v1.1+) is able to use VERP-based bounce handling. This would require to have a compatible SMTP relay (the services mentioned above strip out or block VERP addresses in the SMTP envelope) and you also need to set up special MX DNS name that points to your Mailtrain installation server.
 

@@ -83,8 +83,8 @@ async function readNextChunks() {
     }
 }
 
-function spawn(callback) {
-    if (!config.postfixbounce.enabled) {
+function start(callback) {
+    if (!config.postfixBounce.enabled) {
         return setImmediate(callback);
     }
 
@@ -95,7 +95,7 @@ function spawn(callback) {
     });
 
     server.on('error', err => {
-        const port = config.postfixbounce.port;
+        const port = config.postfixBounce.port;
         const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
         switch (err.code) {
@@ -115,15 +115,15 @@ function spawn(callback) {
         }
     });
 
-    server.listen(config.postfixbounce.port, config.postfixbounce.host, () => {
+    server.listen(config.postfixBounce.port, config.postfixBounce.host, () => {
         if (started) {
             return server.close();
         }
         started = true;
-        log.info('POSTFIXBOUNCE', 'Server listening on port %s', config.postfixbounce.port);
+        log.info('POSTFIXBOUNCE', 'Server listening on port %s', config.postfixBounce.port);
         setImmediate(callback);
     });
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.start = bluebird.promisify(start);
 

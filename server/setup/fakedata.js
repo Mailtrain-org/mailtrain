@@ -1,7 +1,7 @@
 'use strict';
 
 let faker = require('faker');
-let accounts = 100 * 1000;
+let accounts = 1000 * 1000;
 
 let row = 0;
 let getNext = () => {

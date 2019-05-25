@@ -148,7 +148,7 @@ ldap:
   bindUser: name@company.net
   bindPassword: mySecretPassword
 
-postfixbounce:
+postfixBounce:
   # Enable to allow writing Postfix bounce log to Mailtrain listener
   # If enabled, tail mail.log to Mailtrain with the following command:
   #     tail -f -n +0 /var/log/mail.log | nc localhost 5699 -

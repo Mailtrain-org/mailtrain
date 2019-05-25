@@ -86,7 +86,7 @@ const server = new SMTPServer({
     onData: onData
 });
 
-function spawn(callback) {
+function start(callback) {
     if (!config.verp.enabled) {
         return setImmediate(callback);
     }
@@ -145,4 +145,4 @@ function spawn(callback) {
     startNextHost();
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.start = bluebird.promisify(start);

@@ -66,7 +66,10 @@ export default class CUD extends Component {
             data.to_name = null;
         }
 
-        return filterData(data, ['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
+        return filterData(data, ['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode',
+            'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration',
+            'fieldWizard'
+        ]);
     }
 
     componentDidMount() {
@@ -78,7 +81,7 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 form: 'default',
-                default_form: null,
+                default_form: 'default',
                 public_subscribe: true,
                 contact_email: '',
                 homepage: '',

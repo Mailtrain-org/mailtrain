@@ -38,6 +38,16 @@ if (config.title) {
     process.title = config.title;
 }
 
+/*
+const cleanExit = () => process.exit();
+process.on('SIGINT', cleanExit); // catch ctrl-c
+process.on('SIGTERM', cleanExit); // catch kill
+
+process.on('exit', function() {
+    // TODO
+});
+ */
+
 
 async function startHTTPServer(appType, appName, port) {
     const app = await appBuilder.createApp(appType);
@@ -99,8 +109,8 @@ async function init() {
     await privilegeHelpers.ensureMailtrainDir(reportFilesDir);
 
     await executor.spawn();
-    await testServer.spawn();
-    await verpServer.spawn();
+    await testServer.start();
+    await verpServer.start();
     await builtinZoneMta.spawn();
 
     await startHTTPServer(AppType.TRUSTED, 'trusted', trustedPort);
@@ -118,7 +128,7 @@ async function init() {
     triggers.start();
     gdprCleanup.start();
 
-    await postfixBounceServer.spawn();
+    await postfixBounceServer.start();
 
     await reportProcessor.init();
 
