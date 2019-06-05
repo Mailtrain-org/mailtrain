@@ -1,6 +1,6 @@
 FROM node:10.14-alpine
 
-RUN apk add --update pwgen netcat-openbsd python make gcc git g++ bash
+RUN apk add --update pwgen netcat-openbsd python make gcc git g++ bash imagemagick
 
 # First install dependencies
 COPY server/package.json /app/server/package.json
