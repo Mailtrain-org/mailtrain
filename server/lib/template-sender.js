@@ -3,6 +3,8 @@
 const mailers = require('./mailers');
 const tools = require('./tools');
 const templates = require('../models/templates');
+const { getMergeTagsForBases } = require('../../shared/templates');
+const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 
 class TemplateSender {
     constructor(options) {
@@ -27,15 +29,21 @@ class TemplateSender {
             )
         ]);
 
+        const variables = {
+            EMAIL: options.email,
+            ...getMergeTagsForBases(getTrustedUrl(), getSandboxUrl(), getPublicUrl()),
+            ...options.variables
+        };
+
         const html = tools.formatTemplate(
             template.html,
             null,
-            options.variables,
+            variables,
             true
         );
         const subject = tools.formatTemplate(
             options.subject || template.description || template.name,
-            options.variables
+            variables
         );
         return mailer.sendTransactionalMail(
             {
