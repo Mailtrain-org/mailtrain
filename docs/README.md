@@ -42,7 +42,7 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 
 ## Cons
 
-  * Beta-grade software. Might or might not work as expected. 
+  * Beta-grade software. Several users reported success with lists of various sizes (from 100k to 1M) however there is no absolute guarantee it will always work as expected.
   * Almost no documentation (there are some guides in the [Wiki](https://github.com/Mailtrain-org/mailtrain/wiki))
 
 ## Requirements
@@ -197,7 +197,7 @@ If you run Mailtrain on a VPS, you will have to find the PTR configuration somew
 
 ## Upgrade
 
-  * Replace old files with new ones by running  in the Mailtrain folder ` if you used Git to set Mailtrain up or just download [new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these
+  * Replace old files with new ones by running  in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these
   * Run `npm install --production` in the Mailtrain folder
 
 ## Using Environment Variables
