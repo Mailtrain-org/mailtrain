@@ -234,7 +234,6 @@ function reinstallAllModules {
     doForAllModules reinstallModules
 }
 
-
 function installHttpd {
     local portTrusted="$1"
     local portSandbox="$2"
@@ -443,3 +442,17 @@ EOT
 
     systemctl daemon-reload
 }
+
+
+
+function deleteModules {
+    local idx=$1
+    echo Deleting modules in $idx
+    cd $idx && rm -rf node_modules
+}
+
+function deleteAllModules {
+    doForAllModules deleteModules
+}
+
+
