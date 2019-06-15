@@ -42,7 +42,7 @@ Check out [ZoneMTA](https://github.com/zone-eu/zone-mta) as an alternative self 
 
 ## Cons
 
-  * Beta-grade software. Might or might not work as expected. There are several users with list sizes between 100k and 1M and Mailtrain seems to work for them but YMMV
+  * Beta-grade software. Several users reported success with lists of various sizes (from 100k to 1M) however there is no absolute guarantee it will always work as expected.
   * Almost no documentation (there are some guides in the [Wiki](https://github.com/Mailtrain-org/mailtrain/wiki))
 
 ## Requirements
@@ -76,13 +76,13 @@ Install script installs and sets up the following:
   * **logrotate** to rotate Mailtrain log files
   * **upstart** or **systemd** init script to automatically start and manage Mailtrain process
 
-After the install script has finished and you see a success message then you should have a Mailtrain instance running at http://yourdomain.com
+After the install script has finished and you have received "successfully installed" message,  you should have a Mailtrain instance running at http://yourdomain.com
 
 #### Next steps after installation
 
 ##### 1. Change admin password
 
-Navigate to http://yourdomain.com where yourdomain.com is the address of your server. Click on the Sign In link in the right top corner of the page. Authenticate with the following credentials:
+Navigate to http://yourdomain.com where yourdomain.com is the address of your server. Click on the **Sign In** link in the right top corner of the page. Authenticate with the following credentials:
 
   * Username: **admin**
   * Password: **test**
@@ -91,7 +91,7 @@ Once authenticated, click on your username in the right top corner of the page a
 
 ##### 2. Update page configuration
 
-If signed in navigate to http://yourdomain.com/settings and check that all email addresses and domain names are correct. Mailtrain default installation comes bundled with [ZoneMTA](https://github.com/zone-eu/zone-mta), so you should be able to send out messages right away. ZoneMTA even handles a lot of bounces (not all kind of bounces though) automatically so you do not have to change anything in the SMTP settings to get going.
+If signed in, navigate to http://yourdomain.com/settings and check that all email addresses and domain names are correct. Mailtrain default installation comes bundled with [ZoneMTA](https://github.com/zone-eu/zone-mta), so you should be able to send out messages right away. ZoneMTA even handles a lot of bounces (not all kind of bounces though) automatically so you do not have to change anything in the SMTP settings to get going.
 
 ##### 3. Set up SPF
 
@@ -103,9 +103,9 @@ If you are using the bundled ZoneMTA then you can provide a DKIM key to sign all
 
 ##### 5. Set up VERP
 
-The bundled ZoneMTA can already handle a large amount of bounces if you use it to deliver messages but not all - namely such bounces that happen *after* the recipient MX accepts the message for local delivery. This might happen for example when a user exists, so the MX accepts the message but the quota for that user is checked only when actually storing the message to users' mailbox. Then a bounce message is generated and sent to the original sender which in your case is the mail address you are sending your list messages from. You can catch these messages and mark such recipients manually as bounced but alternatively you can set up a VERP based bounce handler that does this automatically. In this case the sender on the message envelope would not be your actual address but a rewritten bounce address that points to your Mailtrain installation.
+The bundled ZoneMTA can already handle a large amount of bounces if you use it to deliver messages but not all: namely, such bounces that happen *after* the recipient MX accepts the message for local delivery. This might happen for example when a user exists, so the MX accepts the message but the quota for that user is checked only when actually storing the message to users' mailbox. Then a bounce message is generated and sent to the original sender which in your case is the mail address you are sending your list messages from. You can catch these messages and mark such recipients manually as bounced but alternatively you can set up a VERP based bounce handler that does this automatically. In this case the sender on the message envelope would not be your actual address but a rewritten bounce address that points to your Mailtrain installation.
 
-To set it up you need to create an additonal DNS MX entry for a bounce domain, eg "bounces.example.com" if you are sending from "example.com". This entry should point to your Mailtrain server IP address. Next you should enable the VERP handling in Mailtrain Settings page.
+To set it up you need to create an additonal DNS MX entry for a bounce domain, eg "bounces.example.com",if you are sending from "example.com". This entry should point to your Mailtrain server IP address. Next you should enable the VERP handling in Mailtrain Settings page.
 
 > As ZoneMTA uses envelope sender as the default for DKIM addresses, then if using VERP you need to set up DKIM to your bounce domain instead of sender domain and also store the DKIM key as "bouncedomain.selector.pem" in the ZoneMTA key folder.
 
@@ -123,7 +123,7 @@ With proper SPF, DKIM and PTR records (DMARC wouldn't hurt either) I got perfect
 
 DKIM, DMARK, SPF and PTR are DNS records which spam filters use to figure out if e-mails were really sent by you (and not by a spammer who tries to conceal his identity to be able to continue send bulks of e-mails people never subscribed for). Assuming that you use zone-mta and your e-mails are to originate from a Mailtrain installation at `mailtrain.example.com` and optionally from `mail.example.net`, to practically set all these records up you will need to:
 
-1. generate genrate a private and public DKIM key
+**1.generate  a private and public DKIM key**
 
 ```sh
 mkdir /opt/dkim-keys
@@ -133,7 +133,7 @@ openssl genrsa -out mailtrain.example.com.key 2048 # private key mailtrain.examp
 openssl rsa -in mailtrain.example.com.key -out mailtrain.example.com.pub -pubout -outform PEM # public key mailtrain.example.com.pub
 ```
 
-2. add 3 new txt records for the mailtrain.example.com that will most likely similar to the example below:
+**2.add the three new txt records for the mailtrain.example.com that will most likely look similar to the example below**
 
 ```
 default._domainkey.mailtrain.example.com     TXT    "k=rsa; p=[public key in one line];"
@@ -151,10 +151,10 @@ The above steps will have the following effect:
 
 - all messages sent by Mailtrain / Zone-mta will be signed by the DKIM Private Key (the signature becomes a part of the e-mail)
 - when a spamfilter encounters this signature, it will look for the **<DKIM selector>**._domainkey.**<DKIM domain>** TXT record, and use the public key stored there to verify that the signature is valid
-- additionally, the spamfilter will look for a TXT SPF record and will look a if the e-mail was sent from the IP address of mailtrain.example.com or mail.example.net.  If the sender IP or domain is different, it will discard the e-mail as spam.
+- additionally, the spamfilter will look for a TXT SPF record and will look  if the e-mail was sent from the IP address of mailtrain.example.com or mail.example.net.  If the sender IP or domain is different, it will discard the e-mail as spam.
 - furthermore, the spamfilter looks for the DMARC record, which tells it what to do with mails that aren't signed with DKIM or which don't have a valid signature. The example above will tell the spamfilter to reject such a mail as well.
 
-3. You are now almost set. To further confirm that you have full control over your network, the last step is to set up a PTR record, which will give the right answer for a reverse DNS lookup (answer to "what domain name is bound to IP address xxx.xxx.xxx.xxx). If you run your own DNS, you probably know it will look similar to this:
+You are now almost set. To further confirm that you have full control over your network, the last step is to set up a PTR record, which will give the right answer for a reverse DNS lookup (answer to "what domain name is bound to IP address xxx.xxx.xxx.xxx). If you run your own DNS, you probably know it will look similar to this:
 
 ```
 10.27/1.110.220.in-addr.arpa.   1800    PTR     mailtrain.example.com.
@@ -172,7 +172,7 @@ If you run Mailtrain on a VPS, you will have to find the PTR configuration somew
 #### Install:
 
 * Download Mailtrain files using git: `git clone git://github.com/Mailtrain-org/mailtrain.git` (or download [zipped repo](https://github.com/Mailtrain-org/mailtrain/archive/master.zip)) and open Mailtrain folder `cd mailtrain`
-* **Note**: depending on how you have configured your system and Docker you may need to prepend the commands below with `sudo`.
+* **Note**: depending on how you have configured your system and Docker, you may need to prepend the commands below with `sudo`.
 * Copy the file `docker-compose.override.yml.tmpl` to `docker-compose.override.yml` and modify it if you need to.
 * Bring up the stack with: `docker-compose up -d`, by default it will use the included `docker-compose.yml` file and override some configurations taken from the `docker-compose.override.yml` file.
 * If you want to use only / copy the `docker-compose.yml` file (for example, if you were deploying with Rancher), you may need to first run `docker-compose build` to make sure your system has a Docker image `mailtrain:latest`.
@@ -197,7 +197,7 @@ If you run Mailtrain on a VPS, you will have to find the PTR configuration somew
 
 ## Upgrade
 
-  * Replace old files with new ones by running in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these
+  * Replace old files with new ones by running  in the Mailtrain folder `git pull origin master` if you used Git to set Mailtrain up or just download [new files](https://github.com/Mailtrain-org/mailtrain/archive/master.zip) and replace old ones with these
   * Run `npm install --production` in the Mailtrain folder
 
 ## Using Environment Variables
@@ -273,7 +273,7 @@ If using VERP with iRedMail, see [this post](http://www.iredmail.org/forum/post4
 
 ## Testing
 
-There is a built in /dev/null server in Mailtrain that you can use to load test your installation. Check the `[testserver]` section in the configuration file for details. By default the test server is disabled. The server uses only cleartext connections, so select "Do not use encryption" in the encryption settings when setting up the server data in Mailtrain.
+There is a built in /dev/null server in Mailtrain that you can use to load-test your installation. Check the `[testserver]` section in the configuration file for details. By default, the test server is disabled. The server uses only cleartext connections, so select: "Do not use encryption" in the encryption settings when setting up the server data in Mailtrain.
 
 Additionally you can generate CSV import files with fake subscriber data:
 
@@ -285,7 +285,7 @@ This command generates a CSV file with 100 000 subscriber accounts
 
 ## Translations
 
-Mailtrain is currently not translated but it supports translations. To add translations you first need to add translation support for the translatable strings. To test if strings are translatable or not, use a fake language with code "zz"
+Mailtrain is currently not translated but it supports translations. To add translations you first need to add translation support for the translatable strings. To test if strings are translatable or not, use a fake language with the code "zz".
 
 ```toml
 language="zz"
@@ -327,10 +327,11 @@ Enclose translatable strings to `{{#translate}}` tags
 
 * To create the translation catalog run `grunt` from command line. This fetches all translatable strings from JavaScript and Handlebars files and merges these into the translation catalog located at */languages/mailtrain.pot*
 
-* To add a new language use this catalog file as source. Once you want to update your translation file from the updated catalog, then select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This would merge all new translations from the POT file to your PO file.
+* To add a new language use this catalog file as a source. Once you want to update your translation file from the updated catalog, select "Catalogue" -> "Update from POT file..." in POEdit and select mailtrain.pot. This will merge all the new translations from the POT file to your PO file.
+
  *If you have saved the PO file in [./languages](./languages) then POEdit should auto generate required MO file whenever you hit save for the PO file.
 
-* Once you have a correct MO file in the languages folder, then edit Mailtrain config and set ["language" option](https://github.com/Mailtrain-org/mailtrain/blob/ba8bd1212335cb9bd7ba094beb7b5400f35cae6c/config/default.toml#L30-L31) to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
+* Once you have a correct MO file in the languages folder, edit Mailtrain config and set ["language" option](https://github.com/Mailtrain-org/mailtrain/blob/ba8bd1212335cb9bd7ba094beb7b5400f35cae6c/config/default.toml#L30-L31) to your language name. If the value is "et" then Mailtrain loads translations from ./languages/et.mo
 
 > **NB!** For now translation settings are global, so if you have set a translation in config then this applies to all users. An user can't select another translation than the default even if there is a translation file. This is because current Mailtrain code does not provide request context to functions and the functions generating strings do not know which language to use.
 
