@@ -95,7 +95,9 @@ queue:
   processes: 5
 EOT
 
-cat >> server/services/workers/reports/config/production.yaml <<EOT
+cat > server/services/workers/reports/config/production.yaml <<EOT
+mysql:
+  host: $mySqlHost
 log:
   level: warn
 EOT

@@ -95,9 +95,7 @@ export default class CUD extends Component {
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
             },
-            onChangeBeforeValidation: {
-                data_sourceCustom_type: ::this.onCustomTemplateTypeChanged
-            }
+            onChangeBeforeValidation: ::this.onFormChangeBeforeValidation
         });
     }
 
@@ -113,9 +111,18 @@ export default class CUD extends Component {
         return id;
     }
 
-    onCustomTemplateTypeChanged(mutStateData, key, oldType, type) {
-        if (type) {
-            this.templateTypes[type].afterTypeChange(mutStateData);
+    onFormChangeBeforeValidation(mutStateData, key, oldValue, newValue) {
+        let match;
+
+        if (key === undefined || key === 'data_sourceCustom_type') {
+            if (newValue) {
+                this.templateTypes[newValue].afterTypeChange(mutStateData);
+            }
+        }
+
+        if (key === undefined || (match = key.match(/^(lists_[0-9]+_)list$/))) {
+            const prefix = match[1];
+            mutStateData.setIn([prefix + 'segment', 'value'], null);
         }
     }
 

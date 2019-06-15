@@ -1,3 +1,5 @@
+Note that some of these may be already obsolete...
+
 ### Front page
 - Some dashboard
 

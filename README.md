@@ -198,7 +198,7 @@ These are the steps to start Mailtrain via docker-compose:
 
 4. Authenticate as `admin`:`test`
 
-The instructions above use an automatically built Docker image on DockerHub (https://hub.docker.com/r/mailtrain/mailtrain). If you want to build the Docker image yourself (e.g. when doing development), use the `docker-compose-local-build.yml` located in the project's root directory.
+The instructions above use an automatically built Docker image on DockerHub (https://hub.docker.com/r/mailtrain/mailtrain). If you want to build the Docker image yourself (e.g. when doing development), use the `docker-compose-local.yml` located in the project's root directory.
 
 
 ## License
