@@ -1,1 +1,13 @@
 buildPack: javascript
+pipelineConfig:
+  pipelines:
+    pullRequest:
+      build:
+        replace: true
+        steps:
+        - command: echo "works"
+    release:
+      build:
+        replace: true
+        steps:
+        - command: echo "works"
