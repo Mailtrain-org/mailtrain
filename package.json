@@ -1,0 +1,22 @@
+{
+  "name": "pepper",
+  "version": "1.0.0",
+  "description": "Mailtrain is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/galaxycard/pepper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/galaxycard/pepper/issues"
+  },
+  "homepage": "https://github.com/galaxycard/pepper#readme"
+}
