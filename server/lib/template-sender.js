@@ -48,7 +48,8 @@ class TemplateSender {
         return mailer.sendTransactionalMail(
             {
                 to: options.email,
-                subject
+                subject,
+                attachments: options.attachments || []
             },
             {
                 html: { template: html },

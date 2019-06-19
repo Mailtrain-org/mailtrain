@@ -308,7 +308,8 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
             email: input.EMAIL,
             sendConfigurationId: input.SEND_CONFIGURATION_ID,
             subject: input.SUBJECT,
-            variables: input.VARIABLES
+            variables: input.VARIABLES,
+            attachments: input.ATTACHMENTS || []
         });
         res.status(200).json({ data: info });
     } catch (e) {
