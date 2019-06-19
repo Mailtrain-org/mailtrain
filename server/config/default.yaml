@@ -19,13 +19,13 @@ gdpr:
   # If enabled, after a user unsubscribes or complains, his/her data are removed from the subscription.
   # Only hashed email remains to prevent resubscription via import
   deleteDataAfterUnsubscribe:
-    enabled: true
+    enabled: false
     secondsAfterUnsubscribe: 86400 # 1 day
 
   # If enabled, after the time below, an entry of a subscriber that unsubscribed or complained
   # is completely removed from the subscribers list (including the hashed email)
   deleteSubscriptionAfterUnsubscribe:
-    enabled: true
+    enabled: false
     secondsAfterUnsubscribe: 2592000 # 30 days
 
 # Enabled HTML editors
@@ -42,9 +42,6 @@ defaultLanguage: en-US
 # Enabled languages
 enabledLanguages:
 - en-US
-- es-ES
-- pt-BR
-- fk-FK
 
 # Inject custom scripts in subscription/layout.mjml.hbs
 # customSubscriptionScripts: [/custom/hello-world.js]
@@ -52,7 +49,7 @@ enabledLanguages:
 
 # Enable to use Redis session cache or disable if Redis is not installed
 redis:
-  enabled: false
+  enabled: true
   host: localhost
   port: 6379
   db: 5
@@ -104,7 +101,7 @@ www:
   # Set this to true if you are serving Mailtrain as a virtual domain through Nginx or Apache
   proxy: false
   # maximum POST body size
-  postSize: 2MB
+  postSize: 20MB
 
 mysql:
   host: localhost
@@ -221,7 +218,7 @@ testServer:
   logger: false
 
 builtinZoneMTA:
-  enabled: true
+  enabled: false
   host: localhost
   port: 2525
   mongo: mongodb://127.0.0.1:27017/zone-mta
@@ -356,5 +353,3 @@ roles:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFiles, manageFiles]
-
-
