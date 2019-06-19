@@ -50,3 +50,6 @@ database:
   username: root
   password: password
   database: pepper
+
+redis:
+  host: redis-master
