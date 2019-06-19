@@ -11,3 +11,18 @@ pipelineConfig:
         replace: true
         steps:
         - command: echo "works"
+      promote:
+        replace: true
+        steps:
+        - dir: ./charts/REPLACE_ME_APP_NAME
+          steps:
+          - sh: git fetch --tags --all --prune -f
+          - sh: jx step changelog --batch-mode --version v\$(cat ../../VERSION)
+            name: changelog
+          - comment: release the helm chart
+            sh: jx step helm release
+            name: helm-release
+        - dir: ./
+          steps:
+          - sh: updatebot push-version --github-pr-label 'approved' --kind helm pepper \$VERSION
+            name: updatebot
