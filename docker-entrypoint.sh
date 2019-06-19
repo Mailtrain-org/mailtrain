@@ -85,9 +85,5 @@ log:
   level: warn
 EOT
 
-# Wait for the other services to start
-while ! nc -z $mySqlHost 3306; do sleep 1; done
-while ! nc -z $redisHost 6379; do sleep 1; done
-
 cd server
 NODE_ENV=production node index.js
