@@ -51,5 +51,5 @@ database:
   password: password
   database: pepper
 
-redis:
-  host: redis-master
+env:
+  REDIS_HOST: redis-master

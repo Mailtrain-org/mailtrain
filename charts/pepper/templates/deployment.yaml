@@ -37,6 +37,26 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: MYSQL_HOSTNAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Chart.Name }}-db-credentials"
+              key: hostname
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Chart.Name }}-db-credentials"
+              key: password
+        - name: MYSQL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Chart.Name }}-db-credentials"
+              key: username
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Chart.Name }}-db-credentials"
+              key: database
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ $pval | quote }}
