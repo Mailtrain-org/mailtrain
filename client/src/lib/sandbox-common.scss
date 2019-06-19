@@ -1,0 +1,90 @@
+$navbarHeight: 34px;
+$editorNormalHeight: 800px !default;
+
+.editor {
+  .host {
+    @if $editorNormalHeight {
+      height: $editorNormalHeight;
+    }
+  }
+}
+
+.editorFullscreen {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 1000;
+  background: white;
+  margin-top: $navbarHeight;
+
+  .navbar {
+    margin-top: -$navbarHeight;
+  }
+
+  .host {
+    height: 100%;
+  }
+}
+
+.navbar {
+  background: #f86c6b;
+  width: 100%;
+  height: $navbarHeight;
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbarLeft {
+  .logo {
+    display: inline-block;
+    height: $navbarHeight;
+    padding: 5px 0 5px 10px;
+    filter: brightness(0) invert(1);
+  }
+
+  .title {
+    display: inline-block;
+    padding: 5px 0 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    float: left;
+    color: white;
+    height: $navbarHeight;
+  }
+}
+
+.navbarRight {
+  .btn, .btnDisabled {
+    display: inline-block;
+    padding: 0px 15px;
+    line-height: $navbarHeight;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: sans-serif;
+    cursor: pointer;
+
+    &, &:not([href]):not([tabindex]) { // This is to override reboot.scss in bootstrap
+      color: white;
+    }
+  }
+
+  .btn:hover {
+    background-color: #c05454;
+    text-decoration: none;
+
+    &, &:not([href]):not([tabindex]) { // This is to override reboot.scss in bootstrap
+      color: white;
+    }
+  }
+
+  .btnDisabled {
+    cursor: default;
+
+    &, &:not([href]):not([tabindex]) { // This is to override reboot.scss in bootstrap
+      color: #621d1d;
+    }
+  }
+}

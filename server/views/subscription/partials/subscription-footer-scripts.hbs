@@ -1,0 +1,61 @@
+<script>
+    (function () {
+        var forEach = function (array, callback, scope) {
+            for (var i = 0; i < array.length; i++) {
+                callback.call(scope, i, array[i]);
+            }
+        };
+
+        forEach(document.querySelectorAll('.js-warning'), function(i, el) {
+            el.style.display = 'none';
+        });
+
+        forEach(document.querySelectorAll('a[href="#submit"]'), function(i, a) {
+            a.onclick = function() {
+                var form = document.getElementById('main-form');
+                form && form.submit();
+                return false;
+            };
+        });
+
+        if (typeof moment !== 'undefined' && moment.tz) {
+            forEach(document.querySelectorAll('.tz-detect'), function(i, el) {
+                el.value = moment.tz.guess() || '';
+            });
+        }
+
+        // Fixes MJML Button until they do ...
+        // https://github.com/mjmlio/mjml/issues/359
+
+        var btnBgColor = '{{btnBgColor}}';
+        var btnBgColorHover = '{{btnBgColorHover}}';
+
+        if (btnBgColor) {
+            var s = document.createElement('style');
+            var c = document.createTextNode(
+                '.td-btn:hover { background-color: ' + btnBgColorHover + '; }' +
+                '.td-btn { cursor: pointer !important; }' +
+                '.a-btn { background-color: transparent !important; }'
+            );
+            s.appendChild(c);
+            document.getElementsByTagName('head')[0].appendChild(s);
+            forEach(document.querySelectorAll('a'), function(i, a) {
+                if (a.parentNode.getAttribute('bgcolor') === btnBgColor) {
+                    a.target = '_self';
+                    a.className += 'a-btn';
+                    a.parentNode.className += 'td-btn';
+                    a.parentNode.onclick = function() {
+                        a.click();
+                    };
+                }
+            });
+        }
+    })();
+</script>
+
+<!-- custom scripts from config -->
+{{#each customSubscriptionScripts}}
+    <script src="{{this}}"></script>
+{{/each}}
+
+{{> tracking_scripts}}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="Self hosted email newsletter app">
+    <link rel="shortcut icon" href="{{publicPath}}static/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="{{publicPath}}static/favicon.ico">
+
+    <title>Mailtrain</title>
+
+    <link rel="stylesheet" href="{{publicPath}}client/mailtrain.css">
+
+    <script src="{{publicPath}}static-npm/jquery.min.js"></script>
+    <script src="{{publicPath}}static-npm/popper.min.js"></script>
+    <script src="{{publicPath}}static-npm/bootstrap.min.js"></script>
+    <script src="{{publicPath}}static-npm/coreui.min.js"></script>
+
+    {{#if mailtrainConfig}}
+        <script>
+            {{#if reactCsrfToken}}window.csrfToken = '{{reactCsrfToken}}';{{/if}}
+            window.mailtrainConfig = {{{mailtrainConfig}}};
+        </script>
+
+        {{#each scriptFiles}}
+            <script src="{{this}}"></script>
+        {{/each}}
+    {{/if}}
+</head>
+
+<body>
+{{{body}}}
+</body>
+
+</html>

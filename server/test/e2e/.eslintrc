@@ -1,0 +1,13 @@
+{
+  "parser": "babel-eslint",
+  "rules": {
+      "strict": 0,
+      "no-console": 0,
+      "comma-dangle": 0,
+      "arrow-body-style": 0,
+      "no-await-in-loop": 0
+  },
+  "env": {
+      "mocha": true
+  }
+}

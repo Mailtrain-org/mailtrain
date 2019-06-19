@@ -1,0 +1,22 @@
+{
+    "name": "mailtrain-zone-mta",
+    "private": true,
+    "version": "1.0.0",
+    "description": "Mailtrain builtin ZoneMTA instance",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js --config=config/zonemta.js"
+    },
+    "keywords": [],
+    "license": "GPL-3.0",
+    "homepage": "https://mailtrain.org/",
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "dependencies": {
+        "zone-mta": "^1.16.0",
+        "zonemta-delivery-counters": "^1.0.1",
+        "zonemta-limiter": "^1.0.0",
+        "zonemta-loop-breaker": "^1.0.2"
+    }
+}

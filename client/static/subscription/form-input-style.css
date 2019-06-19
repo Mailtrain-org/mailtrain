@@ -1,0 +1,216 @@
+/* --- Colors ----------
+
+Input Border: #DCE4EC
+Input Group:  #FAFAFA
+Muted:        #999999
+Anchor:       #1F68D5
+Alerts:       ...
+
+*/
+
+/* --- General -------- */
+
+form {
+  margin: .5em 0 1em;
+}
+
+.form-group {
+    margin-bottom: 1.2em;
+    box-sizing: border-box;
+}
+
+input,
+select,
+textarea {
+    margin-bottom: 0;
+}
+
+label {
+    display: block;
+    font-size: 1em;
+    font-weight: 700;
+    margin-bottom: .3em;
+}
+
+.label-checkbox,
+.label-radio {
+    font-weight: normal;
+    font-size: .9em;
+}
+
+.label-inline {
+    display: inline-block;
+    font-weight: normal;
+    margin-left: .3em;
+}
+
+
+/* --- Inputs ------------- */
+
+input[type='email'],
+input[type='number'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='text'],
+input[type='url'],
+textarea,
+select {
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+    background-color: transparent;
+    border: 2px solid #DCE4EC;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
+    height: 2.8em;
+    padding: .3em .7em;
+    width: 100%;
+    font-size: 1.2em;
+    font-style: inherit;
+}
+
+input[type='email']:focus,
+input[type='number']:focus,
+input[type='password']:focus,
+input[type='search']:focus,
+input[type='tel']:focus,
+input[type='text']:focus,
+input[type='url']:focus,
+textarea:focus,
+select:focus {
+    border-color: #2D3E4F;
+    outline: 0;
+}
+
+input[readonly] {
+    color: #999999;
+}
+input[readonly]:focus {
+    border-color: #DCE4EC;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    margin-bottom: 0;
+    margin-right: .2em;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+    display: inline;
+}
+
+select {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 0 29 14" width="29"><path fill="#d1d1d1" d="M9.37727 3.625l5.08154 6.93523L19.54036 3.625"/></svg>') center right no-repeat;
+    padding-right: 2em;
+}
+
+select:focus {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 0 29 14" width="29"><path fill="#2D3E4F" d="M9.37727 3.625l5.08154 6.93523L19.54036 3.625"/></svg>');
+}
+
+textarea {
+    min-height: 8em;
+    max-width: 100%;
+}
+
+/* --- Input Group --------- */
+
+.input-group {
+    position: relative;
+}
+
+.input-group-addon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: #FAFAFA;
+    height: 100%;
+    padding: 0 .75em;
+    border: 2px solid #DCE4EC;
+    box-sizing: border-box;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.input-group-addon > * {
+    line-height: 2.8em;
+}
+
+
+/* --- Alerts ------------- */
+
+.alert {
+    margin: 22px auto 0;
+    padding: 15px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 21px;
+    box-sizing: border-box;
+}
+
+.alert-dismissible .close {
+    display: none;
+}
+
+.alert-success { color: #397740; background-color: #DEF0D9; border-color: #CFEAC8; }
+.alert-info    { color: #33708E; background-color: #D9EDF6; border-color: #BCDFF0; }
+.alert-warning { color: #8A6D3F; background-color: #FCF8E4; border-color: #F9F2CE; }
+.alert-danger  { color: #AA4144; background-color: #F2DEDE; border-color: #EBCCCC; }
+
+
+/* --- GPG Key ------------- */
+
+.form-group.gpg > label {
+    display: inline-block;
+}
+
+.btn-download-pubkey,
+.btn-download-pubkey:focus,
+.btn-download-pubkey:active {
+    background: none;
+    border: none;
+    display: block;
+    font: inherit;
+    font-size: .8em;
+    margin: .3em 0 0;
+    padding: 0;
+    outline: none;
+    outline-offset: 0;
+    color: #1F68D5;
+    cursor: pointer;
+    text-transform: none;
+    height: auto;
+    float: right;
+}
+
+.btn-download-pubkey:hover {
+    text-decoration: underline;
+}
+
+.gpg-text {
+    font-family: monospace;
+    font-size: .8em;
+}
+
+
+/* --- Other ------------- */
+
+.help-block {
+    display: block;
+    font-size: .9em;
+    line-height: 1;
+    color: #999999;
+}
+
+form a {
+    color: #1F68D5;
+    text-decoration: none;
+}
+
+form a:hover {
+    text-decoration: underline;
+}

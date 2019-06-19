@@ -1,0 +1,16 @@
+<mj-section>
+    <mj-column>
+        <mj-text mj-class="h3">
+            Update Your Preferences
+        </mj-text>
+        <mj-text>
+{{> subscription_manage_form}}<!-- don't indent me! -->
+        </mj-text>
+        <mj-button mj-class="button" href="#submit">
+            Update Profile
+        </mj-button>
+        <mj-text mj-class="p">
+            <a href="/subscription/{{lcid}}/unsubscribe/{{cid}}">Unsubscribe</a>
+        </mj-text>
+    </mj-column>
+</mj-section>

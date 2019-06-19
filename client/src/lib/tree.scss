@@ -1,0 +1,92 @@
+@import "../scss/variables.scss";
+
+:global {
+
+.mt-treetable-container .fancytree-container {
+    border: none;
+}
+
+.mt-treetable-container span.fancytree-expander {
+    color: #333333;
+}
+
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td,
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active:hover>td,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title:hover,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active:hover span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node span.fancytree-title:hover {
+    background-color: transparent;
+}
+
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node span.fancytree-title {
+    cursor: default;
+}
+
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title:hover {
+    border-color: transparent;
+}
+
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable>table.fancytree-ext-table.fancytree-container>tbody>tr.fancytree-active>td span.fancytree-expander,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container span.fancytree-node.fancytree-active span.fancytree-title,
+.mt-treetable-container.mt-treetable-inactivable .fancytree-container>tbody>tr.fancytree-active>td {
+    outline: 0px none;
+    color: #333333;
+}
+
+.mt-treetable-container span.fancytree-node span.fancytree-expander:hover {
+    color: inherit;
+}
+
+.mt-treetable-container {
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+
+.mt-treetable-container>table.fancytree-ext-table {
+    margin-bottom: 0px;
+}
+
+.mt-treetable-container.mt-treetable-noheader>.table>tbody>tr>td {
+    border-top: 0px none;
+}
+
+.mt-treetable-container .mt-treetable-title {
+    min-width: 150px;
+}
+
+
+
+.form-group .mt-treetable-container {
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+    padding-top: $input-padding-y;
+    padding-bottom: $input-padding-y;
+
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.form-group .mt-treetable-container.is-valid {
+    border-color: $form-feedback-valid-color;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+}
+
+.form-group .mt-treetable-container.is-invalid {
+    border-color: $form-feedback-invalid-color;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+}
+
+.mt-treetable-container .table td {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+}

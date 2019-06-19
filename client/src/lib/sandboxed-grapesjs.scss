@@ -1,0 +1,18 @@
+@import "sandbox-common";
+
+:global .grapesjs-body {
+  margin: 0px;
+}
+
+:global .gjs-editor-cont {
+  position: absolute;
+}
+
+:global .gjs-devices-c .gjs-devices {
+  padding-right: 15px;
+}
+
+:global .gjs-pn-devices-c, :global .gjs-pn-views {
+  padding: 4px;
+}
+

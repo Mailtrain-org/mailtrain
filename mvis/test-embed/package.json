@@ -1,0 +1,20 @@
+{
+  "name": "test-embed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Tomas Bures",
+  "license": "MIT",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.15.2",
+    "handlebars": "^4.0.11",
+    "hbs": "^4.0.1"
+  }
+}

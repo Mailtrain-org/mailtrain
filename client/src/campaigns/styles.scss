@@ -1,0 +1,103 @@
+.entry {
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 15px;
+  min-height: 91px;
+  position: relative;
+
+  &:last-child {
+    border-bottom: 0px none;
+    margin-bottom: 0px;
+  }
+
+  .entryButtons {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 19px;
+
+    button {
+      padding: 2px 3px;
+      font-size: 11px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    button:last-child {
+      margin-bottom: 0px;
+    }
+  }
+
+  &.entryWithButtons > .entryContent {
+    margin-right: 26px;
+  }
+}
+
+.newEntry {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.sendButtonRow {
+  margin-top: 10px;
+}
+
+.statsMetrics {
+  width: 10ex;
+  display: inline-block;
+}
+
+.statsProgressBar {
+  margin-right: 30px;
+  margin-bottom: 0px;
+}
+
+.statsProgressBarZoomIn {
+  float: right;
+  width: 30px;
+  text-align: right;
+  display: block;
+}
+
+.zoomIn {
+  padding-left: 15px;
+}
+
+.navPills {
+  margin-top: -3px;
+  margin-bottom: 5px;
+  float: right;
+
+  & > li {
+    display: inline-block;
+    float: none;
+
+    & > a {
+      padding: 3px 10px;
+    }
+  }
+}
+
+.charts {
+  margin-bottom: 30px;
+
+  .chart {
+    margin-bottom: 30px;
+  }
+}
+
+.sectionTitle {
+  margin-bottom: 30px;
+}
+
+.overrideCheckbox{
+  margin-top: -8px !important;
+}
+
+.tblCol_id {
+  min-width: 5ex;
+  max-width: 8ex;
+}
+
+.tblCol_buttons {
+  min-width: 5.8rem;
+}

@@ -1,0 +1,185 @@
+@import "../scss/variables.scss";
+
+.toolbar {
+  float: right;
+  margin-bottom: 15px;
+}
+
+.form { // This is here to give the styles below higher priority than Bootstrap has
+  :global .DayPicker {
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+    padding: $input-padding-y $input-padding-x;
+  }
+
+  :global .form-horizontal .control-label {
+    display: block;
+  }
+
+  :global .form-control[disabled] {
+    cursor: default;
+    background-color: #eeeeee;
+    opacity: 1;
+  }
+
+  :global .ace_editor {
+    border: 1px solid #ccc;
+  }
+
+  .buttonRow:last-child {
+    // This is to move Save/Delete buttons a bit down
+    margin-top: 15px;
+  }
+}
+
+.staticFormGroup {
+  margin-bottom: 15px;
+}
+
+.dayPickerWrapper {
+  text-align: right;
+}
+
+.buttonRow {
+}
+
+.buttonRow > * {
+  margin-right: 15px;
+}
+
+.buttonRow > *:last-child {
+  margin-right: 0px;
+}
+
+.formDisabled {
+  background-color: #eeeeee;
+  opacity: 1;
+}
+
+.formStatus {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.dataTableTable {
+  overflow-x: auto;
+}
+
+.actionLinks > * {
+  margin-right: 8px;
+}
+
+.actionLinks > *:last-child {
+  margin-right: 0px;
+}
+
+.tableSelectDropdown {
+  margin-bottom: 15px;
+}
+
+.tableSelectTable.tableSelectTableHidden {
+  display: none;
+  height: 0px;
+  margin-top: -15px;
+}
+
+.tableSelectDropdown input[readonly] {
+  background-color: white;
+}
+
+:global h3.legend {
+  font-size: 21px;
+  margin-bottom: 20px;
+}
+
+.tertiaryNav {
+  justify-content: flex-end;
+  flex-grow: 1;
+  align-self: center;
+
+  margin-left: 5px;
+  margin-right: 5px;
+
+  :global .nav-item .nav-link {
+    padding: 3px 10px;
+  }
+}
+
+.colorPickerSwatchWrapper {
+  padding: 7px;
+  background: #fff;
+  border: 1px solid #AAB2BD;
+  border-radius: 4px;
+  display: inline-block;
+  cursor: pointer;
+
+  .colorPickerSwatchColor {
+    width: 60px;
+    height: 18px;
+    borderRadius: 2px;
+  }
+}
+
+.colorPickerWrapper {
+  text-align: right;
+}
+
+.checkboxText{
+  padding-top: 3px;
+}
+
+.dropZone{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 3px;
+  margin-top: 3px;
+  border: 2px solid #E6E9ED;
+  border-radius: 5px;
+  background-color: #FAFAD2;
+  text-align: center;
+  font-size: 20px;
+  color: #808080;
+
+  p:last-child {
+    margin-bottom: 0px;
+  }
+}
+
+.dropZoneActive{
+  border-color: #90EE90;
+  color: #000;
+  background-color: #DDFFDD;
+}
+
+
+.untrustedContent {
+  border: 0px none;
+  width: 100%;
+  overflow: hidden;
+}
+
+.withElementInFullscreen {
+  height: 0px;
+  overflow: hidden;
+}
+
+.iconDisabled {
+  color: $link-color;
+  text-decoration: $link-decoration;
+}
+
+.errorsList {
+  margin-bottom: 0px;
+}
+
+
+:global .modal-dialog {
+  @media (min-width: 768px) {
+    max-width: 700px;
+  }
+
+  @media (min-width: 1000px) {
+    max-width: 900px;
+  }
+}
+

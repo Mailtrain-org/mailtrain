@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="Self hosted email newsletter app">
+    <link rel="shortcut icon" href="{{publicPath}}static/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="{{publicPath}}static/favicon.ico">
+
+    <title>Mailtrain</title>
+
+    <script src="{{publicPath}}static/mosaico/rs/mosaico-libs-and-tinymce.min.js?v=0.17.5"></script>
+    <script src="{{publicPath}}static/mosaico/rs/mosaico.min.js?v=0.17.5"></script>
+
+    {{#if languageStrings}}<script> window.mosaicoLanguageStrings = {{{languageStrings}}}; </script>{{/if}}
+    <script> window.mosaicoPlugins = []; </script>
+    <script> window.mosaicoHTMLPostRenderers = []; </script>
+
+    {{#if editorConfig.customscripts}}
+        {{#each editorConfig.customscripts}}
+            <script src="{{this}}"></script>
+        {{/each}}
+    {{/if}}
+
+    <script>
+        window.csrfToken = '{{reactCsrfToken}}';
+        window.mailtrainConfig = {{{mailtrainConfig}}};
+    </script>
+
+    {{#each scriptFiles}}
+        <script src="{{this}}"></script>
+    {{/each}}
+
+    <link rel="stylesheet" href="{{publicPath}}static/mosaico/rs/mosaico-libs-and-tinymce.min.css?v=0.17.5" />
+    <link rel="stylesheet" href="{{publicPath}}static/mosaico/rs/mosaico-material.min.css?v=0.17.5" />
+</head>
+<body class="mo-standalone">
+{{{body}}}
+</body>
+</html>
+

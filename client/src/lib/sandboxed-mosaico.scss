@@ -1,0 +1,8 @@
+@import "sandbox-common";
+
+:global .mo-standalone {
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  position: absolute;
+}

@@ -1,0 +1,152 @@
+$desktopMinWidth: 768px;
+
+$mobileLeftPaneResidualWidth: 0px;
+$mobileAnimationStartPosition: 100px;
+
+$desktopLeftPaneResidualWidth: 200px;
+$desktopAnimationStartPosition: 300px;
+
+@mixin optionsHidden {
+  transform: translateX($mobileAnimationStartPosition);
+  @media (min-width: $desktopMinWidth) {
+    transform: translateX($desktopAnimationStartPosition);
+  }
+}
+
+@mixin optionsVisible {
+  transform: translateX($mobileLeftPaneResidualWidth);
+  @media (min-width: $desktopMinWidth) {
+    transform: translateX($desktopLeftPaneResidualWidth);
+  }
+}
+
+.toolbar {
+  text-align: right;
+}
+
+.ruleActionLink {
+  padding-right: 5px;
+}
+
+.rulePane {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+
+  .leftPane {
+    display: inline-block;
+    width: 100%;
+    margin-right: -100%;
+
+    .leftPaneInner {
+      .ruleTree {
+        background: #fbfbfb;
+        border: #cfcfcf 1px solid;
+        border-radius: 4px;
+        padding: 10px 0px;
+        margin-top: 15px;
+        margin-bottom: 30px;
+
+        // Without this, the placeholders when rearranging the tree are not shown
+        position: relative;
+        z-index: 0;
+      }
+    }
+
+    .leftPaneOverlay {
+      display: none;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      height: 100%;
+      z-index: 1;
+
+      width: $mobileLeftPaneResidualWidth;
+      @media (min-width: $desktopMinWidth) {
+        width: $desktopLeftPaneResidualWidth;
+      }
+    }
+
+    .paneDivider {
+      display: block;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+      background: url('./divider.png') repeat-y;
+
+      @include optionsHidden;
+
+      padding-left: 50px;
+      z-index: 1;
+
+      opacity: 0;
+      visibility: hidden;
+
+      .paneDividerSolidBackground {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: white;
+      }
+    }
+  }
+
+  .rightPane {
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+    z-index: 2;
+    position: relative;
+
+    @include optionsHidden;
+
+    opacity: 0;
+    visibility: hidden;
+
+    .rightPaneInner {
+      margin-right: $mobileLeftPaneResidualWidth;
+      @media (min-width: $desktopMinWidth) {
+        margin-right: $desktopLeftPaneResidualWidth;
+      }
+
+      .ruleOptions {
+        margin-left: 60px;
+      }
+    }
+  }
+
+  &.ruleOptionsVisible {
+    .leftPaneOverlay {
+      display: block;
+    }
+
+    .paneDivider {
+      transition: transform 300ms ease-out, opacity 100ms ease-out;
+      opacity: 1;
+      visibility: visible;
+
+      @include optionsVisible;
+    }
+
+    .rightPane {
+      transition: transform 300ms ease-out, opacity 100ms ease-out;
+      opacity: 1;
+      visibility: visible;
+
+      @include optionsVisible;
+    }
+  }
+
+  &.ruleOptionsHidden {
+    .paneDivider {
+      transition: visibility 0s linear 300ms, transform 300ms ease-in, opacity 100ms ease-in 200ms;
+    }
+
+    .rightPane {
+      transition: visibility 0s linear 300ms, transform 300ms ease-in, opacity 100ms ease-in 200ms;
+    }
+  }
+
+}

@@ -1,0 +1,23 @@
+{
+  "name": "mailtrain-ivis-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Tomas Bures",
+  "license": "MIT",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "dependencies": {
+    "axios": "^0.18.0",
+    "js-yaml": "^3.12.0",
+    "knex": "^0.16.3",
+    "moment": "^2.18.1",
+    "moment-timezone": "^0.5.21",
+    "mysql": "^2.16.0",
+    "npmlog": "^4.0.2"
+  }
+}

@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400i,700,700i|Ubuntu:300,300i,400,400i,700,700i&subset=latin-ext');
+
+$font-family-sans-serif: 'Ubuntu', sans-serif;
+$font-family-monospace: 'Ubuntu Mono', monospace;
+
+$fa-font-path: "../static-npm/fontawesome";
+$enable-print-styles: false;
+
+@import "./variables.scss";
+@import "node_modules/@coreui/coreui/scss/coreui.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+
+.custom-select {
+  -webkit-appearance: none; // This is a fix for Chrome
+}
+
+body.mailtrain {
+  background-color: white;
+
+  &.sandbox {
+    overflow-x: hidden;
+  }
+
+  &.inside-iframe {
+    overflow: hidden;
+  }
+
+  .sandbox-loading-message {
+    // The 40 px below corresponds to the height in in UntrustedContentHost.render
+    height: 40px;
+  }
+
+  .dropdown-item {
+    border-bottom: none 0px;
+  }
+
+  .mt-breadcrumb-and-tertiary-navbar {
+    display: flex;
+    border-radius: 0;
+    @include border-radius($breadcrumb-border-radius);
+    @include borders($breadcrumb-borders);
+    background-color: $breadcrumb-bg;
+
+    .breadcrumb {
+      border: 0px none;
+      margin-bottom: 0px;
+      padding-top: 11px;
+      padding-bottom: 12px;
+    }
+
+    margin-bottom: 1.5rem;
+  }
+
+  @include media-breakpoint-down(md) {
+    .app-header {
+      position: relative;
+    }
+
+    .app-body {
+      margin-top: 0px;
+    }
+  }
+
+  .app-header {
+
+    .navbar {
+      padding: 0 15px;
+
+      .navbar-brand {
+        // width: $sidebar-width - 30px;
+        width: 130px; // We don't use sidebar yet, so no need to align with it.
+
+        justify-content: left;
+
+        @include media-breakpoint-down(md) {
+          // This is to keep the title and the menu buttons in order. Normally the brand is position: absolute which distorts the order
+          position: relative;
+          top: auto;
+          left: auto;
+          margin: 0px;
+        }
+      }
+    }
+
+    @include media-breakpoint-down(md) {
+      .navbar-toggler {
+        color: #fff;
+        height: 35px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+    }
+
+    .navbar-toggler {
+      .navbar-toggler-icon, &:hover .navbar-toggler-icon {
+        background-image: $navbar-dark-toggler-icon-bg;
+      }
+    }
+
+    .navbar-nav {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    .mt-navbar-nav-right {
+      @include media-breakpoint-up(lg) {
+        flex-grow: 1;
+        justify-content: flex-end;
+      }
+
+      .nav-item {
+        .nav-link {
+          padding: 0px;
+        }
+
+        @include media-breakpoint-up(lg) {
+          margin-left: 15px;
+        }
+
+        @include media-breakpoint-down(md) {
+          margin-right: 15px;
+
+          .dropdown-menu-right {
+            right: auto;
+            left: 0;
+          }
+        }
+      }
+    }
+
+    .mt-navbar-nav-left {
+      @include media-breakpoint-up(lg) {
+        margin-left: 15px;
+      }
+
+      .nav-item {
+        margin-right: 15px;
+      }
+    }
+
+    .nav-item {
+      min-width: 0px;
+    }
+  }
+
+  .main .container-fluid {
+    padding: 0 15px;
+
+    @include media-breakpoint-down(md) {
+      padding: 0 3px;
+    }
+  }
+
+  .navbar-dark {
+    .navbar-nav {
+      .active > .nav-link:hover {
+        color: $navbar-dark-active-color;
+      }
+    }
+  }
+}
+
+.gpg-text {
+  font-family: monospace;
+}
+

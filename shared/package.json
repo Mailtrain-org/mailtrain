@@ -1,0 +1,38 @@
+{
+  "name": "mailtrain-shared",
+  "version": "2.0.0",
+  "description": "Self hosted email newsletter app - shared lib",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Mailtrain-org/mailtrain.git"
+  },
+  "license": "GPL-3.0",
+  "homepage": "https://mailtrain.org/",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "dependencies": {
+    "moment": "^2.23.0",
+    "moment-timezone": "^0.5.25",
+    "owasp-password-strength-test": "github:bures/owasp-password-strength-test"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-decorators": "^7.2.3",
+    "@babel/plugin-proposal-function-bind": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "css-loader": "^2.1.0",
+    "file-loader": "^3.0.1",
+    "node-sass": "^4.11.0",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "url-loader": "^1.1.2",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.0"
+  }
+}

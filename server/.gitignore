@@ -1,0 +1,7 @@
+/config/development.*
+/config/production.*
+/config/test.*
+/services/workers/reports/config/development.*
+/services/workers/reports/config/production.*
+/services/workers/reports/config/test.*
+/files

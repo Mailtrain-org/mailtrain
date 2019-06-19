@@ -1,0 +1,58 @@
+{{- if .Values.knativeDeploy }}
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+{{- if .Values.service.name }}
+  name: {{ .Values.service.name }}
+{{- else }}
+  name: {{ template "fullname" . }}
+{{- end }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            env:
+            - name: MAUTIC_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Chart.Name }}-db-credentials"
+                  key: hostname
+            - name: MAUTIC_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Chart.Name }}-db-credentials"
+                  key: username
+            - name: MAUTIC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Chart.Name }}-db-credentials"
+                  key: password
+            - name: MAUTIC_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Chart.Name }}-db-credentials"
+                  key: database
+{{- range $pkey, $pval := .Values.env }}
+            - name: {{ $pkey }}
+              value: {{ $pval }}
+{{- end }}
+            livenessProbe:
+              httpGet:
+                path: {{ .Values.probePath }}
+              initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+              periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+              successThreshold: {{ .Values.livenessProbe.successThreshold }}
+              timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            readinessProbe:
+              httpGet:
+                path: {{ .Values.probePath }}
+              periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+              successThreshold: {{ .Values.readinessProbe.successThreshold }}
+              timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+{{- end }}

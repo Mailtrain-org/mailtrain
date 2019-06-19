@@ -1,0 +1,52 @@
+# Default values for node projects.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+image:
+  repository: draft
+  tag: dev
+  pullPolicy: IfNotPresent
+service:
+  name: pepper
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 3000
+  annotations: {}
+sandboxService:
+  name: pepper-sandbox
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 3003
+  annotations: {}
+publicService:
+  name: emails
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 3004
+  annotations: {}
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+probePath: /
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+terminationGracePeriodSeconds: 10
+
+knativeDeploy: false
+
+database:
+  hostname: localhost
+  username: root
+  password: password
+  database: pepper
