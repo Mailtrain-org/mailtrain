@@ -9,11 +9,6 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
   replicas: {{ .Values.replicaCount }}
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -24,22 +19,14 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
-      volumes:
-      - name: config
-        secret:
-          secretName: {{ template "fullname" . }}
       containers:
       - name: {{ .Chart.Name }}
-        volumeMounts:
-          - readOnly: true
-            mountPath: server/config
-            name: config
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
-          value: {{ $pval | quote }}
+          value: {{ $pval }}
 {{- end }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}

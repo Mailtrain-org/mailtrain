@@ -18,26 +18,6 @@ spec:
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             env:
-            - name: MAUTIC_DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Chart.Name }}-db-credentials"
-                  key: hostname
-            - name: MAUTIC_DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Chart.Name }}-db-credentials"
-                  key: username
-            - name: MAUTIC_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Chart.Name }}-db-credentials"
-                  key: password
-            - name: MAUTIC_DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Chart.Name }}-db-credentials"
-                  key: database
 {{- range $pkey, $pval := .Values.env }}
             - name: {{ $pkey }}
               value: {{ $pval }}
@@ -55,4 +35,6 @@ spec:
               periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
               successThreshold: {{ .Values.readinessProbe.successThreshold }}
               timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            resources:
+{{ toYaml .Values.resources | indent 14 }}
 {{- end }}

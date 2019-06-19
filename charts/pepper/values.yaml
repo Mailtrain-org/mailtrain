@@ -6,31 +6,28 @@ image:
   repository: draft
   tag: dev
   pullPolicy: IfNotPresent
+
+# define environment variables here as a map of key: value
+env:
+
+# enable this flag to use knative serve to deploy the app
+knativeDeploy: false
+
 service:
   name: pepper
   type: ClusterIP
   externalPort: 80
-  internalPort: 3000
-  annotations: {}
-sandboxService:
-  name: pepper-sandbox
-  type: ClusterIP
-  externalPort: 80
-  internalPort: 3003
-  annotations: {}
-publicService:
-  name: emails
-  type: ClusterIP
-  externalPort: 80
-  internalPort: 3004
-  annotations: {}
+  internalPort: 8080
+  annotations:
+    fabric8.io/expose: "true"
+    fabric8.io/ingress.annotations: "kubernetes.io/ingress.class: nginx"
 resources:
   limits:
-    cpu: 2000m
-    memory: 2Gi
+    cpu: 400m
+    memory: 256Mi
   requests:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 200m
+    memory: 128Mi
 probePath: /
 livenessProbe:
   initialDelaySeconds: 60
@@ -41,12 +38,3 @@ readinessProbe:
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 1
-terminationGracePeriodSeconds: 10
-
-knativeDeploy: false
-
-database:
-  hostname: localhost
-  username: root
-  password: password
-  database: pepper
