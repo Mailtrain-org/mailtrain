@@ -1,0 +1,33 @@
+{{- if .Values.knativeDeploy }}
+{{- else }}
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.sandboxService.name }}
+  name: {{ .Values.sandboxService.name }}
+{{- else }}
+  name: {{ template "fullname" . }}
+{{- end }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+{{- if (not .Values.sandboxService.prometheusAnnotations) and (not .Values.sandboxService.annotations) }}
+  annotations: {}
+{{- else }}
+  annotations:
+{{- if .Values.sandboxService.annotations }}
+{{ toYaml .Values.sandboxService.annotations | indent 4 }}
+{{- end }}
+{{- if .Values.sandboxService.prometheusAnnotations }}
+{{ toYaml .Values.sandboxService.prometheusAnnotations | indent 4 }}
+{{- end }}
+{{- end }}
+spec:
+  type: {{ .Values.sandboxService.type }}
+  ports:
+  - port: {{ .Values.sandboxService.externalPort }}
+    targetPort: {{ .Values.sandboxService.internalPort }}
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ template "fullname" . }}
+{{- end }}
