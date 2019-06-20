@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.service.name }}
+  annotations:
+    configmap.fabric8.io/update-on-change: {{ template "fullname" . }}
+    expose.config.fabric8.io/url-key: url

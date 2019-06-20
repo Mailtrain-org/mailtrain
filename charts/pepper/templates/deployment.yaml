@@ -29,6 +29,21 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: PUBLIC_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.publicService.name }}
+              key: url
+        - name: SANDBOX_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.sandboxService.name }}
+              key: url
+        - name: TRUSTED_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.service.name }}
+              key: url
         - name: MYSQL_HOSTNAME
           valueFrom:
             secretKeyRef:
