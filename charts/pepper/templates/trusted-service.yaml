@@ -10,16 +10,8 @@ metadata:
 {{- end }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-{{- if (not .Values.service.prometheusAnnotations) and (not .Values.service.annotations) }}
-  annotations: {}
-{{- else }}
-  annotations:
 {{- if .Values.service.annotations }}
 {{ toYaml .Values.service.annotations | indent 4 }}
-{{- end }}
-{{- if .Values.service.prometheusAnnotations }}
-{{ toYaml .Values.service.prometheusAnnotations | indent 4 }}
-{{- end }}
 {{- end }}
 spec:
   type: {{ .Values.service.type }}
