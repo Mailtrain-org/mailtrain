@@ -139,7 +139,7 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
     try {
         if (list.send_configuration) {
             const mailer = await mailers.getOrCreateMailer(list.send_configuration);
-            await mailer.sendTransactionalMail({
+            await mailer.sendTransactionalMailBasedOnTemplate({
                 to: {
                     name: getDisplayName(flds, subscription),
                     address: email

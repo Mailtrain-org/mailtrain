@@ -19,6 +19,8 @@ const lists = require('./lists');
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
 
+const TEST_USERS_LIST_LIMIT = 1000;
+
 const fieldTypes = {};
 
 const Cardinality = {
@@ -407,6 +409,32 @@ async function list(context, listId, grouped, offset, limit) {
             total: count
         };
     });
+}
+
+async function listTestUsersTx(tx, context, listId, segmentId, grouped) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+
+    let entitiesQry = tx(getSubscriptionTableName(listId)).orderBy('id', 'asc').where('is_test', true).limit(TEST_USERS_LIST_LIMIT);
+
+    if (segmentId) {
+        const addSegmentQuery = await segments.getQueryGeneratorTx(tx, listId, segmentId);
+
+        entitiesQry = entitiesQry.where(function() {
+            addSegmentQuery(this);
+        });
+    }
+
+    const entities = await entitiesQry;
+
+    if (grouped) {
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
+
+        for (const entity of entities) {
+            groupSubscription(groupedFieldsMap, entity);
+        }
+    }
+
+    return entities;
 }
 
 // Note that this does not do all the work in the transaction. Thus it is prone to fail if the list is deleted in during the run of the function
@@ -855,6 +883,7 @@ module.exports.getByEmail = getByEmail;
 module.exports.list = list;
 module.exports.listIterator = listIterator;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listTestUsersTx = listTestUsersTx;
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
 module.exports.serverValidate = serverValidate;
 module.exports.create = create;

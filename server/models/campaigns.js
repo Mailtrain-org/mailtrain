@@ -21,12 +21,14 @@ const {LinkId} = require('./links');
 const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
+const {CampaignSender, MessageType} = require('../lib/campaign-sender');
+const lists = require('./lists');
 
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
-    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
+    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
 const allowedKeysCreateRssEntry = new Set(['type', 'source', 'parent', ...allowedKeysCommon]);
@@ -168,7 +170,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
             let subsQry;
 
             if (subsQrys.length === 1) {
-                const subsUnionSql = '(' + subsQrys[0].sql + ') as `test_subscriptions`'
+                const subsUnionSql = '(' + subsQrys[0].sql + ') as `test_subscriptions`';
                 subsQry = knex.raw(subsUnionSql, subsQrys[0].bindings);
 
             } else {
@@ -342,7 +344,7 @@ async function rawGetByTx(tx, key, id) {
         .groupBy('campaigns.id')
         .select([
             'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
-            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject_override',
+            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject',
             'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
             'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks',
             knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
@@ -632,21 +634,32 @@ async function remove(context, id) {
     });
 }
 
-async function enforceSendPermissionTx(tx, context, campaignId) {
+async function enforceSendPermissionTx(tx, context, campaignOrCampaignId, isToTestUsers, listId) {
     let campaign;
 
-    if (typeof campaignId === 'object') {
-        campaign = campaignId;
+    if (typeof campaignOrCampaignId === 'object') {
+        campaign = campaignOrCampaignId;
     } else {
-        campaign = await getByIdTx(tx, context, campaignId, false);
+        campaign = await getByIdTx(tx, context, campaignOrCampaignId, false);
     }
 
     const sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), campaign.send_configuration, false, false);
 
-    const requiredPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
+    const requiredSendConfigurationPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
+    await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', campaign.send_configuration, requiredSendConfigurationPermission);
 
-    await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', campaign.send_configuration, requiredPermission);
-    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, 'send');
+    const requiredListAndCampaignPermission = isToTestUsers ? 'sendToTestUsers' : 'send';
+
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, requiredListAndCampaignPermission);
+
+    if (listId) {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, requiredListAndCampaignPermission);
+
+    } else {
+        for (const listIds of campaign.lists) {
+            await shares.enforceEntityPermissionTx(tx, context, 'list', listIds.list, requiredListAndCampaignPermission);
+        }
+    }
 }
 
 
@@ -845,12 +858,9 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId) {
 
 async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, scheduled = null) {
     await knex.transaction(async tx => {
-        const entity = await tx('campaigns').where('id', campaignId).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
+        const entity = await getByIdTx(tx, context, campaignId, false);
 
-        await enforceSendPermissionTx(tx, context, entity);
+        await enforceSendPermissionTx(tx, context, entity, false);
 
         if (!permittedCurrentStates.includes(entity.status)) {
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);
@@ -869,11 +879,11 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 
 
 async function start(context, campaignId, startAt) {
-    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE, PAUSED, or FINISHED state', startAt);
 }
 
 async function stop(context, campaignId) {
-    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED], CampaignStatus.PAUSED, 'Cannot stop campaign until it is in SCHEDULED state');
+    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED, CampaignStatus.SENDING], CampaignStatus.PAUSING, 'Cannot stop campaign until it is in SCHEDULED or SENDING state');
 }
 
 async function reset(context, campaignId) {
@@ -944,6 +954,103 @@ async function fetchRssCampaign(context, cid) {
     });
 }
 
+async function testSend(context, data) {
+    // Though it's a bit counterintuitive, this handles also test sends of a template (i.e. without any campaign id)
+
+    await knex.transaction(async tx => {
+        const processSubscriber = async (sendConfigurationId, listId, subscriptionId, messageData) => {
+            await CampaignSender.queueMessageTx(tx, sendConfigurationId, listId, subscriptionId, MessageType.TEST, messageData);
+
+            await activityLog.logEntityActivity('campaign', CampaignActivityType.TEST_SEND, campaignId, {list: listId, subscription: subscriptionId});
+        };
+
+        const campaignId = data.campaignId;
+
+        if (campaignId) { // This means we are sending a campaign
+            /*
+                Data coming from the client:
+                - html, text
+                - subjectPrepend, subjectAppend
+                - listCid, subscriptionCid
+                - listId, segmentId
+             */
+
+            const campaign = await getByIdTx(tx, context, campaignId, false);
+            const sendConfigurationId = campaign.send_configuration;
+
+            const messageData = {
+                campaignId: campaignId,
+                subject: data.subjectPrepend + campaign.subject + data.subjectAppend,
+                html: data.html, // The html and text may be undefined
+                text: data.text,
+                attachments: []
+            };
+
+            const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', campaignId);
+            for (const attachment of attachments) {
+                messageData.attachments.push({
+                    filename: attachment.originalname,
+                    path: files.getFilePath('campaign', 'attachment', campaign.id, attachment.filename),
+                    id: attachment.id
+                });
+            }
+
+
+            let listId = data.listId;
+            if (!listId && data.listCid) {
+                const list = await lists.getByCidTx(tx, context, data.listCid);
+                listId = list.id;
+            }
+
+            const segmentId = data.segmentId;
+
+            if (listId) {
+                await enforceSendPermissionTx(tx, context, campaign, true, listId);
+
+                if (data.subscriptionCid) {
+                    const subscriber = await subscriptions.getByCidTx(tx, context, listId, data.subscriptionCid);
+                    await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
+
+                } else {
+                    const subscribers = await subscriptions.listTestUsersTx(tx, context, listId, segmentId);
+                    for (const subscriber of subscribers) {
+                        await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
+                    }
+                }
+
+            } else {
+                for (const lstSeg of campaign.lists) {
+                    await enforceSendPermissionTx(tx, context, campaign, true, lstSeg.list);
+
+                    const subscribers = await subscriptions.listTestUsersTx(tx, context, lstSeg.list, segmentId);
+                    for (const subscriber of subscribers) {
+                        await processSubscriber(sendConfigurationId, lstSeg.list, subscriber.id, messageData);
+                    }
+                }
+            }
+
+        } else { // This means we are sending a template
+            /*
+                Data coming from the client:
+                - html, text
+                - listCid, subscriptionCid, sendConfigurationId
+             */
+
+            const messageData = {
+                subject: 'Test',
+                html: data.html,
+                text: data.text
+            };
+
+            const list = await lists.getByCidTx(tx, context, data.listCid);
+            const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid);
+            await processSubscriber(data.sendConfigurationId, list.id, subscriber.id, messageData);
+        }
+    });
+
+    senders.scheduleCheck();
+}
+
 module.exports.Content = Content;
 module.exports.hash = hash;
 
@@ -987,3 +1094,5 @@ module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
 module.exports.getStatisticsOpened = getStatisticsOpened;
 
 module.exports.fetchRssCampaign = fetchRssCampaign;
+
+module.exports.testSend = testSend;

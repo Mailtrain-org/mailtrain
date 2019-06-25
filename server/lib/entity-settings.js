@@ -44,6 +44,7 @@ const entityTypes = {
             },
             attachment: {
                 table: 'files_campaign_attachment',
+                inUseTable: 'files_campaign_attachment_usage',
                 permissions: {
                     view: 'viewAttachments',
                     manage: 'manageAttachments'

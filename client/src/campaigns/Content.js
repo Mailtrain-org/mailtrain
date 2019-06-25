@@ -20,7 +20,7 @@ import {getEditForm, getTemplateTypes, getTypeForm, ResourceType} from '../templ
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
-import {TestSendModalDialog} from "./TestSendModalDialog";
+import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {ContentModalDialog} from "../lib/modals";
 
@@ -234,10 +234,11 @@ export default class CustomContent extends Component {
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
                 <TestSendModalDialog
+                    mode={TestSendModalDialogMode.CAMPAIGN_CONTENT}
                     visible={this.state.showTestSendModal}
                     onHide={() => this.setState({showTestSendModal: false})}
                     getDataAsync={this.sendModalGetDataHandler}
-                    entity={this.props.entity}
+                    campaign={this.props.entity}
                 />
                 <ContentModalDialog
                     title={this.state.exportModalTitle}
@@ -261,7 +262,7 @@ export default class CustomContent extends Component {
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
                         <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
-                        <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+                        <Button className="btn-success" icon="at" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
             </div>

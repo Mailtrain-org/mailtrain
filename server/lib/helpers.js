@@ -28,11 +28,11 @@ function filterObject(obj, allowedKeys) {
     return result;
 }
 
-function castToInteger(id) {
+function castToInteger(id, msg) {
     const val = parseInt(id);
 
     if (!Number.isInteger(val)) {
-        throw new Error('Invalid id');
+        throw new Error(msg || 'Invalid id');
     }
 
     return val;

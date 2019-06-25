@@ -3,14 +3,13 @@
 const config = require('config');
 const log = require('../lib/log');
 const mailers = require('../lib/mailers');
-const CampaignSender = require('../lib/campaign-sender');
-const {enforce} = require('../lib/helpers');
+const {CampaignSender} = require('../lib/campaign-sender');
 require('../lib/fork');
 
 const workerId = Number.parseInt(process.argv[2]);
 let running = false;
 
-async function processMessages(campaignId, subscribers) {
+async function processCampaignMessages(campaignId, messages) {
     if (running) {
         log.error('Senders', `Worker ${workerId} assigned work while working`);
         return;
@@ -19,23 +18,40 @@ async function processMessages(campaignId, subscribers) {
     running = true;
 
     const cs = new CampaignSender();
-    await cs.init({campaignId})
+    await cs.initByCampaignId(campaignId);
 
-    for (const subData of subscribers) {
+    for (const msgData of messages) {
         try {
-            if (subData.email) {
-                await cs.sendMessageByEmail(subData.listId, subData.email);
+            await cs.sendRegularMessage(msgData.listId, msgData.email);
 
-            } else if (subData.subscriptionId) {
-                await cs.sendMessageBySubscriptionId(subData.listId, subData.subscriptionId);
-
-            } else {
-                enforce(false);
-            }
-
-            log.verbose('Senders', 'Message sent and status updated for %s:%s', subData.listId, subData.email || subData.subscriptionId);
+            log.verbose('Senders', 'Message sent and status updated for %s:%s', msgData.listId, msgData.email);
         } catch (err) {
-            log.error('Senders', `Sending message to ${subData.listId}:${subData.email} failed with error: ${err.message}`)
+            log.error('Senders', `Sending message to ${msgData.listId}:${msgData.email} failed with error: ${err.message}`);
+            log.verbose(err.stack);
+        }
+    }
+
+    running = false;
+
+    sendToMaster('messages-processed');
+}
+
+async function processQueuedMessages(sendConfigurationId, messages) {
+    if (running) {
+        log.error('Senders', `Worker ${workerId} assigned work while working`);
+        return;
+    }
+
+    running = true;
+
+    for (const msgData of messages) {
+        const queuedMessage = msgData.queuedMessage;
+        try {
+            await CampaignSender.sendQueuedMessage(queuedMessage);
+
+            log.verbose('Senders', 'Message sent and status updated for %s:%s', queuedMessage.list, queuedMessage.subscription);
+        } catch (err) {
+            log.error('Senders', `Sending message to ${queuedMessage.list}:${queuedMessage.subscription} failed with error: ${err.message}`);
             log.verbose(err.stack);
         }
     }
@@ -58,11 +74,14 @@ process.on('message', msg => {
         if (type === 'reload-config') {
             mailers.invalidateMailer(msg.data.sendConfigurationId);
 
-        } else if (type === 'process-messages') {
+        } else if (type === 'process-campaign-messages') {
             // noinspection JSIgnoredPromiseFromCall
-            processMessages(msg.data.campaignId, msg.data.subscribers)
-        }
+            processCampaignMessages(msg.data.campaignId, msg.data.messages)
 
+        } else if (type === 'process-queued-messages') {
+            // noinspection JSIgnoredPromiseFromCall
+            processQueuedMessages(msg.data.sendConfigurationId, msg.data.messages)
+        }
     }
 });
 

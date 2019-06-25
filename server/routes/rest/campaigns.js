@@ -114,6 +114,12 @@ router.postAsync('/campaigns-link-clicks-table/:campaignId', passport.loggedIn, 
     return res.json(await campaigns.listLinkClicksDTAjax(req.context, castToInteger(req.params.campaignId), req.body));
 });
 
+router.postAsync('/campaign-test-send', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    const data = req.body;
+    const result = await campaigns.testSend(req.context, data);
+    return res.json(result);
+});
+
 
 
 module.exports = router;

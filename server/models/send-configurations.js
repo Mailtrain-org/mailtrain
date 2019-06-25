@@ -14,7 +14,7 @@ const mailers = require('../lib/mailers');
 const senders = require('../lib/senders');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
-const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable', 'x_mailer', 'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'x_mailer', 'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
 
 const allowedMailerTypes = new Set(Object.values(MailerType));
 
@@ -75,7 +75,7 @@ async function _getByTx(tx, context, key, id, withPermissions, withPrivateData) 
         entity.mailer_settings = JSON.parse(entity.mailer_settings);
     } else {
         entity = await tx('send_configurations').where(key, id).select(
-            ['id', 'name', 'cid', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable']
+            ['id', 'name', 'cid', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable']
         ).first();
 
         if (!entity) {

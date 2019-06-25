@@ -27,7 +27,7 @@ import {getEditForm, getTemplateTypes, getTypeForm} from './helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
-import {TestSendModalDialog} from "./TestSendModalDialog";
+import {TestSendModalDialog, TestSendModalDialogMode} from "../campaigns/TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import moment from 'moment';
 
@@ -298,6 +298,7 @@ export default class CUD extends Component {
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
                 {isEdit &&
                     <TestSendModalDialog
+                        mode={TestSendModalDialogMode.TEMPLATE}
                         visible={this.state.showTestSendModal}
                         onHide={() => this.setState({showTestSendModal: false})}
                         getDataAsync={this.sendModalGetDataHandler}/>

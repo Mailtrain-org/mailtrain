@@ -311,7 +311,7 @@ async function sendPasswordReset(locale, usernameOrEmail) {
             const { adminEmail } = await settings.get(contextHelpers.getAdminContext(), ['adminEmail']);
 
             const mailer = await mailers.getOrCreateMailer();
-            await mailer.sendTransactionalMail({
+            await mailer.sendTransactionalMailBasedOnTemplate({
                 to: {
                     address: user.email
                 },

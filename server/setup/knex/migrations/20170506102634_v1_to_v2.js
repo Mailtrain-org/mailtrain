@@ -753,11 +753,11 @@ async function migrateSettings(knex) {
 
         if (settings.dkimApiKey) {
             mailer_type = MailerType.ZONE_MTA;
-            mailer_settings.dkimApiKey = settings.dkimApiKey;
+            mailer_settings.dkimApiKey = settings.dkimApiKey || '';
             mailer_settings.zoneMtaType = ZoneMTAType.WITH_HTTP_CONF;
-            mailer_settings.dkimDomain = settings.dkimDomain;
-            mailer_settings.dkimSelector = settings.dkimSelector;
-            mailer_settings.dkimPrivateKey = settings.dkimPrivateKey;
+            mailer_settings.dkimDomain = settings.dkimDomain || '';
+            mailer_settings.dkimSelector = settings.dkimSelector || '';
+            mailer_settings.dkimPrivateKey = settings.dkimPrivateKey || '';
         }
     }
 
@@ -777,7 +777,7 @@ async function migrateSettings(knex) {
         verp_hostname: settings.verpUse ? settings.verpHostname : null,
         mailer_type,
         mailer_settings: JSON.stringify(mailer_settings),
-        x_mailer: settings.x_mailer,
+        x_mailer: settings.x_mailer || '',
         namespace: getGlobalNamespaceId()
     });
 
@@ -810,7 +810,7 @@ async function addFiles(knex) {
                 table.string('mimetype');
                 table.integer('size');
                 table.timestamp('created').defaultTo(knex.fn.now());
-                table.index(['entity', 'originalname'])
+                table.index(['entity', 'originalname']);
             });
         }
     }

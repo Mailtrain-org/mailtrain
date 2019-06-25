@@ -244,7 +244,7 @@ export default class CUD extends Component {
 
         return filterData(data, [
             'name', 'description', 'segment', 'namespace', 'send_configuration',
-            'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override',
+            'from_name_override', 'from_email_override', 'reply_to_override',
             'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url',
             'type', 'source', 'parent', 'lists'
         ]);
@@ -283,6 +283,8 @@ export default class CUD extends Component {
 
                 send_configuration: null,
                 namespace: mailtrainConfig.user.namespace,
+
+                subject: '',
 
                 click_tracking_disabled: false,
                 open_tracking_disabled: false,
@@ -324,6 +326,10 @@ export default class CUD extends Component {
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
+        }
+
+        if (!state.getIn(['subject', 'value'])) {
+            state.setIn(['subject', 'error'], t('"Subject" line must not be empty"'));
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
@@ -592,7 +598,6 @@ export default class CUD extends Component {
             { data: 2, title: t('id'), render: data => <code>{data}</code> },
             { data: 3, title: t('description') },
             { data: 4, title: t('type'), render: data => this.mailerTypes[data].typeName },
-            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
             { data: 6, title: t('namespace') }
         ];
 
@@ -604,10 +609,10 @@ export default class CUD extends Component {
                 const addOverridable = (id, label) => {
                     if(this.state.sendConfiguration[id + '_overridable']){
                         if (this.getFormValue(id + '_overriden')) {
-                            sendSettings.push(<InputField label={t(label)} key={id + '_override'} id={id + '_override'}/>);
+                            sendSettings.push(<InputField label={label} key={id + '_override'} id={id + '_override'}/>);
                         } else {
                             sendSettings.push(
-                                <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                                <StaticField key={id + '_original'} label={label} id={id + '_original'} className={styles.formDisabled}>
                                     {this.state.sendConfiguration[id]}
                                 </StaticField>
                             );
@@ -616,7 +621,7 @@ export default class CUD extends Component {
                     }
                     else{
                         sendSettings.push(
-                            <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                            <StaticField key={id + '_original'} label={label} id={id + '_original'} className={styles.formDisabled}>
                                 {this.state.sendConfiguration[id]}
                             </StaticField>
                         );
@@ -626,7 +631,8 @@ export default class CUD extends Component {
                 addOverridable('from_name', t('fromName'));
                 addOverridable('from_email', t('fromEmailAddress'));
                 addOverridable('reply_to', t('replytoEmailAddress'));
-                addOverridable('subject', t('subjectLine'));
+
+                sendSettings.push(<InputField label={t('subjectLine')} key="subject" id="subject"/>);
             } else {
                 sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
             }
@@ -759,8 +765,6 @@ export default class CUD extends Component {
                         </Fieldset>
                     </>
                     }
-
-
 
                     {templateEdit}
 

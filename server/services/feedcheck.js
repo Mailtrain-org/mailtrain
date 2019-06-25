@@ -112,7 +112,7 @@ async function run() {
                             from_name_override: rssCampaign.from_name_override,
                             from_email_override: rssCampaign.from_email_override,
                             reply_to_override: rssCampaign.reply_to_override,
-                            subject_override: rssCampaign.subject_override,
+                            subject: rssCampaign.subject,
                             data: campaignData,
 
                             click_tracking_disabled: rssCampaign.click_tracking_disabled,

@@ -11,6 +11,7 @@ const he = require('he');
 const { getPublicUrl } = require('../lib/urls');
 const tools = require('../lib/tools');
 const shortid = require('shortid');
+const {enforce} = require('../lib/helpers');
 
 const LinkId = {
     OPEN: -1,
@@ -103,16 +104,16 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
 }
 
 async function addOrGet(campaignId, url) {
-    return await knex.transaction(async tx => {
-        const link = await tx('links').select(['id', 'cid']).where({
-            campaign: campaignId,
-            url
-        }).first();
+    const link = await knex('links').select(['id', 'cid']).where({
+        campaign: campaignId,
+        url
+    }).first();
 
-        if (!link) {
-            let cid = shortid.generate();
+    if (!link) {
+        let cid = shortid.generate();
 
-            const ids = await tx('links').insert({
+        try {
+            const ids = await knex('links').insert({
                 campaign: campaignId,
                 cid,
                 url
@@ -122,10 +123,21 @@ async function addOrGet(campaignId, url) {
                 id: ids[0],
                 cid
             };
-        } else {
-            return link;
+        } catch (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                const link = await knex('links').select(['id', 'cid']).where({
+                    campaign: campaignId,
+                    url
+                }).first();
+
+                enforce(link);
+                return link;
+            }
         }
-    });
+
+    } else {
+        return link;
+    }
 }
 
 async function updateLinks(campaign, list, subscription, mergeTags, message) {

@@ -138,7 +138,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/subscribe/B16uVTdW?access_token=${accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/subscribe/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
                 <h4>POST /api/unsubscribe/:listId – {t('removeSubscription')}</h4>
@@ -165,7 +165,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/unsubscribe/B16uVTdW?access_token=${accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/unsubscribe/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com'</pre>
 
                 <h4>POST /api/delete/:listId – {t('deleteSubscription')}</h4>
@@ -192,7 +192,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/delete/B16uVTdW?access_token=${accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/delete/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com'</pre>
 
                 <h4>POST /api/field/:listId – {t('addNewCustomField')}</h4>
@@ -240,7 +240,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/field/B16uVTdW?access_token=${accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/field/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>
 
                 <h4>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h4>
@@ -292,7 +292,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token={accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token={accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com&amp;'</pre>
 
                 <h4>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h4>
@@ -319,7 +319,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/blacklist/delete?access_token=${accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/blacklist/delete?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com&amp;'</pre>
 
                 <h4>GET /api/lists/:email – {t('getTheListsAUserHasSubscribedTo')}</h4>
@@ -381,15 +381,14 @@ export default class API extends Component {
                     <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
                     <li><strong>SEND_CONFIGURATION_ID</strong> – {t('idOfConfigurationUsedToCreateMailer')}</li>
                     <li><strong>SUBJECT</strong> – {t('subject')}</li>
-                    <li><strong>DATA</strong> – {t('dataPassedToTemplateWhenCompilingWith')}: <em>{'{'} "any": ["type", {'{'}"of": "data"{'}'}] {'}'}</em></li>
-                    <li><strong>VARIABLES</strong> – {t('mapOfTemplatesubjectVariablesToReplace')}: <em>{'{'} "FOO": "bar" {'}'}</em></li>
+                    <li><strong>VARIABLES</strong> – {t('mapOfTemplatesubjectVariablesToReplace')}</li>
                 </ul>
 
                 <p>
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/templates/1/send?access_token={accessToken}`)}' \
+                <pre>curl -XPOST '{getUrl(`api/templates/1/send?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com&amp;SUBJECT=Test&amp;VARIABLES[FOO]=bar&amp;VARIABLES[TEST]=example'</pre>
             </div>
         );

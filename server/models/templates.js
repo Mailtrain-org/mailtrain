@@ -7,10 +7,16 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
-const reports = require('./reports');
 const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
+
+const mailers = require('../lib/mailers');
+const tools = require('../lib/tools');
+const sendConfigurations = require('./send-configurations');
+const { getMergeTagsForBases } = require('../../shared/templates');
+const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
+const htmlToText = require('html-to-text');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
 
@@ -145,6 +151,65 @@ async function remove(context, id) {
     });
 }
 
+const MAX_EMAIL_COUNT = 100;
+async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags) {
+    // TODO - Update this to use CampaignSender.queueMessageTx (with renderedHtml and renderedText)
+
+    if (emails.length > MAX_EMAIL_COUNT) {
+        throw new Error(`Cannot send more than ${MAX_EMAIL_COUNT} emails at once`);
+    }
+
+    await knex.transaction(async tx => {
+        const template = await getByIdTx(tx, context, templateId,false);
+        const sendConfiguration = await sendConfigurations.getByIdTx(tx, context, sendConfigurationId, false, false);
+
+        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
+
+        const mailer = await mailers.getOrCreateMailer(sendConfigurationId);
+
+        const variablesSkeleton = {
+            ...getMergeTagsForBases(getTrustedUrl(), getSandboxUrl(), getPublicUrl()),
+            ...mergeTags
+        };
+
+        for (const email of emails) {
+            const variables = {
+                ...variablesSkeleton,
+                EMAIL: email
+            };
+
+            const html = tools.formatTemplate(
+                template.html,
+                null,
+                variables,
+                true
+            );
+
+            const text = (template.text || '').trim()
+                ? tools.formatTemplate(
+                    template.text,
+                    null,
+                    variables,
+                    false
+                ) : htmlToText.fromString(html, {wordwrap: 130});
+
+            return mailer.sendTransactionalMail(
+                {
+                    to: email,
+                    subject,
+                    from: {
+                        name: sendConfiguration.from_name,
+                        address: sendConfiguration.from_email
+                    },
+                    html,
+                    text
+                 }
+            );
+        }
+    });
+}
+
+
 module.exports.hash = hash;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
@@ -153,3 +218,4 @@ module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
+module.exports.sendAsTransactionalEmail = sendAsTransactionalEmail;

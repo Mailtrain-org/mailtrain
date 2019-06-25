@@ -18,7 +18,8 @@ export function getCampaignLabels(t) {
         [CampaignStatus.PAUSED]: t('paused'),
         [CampaignStatus.INACTIVE]: t('inactive'),
         [CampaignStatus.ACTIVE]: t('active'),
-        [CampaignStatus.SENDING]: t('sending')
+        [CampaignStatus.SENDING]: t('sending'),
+        [CampaignStatus.PAUSING]: t('Pausing')
     };
 
 

@@ -333,6 +333,13 @@ class InputField extends Component {
 
         const className = owner.addFormValidationClass('form-control', id);
 
+        /* This is for debugging purposes when React reports that InputField is uncontrolled
+        const value = owner.getFormValue(id);
+        if (value === null || value === undefined) console.log(`Warning: InputField ${id} is ${value}`);
+        */
+        const value = owner.getFormValue(id);
+        if (value === null || value === undefined) console.log(`Warning: InputField ${id} is ${value}`);
+
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
         );

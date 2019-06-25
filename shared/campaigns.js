@@ -38,11 +38,12 @@ const CampaignStatus = {
 
     // For campaign types: NORMAL, RSS_ENTRY
     SENDING: 7,
+    PAUSING: 8,
 
-    MAX: 8
+    MAX: 9
 };
 
-const campaignOverridables = ['from_name', 'from_email', 'reply_to', 'subject'];
+const campaignOverridables = ['from_name', 'from_email', 'reply_to'];
 
 function getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration) {
     let allowedOverride = false;

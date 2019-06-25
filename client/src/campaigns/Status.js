@@ -16,6 +16,7 @@ import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
 import moment from 'moment';
 import campaignsStyles from "./styles.scss";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
 
 
 @withComponentMixins([
@@ -25,7 +26,7 @@ import {withComponentMixins} from "../lib/decorator-helpers";
     withPageHelpers,
     requiresAuthenticatedUser
 ])
-class TestUser extends Component {
+class PreviewForTestUserModalDialog extends Component {
     constructor(props) {
         super(props);
         this.initForm({
@@ -34,7 +35,9 @@ class TestUser extends Component {
     }
 
     static propTypes = {
-        entity: PropTypes.object.isRequired
+        visible: PropTypes.bool.isRequired,
+        onHide: PropTypes.func.isRequired,
+        entity: PropTypes.object.isRequired,
     }
 
     localValidateFormValues(state) {
@@ -64,6 +67,10 @@ class TestUser extends Component {
         }
     }
 
+    async hideModal() {
+        this.props.onHide();
+    }
+
     render() {
         const t = this.props.t;
 
@@ -76,12 +83,14 @@ class TestUser extends Component {
         ];
 
         return (
-            <Form stateOwner={this}>
-                <TableSelect id="testUser" label={t('previewCampaignAs')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
-                <ButtonRow>
-                    <Button className="btn-primary" label={t('preview')} onClickAsync={::this.previewAsync}/>
-                </ButtonRow>
-            </Form>
+            <ModalDialog hidden={!this.props.visible} title={t('Preview Campaign')} onCloseAsync={() => this.hideModal()} buttons={[
+                { label: t('preview'), className: 'btn-primary', onClickAsync: ::this.previewAsync },
+                { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
+            ]}>
+                <Form stateOwner={this}>
+                    <TableSelect id="testUser" label={t('Preview as')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
+                </Form>
+            </ModalDialog>
         );
     }
 }
@@ -96,6 +105,12 @@ class TestUser extends Component {
 class SendControls extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            showTestSendModal: false,
+            previewForTestUserVisible: false
+        };
+
         this.initForm({
             leaveConfirmation: false
         });
@@ -257,13 +272,33 @@ class SendControls extends Component {
         const t = this.props.t;
         const entity = this.props.entity;
 
-        const yesNoDialog = (
-            <ModalDialog hidden={!this.state.modalVisible} title={this.state.modalTitle} onCloseAsync={() => this.modalAction(false)} buttons={[
-                { label: t('no'), className: 'btn-primary', onClickAsync: () => this.modalAction(false) },
-                { label: t('yes'), className: 'btn-danger', onClickAsync: () => this.modalAction(true) }
-            ]}>
-                {this.state.modalMessage}
-            </ModalDialog>
+        const dialogs = (
+            <>
+                <TestSendModalDialog
+                    mode={TestSendModalDialogMode.CAMPAIGN_STATUS}
+                    visible={this.state.showTestSendModal}
+                    onHide={() => this.setState({showTestSendModal: false})}
+                    campaign={this.props.entity}
+                />
+                <PreviewForTestUserModalDialog
+                    visible={this.state.previewForTestUserVisible}
+                    onHide={() => this.setState({previewForTestUserVisible: false})}
+                    entity={this.props.entity}
+                />
+                <ModalDialog hidden={!this.state.modalVisible} title={this.state.modalTitle} onCloseAsync={() => this.modalAction(false)} buttons={[
+                    { label: t('no'), className: 'btn-primary', onClickAsync: () => this.modalAction(false) },
+                    { label: t('yes'), className: 'btn-danger', onClickAsync: () => this.modalAction(true) }
+                ]}>
+                    {this.state.modalMessage}
+                </ModalDialog>
+            </>
+        );
+
+        const testButtons = (
+            <>
+                <Button className="btn-success" label={t('Preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
+                <Button className="btn-success" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+            </>
         );
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
@@ -271,7 +306,7 @@ class SendControls extends Component {
             const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {entity.scheduled ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
                     </AlignedRow>
@@ -292,20 +327,36 @@ class SendControls extends Component {
                             :
                             <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.confirmStart}/>
                         }
+                        {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
+                        {testButtons}
+                    </ButtonRow>
+                </div>
+            );
+
+        } else if (entity.status === CampaignStatus.PAUSING) {
+            return (
+                <div>{dialogs}
+                    <AlignedRow label={t('sendStatus')}>
+                        {t('Campaign is being paused. Please wait.')}
+                    </AlignedRow>
+                    <ButtonRow>
+                        <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('campaignIsBeingSentOut')}
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
@@ -314,7 +365,7 @@ class SendControls extends Component {
             const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
 
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('allMessagesSent!HitContinueIfYouYouWant')}
                     </AlignedRow>
@@ -322,35 +373,38 @@ class SendControls extends Component {
                         <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.confirmStart}/>
                         <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.INACTIVE) {
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('yourCampaignIsCurrentlyDisabledClick')}
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('enable')} onClickAsync={::this.enableAsync}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.ACTIVE) {
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('yourCampaignIsEnabledAndSendingMessages')}
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="stop" label={t('disable')} onClickAsync={::this.disableAsync}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
-        } else {
 
+        } else {
             return null;
         }
     }
@@ -441,7 +495,7 @@ export default class Status extends Component {
             addOverridable('from_name', t('fromName'));
             addOverridable('from_email', t('fromEmailAddress'));
             addOverridable('reply_to', t('replytoEmailAddress'));
-            addOverridable('subject', t('subjectLine'));
+            sendSettings.push(<AlignedRow key="subject" label={t('subjectLine')}>{entity.subject}</AlignedRow>);
         } else {
             sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
         }
@@ -490,13 +544,6 @@ export default class Status extends Component {
                 <AlignedRow label={t('targetListssegments')}>
                     <Table withHeader dataUrl={`rest/lists-with-segment-by-campaign-table/${this.props.entity.id}`} columns={listsColumns} />
                 </AlignedRow>
-
-                {(entity.type === CampaignType.REGULAR || entity.type === CampaignType.TRIGGERED) &&
-                    <div>
-                        <hr/>
-                        <TestUser entity={entity}/>
-                    </div>
-                }
 
                 <hr/>
                 <SendControls entity={entity} refreshEntity={::this.refreshEntity}/>

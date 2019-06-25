@@ -94,13 +94,17 @@ async function _sendMail(transport, mail, template) {
     return await trySendAsync();
 }
 
-async function _sendTransactionalMail(transport, mail, template) {
-    const sendConfiguration = transport.mailer.sendConfiguration;
-
+async function _sendTransactionalMail(transport, mail) {
     if (!mail.headers) {
         mail.headers = {};
     }
     mail.headers['X-Sending-Zone'] = 'transactional';
+
+    return await _sendMail(transport, mail);
+}
+
+async function _sendTransactionalMailBasedOnTemplate(transport, mail, template) {
+    const sendConfiguration = transport.mailer.sendConfiguration;
 
     mail.from = {
         name: sendConfiguration.from_name,
@@ -129,7 +133,7 @@ async function _sendTransactionalMail(transport, mail, template) {
         });
     }
 
-    return await _sendMail(transport, mail);
+    return await _sendTransactionalMail(transport, mail);
 }
 
 async function _createTransport(sendConfiguration) {
@@ -263,7 +267,8 @@ async function _createTransport(sendConfiguration) {
     transport.mailer = {
         sendConfiguration,
         throttleWait: bluebird.promisify(throttleWait),
-        sendTransactionalMail: async (mail, template) => await _sendTransactionalMail(transport, mail, template),
+        sendTransactionalMail: async (mail, template) => await _sendTransactionalMail(transport, mail),
+        sendTransactionalMailBasedOnTemplate: async (mail, template) => await _sendTransactionalMailBasedOnTemplate(transport, mail, template),
         sendMassMail: async (mail, template) => await _sendMail(transport, mail)
     };
 

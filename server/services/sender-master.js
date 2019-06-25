@@ -6,35 +6,63 @@ const log = require('../lib/log');
 const path = require('path');
 const knex = require('../lib/knex');
 const {CampaignStatus, CampaignType} = require('../../shared/campaigns');
-const { enforce } = require('../lib/helpers');
 const campaigns = require('../models/campaigns');
 const builtinZoneMta = require('../lib/builtin-zone-mta');
 const {CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
+const {MessageType} = require('../lib/campaign-sender')
 require('../lib/fork');
 
+class Notifications {
+    constructor() {
+        this.conts = new Map();
+    }
+
+    notify(id) {
+        const cont = this.conts.get(id);
+        if (cont) {
+            for (const cb of cont) {
+                setImmediate(cb);
+            }
+            this.conts.delete(id);
+        }
+    }
+
+    async waitFor(id) {
+        let cont = this.conts.get(id);
+        if (!cont) {
+            cont = [];
+        }
+
+        const notified = new Promise(resolve => {
+            cont.push(resolve);
+        });
+
+        this.conts.set(id, cont);
+
+        await notified;
+    }
+}
+
+const notifier = new Notifications();
 
 let messageTid = 0;
 const workerProcesses = new Map();
 
+const workersCount = config.queue.processes;
 const idleWorkers = [];
 
 let campaignSchedulerRunning = false;
 let queuedSchedulerRunning = false;
-let workerSchedulerRunning = false;
 
-const campaignsCheckPeriod = 5 * 1000;
+const campaignsCheckPeriod = 30 * 1000;
 const retrieveBatchSize = 1000;
-const workerBatchSize = 100;
+const workerBatchSize = 10;
 
-const messageQueue = new Map(); // campaignId -> [{listId, email}]
-const messageQueueCont = new Map(); // campaignId -> next batch callback
-const campaignFinishCont = new Map(); // campaignId -> worker finished callback
+const sendConfigurationMessageQueue = new Map(); // sendConfigurationId -> [{queuedMessage}]
+const campaignMessageQueue = new Map(); // campaignId -> [{listId, email}]
 
-const workAssignment = new Map(); // workerId -> { campaignId, subscribers: [{listId, email}] }
-
-let workerSchedulerCont = null;
-let queuedLastId = 0;
+const workAssignment = new Map(); // workerId -> { campaignId, messages: [{listId, email} } / { sendConfigurationId, messages: [{queuedMessage}] }
 
 
 function messagesProcessed(workerId) {
@@ -43,108 +71,151 @@ function messagesProcessed(workerId) {
     workAssignment.delete(workerId);
     idleWorkers.push(workerId);
 
-    if (workerSchedulerCont) {
-        const cont = workerSchedulerCont;
-        setImmediate(workerSchedulerCont);
-        workerSchedulerCont = null;
-    }
-
-    if (campaignFinishCont.has(wa.campaignId)) {
-        setImmediate(campaignFinishCont.get(wa.campaignId));
-        campaignFinishCont.delete(wa.campaignId);
-    }
+    notifier.notify('workerFinished');
 }
 
-async function scheduleWorkers() {
+async function workersLoop() {
+    const reservedWorkersForTestCount = workersCount > 1 ? 1 : 0;
+
     async function getAvailableWorker() {
-        if (idleWorkers.length > 0) {
-            return idleWorkers.shift();
-
-        } else {
-            const workerAvailable = new Promise(resolve => {
-                workerSchedulerCont = resolve;
-            });
-
-            await workerAvailable;
-            return idleWorkers.shift();
+        while (idleWorkers.length === 0) {
+            await notifier.waitFor('workerFinished');
         }
+
+        return idleWorkers.shift();
     }
 
+    function assignCampaignTaskToWorker(workerId, task) {
+        const campaignId = task.campaignId;
+        const queue = task.queue;
 
-    if (workerSchedulerRunning) {
-        return;
+        const messages = queue.splice(0, workerBatchSize);
+        workAssignment.set(workerId, {campaignId, messages});
+
+        if (queue.length === 0) {
+            notifier.notify(`campaignMessageQueueEmpty:${campaignId}`);
+        }
+
+        sendToWorker(workerId, 'process-campaign-messages', {
+            campaignId,
+            messages
+        });
     }
 
-    workerSchedulerRunning = true;
-    let workerId = await getAvailableWorker();
+    function assignSendConfigurationTaskToWorker(workerId, task) {
+        const sendConfigurationId = task.sendConfigurationId;
+        const queue = task.queue;
 
-    let keepLooping = true;
+        const messages = queue.splice(0, workerBatchSize);
+        workAssignment.set(workerId, {sendConfigurationId, messages});
 
-    while (keepLooping) {
-        keepLooping = false;
+        if (queue.length === 0) {
+            notifier.notify(`sendConfigurationMessageQueueEmpty:${sendConfigurationId}`);
+        }
 
-        for (const campaignId of messageQueue.keys()) {
-            const queue = messageQueue.get(campaignId);
+        sendToWorker(workerId, 'process-queued-messages', {
+            sendConfigurationId,
+            messages
+        });
+    }
 
-            if (queue.length > 0) {
-                const subscribers = queue.splice(0, workerBatchSize);
-                workAssignment.set(workerId, {campaignId, subscribers});
+    function selectNextTask() {
+        const allocationMap = new Map();
+        const allocation = [];
 
-                if (queue.length === 0 && messageQueueCont.has(campaignId)) {
-                    setImmediate(messageQueueCont.get(campaignId));
-                    messageQueueCont.delete(campaignId);
+        function initAllocation(attrName, queues, assignWorkerHandler) {
+            for (const id of queues.keys()) {
+                const key = attrName + ':' + id;
+
+                const queue = queues.get(id);
+
+                const task = {
+                    [attrName]: id,
+                    existingWorkers: 0,
+                    isEmpty: queue.length === 0,
+                    queue,
+                    assignWorkerHandler
+                };
+
+                allocationMap.set(key, task);
+                allocation.push(task);
+            }
+
+            for (const wa of workAssignment.values()) {
+                if (wa[attrName]) {
+                    const key = attrName + ':' + wa[attrName];
+                    const task = allocationMap.get(key);
+                    task.existingWorkers += 1;
                 }
-
-                sendToWorker(workerId, 'process-messages', {
-                    campaignId,
-                    subscribers
-                });
-                workerId = await getAvailableWorker();
-
-                keepLooping = true;
             }
         }
+
+        initAllocation('sendConfigurationId', sendConfigurationMessageQueue, assignSendConfigurationTaskToWorker);
+        initAllocation('campaignId', campaignMessageQueue, assignCampaignTaskToWorker);
+
+        let minTask = null;
+        let minExistingWorkers;
+
+        for (const task of allocation) {
+            if (!task.isEmpty && (minTask === null || minExistingWorkers > task.existingWorkers)) {
+                minTask = task;
+                minExistingWorkers = task.existingWorkers;
+            }
+        }
+
+        return minTask;
     }
 
-    idleWorkers.push(workerId);
 
-    workerSchedulerRunning = false;
+    while (true) {
+        const task = selectNextTask();
+
+        if (task) {
+            const workerId = await getAvailableWorker();
+            task.assignWorkerHandler(workerId, task);
+            
+        } else {
+            await notifier.waitFor('workAvailable');
+        }
+    }
 }
 
 
 async function processCampaign(campaignId) {
-    async function finish() {
-        let workerRunning = false;
-        for (const wa of workAssignment.values()) {
-            if (wa.campaignId === campaignId) {
-                workerRunning = true;
+    const msgQueue = campaignMessageQueue.get(campaignId);
+
+    async function finish(newStatus) {
+        const isCompleted = () => {
+            if (msgQueue.length > 0) return false;
+
+            let workerRunning = false;
+
+            for (const wa of workAssignment.values()) {
+                if (wa.campaignId === campaignId) {
+                    workerRunning = true;
+                }
             }
+
+            return !workerRunning;
+        };
+
+        while (!isCompleted()) {
+            await notifier.waitFor('workerFinished');
         }
 
-        if (workerRunning) {
-            const workerFinished = new Promise(resolve => {
-                campaignFinishCont.set(campaignId, resolve);
-            });
+        campaignMessageQueue.delete(campaignId);
 
-            await workerFinished;
-            setImmediate(finish);
-        }
-
-        await knex('campaigns').where('id', campaignId).update({status: CampaignStatus.FINISHED});
-        await activityLog.logEntityActivity('campaign', CampaignActivityType.STATUS_CHANGE, campaignId, {status: CampaignStatus.FINISHED});
-
-        messageQueue.delete(campaignId);
+        await knex('campaigns').where('id', campaignId).update({status: newStatus});
+        await activityLog.logEntityActivity('campaign', CampaignActivityType.STATUS_CHANGE, campaignId, {status: newStatus});
     }
-
-    const msgQueue = [];
-    messageQueue.set(campaignId, msgQueue);
 
     try {
         while (true) {
             const cpg = await knex('campaigns').where('id', campaignId).first();
 
-            if (cpg.status === CampaignStatus.PAUSED) {
-                messageQueue.delete(campaignId);
+            if (cpg.status === CampaignStatus.PAUSING) {
+                msgQueue.splice(0);
+                await finish(CampaignStatus.PAUSED);
                 return;
             }
 
@@ -154,21 +225,21 @@ async function processCampaign(campaignId) {
             });
 
             if (qryGen) {
-                let subscribersInProcessing = [...msgQueue];
+                let messagesInProcessing = [...msgQueue];
                 for (const wa of workAssignment.values()) {
                     if (wa.campaignId === campaignId) {
-                        subscribersInProcessing = subscribersInProcessing.concat(wa.subscribers);
+                        messagesInProcessing = messagesInProcessing.concat(wa.messages);
                     }
                 }
 
                 const qry = qryGen(knex)
-                    .whereNotIn('pending_subscriptions.email', subscribersInProcessing.map(x => x.email))
+                    .whereNotIn('pending_subscriptions.email', messagesInProcessing.map(x => x.email))
                     .select(['pending_subscriptions.email', 'campaign_lists.list'])
                     .limit(retrieveBatchSize);
                 const subs = await qry;
 
                 if (subs.length === 0) {
-                    await finish();
+                    await finish(CampaignStatus.FINISHED);
                     return;
                 }
 
@@ -179,21 +250,19 @@ async function processCampaign(campaignId) {
                     });
                 }
 
-                const nextBatchNeeded = new Promise(resolve => {
-                    messageQueueCont.set(campaignId, resolve);
-                });
+                notifier.notify('workAvailable');
 
-                setImmediate(scheduleWorkers);
-
-                await nextBatchNeeded;
+                while (msgQueue.length > 0) {
+                    await notifier.waitFor(`campaignMessageQueueEmpty:${campaignId}`);
+                }
 
             } else {
-                await finish();
+                await finish(CampaignStatus.FINISHED);
                 return;
             }
         }
     } catch (err) {
-        log.error('Senders', `Sending campaign ${campaignId} failed with error: ${err.message}`)
+        log.error('Senders', `Sending campaign ${campaignId} failed with error: ${err.message}`);
         log.verbose(err.stack);
     }
 }
@@ -226,6 +295,8 @@ async function scheduleCampaigns() {
             });
 
             if (campaignId) {
+                campaignMessageQueue.set(campaignId, []);
+
                 // noinspection JSIgnoredPromiseFromCall
                 processCampaign(campaignId);
 
@@ -234,16 +305,81 @@ async function scheduleCampaigns() {
             }
         }
     } catch (err) {
-        log.error('Senders', `Scheduling campaigns failed with error: ${err.message}`)
+        log.error('Senders', `Scheduling campaigns failed with error: ${err.message}`);
         log.verbose(err.stack);
     }
-
 
     campaignSchedulerRunning = false;
 }
 
 
-async function processQueued() {
+async function processQueuedBySendConfiguration(sendConfigurationId) {
+    const msgQueue = sendConfigurationMessageQueue.get(sendConfigurationId);
+
+    const isCompleted = () => {
+        if (msgQueue.length > 0) return false;
+
+        let workerRunning = false;
+
+        for (const wa of workAssignment.values()) {
+            if (wa.sendConfigurationId === sendConfigurationId) {
+                workerRunning = true;
+            }
+        }
+
+        return !workerRunning;
+    };
+
+    try {
+        while (true) {
+            let messagesInProcessing = [...msgQueue];
+            for (const wa of workAssignment.values()) {
+                if (wa.sendConfigurationId === sendConfigurationId) {
+                    messagesInProcessing = messagesInProcessing.concat(wa.messages);
+                }
+            }
+
+            const rows = await knex('queued')
+                .orderByRaw(`FIELD(type, ${MessageType.TRIGGERED}, ${MessageType.TEST}) DESC, id ASC`) // This orders MessageType.TEST messages before MessageType.TRIGGERED ones
+                .where('send_configuration', sendConfigurationId)
+                .whereNotIn('id', messagesInProcessing.map(x => x.queuedMessage.id))
+                .limit(retrieveBatchSize);
+
+            if (rows.length === 0) {
+                if (isCompleted()) {
+                    sendConfigurationMessageQueue.delete(sendConfigurationId);
+                    return;
+
+                } else {
+                    while (!isCompleted()) {
+                        await notifier.waitFor('workerFinished');
+                    }
+
+                    // At this point, there might be new messages in the queued that could belong to us. Thus we have to try again instead for returning.
+                    continue;
+                }
+            }
+
+            for (const row of rows) {
+                row.data = JSON.parse(row.data);
+                msgQueue.push({
+                    queuedMessage: row
+                });
+            }
+
+            notifier.notify('workAvailable');
+
+            while (msgQueue.length > 0) {
+                await notifier.waitFor(`sendConfigurationMessageQueueEmpty:${sendConfigurationId}`);
+            }
+        }
+    } catch (err) {
+        log.error('Senders', `Sending queued messages for send configuration ${sendConfigurationId} failed with error: ${err.message}`);
+        log.verbose(err.stack);
+    }
+}
+
+async function scheduleQueued() {
     if (queuedSchedulerRunning) {
         return;
     }
@@ -252,34 +388,23 @@ async function processQueued() {
 
     try {
         while (true) {
-            const rows = await knex('queued')
-                .orderBy('id', 'asc')
-                .where('id', '>', queuedLastId)
-                .limit(retrieveBatchSize);
+            const sendConfigurationsInProcessing = [...sendConfigurationMessageQueue.keys()];
 
-            if (rows.length === 0) {
-                break;
-            }
+            const rows = await knex('queued')
+                .whereNotIn('send_configuration', sendConfigurationsInProcessing)
+                .groupBy('send_configuration')
+                .select(['send_configuration']);
 
             for (const row of rows) {
-                let msgQueue = messageQueue.get(row.campaign);
-                if (!msgQueue) {
-                    msgQueue = [];
-                    messageQueue.set(row.campaign, msgQueue);
-                }
+                const sendConfigurationId = row.send_configuration;
+                sendConfigurationMessageQueue.set(sendConfigurationId, []);
 
-                msgQueue.push({
-                    listId: row.list,
-                    subscriptionId: row.subscription
-                });
+                // noinspection JSIgnoredPromiseFromCall
+                processQueuedBySendConfiguration(sendConfigurationId);
             }
-
-            queuedLastId = rows[rows.length - 1].id;
-
-            setImmediate(scheduleWorkers);
         }
     } catch (err) {
-        log.error('Senders', `Processing queued messages failed with error: ${err.message}`)
+        log.error('Senders', `Scheduling queued messages failed with error: ${err.message}`);
         log.verbose(err.stack);
     }
 
@@ -337,7 +462,7 @@ function periodicCampaignsCheck() {
     scheduleCampaigns();
 
     // noinspection JSIgnoredPromiseFromCall
-    processQueued();
+    scheduleQueued();
 
     setTimeout(periodicCampaignsCheck, campaignsCheckPeriod);
 }
@@ -345,7 +470,7 @@ function periodicCampaignsCheck() {
 async function init() {
     const spawnWorkerFutures = [];
     let workerId;
-    for (workerId = 0; workerId < config.queue.processes; workerId++) {
+    for (workerId = 0; workerId < workersCount; workerId++) {
         spawnWorkerFutures.push(spawnWorker(workerId));
     }
 
@@ -358,6 +483,7 @@ async function init() {
             if (type === 'schedule-check') {
                 // noinspection JSIgnoredPromiseFromCall
                 scheduleCampaigns();
+                scheduleQueued();
 
             } else if (type === 'reload-config') {
                 for (const workerId of workerProcesses.keys()) {
@@ -376,6 +502,8 @@ async function init() {
     });
 
     periodicCampaignsCheck();
+
+    setImmediate(workersLoop);
 }
 
 // noinspection JSIgnoredPromiseFromCall
