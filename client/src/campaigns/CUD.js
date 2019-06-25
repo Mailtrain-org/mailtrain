@@ -244,7 +244,7 @@ export default class CUD extends Component {
 
         return filterData(data, [
             'name', 'description', 'segment', 'namespace', 'send_configuration',
-            'from_name_override', 'from_email_override', 'reply_to_override',
+            'subject', 'from_name_override', 'from_email_override', 'reply_to_override',
             'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url',
             'type', 'source', 'parent', 'lists'
         ]);
