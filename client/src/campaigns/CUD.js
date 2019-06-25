@@ -631,8 +631,6 @@ export default class CUD extends Component {
                 addOverridable('from_name', t('fromName'));
                 addOverridable('from_email', t('fromEmailAddress'));
                 addOverridable('reply_to', t('replytoEmailAddress'));
-
-                sendSettings.push(<InputField label={t('subjectLine')} key="subject" id="subject"/>);
             } else {
                 sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
             }
@@ -746,6 +744,8 @@ export default class CUD extends Component {
                         <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
                         {sendSettings}
+
+                        <InputField label={t('subjectLine')} key="subject" id="subject"/>
 
                         <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
                     </Fieldset>
