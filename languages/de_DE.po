@@ -58,7 +58,7 @@ msgstr "Blacklist"
 
 #: views/blacklist.hbs:4 views/users/api.hbs:55
 msgid "Add email to blacklist"
-msgstr "E-Mail zur Blacklist hinzufügen"
+msgstr "E-Mail Adresse zur Blacklist hinzufügen"
 
 #: views/blacklist.hbs:5
 msgid "Add"
@@ -151,7 +151,7 @@ msgstr "SMTP Antwort"
 
 #: views/campaigns/bounced.hbs:11
 msgid "Bounce time"
-msgstr "Bouncen Zeitpunkt"
+msgstr "Bounce Zeitpunkt"
 
 #: views/campaigns/campaigns.hbs:3 views/campaigns/create-triggered.hbs:25
 #: views/campaigns/create.hbs:3 views/campaigns/create.hbs:4
@@ -289,8 +289,8 @@ msgid ""
 "new entry is found from this feed it is sent to selected list as an email "
 "message."
 msgstr ""
-"RSS-Kampagne setzt einen Tracker gegen den gewählten RSS-Feed. Wenn ein "
-"neuer Eintrag aus diesem Feed gefunden wird, wird er als E-Mail an die "
+"Eine RSS-Kampagne setzt einen Tracker auf den gewählten RSS-Feed. Wenn ein "
+"neuer Eintrag in diesem Feed gefunden wird, wird er als E-Mail an die "
 "ausgewählte Liste gesendet."
 
 #: views/campaigns/create-rss.hbs:7 views/campaigns/create-triggered.hbs:6
@@ -363,21 +363,21 @@ msgstr ""
 #: views/campaigns/edit-triggered.hbs:16 views/campaigns/edit.hbs:17
 #: views/campaigns/view.hbs:12
 msgid "Email \"from name\""
-msgstr "E-Mail \"von\" Name"
+msgstr "E-Mail \"von Name\""
 
 #: views/campaigns/create-rss.hbs:16 views/campaigns/create-triggered.hbs:19
 #: views/campaigns/create.hbs:19 views/campaigns/edit-rss.hbs:19
 #: views/campaigns/edit-triggered.hbs:17 views/campaigns/edit.hbs:18
 #: views/settings.hbs:23
 msgid "This is the name your emails will come from"
-msgstr "Dies ist Absendernamen Ihrer E-Mails"
+msgstr "Dies ist der Absendername Ihrer E-Mails"
 
 #: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:20
 #: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
 #: views/campaigns/edit-triggered.hbs:18 views/campaigns/edit.hbs:19
 #: views/campaigns/view.hbs:13
 msgid "Email \"from\" address"
-msgstr "E-Mail \"von\" Adresse"
+msgstr "E-Mail \"von Adresse\""
 
 #: views/campaigns/create-rss.hbs:18 views/campaigns/create-triggered.hbs:21
 #: views/campaigns/edit-rss.hbs:21 views/campaigns/edit-triggered.hbs:19
@@ -386,10 +386,16 @@ msgid "This is the address people will send replies to"
 msgstr "Dies ist die Reply-To Adresse"
 
 #: views/campaigns/create-rss.hbs:19 views/campaigns/create-triggered.hbs:24
-#: views/campaigns/create.hbs:26 views/campaigns/edit-rss.hbs:22
-#: views/campaigns/edit-triggered.hbs:22 views/campaigns/edit.hbs:25
-msgid "Disable clicked/opened tracking"
-msgstr "Tracking deaktivieren"
+#: views/campaigns/create.hbs:28 views/campaigns/edit-rss.hbs:22
+#: views/campaigns/edit-triggered.hbs:22 views/campaigns/edit.hbs:27
+msgid "Disable opened tracking"
+msgstr "Deaktiviere das Tracking beim Öffnen der E-Mail (Zählpixel)"
+
+#: views/campaigns/create-rss.hbs:20 views/campaigns/create-triggered.hbs:25
+#: views/campaigns/create.hbs:29 views/campaigns/edit-rss.hbs:23
+#: views/campaigns/edit-triggered.hbs:23 views/campaigns/edit.hbs:28
+msgid "Disable clicked tracking"
+msgstr "Deaktiviere das Tracking beim Klicken von Links"
 
 #: views/campaigns/create-triggered.hbs:3
 #: views/campaigns/create-triggered.hbs:4
@@ -410,12 +416,12 @@ msgstr "Vorlage auswählen:"
 #: views/campaigns/create-triggered.hbs:15 views/campaigns/create.hbs:15
 msgid "Selecting a template creates a campaign specific copy from it"
 msgstr ""
-"Wenn Sie eine Vorlage auswählen, wird eine kampagenspezifische Kopie erstellt"
+"Wenn Sie eine Vorlage auswählen, wird eine Kopie nur für diese Kampagne erstellt"
 
 #: views/campaigns/create-triggered.hbs:16 views/campaigns/create.hbs:16
 msgid "Or alternatively use an URL as the message content source:"
 msgstr ""
-"Oder alternativ können Sie eine URL als E-Mail-Inhalts-Quelle verwenden:"
+"Oder alternativ können Sie eine URL als Quelle für den E-Mail Inhalt verwenden:"
 
 #: views/campaigns/create-triggered.hbs:17 views/campaigns/create.hbs:17
 #: views/campaigns/edit-triggered.hbs:25 views/campaigns/edit.hbs:28
@@ -431,13 +437,13 @@ msgstr ""
 #: views/campaigns/edit-triggered.hbs:20 views/campaigns/edit.hbs:23
 #: views/campaigns/view.hbs:15
 msgid "Email \"subject line\""
-msgstr "E-Mail-Betreffzeile"
+msgstr "E-Mail Betreffzeile"
 
 #: views/campaigns/create-triggered.hbs:23 views/campaigns/create.hbs:25
 #: views/campaigns/edit-triggered.hbs:21 views/campaigns/edit.hbs:24
 #: views/settings.hbs:27
 msgid "Keep it relevant and non-spammy"
-msgstr "Halten Sie den Inhalt relevant und non-spammy"
+msgstr "Halten Sie den Inhalt relevant und frei von Spam"
 
 #: views/campaigns/create.hbs:21 views/campaigns/edit.hbs:20
 msgid ""
@@ -445,7 +451,7 @@ msgid ""
 "set"
 msgstr ""
 "Dies ist die Adresse, an welche Antworten gesendet werden, ausser die "
-"Kampagnenspezifische reply-to Adresse ist definiert"
+"Kampagnenspezifische \"reply-to\" Adresse ist definiert"
 
 #: views/campaigns/create.hbs:22 views/campaigns/edit.hbs:21
 #: views/campaigns/view.hbs:14
@@ -458,15 +464,23 @@ msgstr ""
 "Falls gesetzt, ist dies die Adresse an welche E-Mail-Antworten gesendet "
 "werden"
 
+#: views/campaigns/create.hbs:26 views/campaigns/edit.hbs:25
+msgid "Custom unsubscribe (URL)"
+msgstr "Benutzerdefiniertes Deabonnement (URL)"
+
+#: views/campaigns/create.hbs:27 views/campaigns/edit.hbs:26
+msgid "Set a custom unsubscribe url"
+msgstr "Geben Sie eine eigene URL an, die den Abonnenten zum Abmelden angezeigt wird"
+
 #: views/campaigns/delivered.hbs:3 views/campaigns/delivered.hbs:4
 msgid "Delivered info"
-msgstr "Zustellungs-Info"
+msgstr "Zustellungs Info"
 
 #: views/campaigns/delivered.hbs:6
 msgid "Subscribers who received the message and did not bounce/unsubscribe:"
 msgstr ""
-"Abonnenten, welche die Nachricht erhalten haben und nicht bounced oder "
-"abbestellen:"
+"Abonnenten, welche die Nachricht erfolgreich erhalten (kein \"bounce\") und "
+"nicht deabonniert haben:"
 
 #: views/campaigns/delivered.hbs:11
 msgid "Delivery time"
@@ -516,7 +530,7 @@ msgstr "Generell"
 
 #: views/campaigns/edit-triggered.hbs:23 views/campaigns/edit.hbs:26
 msgid "Template Settings"
-msgstr "Vorlagen-Einstellungen"
+msgstr "Vorlagen Einstellungen"
 
 #: views/campaigns/edit-triggered.hbs:24 views/campaigns/edit.hbs:27
 msgid "Template URL"
@@ -568,7 +582,7 @@ msgstr "Anzahl Öffnungen"
 
 #: views/campaigns/unsubscribed.hbs:3 views/campaigns/unsubscribed.hbs:4
 msgid "Unsubscribed info"
-msgstr "Abmeldungs-Info"
+msgstr "Deabonnement Info"
 
 #: views/campaigns/unsubscribed.hbs:6
 msgid "Subscribers who unsubscribed:"
@@ -577,7 +591,7 @@ msgstr "Abonnenten welche deabonnierten:"
 #: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:28
 #: views/lists/subscription/import.hbs:10 routes/lists.js:202
 msgid "Unsubscribed"
-msgstr "Abbestellt"
+msgstr "Deabonniert"
 
 #: views/campaigns/upload-attachment.hbs:7
 msgid "Upload"
@@ -619,7 +633,7 @@ msgstr "Kampagnen Vorschau als"
 
 #: views/campaigns/view.hbs:17
 msgid "Add new test user"
-msgstr "Neuen Test-User hinzufügen"
+msgstr "Neuen Testbenutzer hinzufügen"
 
 #: views/campaigns/view.hbs:18
 msgid "No test users yet, create one here"
@@ -643,7 +657,7 @@ msgstr "Blacklisted"
 
 #: views/campaigns/view.hbs:23
 msgid "List subscribers who blacklisted by global blacklist"
-msgstr ""
+msgstr "Abonnenten, die von der globalen Blacklist aufgelistet wurden"
 
 #: views/campaigns/view.hbs:24 routes/lists.js:202
 msgid "Bounced"
@@ -685,7 +699,7 @@ msgstr "Abonnenten, die auf einen Link geklickt haben"
 msgid ""
 "Are you sure? This action would start sending messages to the selected list"
 msgstr ""
-"Sind Sie sicher? Diese Aktion würde mit dem Senden von Nachrichten an die "
+"Sind Sie sicher? Diese Aktion wird mit dem Senden von Nachrichten an die "
 "ausgewählte Liste beginnen"
 
 #: views/campaigns/view.hbs:35
@@ -706,7 +720,7 @@ msgstr "An Abonnenten senden:"
 
 #: views/campaigns/view.hbs:39
 msgid "Are you sure? This action would reset scheduling"
-msgstr "Sind Sie sicher? Diese Aktion würde die Terminierung zurücksetzen"
+msgstr "Sind Sie sicher? Diese Aktion wird die Terminierung zurücksetzen"
 
 #: views/campaigns/view.hbs:40
 msgid "Cancel"
@@ -728,7 +742,7 @@ msgstr "Am senden"
 msgid ""
 "Are you sure? This action would resume sending messages to the selected list"
 msgstr ""
-"Sind Sie sicher? Diese Aktion würde das Senden von E-Mails an die "
+"Sind Sie sicher? Diese Aktion wird das Senden von E-Mails an die "
 "ausgewählte Liste fortsetzen"
 
 #: views/campaigns/view.hbs:45 views/campaigns/view.hbs:49
@@ -762,7 +776,7 @@ msgid ""
 "Are you sure? This action would pause sending new entries in RSS feed as "
 "email messages to the selected list"
 msgstr ""
-"Sind Sie sicher? Diese Aktion würde das Senden neuer Einträge des RSS-Feed "
+"Sind Sie sicher? Diese Aktion wird das Senden neuer Einträge des RSS-Feed "
 "als E-Mail-Nachrichten an die ausgewählte Liste pausieren"
 
 #: views/campaigns/view.hbs:55 views/campaigns/view.hbs:59
@@ -830,7 +844,7 @@ msgstr "Ändern Sie Ihr Passwort"
 #: views/emails/password-reset-text.hbs:2
 msgid "We have received a password change request for your Mailtrain account:"
 msgstr ""
-"Wir haben eine Passwortänderungsanforderung für Ihr Mailtrain-Konto erhalten:"
+"Wir haben eine Anforderung zur Passwortänderungs für Ihr Mailtrain-Konto erhalten:"
 
 #: views/emails/password-reset-html.hbs:3
 #: views/emails/password-reset-text.hbs:3
@@ -843,8 +857,8 @@ msgid ""
 "If you did not ask to change your password, then you can ignore this email "
 "and your password will not be changed."
 msgstr ""
-"Wenn Sie nicht angefordert haben, Ihr Passwort zu ändern, können Sie diese E-"
-"Mail ignorieren und Ihr Passwort wird nicht geändert."
+"Wenn Sie Ihr Passwort nicht ändern wollen, können Sie diese E-"
+"Mail einfach ignorieren."
 
 #: views/emails/rss-html.hbs:1 views/emails/stationery-html.hbs:3
 #: views/emails/stationery-text.hbs:3
@@ -864,7 +878,7 @@ msgstr "Newsletter abbestellen"
 #: views/emails/rss-html.hbs:3 views/emails/stationery-html.hbs:5
 #: views/emails/stationery-text.hbs:5
 msgid "View this email in your browser"
-msgstr "E-Mail in Browser ansehen"
+msgstr "E-Mail im Browser ansehen"
 
 #: views/emails/stationery-html.hbs:1 views/emails/stationery-text.hbs:1
 msgid "Hey [FIRST_NAME/Customer],"
@@ -885,10 +899,10 @@ msgid ""
 "API or import from a CSV file. All lists come with support for custom fields "
 "and merge tags as well."
 msgstr ""
-"Mailtrain ermöglicht es Ihnen, auch sehr große Listen zu verwalten. Million "
+"Mailtrain ermöglicht es Ihnen, auch sehr große Listen zu verwalten. Millionen von "
 "Abonnenten? Kein Problem. Sie können Abonnenten manuell über die API "
-"hinzufügen oder aus einer CSV-Datei importieren. Alle Listen kommen mit "
-"Unterstützung für benutzerdefinierte Felder und Merge-Tags."
+"hinzufügen oder aus einer CSV-Datei importieren. Für alle Listen können "
+"zusätzliche Datenfelder und Merge Tags genutzt werden."
 
 #: views/index.hbs:3 views/index.hbs:7 views/index.hbs:10 views/index.hbs:13
 #: views/index.hbs:16 views/index.hbs:19 views/index.hbs:22 views/index.hbs:25
@@ -900,7 +914,7 @@ msgstr "Zeige mehr"
 #: views/lists/fields/edit.hbs:3 views/lists/fields/fields.hbs:3
 #: views/lists/fields/fields.hbs:5 views/lists/view.hbs:6
 msgid "Custom Fields"
-msgstr "Zusätzliche Felder"
+msgstr "Zusätzliche Datenfelder"
 
 #: views/index.hbs:5
 msgid ""
@@ -908,8 +922,8 @@ msgid ""
 "Every custom field can be included in the generated newsletters through "
 "merge tags."
 msgstr ""
-"Textfelder, Nummern, Dropdowns oder Checkboxen, Mailtrain hat sie alle. "
-"Jedes benutzerdefinierte Feld kann in den generierten Newslettern mittels "
+"Textfelder, Nummern, Dropdowns oder Checkboxen, Mailtrain bietet all das. "
+"Jedes zusätzliche Feld kann in den generierten Newslettern über "
 "Merge-Tags eingebunden werden."
 
 #: views/index.hbs:6
@@ -918,7 +932,7 @@ msgstr "Mailtrain bietet auch benutzerdefinierte Formulare."
 
 #: views/index.hbs:8
 msgid "List Segmentation"
-msgstr "Segmentierung"
+msgstr "Listen Segmentierung"
 
 #: views/index.hbs:9
 msgid ""
@@ -939,13 +953,13 @@ msgid ""
 "then Mailtrain auto-generates a new campaign using entry data as message "
 "contents and sends it to selected subscribers."
 msgstr ""
-"Mailtrain kann RSS-Feeds verfolgen, und wenn ein neuer Eintrag in einem Feed "
-"erkannt wird, sendet Mailtrain automatisch eine neue Kampagne mit dem RSS-"
-"Beitrag als Nachrichteninhalt an die ausgewählte Liste."
+"Mailtrain kann RSS-Feeds verfolgen und bei neuen Einträgen automatisch "
+"eine neue Kampagne mit dem RSS-Beitrag als Nachrichteninhalt an die "
+"ausgewählte Liste senden."
 
 #: views/index.hbs:14
 msgid "GPG Encryption"
-msgstr "GPG-Verschlüsselung"
+msgstr "GPG Verschlüsselung"
 
 #: views/index.hbs:15
 msgid ""
@@ -954,7 +968,7 @@ msgid ""
 msgstr ""
 "Wenn für eine Liste ein benutzerdefiniertes Feld für den GPG-Public-Key "
 "vorhanden ist, können Abonnenten ihren GPG-Public-Key hochladen, um "
-"verschlüsselte E-Mails der Liste zu empfangen."
+"alle E-Mails verschlüsselt zu erhalten."
 
 #: views/index.hbs:17
 msgid "Click Stats"
@@ -984,7 +998,7 @@ msgstr ""
 
 #: views/index.hbs:23
 msgid "Send via Any Provider"
-msgstr "Sende mit"
+msgstr "Sende mit beliebigen Anbietern"
 
 #: views/index.hbs:24
 msgid ""
@@ -1015,7 +1029,7 @@ msgstr ""
 
 #: views/index.hbs:29
 msgid "Donate to Author"
-msgstr "Dem Autor Spenden"
+msgstr "Dem Autor spenden"
 
 #: views/index.hbs:30
 msgid "Mailtrain is available under GPLv3 license and completely open source."
@@ -1127,6 +1141,15 @@ msgstr "Name der Liste"
 msgid "Allow public users to subscribe themselves"
 msgstr "Allen erlauben, diese Liste selbst zu abonnieren"
 
+#: views/lists/create.hbs:11 views/lists/edit.hbs:17
+msgid "Unsubscription"
+msgstr "Deabonnement"
+
+#: views/lists/create.hbs:12 views/lists/edit.hbs:18
+msgid "Select how an unsuscription request by subscriber is handled."
+msgstr ""
+"Wählen Sie, welche Schritte zum Abmelden von der Liste notwendig sein sollen."
+
 #: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:8
 msgid "Edit List"
 msgstr "Liste bearbeiten"
@@ -1145,7 +1168,7 @@ msgstr "Diese Listen ID wird den Abonnenten dargestellt"
 
 #: views/lists/edit.hbs:12
 msgid "Custom Form"
-msgstr "Formular"
+msgstr "Benutzerdefiniertes Formular"
 
 #: views/lists/edit.hbs:13 views/lists/forms/forms.hbs:11
 msgid "Default Mailtrain Form"
@@ -1153,11 +1176,18 @@ msgstr "Standard Mailtrain Formular"
 
 #: views/lists/edit.hbs:14
 msgid ""
-"The custom form used for this list. You can create a form <a href=\"/forms/"
-"{{id}}/create\">here</a>."
+"The custom form used for this list. You can create a form <a href=\"/forms/{{id}}/create\">here</a>."
 msgstr ""
-"Das Standard-Formular dieser Liste. Wenn Sie ein Formular erstellt möchten, "
-"klicken Sie <a href=\"/forms/{{id}}/create\">hier</a>."
+"Das Standard-Formular dieser Liste. Wenn Sie ein benutzerdefiniertes Formular "
+"erstellen möchten, klicken Sie <a href=\"/forms/{{id}}/create\">hier</a>."
+
+#: views/lists/edit.hbs:19
+msgid "Unsubscribe Header"
+msgstr "Deabonnement Header"
+
+#: views/lists/edit.hbs:20
+msgid "Do not send List-Unsubscribe headers"
+msgstr "Sende keine Header zum Abmelden von der Liste"
 
 #: views/lists/edit.hbs:16
 msgid "Delete List"
@@ -1169,7 +1199,7 @@ msgstr "Feld erstellen"
 
 #: views/lists/fields/create.hbs:5 views/lists/fields/fields.hbs:4
 msgid "Create Custom Field"
-msgstr "Feld erstellen"
+msgstr "zusäzliches Feld erstellen"
 
 #: views/lists/fields/create.hbs:6 views/lists/fields/create.hbs:7
 #: views/lists/fields/edit.hbs:7 views/lists/fields/edit.hbs:8
@@ -1247,7 +1277,7 @@ msgstr "Dropdown"
 #: views/lists/fields/create.hbs:23 views/lists/fields/edit.hbs:24
 #: lib/models/fields.js:22
 msgid "Radio Buttons"
-msgstr "Radio Knöpfe"
+msgstr "Radio Buttons"
 
 #: views/lists/fields/create.hbs:24 views/lists/fields/edit.hbs:25
 #: lib/models/fields.js:23
@@ -1270,7 +1300,7 @@ msgstr "Erforderlich für Gruppenoptionen"
 #: views/lists/fields/edit.hbs:35 views/lists/fields/edit.hbs:36
 #: views/lists/fields/fields.hbs:9
 msgid "Default merge tag value"
-msgstr "Standard-Merge-Tag-Wert"
+msgstr "Standard Wert für Merge-Tag"
 
 #: views/lists/fields/create.hbs:32 views/lists/fields/edit.hbs:34
 msgid ""
@@ -1305,7 +1335,7 @@ msgstr "Feld bearbeiten"
 
 #: views/lists/fields/edit.hbs:5
 msgid "Edit Custom Field"
-msgstr "Feld bearbeiten"
+msgstr "Zusätzliches Feld bearbeiten"
 
 #: views/lists/fields/edit.hbs:6
 msgid "Back to fields"
@@ -1347,7 +1377,7 @@ msgstr "Bearbeiten"
 #: views/lists/forms/forms.hbs:3 views/lists/forms/forms.hbs:5
 #: views/lists/view.hbs:5
 msgid "Custom Forms"
-msgstr "Formulare"
+msgstr "Benutzerdefinierte Formulare"
 
 #: views/lists/forms/create.hbs:4
 msgid "Create Form"
@@ -1355,7 +1385,7 @@ msgstr "Formular erstellen"
 
 #: views/lists/forms/create.hbs:5 views/lists/forms/forms.hbs:4
 msgid "Create Custom Form"
-msgstr "Formular erstellen"
+msgstr "Benutzerdefiniertes Formular erstellen"
 
 #: views/lists/forms/create.hbs:6 views/lists/forms/create.hbs:7
 #: views/lists/forms/edit.hbs:7 views/lists/forms/edit.hbs:8
@@ -1807,7 +1837,7 @@ msgstr "Deaktiviert"
 
 #: views/lists/view.hbs:3
 msgid "Subscription Form"
-msgstr "Abonnement-Formular"
+msgstr "Abonnement Formular"
 
 #: views/lists/view.hbs:4
 msgid "List Actions"
@@ -1838,7 +1868,7 @@ msgstr "Filter"
 
 #: views/lists/view.hbs:17
 msgid "Subscriptions"
-msgstr "Abonnemente"
+msgstr "Abonnements"
 
 #: views/lists/view.hbs:18
 msgid "Imports"
@@ -2107,7 +2137,7 @@ msgstr "Wenn markiert zeigt der Editor HTML-Code ohne Vorschau an"
 
 #: views/settings.hbs:11
 msgid "Disable subscription confirmation messages"
-msgstr "Abonnement-Bestätigungsmeldungen deaktivieren"
+msgstr "Bestätigungsmeldungen für Abonnements deaktivieren"
 
 #: views/settings.hbs:12
 msgid ""
@@ -2785,6 +2815,10 @@ msgstr "Optionale Kommentare zu dieser Vorlage"
 msgid "Back to templates"
 msgstr "Zurück zu Vorlagen"
 
+#: views/templates/edit.hbs:11
+msgid "Duplicate"
+msgstr "Duplizieren"
+
 #: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2
 #: views/triggers/edit.hbs:2 views/triggers/triggered.hbs:2
 #: views/triggers/triggers.hbs:2 views/triggers/triggers.hbs:4
@@ -3072,7 +3106,7 @@ msgstr ""
 
 #: views/users/api.hbs:28
 msgid "Remove subscription"
-msgstr "Abonement entfernen"
+msgstr "Abonnement entfernen"
 
 #: views/users/api.hbs:29
 msgid "This API call marks a subscription as unsubscribed"
@@ -3493,7 +3527,7 @@ msgstr "Abonnement-ID fehlt"
 
 #: lib/models/subscriptions.js:499
 msgid "Missing Subscription email address"
-msgstr "Abonnement-E-Mail-Adresse fehlt"
+msgstr "Abonnement E-Mail Adresse fehlt"
 
 #: lib/models/subscriptions.js:578 lib/models/subscriptions.js:827
 #: lib/models/subscriptions.js:1090
@@ -4107,6 +4141,33 @@ msgstr "Import gestartet"
 #: routes/lists.js:714
 msgid "Import restarted"
 msgstr "Import neu gestartet"
+
+#: routes/lists.js:797
+msgid "One-step (i.e. no email with confirmation link)"
+msgstr "Ein Schritt ohne Formular (direkt nach dem Klicken auf den Link erfolgt die Abmeldung)"
+
+#: routes/lists.js:803
+msgid ""
+"One-step with unsubscription form (i.e. no email with confirmation link)"
+msgstr ""
+"Ein Schritt mit Formular (nach dem Klick wird ein Formular mit der E-Mail Adresse angezeigt)"
+
+#: routes/lists.js:809
+msgid "Two-step (i.e. an email with confirmation link will be sent)"
+msgstr "Zwei Schritte ohne Formular (direkt nach dem Klick auf den Link wird eine E-Mail mit Bestätigungslink versendet)"
+
+#: routes/lists.js:815
+msgid ""
+"Two-step with unsubscription form (i.e. an email with confirmation link will "
+"be sent)"
+msgstr ""
+"Zwei Schritte mit Formular (nach dem Klick wird ein Formular mit der E-Mail Adresse " "angezeigt, dann wird eine E-Mail mit Bestätigungslink versendet)"
+
+#: routes/lists.js:821
+msgid ""
+"Manual (i.e. unsubscription has to be performed by the list administrator)"
+msgstr ""
+"Manuell (die Abmeldung muss durch den Listen Admin vorgenommen werden)"
 
 #: routes/report-templates.js:246
 msgid "Could not create report template"
