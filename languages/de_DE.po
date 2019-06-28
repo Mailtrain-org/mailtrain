@@ -900,7 +900,7 @@ msgstr "Zeige mehr"
 #: views/lists/fields/edit.hbs:3 views/lists/fields/fields.hbs:3
 #: views/lists/fields/fields.hbs:5 views/lists/view.hbs:6
 msgid "Custom Fields"
-msgstr "Felder"
+msgstr "Zusätzliche Felder"
 
 #: views/index.hbs:5
 msgid ""
