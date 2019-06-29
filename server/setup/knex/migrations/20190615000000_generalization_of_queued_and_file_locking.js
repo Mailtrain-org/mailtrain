@@ -15,7 +15,7 @@ const entityTypesWithFiles = {
 exports.up = (knex, Promise) => (async() => {
     await knex.schema.table('queued', table => {
         table.integer('send_configuration').unsigned().notNullable();
-        table.integer('type').unsigned().notNullable(); // The values come from campaign-sender.js:MessageType
+        table.integer('type').unsigned().notNullable(); // The values come from message-sender.js:MessageType
         table.text('data', 'longtext');
     });
 

@@ -3,7 +3,7 @@
 const config = require('config');
 const log = require('../lib/log');
 const mailers = require('../lib/mailers');
-const {CampaignSender} = require('../lib/campaign-sender');
+const messageSender = require('../lib/message-sender');
 require('../lib/fork');
 
 const workerId = Number.parseInt(process.argv[2]);
@@ -17,8 +17,10 @@ async function processCampaignMessages(campaignId, messages) {
 
     running = true;
 
-    const cs = new CampaignSender();
+    const cs = new MessageSender();
     await cs.initByCampaignId(campaignId);
+
+    let withErrors = false;
 
     for (const msgData of messages) {
         try {
@@ -26,14 +28,22 @@ async function processCampaignMessages(campaignId, messages) {
 
             log.verbose('Senders', 'Message sent and status updated for %s:%s', msgData.listId, msgData.email);
         } catch (err) {
-            log.error('Senders', `Sending message to ${msgData.listId}:${msgData.email} failed with error: ${err.message}`);
-            log.verbose(err.stack);
+
+            if (err instanceof mailers.SendConfigurationError) {
+                log.error('Senders', `Sending message to ${msgData.listId}:${msgData.email} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                withErrors = true;
+                break;
+
+            } else {
+                log.error('Senders', `Sending message to ${msgData.listId}:${msgData.email} failed with error: ${err.message}. Dropping the message.`);
+                log.verbose(err.stack);
+            }
         }
     }
 
     running = false;
 
-    sendToMaster('messages-processed');
+    sendToMaster('messages-processed', { withErrors });
 }
 
 async function processQueuedMessages(sendConfigurationId, messages) {
@@ -44,26 +54,34 @@ async function processQueuedMessages(sendConfigurationId, messages) {
 
     running = true;
 
+    let withErrors = false;
+
     for (const msgData of messages) {
         const queuedMessage = msgData.queuedMessage;
         try {
-            await CampaignSender.sendQueuedMessage(queuedMessage);
-
+            await messageSender.sendQueuedMessage(queuedMessage);
             log.verbose('Senders', 'Message sent and status updated for %s:%s', queuedMessage.list, queuedMessage.subscription);
         } catch (err) {
-            log.error('Senders', `Sending message to ${queuedMessage.list}:${queuedMessage.subscription} failed with error: ${err.message}`);
-            log.verbose(err.stack);
+            if (err instanceof mailers.SendConfigurationError) {
+                log.error('Senders', `Sending message to ${queuedMessage.list}:${queuedMessage.subscription} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                withErrors = true;
+                break;
+            } else {
+                log.error('Senders', `Sending message to ${queuedMessage.list}:${queuedMessage.subscription} failed with error: ${err.message}. Dropping the message.`);
+                log.verbose(err.stack);
+            }
         }
     }
 
     running = false;
 
-    sendToMaster('messages-processed');
+    sendToMaster('messages-processed', { withErrors });
 }
 
-function sendToMaster(msgType) {
+function sendToMaster(msgType, data) {
     process.send({
-        type: msgType
+        type: msgType,
+        data
     });
 }
 

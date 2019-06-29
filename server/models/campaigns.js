@@ -17,11 +17,11 @@ const {SubscriptionStatus} = require('../../shared/lists');
 const subscriptions = require('./subscriptions');
 const segments = require('./segments');
 const senders = require('../lib/senders');
-const {LinkId} = require('./links');
+const links = require('./links');
 const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
-const {CampaignSender, MessageType} = require('../lib/campaign-sender');
+const messageSender = require('../lib/message-sender');
 const lists = require('./lists');
 
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
@@ -298,7 +298,7 @@ async function listOpensDTAjax(context, campaignId, params) {
                     return this.from('campaign_links')
                         .where('campaign_links.campaign', campaignId)
                         .where('campaign_links.list', cpgList.list)
-                        .where('campaign_links.link', LinkId.OPEN)
+                        .where('campaign_links.link', links.LinkId.OPEN)
                         .as('related_campaign_links');
                 },
                 'related_campaign_links.subscription', subsTable + '.id')
@@ -705,16 +705,12 @@ async function getMessageByCid(messageCid, withVerpHostname = false) { // withVe
 }
 
 async function getMessageByResponseId(responseId) {
-    return await knex.transaction(async tx => {
-        const message = await tx('campaign_messages')
-            .where('campaign_messages.response_id', responseId)
-            .select([
-                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
-            ])
-            .first();
-
-        return message;
-    });
+    return await knex('campaign_messages')
+        .where('campaign_messages.response_id', responseId)
+        .select([
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+        ])
+        .first();
 }
 
 const statusFieldMapping = {
@@ -747,7 +743,6 @@ async function _changeStatusByMessageTx(tx, context, message, subscriptionStatus
 }
 
 async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, subscriptionStatus) {
-    const campaign = await tx('campaigns').where('cid', campaignCid);
     const message = await tx('campaign_messages')
         .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
         .where('campaigns.cid', campaignCid)
@@ -856,7 +851,7 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId) {
     }
 }
 
-async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, scheduled = null) {
+async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, startAt) {
     await knex.transaction(async tx => {
         const entity = await getByIdTx(tx, context, campaignId, false);
 
@@ -866,10 +861,18 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);
         }
 
-        await tx('campaigns').where('id', campaignId).update({
+        const updateData = {
             status: newState,
-            scheduled
-        });
+        };
+
+        if (startAt !== undefined) {
+            updateData.scheduled = startAt;
+            if (!startAt || startAt.valueOf() < Date.now()) {
+                updateData.start_at = new Date();
+            }
+        }
+
+        await tx('campaigns').where('id', campaignId).update(updateData);
 
         await activityLog.logEntityActivity('campaign', CampaignActivityType.STATUS_CHANGE, campaignId, {status: newState});
     });
@@ -929,8 +932,8 @@ async function getStatisticsOpened(context, id) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
-        const devices = await tx('campaign_links').where('campaign', id).where('link', LinkId.OPEN).groupBy('device_type').select('device_type AS key').count('* as count');
-        const countries = await tx('campaign_links').where('campaign', id).where('link', LinkId.OPEN).groupBy('country').select('country AS key').count('* as count');
+        const devices = await tx('campaign_links').where('campaign', id).where('link', links.LinkId.OPEN).groupBy('device_type').select('device_type AS key').count('* as count');
+        const countries = await tx('campaign_links').where('campaign', id).where('link', links.LinkId.OPEN).groupBy('country').select('country AS key').count('* as count');
 
         return {
             devices,
@@ -959,7 +962,7 @@ async function testSend(context, data) {
 
     await knex.transaction(async tx => {
         const processSubscriber = async (sendConfigurationId, listId, subscriptionId, messageData) => {
-            await CampaignSender.queueMessageTx(tx, sendConfigurationId, listId, subscriptionId, MessageType.TEST, messageData);
+            await messageSender.queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, messageSender.MessageType.TEST, messageData);
 
             await activityLog.logEntityActivity('campaign', CampaignActivityType.TEST_SEND, campaignId, {list: listId, subscription: subscriptionId});
         };

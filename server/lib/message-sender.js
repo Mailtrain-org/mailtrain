@@ -15,9 +15,9 @@ const links = require('../models/links');
 const {CampaignSource, CampaignType} = require('../../shared/campaigns');
 const {SubscriptionStatus} = require('../../shared/lists');
 const tools = require('./tools');
+const htmlToText = require('html-to-text');
 const request = require('request-promise');
 const files = require('../models/files');
-const htmlToText = require('html-to-text');
 const {getPublicUrl} = require('./urls');
 const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
@@ -26,10 +26,11 @@ const { enforce } = require('./helpers');
 const MessageType = {
     REGULAR: 0,
     TRIGGERED: 1,
-    TEST: 2
+    TEST: 2,
+    SUBSCRIPTION: 3
 };
 
-class CampaignSender {
+class MessageSender {
     constructor() {
     }
 
@@ -40,6 +41,8 @@ class CampaignSender {
         - sendConfiguration, listId, attachments, html, text, subject
      */
     async _init(settings) {
+        this.type = settings.type;
+
         this.listsById = new Map(); // listId -> list
         this.listsByCid = new Map(); // listCid -> list
         this.listsFieldsGrouped = new Map(); // listId -> fieldsGrouped
@@ -47,11 +50,13 @@ class CampaignSender {
         await knex.transaction(async tx => {
             if (settings.campaignCid) {
                 this.campaign = await campaigns.rawGetByTx(tx, 'cid', settings.campaignCid);
+                this.isMassMail = true;
 
             } else if (settings.campaignId) {
                 this.campaign = await campaigns.rawGetByTx(tx, 'id', settings.campaignId);
+                this.isMassMail = true;
 
-            } else {
+            } else if (this.type === MessageType.TEST) {
                 // We are not within scope of a campaign (i.e. templates in MessageType.TEST message)
                 // This is to fake the campaign for getMessageLinks, which is called inside formatMessage
                 this.campaign = {
@@ -60,11 +65,15 @@ class CampaignSender {
                     from_email_override: null,
                     reply_to_override: null
                 };
+                this.isMassMail = true;
+
+            } else {
+                this.isMassMail = false;
             }
 
             if (settings.sendConfigurationId) {
                 this.sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), settings.sendConfigurationId, false, true);
-            } else if (this.campaign.send_configuration) {
+            } else if (this.campaign && this.campaign.send_configuration) {
                 this.sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), this.campaign.send_configuration, false, true);
             } else {
                 enforce(false);
@@ -79,7 +88,7 @@ class CampaignSender {
                 this.listsByCid.set(list.cid, list);
                 this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
 
-            } else if (this.campaign.lists) {
+            } else if (this.campaign && this.campaign.lists) {
                 for (const listSpec of this.campaign.lists) {
                     const list = await lists.getByIdTx(tx, contextHelpers.getAdminContext(), listSpec.list);
                     this.listsById.set(list.id, list);
@@ -94,7 +103,7 @@ class CampaignSender {
             if (settings.attachments) {
                 this.attachments = settings.attachments;
 
-            } else if (this.campaign.id) {
+            } else if (this.campaign && this.campaign.id) {
                 const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', this.campaign.id);
 
                 this.attachments = [];
@@ -109,16 +118,21 @@ class CampaignSender {
                 this.attachments = [];
             }
 
-            if (settings.html !== undefined) {
+            if (settings.renderedHtml !== undefined) {
+                this.rendereHtml = settings.rendereHtml;
+                this.renderedText = settings.renderedText;
+
+            } else if (settings.html !== undefined) {
                 this.html = settings.html;
                 this.text = settings.text;
-            } else if (this.campaign.source === CampaignSource.TEMPLATE) {
+
+            } else if (this.campaign && this.campaign.source === CampaignSource.TEMPLATE) {
                 this.template = await templates.getByIdTx(tx, contextHelpers.getAdminContext(), this.campaign.data.sourceTemplate, false);
             }
 
             if (settings.subject !== undefined) {
                 this.subject = settings.subject;
-            } else if (this.campaign.subject !== undefined) {
+            } else if (this.campaign && this.campaign.subject !== undefined) {
                 this.subject = this.campaign.subject;
             } else {
                 enforce(false);
@@ -142,7 +156,7 @@ class CampaignSender {
             text = this.text;
             renderTags = true;
 
-        } else {
+        } else if (campaign) {
             if (campaign.source === CampaignSource.URL) {
                 const form = tools.getMessageLinks(campaign, list, subscriptionGrouped);
                 for (const key in mergeTags) {
@@ -222,14 +236,16 @@ class CampaignSender {
     }
 
     async initByCampaignCid(campaignCid) {
-        await this._init({campaignCid});
+        await this._init({type: MessageType.REGULAR, campaignCid});
     }
 
     async initByCampaignId(campaignId) {
-        await this._init({campaignId});
+        await this._init({type: MessageType.REGULAR, campaignId});
     }
 
     async getMessage(listCid, subscriptionCid) {
+        enforce(this.type === MessageType.REGULAR);
+
         const list = this.listsByCid.get(listCid);
         const subscriptionGrouped = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid);
         const flds = this.listsFieldsGrouped.get(list.id);
@@ -242,93 +258,81 @@ class CampaignSender {
 
     /*
         subData is one of:
-        - queuedMessage
+        - subscriptionId, listId, attachments
         or
         - email, listId
+        or
+        - to, subject
      */
     async _sendMessage(subData) {
-        let msgType;
-        let subscriptionGrouped;
-        let listId;
+        let msgType = this.type;
+        let to, email;
+        let envelope = false;
+        let sender = false;
+        let headers = {};
+        let listHeader = false;
+        let encryptionKeys = [];
+        let subject;
+        let message;
 
-        if (subData.queuedMessage) {
-            const queuedMessage = subData.queuedMessage;
-            msgType = queuedMessage.type;
-            listId = queuedMessage.list;
-            subscriptionGrouped = await subscriptions.getById(contextHelpers.getAdminContext(), listId, queuedMessage.subscription);
+        let subscriptionGrouped, list; // May be undefined
+        const campaign = this.campaign; // May be undefined
 
-        } else {
-            enforce(subData.email);
-            enforce(subData.listId);
+        if (subData.listId) {
+            let listId;
+            subscriptionGrouped;
 
-            msgType = MessageType.REGULAR;
-            listId = subData.listId;
-            subscriptionGrouped = await subscriptions.getByEmail(contextHelpers.getAdminContext(), listId, subData.email);
-        }
+            if (subData.subscriptionId) {
+                listId = subData.listId;
+                subscriptionGrouped = await subscriptions.getById(contextHelpers.getAdminContext(), listId, subData.subscriptionId);
 
-        const email = subscriptionGrouped.email;
-
-        if (await blacklist.isBlacklisted(email)) {
-            return;
-        }
-
-        const list = this.listsById.get(listId);
-        const flds = this.listsFieldsGrouped.get(list.id);
-        const campaign = this.campaign;
-
-        const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
-
-        const encryptionKeys = [];
-        for (const fld of flds) {
-            if (fld.type === 'gpg' && mergeTags[fld.key]) {
-                encryptionKeys.push(mergeTags[fld.key].trim());
+            } else if (subData.email) {
+                listId = subData.listId;
+                subscriptionGrouped = await subscriptions.getByEmail(contextHelpers.getAdminContext(), listId, subData.email);
             }
-        }
 
-        const sendConfiguration = this.sendConfiguration;
+            list = this.listsById.get(listId);
+            email = subscriptionGrouped.email;
 
-        const {html, text, attachments} = await this._getMessage(list, subscriptionGrouped, mergeTags, true);
+            const flds = this.listsFieldsGrouped.get(list.id);
+            const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
 
-        const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
-
-        let listUnsubscribe = null;
-        if (!list.listunsubscribe_disabled) {
-            listUnsubscribe = campaign.unsubscribe_url
-                ? tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, campaign.unsubscribe_url)
-                : getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscriptionGrouped.cid);
-        }
-
-        const mailer = await mailers.getOrCreateMailer(sendConfiguration.id);
-
-        await mailer.throttleWait();
-
-        const getOverridable = key => {
-            if (sendConfiguration[key + '_overridable'] && this.campaign[key + '_override'] !== null) {
-                return campaign[key + '_override'] || '';
-            } else {
-                return sendConfiguration[key] || '';
+            for (const fld of flds) {
+                if (fld.type === 'gpg' && mergeTags[fld.key]) {
+                    encryptionKeys.push(mergeTags[fld.key].trim());
+                }
             }
-        };
 
-        const mail = {
-            from: {
-                name: getOverridable('from_name'),
-                address: getOverridable('from_email')
-            },
-            replyTo: getOverridable('reply_to'),
-            xMailer: sendConfiguration.x_mailer ? sendConfiguration.x_mailer : false,
-            to: {
+            message = await this._getMessage(list, subscriptionGrouped, mergeTags, true);
+
+            const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
+
+            let listUnsubscribe = null;
+            if (!list.listunsubscribe_disabled) {
+                listUnsubscribe = campaign.unsubscribe_url
+                    ? tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, campaign.unsubscribe_url)
+                    : getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscriptionGrouped.cid);
+            }
+
+            to = {
                 name: list.to_name === null ? undefined : tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
                 address: subscriptionGrouped.email
-            },
-            sender: this.useVerpSenderHeader ? campaignAddress + '@' + sendConfiguration.verp_hostname : false,
+            };
 
-            envelope: this.useVerp ? {
-                from: campaignAddress + '@' + sendConfiguration.verp_hostname,
-                to: subscriptionGrouped.email
-            } : false,
+            subject = tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, this.subject, false);
 
-            headers: {
+            if (this.useVerp) {
+                envelope = {
+                    from: campaignAddress + '@' + sendConfiguration.verp_hostname,
+                    to: subscriptionGrouped.email
+                };
+            }
+
+            if (this.useVerpSenderHeader) {
+                sender = campaignAddress + '@' + sendConfiguration.verp_hostname;
+            }
+
+            headers = {
                 'x-fbl': campaignAddress,
                 // custom header for SparkPost
                 'x-msys-api': JSON.stringify({
@@ -348,175 +352,237 @@ class CampaignSender {
                     prepared: true,
                     value: libmime.encodeWords(list.name) + ' <' + list.cid + '.' + getPublicUrl() + '>'
                 }
-            },
-            list: {
-                unsubscribe: listUnsubscribe
-            },
-            subject: tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, this.subject, false),
-            html,
-            text,
+            };
 
-            attachments,
+            listHeader = {
+                unsubscribe: listUnsubscribe
+            };
+
+        } else if (subData.to) {
+            to = subData.to;
+            email = to.address;
+            subject = this.subject;
+            encryptionKeys = subData.encryptionKeys;
+            message = await this._getMessage();
+        }
+
+        if (await blacklist.isBlacklisted(email)) {
+            return;
+        }
+
+        const sendConfiguration = this.sendConfiguration;
+        const mailer = await mailers.getOrCreateMailer(sendConfiguration.id);
+
+        await mailer.throttleWait();
+
+        const getOverridable = key => {
+            if (campaign && sendConfiguration[key + '_overridable'] && this.campaign[key + '_override'] !== null) {
+                return campaign[key + '_override'] || '';
+            } else {
+                return sendConfiguration[key] || '';
+            }
+        };
+
+        const mail = {
+            from: {
+                name: getOverridable('from_name'),
+                address: getOverridable('from_email')
+            },
+            replyTo: getOverridable('reply_to'),
+            xMailer: sendConfiguration.x_mailer ? sendConfiguration.x_mailer : false,
+            to,
+            sender,
+            envelope,
+            headers,
+            list: listHeader,
+            subject,
+            html: message.html,
+            text: message.text,
+            attachments: message.attachments || [],
             encryptionKeys
         };
 
 
-        let status;
         let response;
         let responseId = null;
-        try {
-            const info = await mailer.sendMassMail(mail);
-            status = SubscriptionStatus.SUBSCRIBED;
 
-            log.verbose('CampaignSender', `response: ${info.response}   messageId: ${info.messageId}`);
+        const info = this.isMassMail ? await mailer.sendMassMail(mail) : await mailer.sendTransactionalMail(mail);
 
-            let match;
-            if ((match = info.response.match(/^250 Message queued as ([0-9a-f]+)$/))) {
-                /*
-                    ZoneMTA
-                    info.response: 250 Message queued as 1691ad7f7ae00080fd
-                    info.messageId: <e65c9386-e899-7d01-b21e-ec03c3a9d9b4@sathyasai.org>
-                 */
-                response = info.response;
-                responseId = match[1];
+        log.verbose('MessageSender', `response: ${info.response}   messageId: ${info.messageId}`);
 
-            } else if ((match = info.messageId.match(/^<([^>@]*)@.*amazonses\.com>$/))) {
-                /*
-                    AWS SES
-                    info.response: 0102016ad2244c0a-955492f2-9194-4cd1-bef9-70a45906a5a7-000000
-                    info.messageId: <0102016ad2244c0a-955492f2-9194-4cd1-bef9-70a45906a5a7-000000@eu-west-1.amazonses.com>
-                 */
-                response = info.response;
-                responseId = match[1];
-
-            } else if (info.response.match(/^250 OK$/) && (match = info.messageId.match(/^<([^>]*)>$/))) {
-                /*
-                    Postal Mail Server
-                    info.response: 250 OK
-                    info.messageId:  <xxxxxxxxx@xxx.xx> (postal messageId)
-                 */
-                response = info.response;
-                responseId = match[1];
-
-            } else {
-                /*
-                    Fallback - Mailtrain v1 behavior
-                 */
-                response = info.response || info.messageId;
-                responseId = response.split(/\s+/).pop();
-            }
-
-
-            if (msgType === MessageType.REGULAR || msgType === MessageType.TRIGGERED) {
-                await knex('campaigns').where('id', campaign.id).increment('delivered');
-            }
-        } catch (err) {
-            console.log(err);
-
+        let match;
+        if ((match = info.response.match(/^250 Message queued as ([0-9a-f]+)$/))) {
             /*
-            { Error: connect ECONNREFUSED 127.0.0.1:55871
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1097:14)
-  cause:
-   { Error: connect ECONNREFUSED 127.0.0.1:55871
-       at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1097:14)
-     stack:
-      'Error: connect ECONNREFUSED 127.0.0.1:55871\n    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1097:14)',
-     errno: 'ECONNREFUSED',
-     code: 'ECONNECTION',
-     syscall: 'connect',
-     address: '127.0.0.1',
-     port: 55871,
-     command: 'CONN' },
-  isOperational: true,
-  errno: 'ECONNREFUSED',
-  code: 'ECONNECTION',
-  syscall: 'connect',
-  address: '127.0.0.1',
-  port: 55871,
-  command: 'CONN' }
-
+                ZoneMTA
+                info.response: 250 Message queued as 1691ad7f7ae00080fd
+                info.messageId: <e65c9386-e899-7d01-b21e-ec03c3a9d9b4@sathyasai.org>
              */
+            response = info.response;
+            responseId = match[1];
 
-            status = SubscriptionStatus.BOUNCED;
-            response = err.response || err.message;
-            if (msgType === MessageType.REGULAR || msgType === MessageType.TRIGGERED) {
-                await knex('campaigns').where('id', campaign.id).increment('delivered').increment('bounced');
-            }
+        } else if ((match = info.messageId.match(/^<([^>@]*)@.*amazonses\.com>$/))) {
+            /*
+                AWS SES
+                info.response: 0102016ad2244c0a-955492f2-9194-4cd1-bef9-70a45906a5a7-000000
+                info.messageId: <0102016ad2244c0a-955492f2-9194-4cd1-bef9-70a45906a5a7-000000@eu-west-1.amazonses.com>
+             */
+            response = info.response;
+            responseId = match[1];
+
+        } else if (info.response.match(/^250 OK$/) && (match = info.messageId.match(/^<([^>]*)>$/))) {
+            /*
+                Postal Mail Server
+                info.response: 250 OK
+                info.messageId:  <xxxxxxxxx@xxx.xx> (postal messageId)
+             */
+            response = info.response;
+            responseId = match[1];
+
+        } else {
+            /*
+                Fallback - Mailtrain v1 behavior
+             */
+            response = info.response || info.messageId;
+            responseId = response.split(/\s+/).pop();
+        }
+
+
+        if (msgType === MessageType.REGULAR || msgType === MessageType.TRIGGERED) {
+            await knex('campaigns').where('id', campaign.id).increment('delivered');
         }
 
 
         const now = new Date();
 
         if (msgType === MessageType.REGULAR) {
+            enforce(list);
+            enforce(subscriptionGrouped);
+
             await knex('campaign_messages').insert({
                 campaign: this.campaign.id,
                 list: list.id,
                 subscription: subscriptionGrouped.id,
                 send_configuration: sendConfiguration.id,
-                status,
+                status: SubscriptionStatus.SUBSCRIBED,
                 response,
                 response_id: responseId,
                 updated: now
             });
 
-        } else if (msgType === MessageType.TRIGGERED || msgType === MessageType.TEST) {
-            if (subData.queuedMessage.data.attachments) {
-                for (const attachment of subData.queuedMessage.data.attachments) {
+        } else if (msgType === MessageType.TRIGGERED || msgType === MessageType.TEST || msgType === MessageType.SUBSCRIPTION) {
+            if (subData.attachments) {
+                for (const attachment of subData.attachments) {
                     try {
                         // We ignore any errors here because we already sent the message. Thus we have to mark it as completed to avoid sending it again.
                         await knex.transaction(async tx => {
                             await files.unlockTx(tx, 'campaign', 'attachment', attachment.id);
                         });
                     } catch (err) {
-                        log.error('CampaignSender', `Error when unlocking attachment ${attachment.id} for ${listId}:${subscriptionGrouped.email} (queuedId: ${subData.queuedMessage.id})`);
+                        log.error('MessageSender', `Error when unlocking attachment ${attachment.id} for ${email} (queuedId: ${subData.queuedId})`);
                         log.verbose(err.stack);
                     }
                 }
             }
 
             await knex('queued')
-                .where({id: subData.queuedMessage.id})
+                .where({id: subData.queuedId})
                 .del();
         }
     }
 
     async sendRegularMessage(listId, email) {
+        enforce(this.type === MessageType.REGULAR);
+
         await this._sendMessage({listId, email});
     }
 }
 
-CampaignSender.sendQueuedMessage = async (queuedMessage) => {
+async function sendQueuedMessage(queuedMessage) {
     const msgData = queuedMessage.data;
 
-    const cs = new CampaignSender();
+    const cs = new MessageSender();
     await cs._init({
+        type: queuedMessage.type,
         campaignId: msgData.campaignId,
-        listId: queuedMessage.list,
+        listId: msgData.listId,
         sendConfigurationId: queuedMessage.send_configuration,
         attachments: msgData.attachments,
         html: msgData.html,
         text: msgData.text,
-        subject: msgData.subject
+        subject: msgData.subject,
+        renderedHtml: msgData.renderedHtml,
+        renderedText: msgData.renderedText
     });
 
-    await cs._sendMessage({queuedMessage});
-};
+    await cs._sendMessage({
+        subscriptionId: msgData.subscriptionId,
+        listId: msgData.listId,
+        to: msgData.to,
+        attachments: msgData.attachments,
+        encryptionKeys: msgData.encryptionKeys,
+        queuedId: queuedMessage.id
+    });
+}
 
-CampaignSender.queueMessageTx = async (tx, sendConfigurationId, listId, subscriptionId, messageType, messageData) => {
-    if (messageData.attachments) {
+async function queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, messageType, messageData) {
+    enforce(messageType === MessageType.TRIGGERED || messageType === MessageType.TEST);
+
+    const msgData = {...messageData};
+
+    if (msgData.attachments) {
         for (const attachment of messageData.attachments) {
             await files.lockTx(tx,'campaign', 'attachment', attachment.id);
         }
     }
 
+    msgData.listId = listId;
+    msgData.subscriptionId = subscriptionId;
+
     await tx('queued').insert({
         send_configuration: sendConfigurationId,
-        list: listId,
-        subscription: subscriptionId,
         type: messageType,
-        data: JSON.stringify(messageData)
+        data: JSON.stringify(msgData)
     });
-};
+}
 
-module.exports.CampaignSender = CampaignSender;
+async function queueSubscriptionMessage(sendConfigurationId, to, subject, encryptionKeys, template) {
+    let html, text;
+
+    const htmlRenderer = await tools.getTemplate(template.html, template.locale);
+    if (htmlRenderer) {
+        html = htmlRenderer(template.data || {});
+
+        if (html) {
+            html = await tools.prepareHtml(html);
+        }
+    }
+
+    const textRenderer = await tools.getTemplate(template.text, template.locale);
+    if (textRenderer) {
+        text = textRenderer(template.data || {});
+    } else if (html) {
+        text = htmlToText.fromString(html, {
+            wordwrap: 130
+        });
+    }
+
+    const msgData = {
+        renderedHtml: html,
+        renderedText: text,
+        to,
+        subject,
+        encryptionKeys
+    };
+
+    await tx('queued').insert({
+        send_configuration: sendConfigurationId,
+        type: MessageType.SUBSCRIPTION,
+        data: JSON.stringify(msgData)
+    });
+}
+
+module.exports.MessageSender = MessageSender;
 module.exports.MessageType = MessageType;
+module.exports.sendQueuedMessage = sendQueuedMessage;
+module.exports.queueCampaignMessageTx = queueCampaignMessageTx;
+module.exports.queueSubscriptionMessage = queueSubscriptionMessage;

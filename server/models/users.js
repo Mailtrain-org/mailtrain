@@ -12,14 +12,14 @@ const crypto = require('crypto');
 const settings = require('./settings');
 const {getTrustedUrl} = require('../lib/urls');
 const { tUI } = require('../lib/translate');
+const messageSender = require('../lib/message-sender');
+const {getSystemSendConfigurationId} = require('../../shared/send-configurations');
 
 const bluebird = require('bluebird');
 
 const bcrypt = require('bcrypt-nodejs');
 const bcryptHash = bluebird.promisify(bcrypt.hash.bind(bcrypt));
 const bcryptCompare = bluebird.promisify(bcrypt.compare.bind(bcrypt));
-
-const mailers = require('../lib/mailers');
 
 const passport = require('../lib/passport');
 
@@ -297,26 +297,31 @@ async function resetAccessToken(userId) {
 async function sendPasswordReset(locale, usernameOrEmail) {
     enforce(passport.isAuthMethodLocal, 'Local user management is required');
 
+    const resetToken = crypto.randomBytes(16).toString('base64').replace(/[^a-z0-9]/gi, '');
+    let user;
+
     await knex.transaction(async tx => {
-        const user = await tx('users').where('username', usernameOrEmail).orWhere('email', usernameOrEmail).select(['id', 'username', 'email', 'name']).first();
+        user = await tx('users').where('username', usernameOrEmail).orWhere('email', usernameOrEmail).select(['id', 'username', 'email', 'name']).forUpdate().first();
 
         if (user) {
-            const resetToken = crypto.randomBytes(16).toString('base64').replace(/[^a-z0-9]/gi, '');
-
             await tx('users').where('id', user.id).update({
                 reset_token: resetToken,
                 reset_expire: new Date(Date.now() + 60 * 60 * 1000)
             });
+        }
+        // We intentionally silently ignore the situation when user is not found. This is not to reveal if a user exists in the system.
 
-            const { adminEmail } = await settings.get(contextHelpers.getAdminContext(), ['adminEmail']);
+    });
 
-            const mailer = await mailers.getOrCreateMailer();
-            await mailer.sendTransactionalMailBasedOnTemplate({
-                to: {
-                    address: user.email
-                },
-                subject: tUI('mailerPasswordChangeRequest', locale)
-            }, {
+    if (user) {
+        await messageSender.queueSubscriptionMessage(
+            getSystemSendConfigurationId(),
+            {
+                address: user.email
+            },
+            tUI('mailerPasswordChangeRequest', locale),
+            null,
+            {
                 html: 'users/password-reset-html.hbs',
                 text: 'users/password-reset-text.hbs',
                 locale,
@@ -326,10 +331,9 @@ async function sendPasswordReset(locale, usernameOrEmail) {
                     name: user.name,
                     confirmUrl: getTrustedUrl(`login/reset/${encodeURIComponent(user.username)}/${encodeURIComponent(resetToken)}`)
                 }
-            });
-        }
-        // We intentionally silently ignore the situation when user is not found. This is not to reveal if a user exists in the system.
-    });
+            }
+        );
+    }
 }
 
 async function isPasswordResetTokenValid(username, resetToken) {

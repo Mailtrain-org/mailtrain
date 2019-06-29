@@ -10,7 +10,7 @@ const campaigns = require('../models/campaigns');
 const builtinZoneMta = require('../lib/builtin-zone-mta');
 const {CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
-const {MessageType} = require('../lib/campaign-sender')
+const {MessageType} = require('../lib/message-sender');
 require('../lib/fork');
 
 class Notifications {
@@ -55,18 +55,110 @@ const idleWorkers = [];
 let campaignSchedulerRunning = false;
 let queuedSchedulerRunning = false;
 
-const campaignsCheckPeriod = 30 * 1000;
+const checkPeriod = 30 * 1000;
 const retrieveBatchSize = 1000;
 const workerBatchSize = 10;
+
+const sendConfigurationIdByCampaignId = new Map(); // campaignId -> sendConfigurationId
+const sendConfigurationStatuses = new Map(); // sendConfigurationId -> {retryCount, postponeTill}
 
 const sendConfigurationMessageQueue = new Map(); // sendConfigurationId -> [{queuedMessage}]
 const campaignMessageQueue = new Map(); // campaignId -> [{listId, email}]
 
-const workAssignment = new Map(); // workerId -> { campaignId, messages: [{listId, email} } / { sendConfigurationId, messages: [{queuedMessage}] }
+const workAssignment = new Map(); // workerId -> { type: WorkAssignmentType.CAMPAIGN, campaignId, messages: [{listId, email} } / { type: WorkAssignmentType.QUEUED, sendConfigurationId, messages: [{queuedMessage}] }
+
+const WorkAssignmentType = {
+    CAMPAIGN: 0,
+    QUEUED: 1
+};
+
+const retryBackoff = [10, 20, 30, 30, 60, 60, 120, 120, 300]; // in seconds
+
+function getSendConfigurationStatus(sendConfigurationId) {
+    let status = sendConfigurationStatuses.get(sendConfigurationId);
+    if (!status) {
+        status = {
+            retryCount: 0,
+            postponeTill: 0
+        };
+
+        sendConfigurationStatuses.set(sendConfigurationId, status);
+    }
+
+    return status;
+}
+
+function setSendConfigurationRetryCount(sendConfigurationStatus, newRetryCount) {
+    sendConfigurationStatus.retryCount = newRetryCount;
+
+    let next = 0;
+    if (newRetryCount > 0) {
+        let backoff;
+        if (newRetryCount > retryBackoff.length) {
+            backoff = retryBackoff[retryBackoff.length - 1];
+        } else {
+            backoff = retryBackoff[newRetryCount - 1];
+        }
+
+        next = Date.now() + backoff * 1000;
+        setTimeout(scheduleCheck, backoff * 1000);
+    }
+
+    sendConfigurationStatus.postponeTill = next;
+}
+
+function isSendConfigurationPostponed(sendConfigurationId) {
+    const now = Date.now();
+    const sendConfigurationStatus = getSendConfigurationStatus(sendConfigurationId);
+    return sendConfigurationStatus.postponeTill > now;
+}
+
+function getPostponedSendConfigurationIds() {
+    const result = [];
+    const now = Date.now();
+
+    for (const entry of sendConfigurationStatuses.entries()) {
+        if (entry[1].postponeTill > now) {
+            result.push(entry[0]);
+        }
+    }
+
+    return result;
+}
 
 
-function messagesProcessed(workerId) {
+function getExpirationThresholds() {
+    const now = Date.now();
+
+    return {
+        [MessageType.TRIGGERED]: {
+            threshold: now - config.queue.retention.triggered * 1000,
+            title: 'triggered campaign'
+        },
+        [MessageType.TEST]: {
+            threshold: now - config.queue.retention.test * 1000,
+            title: 'test campaign'
+        },
+        [MessageType.SUBSCRIPTION]: {
+            threshold: now - config.queue.retention.subscription * 1000,
+            title: 'subscription and password-related'
+        }
+    };
+}
+
+
+function messagesProcessed(workerId, withErrors) {
     const wa = workAssignment.get(workerId);
+
+    const sendConfigurationStatus = getSendConfigurationStatus(wa.sendConfigurationId);
+    if (withErrors) {
+        if (sendConfigurationStatus.retryCount === wa.sendConfigurationRetryCount) { // This is to avoid multiple increments when more workers simultaneously fail to send messages ot the same send configuration
+            setSendConfigurationRetryCount(sendConfigurationStatus, sendConfigurationStatus.retryCount + 1);
+        }
+    } else {
+        setSendConfigurationRetryCount(sendConfigurationStatus, 0);
+    }
+
 
     workAssignment.delete(workerId);
     idleWorkers.push(workerId);
@@ -75,8 +167,6 @@ function messagesProcessed(workerId) {
 }
 
 async function workersLoop() {
-    const reservedWorkersForTestCount = workersCount > 1 ? 1 : 0;
-
     async function getAvailableWorker() {
         while (idleWorkers.length === 0) {
             await notifier.waitFor('workerFinished');
@@ -85,64 +175,42 @@ async function workersLoop() {
         return idleWorkers.shift();
     }
 
-    function assignCampaignTaskToWorker(workerId, task) {
-        const campaignId = task.campaignId;
-        const queue = task.queue;
-
-        const messages = queue.splice(0, workerBatchSize);
-        workAssignment.set(workerId, {campaignId, messages});
-
-        if (queue.length === 0) {
-            notifier.notify(`campaignMessageQueueEmpty:${campaignId}`);
-        }
-
-        sendToWorker(workerId, 'process-campaign-messages', {
-            campaignId,
-            messages
-        });
-    }
-
-    function assignSendConfigurationTaskToWorker(workerId, task) {
-        const sendConfigurationId = task.sendConfigurationId;
-        const queue = task.queue;
-
-        const messages = queue.splice(0, workerBatchSize);
-        workAssignment.set(workerId, {sendConfigurationId, messages});
-
-        if (queue.length === 0) {
-            notifier.notify(`sendConfigurationMessageQueueEmpty:${sendConfigurationId}`);
-        }
-
-        sendToWorker(workerId, 'process-queued-messages', {
-            sendConfigurationId,
-            messages
-        });
-    }
-
     function selectNextTask() {
         const allocationMap = new Map();
         const allocation = [];
 
-        function initAllocation(attrName, queues, assignWorkerHandler) {
+        function initAllocation(waType, attrName, queues, workerMsg, getSendConfigurationId, getQueueEmptyEvent) {
             for (const id of queues.keys()) {
+                const sendConfigurationId = getSendConfigurationId(id);
                 const key = attrName + ':' + id;
 
                 const queue = queues.get(id);
 
+                const postponed = isSendConfigurationPostponed(sendConfigurationId);
+
                 const task = {
-                    [attrName]: id,
+                    type: waType,
+                    id,
                     existingWorkers: 0,
-                    isEmpty: queue.length === 0,
+                    isValid: queue.length > 0 && !postponed,
                     queue,
-                    assignWorkerHandler
+                    workerMsg,
+                    attrName,
+                    getQueueEmptyEvent,
+                    sendConfigurationId
                 };
 
                 allocationMap.set(key, task);
                 allocation.push(task);
+
+                if (postponed && queue.length > 0) {
+                    queue.splice(0);
+                    notifier.notify(task.getQueueEmptyEvent(task));
+                }
             }
 
             for (const wa of workAssignment.values()) {
-                if (wa[attrName]) {
+                if (wa.type === waType) {
                     const key = attrName + ':' + wa[attrName];
                     const task = allocationMap.get(key);
                     task.existingWorkers += 1;
@@ -150,14 +218,29 @@ async function workersLoop() {
             }
         }
 
-        initAllocation('sendConfigurationId', sendConfigurationMessageQueue, assignSendConfigurationTaskToWorker);
-        initAllocation('campaignId', campaignMessageQueue, assignCampaignTaskToWorker);
+        initAllocation(
+            WorkAssignmentType.QUEUED,
+            'sendConfigurationId',
+            sendConfigurationMessageQueue,
+            'process-queued-messages',
+                id => id,
+                task => `sendConfigurationMessageQueueEmpty:${task.id}`
+        );
+
+        initAllocation(
+            WorkAssignmentType.CAMPAIGN,
+            'campaignId',
+            campaignMessageQueue,
+            'process-campaign-messages',
+                id => sendConfigurationIdByCampaignId.get(id),
+            task => `campaignMessageQueueEmpty:${task.id}`
+        );
 
         let minTask = null;
         let minExistingWorkers;
 
         for (const task of allocation) {
-            if (!task.isEmpty && (minTask === null || minExistingWorkers > task.existingWorkers)) {
+            if (task.isValid && (minTask === null || minExistingWorkers > task.existingWorkers)) {
                 minTask = task;
                 minExistingWorkers = task.existingWorkers;
             }
@@ -172,8 +255,31 @@ async function workersLoop() {
 
         if (task) {
             const workerId = await getAvailableWorker();
-            task.assignWorkerHandler(workerId, task);
-            
+
+            const attrName = task.attrName;
+            const sendConfigurationId = task.sendConfigurationId;
+            const sendConfigurationStatus = getSendConfigurationStatus(sendConfigurationId);
+            const sendConfigurationRetryCount = sendConfigurationStatus.retryCount;
+
+            const queue = task.queue;
+
+            const messages = queue.splice(0, workerBatchSize);
+            workAssignment.set(workerId, {
+                type: task.type,
+                [attrName]: task.id,
+                sendConfigurationId,
+                sendConfigurationRetryCount,
+                messages
+            });
+
+            if (queue.length === 0) {
+                notifier.notify(task.getQueueEmptyEvent(task));
+            }
+
+            sendToWorker(workerId, task.workerMsg, {
+                [attrName]: task.id,
+                messages
+            });
         } else {
             await notifier.waitFor('workAvailable');
         }
@@ -184,14 +290,18 @@ async function workersLoop() {
 async function processCampaign(campaignId) {
     const msgQueue = campaignMessageQueue.get(campaignId);
 
-    async function finish(newStatus) {
+    async function finish(clearMsgQueue, newStatus) {
+        if (clearMsgQueue) {
+            msgQueue.splice(0);
+        }
+
         const isCompleted = () => {
             if (msgQueue.length > 0) return false;
 
             let workerRunning = false;
 
             for (const wa of workAssignment.values()) {
-                if (wa.campaignId === campaignId) {
+                if (wa.type === WorkAssignmentType.CAMPAIGN && wa.campaignId === campaignId) {
                     workerRunning = true;
                 }
             }
@@ -213,10 +323,20 @@ async function processCampaign(campaignId) {
         while (true) {
             const cpg = await knex('campaigns').where('id', campaignId).first();
 
+            const expirationThreshold = Date.now() - config.queue.retention.campaign * 1000;
+            if (cpg.start_at.valueOf() < expirationThreshold) {
+                return await finish(true, CampaignStatus.FINISHED);
+            }
+
             if (cpg.status === CampaignStatus.PAUSING) {
-                msgQueue.splice(0);
-                await finish(CampaignStatus.PAUSED);
-                return;
+                return await finish(true, CampaignStatus.PAUSED);
+            }
+
+            sendConfigurationIdByCampaignId.set(cpg.id, cpg.send_configuration);
+
+            if (isSendConfigurationPostponed(cpg.send_configuration)) {
+                // postpone campaign if its send configuration is problematic
+                return await finish(true, CampaignStatus.SCHEDULED);
             }
 
             let qryGen;
@@ -227,7 +347,7 @@ async function processCampaign(campaignId) {
             if (qryGen) {
                 let messagesInProcessing = [...msgQueue];
                 for (const wa of workAssignment.values()) {
-                    if (wa.campaignId === campaignId) {
+                    if (wa.type === WorkAssignmentType.CAMPAIGN && wa.campaignId === campaignId) {
                         messagesInProcessing = messagesInProcessing.concat(wa.messages);
                     }
                 }
@@ -239,8 +359,7 @@ async function processCampaign(campaignId) {
                 const subs = await qry;
 
                 if (subs.length === 0) {
-                    await finish(CampaignStatus.FINISHED);
-                    return;
+                    return await finish(false, CampaignStatus.FINISHED);
                 }
 
                 for (const sub of subs) {
@@ -257,8 +376,7 @@ async function processCampaign(campaignId) {
                 }
 
             } else {
-                await finish(CampaignStatus.FINISHED);
-                return;
+                return await finish(false, CampaignStatus.FINISHED);
             }
         }
     } catch (err) {
@@ -276,15 +394,29 @@ async function scheduleCampaigns() {
     campaignSchedulerRunning = true;
 
     try {
+        // finish old campaigns
+        const nowDate = new Date();
+        const now = nowDate.valueOf();
+
+        const expirationThreshold = new Date(now - config.queue.retention.campaign * 1000);
+        const expiredCampaigns = await knex('campaigns')
+            .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
+            .whereIn('campaigns.status', [CampaignStatus.SCHEDULED, CampaignStatus.PAUSED])
+            .where('campaigns.start_at', '<', expirationThreshold)
+            .update({status: CampaignStatus.FINISHED});
+
         while (true) {
             let campaignId = 0;
+            const postponedSendConfigurationIds = getPostponedSendConfigurationIds();
 
             await knex.transaction(async tx => {
                 const scheduledCampaign = await tx('campaigns')
                     .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
+                    .whereNotIn('campaigns.send_configuration', postponedSendConfigurationIds)
                     .where('campaigns.status', CampaignStatus.SCHEDULED)
-                    .where(qry => qry.whereNull('campaigns.scheduled').orWhere('campaigns.scheduled', '<=', new Date()))
+                    .where('campaigns.start_at', '<=', nowDate)
                     .select(['id'])
+                    .forUpdate()
                     .first();
 
                 if (scheduledCampaign) {
@@ -322,7 +454,7 @@ async function processQueuedBySendConfiguration(sendConfigurationId) {
         let workerRunning = false;
 
         for (const wa of workAssignment.values()) {
-            if (wa.sendConfigurationId === sendConfigurationId) {
+            if (wa.type === WorkAssignmentType.QUEUED && wa.sendConfigurationId === sendConfigurationId) {
                 workerRunning = true;
             }
         }
@@ -330,19 +462,40 @@ async function processQueuedBySendConfiguration(sendConfigurationId) {
         return !workerRunning;
     };
 
+    async function finish(clearMsgQueue, deleteMsgQueue) {
+        if (clearMsgQueue) {
+            msgQueue.splice(0);
+        }
+
+        while (!isCompleted()) {
+            await notifier.waitFor('workerFinished');
+        }
+
+        if (deleteMsgQueue) {
+            sendConfigurationMessageQueue.delete(sendConfigurationId);
+        }
+    }
+
+
     try {
         while (true) {
+            if (isSendConfigurationPostponed(sendConfigurationId)) {
+                return finish(true, true);
+            }
+
             let messagesInProcessing = [...msgQueue];
             for (const wa of workAssignment.values()) {
-                if (wa.sendConfigurationId === sendConfigurationId) {
+                if (wa.type === WorkAssignmentType.QUEUED && wa.sendConfigurationId === sendConfigurationId) {
                     messagesInProcessing = messagesInProcessing.concat(wa.messages);
                 }
             }
 
+            const messageIdsInProcessing = messagesInProcessing.map(x => x.queuedMessage.id);
+
             const rows = await knex('queued')
-                .orderByRaw(`FIELD(type, ${MessageType.TRIGGERED}, ${MessageType.TEST}) DESC, id ASC`) // This orders MessageType.TEST messages before MessageType.TRIGGERED ones
+                .orderByRaw(`FIELD(type, ${MessageType.TRIGGERED}, ${MessageType.TEST}, ${MessageType.SUBSCRIPTION}) DESC, id ASC`) // This orders messages in the following order MessageType.SUBSCRIPTION, MessageType.TEST and MessageType.TRIGGERED
                 .where('send_configuration', sendConfigurationId)
-                .whereNotIn('id', messagesInProcessing.map(x => x.queuedMessage.id))
+                .whereNotIn('id', messageIdsInProcessing)
                 .limit(retrieveBatchSize);
 
             if (rows.length === 0) {
@@ -351,20 +504,43 @@ async function processQueuedBySendConfiguration(sendConfigurationId) {
                     return;
 
                 } else {
-                    while (!isCompleted()) {
-                        await notifier.waitFor('workerFinished');
-                    }
+                    finish(false, false);
 
                     // At this point, there might be new messages in the queued that could belong to us. Thus we have to try again instead for returning.
                     continue;
                 }
             }
 
+            const expirationThresholds = getExpirationThresholds();
+            const expirationCounters = {};
+            for (const type of Object.keys(expirationThresholds)) {
+                expirationCounters[type] = 0;
+            }
+
             for (const row of rows) {
-                row.data = JSON.parse(row.data);
-                msgQueue.push({
-                    queuedMessage: row
-                });
+                for (const type of Object.keys(expirationThresholds)) {
+                    if (row.type === type) {
+                        const expirationThreshold = expirationThresholds[type];
+
+                        if (row.created < expirationThreshold.threshold) {
+                            expirationCounters[type] += 1;
+                            await knex('queued').where('id', row.id).del();
+
+                        } else {
+                            row.data = JSON.parse(row.data);
+                            msgQueue.push({
+                                queuedMessage: row
+                            });
+                        }
+                    }
+                }
+            }
+
+            for (const type of Object.keys(expirationThresholds)) {
+                const expirationThreshold = expirationThresholds[type];
+                if (expirationCounters[type] > 0) {
+                    log.warn('Senders', `Discarded ${expirationCounters[type]} expired ${expirationThreshold.title} message(s).`);
+                }
             }
 
             notifier.notify('workAvailable');
@@ -387,21 +563,36 @@ async function scheduleQueued() {
     queuedSchedulerRunning = true;
 
     try {
-        while (true) {
-            const sendConfigurationsInProcessing = [...sendConfigurationMessageQueue.keys()];
+        const sendConfigurationsIdsInProcessing = [...sendConfigurationMessageQueue.keys()];
+        const postponedSendConfigurationIds = getPostponedSendConfigurationIds();
 
-            const rows = await knex('queued')
-                .whereNotIn('send_configuration', sendConfigurationsInProcessing)
-                .groupBy('send_configuration')
-                .select(['send_configuration']);
+        // prune old messages
+        const expirationThresholds = getExpirationThresholds();
+        for (const type of Object.keys(expirationThresholds)) {
+            const expirationThreshold = expirationThresholds[type];
 
-            for (const row of rows) {
-                const sendConfigurationId = row.send_configuration;
-                sendConfigurationMessageQueue.set(sendConfigurationId, []);
+            const expiredCount = await knex('queued')
+                .whereNotIn('send_configuration', sendConfigurationsIdsInProcessing)
+                .where('type', type)
+                .where('created', '<', expirationThreshold.threshold)
+                .del();
 
-                // noinspection JSIgnoredPromiseFromCall
-                processQueuedBySendConfiguration(sendConfigurationId);
+            if (expiredCount) {
+                log.warn('Senders', `Discarded ${expiredCount} expired ${expirationThreshold.title} message(s).`);
             }
+        }
+
+        const rows = await knex('queued')
+            .whereNotIn('send_configuration', [...sendConfigurationsIdsInProcessing, ...postponedSendConfigurationIds])
+            .groupBy('send_configuration')
+            .select(['send_configuration']);
+
+        for (const row of rows) {
+            const sendConfigurationId = row.send_configuration;
+            sendConfigurationMessageQueue.set(sendConfigurationId, []);
+
+            // noinspection JSIgnoredPromiseFromCall
+            processQueuedBySendConfiguration(sendConfigurationId);
         }
     } catch (err) {
         log.error('Senders', `Scheduling queued messages failed with error: ${err.message}`);
@@ -431,7 +622,7 @@ async function spawnWorker(workerId) {
                     return resolve();
 
                 } else if (msg.type === 'messages-processed') {
-                    messagesProcessed(workerId);
+                    messagesProcessed(workerId, msg.data.withErrors);
                 }
 
             }
@@ -457,15 +648,21 @@ function sendToWorker(workerId, msgType, data) {
 }
 
 
-function periodicCampaignsCheck() {
+function scheduleCheck() {
     // noinspection JSIgnoredPromiseFromCall
     scheduleCampaigns();
 
     // noinspection JSIgnoredPromiseFromCall
     scheduleQueued();
-
-    setTimeout(periodicCampaignsCheck, campaignsCheckPeriod);
 }
+
+function periodicCheck() {
+    // noinspection JSIgnoredPromiseFromCall
+    scheduleCheck();
+
+    setTimeout(periodicCheck, checkPeriod);
+}
+
 
 async function init() {
     const spawnWorkerFutures = [];
@@ -482,10 +679,18 @@ async function init() {
 
             if (type === 'schedule-check') {
                 // noinspection JSIgnoredPromiseFromCall
-                scheduleCampaigns();
-                scheduleQueued();
+                scheduleCheck();
 
             } else if (type === 'reload-config') {
+                const sendConfigurationStatus = getSendConfigurationStatus(msg.data.sendConfigurationId);
+                if (sendConfigurationStatus.retryCount > 0) {
+                    const sendConfigurationStatus = getSendConfigurationStatus(msg.data.sendConfigurationId)
+                    setSendConfigurationRetryCount(sendConfigurationStatus, 0);
+
+                    // noinspection JSIgnoredPromiseFromCall
+                    scheduleCheck();
+                }
+
                 for (const workerId of workerProcesses.keys()) {
                     sendToWorker(workerId, 'reload-config', msg.data);
                 }
@@ -501,7 +706,7 @@ async function init() {
         type: 'master-sender-started'
     });
 
-    periodicCampaignsCheck();
+    periodicCheck();
 
     setImmediate(workersLoop);
 }

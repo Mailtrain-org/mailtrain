@@ -323,11 +323,11 @@ class SendControls extends Component {
                     </Form>
                     <ButtonRow className={campaignsStyles.sendButtonRow}>
                         {this.getFormValue('sendLater') ?
-                            <Button className="btn-primary" icon="send" label={(entity.scheduled ? t('rescheduleSend') : t('scheduleSend')) + subscrInfo} onClickAsync={::this.scheduleAsync}/>
+                            <Button className="btn-primary" icon="play" label={(entity.scheduled ? t('rescheduleSend') : t('scheduleSend')) + subscrInfo} onClickAsync={::this.scheduleAsync}/>
                             :
-                            <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.confirmStart}/>
+                            <Button className="btn-primary" icon="play" label={t('send') + subscrInfo} onClickAsync={::this.confirmStart}/>
                         }
-                        {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>}
+                        {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
                         {testButtons}
                     </ButtonRow>
@@ -341,6 +341,7 @@ class SendControls extends Component {
                         {t('Campaign is being paused. Please wait.')}
                     </AlignedRow>
                     <ButtonRow>
+                        <Button className="btn-primary" icon="pause" label={t('Pausing')} disabled={true}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                         {testButtons}
                     </ButtonRow>
@@ -354,7 +355,7 @@ class SendControls extends Component {
                         {t('campaignIsBeingSentOut')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
+                        <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                         {testButtons}
                     </ButtonRow>
@@ -371,7 +372,7 @@ class SendControls extends Component {
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.confirmStart}/>
-                        <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
+                        <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                         {testButtons}
                     </ButtonRow>

@@ -153,7 +153,7 @@ async function remove(context, id) {
 
 const MAX_EMAIL_COUNT = 100;
 async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags) {
-    // TODO - Update this to use CampaignSender.queueMessageTx (with renderedHtml and renderedText)
+    // TODO - Update this to use MessageSender.queueMessageTx (with renderedHtml and renderedText)
 
     if (emails.length > MAX_EMAIL_COUNT) {
         throw new Error(`Cannot send more than ${MAX_EMAIL_COUNT} emails at once`);

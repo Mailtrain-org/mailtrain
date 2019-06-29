@@ -257,7 +257,7 @@ export default class CUD extends Component {
             if (this.props.entity.status === CampaignStatus.SENDING) {
                 this.disableForm();
             }
-
+            
         } else {
             const data = {};
             for (const overridable of campaignOverridables) {

@@ -504,7 +504,7 @@ async function serverValidate(context, listId, data) {
 async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, isCreate) {
     enforce(entity.email, 'Email must be set');
 
-    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(entity.email));
+    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(entity.email)).forUpdate();
 
     if (!isCreate) {
         existingWithKeyQuery.whereNot('id', entity.id);

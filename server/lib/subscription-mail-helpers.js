@@ -5,11 +5,10 @@ const fields = require('../models/fields');
 const settings = require('../models/settings');
 const {getTrustedUrl, getPublicUrl} = require('./urls');
 const { tUI, tMark } = require('./translate');
-const util = require('util');
 const contextHelpers = require('./context-helpers');
 const {getFieldColumn} = require('../../shared/lists');
 const forms = require('../models/forms');
-const mailers = require('./mailers');
+const messageSender = require('./message-sender');
 
 module.exports = {
     sendAlreadySubscribed,
@@ -138,20 +137,21 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
 
     try {
         if (list.send_configuration) {
-            const mailer = await mailers.getOrCreateMailer(list.send_configuration);
-            await mailer.sendTransactionalMailBasedOnTemplate({
-                to: {
+            await messageSender.queueSubscriptionMessage(
+                list.send_configuration,
+                {
                     name: getDisplayName(flds, subscription),
                     address: email
                 },
-                subject: tUI(subjectKey, locale, { list: list.name }),
-                encryptionKeys
-            }, {
-                html,
-                text,
-                locale,
-                data
-            });
+                tUI(subjectKey, locale, { list: list.name }),
+                encryptionKeys,
+                {
+                    html,
+                    text,
+                    locale,
+                    data
+                }
+            );
         } else {
             log.warn('Subscription', `Not sending email for list id:${list.id} because not send configuration is set.`);
         }

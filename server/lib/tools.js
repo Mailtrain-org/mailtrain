@@ -42,9 +42,7 @@ async function getLocalizedFile(basePath, fileName, language) {
 }
 
 async function getTemplate(template, locale) {
-    if (!template) {
-        return false;
-    }
+    enforce(template);
 
     const key = getLangCodeFromExpressLocale(locale) + ':' + ((typeof template === 'object') ? hasher.hash(template) : template);
 
@@ -148,7 +146,7 @@ function validateEmailGetMessage(result, address, language) {
 }
 
 function formatMessage(campaign, list, subscription, mergeTags, message, isHTML) {
-    const links = getMessageLinks(campaign, list, subscription);
+    const links = campaign && list && subscription ? getMessageLinks(campaign, list, subscription) : {};
     return formatTemplate(message, links, mergeTags, isHTML);
 }
 
@@ -192,10 +190,6 @@ function formatTemplate(template, links, mergeTags, isHTML) {
 }
 
 async function prepareHtml(html) {
-    if (!(html || '').toString().trim()) {
-        return false;
-    }
-
     const { window } = new JSDOM(html);
 
     const head = window.document.querySelector('head');

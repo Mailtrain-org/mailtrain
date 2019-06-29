@@ -165,6 +165,21 @@ queue:
   # How many parallel sender processes to spawn
   processes: 2
 
+  # For how long (in seconds) to try to send an email before Mailtrain stops to trying. An email can normally
+  # be sent out almost immediately. However if the send configuration is not correct or the mail server is not reachable,
+  # Mailtrain will keep retrying until the email expires.
+  # Due to Mailtrain's internal timeouts, the values should be at least 60 seconds.
+  retention:
+    # Regular and RSS campaign. Once this expires, the campaign is considered finished. The remaining recipients
+    # are included in the set of those recipients to whom the message would be delivered if the campaign is again started.
+    campaign: 86400    # 1 day
+    # Triggered campaign. Once this expires, the message gets discarded.
+    triggered: 86400   # 1 day
+    # Test send (in campaign or template)
+    test: 300          # 5 minutes
+    # Subscription and password reset related emails
+    subscription: 300  # 5 minutes
+
 cors:
   # Allow subscription widgets to be embedded
   # origins: ['https://www.example.com']

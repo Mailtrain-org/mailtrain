@@ -10,7 +10,7 @@ const { Entity, Event } = require('../../shared/triggers');
 const { SubscriptionStatus } = require('../../shared/lists');
 const links = require('../models/links');
 const contextHelpers = require('../lib/context-helpers');
-const {MessageType, CampaignSender} = require('../lib/campaign-sender');
+const messageSender = require('../lib/message-sender');
 
 const triggerCheckPeriod = 30 * 1000;
 const triggerFirePeriod = 120 * 1000;
@@ -152,8 +152,8 @@ async function run() {
                         subscription: subscriber.id
                     });
 
-                    await CampaignSender.queueMessageTx(tx,
-                        campaign.send_configuration, cpgList.list, subscriber.id, MessageType.TRIGGERED,
+                    await messageSender.queueCampaignMessageTx(tx,
+                        campaign.send_configuration, cpgList.list, subscriber.id, messageSender.MessageType.TRIGGERED,
                         {
                             campaignId: campaign.id,
                             triggerId: trigger.id

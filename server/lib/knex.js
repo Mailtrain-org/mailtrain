@@ -23,6 +23,12 @@ const knex = require('knex')({
     //, debug: true
 });
 
+/*
+This is to enable logging on mysql side:
+SET GLOBAL general_log = 'ON';
+SET GLOBAL general_log_file = '/tmp/mysql-all.log';
+*/
+
 
 
 module.exports = knex;

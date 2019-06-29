@@ -3,8 +3,6 @@
 const log = require('./log');
 const config = require('config');
 
-const Handlebars = require('handlebars');
-const util = require('util');
 const nodemailer = require('nodemailer');
 const aws = require('aws-sdk');
 const openpgpEncrypt = require('nodemailer-openpgp').openpgpEncrypt;
@@ -14,12 +12,20 @@ const builtinZoneMta = require('./builtin-zone-mta');
 
 const contextHelpers = require('./context-helpers');
 const settings = require('../models/settings');
-const tools = require('./tools');
-const htmlToText = require('html-to-text');
 
 const bluebird = require('bluebird');
 
 const transports = new Map();
+
+class SendConfigurationError extends Error {
+    constructor(sendConfigurationId, ...args) {
+        super(...args);
+        this.sendConfigurationId = sendConfigurationId;
+        Error.captureStackTrace(this, SendConfigurationError);
+    }
+}
+
+
 
 async function getOrCreateMailer(sendConfigurationId) {
     let sendConfiguration;
@@ -73,25 +79,18 @@ function _addDkimKeys(transport, mail) {
 async function _sendMail(transport, mail, template) {
     _addDkimKeys(transport, mail);
 
-    let tryCount = 0;
-    const trySend = (callback) => {
-        tryCount++;
-        transport.sendMail(mail, (err, info) => {
-            if (err) {
-                log.error('Mail', err);
-                if (err.responseCode && err.responseCode >= 400 && err.responseCode < 500 && tryCount <= 5) {
-                    // temporary error, try again
-                    log.verbose('Mail', 'Retrying after %s sec. ...', tryCount);
-                    return setTimeout(trySend, tryCount * 1000);
-                }
-                return callback(err);
-            }
-            return callback(null, info);
-        });
-    };
+    try {
+        return await transport.sendMailAsync(mail);
 
-    const trySendAsync = bluebird.promisify(trySend);
-    return await trySendAsync();
+    } catch (err) {
+        if ( (err.responseCode && err.responseCode >= 400 && err.responseCode < 500) ||
+            (err.code === 'ECONNECTION' && err.errno === 'ECONNREFUSED')
+        ) {
+            throw new SendConfigurationError(transport.mailer.sendConfiguration.id, 'Cannot connect to service specified by send configuration ' + transport.mailer.sendConfiguration.id);
+        }
+
+        throw err;
+    }
 }
 
 async function _sendTransactionalMail(transport, mail) {
@@ -101,39 +100,6 @@ async function _sendTransactionalMail(transport, mail) {
     mail.headers['X-Sending-Zone'] = 'transactional';
 
     return await _sendMail(transport, mail);
-}
-
-async function _sendTransactionalMailBasedOnTemplate(transport, mail, template) {
-    const sendConfiguration = transport.mailer.sendConfiguration;
-
-    mail.from = {
-        name: sendConfiguration.from_name,
-        address: sendConfiguration.from_email
-    };
-
-    const htmlRenderer = await tools.getTemplate(template.html, template.locale);
-
-    if (htmlRenderer) {
-        mail.html = htmlRenderer(template.data || {});
-    }
-
-    const preparedHtml = await tools.prepareHtml(mail.html);
-
-    if (preparedHtml) {
-        mail.html = preparedHtml;
-    }
-
-    const textRenderer = await tools.getTemplate(template.text, template.locale);
-
-    if (textRenderer) {
-        mail.text = textRenderer(template.data || {});
-    } else if (mail.html) {
-        mail.text = htmlToText.fromString(mail.html, {
-            wordwrap: 130
-        });
-    }
-
-    return await _sendTransactionalMail(transport, mail);
 }
 
 async function _createTransport(sendConfiguration) {
@@ -222,6 +188,7 @@ async function _createTransport(sendConfiguration) {
     }
 
     const transport = nodemailer.createTransport(transportOptions, config.nodemailer);
+    transport.sendMailAsync = bluebird.promisify(transport.sendMail.bind(transport));
 
     transport.use('stream', openpgpEncrypt({
         signingKey: configItems.pgpPrivateKey,
@@ -267,8 +234,7 @@ async function _createTransport(sendConfiguration) {
     transport.mailer = {
         sendConfiguration,
         throttleWait: bluebird.promisify(throttleWait),
-        sendTransactionalMail: async (mail, template) => await _sendTransactionalMail(transport, mail),
-        sendTransactionalMailBasedOnTemplate: async (mail, template) => await _sendTransactionalMailBasedOnTemplate(transport, mail, template),
+        sendTransactionalMail: async (mail) => await _sendTransactionalMail(transport, mail),
         sendMassMail: async (mail, template) => await _sendMail(transport, mail)
     };
 
@@ -286,3 +252,4 @@ class MailerError extends Error {
 module.exports.getOrCreateMailer = getOrCreateMailer;
 module.exports.invalidateMailer = invalidateMailer;
 module.exports.MailerError = MailerError;
+module.exports.SendConfigurationError = SendConfigurationError;
