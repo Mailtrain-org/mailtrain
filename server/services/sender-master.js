@@ -175,6 +175,10 @@ async function workersLoop() {
         return idleWorkers.shift();
     }
 
+    function cancelWorker(workerId) {
+        idleWorkers.push(workerId);
+    }
+
     function selectNextTask() {
         const allocationMap = new Map();
         const allocation = [];
@@ -251,11 +255,10 @@ async function workersLoop() {
 
 
     while (true) {
+        const workerId = await getAvailableWorker();
         const task = selectNextTask();
 
         if (task) {
-            const workerId = await getAvailableWorker();
-
             const attrName = task.attrName;
             const sendConfigurationId = task.sendConfigurationId;
             const sendConfigurationStatus = getSendConfigurationStatus(sendConfigurationId);
@@ -280,7 +283,9 @@ async function workersLoop() {
                 [attrName]: task.id,
                 messages
             });
+
         } else {
+            cancelWorker(workerId);
             await notifier.waitFor('workAvailable');
         }
     }
@@ -394,7 +399,7 @@ async function scheduleCampaigns() {
     campaignSchedulerRunning = true;
 
     try {
-        // finish old campaigns
+        // Finish old campaigns
         const nowDate = new Date();
         const now = nowDate.valueOf();
 
@@ -404,6 +409,22 @@ async function scheduleCampaigns() {
             .whereIn('campaigns.status', [CampaignStatus.SCHEDULED, CampaignStatus.PAUSED])
             .where('campaigns.start_at', '<', expirationThreshold)
             .update({status: CampaignStatus.FINISHED});
+
+        // Empty message queues for PAUSING campaigns. A pausing campaign typically waits for campaignMessageQueueEmpty before it can check for PAUSING
+        // We speed this up by discarding messages in the message queue of the campaign.
+        const pausingCampaigns = await knex('campaigns')
+            .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
+            .where('campaigns.status', CampaignStatus.PAUSING)
+            .select(['id'])
+            .forUpdate();
+
+        for (const cpg of pausingCampaigns) {
+            const campaignId = cpg.id;
+            const queue = campaignMessageQueue.get(campaignId);
+            queue.splice(0);
+            notifier.notify(`campaignMessageQueueEmpty:${campaignId}`);
+        }
+
 
         while (true) {
             let campaignId = 0;
@@ -513,30 +534,26 @@ async function processQueuedBySendConfiguration(sendConfigurationId) {
 
             const expirationThresholds = getExpirationThresholds();
             const expirationCounters = {};
-            for (const type of Object.keys(expirationThresholds)) {
+            for (const type in expirationThresholds) {
                 expirationCounters[type] = 0;
             }
 
             for (const row of rows) {
-                for (const type of Object.keys(expirationThresholds)) {
-                    if (row.type === type) {
-                        const expirationThreshold = expirationThresholds[type];
+                const expirationThreshold = expirationThresholds[row.type];
 
-                        if (row.created < expirationThreshold.threshold) {
-                            expirationCounters[type] += 1;
-                            await knex('queued').where('id', row.id).del();
+                if (row.created < expirationThreshold.threshold) {
+                    expirationCounters[row.type] += 1;
+                    await knex('queued').where('id', row.id).del();
 
-                        } else {
-                            row.data = JSON.parse(row.data);
-                            msgQueue.push({
-                                queuedMessage: row
-                            });
-                        }
-                    }
+                } else {
+                    row.data = JSON.parse(row.data);
+                    msgQueue.push({
+                        queuedMessage: row
+                    });
                 }
             }
 
-            for (const type of Object.keys(expirationThresholds)) {
+            for (const type in expirationThresholds) {
                 const expirationThreshold = expirationThresholds[type];
                 if (expirationCounters[type] > 0) {
                     log.warn('Senders', `Discarded ${expirationCounters[type]} expired ${expirationThreshold.title} message(s).`);
@@ -568,7 +585,7 @@ async function scheduleQueued() {
 
         // prune old messages
         const expirationThresholds = getExpirationThresholds();
-        for (const type of Object.keys(expirationThresholds)) {
+        for (const type in expirationThresholds) {
             const expirationThreshold = expirationThresholds[type];
 
             const expiredCount = await knex('queued')

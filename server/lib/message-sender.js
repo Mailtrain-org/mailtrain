@@ -22,6 +22,7 @@ const {getPublicUrl} = require('./urls');
 const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
 const { enforce } = require('./helpers');
+const senders = require('./senders');
 
 const MessageType = {
     REGULAR: 0,
@@ -95,9 +96,6 @@ class MessageSender {
                     this.listsByCid.set(list.cid, list);
                     this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
                 }
-
-            } else {
-                enforce(false);
             }
 
             if (settings.attachments) {
@@ -119,7 +117,7 @@ class MessageSender {
             }
 
             if (settings.renderedHtml !== undefined) {
-                this.rendereHtml = settings.rendereHtml;
+                this.renderedHtml = settings.renderedHtml;
                 this.renderedText = settings.renderedText;
 
             } else if (settings.html !== undefined) {
@@ -145,6 +143,7 @@ class MessageSender {
         let text = '';
         let renderTags = false;
         const campaign = this.campaign;
+
 
         if (this.renderedHtml !== undefined) {
             html = this.renderedHtml;
@@ -497,6 +496,12 @@ class MessageSender {
     }
 }
 
+async function dropQueuedMessage(queuedMessage) {
+    await knex('queued')
+        .where({id: queuedMessage.id})
+        .del();
+}
+
 async function sendQueuedMessage(queuedMessage) {
     const msgData = queuedMessage.data;
 
@@ -574,11 +579,13 @@ async function queueSubscriptionMessage(sendConfigurationId, to, subject, encryp
         encryptionKeys
     };
 
-    await tx('queued').insert({
+    await knex('queued').insert({
         send_configuration: sendConfigurationId,
         type: MessageType.SUBSCRIPTION,
         data: JSON.stringify(msgData)
     });
+
+    senders.scheduleCheck();
 }
 
 module.exports.MessageSender = MessageSender;
@@ -586,3 +593,4 @@ module.exports.MessageType = MessageType;
 module.exports.sendQueuedMessage = sendQueuedMessage;
 module.exports.queueCampaignMessageTx = queueCampaignMessageTx;
 module.exports.queueSubscriptionMessage = queueSubscriptionMessage;
+module.exports.dropQueuedMessage = dropQueuedMessage;

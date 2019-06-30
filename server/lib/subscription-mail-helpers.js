@@ -9,6 +9,7 @@ const contextHelpers = require('./context-helpers');
 const {getFieldColumn} = require('../../shared/lists');
 const forms = require('../models/forms');
 const messageSender = require('./message-sender');
+const tools = require('./tools');
 
 module.exports = {
     sendAlreadySubscribed,
@@ -64,37 +65,12 @@ async function sendUnsubscriptionConfirmed(locale, list, email, subscription) {
     await _sendMail(list, email, 'unsubscription_confirmed', locale, tMark('listUnsubscriptionConfirmed'), relativeUrls, subscription);
 }
 
-function getDisplayName(flds, subscription) {
-    let firstName, lastName, name;
-
-    for (const fld of flds) {
-        if (fld.key === 'FIRST_NAME') {
-            firstName = subscription[fld.column];
-        }
-
-        if (fld.key === 'LAST_NAME') {
-            lastName = subscription[fld.column];
-        }
-
-        if (fld.key === 'NAME') {
-            name = subscription[fld.column];
-        }
-    }
-
-    if (name) {
-        return name;
-    } else if (firstName && lastName) {
-        return firstName + ' ' + lastName;
-    } else if (lastName) {
-        return lastName;
-    } else if (firstName) {
-        return firstName;
-    } else {
-        return '';
-    }
-}
-
 async function _sendMail(list, email, template, locale, subjectKey, relativeUrls, subscription) {
+    subscription = {
+        ...subscription,
+        email
+    };
+
     const flds = await fields.list(contextHelpers.getAdminContext(), list.id);
 
     const encryptionKeys = [];
@@ -136,11 +112,13 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
     }
 
     try {
+        const mergeTags = fields.getMergeTags(flds, subscription);
+
         if (list.send_configuration) {
             await messageSender.queueSubscriptionMessage(
                 list.send_configuration,
                 {
-                    name: getDisplayName(flds, subscription),
+                    name: list.to_name === null ? undefined : tools.formatTemplate(list.to_name, {}, mergeTags, false),
                     address: email
                 },
                 tUI(subjectKey, locale, { list: list.name }),

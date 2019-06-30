@@ -17,25 +17,25 @@ async function processCampaignMessages(campaignId, messages) {
 
     running = true;
 
-    const cs = new MessageSender();
+    const cs = new messageSender.MessageSender();
     await cs.initByCampaignId(campaignId);
 
     let withErrors = false;
 
-    for (const msgData of messages) {
+    for (const msg of messages) {
         try {
-            await cs.sendRegularMessage(msgData.listId, msgData.email);
+            await cs.sendRegularMessage(msg.listId, msg.email);
 
-            log.verbose('Senders', 'Message sent and status updated for %s:%s', msgData.listId, msgData.email);
+            log.verbose('Senders', 'Message sent and status updated for %s:%s', msg.listId, msg.email);
         } catch (err) {
 
             if (err instanceof mailers.SendConfigurationError) {
-                log.error('Senders', `Sending message to ${msgData.listId}:${msgData.email} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                log.error('Senders', `Sending message to ${msg.listId}:${msg.email} failed with error: ${err.message}. Will retry the message if within retention interval.`);
                 withErrors = true;
                 break;
 
             } else {
-                log.error('Senders', `Sending message to ${msgData.listId}:${msgData.email} failed with error: ${err.message}. Dropping the message.`);
+                log.error('Senders', `Sending message to ${msg.listId}:${msg.email} failed with error: ${err.message}.`);
                 log.verbose(err.stack);
             }
         }
@@ -56,19 +56,40 @@ async function processQueuedMessages(sendConfigurationId, messages) {
 
     let withErrors = false;
 
-    for (const msgData of messages) {
-        const queuedMessage = msgData.queuedMessage;
+    for (const msg of messages) {
+        const queuedMessage = msg.queuedMessage;
+
+        const msgData = queuedMessage.data;
+        let target = '';
+        if (msgData.listId && msgData.subscriptionId) {
+            target = `${msgData.listId}:${msgData.subscriptionId}`;
+        } else if (msgData.to) {
+            if (msgData.to.name && msgData.to.address) {
+                target = `${msgData.to.name} <${msgData.to.address}>`;
+            } else if (msgData.to.address) {
+                target = msgData.to.address;
+            } else {
+                target = msgData.to.toString();
+            }
+        }
+
         try {
             await messageSender.sendQueuedMessage(queuedMessage);
-            log.verbose('Senders', 'Message sent and status updated for %s:%s', queuedMessage.list, queuedMessage.subscription);
+            log.verbose('Senders', `Message sent and status updated for ${target}`);
         } catch (err) {
             if (err instanceof mailers.SendConfigurationError) {
-                log.error('Senders', `Sending message to ${queuedMessage.list}:${queuedMessage.subscription} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                log.error('Senders', `Sending message to ${target} failed with error: ${err.message}. Will retry the message if within retention interval.`);
                 withErrors = true;
                 break;
             } else {
-                log.error('Senders', `Sending message to ${queuedMessage.list}:${queuedMessage.subscription} failed with error: ${err.message}. Dropping the message.`);
+                log.error('Senders', `Sending message to ${target} failed with error: ${err.message}. Dropping the message.`);
                 log.verbose(err.stack);
+
+                try {
+                    await messageSender.dropQueuedMessage(queuedMessage);
+                } catch (err) {
+                    log.error(err.stack);
+                }
             }
         }
     }

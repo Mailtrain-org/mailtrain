@@ -125,8 +125,6 @@ async function listDTAjax(context, params) {
 async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
     enforce(await tools.validateEmail(entity.email) === 0, 'Invalid email');
 
-    await namespaceHelpers.validateEntity(tx, entity);
-
     const otherUserWithSameEmailQuery = tx('users').where('email', entity.email);
     if (entity.id) {
         otherUserWithSameEmailQuery.andWhereNot('id', entity.id);
@@ -138,6 +136,9 @@ async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
 
 
     if (!isOwnAccount) {
+        await namespaceHelpers.validateEntity(tx, entity);
+        enforce(entity.role in config.roles.global, 'Unknown role');
+
         const otherUserWithSameUsernameQuery = tx('users').where('username', entity.username);
         if (!isCreate) {
             otherUserWithSameUsernameQuery.andWhereNot('id', entity.id);
@@ -147,8 +148,6 @@ async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
             throw new interoperableErrors.DuplicitNameError();
         }
     }
-
-    enforce(entity.role in config.roles.global, 'Unknown role');
 
     enforce(!isCreate || entity.password.length > 0, 'Password not set');
 

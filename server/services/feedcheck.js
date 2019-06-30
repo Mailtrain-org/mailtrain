@@ -5,7 +5,6 @@ const log = require('../lib/log');
 const knex = require('../lib/knex');
 const feedparser = require('feedparser-promised');
 const { CampaignType, CampaignStatus, CampaignSource } = require('../../shared/campaigns');
-const util = require('util');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
 require('../lib/fork');
