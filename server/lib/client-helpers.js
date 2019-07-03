@@ -44,6 +44,7 @@ async function getAuthenticatedConfig(context) {
         },
         globalPermissions,
         editors: config.editors,
+        tagLanguages: config.tagLanguages,
         mosaico: config.mosaico,
         verpEnabled: config.verp.enabled,
         reportsEnabled: config.reports.enabled,

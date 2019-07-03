@@ -14,11 +14,11 @@ const {convertFileURLs} = require('../lib/campaign-content');
 const mailers = require('../lib/mailers');
 const tools = require('../lib/tools');
 const sendConfigurations = require('./send-configurations');
-const { getMergeTagsForBases } = require('../../shared/templates');
+const { getMergeTagsForBases, allTagLanguages } = require('../../shared/templates');
 const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 const htmlToText = require('html-to-text');
 
-const allowedKeys = new Set(['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
@@ -54,7 +54,7 @@ async function _listDTAjax(context, namespaceId, params) {
             }
             return builder;
         },
-        [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.created', 'namespaces.name' ]
+        [ 'templates.id', 'templates.name', 'templates.description', 'templates.type', 'templates.tag_language', 'templates.created', 'namespaces.name' ]
     );
 }
 
@@ -69,6 +69,8 @@ async function listByNamespaceDTAjax(context, namespaceId, params) {
 async function _validateAndPreprocess(tx, entity) {
     await namespaceHelpers.validateEntity(tx, entity);
 
+    enforce(allTagLanguages.includes(entity.tag_language), `Invalid tag language '${entity.tag_language}'`);
+
     // We don't check contents of the "data" because it is processed solely on the client. The client generates the HTML code we use when sending out campaigns.
 
     entity.data = JSON.stringify(entity.data);
@@ -82,6 +84,7 @@ async function create(context, entity) {
             const template = await getByIdTx(tx, context, entity.sourceTemplate, false);
 
             entity.type = template.type;
+            entity.tag_language = template.tag_language;
             entity.data = template.data;
             entity.html = template.html;
             entity.text = template.text;

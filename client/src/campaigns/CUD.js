@@ -25,7 +25,7 @@ import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import {getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import campaignsStyles from "./styles.scss";
@@ -50,6 +50,8 @@ export default class CUD extends Component {
         const t = props.t;
 
         this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
+        this.tagLanguages = getTagLanguages(props.t);
+
         this.mailerTypes = getMailerTypes(props.t);
 
         const { campaignTypeLabels } = getCampaignLabels(t);
@@ -85,6 +87,11 @@ export default class CUD extends Component {
             this.customTemplateTypeOptions.push({key, label: this.templateTypes[key].typeName});
         }
 
+        this.customTemplateTagLanguageOptions = [];
+        for (const key of mailtrainConfig.tagLanguages) {
+            this.customTemplateTagLanguageOptions.push({key, label: this.tagLanguages[key].name});
+        }
+
         this.state = {
             sendConfiguration: null
         };
@@ -117,6 +124,14 @@ export default class CUD extends Component {
         if (key === undefined || key === 'data_sourceCustom_type') {
             if (newValue) {
                 this.templateTypes[newValue].afterTypeChange(mutStateData);
+            }
+        }
+
+        if (key === undefined || key === 'data_sourceCustom_tag_language') {
+            if (newValue) {
+                const isEdit = !!this.props.entity;
+                const type = mutStateData.getIn(['data_sourceCustom_tag_language', 'value']);
+                this.templateTypes[type].afterTagLanguageChange(mutStateData, isEdit);
             }
         }
 
@@ -202,6 +217,7 @@ export default class CUD extends Component {
 
             data.data.sourceCustom = {
                 type: data.data_sourceCustom_type,
+                tag_language: data.data_sourceCustom_tag_language,
                 data: data.data_sourceCustom_data,
                 html: data.data_sourceCustom_html,
                 text: data.data_sourceCustom_text
@@ -257,7 +273,7 @@ export default class CUD extends Component {
             if (this.props.entity.status === CampaignStatus.SENDING) {
                 this.disableForm();
             }
-            
+
         } else {
             const data = {};
             for (const overridable of campaignOverridables) {
@@ -301,6 +317,7 @@ export default class CUD extends Component {
 
                 // This is for CampaignSource.CUSTOM
                 data_sourceCustom_type: mailtrainConfig.editors[0],
+                data_sourceCustom_tag_language: mailtrainConfig.tagLanguages[0],
                 data_sourceCustom_data: {},
                 data_sourceCustom_html: '',
                 data_sourceCustom_text: '',
@@ -360,6 +377,10 @@ export default class CUD extends Component {
             const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
             if (!customTemplateTypeKey) {
                 state.setIn(['data_sourceCustom_type', 'error'], t('typeMustBeSelected'));
+            }
+
+            if (!state.getIn(['data_sourceCustom_tag_language', 'value'])) {
+                state.setIn(['data_sourceCustom_tag_language', 'error'], t('Tag language must be selected'));
             }
 
             if (customTemplateTypeKey) {
@@ -654,8 +675,8 @@ export default class CUD extends Component {
                 { data: 1, title: t('name') },
                 { data: 2, title: t('description') },
                 { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-                { data: 4, title: t('created'), render: data => moment(data).fromNow() },
-                { data: 5, title: t('namespace') },
+                { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+                { data: 6, title: t('namespace') },
             ];
 
             let help = null;
@@ -690,6 +711,8 @@ export default class CUD extends Component {
 
             templateEdit = <div>
                 <Dropdown id="data_sourceCustom_type" label={t('type')} options={this.customTemplateTypeOptions}/>
+                <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={isEdit && (!customTemplateTypeKey || this.templateTypes[customTemplateTypeKey].isTagLanguageSelectorDisabledForEdit)}/>
+
                 {customTemplateTypeForm}
             </div>;
 

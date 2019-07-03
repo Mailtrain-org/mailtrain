@@ -19,12 +19,24 @@ import {getSandboxUrl} from "../lib/urls";
 import mailtrainConfig from 'mailtrainConfig';
 import {ActionLink, Button} from "../lib/bootstrap-components";
 import {Trans} from "react-i18next";
+import {TagLanguages} from "../../../shared/templates";
 
 import styles from "../lib/styles.scss";
 
 export const ResourceType = {
     TEMPLATE: 'template',
     CAMPAIGN: 'campaign'
+};
+
+export function getTagLanguages(t) {
+    return {
+        [TagLanguages.SIMPLE]: {
+            name: t('Simple')
+        },
+        [TagLanguages.HBS]: {
+            name: t('Handlebars')
+        }
+    };
 }
 
 export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEMPLATE) {
@@ -67,23 +79,29 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             render: data => mosaicoTemplateTypes[data].typeName
         },
         {
-            data: 5,
+            data: 6,
             title: t('namespace')
         },
     ];
 
     templateTypes.mosaico = {
         typeName: t('mosaico'),
-        getTypeForm: (owner, isEdit) =>
-            <TableSelect
-                id={prefix + 'mosaicoTemplate'}
-                label={t('mosaicoTemplate')}
-                withHeader
-                dropdown
-                dataUrl='rest/mosaico-templates-table'
-                columns={mosaicoTemplatesColumns}
-                selectionLabelIndex={1}
-                disabled={isEdit}/>,
+        getTypeForm: (owner, isEdit) => {
+            const tagLanguageKey = owner.getFormValue(prefix + 'tag_language');
+            if (tagLanguageKey) {
+                return <TableSelect
+                    id={prefix + 'mosaicoTemplate'}
+                    label={t('mosaicoTemplate')}
+                    withHeader
+                    dropdown
+                    dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}`}
+                    columns={mosaicoTemplatesColumns}
+                    selectionLabelIndex={1}
+                    disabled={isEdit}/>
+            } else {
+                return null;
+            }
+        },
         getHTMLEditor: owner =>
             <AlignedRow
                 label={t('templateContentHtml')}>
@@ -144,6 +162,12 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'mosaico');
         },
+        afterTagLanguageChange: (mutState, isEdit) => {
+            if (!isEdit) {
+                mutState.setIn([prefix + 'mosaicoTemplate', 'value'], null);
+            }
+        },
+        isTagLanguageSelectorDisabledForEdit: true,
         validate: state => {
             const mosaicoTemplate = state.getIn([prefix + 'mosaicoTemplate', 'value']);
             if (!mosaicoTemplate) {
@@ -230,6 +254,9 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'mosaicoWithFsTemplate');
         },
+        afterTagLanguageChange: (mutState, isEdit) => {
+        },
+        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -317,6 +344,9 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'grapesjs');
         },
+        afterTagLanguageChange: (mutState, isEdit) => {
+        },
+        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -376,6 +406,9 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'ckeditor4');
         },
+        afterTagLanguageChange: (mutState, isEdit) => {
+        },
+        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -460,6 +493,9 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         afterTypeChange: mutState => {
             initFieldsIfMissing(mutState, 'codeeditor');
         },
+        afterTagLanguageChange: (mutState, isEdit) => {
+        },
+        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };

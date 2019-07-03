@@ -712,7 +712,8 @@ class Dropdown extends Component {
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         options: PropTypes.array,
         className: PropTypes.string,
-        format: PropTypes.string
+        format: PropTypes.string,
+        disabled: PropTypes.bool
     }
 
     render() {
@@ -740,7 +741,7 @@ class Dropdown extends Component {
         const className = owner.addFormValidationClass('form-control ' + (props.className || '') , id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <select id={htmlId} className={className} aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)}>
+            <select id={htmlId} className={className} aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)} disabled={props.disabled}>
                 {options}
             </select>
         );

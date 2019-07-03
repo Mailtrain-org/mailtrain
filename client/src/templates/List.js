@@ -7,10 +7,11 @@ import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} 
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import moment from 'moment';
-import {getTemplateTypes} from './helpers';
+import {getTemplateTypes, getTagLanguages} from './helpers';
 import {checkPermissions} from "../lib/permissions";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
+
 
 @withComponentMixins([
     withTranslation,
@@ -23,6 +24,7 @@ export default class List extends Component {
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
+        this.tagLanguages = getTagLanguages(props.t);
 
         this.state = {};
         tableRestActionDialogInit(this);
@@ -63,12 +65,13 @@ export default class List extends Component {
             { data: 1, title: t('name') },
             { data: 2, title: t('description') },
             { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-            { data: 4, title: t('created'), render: data => moment(data).fromNow() },
-            { data: 5, title: t('namespace') },
+            { data: 4, title: t('Tag language'), render: data => this.tagLanguages[data].name },
+            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
-                    const perms = data[6];
+                    const perms = data[7];
 
                     if (perms.includes('edit')) {
                         actions.push({

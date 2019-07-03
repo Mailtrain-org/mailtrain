@@ -10,6 +10,7 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
+const { allTagLanguages } = require('../../shared/templates');
 const { CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
 const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
@@ -445,6 +446,10 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
 
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.send_configuration, 'viewPublic');
     }
+
+    if ((isCreate && entity.source === CampaignSource.CUSTOM) || (content === Content.ONLY_SOURCE_CUSTOM)) {
+        enforce(allTagLanguages.includes(entity.data.sourceCustom.tag_language), `Invalid tag language '${entity.data.sourceCustom.tag_language}'`);
+    }
 }
 
 async function _createTx(tx, context, entity, content) {
@@ -462,6 +467,7 @@ async function _createTx(tx, context, entity, content) {
 
             entity.data.sourceCustom = {
                 type: template.type,
+                tag_language: template.tag_language,
                 data: template.data,
                 html: template.html,
                 text: template.text

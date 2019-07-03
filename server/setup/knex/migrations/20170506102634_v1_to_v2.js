@@ -2,6 +2,7 @@ const { CampaignSource, CampaignType} = require('../../../../shared/campaigns');
 const files = require('../../../models/files');
 const contextHelpers = require('../../../lib/context-helpers');
 const mosaicoTemplates = require('../../../../shared/mosaico-templates');
+const {TagLanguages} = require('../../../../shared/templates');
 const {getGlobalNamespaceId} = require('../../../../shared/namespaces');
 const {getAdminId} = require('../../../../shared/users');
 const { MailerType, ZoneMTAType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../../shared/send-configurations');
@@ -905,7 +906,7 @@ async function addMosaicoTemplates(knex) {
         type: 'html',
         namespace: 1,
         data: JSON.stringify({
-            html: mosaicoTemplates.getVersafix()
+            html: mosaicoTemplates.getVersafix(TagLanguages.SIMPLE)
         })
     };
 

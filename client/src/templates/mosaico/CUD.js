@@ -20,11 +20,12 @@ import {
 import {withErrorHandling} from '../../lib/error-handling';
 import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
-
+import mailtrainConfig from 'mailtrainConfig';
 import {getMJMLSample, getVersafix} from "../../../../shared/mosaico-templates";
 import {getTemplateTypes, getTemplateTypesOrder} from "./helpers";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import styles from "../../lib/styles.scss";
+import {getTagLanguages} from "../helpers";
 
 @withComponentMixins([
     withTranslation,
@@ -38,6 +39,7 @@ export default class CUD extends Component {
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
+        this.tagLanguages = getTagLanguages(props.t);
 
         this.typeOptions = [];
         for (const type of getTemplateTypesOrder()) {
@@ -63,8 +65,16 @@ export default class CUD extends Component {
     }
 
     submitFormValuesMutator(data) {
+        const wizard = this.props.wizard;
+
+        if (wizard === 'versafix') {
+            data.html = getVersafix(data.tag_language);
+        } else if (wizard === 'mjml-sample') {
+            data.mjml = getMJMLSample(data.tag_language);
+        }
+
         this.templateTypes[data.type].beforeSave(this, data);
-        return filterData(data, ['name', 'description', 'type', 'data', 'namespace']);
+        return filterData(data, ['name', 'description', 'type', 'tag_language', 'data', 'namespace']);
     }
 
     componentDidMount() {
@@ -80,7 +90,7 @@ export default class CUD extends Component {
                     description: '',
                     namespace: mailtrainConfig.user.namespace,
                     type: 'html',
-                    html: getVersafix()
+                    tag_language: mailtrainConfig.tagLanguages[0]
                 });
 
             } else if (wizard === 'mjml-sample') {
@@ -89,7 +99,7 @@ export default class CUD extends Component {
                     description: '',
                     namespace: mailtrainConfig.user.namespace,
                     type: 'mjml',
-                    mjml: getMJMLSample()
+                    tag_language: mailtrainConfig.tagLanguages[0]
                 });
 
             } else {
@@ -98,6 +108,7 @@ export default class CUD extends Component {
                     description: '',
                     namespace: mailtrainConfig.user.namespace,
                     type: 'html',
+                    tag_language: mailtrainConfig.tagLanguages[0],
                     html: ''
                 });
             }
@@ -117,6 +128,12 @@ export default class CUD extends Component {
             state.setIn(['type', 'error'], t('typeMustBeSelected'));
         } else {
             state.setIn(['type', 'error'], null);
+        }
+
+        if (!state.getIn(['tag_language', 'value'])) {
+            state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
+        } else {
+            state.setIn(['tag_language', 'error'], null);
         }
 
         validateNamespace(t, state);
@@ -169,6 +186,11 @@ export default class CUD extends Component {
 
         const typeKey = this.getFormValue('type');
 
+        const tagLanguageOptions = [];
+        for (const key of mailtrainConfig.tagLanguages) {
+            tagLanguageOptions.push({key, label: this.tagLanguages[key].name});
+        }
+
         return (
             <div>
                 {canDelete &&
@@ -194,6 +216,9 @@ export default class CUD extends Component {
                         :
                         <Dropdown id="type" label={t('type')} options={this.typeOptions}/>
                     }
+
+                    <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions}/>
+
                     <NamespaceSelect/>
 
                     {isEdit && typeKey && this.templateTypes[typeKey].getForm(this)}

@@ -36,6 +36,11 @@ editors:
 - ckeditor4
 - codeeditor
 
+# Enabled tag languages
+tagLanguages:
+- simple  # e.g. [FIRST_NAME] - this the style of merge tags found in Mailtrain v1
+- hbs     # e.g. {{#if FIRST_NAME}}Hello {{firstName}}!{{else}}Hello!{{/if}} - this syntax uses Handlebars templating language (http://handlebarsjs.com)
+
 # Default language to use
 defaultLanguage: en-US
 

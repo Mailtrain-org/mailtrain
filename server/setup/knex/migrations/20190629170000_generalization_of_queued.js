@@ -7,7 +7,7 @@ exports.up = (knex, Promise) => (async() => {
         data.listId = queuedEntry.list;
         data.subscriptionId = queuedEntry.subscription;
 
-        knex('queued')
+        await knex('queued')
             .where('id', queuedEntry.id)
             .update({
                 data: JSON.stringify(data)

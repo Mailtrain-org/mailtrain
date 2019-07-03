@@ -33,6 +33,8 @@ class TreeTable extends Component {
     constructor(props) {
         super(props);
 
+        this.isComponentMounted = false;
+
         this.state = {
             treeData: []
         };
@@ -68,9 +70,11 @@ class TreeTable extends Component {
             }
         }
 
-        this.setState({
-            treeData
-        });
+        if (this.isComponentMounted) {
+            this.setState({
+                treeData
+            });
+        }
     }
 
     static propTypes = {
@@ -109,6 +113,8 @@ class TreeTable extends Component {
     }
 
     componentDidMount() {
+        this.isComponentMounted = true;
+
         if (!this.props.data && this.props.dataUrl) {
             // noinspection JSIgnoredPromiseFromCall
             this.loadData();
@@ -219,6 +225,10 @@ class TreeTable extends Component {
 
             this.updateSelection();
         }
+    }
+
+    componentWillUnmount() {
+        this.isComponentMounted = false;
     }
 
     updateSelection() {
