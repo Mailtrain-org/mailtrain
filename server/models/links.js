@@ -140,10 +140,10 @@ async function addOrGet(campaignId, url) {
     }
 }
 
-async function updateLinks(campaign, list, subscription, mergeTags, message) {
-    if ((campaign.open_tracking_disabled && campaign.click_tracking_disabled) || !message || !message.trim()) {
+async function updateLinks(source, tagLanguage, mergeTags, campaign, list, subscription) {
+    if ((campaign.open_tracking_disabled && campaign.click_tracking_disabled) || !source || !source.trim()) {
         // tracking is disabled, do not modify the message
-        return message;
+        return source;
     }
 
     // insert tracking image
@@ -151,12 +151,12 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
         let inserted = false;
         const imgUrl = getPublicUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}`);
         const img = '<img src="' + imgUrl + '" width="1" height="1" alt="mt">';
-        message = message.replace(/<\/body\b/i, match => {
+        source = source.replace(/<\/body\b/i, match => {
             inserted = true;
             return img + match;
         });
         if (!inserted) {
-            message = message + img;
+            source = source + img;
         }
     }
 
@@ -165,7 +165,7 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
 
         const urlsToBeReplaced = new Set();
 
-        message.replace(re, (match, prefix, encodedUrl) => {
+        source.replace(re, (match, prefix, encodedUrl) => {
             const url = he.decode(encodedUrl, {isAttributeValue: true});
             urlsToBeReplaced.add(url);
         });
@@ -173,19 +173,19 @@ async function updateLinks(campaign, list, subscription, mergeTags, message) {
         const urls = new Map(); // url -> {id, cid} (as returned by add)
         for (const url of urlsToBeReplaced) {
             // url might include variables, need to rewrite those just as we do with message content
-            const expanedUrl = tools.formatMessage(campaign, list, subscription, mergeTags, url);
+            const expanedUrl = tools.formatCampaignTemplate(url, tagLanguage, mergeTags, false, campaign, list, subscription);
             const link = await addOrGet(campaign.id, expanedUrl);
             urls.set(url, link);
         }
 
-        message = message.replace(re, (match, prefix, encodedUrl) => {
+        source = source.replace(re, (match, prefix, encodedUrl) => {
             const url = he.decode(encodedUrl, {isAttributeValue: true});
             const link = urls.get(url);
             return prefix + (link ? getPublicUrl(`/links/${campaign.cid}/${list.cid}/${subscription.cid}/${link.cid}`) : url);
         });
     }
 
-    return message;
+    return source;
 }
 
 module.exports.LinkId = LinkId;

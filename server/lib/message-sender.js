@@ -13,7 +13,7 @@ const fields = require('../models/fields');
 const sendConfigurations = require('../models/send-configurations');
 const links = require('../models/links');
 const {CampaignSource, CampaignType} = require('../../shared/campaigns');
-const {SubscriptionStatus} = require('../../shared/lists');
+const {SubscriptionStatus, toNameTagLangauge} = require('../../shared/lists');
 const tools = require('./tools');
 const htmlToText = require('html-to-text');
 const request = require('request-promise');
@@ -39,7 +39,7 @@ class MessageSender {
         settings is one of:
         - campaignCid / campaignId
         or
-        - sendConfiguration, listId, attachments, html, text, subject
+        - sendConfiguration, listId, attachments, html, text, subject, tagLanguage
      */
     async _init(settings) {
         this.type = settings.type;
@@ -58,14 +58,6 @@ class MessageSender {
                 this.isMassMail = true;
 
             } else if (this.type === MessageType.TEST) {
-                // We are not within scope of a campaign (i.e. templates in MessageType.TEST message)
-                // This is to fake the campaign for getMessageLinks, which is called inside formatMessage
-                this.campaign = {
-                    cid: '[CAMPAIGN_ID]',
-                    from_name_override: null,
-                    from_email_override: null,
-                    reply_to_override: null
-                };
                 this.isMassMail = true;
 
             } else {
@@ -85,6 +77,12 @@ class MessageSender {
 
             if (settings.listId) {
                 const list = await lists.getByIdTx(tx, contextHelpers.getAdminContext(), settings.listId);
+                this.listsById.set(list.id, list);
+                this.listsByCid.set(list.cid, list);
+                this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
+
+            } else if (settings.listCid) {
+                const list = await lists.getByCidTx(tx, contextHelpers.getAdminContext(), settings.listCid);
                 this.listsById.set(list.id, list);
                 this.listsByCid.set(list.cid, list);
                 this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
@@ -123,10 +121,21 @@ class MessageSender {
             } else if (settings.html !== undefined) {
                 this.html = settings.html;
                 this.text = settings.text;
+                this.tagLanguage = settings.tagLanguage;
 
             } else if (this.campaign && this.campaign.source === CampaignSource.TEMPLATE) {
                 this.template = await templates.getByIdTx(tx, contextHelpers.getAdminContext(), this.campaign.data.sourceTemplate, false);
+                this.html = this.template.html;
+                this.text = this.template.text;
+                this.tagLanguage = this.template.tag_language;
+
+            } else if (this.campaign && (this.campaign.source === CampaignSource.CUSTOM || this.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || this.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
+                this.html = this.campaign.data.sourceCustom.html;
+                this.text = this.campaign.data.sourceCustom.text;
+                this.tagLanguage = this.campaign.data.sourceCustom.tag_language;
             }
+
+            enforce(this.renderedHtml || (this.campaign && this.campaign.source === CampaignSource.URL) || this.tagLanguage);
 
             if (settings.subject !== undefined) {
                 this.subject = settings.subject;
@@ -155,40 +164,25 @@ class MessageSender {
             text = this.text;
             renderTags = true;
 
-        } else if (campaign) {
-            if (campaign.source === CampaignSource.URL) {
-                const form = tools.getMessageLinks(campaign, list, subscriptionGrouped);
-                for (const key in mergeTags) {
-                    form[key] = mergeTags[key];
-                }
-
-                const response = await request.post({
-                    uri: campaign.sourceUrl,
-                    form,
-                    resolveWithFullResponse: true
-                });
-
-                if (response.statusCode !== 200) {
-                    throw new Error(`Received status code ${httpResponse.statusCode} from ${campaign.sourceUrl}`);
-                }
-
-                html = response.body;
-                text = '';
-                renderTags = false;
-
-            } else if (campaign.source === CampaignSource.CUSTOM || campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN || campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                html = campaign.data.sourceCustom.html;
-                text = campaign.data.sourceCustom.text;
-                renderTags = true;
-
-            } else if (campaign.source === CampaignSource.TEMPLATE) {
-                const template = this.template;
-                html = template.html;
-                text = template.text;
-                renderTags = true;
+        } else if (campaign && campaign.source === CampaignSource.URL) {
+            const form = tools.getMessageLinks(campaign, list, subscriptionGrouped);
+            for (const key in mergeTags) {
+                form[key] = mergeTags[key];
             }
 
-            html = await links.updateLinks(campaign, list, subscriptionGrouped, mergeTags, html);
+            const response = await request.post({
+                uri: campaign.sourceUrl,
+                form,
+                resolveWithFullResponse: true
+            });
+
+            if (response.statusCode !== 200) {
+                throw new Error(`Received status code ${httpResponse.statusCode} from ${campaign.sourceUrl}`);
+            }
+
+            html = response.body;
+            text = '';
+            renderTags = false;
         }
 
         const attachments = this.attachments.slice();
@@ -204,11 +198,23 @@ class MessageSender {
             });
         }
 
-        html = renderTags ? tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, html, true) : html;
 
-        text = (text || '').trim()
-            ? (renderTags ? tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, text) : text)
-            : htmlToText.fromString(html, {wordwrap: 130});
+        if (renderTags) {
+            if (this.campaign) {
+                html = await links.updateLinks(html, this.tagLanguage, mergeTags, campaign, list, subscriptionGrouped);
+            }
+
+            html = tools.formatCampaignTemplate(html, this.tagLanguage, mergeTags, true, campaign, list, subscriptionGrouped);
+        }
+
+        const generateText = !!(text || '').trim();
+        if (generateText) {
+            text = htmlToText.fromString(html, {wordwrap: 130});
+        } else {
+            if (renderTags) {
+                text = tools.formatCampaignTemplate(text, this.tagLanguage, mergeTags, false, campaign, list, subscriptionGrouped)
+            }
+        }
 
         return {
             html,
@@ -220,7 +226,7 @@ class MessageSender {
     _getExtraTags(campaign) {
         const tags = {};
 
-        if (campaign.type === CampaignType.RSS_ENTRY) {
+        if (campaign && campaign.type === CampaignType.RSS_ENTRY) {
             const rssEntry = campaign.data.rssEntry;
             tags['RSS_ENTRY_TITLE'] = rssEntry.title;
             tags['RSS_ENTRY_DATE'] = rssEntry.date;
@@ -234,24 +240,8 @@ class MessageSender {
         return tags;
     }
 
-    async initByCampaignCid(campaignCid) {
-        await this._init({type: MessageType.REGULAR, campaignCid});
-    }
-
     async initByCampaignId(campaignId) {
         await this._init({type: MessageType.REGULAR, campaignId});
-    }
-
-    async getMessage(listCid, subscriptionCid) {
-        enforce(this.type === MessageType.REGULAR);
-
-        const list = this.listsByCid.get(listCid);
-        const subscriptionGrouped = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid);
-        const flds = this.listsFieldsGrouped.get(list.id);
-        const campaign = this.campaign;
-        const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
-
-        return await this._getMessage(list, subscriptionGrouped, mergeTags, false);
     }
 
 
@@ -304,54 +294,58 @@ class MessageSender {
 
             message = await this._getMessage(list, subscriptionGrouped, mergeTags, true);
 
-            const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
-
             let listUnsubscribe = null;
             if (!list.listunsubscribe_disabled) {
-                listUnsubscribe = campaign.unsubscribe_url
-                    ? tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, campaign.unsubscribe_url)
+                listUnsubscribe = campaign && campaign.unsubscribe_url
+                    ? tools.formatCampaignTemplate(campaign.unsubscribe_url, this.tagLanguage, mergeTags, false, campaign, list, subscriptionGrouped)
                     : getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscriptionGrouped.cid);
             }
 
             to = {
-                name: list.to_name === null ? undefined : tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
+                name: list.to_name === null ? undefined : tools.formatCampaignTemplate(list.to_name, toNameTagLangauge, mergeTags, false, campaign, list, subscriptionGrouped),
                 address: subscriptionGrouped.email
             };
 
-            subject = tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, this.subject, false);
+            subject = this.subject;
 
-            if (this.useVerp) {
-                envelope = {
-                    from: campaignAddress + '@' + sendConfiguration.verp_hostname,
-                    to: subscriptionGrouped.email
-                };
-            }
-
-            if (this.useVerpSenderHeader) {
-                sender = campaignAddress + '@' + sendConfiguration.verp_hostname;
+            if (this.tagLanguage) {
+                subject = tools.formatCampaignTemplate(this.subject, this.tagLanguage, mergeTags, false, campaign, list, subscriptionGrouped);
             }
 
             headers = {
-                'x-fbl': campaignAddress,
-                // custom header for SparkPost
-                'x-msys-api': JSON.stringify({
-                    campaign_id: campaignAddress
-                }),
-                // custom header for SendGrid
-                'x-smtpapi': JSON.stringify({
-                    unique_args: {
-                        campaign_id: campaignAddress
-                    }
-                }),
-                // custom header for Mailgun
-                'x-mailgun-variables': JSON.stringify({
-                    campaign_id: campaignAddress
-                }),
                 'List-ID': {
                     prepared: true,
                     value: libmime.encodeWords(list.name) + ' <' + list.cid + '.' + getPublicUrl() + '>'
                 }
             };
+
+            if (campaign) {
+                const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
+
+                if (this.useVerp) {
+                    envelope = {
+                        from: campaignAddress + '@' + sendConfiguration.verp_hostname,
+                        to: subscriptionGrouped.email
+                    };
+                }
+
+                if (this.useVerpSenderHeader) {
+                    sender = campaignAddress + '@' + sendConfiguration.verp_hostname;
+                }
+
+                headers['x-fbl'] = campaignAddress;
+                headers['x-msys-api'] = JSON.stringify({
+                    campaign_id: campaignAddress
+                });
+                headers['x-smtpapi'] = JSON.stringify({
+                    unique_args: {
+                        campaign_id: campaignAddress
+                    }
+                });
+                headers['x-mailgun-variables'] = JSON.stringify({
+                    campaign_id: campaignAddress
+                });
+            }
 
             listHeader = {
                 unsubscribe: listUnsubscribe
@@ -375,7 +369,7 @@ class MessageSender {
         await mailer.throttleWait();
 
         const getOverridable = key => {
-            if (campaign && sendConfiguration[key + '_overridable'] && this.campaign[key + '_override'] !== null) {
+            if (campaign && sendConfiguration[key + '_overridable'] && campaign[key + '_override'] !== null) {
                 return campaign[key + '_override'] || '';
             } else {
                 return sendConfiguration[key] || '';
@@ -458,7 +452,7 @@ class MessageSender {
             enforce(subscriptionGrouped);
 
             await knex('campaign_messages').insert({
-                campaign: this.campaign.id,
+                campaign: campaign.id,
                 list: list.id,
                 subscription: subscriptionGrouped.id,
                 send_configuration: sendConfiguration.id,
@@ -468,7 +462,31 @@ class MessageSender {
                 updated: now
             });
 
-        } else if (msgType === MessageType.TRIGGERED || msgType === MessageType.TEST || msgType === MessageType.SUBSCRIPTION) {
+        }
+
+        if (campaign && msgType === MessageType.TEST) {
+            enforce(list);
+            enforce(subscriptionGrouped);
+
+            try {
+                // Insert an entry to test_messages. This allows us to remember test sends to lists that are not
+                // listed in the campaign - see the check in getMessage
+                await knex('test_messages').insert({
+                    campaign: campaign.id,
+                    list: list.id,
+                    subscription: subscriptionGrouped.id
+                });
+            } catch (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    // The entry is already there, so we can ignore this error
+                } else {
+                    throw err;
+                }
+            }
+        }
+
+        if (msgType === MessageType.TRIGGERED || msgType === MessageType.TEST || msgType === MessageType.SUBSCRIPTION) {
+
             if (subData.attachments) {
                 for (const attachment of subData.attachments) {
                     try {
@@ -515,6 +533,7 @@ async function sendQueuedMessage(queuedMessage) {
         html: msgData.html,
         text: msgData.text,
         subject: msgData.subject,
+        tagLanguage: msgData.tagLanguage,
         renderedHtml: msgData.renderedHtml,
         renderedText: msgData.renderedText
     });
@@ -588,9 +607,51 @@ async function queueSubscriptionMessage(sendConfigurationId, to, subject, encryp
     senders.scheduleCheck();
 }
 
+async function getMessage(campaignCid, listCid, subscriptionCid) {
+    const cs = new MessageSender();
+    await cs._init({type: MessageType.REGULAR, campaignCid, listCid});
+
+    const campaign = cs.campaign;
+    const list = cs.listsByCid.get(listCid);
+
+    const subscriptionGrouped = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid);
+
+    let listOk = false;
+
+    for (const listSpec of campaign.lists) {
+        if (list.id === listSpec.list) {
+            // This means we send to a list that is associated with the campaign
+            listOk = true;
+            break;
+        }
+    }
+
+    if (!listOk) {
+        const row = await knex('test_messages').where({
+            campaign: campaign.id,
+            list: list.id,
+            subscription: subscriptionGrouped.id
+        }).first();
+
+        if (row) {
+            listOk = true;
+        }
+    }
+
+    if (!listOk) {
+        throw new Error('Message not found');
+    }
+
+    const flds = cs.listsFieldsGrouped.get(list.id);
+    const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, cs._getExtraTags(campaign));
+
+    return await cs._getMessage(list, subscriptionGrouped, mergeTags, false);
+}
+
 module.exports.MessageSender = MessageSender;
 module.exports.MessageType = MessageType;
 module.exports.sendQueuedMessage = sendQueuedMessage;
 module.exports.queueCampaignMessageTx = queueCampaignMessageTx;
 module.exports.queueSubscriptionMessage = queueSubscriptionMessage;
 module.exports.dropQueuedMessage = dropQueuedMessage;
+module.exports.getMessage = getMessage;

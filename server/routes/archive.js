@@ -1,13 +1,11 @@
 'use strict';
 
 const router = require('../lib/router-async').create();
-const {MessageSender} = require('../lib/message-sender');
+const messageSender = require('../lib/message-sender');
 
 
 router.get('/:campaign/:list/:subscription', (req, res, next) => {
-    const cs = new MessageSender();
-    cs.initByCampaignCid(req.params.campaign)
-        .then(() => cs.getMessage(req.params.list, req.params.subscription))
+    messageSender.getMessage(req.params.campaign, req.params.list, req.params.subscription)
         .then(result => {
             const {html} = result;
 

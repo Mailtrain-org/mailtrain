@@ -1,14 +1,6 @@
 'use strict';
 
-const {TagLanguages} = require('./templates');
-
-function renderTag(tagLanguage, tag) {
-    if (tagLanguage === TagLanguages.SIMPLE) {
-        return `[${tag}]`;
-    } else if (tagLanguage === TagLanguages.HBS) {
-        return `{{${tag}}}`;
-    }
-}
+const {renderTag} = require('./templates');
 
 function getVersafix(tagLanguage) {
     const tg = tag => renderTag(tagLanguage, tag);

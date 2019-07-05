@@ -18,6 +18,8 @@ const fs = require('fs-extra');
 const { JSDOM } = require('jsdom');
 const { tUI, tLog, getLangCodeFromExpressLocale } = require('./translate');
 
+const {TagLanguages} = require('../../shared/templates');
+
 
 const templates = new Map();
 
@@ -142,22 +144,17 @@ function validateEmailGetMessage(result, address, language) {
     }
 }
 
-function formatMessage(campaign, list, subscription, mergeTags, message, isHTML) {
-    const links = campaign && list && subscription ? getMessageLinks(campaign, list, subscription) : {};
-    return formatTemplate(message, links, mergeTags, isHTML);
+function formatCampaignTemplate(source, tagLanguage, mergeTags, isHTML, campaign, list, subscription) {
+    const links = getMessageLinks(campaign, list, subscription);
+    mergeTags = {...mergeTags, ...links};
+    return formatTemplate(source, tagLanguage, mergeTags, isHTML);
 }
 
-function formatTemplate(template, links, mergeTags, isHTML) {
-    if (!links && !mergeTags) { return template; }
+function _formatTemplateSimple(source, mergeTags, isHTML) {
+    if (!mergeTags) { return source; }
 
     const getValue = fullKey => {
         const keys = (fullKey || '').split('.');
-
-        if (links && links.hasOwnProperty(keys[0])) {
-            return links[keys[0]];
-        }
-
-        if (!mergeTags) { return false; }
 
         let value = mergeTags;
         while (keys.length > 0) {
@@ -176,7 +173,7 @@ function formatTemplate(template, links, mergeTags, isHTML) {
         }) : (containsHTML ? htmlToText.fromString(value) : value);
     };
 
-    return template.replace(/\[([a-z0-9_.]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
+    return source.replace(/\[([a-z0-9_.]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
         let value = getValue(identifier);
         if (value === false) {
             return match;
@@ -184,6 +181,21 @@ function formatTemplate(template, links, mergeTags, isHTML) {
         value = (value || fallback || '').trim();
         return value;
     });
+}
+
+function _formatTemplateHbs(source, mergeTags, isHTML) {
+    const renderer = hbs.handlebars.compile(source);
+    const options = {};
+
+    return renderer(mergeTags, options);
+}
+
+function formatTemplate(source, tagLanguage, mergeTags, isHTML) {
+    if (tagLanguage === TagLanguages.SIMPLE) {
+        return _formatTemplateSimple(source, mergeTags, isHTML)
+    } else if (tagLanguage === TagLanguages.HBS) {
+        return _formatTemplateHbs(source, mergeTags, isHTML)
+    }
 }
 
 async function prepareHtml(html) {
@@ -212,14 +224,26 @@ async function prepareHtml(html) {
 }
 
 function getMessageLinks(campaign, list, subscription) {
-    return {
-        LINK_UNSUBSCRIBE: getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscription.cid + '?c=' + campaign.cid),
-        LINK_PREFERENCES: getPublicUrl('/subscription/' + list.cid + '/manage/' + subscription.cid),
-        LINK_BROWSER: getPublicUrl('/archive/' + campaign.cid + '/' + list.cid + '/' + subscription.cid),
-        CAMPAIGN_ID: campaign.cid,
-        LIST_ID: list.cid,
-        SUBSCRIPTION_ID: subscription.cid
-    };
+    const result = {};
+
+    if (list && subscription) {
+        if (campaign) {
+            result.LINK_UNSUBSCRIBE = getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscription.cid + '?c=' + campaign.cid);
+            result.LINK_BROWSER = getPublicUrl('/archive/' + campaign.cid + '/' + list.cid + '/' + subscription.cid);
+        } else {
+            result.LINK_UNSUBSCRIBE = getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscription.cid);
+        }
+
+        result.LINK_PREFERENCES = getPublicUrl('/subscription/' + list.cid + '/manage/' + subscription.cid);
+        result.LIST_ID = list.cid;
+        result.SUBSCRIPTION_ID = subscription.cid;
+    }
+
+    if (campaign) {
+        result.CAMPAIGN_ID = campaign.cid;
+    }
+
+    return result;
 }
 
 module.exports = {
@@ -228,7 +252,7 @@ module.exports = {
     getTemplate,
     prepareHtml,
     getMessageLinks,
-    formatMessage,
+    formatCampaignTemplate,
     formatTemplate
 };
 

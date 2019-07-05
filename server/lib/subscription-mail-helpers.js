@@ -6,7 +6,7 @@ const settings = require('../models/settings');
 const {getTrustedUrl, getPublicUrl} = require('./urls');
 const { tUI, tMark } = require('./translate');
 const contextHelpers = require('./context-helpers');
-const {getFieldColumn} = require('../../shared/lists');
+const {getFieldColumn, toNameTagLangauge} = require('../../shared/lists');
 const forms = require('../models/forms');
 const messageSender = require('./message-sender');
 const tools = require('./tools');
@@ -118,7 +118,7 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
             await messageSender.queueSubscriptionMessage(
                 list.send_configuration,
                 {
-                    name: list.to_name === null ? undefined : tools.formatTemplate(list.to_name, {}, mergeTags, false),
+                    name: list.to_name === null ? undefined : tools.formatTemplate(list.to_name, toNameTagLangauge, mergeTags, false),
                     address: email
                 },
                 tUI(subjectKey, locale, { list: list.name }),

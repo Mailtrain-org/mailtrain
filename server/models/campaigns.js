@@ -888,7 +888,7 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 
 
 async function start(context, campaignId, startAt) {
-    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE, PAUSED, or FINISHED state', startAt);
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE, PAUSED, or FINISHED state', startAt);
 }
 
 async function stop(context, campaignId) {
@@ -990,8 +990,9 @@ async function testSend(context, data) {
             const messageData = {
                 campaignId: campaignId,
                 subject: data.subjectPrepend + campaign.subject + data.subjectAppend,
-                html: data.html, // The html and text may be undefined
+                html: data.html, // The html, text and tagLanguage may be undefined
                 text: data.text,
+                tagLanguage: data.tagLanguage,
                 attachments: []
             };
 
@@ -1048,7 +1049,8 @@ async function testSend(context, data) {
             const messageData = {
                 subject: 'Test',
                 html: data.html,
-                text: data.text
+                text: data.text,
+                tagLanguage: data.tagLanguage
             };
 
             const list = await lists.getByCidTx(tx, context, data.listCid);

@@ -229,7 +229,8 @@ export default class CustomContent extends Component {
 
         return {
             html: exportedData.data_sourceCustom_html,
-            text: this.getFormValue('data_sourceCustom_text')
+            text: this.getFormValue('data_sourceCustom_text'),
+            tagLanguage: this.getFormValue('data_sourceCustom_tag_language')
         };
     }
 

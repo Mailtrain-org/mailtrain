@@ -7,6 +7,14 @@ const TagLanguages = {
 
 const allTagLanguages = [TagLanguages.SIMPLE, TagLanguages.HBS];
 
+function renderTag(tagLanguage, tag) {
+    if (tagLanguage === TagLanguages.SIMPLE) {
+        return `[${tag}]`;
+    } else if (tagLanguage === TagLanguages.HBS) {
+        return `{{${tag}}}`;
+    }
+}
+
 function _getBases(trustedBaseUrl, sandboxBaseUrl, publicBaseUrl) {
     if (trustedBaseUrl.endsWith('/')) {
         trustedBaseUrl = trustedBaseUrl.substring(0, trustedBaseUrl.length - 1);
@@ -67,5 +75,6 @@ module.exports = {
     unbase,
     getMergeTagsForBases,
     TagLanguages,
-    allTagLanguages
+    allTagLanguages,
+    renderTag
 };

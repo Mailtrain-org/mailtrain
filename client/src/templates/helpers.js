@@ -19,7 +19,7 @@ import {getSandboxUrl} from "../lib/urls";
 import mailtrainConfig from 'mailtrainConfig';
 import {ActionLink, Button} from "../lib/bootstrap-components";
 import {Trans} from "react-i18next";
-import {TagLanguages} from "../../../shared/templates";
+import {TagLanguages, renderTag} from "../../../shared/templates";
 
 import styles from "../lib/styles.scss";
 
@@ -507,6 +507,39 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 export function getEditForm(owner, typeKey, prefix = '') {
     const t = owner.props.t;
 
+    const tagLanguage = owner.getFormValue(prefix + 'tag_language');
+
+    const tg = tag => renderTag(tagLanguage, tag);
+
+    let instructions = null;
+    if (tagLanguage === TagLanguages.SIMPLE) {
+        instructions = (
+            <>
+                <Trans i18nKey="mergeTagsAreTagsThatAreReplacedBefore">
+                    <p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>{tg('TAG_NAME')}</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p>
+                </Trans>
+                <Trans i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
+                    <p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p>
+                </Trans>
+            </>
+        );
+    } else if (tagLanguage === TagLanguages.HBS) {
+        instructions = (
+            <>
+                <Trans>
+                    <p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>{tg('TAG_NAME')}</code>. </p>
+                </Trans>
+                <Trans i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
+                    <p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p>
+                </Trans>
+                <Trans>
+                    <p>The whole message is interpreted as Handlebars template (see <a href="http://handlebarsjs.com/">http://handlebarsjs.com/</a>). You can use any Handlebars blocks and expressions
+                        in the template. The merge tags form the root context of the Handlebars template.</p>
+                </Trans>
+            </>
+        );
+    }
+
     return (
         <div>
             <AlignedRow>
@@ -516,12 +549,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                     label={t('mergeTagReference')}/>
                 {owner.state.showMergeTagReference &&
                 <div style={{marginTop: '15px'}}>
-                    <Trans i18nKey="mergeTagsAreTagsThatAreReplacedBefore">
-                        <p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>[TAG_NAME]</code> or <code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional text value used when <code>TAG_NAME</code> is empty.</p>
-                    </Trans>
-                    <Trans i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
-                        <p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p>
-                    </Trans>
+                    {instructions}
                     <table className="table table-bordered table-condensed table-striped">
                         <thead>
                         <tr>
@@ -536,7 +564,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         <tbody>
                         <tr>
                             <th scope="row">
-                                [LINK_UNSUBSCRIBE]
+                                {tg('LINK_UNSUBSCRIBE')}
                             </th>
                             <td>
                                 <Trans i18nKey="urlThatPointsToTheUnsubscribePage">URL that points to the unsubscribe page</Trans>
@@ -544,7 +572,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [LINK_PREFERENCES]
+                                {tg('LINK_PREFERENCES')}
                             </th>
                             <td>
                                 <Trans i18nKey="urlThatPointsToThePreferencesPageOfThe">URL that points to the preferences page of the subscriber</Trans>
@@ -552,7 +580,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [LINK_BROWSER]
+                                {tg('LINK_BROWSER')}
                             </th>
                             <td>
                                 <Trans i18nKey="urlToPreviewTheMessageInABrowser">URL to preview the message in a browser</Trans>
@@ -560,7 +588,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [EMAIL]
+                                {tg('EMAIL')}
                             </th>
                             <td>
                                 <Trans i18nKey="emailAddress-1">Email address</Trans>
@@ -568,7 +596,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [SUBSCRIPTION_ID]
+                                {tg('SUBSCRIPTION_ID')}
                             </th>
                             <td>
                                 <Trans i18nKey="uniqueIdThatIdentifiesTheRecipient">Unique ID that identifies the recipient</Trans>
@@ -576,7 +604,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [LIST_ID]
+                                {tg('LIST_ID')}
                             </th>
                             <td>
                                 <Trans i18nKey="uniqueIdThatIdentifiesTheListUsedForThis">Unique ID that identifies the list used for this campaign</Trans>
@@ -584,7 +612,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [CAMPAIGN_ID]
+                                {tg('CAMPAIGN_ID')}
                             </th>
                             <td>
                                 <Trans i18nKey="uniqueIdThatIdentifiesCurrentCampaign">Unique ID that identifies current campaign</Trans>
@@ -609,7 +637,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         <tbody>
                         <tr>
                             <th scope="row">
-                                [RSS_ENTRY_TITLE]
+                                {tg('RSS_ENTRY_TITLE')}
                             </th>
                             <td>
                                 <Trans i18nKey="rssEntryTitle">RSS entry title</Trans>
@@ -617,7 +645,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [RSS_ENTRY_DATE]
+                                {tg('RSS_ENTRY_DATE')}
                             </th>
                             <td>
                                 <Trans i18nKey="rssEntryDate">RSS entry date</Trans>
@@ -625,7 +653,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [RSS_ENTRY_LINK]
+                                {tg('RSS_ENTRY_LINK')}
                             </th>
                             <td>
                                 <Trans i18nKey="rssEntryLink">RSS entry link</Trans>
@@ -633,7 +661,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [RSS_ENTRY_CONTENT]
+                                {tg('RSS_ENTRY_CONTENT')}
                             </th>
                             <td>
                                 <Trans i18nKey="contentOfAnRssEntry">Content of an RSS entry</Trans>
@@ -641,7 +669,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [RSS_ENTRY_SUMMARY]
+                                {tg('RSS_ENTRY_SUMMARY')}
                             </th>
                             <td>
                                 <Trans i18nKey="rssEntrySummary">RSS entry summary</Trans>
@@ -649,7 +677,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                         </tr>
                         <tr>
                             <th scope="row">
-                                [RSS_ENTRY_IMAGE_URL]
+                                {tg('RSS_ENTRY_IMAGE_URL')}
                             </th>
                             <td>
                                 <Trans i18nKey="rssEntryImageUrl">RSS entry image URL</Trans>

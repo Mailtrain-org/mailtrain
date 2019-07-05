@@ -148,7 +148,7 @@ class SendControls extends Component {
         const entity = this.props.entity;
 
         if (entity.scheduled) {
-            const date = moment(entity.scheduled);
+            const date = moment.utc(entity.scheduled);
             this.populateFormValues({
                 sendLater: true,
                 date: date.format('YYYY-MM-DD'),

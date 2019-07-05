@@ -158,6 +158,7 @@ const MAX_EMAIL_COUNT = 100;
 async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags) {
     // TODO - Update this to use MessageSender.queueMessageTx (with renderedHtml and renderedText)
 
+    /*
     if (emails.length > MAX_EMAIL_COUNT) {
         throw new Error(`Cannot send more than ${MAX_EMAIL_COUNT} emails at once`);
     }
@@ -182,6 +183,7 @@ async function sendAsTransactionalEmail(context, templateId, sendConfigurationId
             };
 
             const html = tools.formatTemplate(
+                TODO - tag langauge
                 template.html,
                 null,
                 variables,
@@ -190,6 +192,7 @@ async function sendAsTransactionalEmail(context, templateId, sendConfigurationId
 
             const text = (template.text || '').trim()
                 ? tools.formatTemplate(
+                    TODO - tag langauge
                     template.text,
                     null,
                     variables,
@@ -210,6 +213,7 @@ async function sendAsTransactionalEmail(context, templateId, sendConfigurationId
             );
         }
     });
+     */
 }
 
 

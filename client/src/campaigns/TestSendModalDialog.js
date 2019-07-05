@@ -97,6 +97,7 @@ export class TestSendModalDialog extends Component {
                     const contentData = await this.props.getDataAsync();
                     data.html = contentData.html;
                     data.text = contentData.text;
+                    data.tagLanguage = contentData.tagLanguage;
                 }
 
                 if (mode === TestSendModalDialogMode.TEMPLATE) {
@@ -202,7 +203,7 @@ export class TestSendModalDialog extends Component {
         const target = this.getFormValue('target');
         const mode = this.props.mode;
 
-        if (mode === TestSendModalDialogMode.CAMPAIGN_STATUS) {
+        if (mode === TestSendModalDialogMode.CAMPAIGN_CONTENT || mode === TestSendModalDialogMode.CAMPAIGN_STATUS) {
             const targetOpts = [
                 {key: Target.CAMPAIGN_ONE, label: t('Single test user of the campaign')},
                 {key: Target.CAMPAIGN_ALL, label: t('All test users of the campaign')},

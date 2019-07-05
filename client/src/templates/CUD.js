@@ -262,7 +262,8 @@ export default class CUD extends Component {
 
         return {
             html: exportedData.html,
-            text: this.getFormValue('text')
+            text: this.getFormValue('text'),
+            tagLanguage: this.getFormValue('tag_language')
         };
     }
 
