@@ -71,7 +71,7 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
         email
     };
 
-    const flds = await fields.list(contextHelpers.getAdminContext(), list.id);
+    const flds = await fields.listGrouped(contextHelpers.getAdminContext(), list.id);
 
     const encryptionKeys = [];
     for (const fld of flds) {

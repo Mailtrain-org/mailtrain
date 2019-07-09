@@ -13,8 +13,8 @@ if (process.env.NODE_ENV === 'production') {
     process.exit(1);
 }
 
-if (process.env.NODE_ENV === 'test' && !fs.existsSync(path.join(__dirname, '..', '..', 'config', 'test.toml'))) {
-    log.error('sqldrop', 'This script only runs in test if config/test.toml (i.e. a dedicated test database) is present');
+if (process.env.NODE_ENV === 'test' && !fs.existsSync(path.join(__dirname, '..', '..', 'config', 'test.yaml'))) {
+    log.error('sqldrop', 'This script only runs in test if config/test.yaml (i.e. a dedicated test database) is present');
     process.exit(1);
 }
 

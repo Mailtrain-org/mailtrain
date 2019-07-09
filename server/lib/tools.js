@@ -124,7 +124,7 @@ async function validateEmail(address) {
 
 function validateEmailGetMessage(result, address, language) {
     let t;
-    if (language) {
+    if (language !== undefined) {
         t = (key, args) => tUI(key, language, args);
     } else {
         t = (key, args) => tLog(key, args);

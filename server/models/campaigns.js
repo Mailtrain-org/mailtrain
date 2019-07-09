@@ -339,6 +339,11 @@ async function getTrackingSettingsByCidTx(tx, cid) {
     return entity;
 }
 
+async function lockByIdTx(tx, id) {
+    // This locks the entry for update
+    await tx('campaigns').where('id', id).forUpdate();
+}
+
 async function rawGetByTx(tx, key, id) {
     const entity = await tx('campaigns').where('campaigns.' + key, id)
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
@@ -857,8 +862,12 @@ async function getSubscribersQueryGeneratorTx(tx, campaignId) {
     }
 }
 
-async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, startAt) {
+async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, extraData) {
     await knex.transaction(async tx => {
+        // This is quite inefficient because it selects the same row 3 times. However as status is changed
+        // rather infrequently, we keep it this way for simplicity
+        await lockByIdTx(tx, campaignId);
+
         const entity = await getByIdTx(tx, context, campaignId, false);
 
         await enforceSendPermissionTx(tx, context, entity, false);
@@ -867,14 +876,36 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);
         }
 
+        if (Array.isArray(newState)) {
+            const newStateIdx = permittedCurrentStates.indexOf(entity.status);
+            enforce(newStateIdx != -1);
+            newState = newState[newStateIdx];
+        }
+
         const updateData = {
-            status: newState,
+            status: newState
         };
 
-        if (startAt !== undefined) {
+        if (!extraData) {
+            updateData.scheduled = null;
+            updateData.start_at = null;
+        } else {
+            const startAt = extraData.startAt;
+
+            // If campaign is started without "scheduled" specified, startAt === null
             updateData.scheduled = startAt;
             if (!startAt || startAt.valueOf() < Date.now()) {
                 updateData.start_at = new Date();
+            } else {
+                updateData.start_at = startAt;
+            }
+
+            const timezone = extraData.timezone;
+            if (timezone) {
+                updateData.data = JSON.stringify({
+                    ...entity.data,
+                    timezone
+                });
             }
         }
 
@@ -887,22 +918,23 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 }
 
 
-async function start(context, campaignId, startAt) {
-    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE, PAUSED, or FINISHED state', startAt);
+async function start(context, campaignId, extraData) {
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE, PAUSED, or FINISHED state', extraData);
 }
 
 async function stop(context, campaignId) {
-    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED, CampaignStatus.SENDING], CampaignStatus.PAUSING, 'Cannot stop campaign until it is in SCHEDULED or SENDING state');
+    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED, CampaignStatus.SENDING], [CampaignStatus.PAUSED, CampaignStatus.PAUSING], 'Cannot stop campaign until it is in SCHEDULED or SENDING state');
 }
 
 async function reset(context, campaignId) {
     await knex.transaction(async tx => {
+        // This is quite inefficient because it selects the same row 3 times. However as RESET is
+        // going to be called rather infrequently, we keep it this way for simplicity
+        await lockByIdTx(tx, campaignId);
+
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
 
         const entity = await tx('campaigns').where('id', campaignId).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
 
         if (entity.status !== CampaignStatus.FINISHED && entity.status !== CampaignStatus.PAUSED) {
             throw new interoperableErrors.InvalidStateError('Cannot reset campaign until it is FINISHED or PAUSED state');

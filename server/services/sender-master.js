@@ -328,13 +328,13 @@ async function processCampaign(campaignId) {
         while (true) {
             const cpg = await knex('campaigns').where('id', campaignId).first();
 
-            const expirationThreshold = Date.now() - config.queue.retention.campaign * 1000;
-            if (cpg.start_at.valueOf() < expirationThreshold) {
-                return await finish(true, CampaignStatus.FINISHED);
-            }
-
             if (cpg.status === CampaignStatus.PAUSING) {
                 return await finish(true, CampaignStatus.PAUSED);
+            }
+
+            const expirationThreshold = Date.now() - config.queue.retention.campaign * 1000;
+            if (cpg.start_at && cpg.start_at.valueOf() < expirationThreshold) {
+                return await finish(true, CampaignStatus.FINISHED);
             }
 
             sendConfigurationIdByCampaignId.set(cpg.id, cpg.send_configuration);

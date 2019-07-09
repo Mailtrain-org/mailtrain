@@ -17,7 +17,7 @@ suite('Login use-cases', () => {
     });
 
     test('Anonymous user cannot access restricted content', async () => {
-        await driver.navigate().to(config.baseUrl + '/settings');
+        await driver.navigate().to(config.baseTrustedUrl + '/settings');
         await page.login.waitUntilVisible();
         await page.login.waitForFlash();
         expect(await page.login.getFlash()).to.contain('Need to be logged in to access restricted content');

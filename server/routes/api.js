@@ -44,7 +44,7 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
 
     const emailErr = await tools.validateEmail(input.EMAIL);
     if (emailErr) {
-        const errMsg = tools.validateEmailGetMessage(emailErr, input.email);
+        const errMsg = tools.validateEmailGetMessage(emailErr, input.email, null);
         log.error('API', errMsg);
         throw new APIError(errMsg, 400);
     }

@@ -841,7 +841,7 @@ async function updateManaged(context, listId, cid, entity) {
         for (const key in groupedFieldsMap) {
             const fld = groupedFieldsMap[key];
 
-            if (fld.order_manage) {
+            if (fld.order_manage !== null) {
                 update[key] = entity[key];
             }
 

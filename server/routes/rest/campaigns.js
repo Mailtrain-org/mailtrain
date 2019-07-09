@@ -74,11 +74,13 @@ router.deleteAsync('/campaigns/:campaignId', passport.loggedIn, passport.csrfPro
 });
 
 router.postAsync('/campaign-start/:campaignId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), null));
+    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), {startAt: null}));
 });
 
-router.postAsync('/campaign-start-at/:campaignId/:dateTime', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), new Date(Number.parseInt(req.params.dateTime))));
+router.postAsync('/campaign-start-at/:campaignId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    const startAt = new Date(req.body.startAt);
+    const timezone = req.body.timezone;
+    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), {startAt, timezone}));
 });
 
 
