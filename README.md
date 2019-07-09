@@ -170,7 +170,11 @@ This setup starts a stack composed of Mailtrain, MongoDB, Redis, and MariaDB. It
 - http://localhost:3003 - sandbox endpoint
 - http://localhost:3004 - public endpoint
 
-To make this publicly accessible, you should add reverse proxy that makes these endpoints publicly available over HTTPS.
+To make this publicly accessible, you should add reverse proxy that makes these endpoints publicly available over HTTPS. If using the proxy, you also need to set the URL bases and `--withProxy` parameter via `MAILTRAIN_SETTING` as shown below.
+An example of such proxy would be:
+- http://localhost:3000 -> https://mailtrain.example.com
+- http://localhost:3003 -> https://sbox.mailtrain.example.com
+- http://localhsot:3004 -> https://lists.example.com
 
 To deploy Mailtrain with Docker, you need the following three dependencies installed:
 

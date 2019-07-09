@@ -311,6 +311,7 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
 
     const emails = input.EMAIL.split(',');
 
+    // TODO: attachments: input.ATTACHMENTS || []
     const info = await templates.sendAsTransactionalEmail(req.context, templateId, sendConfigurationId, emails, input.SUBJECT, input.VARIABLES);
 
     res.json({ data: info });
