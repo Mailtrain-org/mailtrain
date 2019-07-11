@@ -46,7 +46,7 @@ EOF
       exit 1
     fi
 
-    installPrerequisities
+    #installPrerequisities
     installMailtrain http://localhost:3000 http://localhost:3003 http://localhost:3004 0.0.0.0 false
     installService
 
@@ -155,11 +155,11 @@ function installMailtrain {
     mysqlRoPassword=`pwgen 12 -1`
     
     # Setup MySQL user for Mailtrain
-    mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$mysqlPassword';"
-    mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';"
-    mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$mysqlRoPassword';"
-    mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';"
-    mysql -u mailtrain --password="$mysqlPassword" -e "CREATE database mailtrain;"
+    #mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$mysqlPassword';"
+    #mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';"
+    #mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$mysqlRoPassword';"
+    #mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';"
+    #mysql -u mailtrain --password="$mysqlPassword" -e "CREATE database mailtrain;"
     
     # Add new user for the mailtrain daemon to run as
     useradd mailtrain || true
@@ -181,7 +181,7 @@ www:
 
 
 mysql:
-  password: "$mysqlPassword"
+  password: "asdf1234"
 
 redis:
   enabled: true
@@ -206,7 +206,7 @@ mysql:
   password: "$mysqlRoPassword"
 EOT
 
-    reinstallAllModules
+    #reinstallModules
 
     (cd client && npm run build)
     
@@ -215,23 +215,12 @@ EOT
 }
 
 
-function doForAllModules {
+function reinstallModules {
     # Install required node packages
     for idx in client shared server zone-mta mvis/client mvis/server mvis/test-embed mvis/ivis-core/client mvis/ivis-core/server mvis/ivis-core/shared mvis/ivis-core/embedding; do
-        if [ -d $idx ]; then
-            ($1 $idx)
-        fi
+        echo Reinstalling modules in $idx
+        (cd $idx && rm -rf node_modules && npm install)
     done
-}
-
-function reinstallModules {
-    local idx=$1
-    echo Reinstalling modules in $idx
-    cd $idx && rm -rf node_modules && npm install
-}
-
-function reinstallAllModules {
-    doForAllModules reinstallModules
 }
 
 
@@ -431,7 +420,7 @@ After=syslog.target network.target mariadb.service ${redisService}.service mongo
 
 [Service]
 Environment="NODE_ENV=production"
-WorkingDirectory=/opt/mailtrain/server
+WorkingDirectory=/home/carloszamora/cmailtrain/mailtrain/server
 ExecStart=/usr/bin/node index.js
 Type=simple
 Restart=always

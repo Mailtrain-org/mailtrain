@@ -109,7 +109,7 @@ www:
 mysql:
   host: localhost
   user: mailtrain
-  password: mailtrain
+  password: asdf1234
   database: mailtrain
   # Some installations, eg. MAMP can use a different port (8889)
   # MAMP users should also turn on Allow network access to MySQL otherwise MySQL might not be accessible
