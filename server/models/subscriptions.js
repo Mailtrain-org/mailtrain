@@ -455,7 +455,7 @@ async function serverValidate(context, listId, data) {
     return await knex.transaction(async tx => {
         const result = {};
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
-
+        data.email = data.email.toLowerCase();
         if (data.email) {
             const existingKeyQuery = tx(getSubscriptionTableName(listId)).where('email', data.email);
 
@@ -475,6 +475,7 @@ async function serverValidate(context, listId, data) {
 
 async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, isCreate) {
     enforce(entity.email, 'Email must be set');
+    entity.email = entity.email.toLowerCase();
 
     const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(entity.email));
 
