@@ -565,7 +565,6 @@ function purgeSensitiveData(subscription, groupedFieldsMap) {
 
 async function _update(tx, listId, groupedFieldsMap, existing, filteredEntity) {
 
-    filteredEntity.email = filteredEntity.email.toLowerCase();//Save email with LowerCase
     if ('status' in filteredEntity) {
         if (existing.status !== filteredEntity.status) {
             filteredEntity.status_change = new Date();
