@@ -194,7 +194,7 @@ async function _renderSubscribe(req, res, list, subscription) {
 router.getAsync('/:cid', passport.csrfProtection, async (req, res) => {
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
 
-    if (!list.public_subscribe) {
+    if (list.public_subscribe) {
         shares.throwPermissionDenied();
     }
 
@@ -230,7 +230,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     const list = await lists.getByCid(contextHelpers.getAdminContext(), req.params.cid);
 
     if (!list.public_subscribe) {
-        shares.throwPermissionDenied();
+        //shares.throwPermissionDenied();
     }
 
     // TODO: Validate date/birthady formats here. Now if the value is wrong, it gets simply ignored
