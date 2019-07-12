@@ -108,7 +108,7 @@ www:
 
 mysql:
   host: localhost
-  user: mailtrain
+  user: carloszamora
   password: asdf1234
   database: mailtrain
   # Some installations, eg. MAMP can use a different port (8889)
