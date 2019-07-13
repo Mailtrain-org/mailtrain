@@ -218,7 +218,7 @@ testServer:
   logger: false
 
 builtinZoneMTA:
-  enabled: false
+  enabled: true
   host: localhost
   port: 2525
   mongo: mongodb://127.0.0.1:27017/zone-mta
