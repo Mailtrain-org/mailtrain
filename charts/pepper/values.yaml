@@ -53,3 +53,9 @@ database:
 
 env:
   REDIS_HOST: redis-master
+
+mongodb:
+  fullnameOverride: mongodb
+  usePassword: false
+  persistence:
+    storageClass: pd-ssd
