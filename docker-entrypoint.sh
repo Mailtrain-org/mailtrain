@@ -20,6 +20,9 @@ redis:
   enabled: true
   host: $REDIS_HOST
 
+builtinZoneMTA:
+  redis: redis://$REDIS_HOST:6379/2
+
 log:
   level: info
 
