@@ -111,7 +111,7 @@
                     $.post('/editorapi/update?type={{type}}&editor={{resource.editorName}}', {
                         id: {{resource.id}},
                         name: '{{resource.name}}',
-                        {{#if resource.list}} list: {{resource.list}}, {{/if}}
+                        {{#if resource.list}} list: {{resource.list}}+':'+{{resource.segment}}, {{/if}}
                         html: html,
                         editorData: JSON.stringify({
                             template: '{{resource.editorData.template}}',
