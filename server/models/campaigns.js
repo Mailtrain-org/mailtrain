@@ -11,7 +11,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
 const { allTagLanguages } = require('../../shared/templates');
-const { CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
+const { CampaignMessageStatus, CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
 const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
 const {SubscriptionStatus} = require('../../shared/lists');
@@ -724,36 +724,31 @@ async function getMessageByResponseId(responseId) {
         .first();
 }
 
-const statusFieldMapping = {
-    [SubscriptionStatus.UNSUBSCRIBED]: 'unsubscribed',
-    [SubscriptionStatus.BOUNCED]: 'bounced',
-    [SubscriptionStatus.COMPLAINED]: 'complained'
-};
+const statusFieldMapping = new Map();
+statusFieldMapping.set(CampaignMessageStatus.UNSUBSCRIBED, 'unsubscribed');
+statusFieldMapping.set(CampaignMessageStatus.BOUNCED, 'bounced');
+statusFieldMapping.set(CampaignMessageStatus.COMPLAINED, 'complained');
 
-async function _changeStatusByMessageTx(tx, context, message, subscriptionStatus) {
-    enforce(subscriptionStatus !== SubscriptionStatus.SUBSCRIBED);
+async function _changeStatusByMessageTx(tx, context, message, campaignMessageStatus) {
+    enforce(statusFieldMapping.has(campaignMessageStatus));
 
-    if (message.status === SubscriptionStatus.SUBSCRIBED) {
+    if (message.status === SubscriptionStatus.SENT) {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
 
-        if (!subscriptionStatus in statusFieldMapping) {
-            throw new Error('Unrecognized message status');
-        }
-
-        const statusField = statusFieldMapping[subscriptionStatus];
+        const statusField = statusFieldMapping.get(campaignMessageStatus);
 
         await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
 
         await tx('campaign_messages')
             .where('id', message.id)
             .update({
-                status: subscriptionStatus,
+                status: campaignMessageStatus,
                 updated: knex.fn.now()
             });
     }
 }
 
-async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, subscriptionStatus) {
+async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, campaignMessageStatus) {
     const message = await tx('campaign_messages')
         .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
         .where('campaigns.cid', campaignCid)
@@ -767,17 +762,23 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         throw new Error('Invalid campaign.');
     }
 
-    await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
+    await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
 }
 
-async function changeStatusByMessage(context, message, subscriptionStatus, updateSubscription) {
+
+const campaignMessageStatusToSubscriptionStatusMapping = new Map();
+campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.BOUNCED, SubscriptionStatus.BOUNCED);
+campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.UNSUBSCRIBED, SubscriptionStatus.UNSUBSCRIBED);
+campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.COMPLAINED, SubscriptionStatus.COMPLAINED);
+
+async function changeStatusByMessage(context, message, campaignMessageStatus, updateSubscription) {
     await knex.transaction(async tx => {
         if (updateSubscription) {
-            await subscriptions.changeStatusTx(tx, context, message.list, message.subscription, subscriptionStatus);
+            enforce(campaignMessageStatusToSubscriptionStatusMapping.has(campaignMessageStatus));
+            await subscriptions.changeStatusTx(tx, context, message.list, message.subscription, campaignMessageStatusToSubscriptionStatusMapping.get(campaignMessageStatus));
         }
 
-        await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
-
+        await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
     });
 }
 

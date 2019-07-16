@@ -310,11 +310,14 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
     }
 
     const emails = input.EMAIL.split(',');
+    const mergeTags = input.TAGS || {};
+    const subject = input.SUBJECT || '';
+    const attachments = input.ATTACHMENTS || [];
 
-    // TODO: attachments: input.ATTACHMENTS || []
-    const info = await templates.sendAsTransactionalEmail(req.context, templateId, sendConfigurationId, emails, input.SUBJECT, input.VARIABLES);
 
-    res.json({ data: info });
+    const result = await templates.sendAsTransactionalEmail(req.context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments);
+
+    res.json({ data: result });
 });
 
 module.exports = router;

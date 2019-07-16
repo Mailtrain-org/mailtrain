@@ -24,7 +24,7 @@ async function processCampaignMessages(campaignId, messages) {
 
     for (const msg of messages) {
         try {
-            await cs.sendRegularMessage(msg.listId, msg.email);
+            await cs.sendRegularCampaignMessage(msg.listId, msg.email);
 
             log.verbose('Senders', 'Message sent and status updated for %s:%s', msg.listId, msg.email);
         } catch (err) {

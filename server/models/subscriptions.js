@@ -9,6 +9,7 @@ const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');
 const fields = require('./fields');
 const { SubscriptionSource, SubscriptionStatus, getFieldColumn } = require('../../shared/lists');
+const { CampaignMessageStatus } = require('../../shared/campaigns');
 const segments = require('./segments');
 const { enforce, filterObject } = require('../lib/helpers');
 const moment = require('moment');
@@ -783,7 +784,7 @@ async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaign
         const existing = await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).first();
 
         if (campaignCid) {
-            await campaigns.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, SubscriptionStatus.UNSUBSCRIBED);
+            await campaigns.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, CampaignMessageStatus.UNSUBSCRIBED);
         }
 
         return await _unsubscribeExistingAndGetTx(tx, context, listId, existing);

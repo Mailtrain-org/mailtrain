@@ -10,13 +10,8 @@ const shares = require('./shares');
 const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
-
-const mailers = require('../lib/mailers');
-const tools = require('../lib/tools');
-const sendConfigurations = require('./send-configurations');
-const { getMergeTagsForBases, allTagLanguages } = require('../../shared/templates');
-const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
-const htmlToText = require('html-to-text');
+const { allTagLanguages } = require('../../shared/templates');
+const messageSender = require('../lib/message-sender');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace']);
 
@@ -154,66 +149,14 @@ async function remove(context, id) {
     });
 }
 
-const MAX_EMAIL_COUNT = 100;
-async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags) {
-    // TODO - Update this to use MessageSender.queueMessageTx (with renderedHtml and renderedText)
+async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments) {
+    const template = await getById(context, templateId, false);
 
-    /*
-    if (emails.length > MAX_EMAIL_COUNT) {
-        throw new Error(`Cannot send more than ${MAX_EMAIL_COUNT} emails at once`);
+    await shares.enforceEntityPermission(context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
+
+    for (const email of emails) {
+        await messageSender.queueAPITransactionalMessage(sendConfigurationId, email, subject, template.html, template.text, template.tag_language, {...mergeTags,  EMAIL: email }, attachments);
     }
-
-    await knex.transaction(async tx => {
-        const template = await getByIdTx(tx, context, templateId,false);
-        const sendConfiguration = await sendConfigurations.getByIdTx(tx, context, sendConfigurationId, false, false);
-
-        await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
-
-        const mailer = await mailers.getOrCreateMailer(sendConfigurationId);
-
-        const variablesSkeleton = {
-            ...getMergeTagsForBases(getTrustedUrl(), getSandboxUrl(), getPublicUrl()),
-            ...mergeTags
-        };
-
-        for (const email of emails) {
-            const variables = {
-                ...variablesSkeleton,
-                EMAIL: email
-            };
-
-            const html = tools.formatTemplate(
-                TODO - tag langauge
-                template.html,
-                null,
-                variables,
-                true
-            );
-
-            const text = (template.text || '').trim()
-                ? tools.formatTemplate(
-                    TODO - tag langauge
-                    template.text,
-                    null,
-                    variables,
-                    false
-                ) : htmlToText.fromString(html, {wordwrap: 130});
-
-            return mailer.sendTransactionalMail(
-                {
-                    to: email,
-                    subject,
-                    from: {
-                        name: sendConfiguration.from_name,
-                        address: sendConfiguration.from_email
-                    },
-                    html,
-                    text
-                 }
-            );
-        }
-    });
-     */
 }
 
 

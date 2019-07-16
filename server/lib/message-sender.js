@@ -13,7 +13,8 @@ const fields = require('../models/fields');
 const sendConfigurations = require('../models/send-configurations');
 const links = require('../models/links');
 const {CampaignSource, CampaignType} = require('../../shared/campaigns');
-const {SubscriptionStatus, toNameTagLangauge} = require('../../shared/lists');
+const {toNameTagLangauge} = require('../../shared/lists');
+const {CampaignMessageStatus} = require('../../shared/campaigns');
 const tools = require('./tools');
 const htmlToText = require('html-to-text');
 const request = require('request-promise');
@@ -28,7 +29,9 @@ const MessageType = {
     REGULAR: 0,
     TRIGGERED: 1,
     TEST: 2,
-    SUBSCRIPTION: 3
+    SUBSCRIPTION: 3,
+    API_TRANSACTIONAL: 4
+
 };
 
 class MessageSender {
@@ -36,10 +39,23 @@ class MessageSender {
     }
 
     /*
-        settings is one of:
+        Accepted combinations of settings:
+
+        Option #1
+        - settings.type in [MessageType.REGULAR, MessageType.TRIGGERED, MessageType.TEST]
         - campaignCid / campaignId
-        or
-        - sendConfiguration, listId, attachments, html, text, subject, tagLanguage
+        - listId / listCid [optional if campaign is provided]
+        - sendConfigurationId [optional if campaign is provided]
+        - attachments [optional]
+        - renderedHtml + renderedText / html + text + tagLanguage [optional if campaign is provided]
+        - subject [optional if campaign is provided]
+
+        Option #2
+        - settings.type in [MessageType.SUBSCRIPTION, MessageType.API_TRANSACTIONAL]
+        - sendConfigurationId
+        - attachments [optional]
+        - renderedHtml + renderedText / html + text + tagLanguage
+        - subject
      */
     async _init(settings) {
         this.type = settings.type;
@@ -49,52 +65,56 @@ class MessageSender {
         this.listsFieldsGrouped = new Map(); // listId -> fieldsGrouped
 
         await knex.transaction(async tx => {
-            if (settings.campaignCid) {
-                this.campaign = await campaigns.rawGetByTx(tx, 'cid', settings.campaignCid);
+            if (this.type === MessageType.REGULAR || this.type === MessageType.TRIGGERED || this.type === MessageType.TEST) {
                 this.isMassMail = true;
 
-            } else if (settings.campaignId) {
-                this.campaign = await campaigns.rawGetByTx(tx, 'id', settings.campaignId);
-                this.isMassMail = true;
+                if (settings.campaignCid) {
+                    this.campaign = await campaigns.rawGetByTx(tx, 'cid', settings.campaignCid);
+                } else if (settings.campaignId) {
+                    this.campaign = await campaigns.rawGetByTx(tx, 'id', settings.campaignId);
+                }
 
-            } else if (this.type === MessageType.TEST) {
-                this.isMassMail = true;
+                if (settings.sendConfigurationId) {
+                    this.sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), settings.sendConfigurationId, false, true);
+                } else if (this.campaign && this.campaign.send_configuration) {
+                    this.sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), this.campaign.send_configuration, false, true);
+                } else {
+                    enforce(false);
+                }
 
-            } else {
+                this.useVerp = config.verp.enabled && this.sendConfiguration.verp_hostname;
+                this.useVerpSenderHeader = this.useVerp && !this.sendConfiguration.verp_disable_sender_header;
+
+
+                if (settings.listId) {
+                    const list = await lists.getByIdTx(tx, contextHelpers.getAdminContext(), settings.listId);
+                    this.listsById.set(list.id, list);
+                    this.listsByCid.set(list.cid, list);
+                    this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
+
+                } else if (settings.listCid) {
+                    const list = await lists.getByCidTx(tx, contextHelpers.getAdminContext(), settings.listCid);
+                    this.listsById.set(list.id, list);
+                    this.listsByCid.set(list.cid, list);
+                    this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
+
+                } else if (this.campaign && this.campaign.lists) {
+                    for (const listSpec of this.campaign.lists) {
+                        const list = await lists.getByIdTx(tx, contextHelpers.getAdminContext(), listSpec.list);
+                        this.listsById.set(list.id, list);
+                        this.listsByCid.set(list.cid, list);
+                        this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
+                    }
+                }
+
+            } else if (this.type === MessageType.SUBSCRIPTION || this.type === MessageType.API_TRANSACTIONAL) {
                 this.isMassMail = false;
-            }
-
-            if (settings.sendConfigurationId) {
                 this.sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), settings.sendConfigurationId, false, true);
-            } else if (this.campaign && this.campaign.send_configuration) {
-                this.sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), this.campaign.send_configuration, false, true);
+
             } else {
                 enforce(false);
             }
 
-            this.useVerp = config.verp.enabled && this.sendConfiguration.verp_hostname;
-            this.useVerpSenderHeader = this.useVerp && !this.sendConfiguration.verp_disable_sender_header;
-
-            if (settings.listId) {
-                const list = await lists.getByIdTx(tx, contextHelpers.getAdminContext(), settings.listId);
-                this.listsById.set(list.id, list);
-                this.listsByCid.set(list.cid, list);
-                this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
-
-            } else if (settings.listCid) {
-                const list = await lists.getByCidTx(tx, contextHelpers.getAdminContext(), settings.listCid);
-                this.listsById.set(list.id, list);
-                this.listsByCid.set(list.cid, list);
-                this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
-
-            } else if (this.campaign && this.campaign.lists) {
-                for (const listSpec of this.campaign.lists) {
-                    const list = await lists.getByIdTx(tx, contextHelpers.getAdminContext(), listSpec.list);
-                    this.listsById.set(list.id, list);
-                    this.listsByCid.set(list.cid, list);
-                    this.listsFieldsGrouped.set(list.id, await fields.listGroupedTx(tx, list.id));
-                }
-            }
 
             if (settings.attachments) {
                 this.attachments = settings.attachments;
@@ -147,7 +167,7 @@ class MessageSender {
         });
     }
 
-    async _getMessage(list, subscriptionGrouped, mergeTags, replaceDataImgs) {
+    async _getMessage(mergeTags, list, subscriptionGrouped, replaceDataImgs) {
         let html = '';
         let text = '';
         let renderTags = false;
@@ -160,11 +180,15 @@ class MessageSender {
             renderTags = false;
 
         } else if (this.html !== undefined) {
+            enforce(mergeTags);
+
             html = this.html;
             text = this.text;
             renderTags = true;
 
         } else if (campaign && campaign.source === CampaignSource.URL) {
+            const mergeTags = subData.mergeTags;
+
             const form = tools.getMessageLinks(campaign, list, subscriptionGrouped);
             for (const key in mergeTags) {
                 form[key] = mergeTags[key];
@@ -204,6 +228,7 @@ class MessageSender {
                 html = await links.updateLinks(html, this.tagLanguage, mergeTags, campaign, list, subscriptionGrouped);
             }
 
+            // When no list and subscriptionGrouped is provided, formatCampaignTemplate works the same way as formatTemplate
             html = tools.formatCampaignTemplate(html, this.tagLanguage, mergeTags, true, campaign, list, subscriptionGrouped);
         }
 
@@ -211,9 +236,8 @@ class MessageSender {
         if (generateText) {
             text = htmlToText.fromString(html, {wordwrap: 130});
         } else {
-            if (renderTags) {
-                text = tools.formatCampaignTemplate(text, this.tagLanguage, mergeTags, false, campaign, list, subscriptionGrouped)
-            }
+            // When no list and subscriptionGrouped is provided, formatCampaignTemplate works the same way as formatTemplate
+            text = tools.formatCampaignTemplate(text, this.tagLanguage, mergeTags, false, campaign, list, subscriptionGrouped)
         }
 
         return {
@@ -246,15 +270,19 @@ class MessageSender {
 
 
     /*
-        subData is one of:
-        - subscriptionId, listId, attachments
-        or
-        - email, listId
-        or
-        - to, subject
+        Accepted combinations of subData:
+
+        Option #1
+        - listId
+        - subscriptionId / email
+        - mergeTags [optional, used only when campaign / html+text is provided]
+
+        Option #2:
+        - to ... email / { name, address }
+        - encryptionKeys [optional]
+        - mergeTags [used only when campaign / html+text is provided]
      */
     async _sendMessage(subData) {
-        let msgType = this.type;
         let to, email;
         let envelope = false;
         let sender = false;
@@ -267,9 +295,10 @@ class MessageSender {
         let subscriptionGrouped, list; // May be undefined
         const campaign = this.campaign; // May be undefined
 
+        let mergeTags = subData.mergeTags;
+
         if (subData.listId) {
             let listId;
-            subscriptionGrouped;
 
             if (subData.subscriptionId) {
                 listId = subData.listId;
@@ -284,7 +313,10 @@ class MessageSender {
             email = subscriptionGrouped.email;
 
             const flds = this.listsFieldsGrouped.get(list.id);
-            const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
+
+            if (!mergeTags) {
+                mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
+            }
 
             for (const fld of flds) {
                 if (fld.type === 'gpg' && mergeTags[fld.key]) {
@@ -292,7 +324,7 @@ class MessageSender {
                 }
             }
 
-            message = await this._getMessage(list, subscriptionGrouped, mergeTags, true);
+            message = await this._getMessage(mergeTags, list, subscriptionGrouped, true);
 
             let listUnsubscribe = null;
             if (!list.listunsubscribe_disabled) {
@@ -356,7 +388,7 @@ class MessageSender {
             email = to.address;
             subject = this.subject;
             encryptionKeys = subData.encryptionKeys;
-            message = await this._getMessage();
+            message = await this._getMessage(mergeTags);
         }
 
         if (await blacklist.isBlacklisted(email)) {
@@ -391,7 +423,7 @@ class MessageSender {
             subject,
             html: message.html,
             text: message.text,
-            attachments: message.attachments || [],
+            attachments: message.attachments,
             encryptionKeys
         };
 
@@ -440,92 +472,72 @@ class MessageSender {
         }
 
 
-        if (msgType === MessageType.REGULAR || msgType === MessageType.TRIGGERED) {
-            await knex('campaigns').where('id', campaign.id).increment('delivered');
+        const result = {
+            response,
+            response_id: responseId,
+            list,
+            subscriptionGrouped,
+            email
+        };
+
+        return result;
+    }
+
+    async sendRegularCampaignMessage(listId, email) {
+        enforce(this.type === MessageType.REGULAR);
+
+        // We insert into campaign_messages before the message is actually sent. This is to avoid multiple delivery
+        // if by chance we run out of disk space and couldn't insert in the database after the message has been sent out
+        const ids = await knex('campaign_messages').insert({
+            campaign: this.campaign.id,
+            list: result.list.id,
+            subscription: result.subscriptionGrouped.id,
+            send_configuration: this.sendConfiguration.id,
+            status: CampaignMessageStatus.SENDING
+        });
+
+        const campaignMessageId = ids[0];
+
+        let result;
+        try {
+            result = await this._sendMessage({listId, email});
+        } catch (err) {
+            await knex('campaign_messages')
+                .where({id: campaignMessageId})
+                .del();
+
+            throw err;
         }
 
+        enforce(result.list);
+        enforce(result.subscriptionGrouped);
 
         const now = new Date();
 
-        if (msgType === MessageType.REGULAR) {
-            enforce(list);
-            enforce(subscriptionGrouped);
-
-            await knex('campaign_messages').insert({
-                campaign: campaign.id,
-                list: list.id,
-                subscription: subscriptionGrouped.id,
-                send_configuration: sendConfiguration.id,
-                status: SubscriptionStatus.SUBSCRIBED,
-                response,
-                response_id: responseId,
+        await knex('campaign_messages')
+            .where({id: campaignMessageId})
+            .update({
+                status: CampaignMessageStatus.SENT,
+                response: result.response,
+                response_id: result.responseId,
                 updated: now
             });
 
-        }
-
-        if (campaign && msgType === MessageType.TEST) {
-            enforce(list);
-            enforce(subscriptionGrouped);
-
-            try {
-                // Insert an entry to test_messages. This allows us to remember test sends to lists that are not
-                // listed in the campaign - see the check in getMessage
-                await knex('test_messages').insert({
-                    campaign: campaign.id,
-                    list: list.id,
-                    subscription: subscriptionGrouped.id
-                });
-            } catch (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    // The entry is already there, so we can ignore this error
-                } else {
-                    throw err;
-                }
-            }
-        }
-
-        if (msgType === MessageType.TRIGGERED || msgType === MessageType.TEST || msgType === MessageType.SUBSCRIPTION) {
-
-            if (subData.attachments) {
-                for (const attachment of subData.attachments) {
-                    try {
-                        // We ignore any errors here because we already sent the message. Thus we have to mark it as completed to avoid sending it again.
-                        await knex.transaction(async tx => {
-                            await files.unlockTx(tx, 'campaign', 'attachment', attachment.id);
-                        });
-                    } catch (err) {
-                        log.error('MessageSender', `Error when unlocking attachment ${attachment.id} for ${email} (queuedId: ${subData.queuedId})`);
-                        log.verbose(err.stack);
-                    }
-                }
-            }
-
-            await knex('queued')
-                .where({id: subData.queuedId})
-                .del();
-        }
-    }
-
-    async sendRegularMessage(listId, email) {
-        enforce(this.type === MessageType.REGULAR);
-
-        await this._sendMessage({listId, email});
+        await knex('campaigns').where('id', this.campaign.id).increment('delivered');
     }
 }
 
-async function dropQueuedMessage(queuedMessage) {
-    await knex('queued')
-        .where({id: queuedMessage.id})
-        .del();
-}
 
 async function sendQueuedMessage(queuedMessage) {
+    const messageType = queuedMessage.type;
+
+    enforce(messageType === MessageType.TRIGGERED || messageType === MessageType.TEST || messageType === MessageType.SUBSCRIPTION || messageType === MessageType.API_TRANSACTIONAL);
+
     const msgData = queuedMessage.data;
 
     const cs = new MessageSender();
     await cs._init({
-        type: queuedMessage.type,
+        type: messageType,
         campaignId: msgData.campaignId,
         listId: msgData.listId,
         sendConfigurationId: queuedMessage.send_configuration,
@@ -538,15 +550,78 @@ async function sendQueuedMessage(queuedMessage) {
         renderedText: msgData.renderedText
     });
 
-    await cs._sendMessage({
-        subscriptionId: msgData.subscriptionId,
-        listId: msgData.listId,
-        to: msgData.to,
-        attachments: msgData.attachments,
-        encryptionKeys: msgData.encryptionKeys,
-        queuedId: queuedMessage.id
-    });
+    const campaign = cs.campaign;
+
+    await knex('queued')
+        .where({id: queuedMessage.id})
+        .del();
+
+    let result;
+    try {
+        result = await cs._sendMessage({
+            subscriptionId: msgData.subscriptionId,
+            listId: msgData.listId,
+            to: msgData.to,
+            encryptionKeys: msgData.encryptionKeys
+        });
+    } catch (err) {
+        await knex.insert({
+            id: queuedMessage.id,
+            send_configuration: queuedMessage.send_configuration,
+            type: queuedMessage.type,
+            data: JSON.stringify(queuedMessage.data)
+        });
+
+        throw err;
+    }
+
+    if (messageType === MessageType.TRIGGERED) {
+        await knex('campaigns').where('id', campaign.id).increment('delivered');
+    }
+
+    if (campaign && messageType === MessageType.TEST) {
+        enforce(result.list);
+        enforce(result.subscriptionGrouped);
+
+        try {
+            // Insert an entry to test_messages. This allows us to remember test sends to lists that are not
+            // listed in the campaign - see the check in getMessage
+            await knex('test_messages').insert({
+                campaign: campaign.id,
+                list: result.list.id,
+                subscription: result.subscriptionGrouped.id
+            });
+        } catch (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                // The entry is already there, so we can ignore this error
+            } else {
+                throw err;
+            }
+        }
+    }
+
+    for (const attachment of msgData.attachments) {
+        if (attachment.id) { // This means that it is an attachment recorded in table files_campaign_attachment
+            try {
+                // We ignore any errors here because we already sent the message. Thus we have to mark it as completed to avoid sending it again.
+                await knex.transaction(async tx => {
+                    await files.unlockTx(tx, 'campaign', 'attachment', attachment.id);
+                });
+            } catch (err) {
+                log.error('MessageSender', `Error when unlocking attachment ${attachment.id} for ${result.email} (queuedId: ${queuedMessage.id})`);
+                log.verbose(err.stack);
+            }
+        }
+    }
 }
+
+async function dropQueuedMessage(queuedMessage) {
+    await knex('queued')
+        .where({id: queuedMessage.id})
+        .del();
+}
+
+
 
 async function queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, messageType, messageData) {
     enforce(messageType === MessageType.TRIGGERED || messageType === MessageType.TEST);
@@ -565,6 +640,26 @@ async function queueCampaignMessageTx(tx, sendConfigurationId, listId, subscript
     await tx('queued').insert({
         send_configuration: sendConfigurationId,
         type: messageType,
+        data: JSON.stringify(msgData)
+    });
+}
+
+async function queueAPITransactionalMessage(sendConfigurationId, email, subject, html, text, tagLanguage, mergeTags, attachments) {
+    const msgData = {
+        to: {
+            address: email
+        },
+        html,
+        text,
+        tagLanguage,
+        subject,
+        mergeTags,
+        attachments
+    };
+
+    await tx('queued').insert({
+        send_configuration: sendConfigurationId,
+        type: MessageType.API_TRANSACTIONAL,
         data: JSON.stringify(msgData)
     });
 }
@@ -645,7 +740,7 @@ async function getMessage(campaignCid, listCid, subscriptionCid) {
     const flds = cs.listsFieldsGrouped.get(list.id);
     const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, cs._getExtraTags(campaign));
 
-    return await cs._getMessage(list, subscriptionGrouped, mergeTags, false);
+    return await cs._getMessage(mergeTags, list, subscriptionGrouped, false);
 }
 
 module.exports.MessageSender = MessageSender;
@@ -655,3 +750,4 @@ module.exports.queueCampaignMessageTx = queueCampaignMessageTx;
 module.exports.queueSubscriptionMessage = queueSubscriptionMessage;
 module.exports.dropQueuedMessage = dropQueuedMessage;
 module.exports.getMessage = getMessage;
+module.exports.queueAPITransactionalMessage = queueAPITransactionalMessage;

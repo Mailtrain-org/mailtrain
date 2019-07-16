@@ -184,6 +184,8 @@ queue:
     test: 300          # 5 minutes
     # Subscription and password reset related emails
     subscription: 300  # 5 minutes
+    # Transactional emails sent via API (i.e. /templates/:templateId/send)
+    apiTransactional: 3600  # 60 minutes
 
 cors:
   # Allow subscription widgets to be embedded

@@ -5,7 +5,7 @@ const config = require('config');
 const net = require('net');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
-const { SubscriptionStatus } = require('../../shared/lists');
+const { CampaignMessageStatus } = require('../../shared/campaigns');
 const bluebird = require('bluebird');
 
 const seenIds = new Set();
@@ -66,7 +66,7 @@ async function readNextChunks() {
                                 campaigns.updateMessageResponse(contextHelpers.getAdminContext(), message, queued, queuedAs);
                                 log.verbose('POSTFIXBOUNCE', 'Successfully changed message queueId to %s', queuedAs);
                             } else {
-                                campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                                campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
                                 log.verbose('POSTFIXBOUNCE', 'Marked message %s as bounced', queueId);
                             }
 
