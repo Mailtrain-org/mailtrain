@@ -103,7 +103,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -148,7 +148,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -175,7 +175,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -202,7 +202,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -250,7 +250,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}
@@ -275,7 +275,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -302,7 +302,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -329,7 +329,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -349,7 +349,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -368,7 +368,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    <strong>GET</strong> {t('arguments')}
+                    {t('Query params')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -381,7 +381,8 @@ export default class API extends Component {
                     <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
                     <li><strong>SEND_CONFIGURATION_ID</strong> – {t('idOfConfigurationUsedToCreateMailer')}</li>
                     <li><strong>SUBJECT</strong> – {t('subject')}</li>
-                    <li><strong>VARIABLES</strong> – {t('mapOfTemplatesubjectVariablesToReplace')}</li>
+                    <li><strong>TAGS</strong> – {t('mapOfTemplatesubjectVariablesToReplace')}</li>
+                    <li><strong>ATTACHMENTS</strong> – {t('Attachments (format as consumed by nodemailer)')}</li>
                 </ul>
 
                 <p>
@@ -389,7 +390,7 @@ export default class API extends Component {
                 </p>
 
                 <pre>curl -XPOST '{getUrl(`api/templates/1/send?access_token=${accessToken}`)}' \<br/>
---data 'EMAIL=test@example.com&amp;SUBJECT=Test&amp;VARIABLES[FOO]=bar&amp;VARIABLES[TEST]=example'</pre>
+--data 'EMAIL=test@example.com&amp;SUBJECT=Test&amp;TAGS[FOO]=bar&amp;TAGS[TEST]=example'</pre>
             </div>
         );
     }
