@@ -6,10 +6,9 @@ const {TagLanguages} = require('../../../../shared/templates');
 const {getGlobalNamespaceId} = require('../../../../shared/namespaces');
 const {getAdminId} = require('../../../../shared/users');
 const { MailerType, ZoneMTAType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../../shared/send-configurations');
-const { enforce } = require('../../../lib/helpers');
+const { enforce, hashEmail} = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../../shared/triggers');
 const { SubscriptionSource } = require('../../../../shared/lists');
-const crypto = require('crypto');
 const {DOMParser, XMLSerializer} = require('xmldom');
 const log = require('../../../lib/log');
 
@@ -271,7 +270,7 @@ async function migrateSubscriptions(knex) {
 
             if (rows.length > 0) {
                 for await (const subscription of rows) {
-                    subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
+                    subscription.hash_email = hashEmail(subscription.email);
                     subscription.source_email = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
                     for (const field of fields) {
                         if (field.column != null) {
@@ -417,6 +416,7 @@ async function migrateCustomFields(knex) {
     });
 
     await knex.schema.table('custom_fields', table => {
+        table.renameColumn('description', 'help');
         table.dropColumn('visible');
     });
 

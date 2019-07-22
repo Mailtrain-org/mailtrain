@@ -22,20 +22,20 @@ async function processCampaignMessages(campaignId, messages) {
 
     let withErrors = false;
 
-    for (const msg of messages) {
+    for (const campaignMessage of messages) {
         try {
-            await cs.sendRegularCampaignMessage(msg.listId, msg.email);
+            await cs.sendRegularCampaignMessage(campaignMessage);
 
-            log.verbose('Senders', 'Message sent and status updated for %s:%s', msg.listId, msg.email);
+            log.verbose('Senders', 'Message sent and status updated for %s:%s', campaignMessage.list, campaignMessage.subscription);
         } catch (err) {
 
             if (err instanceof mailers.SendConfigurationError) {
-                log.error('Senders', `Sending message to ${msg.listId}:${msg.email} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                log.error('Senders', `Sending message to ${campaignMessage.list}:${campaignMessage.subscription} failed with error: ${err.message}. Will retry the message if within retention interval.`);
                 withErrors = true;
                 break;
 
             } else {
-                log.error('Senders', `Sending message to ${msg.listId}:${msg.email} failed with error: ${err.message}.`);
+                log.error('Senders', `Sending message to ${campaignMessage.list}:${campaignMessage.subscription} failed with error: ${err.message}.`);
                 log.verbose(err.stack);
             }
         }
@@ -56,8 +56,7 @@ async function processQueuedMessages(sendConfigurationId, messages) {
 
     let withErrors = false;
 
-    for (const msg of messages) {
-        const queuedMessage = msg.queuedMessage;
+    for (const queuedMessage of messages) {
 
         const msgData = queuedMessage.data;
         let target = '';

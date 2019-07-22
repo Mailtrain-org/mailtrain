@@ -12,7 +12,7 @@ const pathlib = require('path');
 const Handlebars = require('handlebars');
 const bluebird = require('bluebird');
 
-const highestLegacySchemaVersion = 33;
+const highestLegacySchemaVersion = 34;
 
 const mysqlConfig = {
     multipleStatements: true

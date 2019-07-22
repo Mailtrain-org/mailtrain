@@ -18,6 +18,7 @@ import {
     InputField,
     StaticField,
     TableSelect,
+    TextArea,
     withForm,
     withFormErrorHandlers
 } from '../../lib/form';
@@ -83,6 +84,10 @@ export default class CUD extends Component {
             data.default_value = '';
         }
 
+        if (data.help === null) {
+            data.help = '';
+        }
+
         data.isInGroup = data.group !== null;
 
         data.enumOptions = '';
@@ -122,6 +127,10 @@ export default class CUD extends Component {
     submitFormValuesMutator(data) {
         if (data.default_value.trim() === '') {
             data.default_value = null;
+        }
+
+        if (data.help.trim() === '') {
+            data.help = null;
         }
 
         if (!data.isInGroup) {
@@ -164,7 +173,7 @@ export default class CUD extends Component {
             data.orderManageBefore = Number.parseInt(data.orderManageBefore) || data.orderManageBefore;
         }
 
-        return filterData(data, ['name', 'key', 'default_value', 'type', 'group', 'settings',
+        return filterData(data, ['name', 'help', 'key', 'default_value', 'type', 'group', 'settings',
             'orderListBefore', 'orderSubscribeBefore', 'orderManageBefore']);
     }
 
@@ -178,6 +187,7 @@ export default class CUD extends Component {
                 type: 'text',
                 key: '',
                 default_value: '',
+                help: '',
                 group: null,
                 isInGroup: false,
                 renderTemplate: '',
@@ -500,6 +510,8 @@ export default class CUD extends Component {
                     }
 
                     <InputField id="key" label={t('mergeTag-1')}/>
+
+                    <TextArea id="help" label={t('Help text')}/>
 
                     {fieldSettings}
 

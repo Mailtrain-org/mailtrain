@@ -11,6 +11,7 @@
             {{else}}
                 <input type="email" name="EMAIL" id="email" placeholder="" value="{{../email}}" required>
             {{/if}}
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -18,6 +19,7 @@
         <div class="form-group text {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="text" name="{{key}}" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -25,6 +27,7 @@
         <div class="form-group number {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="number" name="{{key}}" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -32,6 +35,7 @@
         <div class="form-group url {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="url" name="{{key}}" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -39,6 +43,7 @@
         <div class="form-group longtext {{key}}">
             <label for="{{key}}">{{name}}</label>
             <textarea rows="3" name="{{key}}">{{value}}</textarea>
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -46,6 +51,7 @@
         <div class="form-group json {{key}}">
             <label for="{{key}}">{{name}}</label>
             <textarea class="gpg-text" rows="3" name="{{key}}" placeholder="{&quot;data&quot;:&quot;value&quot;}">{{value}}</textarea>
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -56,6 +62,7 @@
                 <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}}> {{field.settings.checkedLabel}}
             </label>
             <input type="hidden" value="0" name="{{key}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -66,9 +73,8 @@
                 <button class="btn-download-pubkey" type="submit" form="download-pubkey">{{#translate}}downloadSignatureVerificationKey{{/translate}}</button>
             {{/if}}
             <textarea class="form-control gpg-text" rows="4" name="{{key}}" placeholder="{{#translate}}beginsWithAnd#39BeginPgpPublicKeyBloc{{/translate}}">{{value}}</textarea>
-            <span class="help-block">
-                {{#translate}}insertYourGpgPublicKeyHereToEncrypt{{/translate}}
-            </span>
+            <small class="form-text text-muted">{{#translate}}insertYourGpgPublicKeyHereToEncrypt{{/translate}}</small>
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -76,6 +82,7 @@
         <div class="form-group date fm-date-us {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="text" name="{{key}}" placeholder="MM/DD/YYYY" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -83,6 +90,7 @@
         <div class="form-group date fm-date-eur {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="text" name="{{key}}" placeholder="DD/MM/YYYY" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -90,6 +98,7 @@
         <div class="form-group date fm-birthday-us {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="text" name="{{key}}" placeholder="MM/DD" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -97,6 +106,7 @@
         <div class="form-group date fm-birthday-eur {{key}}">
             <label for="{{key}}">{{name}}</label>
             <input type="text" name="{{key}}" placeholder="DD/MM" value="{{value}}">
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -111,6 +121,7 @@
                     <option value="{{key}}" {{#if value}} selected {{/if}}>{{name}}</option>
                 {{/each}}
             </select>
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -122,6 +133,7 @@
                     <input type="radio" name="{{../key}}" value="{{key}}" {{#if value}} checked {{/if}}> {{name}}
                 </label>
             {{/each}}
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -133,6 +145,7 @@
                 <label class="label-checkbox">
                     <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}}> {{name}}
                 </label>
+                <small class="option-help-block form-text text-muted">{{help}}</small>
             {{/each}}
         </div>
     {{/if}}
@@ -148,6 +161,7 @@
                     <option value="{{key}}" {{#if value}} selected {{/if}}>{{name}}</option>
                 {{/each}}
             </select>
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 
@@ -159,6 +173,7 @@
                     <input type="radio" name="{{../key}}" value="{{key}}" {{#if value}} checked {{/if}}> {{name}}
                 </label>
             {{/each}}
+            <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
 

@@ -73,7 +73,7 @@ export default class Statistics extends Component {
     render() {
         const t = this.props.t;
         const entity = this.state.entity;
-        const total = entity.subscriptionsToSend === undefined ? undefined : entity.subscriptionsToSend + entity.delivered;
+        const total = entity.total;
 
         const renderMetrics = (key, label, showZoomIn = true) => {
             const val = entity[key]

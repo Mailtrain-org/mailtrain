@@ -329,8 +329,6 @@ class SendControls extends Component {
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
-            const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
-
             const timezoneColumns = [
                 { data: 0, title: t('Timezone') }
             ];
@@ -372,9 +370,9 @@ class SendControls extends Component {
                     </Form>
                     <ButtonRow className={campaignsStyles.sendButtonRow}>
                         {this.getFormValue('sendLater') ?
-                            <Button className="btn-primary" icon="play" label={(entity.status === CampaignStatus.SCHEDULED ? t('rescheduleSend') : t('scheduleSend')) + subscrInfo} onClickAsync={::this.confirmSchedule}/>
+                            <Button className="btn-primary" icon="play" label={entity.status === CampaignStatus.SCHEDULED ? t('rescheduleSend') : t('scheduleSend')} onClickAsync={::this.confirmSchedule}/>
                             :
-                            <Button className="btn-primary" icon="play" label={t('send') + subscrInfo} onClickAsync={::this.confirmStart}/>
+                            <Button className="btn-primary" icon="play" label={t('send')} onClickAsync={::this.confirmStart}/>
                         }
                         {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>}
@@ -413,15 +411,13 @@ class SendControls extends Component {
             );
 
         } else if (entity.status === CampaignStatus.FINISHED) {
-            const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
-
             return (
                 <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('allMessagesSent!HitContinueIfYouYouWant')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.confirmStart}/>
+                        <Button className="btn-primary" icon="play" label={t('continue')} onClickAsync={::this.confirmStart}/>
                         <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                         {testButtons}

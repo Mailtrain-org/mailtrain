@@ -22,7 +22,7 @@ const files = require('../models/files');
 const {getPublicUrl} = require('./urls');
 const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
-const { enforce } = require('./helpers');
+const { enforce, hashEmail } = require('./helpers');
 const senders = require('./senders');
 
 const MessageType = {
@@ -187,8 +187,6 @@ class MessageSender {
             renderTags = true;
 
         } else if (campaign && campaign.source === CampaignSource.URL) {
-            const mergeTags = subData.mergeTags;
-
             const form = tools.getMessageLinks(campaign, list, subscriptionGrouped);
             for (const key in mergeTags) {
                 form[key] = mergeTags[key];
@@ -274,7 +272,7 @@ class MessageSender {
 
         Option #1
         - listId
-        - subscriptionId / email
+        - subscriptionId
         - mergeTags [optional, used only when campaign / html+text is provided]
 
         Option #2:
@@ -303,10 +301,6 @@ class MessageSender {
             if (subData.subscriptionId) {
                 listId = subData.listId;
                 subscriptionGrouped = await subscriptions.getById(contextHelpers.getAdminContext(), listId, subData.subscriptionId);
-
-            } else if (subData.email) {
-                listId = subData.listId;
-                subscriptionGrouped = await subscriptions.getByEmail(contextHelpers.getAdminContext(), listId, subData.email);
             }
 
             list = this.listsById.get(listId);
@@ -474,7 +468,7 @@ class MessageSender {
 
         const result = {
             response,
-            response_id: responseId,
+            responseId: responseId,
             list,
             subscriptionGrouped,
             email
@@ -483,28 +477,28 @@ class MessageSender {
         return result;
     }
 
-    async sendRegularCampaignMessage(listId, email) {
+    async sendRegularCampaignMessage(campaignMessage) {
         enforce(this.type === MessageType.REGULAR);
 
-        // We insert into campaign_messages before the message is actually sent. This is to avoid multiple delivery
-        // if by chance we run out of disk space and couldn't insert in the database after the message has been sent out
-        const ids = await knex('campaign_messages').insert({
-            campaign: this.campaign.id,
-            list: result.list.id,
-            subscription: result.subscriptionGrouped.id,
-            send_configuration: this.sendConfiguration.id,
-            status: CampaignMessageStatus.SENDING
-        });
-
-        const campaignMessageId = ids[0];
+        // We set the campaign_message to SENT before the message is actually sent. This is to avoid multiple delivery
+        // if by chance we run out of disk space and couldn't change status in the database after the message has been sent out
+        await knex('campaign_messages')
+            .where({id: campaignMessage.id})
+            .update({
+                status: CampaignMessageStatus.SENT,
+                updated: new Date()
+            });
 
         let result;
         try {
-            result = await this._sendMessage({listId, email});
+            result = await this._sendMessage({listId: campaignMessage.list, subscriptionId: campaignMessage.subscription});
         } catch (err) {
             await knex('campaign_messages')
-                .where({id: campaignMessageId})
-                .del();
+                .where({id: campaignMessage.id})
+                .update({
+                    status: CampaignMessageStatus.SCHEDULED,
+                    updated: new Date()
+                });
 
             throw err;
         }
@@ -512,15 +506,12 @@ class MessageSender {
         enforce(result.list);
         enforce(result.subscriptionGrouped);
 
-        const now = new Date();
-
         await knex('campaign_messages')
-            .where({id: campaignMessageId})
+            .where({id: campaignMessage.id})
             .update({
-                status: CampaignMessageStatus.SENT,
                 response: result.response,
                 response_id: result.responseId,
-                updated: now
+                updated: new Date()
             });
 
         await knex('campaigns').where('id', this.campaign.id).increment('delivered');
@@ -600,16 +591,18 @@ async function sendQueuedMessage(queuedMessage) {
         }
     }
 
-    for (const attachment of msgData.attachments) {
-        if (attachment.id) { // This means that it is an attachment recorded in table files_campaign_attachment
-            try {
-                // We ignore any errors here because we already sent the message. Thus we have to mark it as completed to avoid sending it again.
-                await knex.transaction(async tx => {
-                    await files.unlockTx(tx, 'campaign', 'attachment', attachment.id);
-                });
-            } catch (err) {
-                log.error('MessageSender', `Error when unlocking attachment ${attachment.id} for ${result.email} (queuedId: ${queuedMessage.id})`);
-                log.verbose(err.stack);
+    if (msgData.attachments) {
+        for (const attachment of msgData.attachments) {
+            if (attachment.id) { // This means that it is an attachment recorded in table files_campaign_attachment
+                try {
+                    // We ignore any errors here because we already sent the message. Thus we have to mark it as completed to avoid sending it again.
+                    await knex.transaction(async tx => {
+                        await files.unlockTx(tx, 'campaign', 'attachment', attachment.id);
+                    });
+                } catch (err) {
+                    log.error('MessageSender', `Error when unlocking attachment ${attachment.id} for ${result.email} (queuedId: ${queuedMessage.id})`);
+                    log.verbose(err.stack);
+                }
             }
         }
     }

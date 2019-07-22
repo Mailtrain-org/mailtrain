@@ -494,7 +494,7 @@ export default class CUD extends Component {
                         { previewListId &&
                             <div>
                                 <AlignedRow>
-                                    <div className="help-block">
+                                    <div>
                                         <small>
                                             {t('noteTheseLinksAreSolelyForAQuickPreview')}
                                         </small>

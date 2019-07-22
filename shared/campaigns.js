@@ -51,7 +51,7 @@ const CampaignMessageStatus = {
     UNSUBSCRIBED: 2,
     BOUNCED: 3,
     COMPLAINED: 4,
-    SENDING: 5,
+    SCHEDULED: 5,
 
     MAX: 5
 };

@@ -11,10 +11,9 @@ const fields = require('./fields');
 const { SubscriptionSource, SubscriptionStatus, getFieldColumn } = require('../../shared/lists');
 const { CampaignMessageStatus } = require('../../shared/campaigns');
 const segments = require('./segments');
-const { enforce, filterObject } = require('../lib/helpers');
+const { enforce, filterObject, hashEmail, normalizeEmail } = require('../lib/helpers');
 const moment = require('moment');
 const { formatDate, formatBirthday } = require('../../shared/date');
-const crypto = require('crypto');
 const campaigns = require('./campaigns');
 const lists = require('./lists');
 
@@ -83,7 +82,6 @@ fieldTypes.option = {
     afterJSON: (groupedField, entity) => {},
     listRender: (groupedField, value) => value ? groupedField.settings.checkedLabel : groupedField.settings.uncheckedLabel
 };
-
 
 
 function getSubscriptionTableName(listId) {
@@ -232,7 +230,12 @@ async function getById(context, listId, id, grouped = true) {
 }
 
 async function getByEmail(context, listId, email, grouped = true) {
-    return await _getBy(context, listId, 'email', email, grouped);
+    const result = await _getBy(context, listId, 'hash_email', hashEmail(email), grouped);
+    if (result.email === null) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+    }
+    enforce(normalizeEmail(email) === normalizeEmail(result.email));
+    return result;
 }
 
 async function getByCid(context, listId, cid, grouped = true) {
@@ -486,7 +489,7 @@ async function serverValidate(context, listId, data) {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
         if (data.email) {
-            const existingKeyQuery = tx(getSubscriptionTableName(listId)).where('email', data.email);
+            const existingKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(data.email)).whereNotNull('email');
 
             if (data.id) {
                 existingKeyQuery.whereNot('id', data.id);
@@ -537,10 +540,6 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
 
         fieldTypes[fld.type].afterJSON(fld, entity);
     }
-}
-
-function hashEmail(email) {
-    return crypto.createHash('sha512').update(email).digest("base64");
 }
 
 function updateSourcesAndHashEmail(subscription, source, groupedFieldsMap) {
@@ -865,7 +864,7 @@ async function getListsWithEmail(context, email) {
 
         for (const list of lsts) {
             await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
-            const entity = await tx(getSubscriptionTableName(list.id)).where('email', email).first();
+            const entity = await tx(getSubscriptionTableName(list.id)).where('hash_email', hashEmail(email)).whereNotNull('email').first();
             if (entity) {
                 result.push(list);
             }

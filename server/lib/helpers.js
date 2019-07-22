@@ -1,10 +1,14 @@
 'use strict';
 
+const crypto = require('crypto');
+
 module.exports = {
     enforce,
     cleanupFromPost,
     filterObject,
-    castToInteger
+    castToInteger,
+    normalizeEmail,
+    hashEmail
 };
 
 function enforce(condition, message) {
@@ -37,3 +41,21 @@ function castToInteger(id, msg) {
 
     return val;
 }
+
+function normalizeEmail(email) {
+    const emailParts = email.split(/@/);
+
+    if (emailParts.length !== 2) {
+        return email;
+    }
+
+    const username = emailParts[0];
+    const domain = emailParts[1].toLowerCase();
+
+    return username + '@' + domain;
+}
+
+function hashEmail(email) {
+    return crypto.createHash('sha512').update(normalizeEmail(email)).digest("base64");
+}
+

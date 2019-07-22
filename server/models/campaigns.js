@@ -390,11 +390,13 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
-        const unsentQryGen = await getSubscribersQueryGeneratorTx(tx, id);
-        if (unsentQryGen) {
-            const res = await unsentQryGen(tx).count('* AS subscriptionsToSend').first();
-            entity.subscriptionsToSend = res.subscriptionsToSend;
-        }
+        const totalRes = await tx('campaign_messages')
+            .where({campaign: id})
+            .whereIn('status', [CampaignMessageStatus.SCHEDULED, CampaignMessageStatus.SENT,
+                CampaignMessageStatus.COMPLAINED, CampaignMessageStatus.UNSUBSCRIBED, CampaignMessageStatus.BOUNCED])
+            .count('* as count').first();
+
+        entity.total = totalRes.count;
 
     } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
         delete entity.data.sourceCustom;
@@ -699,7 +701,7 @@ async function getMessageByCid(messageCid, withVerpHostname = false) { // withVe
             .where(subscrTblName + '.cid', subscriptionCid)
             .where('campaigns.cid', campaignCid)
             .select([
-                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
             ])
             .first();
 
@@ -719,7 +721,7 @@ async function getMessageByResponseId(responseId) {
     return await knex('campaign_messages')
         .where('campaign_messages.response_id', responseId)
         .select([
-            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
         ])
         .first();
 }
@@ -754,7 +756,7 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         .where('campaigns.cid', campaignCid)
         .where({subscription: subscriptionId, list: listId})
         .select([
-            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
         ])
         .first();
 
@@ -793,73 +795,34 @@ async function updateMessageResponse(context, message, response, responseId) {
     });
 }
 
-async function getSubscribersQueryGeneratorTx(tx, campaignId) {
-    /*
-    This is supposed to produce queries like this:
+async function prepareCampaignMessages(campaignId) {
+    const campaign = await getById(contextHelpers.getAdminContext(), campaignId, false);
 
-    select ... from `campaign_lists` inner join (
-        select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (
-            (select `subscription__2`.`email`, 8 AS campaign_list_id, related_campaign_messages.id IS NOT NULL AS sent from `subscription__2` left join
-                (select * from `campaign_messages` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 2)
-                    as `related_campaign_messages` on `related_campaign_messages`.`subscription` = `subscription__2`.`id` where `subscription__2`.`status` = 1)
-            UNION ALL
-            (select `subscription__1`.`email`, 9 AS campaign_list_id, related_campaign_messages.id IS NOT NULL AS sent from `subscription__1` left join
-                (select * from `campaign_messages` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 1)
-                    as `related_campaign_messages` on `related_campaign_messages`.`subscription` = `subscription__1`.`id` where `subscription__1`.`status` = 1)
-        ) as `pending_subscriptions_all` where `sent` = false group by `email`)
-            as `pending_subscriptions` on `campaign_lists`.`id` = `pending_subscriptions`.`campaign_list_id` where `campaign_lists`.`campaign` = '1'
+    await knex('campaign_messages').where({campaign: campaignId, status: CampaignMessageStatus.SCHEDULED}).del();
 
-     This was too much for Knex, so we partially construct these queries directly as strings;
-     */
-
-    const subsQrys = [];
-    const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
-
-    for (const cpgList of cpgLists) {
-        const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
+    for (const cpgList of campaign.lists) {
+        let addSegmentQuery;
+        await knex.transaction(async tx => {
+            addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
+        });
         const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
 
-        const sqlQry = knex.from(subsTable)
-            .leftJoin(
-                function () {
-                    return this.from('campaign_messages')
-                        .where('campaign_messages.campaign', campaignId)
-                        .where('campaign_messages.list', cpgList.list)
-                        .as('related_campaign_messages');
-                },
-                'related_campaign_messages.subscription', subsTable + '.id')
+        const subsQry = knex.from(subsTable)
             .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
             .where(function() {
                 addSegmentQuery(this);
             })
-            .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('related_campaign_messages.id IS NOT NULL AS sent')])
+            .select([
+                'hash_email',
+                'id',
+                knex.raw('? AS campaign', [campaign.id]),
+                knex.raw('? AS list', [cpgList.list]),
+                knex.raw('? AS send_configuration', [campaign.send_configuration]),
+                knex.raw('? AS status', [CampaignMessageStatus.SCHEDULED])
+            ])
             .toSQL().toNative();
 
-        subsQrys.push(sqlQry);
-    }
-
-    if (subsQrys.length > 0) {
-        let subsQry;
-        const unsentWhere = ' where `sent` = false';
-
-        if (subsQrys.length === 1) {
-            const subsUnionSql = '(select `email`, `campaign_list_id`, `sent` from (' + subsQrys[0].sql + ') as `pending_subscriptions_all`' +  unsentWhere + ') as `pending_subscriptions`'
-            subsQry = knex.raw(subsUnionSql, subsQrys[0].bindings);
-
-        } else {
-            const subsUnionSql = '(select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (' +
-                subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ') +
-                ') as `pending_subscriptions_all`' +  unsentWhere + ' group by `email`) as `pending_subscriptions`';
-            const subsUnionBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
-            subsQry = knex.raw(subsUnionSql, subsUnionBindings);
-        }
-
-        return knx => knx.from('campaign_lists')
-            .where('campaign_lists.campaign', campaignId)
-            .innerJoin(subsQry, 'campaign_lists.id', 'pending_subscriptions.campaign_list_id');
-
-    } else {
-        return null;
+        await knex.raw('INSERT IGNORE INTO `campaign_messages` (`hash_email`, `subscription`, `campaign`, `list`, `send_configuration`, `status`) ' + subsQry.sql, subsQry.bindings);
     }
 }
 
@@ -1125,7 +1088,7 @@ module.exports.changeStatusByCampaignCidAndSubscriptionIdTx = changeStatusByCamp
 module.exports.changeStatusByMessage = changeStatusByMessage;
 module.exports.updateMessageResponse = updateMessageResponse;
 
-module.exports.getSubscribersQueryGeneratorTx = getSubscribersQueryGeneratorTx;
+module.exports.prepareCampaignMessages = prepareCampaignMessages;
 
 module.exports.start = start;
 module.exports.stop = stop;
