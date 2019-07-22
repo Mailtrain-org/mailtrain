@@ -100,6 +100,7 @@
   "customTemplateEditor": "Custom template editor",
   "save": "Save",
   "saveAndLeave": "Save and leave",
+  "copy": "Copy",
   "saveAndGoToStatus": "Save and go to status",
   "testSend": "Test send",
   "createRegularCampaign": "Create Regular Campaign",

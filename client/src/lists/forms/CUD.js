@@ -380,13 +380,18 @@ export default class CUD extends Component {
     }
 
     @withFormErrorHandlers
-    async submitHandler(submitAndLeave) {
+    async submitHandler(submitAndLeave, copy) {
         const t = this.props.t;
 
         let sendMethod, url;
         if (this.props.entity) {
-            sendMethod = FormSendMethod.PUT;
-            url = `rest/forms/${this.props.entity.id}`
+            if(copy){
+                sendMethod = FormSendMethod.POST;
+                url = `rest/forms/${this.props.entity.id}`
+            }else{
+                sendMethod = FormSendMethod.PUT;
+                url = `rest/forms/${this.props.entity.id}`
+            }
         } else {
             sendMethod = FormSendMethod.POST;
             url = 'rest/forms'
@@ -404,13 +409,21 @@ export default class CUD extends Component {
                 } else {
                     await this.getFormValuesFromURL(`rest/forms/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('customFormsUpdated'));
+                    if(copy){
+                        this.navigateToWithFlashMessage(`/lists/forms`, 'success', t('customFormsCopied'));
+                    }else{
+                        this.setFormStatusMessage('success', t('customFormsUpdated'));
+                    }
                 }
             } else {
                 if (submitAndLeave) {
                     this.navigateToWithFlashMessage('/lists/forms', 'success', t('customFormsCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/lists/forms/${submitResult}/edit`, 'success', t('customFormsCreated'));
+                    if(copy){
+                        this.navigateToWithFlashMessage(`/lists/forms`, 'success', t('customFormsCopied'));
+                    }else{
+                        this.navigateToWithFlashMessage(`/lists/forms/${submitResult}/edit`, 'success', t('customFormsCreated'));
+                    }
                 }
             }
         } else {
@@ -552,7 +565,8 @@ export default class CUD extends Component {
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true, false)}/>
+                        {isEdit && <Button type="submit" className="btn-success" icon="copy" label={t('copy')} onClickAsync={async () => await this.submitHandler(false, true)}/>}
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/forms/${this.props.entity.id}/delete`}/>}
                     </ButtonRow>
                 </Form>

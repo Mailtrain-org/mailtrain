@@ -26,6 +26,13 @@ router.postAsync('/forms', passport.loggedIn, passport.csrfProtection, async (re
     return res.json(await forms.create(req.context, req.body));
 });
 
+router.postAsync('/forms/:formId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    const entity = req.body;
+    entity.id = castToInteger(req.params.formId);
+    await forms.copy(req.context, entity);
+    return res.json();
+});
+
 router.putAsync('/forms/:formId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const entity = req.body;
     entity.id = castToInteger(req.params.formId);
