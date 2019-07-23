@@ -102,7 +102,9 @@ export default class CUD extends Component {
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
             },
-            onChangeBeforeValidation: ::this.onFormChangeBeforeValidation
+            onChangeBeforeValidation: {
+                data_sourceCustom_type: ::this.onFormChangeBeforeValidation
+            }
         });
     }
 
