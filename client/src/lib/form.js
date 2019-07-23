@@ -1052,34 +1052,38 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
                 axios.post(getUrl(settings.serverValidation.url), payload)
                     .then(response => {
 
-                        self.setState(previousState => ({
-                            formState: previousState.formState.withMutations(mutState => {
-                                mutState.set('isServerValidationRunning', false);
+                        if (self.isComponentMounted()) {
+                            self.setState(previousState => ({
+                                formState: previousState.formState.withMutations(mutState => {
+                                    mutState.set('isServerValidationRunning', false);
 
-                                mutState.update('data', stateData => stateData.withMutations(mutStateData => {
-                                    for (const attr in payload) {
-                                        mutStateData.setIn([attr, 'serverValue'], payload[attr]);
+                                    mutState.update('data', stateData => stateData.withMutations(mutStateData => {
+                                        for (const attr in payload) {
+                                            mutStateData.setIn([attr, 'serverValue'], payload[attr]);
 
-                                        if (payload[attr] === mutState.getIn(['data', attr, 'value'])) {
-                                            mutStateData.setIn([attr, 'serverValidated'], true);
-                                            mutStateData.setIn([attr, 'serverValidation'], response.data[attr] || true);
+                                            if (payload[attr] === mutState.getIn(['data', attr, 'value'])) {
+                                                mutStateData.setIn([attr, 'serverValidated'], true);
+                                                mutStateData.setIn([attr, 'serverValidation'], response.data[attr] || true);
+                                            }
                                         }
-                                    }
-                                }));
-                            })
-                        }));
+                                    }));
+                                })
+                            }));
 
-                        scheduleValidateForm(self);
+                            scheduleValidateForm(self);
+                        }
                     })
                     .catch(error => {
-                        console.log('Error in "validateFormState": ' + error);
+                        if (self.isComponentMounted()) {
+                            console.log('Error in "validateFormState": ' + error);
 
-                        self.setState(previousState => ({
-                            formState: previousState.formState.set('isServerValidationRunning', false)
-                        }));
+                            self.setState(previousState => ({
+                                formState: previousState.formState.set('isServerValidationRunning', false)
+                            }));
 
-                        // TODO: It might be good not to give up immediatelly, but retry a couple of times
-                        // scheduleValidateForm(self);
+                            // TODO: It might be good not to give up immediatelly, but retry a couple of times
+                            // scheduleValidateForm(self);
+                        }
                     });
             } else {
                 if (formValidateResolve) {
@@ -1095,6 +1099,26 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
                 self.localValidateFormValues(mutStateData);
             }));
         }
+    }
+
+    const previousComponentDidMount = proto.componentDidMount;
+    proto.componentDidMount = function() {
+        this._isComponentMounted = true;
+        if (previousComponentDidMount) {
+            previousComponentDidMount.apply(this);
+        }
+    };
+
+    const previousComponentWillUnmount = proto.componentWillUnmount;
+    proto.componentWillUnmount = function() {
+        this._isComponentMounted = false;
+        if (previousComponentWillUnmount) {
+            previousComponentDidMount.apply(this);
+        }
+    };
+
+    proto.isComponentMounted = function() {
+        return !!this._isComponentMounted;
     }
 
     proto.initForm = function(settings) {

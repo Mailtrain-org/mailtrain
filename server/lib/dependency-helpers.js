@@ -31,7 +31,13 @@ async function ensureNoDependencies(tx, context, id, depSpecs) {
                 break;
             }
 
-            if (await shares.checkEntityPermissionTx(tx, context, depSpec.entityTypeId, row.id, 'view')) {
+            if (depSpec.viewPermission && await shares.checkEntityPermissionTx(tx, context, depSpec.viewPermission.entityTypeId, depSpec.viewPermission.entityId, depSpec.viewPermission.requiredOperations)) {
+                deps.push({
+                    entityTypeId: depSpec.entityTypeId,
+                    name: row.name,
+                    link: entityType.clientLink(row.id)
+                });
+            } else if (await shares.checkEntityPermissionTx(tx, context, depSpec.entityTypeId, row.id, 'view')) {
                 deps.push({
                     entityTypeId: depSpec.entityTypeId,
                     name: row.name,

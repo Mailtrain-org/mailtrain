@@ -108,7 +108,8 @@ const entityTypeLabels = {
     'sendConfiguration': t => t('sendConfiguration'),
     'report': t => t('report'),
     'reportTemplate': t => t('reportTemplate'),
-    'mosaicoTemplate': t => t('mosaicoTemplate')
+    'mosaicoTemplate': t => t('mosaicoTemplate'),
+    'user': t => t('User')
 };
 
 function _getDependencyErrorMessage(err, t, name) {

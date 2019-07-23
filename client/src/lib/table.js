@@ -37,6 +37,7 @@ const TableSelectMode = {
 class Table extends Component {
     constructor(props) {
         super(props);
+        this.mounted = false;
         this.selectionMap = this.getSelectionMap(props);
     }
 
@@ -184,6 +185,8 @@ class Table extends Component {
     }
 
     componentDidMount() {
+        this.mounted = true;
+
         const columns = this.props.columns.slice();
 
         // XSS protection and actions rendering
@@ -364,12 +367,13 @@ class Table extends Component {
     }
 
     componentWillUnmount() {
+        this.mounted = false;
         clearInterval(this.refreshIntervalId);
         clearTimeout(this.refreshTimeoutId);
     }
 
     async notifySelection(eventCallback, newSelectionMap) {
-        if (eventCallback) {
+        if (this.mounted && eventCallback) {
             const selPairs = Array.from(newSelectionMap).sort((l, r) => l[0] - r[0]);
 
             let data = selPairs.map(entry => entry[1]);

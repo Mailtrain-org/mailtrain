@@ -71,7 +71,8 @@ export default class CUD extends Component {
                 email: '',
                 password: '',
                 password2: '',
-                namespace: mailtrainConfig.user.namespace
+                namespace: mailtrainConfig.user.namespace,
+                role: null
             });
         }
     }

@@ -121,21 +121,20 @@ export default class CUD extends Component {
     onFormChangeBeforeValidation(mutStateData, key, oldValue, newValue) {
         let match;
 
-        if (key === undefined || key === 'data_sourceCustom_type') {
+        if (key === 'data_sourceCustom_type') {
             if (newValue) {
                 this.templateTypes[newValue].afterTypeChange(mutStateData);
             }
         }
 
-        if (key === undefined || key === 'data_sourceCustom_tag_language') {
+        if (key === 'data_sourceCustom_tag_language') {
             if (newValue) {
                 const isEdit = !!this.props.entity;
-                const type = mutStateData.getIn(['data_sourceCustom_tag_language', 'value']);
-                this.templateTypes[type].afterTagLanguageChange(mutStateData, isEdit);
+                this.templateTypes[newValue].afterTagLanguageChange(mutStateData, isEdit);
             }
         }
 
-        if (key === undefined || (match = key.match(/^(lists_[0-9]+_)list$/))) {
+        if (key && (match = key.match(/^(lists_[0-9]+_)list$/))) {
             const prefix = match[1];
             mutStateData.setIn([prefix + 'segment', 'value'], null);
         }

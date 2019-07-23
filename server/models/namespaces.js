@@ -226,7 +226,16 @@ async function remove(context, id) {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'delete');
 
         const entityTypesWithNamespace = Object.keys(entitySettings.getEntityTypes());
-        await dependencyHelpers.ensureNoDependencies(tx, context, id, entityTypesWithNamespace.map(entityTypeId => ({ entityTypeId: entityTypeId, column: 'namespace' })));
+
+        const depSpecs = entityTypesWithNamespace.map(entityTypeId => {
+            if (entityTypeId === 'user') {
+                return { entityTypeId: entityTypeId, column: 'namespace', viewPermission: {entityTypeId: 'namespace', entityId: id, requiredOperations: 'manageUsers'} };
+            } else {
+                return { entityTypeId: entityTypeId, column: 'namespace' };
+            }
+        });
+
+        await dependencyHelpers.ensureNoDependencies(tx, context, id, depSpecs);
 
         await tx('namespaces').where('id', id).del();
     });

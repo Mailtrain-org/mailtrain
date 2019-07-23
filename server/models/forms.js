@@ -219,7 +219,7 @@ async function getDefaultCustomFormValues() {
 
 // TODO - this could run in the browser too - move to shared
 function checkForMjmlErrors(form) {
-    let testLayout = '<mjml><mj-body><mj-container>{{{body}}}</mj-container></mj-body></mjml>';
+    let testLayout = '<mjml><mj-body>{{{body}}}</mj-body></mjml>';
 
     let hasMjmlError = (template, layout = testLayout) => {
         let source = layout.replace(/\{\{\{body\}\}\}/g, template);

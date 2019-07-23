@@ -78,7 +78,7 @@ async function migrateBase(knex) {
     // The original Mailtrain migration is executed before this one. So here we check whether the original migration
     // ended where it should have and we take it from there.
     const row = await knex('settings').where({key: 'db_schema_version'}).first('value');
-    if (!row || Number(row.value) !== 33) {
+    if (!row || Number(row.value) !== 34) {
         throw new Error('Unsupported DB schema version: ' + row.value);
     }
 
