@@ -175,26 +175,16 @@ async function updateWithConsistencyCheck(context, entity) {
     });
 }
 
-async function copy(context, entity) {
-    await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'customForm', entity.id, 'edit');
-
-        const existing = await _getById(tx, entity.id);
-
-        const existingHash = hash(existing);
-        if (existingHash !== entity.originalHash) {
-            throw new interoperableErrors.ChangedError();
-        }
-
+async function copy(context, entity, formId) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCustomForm');
+        const existing = await _getById(tx, formId);
         await namespaceHelpers.validateEntity(tx, entity);
-        await namespaceHelpers.validateMove(context, entity, existing, 'customForm', 'createCustomForm', 'delete');
 
-        const form = filterObject(entity, allowedFormKeys);
+        const form = filterObject(existing, allowedFormKeys);
         enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');
 
-        entity.name = entity.name + '_COPY';
         const ids = await tx('custom_forms').insert(filterObject(entity, formAllowedKeys));
-        
         const id = ids[0];
 
         for (const formKey in form) {
@@ -204,8 +194,8 @@ async function copy(context, entity) {
                 data_value: form[formKey]
             })
         }
-        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: id });
 
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: id });
         return id;
     });
 }
