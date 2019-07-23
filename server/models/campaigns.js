@@ -572,7 +572,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete'); // XXX TB - try with entity
+            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete');
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
