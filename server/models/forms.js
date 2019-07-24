@@ -175,6 +175,31 @@ async function updateWithConsistencyCheck(context, entity) {
     });
 }
 
+async function copy(context, entity, formId) {
+    return await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCustomForm');
+        const existing = await _getById(tx, formId);
+        await namespaceHelpers.validateEntity(tx, entity);
+
+        const form = filterObject(existing, allowedFormKeys);
+        enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');
+
+        const ids = await tx('custom_forms').insert(filterObject(entity, formAllowedKeys));
+        const id = ids[0];
+
+        for (const formKey in form) {
+            await tx('custom_forms_data').insert({
+                form: id,
+                data_key: formKey,
+                data_value: form[formKey]
+            })
+        }
+
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: id });
+        return id;
+    });
+}
+
 async function remove(context, id) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'delete');
@@ -285,6 +310,7 @@ module.exports.hash = hash;
 module.exports.getById = getById;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
+module.exports.copy = copy;
 module.exports.remove = remove;
 module.exports.getDefaultCustomFormValues = getDefaultCustomFormValues;
 module.exports.serverValidate = serverValidate;
