@@ -85,8 +85,6 @@ class CampaignSender {
             return sendConfiguration[key];
         };
 
-        const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
-
         const mail = {
             from: {
                 name: getOverridable('from_name'),
@@ -98,29 +96,11 @@ class CampaignSender {
                 name: list.to_name === null ? undefined : tools.formatMessage(campaign, list, subscriptionGrouped, mergeTags, list.to_name, false),
                 address: subscriptionGrouped.email
             },
-            sender: useVerpSenderHeader ? campaignAddress + '@' + sendConfiguration.verp_hostname : false,
+            sender: false,
 
-            envelope: useVerp ? {
-                from: campaignAddress + '@' + sendConfiguration.verp_hostname,
-                to: subscriptionGrouped.email
-            } : false,
+            envelope: false,
 
             headers: {
-                'x-fbl': campaignAddress,
-                // custom header for SparkPost
-                'x-msys-api': JSON.stringify({
-                    campaign_id: campaignAddress
-                }),
-                // custom header for SendGrid
-                'x-smtpapi': JSON.stringify({
-                    unique_args: {
-                        campaign_id: campaignAddress
-                    }
-                }),
-                // custom header for Mailgun
-                'x-mailgun-variables': JSON.stringify({
-                    campaign_id: campaignAddress
-                }),
                 'List-ID': {
                     prepared: true,
                     value: libmime.encodeWords(list.name) + ' <' + list.cid + '.' + getPublicUrl() + '>'
@@ -135,10 +115,12 @@ class CampaignSender {
 
             attachments,
             encryptionKeys
+            
         };
 
 
         let response;
+
         try {
             const info = await mailer.sendMassMail(mail);
             response = info.response || info.messageId;
