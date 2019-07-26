@@ -2,7 +2,6 @@
 
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
-const slugify = require('slugify');
 const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
@@ -543,7 +542,7 @@ async function createTx(tx, context, listId, entity) {
 
     let columnName;
     if (!fieldType.grouped) {
-        columnName = ('custom_' + slugify(entity.name, '_') + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '');
+        columnName = ('custom_' + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '_');
     }
 
     const filteredEntity = filterObject(entity, allowedKeysCreate);

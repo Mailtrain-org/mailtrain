@@ -1373,7 +1373,7 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         const savedData = self.state.formState.get('savedData');
 
         function isDifferent(data1, data2, prefix) {
-            if (typeof data1 === 'object' && typeof data2  === 'object') {
+            if (typeof data1 === 'object' && typeof data2  === 'object' && data1 && data2) {
                 const keys = new Set([...Object.keys(data1), ...Object.keys(data2)]);
                 for (const key of keys) {
                     if (isDifferent(data1[key], data2[key], `${prefix}/${key}`)) {
