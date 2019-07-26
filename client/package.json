@@ -28,7 +28,6 @@
     "datatables.net": "^1.10.19",
     "datatables.net-bs4": "^1.10.19",
     "ellipsize": "^0.1.0",
-    "fast-deep-equal": "^2.0.1",
     "grapesjs": "^0.14.62",
     "grapesjs-mjml": "0.0.31",
     "grapesjs-preset-newsletter": "^0.2.20",

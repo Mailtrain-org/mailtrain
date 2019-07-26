@@ -70,7 +70,7 @@ async function listDTAjax(context, params) {
 }
 
 
-async function _getById(tx, id) {
+async function _getByIdTx(tx, id) {
     const entity = await tx('custom_forms').where('id', id).first();
 
     if (!entity) {
@@ -86,17 +86,20 @@ async function _getById(tx, id) {
     return entity;
 }
 
+async function getByIdTx(tx, context, id, withPermissions = true) {
+    await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
+    const entity = await _getByIdTx(tx, id);
+
+    if (withPermissions) {
+        entity.permissions = await shares.getPermissionsTx(tx, context, 'customForm', id);
+    }
+
+    return entity;
+}
 
 async function getById(context, id, withPermissions = true) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'customForm', id, 'view');
-        const entity = await _getById(tx, id);
-
-        if (withPermissions) {
-            entity.permissions = await shares.getPermissionsTx(tx, context, 'customForm', id);
-        }
-
-        return entity;
+        return await getByIdTx(tx, context, id, withPermissions);
     });
 }
 
@@ -121,6 +124,17 @@ async function serverValidate(context, data) {
 async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCustomForm');
+
+        if (entity.fromExistingEntity) {
+            const existing = await getByIdTx(tx, context, entity.existingEntity, false);
+
+            entity.layout = existing.layout;
+            entity.form_input_style = existing.form_input_style;
+
+            for (const key of allowedFormKeys) {
+                entity[key] = existing[key];
+            }
+        }
 
         await namespaceHelpers.validateEntity(tx, entity);
 
@@ -147,7 +161,7 @@ async function updateWithConsistencyCheck(context, entity) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'customForm', entity.id, 'edit');
 
-        const existing = await _getById(tx, entity.id);
+        const existing = await _getByIdTx(tx, entity.id);
 
         const existingHash = hash(existing);
         if (existingHash !== entity.originalHash) {
@@ -172,31 +186,6 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: entity.id });
-    });
-}
-
-async function copy(context, entity, formId) {
-    return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCustomForm');
-        const existing = await _getById(tx, formId);
-        await namespaceHelpers.validateEntity(tx, entity);
-
-        const form = filterObject(existing, allowedFormKeys);
-        enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');
-
-        const ids = await tx('custom_forms').insert(filterObject(entity, formAllowedKeys));
-        const id = ids[0];
-
-        for (const formKey in form) {
-            await tx('custom_forms_data').insert({
-                form: id,
-                data_key: formKey,
-                data_value: form[formKey]
-            })
-        }
-
-        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'customForm', entityId: id });
-        return id;
     });
 }
 
@@ -308,9 +297,9 @@ function checkForMjmlErrors(form) {
 module.exports.listDTAjax = listDTAjax;
 module.exports.hash = hash;
 module.exports.getById = getById;
+module.exports.getByIdTx = getByIdTx;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
-module.exports.copy = copy;
 module.exports.remove = remove;
 module.exports.getDefaultCustomFormValues = getDefaultCustomFormValues;
 module.exports.serverValidate = serverValidate;

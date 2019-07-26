@@ -98,7 +98,8 @@ export default class CUD extends Component {
 
     submitFormValuesMutator(data) {
         this.templateTypes[data.type].beforeSave(data);
-        return filterData(data, ['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace']);
+
+        return filterData(data, ['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace', 'fromExistingEntity', 'existingEntity']);
     }
 
     async getPreSubmitFormValuesUpdater() {
@@ -127,8 +128,8 @@ export default class CUD extends Component {
                 type: mailtrainConfig.editors[0],
                 tag_language: mailtrainConfig.tagLanguages[0],
 
-                fromSourceTemplate: false,
-                sourceTemplate: null,
+                fromExistingEntity: false,
+                existingEntity: null,
 
                 text: '',
                 html: '',
@@ -158,10 +159,10 @@ export default class CUD extends Component {
             state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
         }
 
-        if (state.getIn(['fromSourceTemplate', 'value']) && !state.getIn(['sourceTemplate', 'value'])) {
-            state.setIn(['sourceTemplate', 'error'], t('sourceTemplateMustNotBeEmpty'));
+        if (state.getIn(['fromExistingEntity', 'value']) && !state.getIn(['existingEntity', 'value'])) {
+            state.setIn(['existingEntity', 'error'], t('sourceTemplateMustNotBeEmpty'));
         } else {
-            state.setIn(['sourceTemplate', 'error'], null);
+            state.setIn(['existingEntity', 'error'], null);
         }
 
         validateNamespace(t, state);
@@ -350,11 +351,11 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('description')}/>
 
                     {!isEdit &&
-                        <CheckBox id="fromSourceTemplate" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
+                        <CheckBox id="fromExistingEntity" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
                     }
 
-                    {this.getFormValue('fromSourceTemplate') ?
-                        <TableSelect key="templateSelect" id="sourceTemplate" withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
+                    {this.getFormValue('fromExistingEntity') ?
+                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
                     :
                         <>
                             {isEdit ?
@@ -366,10 +367,10 @@ export default class CUD extends Component {
                             }
 
                             {typeForm}
+
+                            <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions} disabled={isEdit && (!typeKey || this.templateTypes[typeKey].isTagLanguageSelectorDisabledForEdit)}/>
                         </>
                     }
-
-                    <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions} disabled={isEdit && (!typeKey || this.templateTypes[typeKey].isTagLanguageSelectorDisabledForEdit)}/>
 
                     <NamespaceSelect/>
 

@@ -75,14 +75,14 @@ async function create(context, entity) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
 
-        if (entity.fromSourceTemplate) {
-            const template = await getByIdTx(tx, context, entity.sourceTemplate, false);
+        if (entity.fromExistingEntity) {
+            const existing = await getByIdTx(tx, context, entity.existingEntity, false);
 
-            entity.type = template.type;
-            entity.tag_language = template.tag_language;
-            entity.data = template.data;
-            entity.html = template.html;
-            entity.text = template.text;
+            entity.type = existing.type;
+            entity.tag_language = existing.tag_language;
+            entity.data = existing.data;
+            entity.html = existing.html;
+            entity.text = existing.text;
         }
 
         await _validateAndPreprocess(tx, entity);
@@ -92,10 +92,10 @@ async function create(context, entity) {
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: id });
 
-        if (entity.fromSourceTemplate) {
-            await files.copyAllTx(tx, context, 'template', 'file', entity.sourceTemplate, 'template', 'file', id);
+        if (entity.fromExistingEntity) {
+            await files.copyAllTx(tx, context, 'template', 'file', entity.existingEntity, 'template', 'file', id);
 
-            convertFileURLs(entity, 'template', entity.sourceTemplate, 'template', id);
+            convertFileURLs(entity, 'template', entity.existingEntity, 'template', id);
             await tx('templates').update(filterObject(entity, allowedKeys)).where('id', id);
         }
 

@@ -924,7 +924,7 @@
   "editTemplate": "Edit Template",
   "createTemplate": "Create Template",
   "cloneFromAnExistingTemplate": "Clone from an existing template",
-  "cloneFromAnExistingCustomForms": "Clone from an existing custom forms",
+  "cloneFromAnExistingCustomForms": "Clone from existing custom forms",
   "mosaico": "Mosaico",
   "templateContentHtml": "Template content (HTML)",
   "mosaicoTemplateDesigner": "Mosaico Template Designer",

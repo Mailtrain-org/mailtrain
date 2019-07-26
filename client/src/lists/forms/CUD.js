@@ -46,9 +46,7 @@ export default class CUD extends Component {
 
         this.state = {
             previewContents: null,
-            previewFullscreen: false,
-            fromSourceCustomForms: false,
-            sourceCustomForms: null,
+            previewFullscreen: false
         };
 
         this.serverValidatedFields = [
@@ -300,7 +298,10 @@ export default class CUD extends Component {
     }
 
     submitFormValuesMutator(data) {
-        return filterData(data, ['name', 'description', 'layout', 'form_input_style', 'namespace',
+        return filterData(data, ['name', 'description', 'namespace',
+            'fromExistingEntity', 'existingEntity',
+
+            'layout', 'form_input_style',
             'web_subscribe',
             'web_confirm_subscription_notice',
             'mail_confirm_subscription_html',
@@ -333,8 +334,8 @@ export default class CUD extends Component {
             const data = {
                 name: '',
                 description: '',
-                fromSourceCustomForms: false,
-                sourceCustomForms: null,
+                fromExistingEntity: false,
+                existingEntity: null,
                 selectedTemplate: 'layout',
                 namespace: mailtrainConfig.user.namespace
             };
@@ -355,11 +356,12 @@ export default class CUD extends Component {
 
         validateNamespace(t, state);
 
-        if (state.getIn(['fromSourceCustomForms', 'value']) && !state.getIn(['sourceCustomForms', 'value'])) {
-            state.setIn(['sourceCustomForms', 'error'], t('sourceCustomFormsMustNotBeEmpty'));
+        if (state.getIn(['fromExistingEntity', 'value']) && !state.getIn(['existingEntity', 'value'])) {
+            state.setIn(['existingEntity', 'error'], t('sourceCustomFormsMustNotBeEmpty'));
         } else {
-            state.setIn(['sourceCustomForms', 'error'], null);
+            state.setIn(['existingEntity', 'error'], null);
         }
+
 
         let formsServerValidationRunning = false;
         const formsErrors = [];
@@ -400,11 +402,7 @@ export default class CUD extends Component {
             url = `rest/forms/${this.props.entity.id}`;
         } else {
             sendMethod = FormSendMethod.POST;
-            if (this.getFormValue('sourceCustomForms') !== null) {
-                url = `rest/forms/${this.getFormValue('sourceCustomForms')}`;
-            } else {
-                url = 'rest/forms';
-            }
+            url = 'rest/forms';
         }
 
         this.disableForm();
@@ -510,18 +508,17 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     {!isEdit &&
-                        <CheckBox id="fromSourceCustomForms" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
+                        <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
                     }
 
-                    {this.getFormValue('fromSourceCustomForms') &&
-                        <TableSelect key="sourceCustomFormsKey" id="sourceCustomForms" withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />
-                    }
+                    {this.getFormValue('fromExistingEntity') ?
+                        <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />
+                    :
+                        <>
+                            <Fieldset label={t('formsPreview')}>
+                                <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
 
-                    {!this.getFormValue('fromSourceCustomForms') &&
-                        <Fieldset label={t('formsPreview')}>
-                            <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
-
-                            { previewListId &&
+                                { previewListId &&
                                 <div>
                                     <AlignedRow>
                                         <div>
@@ -570,15 +567,16 @@ export default class CUD extends Component {
                                     </div>
                                     }
                                 </div>
-                            }
-                        </Fieldset>
-                    }
+                                }
+                            </Fieldset>
 
-                    { selectedTemplate &&
-                        <Fieldset label={t('templates')}>
-                            <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
-                            <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
-                        </Fieldset>
+                            { selectedTemplate &&
+                            <Fieldset label={t('templates')}>
+                                <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
+                                <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
+                            </Fieldset>
+                            }
+                        </>
                     }
 
                     <ButtonRow>

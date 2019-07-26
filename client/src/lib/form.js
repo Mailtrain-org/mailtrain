@@ -12,7 +12,6 @@ import {TreeSelectMode, TreeTable} from './tree';
 import {Table, TableSelectMode} from './table';
 import {Button} from "./bootstrap-components";
 import {SketchPicker} from 'react-color';
-import deepEqual from "fast-deep-equal";
 
 import ACEEditorRaw from 'react-ace';
 import 'brace/theme/github';
@@ -1373,7 +1372,24 @@ const withForm = createComponentMixin([], [], (TargetClass, InnerClass) => {
         const currentData = getSaveData(self, self.state.formState.get('data'));
         const savedData = self.state.formState.get('savedData');
 
-        return !deepEqual(currentData, savedData);
+        function isDifferent(data1, data2, prefix) {
+            if (typeof data1 === 'object' && typeof data2  === 'object') {
+                const keys = new Set([...Object.keys(data1), ...Object.keys(data2)]);
+                for (const key of keys) {
+                    if (isDifferent(data1[key], data2[key], `${prefix}/${key}`)) {
+                        return true;
+                    }
+                }
+            } else if (data1 !== data2) {
+                // console.log(prefix);
+                return true;
+            }
+            return false;
+        }
+
+        const result = isDifferent(currentData, savedData, '');
+
+        return result;
     };
 
     proto.isFormChanged = function() {
