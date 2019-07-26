@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('../lib/log');
-const config = require('config');
+const config = require('../lib/config');
 const net = require('net');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');

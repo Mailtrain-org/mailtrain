@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const path = require('path');
 const express = require('express');
 const routerFactory = require('../lib/router-async');

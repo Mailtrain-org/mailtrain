@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('./config');
 const log = require('./log');
 const mailers = require('./mailers');
 const knex = require('./knex');

@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const log = require('../lib/log');
 const knex = require('../lib/knex');
 const subscriptions = require('../models/subscriptions');

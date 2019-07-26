@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('./config');
 const urllib = require('url');
 const {anonymousRestrictedAccessToken} = require('../../shared/urls');
 const {getLangCodeFromExpressLocale} = require('./translate');

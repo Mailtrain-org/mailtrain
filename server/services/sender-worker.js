@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const log = require('../lib/log');
 const mailers = require('../lib/mailers');
 const messageSender = require('../lib/message-sender');

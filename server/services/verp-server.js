@@ -2,7 +2,7 @@
 
 const { nodeifyFunction, nodeifyPromise } = require('../lib/nodeify');
 const log = require('../lib/log');
-const config = require('config');
+const config = require('../lib/config');
 const {MailerError} = require('../lib/mailers');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');

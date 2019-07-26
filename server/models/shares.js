@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('../lib/knex');
-const config = require('config');
+const config = require('../lib/config');
 const { enforce, castToInteger } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const entitySettings = require('../lib/entity-settings');

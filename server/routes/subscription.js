@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('../lib/log');
-const config = require('config');
+const config = require('../lib/config');
 const router = require('../lib/router-async').create();
 const confirmations = require('../models/confirmations');
 const subscriptions = require('../models/subscriptions');

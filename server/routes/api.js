@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const lists = require('../models/lists');
 const tools = require('../lib/tools');
 const blacklist = require('../models/blacklist');

@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('./log');
-const config = require('config');
+const config = require('./config');
 
 const nodemailer = require('nodemailer');
 const aws = require('aws-sdk');

@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const fork = require('../lib/fork').fork;
 const log = require('../lib/log');
 const path = require('path');

@@ -257,7 +257,7 @@ seleniumWebDriver:
   browser: phantomjs
 
 
-roles:
+defaultRoles:
   global:
     master:
       name: Global Master
