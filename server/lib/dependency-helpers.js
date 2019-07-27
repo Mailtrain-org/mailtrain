@@ -37,16 +37,11 @@ async function ensureNoDependencies(tx, context, id, depSpecs) {
                     name: row.name,
                     link: entityType.clientLink(row.id)
                 });
-            } else if (await shares.checkEntityPermissionTx(tx, context, depSpec.entityTypeId, row.id, 'view')) {
+            } else if (!depSpec.viewPermission && await shares.checkEntityPermissionTx(tx, context, depSpec.entityTypeId, row.id, 'view')) {
                 deps.push({
                     entityTypeId: depSpec.entityTypeId,
                     name: row.name,
                     link: entityType.clientLink(row.id)
-                });
-            } else {
-                deps.push({
-                    entityTypeId: depSpec.entityTypeId,
-                    id: row.id
                 });
             }
         }

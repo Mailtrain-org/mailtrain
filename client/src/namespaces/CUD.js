@@ -82,9 +82,11 @@ export default class CUD extends Component {
                 this.removeNsIdSubtree(data);
             }
 
-            this.setState({
-                treeData: data
-            });
+            if (this.isComponentMounted()) {
+                this.setState({
+                    treeData: data
+                });
+            }
         }
     }
 
@@ -191,7 +193,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
-        const canDelete = isEdit && !this.isEditGlobal() && this.props.entity.permissions.includes('delete');
+        const canDelete = isEdit && !this.isEditGlobal() && mailtrainConfig.user.namespace !== this.props.entity.id && this.props.entity.permissions.includes('delete');
 
         return (
             <div>

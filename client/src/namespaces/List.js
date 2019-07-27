@@ -10,6 +10,7 @@ import {checkPermissions} from "../lib/permissions";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -64,7 +65,8 @@ export default class List extends Component {
                 });
             }
 
-            if (Number.parseInt(node.key) !== getGlobalNamespaceId()) {
+            const namespaceId = Number.parseInt(node.key);
+            if (namespaceId !== getGlobalNamespaceId() && mailtrainConfig.user.namespace !== namespaceId) {
                 tableAddDeleteButton(actions, this, node.data.permissions, `rest/namespaces/${node.key}`, node.data.unsanitizedTitle, t('deletingNamespace'), t('namespaceDeleted'));
             }
 

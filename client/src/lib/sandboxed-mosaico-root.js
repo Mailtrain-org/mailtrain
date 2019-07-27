@@ -4,8 +4,7 @@ import './public-path';
 
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {I18nextProvider} from 'react-i18next';
-import i18n, {withTranslation} from './i18n';
+import {TranslationRoot, withTranslation} from './i18n';
 import {parentRPC, UntrustedContentRoot} from './untrusted';
 import PropTypes from "prop-types";
 import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
@@ -149,9 +148,9 @@ export default function() {
     parentRPC.init();
 
     ReactDOM.render(
-        <I18nextProvider i18n={ i18n }>
+        <TranslationRoot>
             <UntrustedContentRoot render={props => <MosaicoSandbox {...props} />} />
-        </I18nextProvider>,
+        </TranslationRoot>,
         document.getElementById('root')
     );
 };

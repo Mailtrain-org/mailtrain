@@ -683,21 +683,24 @@ export class NavDropdown extends Component {
 }
 
 
-export const requiresAuthenticatedUser = createComponentMixin([], [withPageHelpers], (TargetClass, InnerClass) => {
-    class RequiresAuthenticatedUser extends React.Component {
-        constructor(props) {
-            super(props);
-            props.sectionContent.ensureAuthenticated();
+export const requiresAuthenticatedUser = createComponentMixin({
+    deps: [withPageHelpers],
+    decoratorFn: (TargetClass, InnerClass) => {
+        class RequiresAuthenticatedUser extends React.Component {
+            constructor(props) {
+                super(props);
+                props.sectionContent.ensureAuthenticated();
+            }
+
+            render() {
+                return <TargetClass {...this.props}/>
+            }
         }
 
-        render() {
-            return <TargetClass {...this.props}/>
-        }
+        return {
+            cls: RequiresAuthenticatedUser
+        };
     }
-
-    return {
-        cls: RequiresAuthenticatedUser
-    };
 });
 
 export function getLanguageChooser(t) {

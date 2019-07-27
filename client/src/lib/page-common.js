@@ -354,30 +354,34 @@ export function renderRoute(route, panelRouteCtor, loadingMessageFn, flashMessag
 }
 
 export const SectionContentContext = React.createContext(null);
-export const withPageHelpers = createComponentMixin([{context: SectionContentContext, propName: 'sectionContent'}], [withErrorHandling], (TargetClass, InnerClass) => {
-    InnerClass.prototype.setFlashMessage = function(severity, text) {
-        return this.props.sectionContent.setFlashMessage(severity, text);
-    };
+export const withPageHelpers = createComponentMixin({
+    contexts: [{context: SectionContentContext, propName: 'sectionContent'}],
+    deps: [withErrorHandling],
+    decoratorFn: (TargetClass, InnerClass) => {
+        InnerClass.prototype.setFlashMessage = function (severity, text) {
+            return this.props.sectionContent.setFlashMessage(severity, text);
+        };
 
-    InnerClass.prototype.navigateTo = function(path) {
-        return this.props.sectionContent.navigateTo(path);
-    };
+        InnerClass.prototype.navigateTo = function (path) {
+            return this.props.sectionContent.navigateTo(path);
+        };
 
-    InnerClass.prototype.navigateBack = function() {
-        return this.props.sectionContent.navigateBack();
-    };
+        InnerClass.prototype.navigateBack = function () {
+            return this.props.sectionContent.navigateBack();
+        };
 
-    InnerClass.prototype.navigateToWithFlashMessage = function(path, severity, text) {
-        return this.props.sectionContent.navigateToWithFlashMessage(path, severity, text);
-    };
+        InnerClass.prototype.navigateToWithFlashMessage = function (path, severity, text) {
+            return this.props.sectionContent.navigateToWithFlashMessage(path, severity, text);
+        };
 
-    InnerClass.prototype.registerBeforeUnloadHandlers = function(handlers) {
-        return this.props.sectionContent.registerBeforeUnloadHandlers(handlers);
-    };
+        InnerClass.prototype.registerBeforeUnloadHandlers = function (handlers) {
+            return this.props.sectionContent.registerBeforeUnloadHandlers(handlers);
+        };
 
-    InnerClass.prototype.deregisterBeforeUnloadHandlers = function(handlers) {
-        return this.props.sectionContent.deregisterBeforeUnloadHandlers(handlers);
-    };
+        InnerClass.prototype.deregisterBeforeUnloadHandlers = function (handlers) {
+            return this.props.sectionContent.deregisterBeforeUnloadHandlers(handlers);
+        };
 
-    return {};
+        return {};
+    }
 });
