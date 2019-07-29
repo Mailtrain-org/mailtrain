@@ -4,14 +4,14 @@ import React, {Component} from 'react';
 import {withTranslation} from '../../lib/i18n';
 import {ButtonDropdown, Icon} from '../../lib/bootstrap-components';
 import {DropdownLink, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../../lib/page';
-import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
+import {withErrorHandling} from '../../lib/error-handling';
 import {Table} from '../../lib/table';
 import moment from 'moment';
 import {getTemplateTypes} from './helpers';
 import {getTagLanguages} from '../helpers';
-import {checkPermissions} from "../../lib/permissions";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import PropTypes from 'prop-types';
 
 
 @withComponentMixins([
@@ -31,27 +31,15 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
     }
 
-    @withAsyncErrorHandler
-    async fetchPermissions() {
-        const result = await checkPermissions({
-            createMosaicoTemplate: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createMosaicoTemplate']
-            }
-        });
-
-        this.setState({
-            createPermitted: result.data.createMosaicoTemplate
-        });
-    }
-
-    componentDidMount() {
-        // noinspection JSIgnoredPromiseFromCall
-        this.fetchPermissions();
+    static propTypes = {
+        permissions: PropTypes.object
     }
 
     render() {
         const t = this.props.t;
+
+        const permissions = this.props.permissions;
+        const createPermitted = permissions.createMosaicoTemplate;
 
         const columns = [
             { data: 1, title: t('name') },
@@ -103,7 +91,7 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-                {this.state.createPermitted &&
+                {createPermitted &&
                     <Toolbar>
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createMosaicoTemplate')}>
                             <DropdownLink to="/templates/mosaico/create">{t('blank')}</DropdownLink>

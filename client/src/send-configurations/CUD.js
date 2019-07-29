@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 
 import {getMailerTypes} from "./helpers";
@@ -60,7 +60,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     onMailerTypeChanged(mutStateDate, key, oldType, type) {
@@ -96,7 +97,7 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 from_email: '',
                 from_email_overridable: false,
                 from_name: '',

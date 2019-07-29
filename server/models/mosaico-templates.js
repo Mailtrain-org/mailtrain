@@ -73,7 +73,6 @@ async function create(context, entity) {
 
 async function updateWithConsistencyCheck(context, entity) {
     await knex.transaction(async tx => {
-        await shares.enforceGlobalPermission(context, 'createJavascriptWithROAccess');
         await shares.enforceEntityPermissionTx(tx, context, 'mosaicoTemplate', entity.id, 'edit');
 
         const existing = await tx('mosaico_templates').where('id', entity.id).first();

@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
@@ -75,6 +75,7 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
         entity: PropTypes.object,
+        permissions: PropTypes.object,
         setPanelInFullScreen: PropTypes.func
     }
 
@@ -124,7 +125,7 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 type: mailtrainConfig.editors[0],
                 tag_language: mailtrainConfig.tagLanguages[0],
 

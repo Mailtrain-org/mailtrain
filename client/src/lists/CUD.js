@@ -22,10 +22,9 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {DeleteModalDialog} from '../lib/modals';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
 import styles from "../lib/styles.scss";
-import mailtrainConfig from 'mailtrainConfig';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -49,7 +48,8 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     getFormValuesMutator(data) {
@@ -86,7 +86,7 @@ export default class CUD extends Component {
                 contact_email: '',
                 homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 to_name: '',
                 fieldWizard: FieldWizard.FIRST_LAST_NAME,
                 send_configuration: null,

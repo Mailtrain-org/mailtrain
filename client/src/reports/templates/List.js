@@ -4,13 +4,13 @@ import React, {Component} from 'react';
 import {withTranslation} from '../../lib/i18n';
 import {ButtonDropdown, Icon} from '../../lib/bootstrap-components';
 import {DropdownLink, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../../lib/page';
-import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
+import {withErrorHandling} from '../../lib/error-handling';
 import {Table} from '../../lib/table';
 import moment from 'moment';
 import mailtrainConfig from 'mailtrainConfig';
-import {checkPermissions} from "../../lib/permissions";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import PropTypes from 'prop-types';
 
 @withComponentMixins([
     withTranslation,
@@ -26,27 +26,15 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
     }
 
-    @withAsyncErrorHandler
-    async fetchPermissions() {
-        const result = await checkPermissions({
-            createReportTemplate: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createReportTemplate']
-            }
-        });
-
-        this.setState({
-            createPermitted: result.data.createReportTemplate && mailtrainConfig.globalPermissions.createJavascriptWithROAccess
-        });
-    }
-
-    componentDidMount() {
-        // noinspection JSIgnoredPromiseFromCall
-        this.fetchPermissions();
+    static propTypes = {
+        permissions: PropTypes.object
     }
 
     render() {
         const t = this.props.t;
+
+        const permissions = this.props.permissions;
+        const createPermitted = permissions.createReportTemplate && mailtrainConfig.globalPermissions.createJavascriptWithROAccess;
 
         const columns = [
             { data: 1, title: t('name') },
@@ -82,7 +70,7 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-                {this.state.createPermitted &&
+                {createPermitted &&
                     <Toolbar>
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createReportTemplate')}>
                             <DropdownLink to="/reports/templates/create">{t('blank')}</DropdownLink>

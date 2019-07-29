@@ -18,7 +18,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getMJMLSample, getVersafix} from "../../../../shared/mosaico-templates";
@@ -57,7 +57,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     getFormValuesMutator(data) {
@@ -88,7 +89,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: '',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     type: 'html',
                     tag_language: mailtrainConfig.tagLanguages[0]
                 });
@@ -97,7 +98,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: '',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     type: 'mjml',
                     tag_language: mailtrainConfig.tagLanguages[0]
                 });
@@ -106,7 +107,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: '',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     type: 'html',
                     tag_language: mailtrainConfig.tagLanguages[0],
                     html: ''

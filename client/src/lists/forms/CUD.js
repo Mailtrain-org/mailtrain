@@ -23,7 +23,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTrustedUrl, getUrl} from "../../lib/urls";
@@ -280,7 +280,8 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
 
@@ -337,7 +338,7 @@ export default class CUD extends Component {
                 fromExistingEntity: false,
                 existingEntity: null,
                 selectedTemplate: 'layout',
-                namespace: mailtrainConfig.user.namespace
+                namespace: getDefaultNamespace(this.props.permissions)
             };
             this.supplyDefaults(data);
 

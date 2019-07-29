@@ -9,94 +9,142 @@ import {getUrl} from "./urls";
 import {createComponentMixin, withComponentMixins} from "./decorator-helpers";
 import {withTranslation} from "./i18n";
 import shallowEqual from "shallowequal";
+import {checkPermissions} from "./permissions";
 
-async function resolve(route, match, prevResolvedByUrl) {
+async function resolve(route, match, prevResolverState) {
     const resolved = {};
-    const resolvedByUrl = {};
-    const keysToGo = new Set(Object.keys(route.resolve));
+    const permissions = {};
+    const resolverState = {
+        resolvedByUrl: {},
+        permissionsBySig: {}
+    };
 
-    prevResolvedByUrl = prevResolvedByUrl || {};
+    prevResolverState = prevResolverState || {
+        resolvedByUrl: {},
+        permissionsBySig: {}
+    };
 
-    while (keysToGo.size > 0) {
-        const urlsToResolve = [];
-        const keysToResolve = [];
+    async function processResolve() {
+        const keysToGo = new Set(Object.keys(route.resolve));
 
-        for (const key of keysToGo) {
-            const resolveEntry = route.resolve[key];
+        while (keysToGo.size > 0) {
+            const urlsToResolve = [];
+            const keysToResolve = [];
 
-            let allDepsSatisfied = true;
-            let urlFn = null;
+            for (const key of keysToGo) {
+                const resolveEntry = route.resolve[key];
 
-            if (typeof resolveEntry === 'function') {
-                urlFn = resolveEntry;
+                let allDepsSatisfied = true;
+                let urlFn = null;
 
-            } else {
-                if (resolveEntry.dependencies) {
-                    for (const dep of resolveEntry.dependencies) {
-                        if (!(dep in resolved)) {
-                            allDepsSatisfied = false;
-                            break;
+                if (typeof resolveEntry === 'function') {
+                    urlFn = resolveEntry;
+
+                } else {
+                    if (resolveEntry.dependencies) {
+                        for (const dep of resolveEntry.dependencies) {
+                            if (!(dep in resolved)) {
+                                allDepsSatisfied = false;
+                                break;
+                            }
                         }
                     }
+
+                    urlFn = resolveEntry.url;
                 }
 
-                urlFn = resolveEntry.url;
+                if (allDepsSatisfied) {
+                    urlsToResolve.push(urlFn(match.params, resolved));
+                    keysToResolve.push(key);
+                }
             }
 
-            if (allDepsSatisfied) {
-                urlsToResolve.push(urlFn(match.params, resolved));
-                keysToResolve.push(key);
+            if (keysToResolve.length === 0) {
+                throw new Error('Cyclic dependency in "resolved" entries of ' + route.path);
             }
-        }
 
-        if (keysToResolve.length === 0) {
-            throw new Error('Cyclic dependency in "resolved" entries of ' + route.path);
-        }
+            const urlsToResolveByRest = [];
+            const keysToResolveByRest = [];
 
-        const urlsToResolveByRest = [];
-        const keysToResolveByRest = [];
+            for (let idx = 0; idx < keysToResolve.length; idx++) {
+                const key = keysToResolve[idx];
+                const url = urlsToResolve[idx];
 
-        for (let idx = 0; idx < keysToResolve.length; idx++) {
-            const key = keysToResolve[idx];
-            const url = urlsToResolve[idx];
+                if (url in prevResolverState.resolvedByUrl) {
+                    const entity = prevResolverState.resolvedByUrl[url];
+                    resolved[key] = entity;
+                    resolverState.resolvedByUrl[url] = entity;
 
-            if (url in prevResolvedByUrl) {
-                const entity = prevResolvedByUrl[url];
-                resolved[key] = entity;
-                resolvedByUrl[url] = entity;
-
-            } else {
-                urlsToResolveByRest.push(url);
-                keysToResolveByRest.push(key);
-            }
-        }
-
-        if (keysToResolveByRest.length > 0) {
-            const promises = urlsToResolveByRest.map(url => {
-                if (url) {
-                    return axios.get(getUrl(url));
                 } else {
-                    return Promise.resolve({data: null});
+                    urlsToResolveByRest.push(url);
+                    keysToResolveByRest.push(key);
                 }
-            });
-            const resolvedArr = await Promise.all(promises);
-
-            for (let idx = 0; idx < keysToResolveByRest.length; idx++) {
-                resolved[keysToResolveByRest[idx]] = resolvedArr[idx].data;
-                resolvedByUrl[urlsToResolveByRest[idx]] = resolvedArr[idx].data;
             }
-        }
 
-        for (const key of keysToResolve) {
-            keysToGo.delete(key);
+            if (keysToResolveByRest.length > 0) {
+                const promises = urlsToResolveByRest.map(url => {
+                    if (url) {
+                        return axios.get(getUrl(url));
+                    } else {
+                        return Promise.resolve({data: null});
+                    }
+                });
+                const resolvedArr = await Promise.all(promises);
+
+                for (let idx = 0; idx < keysToResolveByRest.length; idx++) {
+                    resolved[keysToResolveByRest[idx]] = resolvedArr[idx].data;
+                    resolverState.resolvedByUrl[urlsToResolveByRest[idx]] = resolvedArr[idx].data;
+                }
+            }
+
+            for (const key of keysToResolve) {
+                keysToGo.delete(key);
+            }
         }
     }
 
-    return { resolved, resolvedByUrl };
+    async function processCheckPermissions() {
+        const checkPermsRequest = {};
+
+        function getSig(checkPermissionsEntry) {
+            return `${checkPermissionsEntry.entityTypeId}-${checkPermissionsEntry.entityId || ''}-${checkPermissionsEntry.requiredOperations.join(',')}`;
+        }
+
+        for (const key in route.checkPermissions) {
+            const checkPermissionsEntry = route.checkPermissions[key];
+            const sig = getSig(checkPermissionsEntry);
+
+            if (sig in prevResolverState.permissionsBySig) {
+                const perm = prevResolverState.permissionsBySig[sig];
+                permissions[key] = perm;
+                resolverState.permissionsBySig[sig] = perm;
+
+            } else {
+                checkPermsRequest[key] = checkPermissionsEntry;
+            }
+        }
+
+        if (Object.keys(checkPermsRequest).length > 0) {
+            const result = await checkPermissions(checkPermsRequest);
+
+            for (const key in checkPermsRequest) {
+                const checkPermissionsEntry = checkPermsRequest[key];
+                const perm = result.data[key];
+
+                permissions[key] = perm;
+                resolverState.permissionsBySig[getSig(checkPermissionsEntry)] = perm;
+            }
+        }
+
+    }
+
+    await Promise.all([processResolve(), processCheckPermissions()]);
+
+    return { resolved, permissions, resolverState };
 }
 
 export function getRoutes(structure, parentRoute) {
-    function _getRoutes(urlPrefix, resolve, parents, structure, navs, primaryMenuComponent, secondaryMenuComponent) {
+    function _getRoutes(urlPrefix, resolve, checkPermissions, parents, structure, navs, primaryMenuComponent, secondaryMenuComponent) {
         let routes = [];
         for (let routeKey in structure) {
             const entry = structure[routeKey];
@@ -113,6 +161,13 @@ export function getRoutes(structure, parentRoute) {
                 entryResolve = Object.assign({}, resolve, entry.resolve);
             } else {
                 entryResolve = resolve;
+            }
+
+            let entryCheckPermissions;
+            if (entry.checkPermissions) {
+                entryCheckPermissions = Object.assign({}, checkPermissions, entry.checkPermissions);
+            } else {
+                entryCheckPermissions = checkPermissions;
             }
 
             let navKeys;
@@ -145,6 +200,7 @@ export function getRoutes(structure, parentRoute) {
                 panelInFullScreen: entry.panelInFullScreen,
                 insideIframe: entry.insideIframe,
                 resolve: entryResolve,
+                checkPermissions: entryCheckPermissions,
                 parents,
                 navs: [...navs, ...entryNavs],
 
@@ -167,12 +223,12 @@ export function getRoutes(structure, parentRoute) {
                     const childNavs = [...entryNavs];
                     childNavs[navKeyIdx] = Object.assign({}, childNavs[navKeyIdx], { active: true });
 
-                    routes = routes.concat(_getRoutes(path + '/', entryResolve, childrenParents, { [navKey]: nav }, childNavs, route.primaryMenuComponent, route.secondaryMenuComponent));
+                    routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, { [navKey]: nav }, childNavs, route.primaryMenuComponent, route.secondaryMenuComponent));
                 }
             }
 
             if (entry.children) {
-                routes = routes.concat(_getRoutes(path + '/', entryResolve, childrenParents, entry.children, entryNavs, route.primaryMenuComponent, route.secondaryMenuComponent));
+                routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, entry.children, entryNavs, route.primaryMenuComponent, route.secondaryMenuComponent));
             }
         }
 
@@ -192,10 +248,10 @@ export function getRoutes(structure, parentRoute) {
             children: { ...(routeSpec.children || {}), ...(structure.children || {}) }
         };
 
-        return _getRoutes(parentRoute.urlPrefix, parentRoute.resolve, parentRoute.parents, { [parentRoute.routeKey]: extStructure }, parentRoute.siblingNavs, parentRoute.primaryMenuComponent, parentRoute.secondaryMenuComponent);
+        return _getRoutes(parentRoute.urlPrefix, parentRoute.resolve, parentRoute.checkPermissions, parentRoute.parents, { [parentRoute.routeKey]: extStructure }, parentRoute.siblingNavs, parentRoute.primaryMenuComponent, parentRoute.secondaryMenuComponent);
 
     } else {
-        return _getRoutes('', {}, [], { "": structure }, [], null, null);
+        return _getRoutes('', {}, {}, [], { "": structure }, [], null, null);
     }
 }
 
@@ -209,11 +265,13 @@ export class Resolver extends Component {
 
         this.state = {
             resolved: null,
-            resolvedByUrl: null
+            permissions: null,
+            resolverState: null
         };
 
-        if (Object.keys(props.route.resolve).length === 0) {
+        if (Object.keys(props.route.resolve).length === 0 && Object.keys(props.route.checkPermissions).length === 0) {
             this.state.resolved = {};
+            this.state.permissions = {};
         }
     }
 
@@ -228,28 +286,31 @@ export class Resolver extends Component {
     async resolve(prevMatch) {
         const props = this.props;
 
-        if (Object.keys(props.route.resolve).length === 0) {
+        if (Object.keys(props.route.resolve).length === 0 && Object.keys(props.route.checkPermissions).length === 0) {
             this.setState({
                 resolved: {},
-                resolvedByUrl: {}
+                permissions: {},
+                resolverState: null
             });
 
         } else {
-            const prevResolvedByUrl = this.state.resolvedByUrl;
+            const prevResolverState = this.state.resolverState;
 
-            if (this.state.resolved) {
+            if (this.state.resolverState) {
                 this.setState({
                     resolved: null,
-                    resolvedByUrl: null
+                    permissions: null,
+                    resolverState: null
                 });
             }
 
-            const {resolved, resolvedByUrl} = await resolve(props.route, props.match, prevResolvedByUrl);
+            const {resolved, permissions, resolverState} = await resolve(props.route, props.match, prevResolverState);
 
             if (!this.disregardResolve) { // This is to prevent the warning about setState on discarded component when we immediatelly redirect.
                 this.setState({
                     resolved,
-                    resolvedByUrl
+                    permissions,
+                    resolverState
                 });
             }
         }
@@ -272,7 +333,7 @@ export class Resolver extends Component {
     }
 
     render() {
-        return this.props.render(this.state.resolved, this.props);
+        return this.props.render(this.state.resolved, this.state.permissions, this.props);
     }
 }
 
@@ -316,9 +377,9 @@ class SubRoute extends Component {
         const route = this.props.route;
         const params = this.props.match.params;
 
-        const render = resolved => {
-            if (resolved) {
-                const subStructure = route.structure(resolved, params);
+        const render = (resolved, permissions) => {
+            if (resolved && permissions) {
+                const subStructure = route.structure(resolved, permissions, params);
                 const routes = getRoutes(subStructure, route);
 
                 const _renderRoute = route => {

@@ -19,7 +19,7 @@ import {withErrorHandling} from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
 import mailtrainConfig from 'mailtrainConfig';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -49,7 +49,8 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     getFormValuesMutator(data) {
@@ -71,7 +72,7 @@ export default class CUD extends Component {
                 email: '',
                 password: '',
                 password2: '',
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 role: null
             });
         }

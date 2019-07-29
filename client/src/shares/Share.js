@@ -139,7 +139,6 @@ export default class Share extends Component {
 
         let usersLabelIndex = 1;
         const usersColumns = [
-            { data: 0, title: "#" },
             { data: 1, title: "Username" },
         ];
 

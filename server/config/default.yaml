@@ -257,6 +257,10 @@ seleniumWebDriver:
   browser: phantomjs
 
 
+# The section below defines the definition of roles (permissions) to be used when no "roles" section is provided
+# in custom config (typically production.yaml). If you want to extend rules provided below, add corresponding rules
+# in "defaultRoles" section in custom config. If you want to define roles from scratch, create "roles" section in
+# the custom config.
 defaultRoles:
   global:
     master:
@@ -308,12 +312,14 @@ defaultRoles:
 
     campaignsCreator:
       name: Campaigns Creator
-      description: In the respective namespace, the user has all permissions to create and manage templates and campaigns.
+      description: In the respective namespace, the user has all permissions to create and manage templates and campaigns. The user can also read public data about send configurations and use Mosaico templates in the namespace.
       permissions: [view, createTemplate, createCampaign]
       children:
         sendConfiguration: [viewPublic]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, sendToTestUsers, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles]
+        mosaicoTemplate: [view, viewFiles]
+        namespace: [view, createTemplate, createCampaign]
 
   sendConfiguration:
     master:
@@ -378,5 +384,9 @@ defaultRoles:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFiles, manageFiles]
+    campaignsCreator:
+      name: Campaigns Creator
+      description: The user can use the Mosaico template, but cannot edit it or delete it.
+      permissions: [view, viewFiles]
 
 

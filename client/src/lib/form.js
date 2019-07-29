@@ -818,7 +818,7 @@ class TreeTableSelect extends Component {
         dataUrl: PropTypes.string,
         data: PropTypes.array,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string
+        format: PropTypes.string,
     }
 
     async onSelectionChangedAsync(sel) {
@@ -835,7 +835,7 @@ class TreeTableSelect extends Component {
         const className = owner.addFormValidationClass('' , id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+            <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync} />
         );
     }
 }

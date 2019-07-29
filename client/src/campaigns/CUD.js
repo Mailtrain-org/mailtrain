@@ -22,7 +22,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
@@ -109,6 +109,7 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object,
+        permissions: PropTypes.object,
         type: PropTypes.number
     }
 
@@ -176,7 +177,12 @@ export default class CUD extends Component {
         }
 
         for (const overridable of campaignOverridables) {
-            data[overridable + '_overriden'] = data[overridable + '_override'] !== null;
+            if (data[overridable + '_override'] === null) {
+                data[overridable + '_override'] = '';
+                data[overridable + '_overriden'] = false;
+            } else {
+                data[overridable + '_overriden'] = true;
+            }
         }
 
         const lsts = [];
@@ -297,7 +303,7 @@ export default class CUD extends Component {
                 lists: [lstUid],
 
                 send_configuration: null,
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
 
                 subject: '',
 

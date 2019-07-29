@@ -4,13 +4,13 @@ import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page';
 import {TreeTable} from '../lib/tree';
-import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import {withErrorHandling} from '../lib/error-handling';
 import {Icon} from "../lib/bootstrap-components";
-import {checkPermissions} from "../lib/permissions";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import mailtrainConfig from 'mailtrainConfig';
+import PropTypes from 'prop-types';
 
 @withComponentMixins([
     withTranslation,
@@ -26,27 +26,15 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
     }
 
-    @withAsyncErrorHandler
-    async fetchPermissions() {
-        const result = await checkPermissions({
-            createNamespace: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createNamespace']
-            }
-        });
-
-        this.setState({
-            createPermitted: result.data.createNamespace
-        });
-    }
-
-    componentDidMount() {
-        // noinspection JSIgnoredPromiseFromCall
-        this.fetchPermissions();
+    static propTypes = {
+        permissions: PropTypes.object
     }
 
     render() {
         const t = this.props.t;
+
+        const permissions = this.props.permissions;
+        const createPermitted = permissions.createNamespace;
 
         const actions = node => {
             const actions = [];
@@ -76,7 +64,7 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-                {this.state.createPermitted &&
+                {createPermitted &&
                     <Toolbar>
                         <LinkButton to="/namespaces/create" className="btn-primary" icon="plus" label={t('createNamespace')}/>
                     </Toolbar>
