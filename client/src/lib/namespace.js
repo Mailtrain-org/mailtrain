@@ -32,16 +32,20 @@ export function getDefaultNamespace(permissions) {
 }
 
 export function namespaceCheckPermissions(createOperation) {
-    return {
-        createEntityInUsersNamespace: {
-            entityTypeId: 'namespace',
-            entityId: mailtrainConfig.user.namespace,
-            requiredOperations: [createOperation]
-        },
-        viewUsersNamespace: {
-            entityTypeId: 'namespace',
-            entityId: mailtrainConfig.user.namespace,
-            requiredOperations: ['view']
-        }
-    };
+    if (mailtrainConfig.user) {
+        return {
+            createEntityInUsersNamespace: {
+                entityTypeId: 'namespace',
+                entityId: mailtrainConfig.user.namespace,
+                requiredOperations: [createOperation]
+            },
+            viewUsersNamespace: {
+                entityTypeId: 'namespace',
+                entityId: mailtrainConfig.user.namespace,
+                requiredOperations: ['view']
+            }
+        };
+    } else {
+        return {};
+    }
 }
