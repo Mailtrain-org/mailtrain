@@ -70,15 +70,19 @@ export default class CUD extends Component {
         };
 
         this.sourceLabels = {
+            [CampaignSource.CUSTOM]: t('customContent'),
+            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
             [CampaignSource.TEMPLATE]: t('template'),
             [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate'),
-            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
-            [CampaignSource.CUSTOM]: t('customContent'),
             [CampaignSource.URL]: t('url')
         };
 
+        const sourceLabelsOrder = [
+            CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN , CampaignSource.TEMPLATE, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.URL
+        ];
+
         this.sourceOptions = [];
-        for (const key in this.sourceLabels) {
+        for (const key in sourceLabelsOrder) {
             this.sourceOptions.push({key, label: this.sourceLabels[key]});
         }
 
@@ -312,7 +316,7 @@ export default class CUD extends Component {
 
                 unsubscribe_url: '',
 
-                source: CampaignSource.TEMPLATE,
+                source: CampaignSource.CUSTOM,
 
                 // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
                 data_sourceTemplate: null,

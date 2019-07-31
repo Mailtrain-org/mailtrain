@@ -171,7 +171,6 @@ async function rebuildPermissionsTx(tx, restriction) {
         }
     }
 
-
     // Reset root, own and shared namespaces shares as per the user roles
     const usersAutoSharesQry = tx('users')
         .select(['users.id', 'users.role', 'users.namespace']);

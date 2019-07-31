@@ -358,7 +358,7 @@ async function listDTAjax(context, listId, segmentId, params) {
 async function listTestUsersDTAjax(context, listCid, params) {
     return await knex.transaction(async tx => {
         const list = await lists.getByCidTx(tx, context, listCid);
-        await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewTestSubscriptions');
 
         const listTable = getSubscriptionTableName(list.id);
 
