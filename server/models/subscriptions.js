@@ -201,10 +201,14 @@ async function hashByList(listId, entity) {
     });
 }
 
-async function _getByTx(tx, context, listId, key, value, grouped) {
-    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+async function _getByTx(tx, context, listId, key, value, grouped, isTest) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, isTest ? 'viewTestSubscriptions' : 'viewSubscriptions');
 
     const entity = await tx(getSubscriptionTableName(listId)).where(key, value).first();
+
+    if (isTest && (!entity || !entity.is_test)) {
+        shares.throwPermissionDenied();
+    }
 
     if (!entity) {
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
@@ -219,18 +223,18 @@ async function _getByTx(tx, context, listId, key, value, grouped) {
     return entity;
 }
 
-async function _getBy(context, listId, key, value, grouped) {
+async function _getBy(context, listId, key, value, grouped, isTest) {
     return await knex.transaction(async tx => {
-        return _getByTx(tx, context, listId, key, value, grouped);
+        return _getByTx(tx, context, listId, key, value, grouped, isTest);
     });
 }
 
 async function getById(context, listId, id, grouped = true) {
-    return await _getBy(context, listId, 'id', id, grouped);
+    return await _getBy(context, listId, 'id', id, grouped, false);
 }
 
 async function getByEmail(context, listId, email, grouped = true) {
-    const result = await _getBy(context, listId, 'hash_email', hashEmail(email), grouped);
+    const result = await _getBy(context, listId, 'hash_email', hashEmail(email), grouped, false);
     if (result.email === null) {
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
     }
@@ -238,12 +242,12 @@ async function getByEmail(context, listId, email, grouped = true) {
     return result;
 }
 
-async function getByCid(context, listId, cid, grouped = true) {
-    return await _getBy(context, listId, 'cid', cid, grouped);
+async function getByCid(context, listId, cid, grouped = true, isTest = true) {
+    return await _getBy(context, listId, 'cid', cid, grouped, isTest);
 }
 
-async function getByCidTx(tx, context, listId, cid, grouped = true) {
-    return await _getByTx(tx, context, listId, 'cid', cid, grouped);
+async function getByCidTx(tx, context, listId, cid, grouped = true, isTest = true) {
+    return await _getByTx(tx, context, listId, 'cid', cid, grouped, isTest);
 }
 
 async function listDTAjax(context, listId, segmentId, params) {

@@ -185,7 +185,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
             return await dtHelpers.ajaxListWithPermissionsTx(
                 tx,
                 context,
-                [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'], column: 'subs.list_id' }],
+                [{ entityTypeId: 'list', requiredOperations: ['viewTestSubscriptions'], column: 'subs.list_id' }],
                 params,
                 builder => {
                     return builder.from(function () {
@@ -960,7 +960,7 @@ async function fetchRssCampaign(context, cid) {
 }
 
 async function testSend(context, data) {
-    // Though it's a bit counterintuitive, this handles also test sends of a template (i.e. without any campaign id)
+    // Though it's a bit counter-intuitive, this handles also test sends of a template (i.e. without any campaign id)
 
     await knex.transaction(async tx => {
         const processSubscriber = async (sendConfigurationId, listId, subscriptionId, messageData) => {
@@ -1014,7 +1014,7 @@ async function testSend(context, data) {
                 await enforceSendPermissionTx(tx, context, campaign, true, listId);
 
                 if (data.subscriptionCid) {
-                    const subscriber = await subscriptions.getByCidTx(tx, context, listId, data.subscriptionCid);
+                    const subscriber = await subscriptions.getByCidTx(tx, context, listId, data.subscriptionCid, true, true);
                     await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
 
                 } else {
@@ -1050,7 +1050,7 @@ async function testSend(context, data) {
             };
 
             const list = await lists.getByCidTx(tx, context, data.listCid);
-            const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid);
+            const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid, true, true);
             await processSubscriber(data.sendConfigurationId, list.id, subscriber.id, messageData);
         }
     });
