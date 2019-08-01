@@ -174,7 +174,7 @@ To make this publicly accessible, you should add reverse proxy that makes these 
 An example of such proxy would be:
 - http://localhost:3000 -> https://mailtrain.example.com
 - http://localhost:3003 -> https://sbox.mailtrain.example.com
-- http://localhsot:3004 -> https://lists.example.com
+- http://localhost:3004 -> https://lists.example.com
 
 To deploy Mailtrain with Docker, you need the following three dependencies installed:
 
