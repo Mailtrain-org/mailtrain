@@ -21,8 +21,7 @@ redis:
   host: $REDIS_HOST
 
 builtinZoneMTA:
-  redis: redis://$REDIS_HOST:6379/2
-  mongo: mongodb://mongodb:27017/zone-mta
+  enabled: false
 
 log:
   level: info
