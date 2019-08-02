@@ -51,6 +51,11 @@ export default class CUD extends Component {
                 extra: ['id']
             },
         });
+
+        this.timezoneOptions = [
+            { key: '', label: t('notSelected') },
+            ...moment.tz.names().map(tz => ({ key: tz.toLowerCase(), label: tz }))
+        ];
     }
 
     static propTypes = {
@@ -185,11 +190,6 @@ export default class CUD extends Component {
         const statusOptions = Object.keys(this.subscriptionStatusLabels)
             .map(key => ({key, label: this.subscriptionStatusLabels[key]}));
 
-        const tzOptions = [
-            { key: '', label: t('notSelected') },
-            ...moment.tz.names().map(tz => ({ key: tz.toLowerCase(), label: tz }))
-        ];
-
         const customFields = [];
         for (const fld of this.props.fieldsGrouped) {
             customFields.push(this.fieldTypes[fld.type].form(fld));
@@ -219,10 +219,9 @@ export default class CUD extends Component {
                     <InputField id="email" label={t('email')}/>
 
                     {customFields}
-
                     <hr />
 
-                    <Dropdown id="tz" label={t('timezone')} options={tzOptions}/>
+                    <Dropdown id="tz" label={t('timezone')} options={this.timezoneOptions}/>
 
                     <Dropdown id="status" label={t('subscriptionStatus')} options={statusOptions}/>
 

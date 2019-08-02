@@ -20,14 +20,14 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import {getEditForm, getTemplateTypes, getTypeForm} from './helpers';
+import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
-import {TestSendModalDialog} from "./TestSendModalDialog";
+import {TestSendModalDialog, TestSendModalDialogMode} from "../campaigns/TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import moment from 'moment';
 
@@ -44,6 +44,7 @@ export default class CUD extends Component {
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
+        this.tagLanguages = getTagLanguages(props.t);
 
         this.state = {
             showMergeTagReference: false,
@@ -57,7 +58,8 @@ export default class CUD extends Component {
         this.initForm({
             getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
             onChangeBeforeValidation: {
-                type: ::this.onTypeChanged
+                type: ::this.onTypeChanged,
+                tag_language: ::this.onTagLanguageChanged
             }
         });
 
@@ -73,6 +75,7 @@ export default class CUD extends Component {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
         entity: PropTypes.object,
+        permissions: PropTypes.object,
         setPanelInFullScreen: PropTypes.func
     }
 
@@ -82,13 +85,22 @@ export default class CUD extends Component {
         }
     }
 
+    onTagLanguageChanged(mutStateData, key, oldTagLanguage, tagLanguage) {
+        if (tagLanguage) {
+            const isEdit = !!this.props.entity;
+            const type = mutStateData.getIn(['type', 'value']);
+            this.templateTypes[type].afterTagLanguageChange(mutStateData, isEdit);
+        }
+    }
+
     getFormValuesMutator(data) {
         this.templateTypes[data.type].afterLoad(data);
     }
 
     submitFormValuesMutator(data) {
         this.templateTypes[data.type].beforeSave(data);
-        return filterData(data, ['name', 'description', 'type', 'data', 'html', 'text', 'namespace']);
+
+        return filterData(data, ['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace', 'fromExistingEntity', 'existingEntity']);
     }
 
     async getPreSubmitFormValuesUpdater() {
@@ -113,11 +125,12 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 type: mailtrainConfig.editors[0],
+                tag_language: mailtrainConfig.tagLanguages[0],
 
-                fromSourceTemplate: false,
-                sourceTemplate: null,
+                fromExistingEntity: false,
+                existingEntity: null,
 
                 text: '',
                 html: '',
@@ -143,10 +156,14 @@ export default class CUD extends Component {
             state.setIn(['type', 'error'], t('typeMustBeSelected'));
         }
 
-        if (state.getIn(['fromSourceTemplate', 'value']) && !state.getIn(['sourceTemplate', 'value'])) {
-            state.setIn(['sourceTemplate', 'error'], t('sourceTemplateMustNotBeEmpty'));
+        if (!state.getIn(['tag_language', 'value'])) {
+            state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
+        }
+
+        if (state.getIn(['fromExistingEntity', 'value']) && !state.getIn(['existingEntity', 'value'])) {
+            state.setIn(['existingEntity', 'error'], t('sourceTemplateMustNotBeEmpty'));
         } else {
-            state.setIn(['sourceTemplate', 'error'], null);
+            state.setIn(['existingEntity', 'error'], null);
         }
 
         validateNamespace(t, state);
@@ -247,7 +264,8 @@ export default class CUD extends Component {
 
         return {
             html: exportedData.html,
-            text: this.getFormValue('text')
+            text: this.getFormValue('text'),
+            tagLanguage: this.getFormValue('tag_language')
         };
     }
 
@@ -274,6 +292,11 @@ export default class CUD extends Component {
             typeOptions.push({key, label: this.templateTypes[key].typeName});
         }
 
+        const tagLanguageOptions = [];
+        for (const key of mailtrainConfig.tagLanguages) {
+            tagLanguageOptions.push({key, label: this.tagLanguages[key].name});
+        }
+
         const typeKey = this.getFormValue('type');
 
         let editForm = null;
@@ -290,14 +313,16 @@ export default class CUD extends Component {
             { data: 1, title: t('name') },
             { data: 2, title: t('description') },
             { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-            { data: 4, title: t('created'), render: data => moment(data).fromNow() },
-            { data: 5, title: t('namespace') },
+            { data: 4, title: t('Tag language'), render: data => this.tagLanguages[data].name },
+            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('namespace') },
         ];
 
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
                 {isEdit &&
                     <TestSendModalDialog
+                        mode={TestSendModalDialogMode.TEMPLATE}
                         visible={this.state.showTestSendModal}
                         onHide={() => this.setState({showTestSendModal: false})}
                         getDataAsync={this.sendModalGetDataHandler}/>
@@ -327,11 +352,11 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('description')}/>
 
                     {!isEdit &&
-                        <CheckBox id="fromSourceTemplate" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
+                        <CheckBox id="fromExistingEntity" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
                     }
 
-                    {this.getFormValue('fromSourceTemplate') ?
-                        <TableSelect key="templateSelect" id="sourceTemplate" withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
+                    {this.getFormValue('fromExistingEntity') ?
+                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
                     :
                         <>
                             {isEdit ?
@@ -343,6 +368,8 @@ export default class CUD extends Component {
                             }
 
                             {typeForm}
+
+                            <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions} disabled={isEdit && (!typeKey || this.templateTypes[typeKey].isTagLanguageSelectorDisabledForEdit)}/>
                         </>
                     }
 

@@ -8,7 +8,8 @@ const EntityActivityType = {
 };
 
 const CampaignActivityType = {
-    STATUS_CHANGE: EntityActivityType.MAX + 1
+    STATUS_CHANGE: EntityActivityType.MAX + 1,
+    TEST_SEND: EntityActivityType.MAX + 2,
 };
 
 const ListActivityType = {

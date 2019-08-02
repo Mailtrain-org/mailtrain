@@ -1,0 +1,3 @@
+[submodule "mvis/ivis-core"]
+	path = mvis/ivis-core
+	url = https://github.com/smartarch/ivis-core.git

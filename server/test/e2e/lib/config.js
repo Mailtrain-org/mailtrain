@@ -1,10 +1,11 @@
 'use strict';
 
-const config = require('server/test/e2e/lib/config');
+const config = require('../../../lib/config');
 
 module.exports = {
     app: config,
-    baseUrl: 'http://localhost:' + config.www.publicPort,
+    baseTrustedUrl: 'http://localhost:' + config.www.trustedPort,
+    basePublicUrl: 'http://localhost:' + config.www.publicPort,
     mailUrl: 'http://localhost:' + config.testServer.mailboxServerPort,
     users: {
         admin: {

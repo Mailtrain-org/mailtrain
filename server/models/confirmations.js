@@ -21,7 +21,7 @@ async function addConfirmation(listId, action, ip, data) {
  */
 async function takeConfirmation(cid) {
     return await knex.transaction(async tx => {
-        const entry = await tx('confirmations').select(['cid', 'list', 'action', 'ip', 'data']).where('cid', cid).first();
+        const entry = await tx('confirmations').select(['cid', 'list', 'action', 'ip', 'data']).where('cid', cid).forUpdate().first();
 
         if (!entry) {
             return false;

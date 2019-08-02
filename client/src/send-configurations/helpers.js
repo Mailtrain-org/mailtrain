@@ -21,7 +21,7 @@ export function getMailerTypes(t) {
         const initVals = mailerTypes[mailerType].initData();
 
         for (const key in initVals) {
-            if (!mutStateData.hasIn([key])) {
+            if (!mutStateData.hasIn([key, 'value']) || mutStateData.getIn([key, 'value']) === undefined) {
                 mutStateData.setIn([key, 'value'], initVals[key]);
             }
         }

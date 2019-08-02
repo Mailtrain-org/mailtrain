@@ -4,13 +4,14 @@ import React, {Component} from 'react';
 import {withTranslation} from '../../lib/i18n';
 import {ButtonDropdown, Icon} from '../../lib/bootstrap-components';
 import {DropdownLink, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../../lib/page';
-import {withAsyncErrorHandler, withErrorHandling} from '../../lib/error-handling';
+import {withErrorHandling} from '../../lib/error-handling';
 import {Table} from '../../lib/table';
 import moment from 'moment';
 import {getTemplateTypes} from './helpers';
-import {checkPermissions} from "../../lib/permissions";
+import {getTagLanguages} from '../helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import PropTypes from 'prop-types';
 
 
 @withComponentMixins([
@@ -24,43 +25,33 @@ export default class List extends Component {
         super(props);
 
         this.templateTypes = getTemplateTypes(props.t);
+        this.tagLanguages = getTagLanguages(props.t);
 
         this.state = {};
         tableRestActionDialogInit(this);
     }
 
-    @withAsyncErrorHandler
-    async fetchPermissions() {
-        const result = await checkPermissions({
-            createMosaicoTemplate: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createMosaicoTemplate']
-            }
-        });
-
-        this.setState({
-            createPermitted: result.data.createMosaicoTemplate
-        });
-    }
-
-    componentDidMount() {
-        // noinspection JSIgnoredPromiseFromCall
-        this.fetchPermissions();
+    static propTypes = {
+        permissions: PropTypes.object
     }
 
     render() {
         const t = this.props.t;
 
+        const permissions = this.props.permissions;
+        const createPermitted = permissions.createMosaicoTemplate;
+
         const columns = [
             { data: 1, title: t('name') },
             { data: 2, title: t('description') },
             { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-            { data: 4, title: t('created'), render: data => moment(data).fromNow() },
-            { data: 5, title: t('namespace') },
+            { data: 4, title: t('Tag language'), render: data => this.tagLanguages[data].name },
+            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 6, title: t('namespace') },
             {
                 actions: data => {
                     const actions = [];
-                    const perms = data[6];
+                    const perms = data[7];
 
                     if (perms.includes('edit')) {
                         actions.push({
@@ -100,7 +91,7 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-                {this.state.createPermitted &&
+                {createPermitted &&
                     <Toolbar>
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createMosaicoTemplate')}>
                             <DropdownLink to="/templates/mosaico/create">{t('blank')}</DropdownLink>

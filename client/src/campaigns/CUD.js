@@ -22,10 +22,10 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import {getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import campaignsStyles from "./styles.scss";
@@ -50,6 +50,8 @@ export default class CUD extends Component {
         const t = props.t;
 
         this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
+        this.tagLanguages = getTagLanguages(props.t);
+
         this.mailerTypes = getMailerTypes(props.t);
 
         const { campaignTypeLabels } = getCampaignLabels(t);
@@ -68,21 +70,30 @@ export default class CUD extends Component {
         };
 
         this.sourceLabels = {
+            [CampaignSource.CUSTOM]: t('customContent'),
+            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
             [CampaignSource.TEMPLATE]: t('template'),
             [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate'),
-            [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
-            [CampaignSource.CUSTOM]: t('customContent'),
             [CampaignSource.URL]: t('url')
         };
 
+        const sourceLabelsOrder = [
+            CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN , CampaignSource.TEMPLATE, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.URL
+        ];
+
         this.sourceOptions = [];
-        for (const key in this.sourceLabels) {
+        for (const key in sourceLabelsOrder) {
             this.sourceOptions.push({key, label: this.sourceLabels[key]});
         }
 
         this.customTemplateTypeOptions = [];
         for (const key of mailtrainConfig.editors) {
             this.customTemplateTypeOptions.push({key, label: this.templateTypes[key].typeName});
+        }
+
+        this.customTemplateTagLanguageOptions = [];
+        for (const key of mailtrainConfig.tagLanguages) {
+            this.customTemplateTagLanguageOptions.push({key, label: this.tagLanguages[key].name});
         }
 
         this.state = {
@@ -102,6 +113,7 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object,
+        permissions: PropTypes.object,
         type: PropTypes.number
     }
 
@@ -114,13 +126,20 @@ export default class CUD extends Component {
     onFormChangeBeforeValidation(mutStateData, key, oldValue, newValue) {
         let match;
 
-        if (key === undefined || key === 'data_sourceCustom_type') {
+        if (key === 'data_sourceCustom_type') {
             if (newValue) {
                 this.templateTypes[newValue].afterTypeChange(mutStateData);
             }
         }
 
-        if (key === undefined || (match = key.match(/^(lists_[0-9]+_)list$/))) {
+        if (key === 'data_sourceCustom_tag_language') {
+            if (newValue) {
+                const isEdit = !!this.props.entity;
+                this.templateTypes[newValue].afterTagLanguageChange(mutStateData, isEdit);
+            }
+        }
+
+        if (key && (match = key.match(/^(lists_[0-9]+_)list$/))) {
             const prefix = match[1];
             mutStateData.setIn([prefix + 'segment', 'value'], null);
         }
@@ -162,7 +181,12 @@ export default class CUD extends Component {
         }
 
         for (const overridable of campaignOverridables) {
-            data[overridable + '_overriden'] = data[overridable + '_override'] !== null;
+            if (data[overridable + '_override'] === null) {
+                data[overridable + '_override'] = '';
+                data[overridable + '_overriden'] = false;
+            } else {
+                data[overridable + '_overriden'] = true;
+            }
         }
 
         const lsts = [];
@@ -202,6 +226,7 @@ export default class CUD extends Component {
 
             data.data.sourceCustom = {
                 type: data.data_sourceCustom_type,
+                tag_language: data.data_sourceCustom_tag_language,
                 data: data.data_sourceCustom_data,
                 html: data.data_sourceCustom_html,
                 text: data.data_sourceCustom_text
@@ -244,7 +269,7 @@ export default class CUD extends Component {
 
         return filterData(data, [
             'name', 'description', 'segment', 'namespace', 'send_configuration',
-            'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override',
+            'subject', 'from_name_override', 'from_email_override', 'reply_to_override',
             'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url',
             'type', 'source', 'parent', 'lists'
         ]);
@@ -282,14 +307,16 @@ export default class CUD extends Component {
                 lists: [lstUid],
 
                 send_configuration: null,
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
+
+                subject: '',
 
                 click_tracking_disabled: false,
                 open_tracking_disabled: false,
 
                 unsubscribe_url: '',
 
-                source: CampaignSource.TEMPLATE,
+                source: CampaignSource.CUSTOM,
 
                 // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
                 data_sourceTemplate: null,
@@ -299,6 +326,7 @@ export default class CUD extends Component {
 
                 // This is for CampaignSource.CUSTOM
                 data_sourceCustom_type: mailtrainConfig.editors[0],
+                data_sourceCustom_tag_language: mailtrainConfig.tagLanguages[0],
                 data_sourceCustom_data: {},
                 data_sourceCustom_html: '',
                 data_sourceCustom_text: '',
@@ -324,6 +352,10 @@ export default class CUD extends Component {
 
         if (!state.getIn(['name', 'value'])) {
             state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
+        }
+
+        if (!state.getIn(['subject', 'value'])) {
+            state.setIn(['subject', 'error'], t('"Subject" line must not be empty"'));
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
@@ -354,6 +386,10 @@ export default class CUD extends Component {
             const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
             if (!customTemplateTypeKey) {
                 state.setIn(['data_sourceCustom_type', 'error'], t('typeMustBeSelected'));
+            }
+
+            if (!state.getIn(['data_sourceCustom_tag_language', 'value'])) {
+                state.setIn(['data_sourceCustom_tag_language', 'error'], t('Tag language must be selected'));
             }
 
             if (customTemplateTypeKey) {
@@ -592,7 +628,6 @@ export default class CUD extends Component {
             { data: 2, title: t('id'), render: data => <code>{data}</code> },
             { data: 3, title: t('description') },
             { data: 4, title: t('type'), render: data => this.mailerTypes[data].typeName },
-            { data: 5, title: t('created'), render: data => moment(data).fromNow() },
             { data: 6, title: t('namespace') }
         ];
 
@@ -604,10 +639,10 @@ export default class CUD extends Component {
                 const addOverridable = (id, label) => {
                     if(this.state.sendConfiguration[id + '_overridable']){
                         if (this.getFormValue(id + '_overriden')) {
-                            sendSettings.push(<InputField label={t(label)} key={id + '_override'} id={id + '_override'}/>);
+                            sendSettings.push(<InputField label={label} key={id + '_override'} id={id + '_override'}/>);
                         } else {
                             sendSettings.push(
-                                <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                                <StaticField key={id + '_original'} label={label} id={id + '_original'} className={styles.formDisabled}>
                                     {this.state.sendConfiguration[id]}
                                 </StaticField>
                             );
@@ -616,7 +651,7 @@ export default class CUD extends Component {
                     }
                     else{
                         sendSettings.push(
-                            <StaticField key={id + '_original'} label={t(label)} id={id + '_original'} className={styles.formDisabled}>
+                            <StaticField key={id + '_original'} label={label} id={id + '_original'} className={styles.formDisabled}>
                                 {this.state.sendConfiguration[id]}
                             </StaticField>
                         );
@@ -626,7 +661,6 @@ export default class CUD extends Component {
                 addOverridable('from_name', t('fromName'));
                 addOverridable('from_email', t('fromEmailAddress'));
                 addOverridable('reply_to', t('replytoEmailAddress'));
-                addOverridable('subject', t('subjectLine'));
             } else {
                 sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
             }
@@ -650,8 +684,8 @@ export default class CUD extends Component {
                 { data: 1, title: t('name') },
                 { data: 2, title: t('description') },
                 { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-                { data: 4, title: t('created'), render: data => moment(data).fromNow() },
-                { data: 5, title: t('namespace') },
+                { data: 5, title: t('created'), render: data => moment(data).fromNow() },
+                { data: 6, title: t('namespace') },
             ];
 
             let help = null;
@@ -686,6 +720,8 @@ export default class CUD extends Component {
 
             templateEdit = <div>
                 <Dropdown id="data_sourceCustom_type" label={t('type')} options={this.customTemplateTypeOptions}/>
+                <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={isEdit && (!customTemplateTypeKey || this.templateTypes[customTemplateTypeKey].isTagLanguageSelectorDisabledForEdit)}/>
+
                 {customTemplateTypeForm}
             </div>;
 
@@ -741,6 +777,8 @@ export default class CUD extends Component {
 
                         {sendSettings}
 
+                        <InputField label={t('subjectLine')} key="subject" id="subject"/>
+
                         <InputField id="unsubscribe_url" label={t('customUnsubscribeUrl')}/>
                     </Fieldset>
 
@@ -759,8 +797,6 @@ export default class CUD extends Component {
                         </Fieldset>
                     </>
                     }
-
-
 
                     {templateEdit}
 

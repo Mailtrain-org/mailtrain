@@ -58,3 +58,8 @@ typings/
 .env
 
 .DS_Store
+/.idea
+/.vscode
+/last-failed-e2e-test.*
+
+dump.rdb

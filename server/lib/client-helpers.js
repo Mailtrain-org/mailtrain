@@ -1,7 +1,7 @@
 'use strict';
 
 const passport = require('./passport');
-const config = require('config');
+const config = require('./config');
 const forms = require('../models/forms');
 const shares = require('../models/shares');
 const urls = require('./urls');
@@ -44,6 +44,7 @@ async function getAuthenticatedConfig(context) {
         },
         globalPermissions,
         editors: config.editors,
+        tagLanguages: config.tagLanguages,
         mosaico: config.mosaico,
         verpEnabled: config.verp.enabled,
         reportsEnabled: config.reports.enabled,

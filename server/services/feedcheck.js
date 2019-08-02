@@ -1,11 +1,10 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const log = require('../lib/log');
 const knex = require('../lib/knex');
 const feedparser = require('feedparser-promised');
 const { CampaignType, CampaignStatus, CampaignSource } = require('../../shared/campaigns');
-const util = require('util');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
 require('../lib/fork');
@@ -112,7 +111,7 @@ async function run() {
                             from_name_override: rssCampaign.from_name_override,
                             from_email_override: rssCampaign.from_email_override,
                             reply_to_override: rssCampaign.reply_to_override,
-                            subject_override: rssCampaign.subject_override,
+                            subject: rssCampaign.subject,
                             data: campaignData,
 
                             click_tracking_disabled: rssCampaign.click_tracking_disabled,

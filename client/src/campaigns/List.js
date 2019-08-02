@@ -4,15 +4,15 @@ import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {ButtonDropdown, Icon} from '../lib/bootstrap-components';
 import {DropdownLink, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page';
-import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import {withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import moment from 'moment';
 import {CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
-import {checkPermissions} from "../lib/permissions";
 import {getCampaignLabels} from "./helpers";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import styles from "./styles.scss";
+import PropTypes from 'prop-types';
 
 @withComponentMixins([
     withTranslation,
@@ -34,27 +34,15 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
     }
 
-    @withAsyncErrorHandler
-    async fetchPermissions() {
-        const result = await checkPermissions({
-            createCampaign: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createCampaign']
-            }
-        });
-
-        this.setState({
-            createPermitted: result.data.createCampaign
-        });
-    }
-
-    componentDidMount() {
-        // noinspection JSIgnoredPromiseFromCall
-        this.fetchPermissions();
+    static propTypes = {
+        permissions: PropTypes.object
     }
 
     render() {
         const t = this.props.t;
+
+        const permissions = this.props.permissions;
+        const createPermitted = permissions.createCampaign;
 
         const columns = [
             { data: 1, title: t('name') },
@@ -153,7 +141,7 @@ export default class List extends Component {
             <div>
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
-                    {this.state.createPermitted &&
+                    {createPermitted &&
                     <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createCampaign')}>
                         <DropdownLink to="/campaigns/create-regular">{t('regular')}</DropdownLink>
                         <DropdownLink to="/campaigns/create-rss">{t('rss')}</DropdownLink>

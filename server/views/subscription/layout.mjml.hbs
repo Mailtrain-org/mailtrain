@@ -13,50 +13,47 @@
             <mj-class name="footer-text" font-size="12px" line-height="18px" color="#999999" />
         </mj-attributes>
     </mj-head>
-    <mj-body>
-        <mj-container width="560" background-color="#ffffff">
+    <mj-body width="560px" background-color="#ffffff">
+        <mj-raw>
+            {{#if isWeb}}
+                <style>
+                    {{{formInputStyle}}}
+                    .alert { max-width: 520px; font-family: Lato, Helvetica, Arial, sans-serif; }
+                </style>
+            {{/if}}
+        </mj-raw>
 
-            <mj-raw>
-                {{#if isWeb}}
-                    <style>
-                        {{{formInputStyle}}}
-                        .alert { max-width: 520px; font-family: Lato, Helvetica, Arial, sans-serif; }
-                    </style>
-                {{/if}}
-            </mj-raw>
+        <mj-section padding-bottom="0">
+            <mj-column>
+                <mj-text mj-class="h1">
+                    {{title}}
+                </mj-text>
+                <mj-divider mj-class="hr"/>
+            </mj-column>
+        </mj-section>
 
-            <mj-section padding-bottom="0">
-                <mj-column>
-                    <mj-text mj-class="h1">
-                        {{title}}
-                    </mj-text>
-                    <mj-divider mj-class="hr"/>
-                </mj-column>
-            </mj-section>
+        <mj-raw>
+            {{#if isWeb}}
+                {{> subscription_flash_messages}}
+            {{/if}}
+        </mj-raw>
 
-            <mj-raw>
-                {{#if isWeb}}
-                    {{> subscription_flash_messages}}
-                {{/if}}
-            </mj-raw>
+        {{{body}}}
 
-            {{{body}}}
+        <mj-section padding-top="0">
+            <mj-column>
+                <mj-text mj-class="small" font-style="italic">
+                    <!-- POST ADDRESS -->
+                </mj-text>
+            </mj-column>
+        </mj-section>
 
-            <mj-section padding-top="0">
-                <mj-column>
-                    <mj-text mj-class="small" font-style="italic">
-                        <!-- POST ADDRESS -->
-                    </mj-text>
-                </mj-column>
-            </mj-section>
+        <mj-raw>
+            {{#if isWeb}}
+                <!-- fixes https://github.com/mjmlio/mjml/issues/359 -->
+                {{> subscription_footer_scripts btnBgColor='#2D3E4F' btnBgColorHover='#1A242F'}}
+            {{/if}}
+        </mj-raw>
 
-            <mj-raw>
-                {{#if isWeb}}
-                    <!-- fixes https://github.com/mjmlio/mjml/issues/359 -->
-                    {{> subscription_footer_scripts btnBgColor='#2D3E4F' btnBgColorHover='#1A242F'}}
-                {{/if}}
-            </mj-raw>
-
-        </mj-container>
     </mj-body>
 </mjml>

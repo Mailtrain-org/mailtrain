@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('../lib/log');
-const config = require('config');
+const config = require('../lib/config');
 const router = require('../lib/router-async').create();
 const links = require('../models/links');
 const interoperableErrors = require('../../shared/interoperable-errors');

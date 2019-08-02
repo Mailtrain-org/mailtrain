@@ -5,7 +5,7 @@ const request = require('request-promise');
 const campaigns = require('../models/campaigns');
 const sendConfigurations = require('../models/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
-const {SubscriptionStatus} = require('../../shared/lists');
+const {CampaignMessageStatus} = require('../../shared/campaigns');
 const {MailerType} = require('../../shared/send-configurations');
 const log = require('../lib/log');
 const multer = require('multer');
@@ -44,13 +44,13 @@ router.postAsync('/aws', async (req, res) => {
 
                     switch (req.body.Message.notificationType) {
                         case 'Bounce':
-                            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, req.body.Message.bounce.bounceType === 'Permanent');
+                            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, req.body.Message.bounce.bounceType === 'Permanent');
                             log.verbose('AWS', 'Marked message %s as bounced', req.body.Message.mail.messageId);
                             break;
 
                         case 'Complaint':
                             if (req.body.Message.complaint) {
-                                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.COMPLAINED, true);
+                                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.COMPLAINED, true);
                                 log.verbose('AWS', 'Marked message %s as complaint', req.body.Message.mail.messageId);
                             }
                             break;
@@ -93,17 +93,17 @@ router.postAsync('/sparkpost', async (req, res) => {
         switch (evt.type) {
             case 'bounce':
                 // https://support.sparkpost.com/customer/portal/articles/1929896
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, [1, 10, 25, 30, 50].indexOf(Number(evt.bounce_class)) >= 0);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, [1, 10, 25, 30, 50].indexOf(Number(evt.bounce_class)) >= 0);
                 log.verbose('Sparkpost', 'Marked message %s as bounced', evt.campaign_id);
                 break;
 
             case 'spam_complaint':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.COMPLAINED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.COMPLAINED, true);
                 log.verbose('Sparkpost', 'Marked message %s as complaint', evt.campaign_id);
                 break;
 
             case 'link_unsubscribe':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.UNSUBSCRIBED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.UNSUBSCRIBED, true);
                 log.verbose('Sparkpost', 'Marked message %s as unsubscribed', evt.campaign_id);
                 break;
         }
@@ -134,18 +134,18 @@ router.postAsync('/sendgrid', async (req, res) => {
         switch (evt.event) {
             case 'bounce':
                 // https://support.sparkpost.com/customer/portal/articles/1929896
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
                 log.verbose('Sendgrid', 'Marked message %s as bounced', evt.campaign_id);
                 break;
 
             case 'spamreport':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.COMPLAINED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.COMPLAINED, true);
                 log.verbose('Sendgrid', 'Marked message %s as complaint', evt.campaign_id);
                 break;
 
             case 'group_unsubscribe':
             case 'unsubscribe':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.UNSUBSCRIBED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.UNSUBSCRIBED, true);
                 log.verbose('Sendgrid', 'Marked message %s as unsubscribed', evt.campaign_id);
                 break;
         }
@@ -167,17 +167,17 @@ router.postAsync('/mailgun', uploads.any(), async (req, res) => {
     if (message) {
         switch (evt.event) {
             case 'bounced':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
                 log.verbose('Mailgun', 'Marked message %s as bounced', evt.campaign_id);
                 break;
 
             case 'complained':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.COMPLAINED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.COMPLAINED, true);
                 log.verbose('Mailgun', 'Marked message %s as complaint', evt.campaign_id);
                 break;
 
             case 'unsubscribed':
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.UNSUBSCRIBED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.UNSUBSCRIBED, true);
                 log.verbose('Mailgun', 'Marked message %s as unsubscribed', evt.campaign_id);
                 break;
         }
@@ -199,7 +199,7 @@ router.postAsync('/zone-mta', async (req, res) => {
             const message = await campaigns.getMessageByResponseId(req.body.id);
 
             if (message) {
-                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
                 log.verbose('ZoneMTA', 'Marked message (campaign:%s, list:%s, subscription:%s) as bounced', message.campaign, message.list, message.subscription);
             }
         }
@@ -265,7 +265,7 @@ router.postAsync('/postal', async (req, res) => {
             if (req.body.payload.message && req.body.payload.message.message_id) {
                 const message = await campaigns.getMessageByResponseId(req.body.payload.message.message_id);
                 if (message) {
-                    await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, req.body.payload.status === 'HardFail');
+                    await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, req.body.payload.status === 'HardFail');
                     log.verbose('Postal', 'Marked message %s as bounced', req.body.payload.message.message_id);
                 }
             }
@@ -275,7 +275,7 @@ router.postAsync('/postal', async (req, res) => {
             if (req.body.payload.original_message && req.body.payload.original_message.message_id) {
                 const message = await campaigns.getMessageByResponseId(req.body.payload.original_message.message_id);
                 if (message) {
-                    await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, SubscriptionStatus.BOUNCED, true);
+                    await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
                     log.verbose('Postal', 'Marked message %s as bounced', req.body.payload.original_message.message_id);
                 }
             }

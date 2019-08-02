@@ -45,7 +45,7 @@ async function listDTAjax(context, type, subType, entityId, params) {
     await shares.enforceEntityPermission(context, type, entityId, getFilesPermission(type, subType, 'view'));
     return await dtHelpers.ajaxList(
         params,
-        builder => builder.from(getFilesTable(type, subType)).where({entity: entityId}),
+        builder => builder.from(getFilesTable(type, subType)).where({entity: entityId, delete_pending: false}),
         ['id', 'originalname', 'filename', 'size', 'created']
     );
 }
@@ -53,7 +53,7 @@ async function listDTAjax(context, type, subType, entityId, params) {
 async function listTx(tx, context, type, subType, entityId) {
     enforceTypePermitted(type, subType);
     await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'view'));
-    return await tx(getFilesTable(type, subType)).where({entity: entityId}).select(['id', 'originalname', 'filename', 'size', 'created']).orderBy('originalname', 'asc');
+    return await tx(getFilesTable(type, subType)).where({entity: entityId, delete_pending: false}).select(['id', 'originalname', 'filename', 'size', 'created']).orderBy('originalname', 'asc');
 }
 
 async function list(context, type, subType, entityId) {
@@ -65,7 +65,7 @@ async function list(context, type, subType, entityId) {
 async function getFileById(context, type, subType, id) {
     enforceTypePermitted(type, subType);
     const file = await knex.transaction(async tx => {
-        const file = await tx(getFilesTable(type, subType)).where('id', id).first();
+        const file = await tx(getFilesTable(type, subType)).where({id: id, delete_pending: false}).first();
         await shares.enforceEntityPermissionTx(tx, context, type, file.entity, getFilesPermission(type, subType, 'view'));
         return file;
     });
@@ -85,7 +85,7 @@ async function _getFileBy(context, type, subType, entityId, key, value) {
     enforceTypePermitted(type, subType);
     const file = await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'view'));
-        const file = await tx(getFilesTable(type, subType)).where({entity: entityId, [key]: value}).first();
+        const file = await tx(getFilesTable(type, subType)).where({entity: entityId, delete_pending: false, [key]: value}).first();
         return file;
     });
 
@@ -155,7 +155,7 @@ async function createFiles(context, type, subType, entityId, files, replacementB
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'manage'));
 
-        const existingNamesRows = await tx(getFilesTable(type, subType)).where('entity', entityId).select(['id', 'filename', 'originalname']);
+        const existingNamesRows = await tx(getFilesTable(type, subType)).where({entity: entityId, delete_pending: false}).select(['id', 'filename', 'originalname']);
 
         const existingNameSet = new Set();
         for (const row of existingNamesRows) {
@@ -275,18 +275,49 @@ async function createFiles(context, type, subType, entityId, files, replacementB
     }
 }
 
+async function lockTx(tx, type, subType, id) {
+    enforceTypePermitted(type, subType);
+    const filesTableName = getFilesTable(type, subType);
+    await tx(filesTableName).where('id', id).increment('lock_count');
+}
+
+async function unlockTx(tx, type, subType, id) {
+    enforceTypePermitted(type, subType);
+
+    const filesTableName = getFilesTable(type, subType);
+    const file = await tx(filesTableName).where('id', id).first();
+
+    enforce(file, `File ${id} not found`);
+    enforce(file.lock_count > 0, `Corrupted lock count at file ${id}`);
+
+    if (file.lock_count === 1 && file.delete_pending) {
+        await tx(filesTableName).where('id', id).del();
+
+        const filePath = getFilePath(type, subType, file.entity, file.filename);
+        await fs.removeAsync(filePath);
+
+    } else {
+        await tx(filesTableName).where('id', id).update({lock_count: file.lock_count - 1});
+    }
+}
+
 async function removeFile(context, type, subType, id) {
     enforceTypePermitted(type, subType);
 
-    const file = await knex.transaction(async tx => {
-        const file = await tx(getFilesTable(type, subType)).where('id', id).select('entity', 'filename').first();
+    await knex.transaction(async tx => {
+        const filesTableName = getFilesTable(type, subType);
+        const file = await tx(filesTableName).where('id', id).first();
         await shares.enforceEntityPermissionTx(tx, context, type, file.entity, getFilesPermission(type, subType, 'manage'));
-        await tx(getFilesTable(type, subType)).where('id', id).del();
-        return {filename: file.filename, entity: file.entity};
-    });
 
-    const filePath = getFilePath(type, subType, file.entity, file.filename);
-    await fs.removeAsync(filePath);
+        if (!file.lock_count) {
+            await tx(filesTableName).where('id', file.id).del();
+
+            const filePath = getFilePath(type, subType, file.entity, file.filename);
+            await fs.removeAsync(filePath);
+        } else {
+            await tx(filesTableName).where('id', file.id).update({delete_pending: true});
+        }
+    });
 }
 
 async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toType, toSubType, toEntityId) {
@@ -296,7 +327,7 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
     enforceTypePermitted(toType, toSubType);
     await shares.enforceEntityPermissionTx(tx, context, toType, toEntityId, getFilesPermission(toType, toSubType, 'manage'));
 
-    const rows = await tx(getFilesTable(fromType, fromSubType)).where({entity: fromEntityId});
+    const rows = await tx(getFilesTable(fromType, fromSubType)).where({entity: fromEntityId, delete_pending: false});
     for (const row of rows) {
         const fromFilePath = getFilePath(fromType, fromSubType, fromEntityId, row.filename);
         const toFilePath = getFilePath(toType, toSubType, toEntityId, row.filename);
@@ -339,4 +370,6 @@ module.exports.getFileUrl = getFileUrl;
 module.exports.getFilePath = getFilePath;
 module.exports.copyAllTx = copyAllTx;
 module.exports.removeAllTx = removeAllTx;
+module.exports.lockTx = lockTx;
+module.exports.unlockTx = unlockTx;
 module.exports.ReplacementBehavior = ReplacementBehavior;

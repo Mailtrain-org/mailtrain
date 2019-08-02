@@ -5,11 +5,11 @@ const fields = require('../models/fields');
 const settings = require('../models/settings');
 const {getTrustedUrl, getPublicUrl} = require('./urls');
 const { tUI, tMark } = require('./translate');
-const util = require('util');
 const contextHelpers = require('./context-helpers');
-const {getFieldColumn} = require('../../shared/lists');
+const {getFieldColumn, toNameTagLangauge} = require('../../shared/lists');
 const forms = require('../models/forms');
-const mailers = require('./mailers');
+const messageSender = require('./message-sender');
+const tools = require('./tools');
 
 module.exports = {
     sendAlreadySubscribed,
@@ -65,38 +65,13 @@ async function sendUnsubscriptionConfirmed(locale, list, email, subscription) {
     await _sendMail(list, email, 'unsubscription_confirmed', locale, tMark('listUnsubscriptionConfirmed'), relativeUrls, subscription);
 }
 
-function getDisplayName(flds, subscription) {
-    let firstName, lastName, name;
-
-    for (const fld of flds) {
-        if (fld.key === 'FIRST_NAME') {
-            firstName = subscription[fld.column];
-        }
-
-        if (fld.key === 'LAST_NAME') {
-            lastName = subscription[fld.column];
-        }
-
-        if (fld.key === 'NAME') {
-            name = subscription[fld.column];
-        }
-    }
-
-    if (name) {
-        return name;
-    } else if (firstName && lastName) {
-        return firstName + ' ' + lastName;
-    } else if (lastName) {
-        return lastName;
-    } else if (firstName) {
-        return firstName;
-    } else {
-        return '';
-    }
-}
-
 async function _sendMail(list, email, template, locale, subjectKey, relativeUrls, subscription) {
-    const flds = await fields.list(contextHelpers.getAdminContext(), list.id);
+    subscription = {
+        ...subscription,
+        email
+    };
+
+    const flds = await fields.listGrouped(contextHelpers.getAdminContext(), list.id);
 
     const encryptionKeys = [];
     for (const fld of flds) {
@@ -137,21 +112,24 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
     }
 
     try {
+        const mergeTags = fields.getMergeTags(flds, subscription);
+
         if (list.send_configuration) {
-            const mailer = await mailers.getOrCreateMailer(list.send_configuration);
-            await mailer.sendTransactionalMail({
-                to: {
-                    name: getDisplayName(flds, subscription),
+            await messageSender.queueSubscriptionMessage(
+                list.send_configuration,
+                {
+                    name: list.to_name === null ? undefined : tools.formatTemplate(list.to_name, toNameTagLangauge, mergeTags, false),
                     address: email
                 },
-                subject: tUI(subjectKey, locale, { list: list.name }),
-                encryptionKeys
-            }, {
-                html,
-                text,
-                locale,
-                data
-            });
+                tUI(subjectKey, locale, { list: list.name }),
+                encryptionKeys,
+                {
+                    html,
+                    text,
+                    locale,
+                    data
+                }
+            );
         } else {
             log.warn('Subscription', `Not sending email for list id:${list.id} because not send configuration is set.`);
         }

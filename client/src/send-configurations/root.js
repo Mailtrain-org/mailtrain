@@ -6,6 +6,7 @@ import CUD from './CUD';
 import List from './List';
 import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
+import {namespaceCheckPermissions} from "../lib/namespace";
 
 
 function getMenus(t) {
@@ -13,7 +14,14 @@ function getMenus(t) {
         'send-configurations': {
             title: t('sendConfigurations-1'),
             link: '/send-configurations',
-            panelComponent: List,
+            checkPermissions: {
+                createSendConfiguration: {
+                    entityTypeId: 'namespace',
+                    requiredOperations: ['createSendConfiguration']
+                },
+                ...namespaceCheckPermissions('createSendConfiguration')
+            },
+            panelRender: props => <List permissions={props.permissions}/>,
             children: {
                 ':sendConfigurationId([0-9]+)': {
                     title: resolved => t('templateName', {name: ellipsizeBreadcrumbLabel(resolved.sendConfiguration.name)}),
@@ -26,7 +34,7 @@ function getMenus(t) {
                             title: t('edit'),
                             link: params => `/send-configurations/${params.sendConfigurationId}/edit`,
                             visible: resolved => resolved.sendConfiguration.permissions.includes('edit'),
-                            panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.sendConfiguration} />
+                            panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.sendConfiguration} permissions={props.permissions} />
                         },
                         share: {
                             title: t('share'),
@@ -38,7 +46,7 @@ function getMenus(t) {
                 },
                 create: {
                     title: t('create'),
-                    panelRender: props => <CUD action="create" />
+                    panelRender: props => <CUD action="create" permissions={props.permissions} />
                 }
             }
         }

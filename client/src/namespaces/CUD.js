@@ -24,6 +24,7 @@ import mailtrainConfig from 'mailtrainConfig';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import {getDefaultNamespace} from "../lib/namespace";
 
 @withComponentMixins([
     withTranslation,
@@ -43,7 +44,8 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     submitFormValuesMutator(data) {
@@ -82,9 +84,11 @@ export default class CUD extends Component {
                 this.removeNsIdSubtree(data);
             }
 
-            this.setState({
-                treeData: data
-            });
+            if (this.isComponentMounted()) {
+                this.setState({
+                    treeData: data
+                });
+            }
         }
     }
 
@@ -95,7 +99,7 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                namespace: mailtrainConfig.user.namespace
+                namespace: getDefaultNamespace(this.props.permissions)
             });
         }
 
@@ -191,7 +195,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
-        const canDelete = isEdit && !this.isEditGlobal() && this.props.entity.permissions.includes('delete');
+        const canDelete = isEdit && !this.isEditGlobal() && mailtrainConfig.user.namespace !== this.props.entity.id && this.props.entity.permissions.includes('delete');
 
         return (
             <div>

@@ -20,9 +20,7 @@ export function getTemplateTypes(t) {
         return owner.getFormValue('mjml') || '';
     }
 
-    function generateHtmlFromMjml(owner) {
-        const mjml = getMjml(owner);
-
+    function generateHtmlFromMjml(mjml) {
         try {
             const res = mjml2html(mjml);
             return res.html;
@@ -88,7 +86,7 @@ export function getTemplateTypes(t) {
         typeName: t('mjml'),
         getForm: owner => (
             <>
-                <ContentModalDialog visible={!!owner.state.exportModalVisible} title={t('html')} getContentAsync={async () => generateHtmlFromMjml(owner)} onHide={() => setExportModalVisibility(owner, false)}/>
+                <ContentModalDialog visible={!!owner.state.exportModalVisible} title={t('html')} getContentAsync={async () => generateHtmlFromMjml(getMjml(owner))} onHide={() => setExportModalVisibility(owner, false)}/>
                 <ACEEditor id="mjml" height="700px" mode="xml" label={t('templateContent')}/>
             </>
         ),
@@ -98,7 +96,7 @@ export function getTemplateTypes(t) {
         beforeSave: (owner, data) => {
             data.data = {
                 mjml: data.mjml,
-                html: generateHtmlFromMjml(owner)
+                html: generateHtmlFromMjml(data.mjml)
             };
 
             clearBeforeSend(data);

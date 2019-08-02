@@ -10,23 +10,26 @@ const shares = require('./shares');
 const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
-const { CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
+const { allTagLanguages } = require('../../shared/templates');
+const { CampaignMessageStatus, CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
 const sendConfigurations = require('./send-configurations');
 const triggers = require('./triggers');
 const {SubscriptionStatus} = require('../../shared/lists');
 const subscriptions = require('./subscriptions');
 const segments = require('./segments');
 const senders = require('../lib/senders');
-const {LinkId} = require('./links');
+const links = require('./links');
 const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
+const messageSender = require('../lib/message-sender');
+const lists = require('./lists');
 
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
 
 const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
-    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject_override', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
+    'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
 const allowedKeysCreateRssEntry = new Set(['type', 'source', 'parent', ...allowedKeysCommon]);
@@ -168,7 +171,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
             let subsQry;
 
             if (subsQrys.length === 1) {
-                const subsUnionSql = '(' + subsQrys[0].sql + ') as `test_subscriptions`'
+                const subsUnionSql = '(' + subsQrys[0].sql + ') as `test_subscriptions`';
                 subsQry = knex.raw(subsUnionSql, subsQrys[0].bindings);
 
             } else {
@@ -182,7 +185,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
             return await dtHelpers.ajaxListWithPermissionsTx(
                 tx,
                 context,
-                [{ entityTypeId: 'list', requiredOperations: ['viewSubscriptions'], column: 'subs.list_id' }],
+                [{ entityTypeId: 'list', requiredOperations: ['viewTestSubscriptions'], column: 'subs.list_id' }],
                 params,
                 builder => {
                     return builder.from(function () {
@@ -296,7 +299,7 @@ async function listOpensDTAjax(context, campaignId, params) {
                     return this.from('campaign_links')
                         .where('campaign_links.campaign', campaignId)
                         .where('campaign_links.list', cpgList.list)
-                        .where('campaign_links.link', LinkId.OPEN)
+                        .where('campaign_links.link', links.LinkId.OPEN)
                         .as('related_campaign_links');
                 },
                 'related_campaign_links.subscription', subsTable + '.id')
@@ -336,13 +339,18 @@ async function getTrackingSettingsByCidTx(tx, cid) {
     return entity;
 }
 
+async function lockByIdTx(tx, id) {
+    // This locks the entry for update
+    await tx('campaigns').where('id', id).forUpdate();
+}
+
 async function rawGetByTx(tx, key, id) {
     const entity = await tx('campaigns').where('campaigns.' + key, id)
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
         .select([
             'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
-            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject_override',
+            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject',
             'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
             'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks',
             knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
@@ -382,11 +390,13 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
-        const unsentQryGen = await getSubscribersQueryGeneratorTx(tx, id);
-        if (unsentQryGen) {
-            const res = await unsentQryGen(tx).count('* AS subscriptionsToSend').first();
-            entity.subscriptionsToSend = res.subscriptionsToSend;
-        }
+        const totalRes = await tx('campaign_messages')
+            .where({campaign: id})
+            .whereIn('status', [CampaignMessageStatus.SCHEDULED, CampaignMessageStatus.SENT,
+                CampaignMessageStatus.COMPLAINED, CampaignMessageStatus.UNSUBSCRIBED, CampaignMessageStatus.BOUNCED])
+            .count('* as count').first();
+
+        entity.total = totalRes.count;
 
     } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
         delete entity.data.sourceCustom;
@@ -443,6 +453,10 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
 
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.send_configuration, 'viewPublic');
     }
+
+    if ((isCreate && entity.source === CampaignSource.CUSTOM) || (content === Content.ONLY_SOURCE_CUSTOM)) {
+        enforce(allTagLanguages.includes(entity.data.sourceCustom.tag_language), `Invalid tag language '${entity.data.sourceCustom.tag_language}'`);
+    }
 }
 
 async function _createTx(tx, context, entity, content) {
@@ -460,6 +474,7 @@ async function _createTx(tx, context, entity, content) {
 
             entity.data.sourceCustom = {
                 type: template.type,
+                tag_language: template.tag_language,
                 data: template.data,
                 html: template.html,
                 text: template.text
@@ -557,7 +572,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, filteredEntity, existing, 'campaign', 'createCampaign', 'delete'); // XXX TB - try with entity
+            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete');
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
@@ -632,21 +647,32 @@ async function remove(context, id) {
     });
 }
 
-async function enforceSendPermissionTx(tx, context, campaignId) {
+async function enforceSendPermissionTx(tx, context, campaignOrCampaignId, isToTestUsers, listId) {
     let campaign;
 
-    if (typeof campaignId === 'object') {
-        campaign = campaignId;
+    if (typeof campaignOrCampaignId === 'object') {
+        campaign = campaignOrCampaignId;
     } else {
-        campaign = await getByIdTx(tx, context, campaignId, false);
+        campaign = await getByIdTx(tx, context, campaignOrCampaignId, false);
     }
 
     const sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), campaign.send_configuration, false, false);
 
-    const requiredPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
+    const requiredSendConfigurationPermission = getSendConfigurationPermissionRequiredForSend(campaign, sendConfiguration);
+    await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', campaign.send_configuration, requiredSendConfigurationPermission);
 
-    await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', campaign.send_configuration, requiredPermission);
-    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, 'send');
+    const requiredListAndCampaignPermission = isToTestUsers ? 'sendToTestUsers' : 'send';
+
+    await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, requiredListAndCampaignPermission);
+
+    if (listId) {
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, requiredListAndCampaignPermission);
+
+    } else {
+        for (const listIds of campaign.lists) {
+            await shares.enforceEntityPermissionTx(tx, context, 'list', listIds.list, requiredListAndCampaignPermission);
+        }
+    }
 }
 
 
@@ -675,7 +701,7 @@ async function getMessageByCid(messageCid, withVerpHostname = false) { // withVe
             .where(subscrTblName + '.cid', subscriptionCid)
             .where('campaigns.cid', campaignCid)
             .select([
-                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
             ])
             .first();
 
@@ -692,55 +718,45 @@ async function getMessageByCid(messageCid, withVerpHostname = false) { // withVe
 }
 
 async function getMessageByResponseId(responseId) {
-    return await knex.transaction(async tx => {
-        const message = await tx('campaign_messages')
-            .where('campaign_messages.response_id', responseId)
-            .select([
-                'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
-            ])
-            .first();
-
-        return message;
-    });
+    return await knex('campaign_messages')
+        .where('campaign_messages.response_id', responseId)
+        .select([
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
+        ])
+        .first();
 }
 
-const statusFieldMapping = {
-    [SubscriptionStatus.UNSUBSCRIBED]: 'unsubscribed',
-    [SubscriptionStatus.BOUNCED]: 'bounced',
-    [SubscriptionStatus.COMPLAINED]: 'complained'
-};
+const statusFieldMapping = new Map();
+statusFieldMapping.set(CampaignMessageStatus.UNSUBSCRIBED, 'unsubscribed');
+statusFieldMapping.set(CampaignMessageStatus.BOUNCED, 'bounced');
+statusFieldMapping.set(CampaignMessageStatus.COMPLAINED, 'complained');
 
-async function _changeStatusByMessageTx(tx, context, message, subscriptionStatus) {
-    enforce(subscriptionStatus !== SubscriptionStatus.SUBSCRIBED);
+async function _changeStatusByMessageTx(tx, context, message, campaignMessageStatus) {
+    enforce(statusFieldMapping.has(campaignMessageStatus));
 
-    if (message.status === SubscriptionStatus.SUBSCRIBED) {
+    if (message.status === SubscriptionStatus.SENT) {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
 
-        if (!subscriptionStatus in statusFieldMapping) {
-            throw new Error('Unrecognized message status');
-        }
-
-        const statusField = statusFieldMapping[subscriptionStatus];
+        const statusField = statusFieldMapping.get(campaignMessageStatus);
 
         await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
 
         await tx('campaign_messages')
             .where('id', message.id)
             .update({
-                status: subscriptionStatus,
+                status: campaignMessageStatus,
                 updated: knex.fn.now()
             });
     }
 }
 
-async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, subscriptionStatus) {
-    const campaign = await tx('campaigns').where('cid', campaignCid);
+async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, campaignMessageStatus) {
     const message = await tx('campaign_messages')
         .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
         .where('campaigns.cid', campaignCid)
         .where({subscription: subscriptionId, list: listId})
         .select([
-            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.status'
+            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
         ])
         .first();
 
@@ -748,17 +764,23 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         throw new Error('Invalid campaign.');
     }
 
-    await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
+    await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
 }
 
-async function changeStatusByMessage(context, message, subscriptionStatus, updateSubscription) {
+
+const campaignMessageStatusToSubscriptionStatusMapping = new Map();
+campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.BOUNCED, SubscriptionStatus.BOUNCED);
+campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.UNSUBSCRIBED, SubscriptionStatus.UNSUBSCRIBED);
+campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.COMPLAINED, SubscriptionStatus.COMPLAINED);
+
+async function changeStatusByMessage(context, message, campaignMessageStatus, updateSubscription) {
     await knex.transaction(async tx => {
         if (updateSubscription) {
-            await subscriptions.changeStatusTx(tx, context, message.list, message.subscription, subscriptionStatus);
+            enforce(campaignMessageStatusToSubscriptionStatusMapping.has(campaignMessageStatus));
+            await subscriptions.changeStatusTx(tx, context, message.list, message.subscription, campaignMessageStatusToSubscriptionStatusMapping.get(campaignMessageStatus));
         }
 
-        await _changeStatusByMessageTx(tx, context, message, subscriptionStatus);
-
+        await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
     });
 }
 
@@ -773,93 +795,85 @@ async function updateMessageResponse(context, message, response, responseId) {
     });
 }
 
-async function getSubscribersQueryGeneratorTx(tx, campaignId) {
-    /*
-    This is supposed to produce queries like this:
+async function prepareCampaignMessages(campaignId) {
+    const campaign = await getById(contextHelpers.getAdminContext(), campaignId, false);
 
-    select ... from `campaign_lists` inner join (
-        select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (
-            (select `subscription__2`.`email`, 8 AS campaign_list_id, related_campaign_messages.id IS NOT NULL AS sent from `subscription__2` left join
-                (select * from `campaign_messages` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 2)
-                    as `related_campaign_messages` on `related_campaign_messages`.`subscription` = `subscription__2`.`id` where `subscription__2`.`status` = 1)
-            UNION ALL
-            (select `subscription__1`.`email`, 9 AS campaign_list_id, related_campaign_messages.id IS NOT NULL AS sent from `subscription__1` left join
-                (select * from `campaign_messages` where `campaign_messages`.`campaign` = 1 and `campaign_messages`.`list` = 1)
-                    as `related_campaign_messages` on `related_campaign_messages`.`subscription` = `subscription__1`.`id` where `subscription__1`.`status` = 1)
-        ) as `pending_subscriptions_all` where `sent` = false group by `email`)
-            as `pending_subscriptions` on `campaign_lists`.`id` = `pending_subscriptions`.`campaign_list_id` where `campaign_lists`.`campaign` = '1'
+    await knex('campaign_messages').where({campaign: campaignId, status: CampaignMessageStatus.SCHEDULED}).del();
 
-     This was too much for Knex, so we partially construct these queries directly as strings;
-     */
-
-    const subsQrys = [];
-    const cpgLists = await tx('campaign_lists').where('campaign', campaignId);
-
-    for (const cpgList of cpgLists) {
-        const addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
+    for (const cpgList of campaign.lists) {
+        let addSegmentQuery;
+        await knex.transaction(async tx => {
+            addSegmentQuery = cpgList.segment ? await segments.getQueryGeneratorTx(tx, cpgList.list, cpgList.segment) : () => {};
+        });
         const subsTable = subscriptions.getSubscriptionTableName(cpgList.list);
 
-        const sqlQry = knex.from(subsTable)
-            .leftJoin(
-                function () {
-                    return this.from('campaign_messages')
-                        .where('campaign_messages.campaign', campaignId)
-                        .where('campaign_messages.list', cpgList.list)
-                        .as('related_campaign_messages');
-                },
-                'related_campaign_messages.subscription', subsTable + '.id')
+        const subsQry = knex.from(subsTable)
             .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
             .where(function() {
                 addSegmentQuery(this);
             })
-            .select([subsTable + '.email', knex.raw('? AS campaign_list_id', [cpgList.id]), knex.raw('related_campaign_messages.id IS NOT NULL AS sent')])
+            .select([
+                'hash_email',
+                'id',
+                knex.raw('? AS campaign', [campaign.id]),
+                knex.raw('? AS list', [cpgList.list]),
+                knex.raw('? AS send_configuration', [campaign.send_configuration]),
+                knex.raw('? AS status', [CampaignMessageStatus.SCHEDULED])
+            ])
             .toSQL().toNative();
 
-        subsQrys.push(sqlQry);
-    }
-
-    if (subsQrys.length > 0) {
-        let subsQry;
-        const unsentWhere = ' where `sent` = false';
-
-        if (subsQrys.length === 1) {
-            const subsUnionSql = '(select `email`, `campaign_list_id`, `sent` from (' + subsQrys[0].sql + ') as `pending_subscriptions_all`' +  unsentWhere + ') as `pending_subscriptions`'
-            subsQry = knex.raw(subsUnionSql, subsQrys[0].bindings);
-
-        } else {
-            const subsUnionSql = '(select `email`, min(`campaign_list_id`) as `campaign_list_id`, max(`sent`) as `sent` from (' +
-                subsQrys.map(qry => '(' + qry.sql + ')').join(' UNION ALL ') +
-                ') as `pending_subscriptions_all`' +  unsentWhere + ' group by `email`) as `pending_subscriptions`';
-            const subsUnionBindings = Array.prototype.concat(...subsQrys.map(qry => qry.bindings));
-            subsQry = knex.raw(subsUnionSql, subsUnionBindings);
-        }
-
-        return knx => knx.from('campaign_lists')
-            .where('campaign_lists.campaign', campaignId)
-            .innerJoin(subsQry, 'campaign_lists.id', 'pending_subscriptions.campaign_list_id');
-
-    } else {
-        return null;
+        await knex.raw('INSERT IGNORE INTO `campaign_messages` (`hash_email`, `subscription`, `campaign`, `list`, `send_configuration`, `status`) ' + subsQry.sql, subsQry.bindings);
     }
 }
 
-async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, scheduled = null) {
+async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, extraData) {
     await knex.transaction(async tx => {
-        const entity = await tx('campaigns').where('id', campaignId).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
+        // This is quite inefficient because it selects the same row 3 times. However as status is changed
+        // rather infrequently, we keep it this way for simplicity
+        await lockByIdTx(tx, campaignId);
 
-        await enforceSendPermissionTx(tx, context, entity);
+        const entity = await getByIdTx(tx, context, campaignId, false);
+
+        await enforceSendPermissionTx(tx, context, entity, false);
 
         if (!permittedCurrentStates.includes(entity.status)) {
             throw new interoperableErrors.InvalidStateError(invalidStateMessage);
         }
 
-        await tx('campaigns').where('id', campaignId).update({
-            status: newState,
-            scheduled
-        });
+        if (Array.isArray(newState)) {
+            const newStateIdx = permittedCurrentStates.indexOf(entity.status);
+            enforce(newStateIdx != -1);
+            newState = newState[newStateIdx];
+        }
+
+        const updateData = {
+            status: newState
+        };
+
+        if (!extraData) {
+            updateData.scheduled = null;
+            updateData.start_at = null;
+        } else {
+            const startAt = extraData.startAt;
+
+            // If campaign is started without "scheduled" specified, startAt === null
+            updateData.scheduled = startAt;
+            if (!startAt || startAt.valueOf() < Date.now()) {
+                updateData.start_at = new Date();
+            } else {
+                updateData.start_at = startAt;
+            }
+
+            const timezone = extraData.timezone;
+            if (timezone) {
+                updateData.data = JSON.stringify({
+                    ...entity.data,
+                    timezone
+                });
+            }
+        }
+
+        await tx('campaigns').where('id', campaignId).update(updateData);
 
         await activityLog.logEntityActivity('campaign', CampaignActivityType.STATUS_CHANGE, campaignId, {status: newState});
     });
@@ -868,22 +882,23 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 }
 
 
-async function start(context, campaignId, startAt) {
-    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE or PAUSED state', startAt);
+async function start(context, campaignId, extraData) {
+    await _changeStatus(context, campaignId, [CampaignStatus.IDLE, CampaignStatus.SCHEDULED, CampaignStatus.PAUSED, CampaignStatus.FINISHED], CampaignStatus.SCHEDULED, 'Cannot start campaign until it is in IDLE, PAUSED, or FINISHED state', extraData);
 }
 
 async function stop(context, campaignId) {
-    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED], CampaignStatus.PAUSED, 'Cannot stop campaign until it is in SCHEDULED state');
+    await _changeStatus(context, campaignId, [CampaignStatus.SCHEDULED, CampaignStatus.SENDING], [CampaignStatus.PAUSED, CampaignStatus.PAUSING], 'Cannot stop campaign until it is in SCHEDULED or SENDING state');
 }
 
 async function reset(context, campaignId) {
     await knex.transaction(async tx => {
+        // This is quite inefficient because it selects the same row 3 times. However as RESET is
+        // going to be called rather infrequently, we keep it this way for simplicity
+        await lockByIdTx(tx, campaignId);
+
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
 
         const entity = await tx('campaigns').where('id', campaignId).first();
-        if (!entity) {
-            throw new interoperableErrors.NotFoundError();
-        }
 
         if (entity.status !== CampaignStatus.FINISHED && entity.status !== CampaignStatus.PAUSED) {
             throw new interoperableErrors.InvalidStateError('Cannot reset campaign until it is FINISHED or PAUSED state');
@@ -919,8 +934,8 @@ async function getStatisticsOpened(context, id) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
-        const devices = await tx('campaign_links').where('campaign', id).where('link', LinkId.OPEN).groupBy('device_type').select('device_type AS key').count('* as count');
-        const countries = await tx('campaign_links').where('campaign', id).where('link', LinkId.OPEN).groupBy('country').select('country AS key').count('* as count');
+        const devices = await tx('campaign_links').where('campaign', id).where('link', links.LinkId.OPEN).groupBy('device_type').select('device_type AS key').count('* as count');
+        const countries = await tx('campaign_links').where('campaign', id).where('link', links.LinkId.OPEN).groupBy('country').select('country AS key').count('* as count');
 
         return {
             devices,
@@ -942,6 +957,105 @@ async function fetchRssCampaign(context, cid) {
 
         feedcheck.scheduleCheck();
     });
+}
+
+async function testSend(context, data) {
+    // Though it's a bit counter-intuitive, this handles also test sends of a template (i.e. without any campaign id)
+
+    await knex.transaction(async tx => {
+        const processSubscriber = async (sendConfigurationId, listId, subscriptionId, messageData) => {
+            await messageSender.queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, messageSender.MessageType.TEST, messageData);
+
+            await activityLog.logEntityActivity('campaign', CampaignActivityType.TEST_SEND, campaignId, {list: listId, subscription: subscriptionId});
+        };
+
+        const campaignId = data.campaignId;
+
+        if (campaignId) { // This means we are sending a campaign
+            /*
+                Data coming from the client:
+                - html, text
+                - subjectPrepend, subjectAppend
+                - listCid, subscriptionCid
+                - listId, segmentId
+             */
+
+            const campaign = await getByIdTx(tx, context, campaignId, false);
+            const sendConfigurationId = campaign.send_configuration;
+
+            const messageData = {
+                campaignId: campaignId,
+                subject: data.subjectPrepend + campaign.subject + data.subjectAppend,
+                html: data.html, // The html, text and tagLanguage may be undefined
+                text: data.text,
+                tagLanguage: data.tagLanguage,
+                attachments: []
+            };
+
+            const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', campaignId);
+            for (const attachment of attachments) {
+                messageData.attachments.push({
+                    filename: attachment.originalname,
+                    path: files.getFilePath('campaign', 'attachment', campaign.id, attachment.filename),
+                    id: attachment.id
+                });
+            }
+
+
+            let listId = data.listId;
+            if (!listId && data.listCid) {
+                const list = await lists.getByCidTx(tx, context, data.listCid);
+                listId = list.id;
+            }
+
+            const segmentId = data.segmentId;
+
+            if (listId) {
+                await enforceSendPermissionTx(tx, context, campaign, true, listId);
+
+                if (data.subscriptionCid) {
+                    const subscriber = await subscriptions.getByCidTx(tx, context, listId, data.subscriptionCid, true, true);
+                    await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
+
+                } else {
+                    const subscribers = await subscriptions.listTestUsersTx(tx, context, listId, segmentId);
+                    for (const subscriber of subscribers) {
+                        await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
+                    }
+                }
+
+            } else {
+                for (const lstSeg of campaign.lists) {
+                    await enforceSendPermissionTx(tx, context, campaign, true, lstSeg.list);
+
+                    const subscribers = await subscriptions.listTestUsersTx(tx, context, lstSeg.list, segmentId);
+                    for (const subscriber of subscribers) {
+                        await processSubscriber(sendConfigurationId, lstSeg.list, subscriber.id, messageData);
+                    }
+                }
+            }
+
+        } else { // This means we are sending a template
+            /*
+                Data coming from the client:
+                - html, text
+                - listCid, subscriptionCid, sendConfigurationId
+             */
+
+            const messageData = {
+                subject: 'Test',
+                html: data.html,
+                text: data.text,
+                tagLanguage: data.tagLanguage
+            };
+
+            const list = await lists.getByCidTx(tx, context, data.listCid);
+            const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid, true, true);
+            await processSubscriber(data.sendConfigurationId, list.id, subscriber.id, messageData);
+        }
+    });
+
+    senders.scheduleCheck();
 }
 
 module.exports.Content = Content;
@@ -974,7 +1088,7 @@ module.exports.changeStatusByCampaignCidAndSubscriptionIdTx = changeStatusByCamp
 module.exports.changeStatusByMessage = changeStatusByMessage;
 module.exports.updateMessageResponse = updateMessageResponse;
 
-module.exports.getSubscribersQueryGeneratorTx = getSubscribersQueryGeneratorTx;
+module.exports.prepareCampaignMessages = prepareCampaignMessages;
 
 module.exports.start = start;
 module.exports.stop = stop;
@@ -987,3 +1101,5 @@ module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
 module.exports.getStatisticsOpened = getStatisticsOpened;
 
 module.exports.fetchRssCampaign = fetchRssCampaign;
+
+module.exports.testSend = testSend;

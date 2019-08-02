@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('../lib/log');
-const config = require('config');
+const config = require('../lib/config');
 const crypto = require('crypto');
 const humanize = require('humanize');
 const http = require('http');

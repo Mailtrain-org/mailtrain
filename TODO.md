@@ -21,3 +21,9 @@ Note that some of these may be already obsolete...
 - Add field to subscriptions which says till when the consent has been given
 - Provide a link (and merge tag) that will update the consent date to now
 - Add campaign trigger that triggers if the consent for specific subscription field is about to expire (i.e. it is greater than now - seconds)
+<<<<<<< HEAD
+=======
+
+### RSS Campaigns
+- Aggregated RSS campaigns
+>>>>>>> mailtrain/development

@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('../lib/knex');
-const config = require('config');
+const config = require('../lib/config');
 const { enforce, castToInteger } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const entitySettings = require('../lib/entity-settings');
@@ -170,7 +170,6 @@ async function rebuildPermissionsTx(tx, restriction) {
             await tx('users').update('role', adminRole).where('id', getAdminId());
         }
     }
-
 
     // Reset root, own and shared namespaces shares as per the user roles
     const usersAutoSharesQry = tx('users')

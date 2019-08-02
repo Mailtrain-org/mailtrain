@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('./lib/config');
 const log = require('./lib/log');
 const appBuilder = require('./app-builder');
 const translate = require('./lib/translate');

@@ -65,7 +65,7 @@ async function _validateAndPreprocess(tx, context, campaignId, entity) {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.source_campaign, 'view');
     }
 
-    await campaigns.enforceSendPermissionTx(tx, context, campaignId);
+    await campaigns.enforceSendPermissionTx(tx, context, campaignId, false);
 }
 
 async function create(context, campaignId, entity) {

@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 
 import {getMailerTypes} from "./helpers";
@@ -60,7 +60,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     onMailerTypeChanged(mutStateDate, key, oldType, type) {
@@ -85,7 +86,7 @@ export default class CUD extends Component {
         }
 
         return filterData(data, ['name', 'description', 'from_email', 'from_email_overridable', 'from_name',
-            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'subject', 'subject_overridable', 'x_mailer',
+            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'x_mailer',
             'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
     }
 
@@ -96,15 +97,13 @@ export default class CUD extends Component {
             this.populateFormValues({
                 name: '',
                 description: '',
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 from_email: '',
                 from_email_overridable: false,
                 from_name: '',
                 from_name_overridable: false,
                 reply_to: '',
                 reply_to_overridable: false,
-                subject: '',
-                subject_overridable: false,
                 verpEnabled: false,
                 verp_hostname: '',
                 verp_disable_sender_header: false,
@@ -233,8 +232,6 @@ export default class CUD extends Component {
                         <CheckBox id="from_name_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="reply_to" label={t('defaultReplytoEmail')}/>
                         <CheckBox id="reply_to_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
-                        <InputField id="subject" label={t('subject')}/>
-                        <CheckBox id="subject_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="x_mailer" label={t('xMailer')}/>
                     </Fieldset>
 

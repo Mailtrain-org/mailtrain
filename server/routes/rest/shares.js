@@ -35,12 +35,13 @@ router.putAsync('/shares', passport.loggedIn, async (req, res) => {
  Accepts format:
  {
    XXX1: {
-     entityTypeId: ...
+     entityTypeId: ...,
      requiredOperations: [ ... ]
    },
 
    XXX2: {
-     entityTypeId: ...
+     entityTypeId: ...,
+     entityId: ...,
      requiredOperations: [ ... ]
    }
  }

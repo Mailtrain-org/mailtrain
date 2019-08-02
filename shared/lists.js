@@ -1,5 +1,7 @@
 'use strict';
 
+const {TagLanguages} = require('./templates');
+
 const UnsubscriptionMode = {
     MIN: 0,
 
@@ -42,10 +44,13 @@ function getFieldColumn(field) {
     return field.column || 'grouped_' + field.id;
 }
 
+const toNameTagLangauge = TagLanguages.SIMPLE;
+
 module.exports = {
     UnsubscriptionMode,
     SubscriptionStatus,
     SubscriptionSource,
     FieldWizard,
-    getFieldColumn
+    getFieldColumn,
+    toNameTagLangauge
 };

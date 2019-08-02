@@ -19,13 +19,29 @@ import ImportRunsStatus from './imports/RunStatus';
 import Share from '../shares/Share';
 import TriggersList from './TriggersList';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
+import {namespaceCheckPermissions} from "../lib/namespace";
 
 function getMenus(t) {
     return {
         'lists': {
             title: t('lists'),
             link: '/lists',
-            panelComponent: ListsList,
+            checkPermissions: {
+                createList: {
+                    entityTypeId: 'namespace',
+                    requiredOperations: ['createList']
+                },
+                createCustomForm: {
+                    entityTypeId: 'namespace',
+                    requiredOperations: ['createCustomForm']
+                },
+                viewCustomForm: {
+                    entityTypeId: 'customForm',
+                    requiredOperations: ['view']
+                },
+                ...namespaceCheckPermissions('createList')
+            },
+            panelRender: props => <ListsList permissions={props.permissions}/>,
             children: {
                 ':listId([0-9]+)': {
                     title: resolved => t('listName', {name: ellipsizeBreadcrumbLabel(resolved.list.name)}),
@@ -70,7 +86,7 @@ function getMenus(t) {
                             title: t('edit'),
                             link: params => `/lists/${params.listId}/edit`,
                             visible: resolved => resolved.list.permissions.includes('edit'),
-                            panelRender: props => <ListsCUD action={props.match.params.action} entity={props.resolved.list} />
+                            panelRender: props => <ListsCUD action={props.match.params.action} entity={props.resolved.list} permissions={props.permissions} />
                         },
                         fields: {
                             title: t('fields'),
@@ -191,12 +207,15 @@ function getMenus(t) {
                 },
                 create: {
                     title: t('create'),
-                    panelRender: props => <ListsCUD action="create" />
+                    panelRender: props => <ListsCUD action="create" permissions={props.permissions} />
                 },
                 forms: {
                     title: t('customForms-1'),
                     link: '/lists/forms',
-                    panelComponent: FormsList,
+                    checkPermissions: {
+                        ...namespaceCheckPermissions('createCustomForm')
+                    },
+                    panelRender: props => <FormsList permissions={props.permissions}/>,
                     children: {
                         ':formsId([0-9]+)': {
                             title: resolved => t('customFormsName', {name: ellipsizeBreadcrumbLabel(resolved.forms.name)}),
@@ -209,7 +228,7 @@ function getMenus(t) {
                                     title: t('edit'),
                                     link: params => `/lists/forms/${params.formsId}/edit`,
                                     visible: resolved => resolved.forms.permissions.includes('edit'),
-                                    panelRender: props => <FormsCUD action={props.match.params.action} entity={props.resolved.forms} />
+                                    panelRender: props => <FormsCUD action={props.match.params.action} entity={props.resolved.forms} permissions={props.permissions} />
                                 },
                                 share: {
                                     title: t('share'),
@@ -221,7 +240,7 @@ function getMenus(t) {
                         },
                         create: {
                             title: t('create'),
-                            panelRender: props => <FormsCUD action="create" />
+                            panelRender: props => <FormsCUD action="create" permissions={props.permissions} />
                         }
                     }
                 }

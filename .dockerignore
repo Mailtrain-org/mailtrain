@@ -13,3 +13,4 @@ watch.sh
 *.log
 .gitignore
 .DS_Store
+node_modules

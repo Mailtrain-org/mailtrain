@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
 const shortid = require('shortid');
@@ -9,15 +9,17 @@ const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');
 const fields = require('./fields');
 const { SubscriptionSource, SubscriptionStatus, getFieldColumn } = require('../../shared/lists');
+const { CampaignMessageStatus } = require('../../shared/campaigns');
 const segments = require('./segments');
-const { enforce, filterObject } = require('../lib/helpers');
+const { enforce, filterObject, hashEmail, normalizeEmail } = require('../lib/helpers');
 const moment = require('moment');
 const { formatDate, formatBirthday } = require('../../shared/date');
-const crypto = require('crypto');
 const campaigns = require('./campaigns');
 const lists = require('./lists');
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
+
+const TEST_USERS_LIST_LIMIT = 1000;
 
 const fieldTypes = {};
 
@@ -80,7 +82,6 @@ fieldTypes.option = {
     afterJSON: (groupedField, entity) => {},
     listRender: (groupedField, value) => value ? groupedField.settings.checkedLabel : groupedField.settings.uncheckedLabel
 };
-
 
 
 function getSubscriptionTableName(listId) {
@@ -200,10 +201,14 @@ async function hashByList(listId, entity) {
     });
 }
 
-async function _getByTx(tx, context, listId, key, value, grouped) {
-    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+async function _getByTx(tx, context, listId, key, value, grouped, isTest) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, isTest ? 'viewTestSubscriptions' : 'viewSubscriptions');
 
     const entity = await tx(getSubscriptionTableName(listId)).where(key, value).first();
+
+    if (isTest && (!entity || !entity.is_test)) {
+        shares.throwPermissionDenied();
+    }
 
     if (!entity) {
         throw new interoperableErrors.NotFoundError('Subscription not found in this list');
@@ -218,26 +223,31 @@ async function _getByTx(tx, context, listId, key, value, grouped) {
     return entity;
 }
 
-async function _getBy(context, listId, key, value, grouped) {
+async function _getBy(context, listId, key, value, grouped, isTest) {
     return await knex.transaction(async tx => {
-        return _getByTx(tx, context, listId, key, value, grouped);
+        return _getByTx(tx, context, listId, key, value, grouped, isTest);
     });
 }
 
 async function getById(context, listId, id, grouped = true) {
-    return await _getBy(context, listId, 'id', id, grouped);
+    return await _getBy(context, listId, 'id', id, grouped, false);
 }
 
 async function getByEmail(context, listId, email, grouped = true) {
-    return await _getBy(context, listId, 'email', email, grouped);
+    const result = await _getBy(context, listId, 'hash_email', hashEmail(email), grouped, false);
+    if (result.email === null) {
+        throw new interoperableErrors.NotFoundError('Subscription not found in this list');
+    }
+    enforce(normalizeEmail(email) === normalizeEmail(result.email));
+    return result;
 }
 
-async function getByCid(context, listId, cid, grouped = true) {
-    return await _getBy(context, listId, 'cid', cid, grouped);
+async function getByCid(context, listId, cid, grouped = true, isTest = true) {
+    return await _getBy(context, listId, 'cid', cid, grouped, isTest);
 }
 
-async function getByCidTx(tx, context, listId, cid, grouped = true) {
-    return await _getByTx(tx, context, listId, 'cid', cid, grouped);
+async function getByCidTx(tx, context, listId, cid, grouped = true, isTest = true) {
+    return await _getByTx(tx, context, listId, 'cid', cid, grouped, isTest);
 }
 
 async function listDTAjax(context, listId, segmentId, params) {
@@ -352,7 +362,7 @@ async function listDTAjax(context, listId, segmentId, params) {
 async function listTestUsersDTAjax(context, listCid, params) {
     return await knex.transaction(async tx => {
         const list = await lists.getByCidTx(tx, context, listCid);
-        await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
+        await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewTestSubscriptions');
 
         const listTable = getSubscriptionTableName(list.id);
 
@@ -409,6 +419,32 @@ async function list(context, listId, grouped, offset, limit) {
     });
 }
 
+async function listTestUsersTx(tx, context, listId, segmentId, grouped) {
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+
+    let entitiesQry = tx(getSubscriptionTableName(listId)).orderBy('id', 'asc').where('is_test', true).limit(TEST_USERS_LIST_LIMIT);
+
+    if (segmentId) {
+        const addSegmentQuery = await segments.getQueryGeneratorTx(tx, listId, segmentId);
+
+        entitiesQry = entitiesQry.where(function() {
+            addSegmentQuery(this);
+        });
+    }
+
+    const entities = await entitiesQry;
+
+    if (grouped) {
+        const groupedFieldsMap = await getGroupedFieldsMapTx(tx, listId);
+
+        for (const entity of entities) {
+            groupSubscription(groupedFieldsMap, entity);
+        }
+    }
+
+    return entities;
+}
+
 // Note that this does not do all the work in the transaction. Thus it is prone to fail if the list is deleted in during the run of the function
 async function* listIterator(context, listId, segmentId, grouped = true) {
     let groupedFieldsMap;
@@ -457,7 +493,7 @@ async function serverValidate(context, listId, data) {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageSubscriptions');
 
         if (data.email) {
-            const existingKeyQuery = tx(getSubscriptionTableName(listId)).where('email', data.email);
+            const existingKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(data.email)).whereNotNull('email');
 
             if (data.id) {
                 existingKeyQuery.whereNot('id', data.id);
@@ -476,7 +512,7 @@ async function serverValidate(context, listId, data) {
 async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, isCreate) {
     enforce(entity.email, 'Email must be set');
 
-    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(entity.email));
+    const existingWithKeyQuery = tx(getSubscriptionTableName(listId)).where('hash_email', hashEmail(entity.email)).forUpdate();
 
     if (!isCreate) {
         existingWithKeyQuery.whereNot('id', entity.id);
@@ -508,10 +544,6 @@ async function _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta
 
         fieldTypes[fld.type].afterJSON(fld, entity);
     }
-}
-
-function hashEmail(email) {
-    return crypto.createHash('sha512').update(email).digest("base64");
 }
 
 function updateSourcesAndHashEmail(subscription, source, groupedFieldsMap) {
@@ -755,7 +787,7 @@ async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaign
         const existing = await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).first();
 
         if (campaignCid) {
-            await campaigns.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, SubscriptionStatus.UNSUBSCRIBED);
+            await campaigns.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, CampaignMessageStatus.UNSUBSCRIBED);
         }
 
         return await _unsubscribeExistingAndGetTx(tx, context, listId, existing);
@@ -813,7 +845,7 @@ async function updateManaged(context, listId, cid, entity) {
         for (const key in groupedFieldsMap) {
             const fld = groupedFieldsMap[key];
 
-            if (fld.order_manage) {
+            if (fld.order_manage !== null) {
                 update[key] = entity[key];
             }
 
@@ -836,7 +868,7 @@ async function getListsWithEmail(context, email) {
 
         for (const list of lsts) {
             await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
-            const entity = await tx(getSubscriptionTableName(list.id)).where('email', email).first();
+            const entity = await tx(getSubscriptionTableName(list.id)).where('hash_email', hashEmail(email)).whereNotNull('email').first();
             if (entity) {
                 result.push(list);
             }
@@ -855,6 +887,7 @@ module.exports.getByEmail = getByEmail;
 module.exports.list = list;
 module.exports.listIterator = listIterator;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listTestUsersTx = listTestUsersTx;
 module.exports.listTestUsersDTAjax = listTestUsersDTAjax;
 module.exports.serverValidate = serverValidate;
 module.exports.create = create;

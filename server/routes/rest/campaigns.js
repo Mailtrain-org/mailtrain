@@ -74,11 +74,13 @@ router.deleteAsync('/campaigns/:campaignId', passport.loggedIn, passport.csrfPro
 });
 
 router.postAsync('/campaign-start/:campaignId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), null));
+    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), {startAt: null}));
 });
 
-router.postAsync('/campaign-start-at/:campaignId/:dateTime', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), new Date(Number.parseInt(req.params.dateTime))));
+router.postAsync('/campaign-start-at/:campaignId', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    const startAt = new Date(req.body.startAt);
+    const timezone = req.body.timezone;
+    return res.json(await campaigns.start(req.context, castToInteger(req.params.campaignId), {startAt, timezone}));
 });
 
 
@@ -112,6 +114,12 @@ router.postAsync('/campaigns-opens-table/:campaignId', passport.loggedIn, async 
 
 router.postAsync('/campaigns-link-clicks-table/:campaignId', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listLinkClicksDTAjax(req.context, castToInteger(req.params.campaignId), req.body));
+});
+
+router.postAsync('/campaign-test-send', passport.loggedIn, passport.csrfProtection, async (req, res) => {
+    const data = req.body;
+    const result = await campaigns.testSend(req.context, data);
+    return res.json(result);
 });
 
 

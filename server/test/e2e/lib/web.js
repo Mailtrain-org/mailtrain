@@ -23,7 +23,7 @@ module.exports = (...extras) => page({
         if (parsedUrl.host) {
             absolutePath = path;
         } else {
-            absolutePath = config.baseUrl + path;
+            absolutePath = this.baseUrl + path;
         }
 
         await driver.navigate().to(absolutePath);
@@ -37,8 +37,8 @@ module.exports = (...extras) => page({
             const currentUrl = url.parse(await driver.getCurrentUrl());
             const urlPattern = new UrlPattern(desiredUrl);
             const params = urlPattern.match(currentUrl.pathname);
-            if (!params || config.baseUrl !== `${currentUrl.protocol}//${currentUrl.host}`) {
-                throw new Error(`Unexpected URL. Expecting ${config.baseUrl}${this.url} got ${currentUrl.protocol}//${currentUrl.host}/${currentUrl.pathname}`);
+            if (!params || this.baseUrl !== `${currentUrl.protocol}//${currentUrl.host}`) {
+                throw new Error(`Unexpected URL. Expecting ${this.baseUrl}${this.url} got ${currentUrl.protocol}//${currentUrl.host}/${currentUrl.pathname}`);
             }
 
             this.params = params;

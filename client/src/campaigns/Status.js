@@ -13,10 +13,11 @@ import axios from "../lib/axios";
 import {getPublicUrl, getUrl} from "../lib/urls";
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
-import moment from 'moment';
+import moment from 'moment-timezone';
 import campaignsStyles from "./styles.scss";
 import {withComponentMixins} from "../lib/decorator-helpers";
-
+import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
+import styles from "../lib/styles.scss";
 
 @withComponentMixins([
     withTranslation,
@@ -25,7 +26,7 @@ import {withComponentMixins} from "../lib/decorator-helpers";
     withPageHelpers,
     requiresAuthenticatedUser
 ])
-class TestUser extends Component {
+class PreviewForTestUserModalDialog extends Component {
     constructor(props) {
         super(props);
         this.initForm({
@@ -34,7 +35,9 @@ class TestUser extends Component {
     }
 
     static propTypes = {
-        entity: PropTypes.object.isRequired
+        visible: PropTypes.bool.isRequired,
+        onHide: PropTypes.func.isRequired,
+        entity: PropTypes.object.isRequired,
     }
 
     localValidateFormValues(state) {
@@ -64,6 +67,10 @@ class TestUser extends Component {
         }
     }
 
+    async hideModal() {
+        this.props.onHide();
+    }
+
     render() {
         const t = this.props.t;
 
@@ -76,12 +83,14 @@ class TestUser extends Component {
         ];
 
         return (
-            <Form stateOwner={this}>
-                <TableSelect id="testUser" label={t('previewCampaignAs')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
-                <ButtonRow>
-                    <Button className="btn-primary" label={t('preview')} onClickAsync={::this.previewAsync}/>
-                </ButtonRow>
-            </Form>
+            <ModalDialog hidden={!this.props.visible} title={t('Preview Campaign')} onCloseAsync={() => this.hideModal()} buttons={[
+                { label: t('preview'), className: 'btn-primary', onClickAsync: ::this.previewAsync },
+                { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
+            ]}>
+                <Form stateOwner={this}>
+                    <TableSelect id="testUser" label={t('Preview as')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
+                </Form>
+            </ModalDialog>
         );
     }
 }
@@ -96,9 +105,17 @@ class TestUser extends Component {
 class SendControls extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            showTestSendModal: false,
+            previewForTestUserVisible: false
+        };
+
         this.initForm({
             leaveConfirmation: false
         });
+
+        this.timezoneOptions = moment.tz.names().map(x => [x]);
     }
 
     static propTypes = {
@@ -111,6 +128,7 @@ class SendControls extends Component {
 
         state.setIn(['date', 'error'], null);
         state.setIn(['time', 'error'], null);
+        state.setIn(['timezone', 'error'], null);
 
         if (state.getIn(['sendLater', 'value'])) {
             const dateValue = state.getIn(['date', 'value']).trim();
@@ -126,26 +144,44 @@ class SendControls extends Component {
             } else if (!moment(timeValue, 'HH:mm', true).isValid()) {
                 state.setIn(['time', 'error'], t('timeIsInvalid'));
             }
+
+            const timezone = state.getIn(['timezone', 'value']);
+            if (!timezone) {
+                state.setIn(['timezone', 'error'], t('Timezone must be selected'));
+            }
         }
     }
 
-    componentDidMount() {
+    populateSendLater() {
         const entity = this.props.entity;
 
         if (entity.scheduled) {
-            const date = moment(entity.scheduled);
+            const timezone = entity.data.timezone || moment.tz.guess();
+            const date = moment.tz(entity.scheduled, timezone);
             this.populateFormValues({
                 sendLater: true,
                 date: date.format('YYYY-MM-DD'),
-                time: date.format('HH:mm')
+                time: date.format('HH:mm'),
+                timezone
             });
 
         } else {
             this.populateFormValues({
                 sendLater: false,
                 date: '',
-                time: ''
+                time: '',
+                timezone: moment.tz.guess()
             });
+        }
+    }
+
+    componentDidMount() {
+        this.populateSendLater();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.entity.scheduled !== this.props.entity.scheduled) {
+            this.populateSendLater();
         }
     }
 
@@ -153,9 +189,9 @@ class SendControls extends Component {
         await this.props.refreshEntity();
     }
 
-    async postAndMaskStateError(url) {
+    async postAndMaskStateError(url, data) {
         try {
-            await axios.post(getUrl(url));
+            await axios.post(getUrl(url), data);
         } catch (err) {
             if (err instanceof interoperableErrors.InvalidStateError) {
                 // Just mask the fact that it's not possible to start anything and refresh instead.
@@ -168,17 +204,12 @@ class SendControls extends Component {
     async scheduleAsync() {
         if (this.isFormWithoutErrors()) {
             const data = this.getFormValues();
-            const date = moment(data.date, 'YYYY-MM-DD');
-            const time = moment(data.time, 'HH:mm');
+            const dateTime = moment.tz(data.date + ' ' + data.time, 'YYYY-MM-DD HH:mm', data.timezone);
 
-            date.hour(time.hour());
-            date.minute(time.minute());
-            date.second(0);
-            date.millisecond(0);
-            date.utcOffset(0, true); // TODO, process offset from user settings
-
-
-            await this.postAndMaskStateError(`rest/campaign-start-at/${this.props.entity.id}/${date.valueOf()}`);
+            await this.postAndMaskStateError(`rest/campaign-start-at/${this.props.entity.id}`, {
+                startAt: dateTime.valueOf(),
+                timezone: data.timezone
+            });
 
         } else {
             this.showFormValidation();
@@ -204,7 +235,17 @@ class SendControls extends Component {
             t('doYouWantToLaunchTheCampaign?'),
             async () => {
                 await this.startAsync();
-                await this.refreshEntity();
+            }
+        );
+    }
+
+    async confirmSchedule() {
+        const t = this.props.t;
+        this.actionDialog(
+            t('confirmLaunch'),
+            t('Do you want to schedule the campaign for launch?'),
+            async () => {
+                await this.scheduleAsync();
             }
         );
     }
@@ -257,23 +298,61 @@ class SendControls extends Component {
         const t = this.props.t;
         const entity = this.props.entity;
 
-        const yesNoDialog = (
-            <ModalDialog hidden={!this.state.modalVisible} title={this.state.modalTitle} onCloseAsync={() => this.modalAction(false)} buttons={[
-                { label: t('no'), className: 'btn-primary', onClickAsync: () => this.modalAction(false) },
-                { label: t('yes'), className: 'btn-danger', onClickAsync: () => this.modalAction(true) }
-            ]}>
-                {this.state.modalMessage}
-            </ModalDialog>
+        const dialogs = (
+            <>
+                <TestSendModalDialog
+                    mode={TestSendModalDialogMode.CAMPAIGN_STATUS}
+                    visible={this.state.showTestSendModal}
+                    onHide={() => this.setState({showTestSendModal: false})}
+                    campaign={this.props.entity}
+                />
+                <PreviewForTestUserModalDialog
+                    visible={this.state.previewForTestUserVisible}
+                    onHide={() => this.setState({previewForTestUserVisible: false})}
+                    entity={this.props.entity}
+                />
+                <ModalDialog hidden={!this.state.modalVisible} title={this.state.modalTitle} onCloseAsync={() => this.modalAction(false)} buttons={[
+                    { label: t('no'), className: 'btn-primary', onClickAsync: () => this.modalAction(false) },
+                    { label: t('yes'), className: 'btn-danger', onClickAsync: () => this.modalAction(true) }
+                ]}>
+                    {this.state.modalMessage}
+                </ModalDialog>
+            </>
+        );
+
+        const testButtons = (
+            <>
+                <Button className="btn-success" label={t('Preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
+                <Button className="btn-success" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+            </>
         );
 
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
-            const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
+            const timezoneColumns = [
+                { data: 0, title: t('Timezone') }
+            ];
+
+            const dateValue = (this.getFormValue('date') || '').trim();
+            const timeValue = (this.getFormValue('time') || '').trim();
+            const timezone = this.getFormValue('timezone');
+
+            let dateTimeHelp = t('Select date, time and a timezone to display the date and time with offset');
+            let dateTimeAlert = null;
+            if (moment(dateValue, 'YYYY-MM-DD', true).isValid() && moment(timeValue, 'HH:mm', true).isValid() && timezone) {
+                const dateTime = moment.tz(dateValue + ' ' + timeValue, 'YYYY-MM-DD HH:mm', timezone);
+
+                dateTimeHelp = dateTime.toString();
+                if (!moment().isBefore(dateTime)) {
+                    dateTimeAlert = <div className="alert alert-danger" role="alert">{t('Scheduled date/time seems to be in the past. If you schedule the send, campaign will be sent immediately.')}</div>;
+                }
+            }
+
 
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
-                        {entity.scheduled ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
+                        {entity.status === CampaignStatus.SCHEDULED ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
                     </AlignedRow>
 
                     <Form stateOwner={this}>
@@ -282,75 +361,97 @@ class SendControls extends Component {
                             <div>
                                 <DatePicker id="date" label={t('date')} />
                                 <InputField id="time" label={t('time')} help={t('enter24HourTimeInFormatHhmmEg1348')}/>
-                                {/* TODO: Timezone selector */}
+                                <TableSelect id="timezone" label={t('Timezone')} dropdown columns={timezoneColumns} selectionKeyIndex={0} selectionLabelIndex={0} data={this.timezoneOptions}
+                                    help={dateTimeHelp}
+                                />
+                                {dateTimeAlert && <AlignedRow>{dateTimeAlert}</AlignedRow>}
                             </div>
                         }
                     </Form>
                     <ButtonRow className={campaignsStyles.sendButtonRow}>
                         {this.getFormValue('sendLater') ?
-                            <Button className="btn-primary" icon="send" label={(entity.scheduled ? t('rescheduleSend') : t('scheduleSend')) + subscrInfo} onClickAsync={::this.scheduleAsync}/>
+                            <Button className="btn-primary" icon="play" label={entity.status === CampaignStatus.SCHEDULED ? t('rescheduleSend') : t('scheduleSend')} onClickAsync={::this.confirmSchedule}/>
                             :
-                            <Button className="btn-primary" icon="send" label={t('send') + subscrInfo} onClickAsync={::this.confirmStart}/>
+                            <Button className="btn-primary" icon="play" label={t('send')} onClickAsync={::this.confirmStart}/>
                         }
+                        {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>}
+                        {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
+                        {testButtons}
+                    </ButtonRow>
+                </div>
+            );
+
+        } else if (entity.status === CampaignStatus.PAUSING) {
+            return (
+                <div>{dialogs}
+                    <AlignedRow label={t('sendStatus')}>
+                        {t('Campaign is being paused. Please wait.')}
+                    </AlignedRow>
+                    <ButtonRow>
+                        <Button className="btn-primary" icon="pause" label={t('Pausing')} disabled={true}/>
+                        <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('campaignIsBeingSentOut')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="stop" label={t('stop')} onClickAsync={::this.stopAsync}/>
+                        <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.FINISHED) {
-            const subscrInfo = entity.subscriptionsToSend === undefined ? '' : ` (${entity.subscriptionsToSend} ${t('subscribers-1')})`;
-
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('allMessagesSent!HitContinueIfYouYouWant')}
                     </AlignedRow>
                     <ButtonRow>
-                        <Button className="btn-primary" icon="play" label={t('continue') + subscrInfo} onClickAsync={::this.confirmStart}/>
-                        <Button className="btn-primary" icon="refresh" label={t('reset')} onClickAsync={::this.resetAsync}/>
+                        <Button className="btn-primary" icon="play" label={t('continue')} onClickAsync={::this.confirmStart}/>
+                        <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.INACTIVE) {
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('yourCampaignIsCurrentlyDisabledClick')}
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="play" label={t('enable')} onClickAsync={::this.enableAsync}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
 
         } else if (entity.status === CampaignStatus.ACTIVE) {
             return (
-                <div>{yesNoDialog}
+                <div>{dialogs}
                     <AlignedRow label={t('sendStatus')}>
                         {t('yourCampaignIsEnabledAndSendingMessages')}
                     </AlignedRow>
                     <ButtonRow>
                         <Button className="btn-primary" icon="stop" label={t('disable')} onClickAsync={::this.disableAsync}/>
+                        {testButtons}
                     </ButtonRow>
                 </div>
             );
-        } else {
 
+        } else {
             return null;
         }
     }
@@ -441,7 +542,7 @@ export default class Status extends Component {
             addOverridable('from_name', t('fromName'));
             addOverridable('from_email', t('fromEmailAddress'));
             addOverridable('reply_to', t('replytoEmailAddress'));
-            addOverridable('subject', t('subjectLine'));
+            sendSettings.push(<AlignedRow key="subject" label={t('subjectLine')}>{entity.subject}</AlignedRow>);
         } else {
             sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
         }
@@ -490,13 +591,6 @@ export default class Status extends Component {
                 <AlignedRow label={t('targetListssegments')}>
                     <Table withHeader dataUrl={`rest/lists-with-segment-by-campaign-table/${this.props.entity.id}`} columns={listsColumns} />
                 </AlignedRow>
-
-                {(entity.type === CampaignType.REGULAR || entity.type === CampaignType.TRIGGERED) &&
-                    <div>
-                        <hr/>
-                        <TestUser entity={entity}/>
-                    </div>
-                }
 
                 <hr/>
                 <SendControls entity={entity} refreshEntity={::this.refreshEntity}/>

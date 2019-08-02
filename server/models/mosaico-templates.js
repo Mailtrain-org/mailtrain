@@ -9,8 +9,9 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
 const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const { allTagLanguages } = require('../../shared/templates');
 
-const allowedKeys = new Set(['name', 'description', 'type', 'data', 'namespace']);
+const allowedKeys = new Set(['name', 'description', 'type', 'tag_language', 'data', 'namespace']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
@@ -32,11 +33,25 @@ async function listDTAjax(context, params) {
         [{ entityTypeId: 'mosaicoTemplate', requiredOperations: ['view'] }],
         params,
         builder => builder.from('mosaico_templates').innerJoin('namespaces', 'namespaces.id', 'mosaico_templates.namespace'),
-        [ 'mosaico_templates.id', 'mosaico_templates.name', 'mosaico_templates.description', 'mosaico_templates.type', 'mosaico_templates.created', 'namespaces.name' ]
+        [ 'mosaico_templates.id', 'mosaico_templates.name', 'mosaico_templates.description', 'mosaico_templates.type', 'mosaico_templates.tag_language', 'mosaico_templates.created', 'namespaces.name' ]
+    );
+}
+
+async function listByTagLanguageDTAjax(context, tagLanguage, params) {
+    return await dtHelpers.ajaxListWithPermissions(
+        context,
+        [{ entityTypeId: 'mosaicoTemplate', requiredOperations: ['view'] }],
+        params,
+        builder => builder.from('mosaico_templates')
+            .innerJoin('namespaces', 'namespaces.id', 'mosaico_templates.namespace')
+            .where('mosaico_templates.tag_language', tagLanguage),
+        [ 'mosaico_templates.id', 'mosaico_templates.name', 'mosaico_templates.description', 'mosaico_templates.type', 'mosaico_templates.tag_language', 'mosaico_templates.created', 'namespaces.name' ]
     );
 }
 
 async function _validateAndPreprocess(tx, entity) {
+    enforce(allTagLanguages.includes(entity.tag_language), `Invalid tag language '${entity.tag_language}'`);
+
     entity.data = JSON.stringify(entity.data);
     await namespaceHelpers.validateEntity(tx, entity);
 }
@@ -58,7 +73,6 @@ async function create(context, entity) {
 
 async function updateWithConsistencyCheck(context, entity) {
     await knex.transaction(async tx => {
-        await shares.enforceGlobalPermission(context, 'createJavascriptWithROAccess');
         await shares.enforceEntityPermissionTx(tx, context, 'mosaicoTemplate', entity.id, 'edit');
 
         const existing = await tx('mosaico_templates').where('id', entity.id).first();
@@ -119,6 +133,7 @@ async function remove(context, id) {
 module.exports.hash = hash;
 module.exports.getById = getById;
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByTagLanguageDTAjax = listByTagLanguageDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

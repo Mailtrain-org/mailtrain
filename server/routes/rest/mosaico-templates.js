@@ -33,4 +33,9 @@ router.postAsync('/mosaico-templates-table', passport.loggedIn, async (req, res)
     return res.json(await mosaicoTemplates.listDTAjax(req.context, req.body));
 });
 
+router.postAsync('/mosaico-templates-by-tag-language-table/:tagLanguage', passport.loggedIn, async (req, res) => {
+    return res.json(await mosaicoTemplates.listByTagLanguageDTAjax(req.context, req.params.tagLanguage, req.body));
+});
+
+
 module.exports = router;

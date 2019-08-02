@@ -4,7 +4,6 @@ const knex = require('./knex');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const entitySettings = require('./entity-settings');
 const shares = require('../models/shares');
-const { enforce } = require('./helpers');
 
 const defaultNoOfDependenciesReported = 20;
 
@@ -21,7 +20,7 @@ async function ensureNoDependencies(tx, context, id, depSpecs) {
         if (depSpec.query) {
             rows = await depSpec.query(tx).limit(defaultNoOfDependenciesReported + 1);
         } else if (depSpec.column) {
-            rows = await tx(entityType.entitiesTable).where(depSpec.column, id).select(['id', 'name']).limit(defaultNoOfDependenciesReported + 1);
+            rows = await tx(entityType.entitiesTable).where(depSpec.column, id).forShare().select(['id', 'name']).limit(defaultNoOfDependenciesReported + 1);
         } else if (depSpec.rows) {
             rows = await depSpec.rows(tx, defaultNoOfDependenciesReported + 1)
         }
@@ -32,16 +31,17 @@ async function ensureNoDependencies(tx, context, id, depSpecs) {
                 break;
             }
 
-            if (await shares.checkEntityPermissionTx(tx, context, depSpec.entityTypeId, row.id, 'view')) {
+            if (depSpec.viewPermission && await shares.checkEntityPermissionTx(tx, context, depSpec.viewPermission.entityTypeId, depSpec.viewPermission.entityId, depSpec.viewPermission.requiredOperations)) {
                 deps.push({
                     entityTypeId: depSpec.entityTypeId,
                     name: row.name,
                     link: entityType.clientLink(row.id)
                 });
-            } else {
+            } else if (!depSpec.viewPermission && await shares.checkEntityPermissionTx(tx, context, depSpec.entityTypeId, row.id, 'view')) {
                 deps.push({
                     entityTypeId: depSpec.entityTypeId,
-                    id: row.id
+                    name: row.name,
+                    link: entityType.clientLink(row.id)
                 });
             }
         }

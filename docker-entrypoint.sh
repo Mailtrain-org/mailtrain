@@ -20,6 +20,12 @@ redis:
   enabled: true
   host: $REDIS_HOST
 
+gdpr:
+  deleteDataAfterUnsubscribe:
+    enabled: false
+  deleteSubscriptionAfterUnsubscribe:
+    enabled: false
+
 builtinZoneMTA:
   enabled: false
 

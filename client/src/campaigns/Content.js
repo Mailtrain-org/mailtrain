@@ -7,6 +7,7 @@ import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
     Button,
     ButtonRow,
+    Dropdown,
     filterData,
     Form,
     FormSendMethod,
@@ -16,11 +17,11 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import mailtrainConfig from 'mailtrainConfig';
-import {getEditForm, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
-import {TestSendModalDialog} from "./TestSendModalDialog";
+import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {ContentModalDialog} from "../lib/modals";
 
@@ -39,10 +40,16 @@ export default class CustomContent extends Component {
         const t = props.t;
 
         this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
+        this.tagLanguages = getTagLanguages(props.t);
 
         this.customTemplateTypeOptions = [];
         for (const key of mailtrainConfig.editors) {
             this.customTemplateTypeOptions.push({key, label: this.templateTypes[key].typeName});
+        }
+
+        this.customTemplateTagLanguageOptions = [];
+        for (const key of mailtrainConfig.tagLanguages) {
+            this.customTemplateTagLanguageOptions.push({key, label: this.tagLanguages[key].name});
         }
 
         this.state = {
@@ -56,6 +63,9 @@ export default class CustomContent extends Component {
 
         this.initForm({
             getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
+            onChangeBeforeValidation: {
+                data_sourceCustom_tag_language: ::this.onTagLanguageChanged
+            }
         });
 
         this.sendModalGetDataHandler = ::this.sendModalGetData;
@@ -71,9 +81,16 @@ export default class CustomContent extends Component {
         setPanelInFullScreen: PropTypes.func
     }
 
+    onTagLanguageChanged(mutStateData, key, oldTagLanguage, tagLanguage) {
+        if (tagLanguage) {
+            const type = mutStateData.getIn(['data_sourceCustom_tag_language', 'value']);
+            this.tagLanguages[type].afterTagLanguageChange(mutStateData, true);
+        }
+    }
 
     getFormValuesMutator(data) {
         data.data_sourceCustom_type = data.data.sourceCustom.type;
+        data.data_sourceCustom_tag_language = data.data.sourceCustom.tag_language;
         data.data_sourceCustom_data = data.data.sourceCustom.data;
         data.data_sourceCustom_html = data.data.sourceCustom.html;
         data.data_sourceCustom_text = data.data.sourceCustom.text;
@@ -86,6 +103,7 @@ export default class CustomContent extends Component {
 
         data.data.sourceCustom = {
             type: data.data_sourceCustom_type,
+            tag_language: data.data_sourceCustom_tag_language,
             data: data.data_sourceCustom_data,
             html: data.data_sourceCustom_html,
             text: data.data_sourceCustom_text
@@ -111,6 +129,12 @@ export default class CustomContent extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
+
+        if (!state.getIn(['data_sourceCustom_tag_language', 'value'])) {
+            state.setIn(['data_sourceCustom_tag_language', 'error'], t('Tag language must be selected'));
+        } else {
+            state.setIn(['data_sourceCustom_tag_language', 'error'], null);
+        }
 
         const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
 
@@ -205,7 +229,8 @@ export default class CustomContent extends Component {
 
         return {
             html: exportedData.data_sourceCustom_html,
-            text: this.getFormValue('data_sourceCustom_text')
+            text: this.getFormValue('data_sourceCustom_text'),
+            tagLanguage: this.getFormValue('data_sourceCustom_tag_language')
         };
     }
 
@@ -229,15 +254,14 @@ export default class CustomContent extends Component {
 
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
 
-        // FIXME - data_sourceCustom_type is initialized only after first render
-
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
                 <TestSendModalDialog
+                    mode={TestSendModalDialogMode.CAMPAIGN_CONTENT}
                     visible={this.state.showTestSendModal}
                     onHide={() => this.setState({showTestSendModal: false})}
                     getDataAsync={this.sendModalGetDataHandler}
-                    entity={this.props.entity}
+                    campaign={this.props.entity}
                 />
                 <ContentModalDialog
                     title={this.state.exportModalTitle}
@@ -253,6 +277,8 @@ export default class CustomContent extends Component {
                         {customTemplateTypeKey && this.templateTypes[customTemplateTypeKey].typeName}
                     </StaticField>
 
+                    <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={!customTemplateTypeKey || this.templateTypes[customTemplateTypeKey].isTagLanguageSelectorDisabledForEdit}/>
+
                     {customTemplateTypeKey && getTypeForm(this, customTemplateTypeKey, true)}
 
                     {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
@@ -261,7 +287,7 @@ export default class CustomContent extends Component {
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
                         <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
                         <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
-                        <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+                        <Button className="btn-success" icon="at" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
             </div>

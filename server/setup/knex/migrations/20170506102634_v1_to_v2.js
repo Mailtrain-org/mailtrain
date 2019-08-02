@@ -2,13 +2,13 @@ const { CampaignSource, CampaignType} = require('../../../../shared/campaigns');
 const files = require('../../../models/files');
 const contextHelpers = require('../../../lib/context-helpers');
 const mosaicoTemplates = require('../../../../shared/mosaico-templates');
+const {TagLanguages} = require('../../../../shared/templates');
 const {getGlobalNamespaceId} = require('../../../../shared/namespaces');
 const {getAdminId} = require('../../../../shared/users');
 const { MailerType, ZoneMTAType, getSystemSendConfigurationId, getSystemSendConfigurationCid } = require('../../../../shared/send-configurations');
-const { enforce } = require('../../../lib/helpers');
+const { enforce, hashEmail} = require('../../../lib/helpers');
 const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('../../../../shared/triggers');
 const { SubscriptionSource } = require('../../../../shared/lists');
-const crypto = require('crypto');
 const {DOMParser, XMLSerializer} = require('xmldom');
 const log = require('../../../lib/log');
 
@@ -78,7 +78,7 @@ async function migrateBase(knex) {
     // The original Mailtrain migration is executed before this one. So here we check whether the original migration
     // ended where it should have and we take it from there.
     const row = await knex('settings').where({key: 'db_schema_version'}).first('value');
-    if (!row || Number(row.value) !== 33) {
+    if (!row || Number(row.value) !== 34) {
         throw new Error('Unsupported DB schema version: ' + row.value);
     }
 
@@ -270,7 +270,7 @@ async function migrateSubscriptions(knex) {
 
             if (rows.length > 0) {
                 for await (const subscription of rows) {
-                    subscription.hash_email = crypto.createHash('sha512').update(subscription.email).digest("base64");
+                    subscription.hash_email = hashEmail(subscription.email);
                     subscription.source_email = subscription.imported ? SubscriptionSource.IMPORTED_V1 : SubscriptionSource.NOT_IMPORTED_V1;
                     for (const field of fields) {
                         if (field.column != null) {
@@ -416,6 +416,7 @@ async function migrateCustomFields(knex) {
     });
 
     await knex.schema.table('custom_fields', table => {
+        table.renameColumn('description', 'help');
         table.dropColumn('visible');
     });
 
@@ -753,11 +754,11 @@ async function migrateSettings(knex) {
 
         if (settings.dkimApiKey) {
             mailer_type = MailerType.ZONE_MTA;
-            mailer_settings.dkimApiKey = settings.dkimApiKey;
+            mailer_settings.dkimApiKey = settings.dkimApiKey || '';
             mailer_settings.zoneMtaType = ZoneMTAType.WITH_HTTP_CONF;
-            mailer_settings.dkimDomain = settings.dkimDomain;
-            mailer_settings.dkimSelector = settings.dkimSelector;
-            mailer_settings.dkimPrivateKey = settings.dkimPrivateKey;
+            mailer_settings.dkimDomain = settings.dkimDomain || '';
+            mailer_settings.dkimSelector = settings.dkimSelector || '';
+            mailer_settings.dkimPrivateKey = settings.dkimPrivateKey || '';
         }
     }
 
@@ -777,7 +778,7 @@ async function migrateSettings(knex) {
         verp_hostname: settings.verpUse ? settings.verpHostname : null,
         mailer_type,
         mailer_settings: JSON.stringify(mailer_settings),
-        x_mailer: settings.x_mailer,
+        x_mailer: settings.x_mailer || '',
         namespace: getGlobalNamespaceId()
     });
 
@@ -810,7 +811,7 @@ async function addFiles(knex) {
                 table.string('mimetype');
                 table.integer('size');
                 table.timestamp('created').defaultTo(knex.fn.now());
-                table.index(['entity', 'originalname'])
+                table.index(['entity', 'originalname']);
             });
         }
     }
@@ -905,7 +906,7 @@ async function addMosaicoTemplates(knex) {
         type: 'html',
         namespace: 1,
         data: JSON.stringify({
-            html: mosaicoTemplates.getVersafix()
+            html: mosaicoTemplates.getVersafix(TagLanguages.SIMPLE)
         })
     };
 

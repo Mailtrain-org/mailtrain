@@ -5,7 +5,6 @@ const templates = require('../../models/templates');
 
 const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
-const CampaignSender = require('../../lib/campaign-sender');
 
 
 router.getAsync('/templates/:templateId', passport.loggedIn, async (req, res) => {
@@ -37,12 +36,6 @@ router.postAsync('/templates-table', passport.loggedIn, async (req, res) => {
 
 router.postAsync('/templates-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
     return res.json(await templates.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
-});
-
-router.postAsync('/template-test-send', passport.loggedIn, passport.csrfProtection, async (req, res) => {
-    const data = req.body;
-    const result = await CampaignSender.testSend(req.context, data.listCid, data.subscriptionCid, data.campaignId, data.sendConfigurationId, data.html, data.text);
-    return res.json(result);
 });
 
 module.exports = router;
