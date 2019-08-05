@@ -1,5 +1,20 @@
 'use strict';
 
+const TagLanguages = {
+    SIMPLE: 'simple',
+    HBS: 'hbs'
+};
+
+const allTagLanguages = [TagLanguages.SIMPLE, TagLanguages.HBS];
+
+function renderTag(tagLanguage, tag) {
+    if (tagLanguage === TagLanguages.SIMPLE) {
+        return `[${tag}]`;
+    } else if (tagLanguage === TagLanguages.HBS) {
+        return `{{${tag}}}`;
+    }
+}
+
 function _getBases(trustedBaseUrl, sandboxBaseUrl, publicBaseUrl) {
     if (trustedBaseUrl.endsWith('/')) {
         trustedBaseUrl = trustedBaseUrl.substring(0, trustedBaseUrl.length - 1);
@@ -58,5 +73,8 @@ function unbase(text, trustedBaseUrl, sandboxBaseUrl, publicBaseUrl, treatAllAsP
 module.exports = {
     base,
     unbase,
-    getMergeTagsForBases
+    getMergeTagsForBases,
+    TagLanguages,
+    allTagLanguages,
+    renderTag
 };

@@ -49,7 +49,7 @@ export default class Account extends Component {
     }
 
     submitFormValuesMutator(data) {
-        return filterData(data, ['password']);
+        return filterData(data, ['username', 'password', 'resetToken']);
     }
 
     @withAsyncErrorHandler

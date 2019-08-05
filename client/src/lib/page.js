@@ -268,16 +268,17 @@ class PanelRoute extends Component {
 
         const panelInFullScreen = this.state.panelInFullScreen;
 
-        const render = resolved => {
+        const render = (resolved, permissions) => {
             let primaryMenu = null;
             let secondaryMenu = null;
             let content = null;
 
-            if (resolved) {
+            if (resolved && permissions) {
                 const compProps = {
                     match: this.props.match,
                     location: this.props.location,
                     resolved,
+                    permissions,
                     setPanelInFullScreen: this.setPanelInFullScreen,
                     panelInFullScreen: this.state.panelInFullScreen
                 };
@@ -683,21 +684,24 @@ export class NavDropdown extends Component {
 }
 
 
-export const requiresAuthenticatedUser = createComponentMixin([], [withPageHelpers], (TargetClass, InnerClass) => {
-    class RequiresAuthenticatedUser extends React.Component {
-        constructor(props) {
-            super(props);
-            props.sectionContent.ensureAuthenticated();
+export const requiresAuthenticatedUser = createComponentMixin({
+    deps: [withPageHelpers],
+    decoratorFn: (TargetClass, InnerClass) => {
+        class RequiresAuthenticatedUser extends React.Component {
+            constructor(props) {
+                super(props);
+                props.sectionContent.ensureAuthenticated();
+            }
+
+            render() {
+                return <TargetClass {...this.props}/>
+            }
         }
 
-        render() {
-            return <TargetClass {...this.props}/>
-        }
+        return {
+            cls: RequiresAuthenticatedUser
+        };
     }
-
-    return {
-        cls: RequiresAuthenticatedUser
-    };
 });
 
 export function getLanguageChooser(t) {

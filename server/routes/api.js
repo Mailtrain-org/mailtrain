@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const lists = require('../models/lists');
 const tools = require('../lib/tools');
 const blacklist = require('../models/blacklist');
@@ -16,8 +16,10 @@ const contextHelpers = require('../lib/context-helpers');
 const shares = require('../models/shares');
 const slugify = require('slugify');
 const passport = require('../lib/passport');
-const TemplateSender = require('../lib/template-sender');
+const templates = require('../models/templates');
 const campaigns = require('../models/campaigns');
+const {castToInteger} = require('../lib/helpers');
+const {getSystemSendConfigurationId} = require('../../shared/send-configurations');
 
 class APIError extends Error {
     constructor(msg, status) {
@@ -42,7 +44,7 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
 
     const emailErr = await tools.validateEmail(input.EMAIL);
     if (emailErr) {
-        const errMsg = tools.validateEmailGetMessage(emailErr, input.email);
+        const errMsg = tools.validateEmailGetMessage(emailErr, input.email, null);
         log.error('API', errMsg);
         throw new APIError(errMsg, 400);
     }
@@ -236,7 +238,7 @@ router.postAsync('/blacklist/add', passport.loggedIn, async (req, res) => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
     if (!(input.EMAIL) || (input.EMAIL === ''))  {
-        throw new Error('EMAIL argument is required');
+        throw new APIError('EMAIL argument is required', 400);
     }
 
     await blacklist.add(req.context, input.EMAIL);
@@ -253,7 +255,7 @@ router.postAsync('/blacklist/delete', passport.loggedIn, async (req, res) => {
         input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
     });
     if (!(input.EMAIL) || (input.EMAIL === '')) {
-        throw new Error('EMAIL argument is required');
+        throw new APIError('EMAIL argument is required', 400);
     }
 
     await blacklist.remove(req.oontext, input.EMAIL);
@@ -288,33 +290,34 @@ router.getAsync('/rss/fetch/:campaignCid', passport.loggedIn, async (req, res) =
 
 router.postAsync('/templates/:templateId/send', async (req, res) => {
     const input = {};
-    Object.keys(req.body).forEach(key => {
-        input[
-            (key || '')
-                .toString()
-                .trim()
-                .toUpperCase()
-        ] = req.body[key] || '';
-    });
 
-    try {
-        const templateSender = new TemplateSender({
-            context: req.context,
-            locale: req.locale,
-            templateId: req.params.templateId
-        });
-        const info = await templateSender.send({
-            data: input.DATA,
-            email: input.EMAIL,
-            sendConfigurationId: input.SEND_CONFIGURATION_ID,
-            subject: input.SUBJECT,
-            variables: input.VARIABLES,
-            attachments: input.ATTACHMENTS || []
-        });
-        res.status(200).json({ data: info });
-    } catch (e) {
-        throw new APIError(e.message, 400);
+    for (const key in req.body) {
+        const sanitizedKey = key.toString().trim().toUpperCase();
+        input[sanitizedKey] = req.body[key] || '';
     }
+
+    const templateId = castToInteger(req.params.templateId, 'Invalid template ID');
+
+    let sendConfigurationId;
+    if (!('SEND_CONFIGURATION_ID' in input)) {
+        sendConfigurationId = getSystemSendConfigurationId();
+    } else {
+        sendConfigurationId = castToInteger(input.SEND_CONFIGURATION_ID, 'Invalid send configuration ID');
+    }
+
+    if (!input.EMAIL || input.EMAIL === 0) {
+        throw new APIError('Missing email(s)', 400);
+    }
+
+    const emails = input.EMAIL.split(',');
+    const mergeTags = input.TAGS || {};
+    const subject = input.SUBJECT || '';
+    const attachments = input.ATTACHMENTS || [];
+
+
+    const result = await templates.sendAsTransactionalEmail(req.context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments);
+
+    res.json({ data: result });
 });
 
 module.exports = router;

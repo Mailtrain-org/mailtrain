@@ -1,10 +1,14 @@
 'use strict';
 
+const crypto = require('crypto');
+
 module.exports = {
     enforce,
     cleanupFromPost,
     filterObject,
-    castToInteger
+    castToInteger,
+    normalizeEmail,
+    hashEmail
 };
 
 function enforce(condition, message) {
@@ -28,12 +32,30 @@ function filterObject(obj, allowedKeys) {
     return result;
 }
 
-function castToInteger(id) {
+function castToInteger(id, msg) {
     const val = parseInt(id);
 
     if (!Number.isInteger(val)) {
-        throw new Error('Invalid id');
+        throw new Error(msg || 'Invalid id');
     }
 
     return val;
 }
+
+function normalizeEmail(email) {
+    const emailParts = email.split(/@/);
+
+    if (emailParts.length !== 2) {
+        return email;
+    }
+
+    const username = emailParts[0];
+    const domain = emailParts[1].toLowerCase();
+
+    return username + '@' + domain;
+}
+
+function hashEmail(email) {
+    return crypto.createHash('sha512').update(normalizeEmail(email)).digest("base64");
+}
+

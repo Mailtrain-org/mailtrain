@@ -36,6 +36,11 @@ editors:
 - ckeditor4
 - codeeditor
 
+# Enabled tag languages
+tagLanguages:
+- simple  # e.g. [FIRST_NAME] - this the style of merge tags found in Mailtrain v1
+- hbs     # e.g. {{#if FIRST_NAME}}Hello {{firstName}}!{{else}}Hello!{{/if}} - this syntax uses Handlebars templating language (http://handlebarsjs.com)
+
 # Default language to use
 defaultLanguage: en-US
 
@@ -165,6 +170,23 @@ queue:
   # How many parallel sender processes to spawn
   processes: 2
 
+  # For how long (in seconds) to try to send an email before Mailtrain stops to trying. An email can normally
+  # be sent out almost immediately. However if the send configuration is not correct or the mail server is not reachable,
+  # Mailtrain will keep retrying until the email expires.
+  # Due to Mailtrain's internal timeouts, the values should be at least 60 seconds.
+  retention:
+    # Regular and RSS campaign. Once this expires, the campaign is considered finished. The remaining recipients
+    # are included in the set of those recipients to whom the message would be delivered if the campaign is again started.
+    campaign: 86400    # 1 day
+    # Triggered campaign. Once this expires, the message gets discarded.
+    triggered: 86400   # 1 day
+    # Test send (in campaign or template)
+    test: 300          # 5 minutes
+    # Subscription and password reset related emails
+    subscription: 300  # 5 minutes
+    # Transactional emails sent via API (i.e. /templates/:templateId/send)
+    apiTransactional: 3600  # 60 minutes
+
 cors:
   # Allow subscription widgets to be embedded
   # origins: ['https://www.example.com']
@@ -235,7 +257,11 @@ seleniumWebDriver:
   browser: phantomjs
 
 
-roles:
+# The section below defines the definition of roles (permissions) to be used when no "roles" section is provided
+# in custom config (typically production.yaml). If you want to extend rules provided below, add corresponding rules
+# in "defaultRoles" section in custom config. If you want to define roles from scratch, create "roles" section in
+# the custom config.
+defaultRoles:
   global:
     master:
       name: Global Master
@@ -260,9 +286,9 @@ roles:
       permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createReportTemplate, createTemplate, createMosaicoTemplate, createSendConfiguration, createCampaign, manageUsers]
       children:
         sendConfiguration: [viewPublic, viewPrivate, edit, delete, share, sendWithoutOverrides, sendWithAllowedOverrides, sendWithAnyOverrides]
-        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
+        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
-        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, fetchRss]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
         reportTemplate: [view, edit, delete, share, execute]
@@ -275,9 +301,9 @@ roles:
       permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createCampaign]
       children:
         sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
-        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
+        list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
-        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, fetchRss]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
         reportTemplate: [view, share, execute]
@@ -286,12 +312,24 @@ roles:
 
     campaignsCreator:
       name: Campaigns Creator
-      description: In the respective namespace, the user has all permissions for templates and campaigns.
+      description: In the respective namespace, the user has all permissions to create and manage templates and campaigns. The user can also read public data about send configurations and use Mosaico templates in the namespace.
       permissions: [view, createTemplate, createCampaign]
       children:
         sendConfiguration: [viewPublic]
-        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, fetchRss]
-        template: [view, edit, delete, share, viewFiles, manageFiles]
+        campaign: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, sendToTestUsers, viewStats, fetchRss]
+        template: [view, edit, delete, viewFiles, manageFiles]
+        mosaicoTemplate: [view, viewFiles]
+        namespace: [view, createTemplate, createCampaign]
+
+    campaignsViewer:
+      name: Campaigns Viewer
+      description: In the respective namespace, the user has permissions to view campaigns and templates in order to be able to replicate them.
+      permissions: [view, createTemplate, createCampaign]
+      children:
+        campaign: [view, viewFiles, viewAttachments, viewTriggers]
+        template: [view, viewFiles]
+        mosaicoTemplate: [view, viewFiles]
+        namespace: [view]
 
   sendConfiguration:
     master:
@@ -301,17 +339,17 @@ roles:
     campaignsCreator:
       name: Campaigns Creator
       description: The user can only use the send configuration in setting up a campaign. However, this gives no permission to send.
-      permissions: [viewPublic]
+      permissions: [viewPublic, sendWithoutOverrides]
 
   list:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports]
+      permissions: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
     campaignsCreator:
       name: Campaigns Creator
-      description: The user can only use the list in setting up a campaign. However, this gives no permission to view subscriptions or to send to the list.
-      permissions: [view, viewFields, viewSegments]
+      description: The user can only use the list in setting up a campaign and to send email to test users. This gives no permission to view subscriptions or to send to the whole list.
+      permissions: [view, viewFields, viewSegments, viewTestSubscriptions, sendToTestUsers]
 
   customForm:
     master:
@@ -323,11 +361,15 @@ roles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, viewStats, manageMessages, fetchRss]
-    campaignsCreator:
-      name: Campaigns Creator
+      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, manageMessages, fetchRss]
+    creator:
+      name: Creator
       description: The user can setup the campaign but cannot send it.
-      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, fetchRss]
+      permissions: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, sendToTestUsers, viewStats, fetchRss]
+    viewer:
+      name: Viewer
+      description: The user can view the campaign but cannot edit it or send it.
+      permissions: [view, viewFiles, viewAttachments, viewTriggers]
     rssTrigger:
       name: RSS Campaign Trigger
       description: Allows triggering a fetch of an RSS campaign
@@ -338,6 +380,10 @@ roles:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFiles, manageFiles]
+    viewer:
+      name: Viewer
+      description: The user can view the template but cannot edit it.
+      permissions: [view, viewFiles]
 
   report:
     master:
@@ -356,5 +402,8 @@ roles:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFiles, manageFiles]
-
+    viewer:
+      name: Viewer
+      description: The user can use the Mosaico template, but cannot edit it or delete it.
+      permissions: [view, viewFiles]
 

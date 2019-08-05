@@ -8,7 +8,7 @@ const driver = require('./mocha-e2e').driver;
 const url = require('url');
 const UrlPattern = require('url-pattern');
 
-const waitTimeout = 10000;
+const waitTimeout = 20000;
 
 module.exports = (...extras) => Object.assign({
     elements: {},
@@ -21,7 +21,8 @@ module.exports = (...extras) => Object.assign({
         const elem = await driver.findElement(By.css(this.elements[key]));
 
         const linkUrl = await elem.getAttribute('href');
-        const linkPath = url.parse(linkUrl).path;
+        const parsedUrl = url.parse(linkUrl);
+        const linkPath = parsedUrl.pathname;
 
         const urlPattern = new UrlPattern(this.links[key]);
 

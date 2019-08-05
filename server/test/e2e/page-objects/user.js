@@ -1,9 +1,11 @@
 'use strict';
 
+const config = require('../lib/config');
 const web = require('../lib/web');
 
 module.exports = {
     login: web({
+        baseUrl: config.baseTrustedUrl,
         url: '/users/login',
         elementsToWaitFor: ['submitButton'],
         elements: {
@@ -14,11 +16,13 @@ module.exports = {
     }),
 
     logout: web({
+        baseUrl: config.baseTrustedUrl,
         requestUrl: '/users/logout',
         url: '/'
     }),
 
     account: web({
+        baseUrl: config.baseTrustedUrl,
         url: '/users/account',
         elementsToWaitFor: ['form'],
         elements: {

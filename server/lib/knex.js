@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('config');
+const config = require('./config');
 const path = require('path');
 
 const knexConstructor = require('knex');
@@ -22,6 +22,12 @@ const knex = require('knex')({
     }
     //, debug: true
 });
+
+/*
+This is to enable logging on mysql side:
+SET GLOBAL general_log = 'ON';
+SET GLOBAL general_log_file = '/tmp/mysql-all.log';
+*/
 
 
 

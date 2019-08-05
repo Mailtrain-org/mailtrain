@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('../lib/log');
-const config = require('config');
+const config = require('../lib/config');
 const router = require('../lib/router-async').create();
 const confirmations = require('../models/confirmations');
 const subscriptions = require('../models/subscriptions');
@@ -249,7 +249,7 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
 
     const emailErr = await tools.validateEmail(email);
     if (emailErr) {
-        const errMsg = tools.validateEmailGetMessage(emailErr, email);
+        const errMsg = tools.validateEmailGetMessage(emailErr, email, req.locale);
 
         if (req.xhr) {
             throw new Error(errMsg);
@@ -457,7 +457,7 @@ router.postAsync('/:lcid/manage-address', passport.parseForm, passport.csrfProte
     } else {
         const emailErr = await tools.validateEmail(emailNew);
         if (emailErr) {
-            const errMsg = tools.validateEmailGetMessage(emailErr, email);
+            const errMsg = tools.validateEmailGetMessage(emailErr, email, req.locale);
 
             req.flash('danger', errMsg);
 

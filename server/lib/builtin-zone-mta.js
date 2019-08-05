@@ -1,19 +1,33 @@
 'use strict';
 
-const config = require('config');
+const config = require('./config');
 const fork = require('./fork').fork;
 const log = require('./log');
 const path = require('path');
-const fs = require('fs-extra')
+const fs = require('fs-extra');
 const crypto = require('crypto');
 const bluebird = require('bluebird');
 
-let zoneMtaProcess;
+let zoneMtaProcess = null;
 
 const zoneMtaDir = path.join(__dirname, '..', '..', 'zone-mta');
 const zoneMtaBuiltingConfig = path.join(zoneMtaDir, 'config', 'builtin-zonemta.json');
 
 const password = process.env.BUILTIN_ZONE_MTA_PASSWORD || crypto.randomBytes(20).toString('hex').toLowerCase();
+
+let restartCount = 0;
+let lastRestartCount = 0;
+
+let restartBackoffIdx = 0;
+const restartBackoff = [0, 30, 60, 300]; // in seconds
+
+setInterval(() => {
+    if (restartCount === lastRestartCount) {
+        restartBackoffIdx = 0;
+    }
+
+    lastRestartCount = restartCount;
+}, 300000 /* 5 mins */);
 
 function getUsername() {
     return 'mailtrain';
@@ -119,36 +133,58 @@ async function createConfig() {
     await fs.writeFile(zoneMtaBuiltingConfig, JSON.stringify(cnf, null, 2));
 }
 
+function restart(callback) {
+    if (zoneMtaProcess) return callback();
+
+    if (restartCount === 0) {
+        log.info('ZoneMTA', 'Starting built-in Zone MTA process');
+    } else {
+        log.info('ZoneMTA', `Restarting built-in Zone MTA process (restart count ${restartCount})`);
+    }
+
+    zoneMtaProcess = fork(
+        path.join(zoneMtaDir, 'index.js'),
+        ['--config=' + zoneMtaBuiltingConfig],
+        {
+            cwd: zoneMtaDir,
+            env: {NODE_ENV: process.env.NODE_ENV}
+        }
+    );
+
+    zoneMtaProcess.on('message', msg => {
+        if (msg) {
+            if (msg.type === 'zone-mta-started') {
+                log.info('ZoneMTA', 'ZoneMTA process started');
+
+                if (callback) {
+                    return callback();
+                } else {
+                    return;
+                }
+            }
+        }
+    });
+
+    zoneMtaProcess.on('close', (code, signal) => {
+        log.error('ZoneMTA', 'ZoneMTA process exited with code %s signal %s', code, signal);
+
+        zoneMtaProcess = null;
+        restartCount += 1;
+
+        const backoffTimeout = restartBackoff[restartBackoffIdx] * 1000;
+        if (restartBackoffIdx < restartBackoff.length - 1) {
+            restartBackoffIdx += 1;
+        }
+
+        setTimeout(restart, backoffTimeout);
+    });
+}
+
 function spawn(callback) {
     if (config.builtinZoneMTA.enabled) {
 
         createConfig().then(() => {
-            log.info('ZoneMTA', 'Starting built-in Zone MTA process');
-
-            zoneMtaProcess = fork(
-                path.join(zoneMtaDir, 'index.js'),
-                ['--config=' + zoneMtaBuiltingConfig],
-                {
-                    cwd: zoneMtaDir,
-                    env: {NODE_ENV: process.env.NODE_ENV}
-                }
-            );
-
-            zoneMtaProcess.on('message', msg => {
-                if (msg) {
-                    if (msg.type === 'zone-mta-started') {
-                        log.info('ZoneMTA', 'ZoneMTA process started');
-                        return callback();
-                    } else if (msg.type === 'entries-added') {
-                        senders.scheduleCheck();
-                    }
-                }
-            });
-
-            zoneMtaProcess.on('close', (code, signal) => {
-                log.error('ZoneMTA', 'ZoneMTA process exited with code %s signal %s', code, signal);
-            });
-
+            restart(callback);
         }).catch(err => callback(err));
 
     } else {

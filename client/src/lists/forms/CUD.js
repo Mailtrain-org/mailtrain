@@ -10,6 +10,7 @@ import {
     AlignedRow,
     Button,
     ButtonRow,
+    CheckBox,
     Dropdown,
     Fieldset,
     filterData,
@@ -22,7 +23,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTrustedUrl, getUrl} from "../../lib/urls";
@@ -279,7 +280,8 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
 
@@ -297,7 +299,10 @@ export default class CUD extends Component {
     }
 
     submitFormValuesMutator(data) {
-        return filterData(data, ['name', 'description', 'layout', 'form_input_style', 'namespace',
+        return filterData(data, ['name', 'description', 'namespace',
+            'fromExistingEntity', 'existingEntity',
+
+            'layout', 'form_input_style',
             'web_subscribe',
             'web_confirm_subscription_notice',
             'mail_confirm_subscription_html',
@@ -330,8 +335,10 @@ export default class CUD extends Component {
             const data = {
                 name: '',
                 description: '',
+                fromExistingEntity: false,
+                existingEntity: null,
                 selectedTemplate: 'layout',
-                namespace: mailtrainConfig.user.namespace
+                namespace: getDefaultNamespace(this.props.permissions)
             };
             this.supplyDefaults(data);
 
@@ -349,6 +356,13 @@ export default class CUD extends Component {
         }
 
         validateNamespace(t, state);
+
+        if (state.getIn(['fromExistingEntity', 'value']) && !state.getIn(['existingEntity', 'value'])) {
+            state.setIn(['existingEntity', 'error'], t('sourceCustomFormsMustNotBeEmpty'));
+        } else {
+            state.setIn(['existingEntity', 'error'], null);
+        }
+
 
         let formsServerValidationRunning = false;
         const formsErrors = [];
@@ -386,10 +400,10 @@ export default class CUD extends Component {
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `rest/forms/${this.props.entity.id}`
+            url = `rest/forms/${this.props.entity.id}`;
         } else {
             sendMethod = FormSendMethod.POST;
-            url = 'rest/forms'
+            url = 'rest/forms';
         }
 
         this.disableForm();
@@ -456,6 +470,12 @@ export default class CUD extends Component {
             });
         }
 
+        const customFormsColumns = [
+            { data: 1, title: t('name') },
+            { data: 2, title: t('description') },
+            { data: 3, title: t('namespace') }
+        ];
+
         const listsColumns = [
             { data: 0, title: "#" },
             { data: 1, title: t('name') },
@@ -488,66 +508,76 @@ export default class CUD extends Component {
 
                     <NamespaceSelect/>
 
-                    <Fieldset label={t('formsPreview')}>
-                        <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
+                    {!isEdit &&
+                        <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
+                    }
 
-                        { previewListId &&
-                            <div>
-                                <AlignedRow>
-                                    <div className="help-block">
-                                        <small>
-                                            {t('noteTheseLinksAreSolelyForAQuickPreview')}
-                                        </small>
-                                    </div>
-                                    <p>
-                                        <ActionLink onClickAsync={async () => await this.preview('web_subscribe')}>Subscribe</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_confirm_subscription_notice')}>Confirm Subscription Notice</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_confirm_unsubscription_notice')}>Confirm Unsubscription Notice</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_subscribed_notice')}>Subscribed Notice</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_updated_notice')}>Updated Notice</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_unsubscribed_notice')}>Unsubscribed Notice</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_manual_unsubscribe_notice')}>Manual Unsubscribe Notice</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_unsubscribe')}>Unsubscribe</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_manage')}>Manage</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_manage_address')}>Manage Address</ActionLink>
-                                        {' | '}
-                                        <ActionLink onClickAsync={async () => await this.preview('web_privacy_policy_notice')}>Privacy Policy</ActionLink>
-                                    </p>
-                                </AlignedRow>
-                                {this.state.previewContents &&
-                                <div className={this.state.previewFullscreen ? formsStyles.editorFullscreen : formsStyles.editor}>
-                                    <div className={formsStyles.navbar}>
-                                        <div className={formsStyles.navbarLeft}>
-                                            {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
-                                            <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
+                    {this.getFormValue('fromExistingEntity') ?
+                        <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />
+                    :
+                        <>
+                            <Fieldset label={t('formsPreview')}>
+                                <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
+
+                                { previewListId &&
+                                <div>
+                                    <AlignedRow>
+                                        <div>
+                                            <small>
+                                                {t('noteTheseLinksAreSolelyForAQuickPreview')}
+                                            </small>
                                         </div>
-                                        <div className={formsStyles.navbarRight}>
-                                            <a className={formsStyles.btn} onClick={() => this.preview(this.state.previewKey)} title={t('refresh')}><Icon icon="sync-alt"/></a>
-                                            <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})} title={t('maximizeEditor')}><Icon icon="window-maximize"/></a>
-                                            <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})} title={t('closePreview')}><Icon icon="window-close"/></a>
+                                        <p>
+                                            <ActionLink onClickAsync={async () => await this.preview('web_subscribe')}>Subscribe</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_confirm_subscription_notice')}>Confirm Subscription Notice</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_confirm_unsubscription_notice')}>Confirm Unsubscription Notice</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_subscribed_notice')}>Subscribed Notice</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_updated_notice')}>Updated Notice</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_unsubscribed_notice')}>Unsubscribed Notice</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_manual_unsubscribe_notice')}>Manual Unsubscribe Notice</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_unsubscribe')}>Unsubscribe</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_manage')}>Manage</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_manage_address')}>Manage Address</ActionLink>
+                                            {' | '}
+                                            <ActionLink onClickAsync={async () => await this.preview('web_privacy_policy_notice')}>Privacy Policy</ActionLink>
+                                        </p>
+                                    </AlignedRow>
+                                    {this.state.previewContents &&
+                                    <div className={this.state.previewFullscreen ? formsStyles.editorFullscreen : formsStyles.editor}>
+                                        <div className={formsStyles.navbar}>
+                                            <div className={formsStyles.navbarLeft}>
+                                                {this.state.fullscreen && <img className={formsStyles.logo} src={getTrustedUrl('static/mailtrain-notext.png')}/>}
+                                                <div className={formsStyles.title}>{t('formPreview') + ' ' + this.state.previewLabel}</div>
+                                            </div>
+                                            <div className={formsStyles.navbarRight}>
+                                                <a className={formsStyles.btn} onClick={() => this.preview(this.state.previewKey)} title={t('refresh')}><Icon icon="sync-alt"/></a>
+                                                <a className={formsStyles.btn} onClick={() => this.setState({previewFullscreen: !this.state.previewFullscreen})} title={t('maximizeEditor')}><Icon icon="window-maximize"/></a>
+                                                <a className={formsStyles.btn} onClick={() => this.setState({previewContents: null, previewFullscreen: false})} title={t('closePreview')}><Icon icon="window-close"/></a>
+                                            </div>
                                         </div>
+                                        <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
                                     </div>
-                                    <iframe className={formsStyles.host} src={"data:text/html;charset=utf-8," + encodeURIComponent(this.state.previewContents)}></iframe>
+                                    }
                                 </div>
                                 }
-                            </div>
-                        }
-                    </Fieldset>
+                            </Fieldset>
 
-                    { selectedTemplate &&
-                        <Fieldset label={t('templates')}>
-                            <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
-                            <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
-                        </Fieldset>
+                            { selectedTemplate &&
+                            <Fieldset label={t('templates')}>
+                                <Dropdown id="selectedTemplate" label={t('edit')} options={templateOptGroups} help={this.templateSettings[selectedTemplate].help}/>
+                                <ACEEditor id={selectedTemplate} height="500px" mode={this.templateSettings[selectedTemplate].mode}/>
+                            </Fieldset>
+                            }
+                        </>
                     }
 
                     <ButtonRow>

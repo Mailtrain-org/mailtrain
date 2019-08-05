@@ -33,8 +33,10 @@ class TreeTable extends Component {
     constructor(props) {
         super(props);
 
+        this.mounted = false;
+
         this.state = {
-            treeData: []
+            treeData: null
         };
 
         if (props.data) {
@@ -46,13 +48,13 @@ class TreeTable extends Component {
     }
 
     static defaultProps = {
-        selectMode: TreeSelectMode.NONE 
+        selectMode: TreeSelectMode.NONE
     }
 
     refresh() {
-        if (this.tree) {
-            this.tree.reload(this.sanitizeTreeData(this.state.treeData));
-            this.updateSelection();
+        if (this.tree && !this.props.data && this.props.dataUrl) {
+            // noinspection JSIgnoredPromiseFromCall
+            this.loadData();
         }
     }
 
@@ -68,9 +70,11 @@ class TreeTable extends Component {
             }
         }
 
-        this.setState({
-            treeData
-        });
+        if (this.mounted) {
+            this.setState({
+                treeData
+            });
+        }
     }
 
     static propTypes = {
@@ -95,20 +99,25 @@ class TreeTable extends Component {
     // XSS protection
     sanitizeTreeData(unsafeData) {
         const data = [];
-        for (const unsafeEntry of unsafeData) {
-            const entry = Object.assign({}, unsafeEntry);
-            entry.unsanitizedTitle = entry.title;
-            entry.title = ReactDOMServer.renderToStaticMarkup(<div>{entry.title}</div>);
-            entry.description = ReactDOMServer.renderToStaticMarkup(<div>{entry.description}</div>);
-            if (entry.children) {
-                entry.children = this.sanitizeTreeData(entry.children);
+        if (unsafeData) {
+            for (const unsafeEntry of unsafeData) {
+                const entry = Object.assign({}, unsafeEntry);
+                entry.unsanitizedTitle = entry.title;
+                entry.title = ReactDOMServer.renderToStaticMarkup(<div>{entry.title}</div>);
+                entry.description = ReactDOMServer.renderToStaticMarkup(<div>{entry.description}</div>);
+                if (entry.children) {
+                    entry.children = this.sanitizeTreeData(entry.children);
+                }
+                data.push(entry);
             }
-            data.push(entry);
         }
+
         return data;
     }
 
     componentDidMount() {
+        this.mounted = true;
+
         if (!this.props.data && this.props.dataUrl) {
             // noinspection JSIgnoredPromiseFromCall
             this.loadData();
@@ -187,6 +196,7 @@ class TreeTable extends Component {
             createNode: createNodeFn,
             checkbox: this.selectMode === TreeSelectMode.MULTI,
             activate: (this.selectMode === TreeSelectMode.SINGLE ? ::this.onActivate : null),
+            deactivate: (this.selectMode === TreeSelectMode.SINGLE ? ::this.onActivate : null),
             select: (this.selectMode === TreeSelectMode.MULTI ? ::this.onSelect : null),
         };
 
@@ -221,6 +231,10 @@ class TreeTable extends Component {
         }
     }
 
+    componentWillUnmount() {
+        this.mounted = false;
+    }
+
     updateSelection() {
         const tree = this.tree;
         if (this.selectMode === TreeSelectMode.MULTI) {
@@ -231,7 +245,22 @@ class TreeTable extends Component {
             tree.enableUpdate(true);
 
         } else if (this.selectMode === TreeSelectMode.SINGLE) {
-            this.tree.activateKey(this.stringifyKey(this.props.selection));
+            let selection = this.stringifyKey(this.props.selection);
+
+            if (this.state.treeData) {
+                if (!tree.getNodeByKey(selection)) {
+                    selection = null;
+                }
+
+                if (selection === null && !this.tree.getActiveNode()) {
+                    // This covers the case when we mount the tree and selection is not present in the tree.
+                    // At this point, nothing is selected, so the onActive event won't trigger. So we have to
+                    // call it manually, so that the form can update and set null instead of the invalid selection.
+                    this.onActivate();
+                } else {
+                    tree.activateKey(selection);
+                }
+            }
         }
     }
 
@@ -260,7 +289,8 @@ class TreeTable extends Component {
 
     // Single-select
     onActivate(event, data) {
-        const selection = this.destringifyKey(this.tree.getActiveNode().key);
+        const activeNode = this.tree.getActiveNode();
+        const selection = activeNode ? this.destringifyKey(activeNode.key) : null;
 
         if (selection !== this.props.selection) {
             // noinspection JSIgnoredPromiseFromCall
@@ -288,7 +318,7 @@ class TreeTable extends Component {
 
         if (updated) {
             // noinspection JSIgnoredPromiseFromCall
-            this.onSelectionChanged(selection);
+            this.onSelectionChanged(newSel);
         }
     }
 

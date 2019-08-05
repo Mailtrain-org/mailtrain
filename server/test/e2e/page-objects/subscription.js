@@ -50,6 +50,7 @@ const fieldHelpers = list => ({
 module.exports = list => ({
 
     webSubscribe: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}`,
         elementsToWaitFor: ['form'],
         textsToWaitFor: ['Subscribe to list'],
@@ -63,6 +64,7 @@ module.exports = list => ({
     }, fieldHelpers(list)),
 
     webSubscribeAfterPost: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/subscribe`,
         elementsToWaitFor: ['form'],
         textsToWaitFor: ['Subscribe to list'],
@@ -76,11 +78,13 @@ module.exports = list => ({
     }, fieldHelpers(list)),
 
     webSubscribeNonPublic: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}`,
         textsToWaitFor: ['Permission denied'],
     }),
 
     webConfirmSubscriptionNotice: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/confirm-subscription-notice`,
         textsToWaitFor: ['We need to confirm your email address']
     }),
@@ -107,6 +111,7 @@ module.exports = list => ({
     }),
 
     webSubscribedNotice: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/subscribed-notice`,
         textsToWaitFor: ['Subscription Confirmed']
     }),
@@ -125,6 +130,7 @@ module.exports = list => ({
     }),
 
     webManage: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/manage/:ucid`,
         elementsToWaitFor: ['form'],
         textsToWaitFor: ['Update Your Preferences'],
@@ -142,6 +148,7 @@ module.exports = list => ({
     }, fieldHelpers(list)),
 
     webManageAddress: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/manage-address/:ucid`,
         elementsToWaitFor: ['form'],
         textsToWaitFor: ['Update Your Email Address'],
@@ -162,11 +169,13 @@ module.exports = list => ({
     }),
 
     webUpdatedNotice: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/updated-notice`,
         textsToWaitFor: ['Profile Updated']
     }),
 
     webUnsubscribedNotice: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/unsubscribed-notice`,
         textsToWaitFor: ['Unsubscribe Successful']
     }),
@@ -180,6 +189,7 @@ module.exports = list => ({
     }),
 
     webUnsubscribe: web({
+        baseUrl: config.basePublicUrl,
         elementsToWaitFor: ['submitButton'],
         textsToWaitFor: ['Unsubscribe'],
         elements: {
@@ -188,6 +198,7 @@ module.exports = list => ({
     }),
 
     webConfirmUnsubscriptionNotice: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/confirm-unsubscription-notice`,
         textsToWaitFor: ['We need to confirm your email address']
     }),
@@ -201,6 +212,7 @@ module.exports = list => ({
     }),
 
     webManualUnsubscribeNotice: web({
+        baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/manual-unsubscribe-notice`,
         elementsToWaitFor: ['contactLink'],
         textsToWaitFor: ['Online Unsubscription Is Not Possible', config.settings['admin-email']],

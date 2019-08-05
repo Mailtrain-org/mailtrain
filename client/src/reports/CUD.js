@@ -21,9 +21,8 @@ import {
 import axios from '../lib/axios';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import moment from 'moment';
-import {NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -49,7 +48,8 @@ export default class CUD extends Component {
 
     static propTypes = {
         action: PropTypes.string.isRequired,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     @withAsyncErrorHandler
@@ -97,7 +97,7 @@ export default class CUD extends Component {
                 name: '',
                 description: '',
                 report_template: null,
-                namespace: mailtrainConfig.user.namespace,
+                namespace: getDefaultNamespace(this.props.permissions),
                 user_fields: null
             });
         }

@@ -199,11 +199,10 @@ textarea {
 
 /* --- Other ------------- */
 
-.help-block {
+.option-help-block {
     display: block;
-    font-size: .9em;
-    line-height: 1;
-    color: #999999;
+    margin-left: 3px;
+    margin-bottom: 4px;
 }
 
 form a {

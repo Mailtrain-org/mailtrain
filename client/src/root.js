@@ -4,8 +4,7 @@ import './lib/public-path';
 
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {I18nextProvider} from 'react-i18next';
-import i18n, {withTranslation} from './lib/i18n';
+import {TranslationRoot, withTranslation} from './lib/i18n';
 import account from './account/root';
 import login from './login/root';
 import blacklist from './blacklist/root';
@@ -139,7 +138,7 @@ class Root extends Component {
 }
 
 export default function() {
-    ReactDOM.render(<I18nextProvider i18n={ i18n }><Root/></I18nextProvider>,document.getElementById('root'));
+    ReactDOM.render(<TranslationRoot><Root/></TranslationRoot>,document.getElementById('root'));
 };
 
 

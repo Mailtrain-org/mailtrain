@@ -19,9 +19,8 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {NamespaceSelect, validateNamespace} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
-import mailtrainConfig from 'mailtrainConfig';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/handlebars';
@@ -46,7 +45,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         wizard: PropTypes.string,
-        entity: PropTypes.object
+        entity: PropTypes.object,
+        permissions: PropTypes.object
     }
 
     submitFormValuesMutator(data) {
@@ -64,7 +64,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report listing all subscribers along with open counts.',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     mime_type: 'text/html',
                     user_fields:
                         '[\n' +
@@ -114,7 +114,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report as CSV that lists all subscribers along with open counts.',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     mime_type: 'text/csv',
                     user_fields:
                         '[\n' +
@@ -144,7 +144,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: 'Generates a campaign report with results are aggregated by "Country" custom field. (Note that this custom field has to be presents in the subscription custom fields.)',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     mime_type: 'text/html',
                     user_fields:
                         '[\n' +
@@ -215,7 +215,7 @@ export default class CUD extends Component {
                 this.populateFormValues({
                     name: '',
                     description: '',
-                    namespace: mailtrainConfig.user.namespace,
+                    namespace: getDefaultNamespace(this.props.permissions),
                     mime_type: 'text/html',
                     user_fields: '',
                     js: '',

@@ -3,13 +3,13 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {LinkButton, requiresAuthenticatedUser, Title, Toolbar, withPageHelpers} from '../lib/page';
-import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
+import {withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import {Icon} from "../lib/bootstrap-components";
-import {checkPermissions} from "../lib/permissions";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {withForm} from "../lib/form";
+import PropTypes from 'prop-types';
 
 @withComponentMixins([
     withTranslation,
@@ -26,27 +26,16 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
     }
 
-    @withAsyncErrorHandler
-    async fetchPermissions() {
-        const result = await checkPermissions({
-            createList: {
-                entityTypeId: 'namespace',
-                requiredOperations: ['createList']
-            }
-        });
-
-        this.setState({
-            createPermitted: result.data.createList
-        });
-    }
-
-    componentDidMount() {
-        // noinspection JSIgnoredPromiseFromCall
-        this.fetchPermissions();
+    static propTypes = {
+        permissions: PropTypes.object
     }
 
     render() {
         const t = this.props.t;
+
+        const permissions = this.props.permissions;
+        const createPermitted = permissions.createList;
+        const customFormsPermitted = permissions.createCustomForm || permissions.viewCustomForm;
 
         const columns = [
             {
@@ -130,12 +119,14 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-                {this.state.createPermitted &&
-                    <Toolbar>
+                <Toolbar>
+                    { createPermitted &&
                         <LinkButton to="/lists/create" className="btn-primary" icon="plus" label={t('createList')}/>
+                    }
+                    { customFormsPermitted &&
                         <LinkButton to="/lists/forms" className="btn-primary" label={t('customForms-1')}/>
-                    </Toolbar>
-                }
+                    }
+                </Toolbar>
 
                 <Title>{t('lists')}</Title>
 

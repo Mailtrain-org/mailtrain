@@ -1,16 +1,15 @@
 'use strict';
 
-const config = require('config');
+const config = require('../lib/config');
 const log = require('../lib/log');
 const mailers = require('../lib/mailers');
-const CampaignSender = require('../lib/campaign-sender');
-const {enforce} = require('../lib/helpers');
+const messageSender = require('../lib/message-sender');
 require('../lib/fork');
 
 const workerId = Number.parseInt(process.argv[2]);
 let running = false;
 
-async function processMessages(campaignId, subscribers) {
+async function processCampaignMessages(campaignId, messages) {
     if (running) {
         log.error('Senders', `Worker ${workerId} assigned work while working`);
         return;
@@ -18,36 +17,91 @@ async function processMessages(campaignId, subscribers) {
 
     running = true;
 
-    const cs = new CampaignSender();
-    await cs.init({campaignId})
+    const cs = new messageSender.MessageSender();
+    await cs.initByCampaignId(campaignId);
 
-    for (const subData of subscribers) {
+    let withErrors = false;
+
+    for (const campaignMessage of messages) {
         try {
-            if (subData.email) {
-                await cs.sendMessageByEmail(subData.listId, subData.email);
+            await cs.sendRegularCampaignMessage(campaignMessage);
 
-            } else if (subData.subscriptionId) {
-                await cs.sendMessageBySubscriptionId(subData.listId, subData.subscriptionId);
+            log.verbose('Senders', 'Message sent and status updated for %s:%s', campaignMessage.list, campaignMessage.subscription);
+        } catch (err) {
+
+            if (err instanceof mailers.SendConfigurationError) {
+                log.error('Senders', `Sending message to ${campaignMessage.list}:${campaignMessage.subscription} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                withErrors = true;
+                break;
 
             } else {
-                enforce(false);
+                log.error('Senders', `Sending message to ${campaignMessage.list}:${campaignMessage.subscription} failed with error: ${err.message}.`);
+                log.verbose(err.stack);
             }
-
-            log.verbose('Senders', 'Message sent and status updated for %s:%s', subData.listId, subData.email || subData.subscriptionId);
-        } catch (err) {
-            log.error('Senders', `Sending message to ${subData.listId}:${subData.email} failed with error: ${err.message}`)
-            log.verbose(err.stack);
         }
     }
 
     running = false;
 
-    sendToMaster('messages-processed');
+    sendToMaster('messages-processed', { withErrors });
 }
 
-function sendToMaster(msgType) {
+async function processQueuedMessages(sendConfigurationId, messages) {
+    if (running) {
+        log.error('Senders', `Worker ${workerId} assigned work while working`);
+        return;
+    }
+
+    running = true;
+
+    let withErrors = false;
+
+    for (const queuedMessage of messages) {
+
+        const msgData = queuedMessage.data;
+        let target = '';
+        if (msgData.listId && msgData.subscriptionId) {
+            target = `${msgData.listId}:${msgData.subscriptionId}`;
+        } else if (msgData.to) {
+            if (msgData.to.name && msgData.to.address) {
+                target = `${msgData.to.name} <${msgData.to.address}>`;
+            } else if (msgData.to.address) {
+                target = msgData.to.address;
+            } else {
+                target = msgData.to.toString();
+            }
+        }
+
+        try {
+            await messageSender.sendQueuedMessage(queuedMessage);
+            log.verbose('Senders', `Message sent and status updated for ${target}`);
+        } catch (err) {
+            if (err instanceof mailers.SendConfigurationError) {
+                log.error('Senders', `Sending message to ${target} failed with error: ${err.message}. Will retry the message if within retention interval.`);
+                withErrors = true;
+                break;
+            } else {
+                log.error('Senders', `Sending message to ${target} failed with error: ${err.message}. Dropping the message.`);
+                log.verbose(err.stack);
+
+                try {
+                    await messageSender.dropQueuedMessage(queuedMessage);
+                } catch (err) {
+                    log.error(err.stack);
+                }
+            }
+        }
+    }
+
+    running = false;
+
+    sendToMaster('messages-processed', { withErrors });
+}
+
+function sendToMaster(msgType, data) {
     process.send({
-        type: msgType
+        type: msgType,
+        data
     });
 }
 
@@ -58,11 +112,14 @@ process.on('message', msg => {
         if (type === 'reload-config') {
             mailers.invalidateMailer(msg.data.sendConfigurationId);
 
-        } else if (type === 'process-messages') {
+        } else if (type === 'process-campaign-messages') {
             // noinspection JSIgnoredPromiseFromCall
-            processMessages(msg.data.campaignId, msg.data.subscribers)
-        }
+            processCampaignMessages(msg.data.campaignId, msg.data.messages)
 
+        } else if (type === 'process-queued-messages') {
+            // noinspection JSIgnoredPromiseFromCall
+            processQueuedMessages(msg.data.sendConfigurationId, msg.data.messages)
+        }
     }
 });
 

@@ -4,7 +4,7 @@
 This module handles Mailtrain database initialization and upgrades
 */
 
-const config = require('config');
+const config = require('./config');
 const mysql = require('mysql');
 const log = require('./log');
 const fs = require('fs');
@@ -12,7 +12,7 @@ const pathlib = require('path');
 const Handlebars = require('handlebars');
 const bluebird = require('bluebird');
 
-const highestLegacySchemaVersion = 33;
+const highestLegacySchemaVersion = 34;
 
 const mysqlConfig = {
     multipleStatements: true

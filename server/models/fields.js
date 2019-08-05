@@ -2,7 +2,6 @@
 
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
-const slugify = require('slugify');
 const { enforce, filterObject } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
@@ -20,8 +19,8 @@ const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
 
 
-const allowedKeysCreate = new Set(['name', 'key', 'default_value', 'type', 'group', 'settings']);
-const allowedKeysUpdate = new Set(['name', 'key', 'default_value', 'group', 'settings']);
+const allowedKeysCreate = new Set(['name', 'help', 'key', 'default_value', 'type', 'group', 'settings']);
+const allowedKeysUpdate = new Set(['name', 'help', 'key', 'default_value', 'group', 'settings']);
 const hashKeys = allowedKeysCreate;
 
 const fieldTypes = {};
@@ -304,7 +303,7 @@ async function getById(context, listId, id) {
 }
 
 async function listTx(tx, listId) {
-    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'key', 'column', 'settings', 'group', 'default_value', 'order_list', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
+    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'help', 'key', 'column', 'settings', 'group', 'default_value', 'order_list', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
 }
 
 async function list(context, listId) {
@@ -543,7 +542,7 @@ async function createTx(tx, context, listId, entity) {
 
     let columnName;
     if (!fieldType.grouped) {
-        columnName = ('custom_' + slugify(entity.name, '_') + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '');
+        columnName = ('custom_' + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '_');
     }
 
     const filteredEntity = filterObject(entity, allowedKeysCreate);
@@ -661,10 +660,11 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
         const entry = {
             name: fld.name,
             key: fld.key,
+            help: fld.help,
             field: fld,
             [type.getHbsType(fld)]: true,
             order_subscribe: fld.order_subscribe,
-            order_manage: fld.order_manage,
+            order_manage: fld.order_manage
         };
 
         if (!type.grouped && !type.enumerated) {
@@ -688,6 +688,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
                 options.push({
                     key: opt.key,
                     name: opt.name,
+                    help: opt.help,
                     value: isEnabled
                 });
             }
@@ -702,6 +703,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
                 options.push({
                     key: opt.key,
                     name: opt.label,
+                    help: opt.help,
                     value: value === opt.key
                 });
             }

@@ -19,8 +19,8 @@ export default class List extends Component {
 
         return (
             <div>
-                <h2>{t('welcomeToMailtrain')}</h2>
-                <div>TODO: some dashboard</div>
+                <h2>{t('Mailtrain 2 beta')}</h2>
+                <div>{t('Build') + ' 2019-08-01-0745'}</div>
             </div>
         );
     }

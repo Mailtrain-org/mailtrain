@@ -5,13 +5,21 @@ import CUD from './CUD';
 import List from './List';
 import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
+import {namespaceCheckPermissions} from "../lib/namespace";
 
 function getMenus(t) {
     return {
         namespaces: {
             title: t('namespaces'),
             link: '/namespaces',
-            panelComponent: List,
+            checkPermissions: {
+                createNamespace: {
+                    entityTypeId: 'namespace',
+                    requiredOperations: ['createNamespace']
+                },
+                ...namespaceCheckPermissions('createNamespace')
+            },
+            panelRender: props => <List permissions={props.permissions}/>,
             children: {
                 ':namespaceId([0-9]+)': {
                     title: resolved => t('namespaceName', {name: ellipsizeBreadcrumbLabel(resolved.namespace.name)}),
@@ -24,7 +32,7 @@ function getMenus(t) {
                             title: t('edit'),
                             link: params => `/namespaces/${params.namespaceId}/edit`,
                             visible: resolved => resolved.namespace.permissions.includes('edit'),
-                            panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.namespace} />
+                            panelRender: props => <CUD action={props.match.params.action} entity={props.resolved.namespace} permissions={props.permissions} />
                         },
                         share: {
                             title: t('share'),
@@ -36,7 +44,7 @@ function getMenus(t) {
                 },
                 create: {
                     title: t('create'),
-                    panelRender: props => <CUD action="create" />
+                    panelRender: props => <CUD action="create" permissions={props.permissions} />
                 },
             }
         }

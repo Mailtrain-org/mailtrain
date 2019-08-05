@@ -136,7 +136,7 @@ suite('Subscription use-cases', () => {
         });
 
         await step('User submits an invalid email.', async () => {
-            await page.webSubscribe.setValue('emailInput', 'foo@bar.nope');
+            await page.webSubscribe.setValue('emailInput', 'foo-bar');
             await page.webSubscribe.submit();
         });
 
@@ -545,7 +545,7 @@ suite('Subscription use-cases', () => {
 async function apiSubscribe(listConf, subscription) {
     await step('Add subscription via API call.', async () => {
         const response = await request({
-            uri: `${config.baseUrl}/api/subscribe/${listConf.cid}?access_token=${config.users.admin.accessToken}`,
+            uri: `${config.baseTrustedUrl}/api/subscribe/${listConf.cid}?access_token=${config.users.admin.accessToken}`,
             method: 'POST',
             json: subscription
         });
@@ -630,7 +630,7 @@ suite('API Subscription use-cases', () => {
 
         await step('Unsubsribe via API call.', async () => {
             const response = await request({
-                uri: `${config.baseUrl}/api/unsubscribe/${config.lists.l1.cid}?access_token=${config.users.admin.accessToken}`,
+                uri: `${config.baseTrustedUrl}/api/unsubscribe/${config.lists.l1.cid}?access_token=${config.users.admin.accessToken}`,
                 method: 'POST',
                 json: {
                     EMAIL: subscription.EMAIL
