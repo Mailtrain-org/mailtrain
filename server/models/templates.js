@@ -92,12 +92,13 @@ async function create(context, entity) {
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: id });
 
-        if (entity.fromExistingEntity) {
+        //Returns an error
+        /*if (entity.fromExistingEntity) {
             await files.copyAllTx(tx, context, 'template', 'file', entity.existingEntity, 'template', 'file', id);
 
             convertFileURLs(entity, 'template', entity.existingEntity, 'template', id);
             await tx('templates').update(filterObject(entity, allowedKeys)).where('id', id);
-        }
+        }*/
 
         return id;
     });

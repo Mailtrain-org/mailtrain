@@ -152,8 +152,10 @@ export default class CUD extends Component {
         }
 
         const typeKey = state.getIn(['type', 'value']);
-        if (!typeKey) {
+        if (!typeKey && !state.getIn(['fromExistingEntity', 'value'])) {
             state.setIn(['type', 'error'], t('typeMustBeSelected'));
+        }else{
+            state.setIn(['type', 'error'], null);
         }
 
         if (!state.getIn(['tag_language', 'value'])) {
@@ -168,7 +170,7 @@ export default class CUD extends Component {
 
         validateNamespace(t, state);
 
-        if (typeKey) {
+        if (typeKey && !state.getIn(['fromExistingEntity', 'value'])) {
             this.templateTypes[typeKey].validate(state);
         }
     }
