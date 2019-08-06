@@ -134,8 +134,9 @@ export default class CUD extends Component {
 
         if (key === 'data_sourceCustom_tag_language') {
             if (newValue) {
+                const currentType = this.getFormValue('data_sourceCustom_type');
                 const isEdit = !!this.props.entity;
-                this.templateTypes[newValue].afterTagLanguageChange(mutStateData, isEdit);
+                this.templateTypes[currentType].afterTagLanguageChange(mutStateData, isEdit);
             }
         }
 
