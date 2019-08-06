@@ -77,7 +77,7 @@ async function create(context, entity) {
 
         if (entity.fromExistingEntity) {
             const existing = await getByIdTx(tx, context, entity.existingEntity, false);
-
+            
             entity.type = existing.type;
             entity.tag_language = existing.tag_language;
             entity.data = existing.data;
@@ -92,13 +92,11 @@ async function create(context, entity) {
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: id });
 
-        //Returns an error
-        /*if (entity.fromExistingEntity) {
+        if (entity.fromExistingEntity) {
             await files.copyAllTx(tx, context, 'template', 'file', entity.existingEntity, 'template', 'file', id);
-
-            convertFileURLs(entity, 'template', entity.existingEntity, 'template', id);
+            convertFileURLs(entity, 'template', entity.existingEntity, 'template', id, false);
             await tx('templates').update(filterObject(entity, allowedKeys)).where('id', id);
-        }*/
+        }
 
         return id;
     });
