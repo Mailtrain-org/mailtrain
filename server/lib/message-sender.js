@@ -347,16 +347,15 @@ class MessageSender {
 
             if (campaign) {
                 const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
-
                 if (this.useVerp) {
                     envelope = {
-                        from: campaignAddress + '@' + sendConfiguration.verp_hostname,
+                        from: campaignAddress + '@' + this.sendConfiguration.verp_hostname,
                         to: subscriptionGrouped.email
                     };
                 }
 
                 if (this.useVerpSenderHeader) {
-                    sender = campaignAddress + '@' + sendConfiguration.verp_hostname;
+                    sender = campaignAddress + '@' + this.sendConfiguration.verp_hostname;
                 }
 
                 headers['x-fbl'] = campaignAddress;
