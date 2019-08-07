@@ -1,6 +1,6 @@
 'use strict';
 
-function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityType, toEntityId, campaign) {
+function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityType, toEntityId) {
 
     function convertText(text) {
         if (text) {
@@ -22,7 +22,7 @@ function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityTyp
     sourceCustom.html = convertText(sourceCustom.html);
     sourceCustom.text = convertText(sourceCustom.text);
 
-    if ((sourceCustom.type === 'mosaico' || sourceCustom.type === 'mosaicoWithFsTemplate') && campaign){
+    if (sourceCustom.type === 'mosaico' || sourceCustom.type === 'mosaicoWithFsTemplate') {
         sourceCustom.data.model = convertText(sourceCustom.data.model);
         sourceCustom.data.model = convertText(sourceCustom.data.model);
         sourceCustom.data.metadata = convertText(sourceCustom.data.metadata);

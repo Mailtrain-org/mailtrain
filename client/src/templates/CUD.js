@@ -98,9 +98,13 @@ export default class CUD extends Component {
     }
 
     submitFormValuesMutator(data) {
-        this.templateTypes[data.type].beforeSave(data);
+        if (data.fromExistingEntity) {
+            return filterData(data, ['name', 'description', 'namespace', 'fromExistingEntity', 'existingEntity']);
 
-        return filterData(data, ['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace', 'fromExistingEntity', 'existingEntity']);
+        } else {
+            this.templateTypes[data.type].beforeSave(data);
+            return filterData(data, ['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace', 'fromExistingEntity']);
+        }
     }
 
     async getPreSubmitFormValuesUpdater() {
@@ -151,27 +155,28 @@ export default class CUD extends Component {
             state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         }
 
-        const typeKey = state.getIn(['type', 'value']);
-        if (!typeKey && !state.getIn(['fromExistingEntity', 'value'])) {
-            state.setIn(['type', 'error'], t('typeMustBeSelected'));
-        }else{
-            state.setIn(['type', 'error'], null);
-        }
-
-        if (!state.getIn(['tag_language', 'value'])) {
-            state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
-        }
-
-        if (state.getIn(['fromExistingEntity', 'value']) && !state.getIn(['existingEntity', 'value'])) {
-            state.setIn(['existingEntity', 'error'], t('sourceTemplateMustNotBeEmpty'));
-        } else {
-            state.setIn(['existingEntity', 'error'], null);
-        }
-
         validateNamespace(t, state);
 
-        if (typeKey && !state.getIn(['fromExistingEntity', 'value'])) {
-            this.templateTypes[typeKey].validate(state);
+        const fromExistingEntity = state.getIn(['fromExistingEntity', 'value']);
+
+        if (fromExistingEntity) {
+            if (!state.getIn(['existingEntity', 'value'])) {
+                state.setIn(['existingEntity', 'error'], t('sourceTemplateMustNotBeEmpty'));
+            }
+
+        } else {
+            const typeKey = state.getIn(['type', 'value']);
+            if (!typeKey) {
+                state.setIn(['type', 'error'], t('typeMustBeSelected'));
+            }
+
+            if (!state.getIn(['tag_language', 'value'])) {
+                state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
+            }
+
+            if (typeKey) {
+                this.templateTypes[typeKey].validate(state);
+            }
         }
     }
 

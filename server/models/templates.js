@@ -67,8 +67,6 @@ async function _validateAndPreprocess(tx, entity) {
     enforce(allTagLanguages.includes(entity.tag_language), `Invalid tag language '${entity.tag_language}'`);
 
     // We don't check contents of the "data" because it is processed solely on the client. The client generates the HTML code we use when sending out campaigns.
-
-    entity.data = JSON.stringify(entity.data);
 }
 
 async function create(context, entity) {
@@ -77,7 +75,7 @@ async function create(context, entity) {
 
         if (entity.fromExistingEntity) {
             const existing = await getByIdTx(tx, context, entity.existingEntity, false);
-            
+
             entity.type = existing.type;
             entity.tag_language = existing.tag_language;
             entity.data = existing.data;
@@ -87,15 +85,28 @@ async function create(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        const ids = await tx('templates').insert(filterObject(entity, allowedKeys));
+        const filteredEntityWithUnstringifiedData = filterObject(entity, allowedKeys);
+        const filteredEntity = {
+            ...filteredEntityWithUnstringifiedData,
+            data: JSON.stringify(filteredEntityWithUnstringifiedData.data)
+        };
+
+        const ids = await tx('templates').insert(filteredEntity);
         const id = ids[0];
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: id });
 
         if (entity.fromExistingEntity) {
             await files.copyAllTx(tx, context, 'template', 'file', entity.existingEntity, 'template', 'file', id);
-            convertFileURLs(entity, 'template', entity.existingEntity, 'template', id, false);
-            await tx('templates').update(filterObject(entity, allowedKeys)).where('id', id);
+
+            convertFileURLs(filteredEntityWithUnstringifiedData, 'template', entity.existingEntity, 'template', id);
+
+            const filteredEntity = {
+                ...filteredEntityWithUnstringifiedData,
+                data: JSON.stringify(filteredEntityWithUnstringifiedData.data)
+            };
+
+            await tx('templates').update(filteredEntity).where('id', id);
         }
 
         return id;
@@ -119,10 +130,13 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         await _validateAndPreprocess(tx, entity);
+        entity.data = JSON.stringify(entity.data);
 
         await namespaceHelpers.validateMove(context, entity, existing, 'template', 'createTemplate', 'delete');
 
-        await tx('templates').where('id', entity.id).update(filterObject(entity, allowedKeys));
+        const filteredEntity = filterObject(entity, allowedKeys);
+
+        await tx('templates').where('id', entity.id).update(filteredEntity);
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: entity.id });
     });

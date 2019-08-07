@@ -529,7 +529,7 @@ async function _createTx(tx, context, entity, content) {
 
         if (copyFilesFrom) {
             await files.copyAllTx(tx, context, copyFilesFrom.entityType, 'file', copyFilesFrom.entityId, 'campaign', 'file', id);
-            convertFileURLs(data.sourceCustom, copyFilesFrom.entityType, copyFilesFrom.entityId, 'campaign', id, true);
+            convertFileURLs(data.sourceCustom, copyFilesFrom.entityType, copyFilesFrom.entityId, 'campaign', id);
             await tx('campaigns')
                 .update({
                     data: JSON.stringify(data)

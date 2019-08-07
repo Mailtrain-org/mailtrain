@@ -82,7 +82,7 @@ export default class CUD extends Component {
         ];
 
         this.sourceOptions = [];
-        for (const key in sourceLabelsOrder) {
+        for (const key of sourceLabelsOrder) {
             this.sourceOptions.push({key, label: this.sourceLabels[key]});
         }
 
