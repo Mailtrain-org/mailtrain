@@ -293,6 +293,8 @@ class MessageSender {
         let subscriptionGrouped, list; // May be undefined
         const campaign = this.campaign; // May be undefined
 
+        const sendConfiguration = this.sendConfiguration;
+
         let mergeTags = subData.mergeTags;
 
         if (subData.listId) {
@@ -347,15 +349,16 @@ class MessageSender {
 
             if (campaign) {
                 const campaignAddress = [campaign.cid, list.cid, subscriptionGrouped.cid].join('.');
+
                 if (this.useVerp) {
                     envelope = {
-                        from: campaignAddress + '@' + this.sendConfiguration.verp_hostname,
+                        from: campaignAddress + '@' + sendConfiguration.verp_hostname,
                         to: subscriptionGrouped.email
                     };
                 }
 
                 if (this.useVerpSenderHeader) {
-                    sender = campaignAddress + '@' + this.sendConfiguration.verp_hostname;
+                    sender = campaignAddress + '@' + sendConfiguration.verp_hostname;
                 }
 
                 headers['x-fbl'] = campaignAddress;
@@ -388,7 +391,6 @@ class MessageSender {
             return;
         }
 
-        const sendConfiguration = this.sendConfiguration;
         const mailer = await mailers.getOrCreateMailer(sendConfiguration.id);
 
         await mailer.throttleWait();
