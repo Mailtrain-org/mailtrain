@@ -83,8 +83,8 @@ export default class CustomContent extends Component {
 
     onTagLanguageChanged(mutStateData, key, oldTagLanguage, tagLanguage) {
         if (tagLanguage) {
-            const type = mutStateData.getIn(['data_sourceCustom_tag_language', 'value']);
-            this.tagLanguages[type].afterTagLanguageChange(mutStateData, true);
+            const type = mutStateData.getIn(['data_sourceCustom_type', 'value']);
+            this.templateTypes[type].afterTagLanguageChange(mutStateData, true);
         }
     }
 
