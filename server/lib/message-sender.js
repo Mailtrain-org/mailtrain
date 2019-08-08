@@ -293,6 +293,8 @@ class MessageSender {
         let subscriptionGrouped, list; // May be undefined
         const campaign = this.campaign; // May be undefined
 
+        const sendConfiguration = this.sendConfiguration;
+
         let mergeTags = subData.mergeTags;
 
         if (subData.listId) {
@@ -389,7 +391,6 @@ class MessageSender {
             return;
         }
 
-        const sendConfiguration = this.sendConfiguration;
         const mailer = await mailers.getOrCreateMailer(sendConfiguration.id);
 
         await mailer.throttleWait();
