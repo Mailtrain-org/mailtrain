@@ -97,7 +97,8 @@ export default class CUD extends Component {
         }
 
         this.state = {
-            sendConfiguration: null
+            sendConfiguration: null,
+            unallowedNamespace: false
         };
 
         this.nextListEntryId = 0;
@@ -157,11 +158,24 @@ export default class CUD extends Component {
         if (sendConfigurationId) {
             this.fetchSendConfigurationId = sendConfigurationId;
 
-            const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
-
-            if (sendConfigurationId === this.fetchSendConfigurationId) {
+            try{
+                const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
+                if (sendConfigurationId === this.fetchSendConfigurationId) {
+                    this.setState({
+                        sendConfiguration: result.data,
+                        unallowedNamespace: false
+                    });
+                }
+            }catch(error){  
+                var unallowedNamespace = false;
+                if(error.message == 'Permission denied'){
+                    unallowedNamespace = true;
+                }else{
+                    unallowedNamespace = false;
+                }
                 this.setState({
-                    sendConfiguration: result.data
+                    sendConfiguration: null, 
+                    unallowedNamespace: unallowedNamespace
                 });
             }
         }
@@ -663,7 +677,9 @@ export default class CUD extends Component {
                 addOverridable('from_email', t('fromEmailAddress'));
                 addOverridable('reply_to', t('replytoEmailAddress'));
             } else {
-                sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
+                if(!this.state.unallowedNamespace){
+                    sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
+                }
             }
         } else {
             sendSettings = null;
