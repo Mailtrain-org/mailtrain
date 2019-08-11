@@ -72,7 +72,7 @@ class PreviewForTestUserModalDialog extends Component {
                 });
 
                 const accessToken = result.data;
-                window.open(getSandboxUrl(`campaigns/rss-preview/${campaignCid}/${listCid}/${subscriptionCid}`, accessToken, {withLocale: true}), '_blank');
+                window.open(getSandboxUrl(`cpgs/rss-preview/${campaignCid}/${listCid}/${subscriptionCid}`, accessToken, {withLocale: true}), '_blank');
 
             } else if (entity.type === CampaignType.REGULAR) {
                 window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');

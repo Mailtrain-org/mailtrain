@@ -275,7 +275,7 @@ async function createApp(appType) {
         useWith404Fallback('/files', files);
     }
 
-    useWith404Fallback('/campaigns', await campaigns.getRouter(appType));
+    useWith404Fallback('/cpgs', await campaigns.getRouter(appType)); // This needs to be different from "campaigns", which is already used by the UI
 
     useWith404Fallback('/mosaico', await sandboxedMosaico.getRouter(appType));
     useWith404Fallback('/ckeditor', await sandboxedCKEditor.getRouter(appType));

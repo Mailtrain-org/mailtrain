@@ -200,14 +200,16 @@ class MessageSender {
                 form[key] = mergeTags[key];
             }
 
+            const sourceUrl = campaign.data.sourceUrl;
+
             const response = await request.post({
-                uri: campaign.sourceUrl,
+                uri: sourceUrl,
                 form,
                 resolveWithFullResponse: true
             });
 
             if (response.statusCode !== 200) {
-                throw new Error(`Received status code ${httpResponse.statusCode} from ${campaign.sourceUrl}`);
+                throw new Error(`Received status code ${httpResponse.statusCode} from ${sourceUrl}`);
             }
 
             html = response.body;
