@@ -167,7 +167,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 mutState.setIn([prefix + 'mosaicoTemplate', 'value'], null);
             }
         },
-        isTagLanguageSelectorDisabledForEdit: true,
         validate: state => {
             const mosaicoTemplate = state.getIn([prefix + 'mosaicoTemplate', 'value']);
             if (!mosaicoTemplate) {
@@ -256,7 +255,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -346,7 +344,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -408,7 +405,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -495,7 +491,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };

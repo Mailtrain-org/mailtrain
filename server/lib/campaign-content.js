@@ -1,6 +1,10 @@
 'use strict';
 
+const {renderTag} = require('../../shared/templates');
+
 function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityType, toEntityId) {
+
+    const tagLanguage = sourceCustom.tag_language;
 
     function convertText(text) {
         if (text) {
@@ -10,10 +14,10 @@ function convertFileURLs(sourceCustom, fromEntityType, fromEntityId, toEntityTyp
             const encodedFromUrl = encodeURIComponent(fromUrl);
             const encodedToUrl = encodeURIComponent(toUrl);
 
-            text = text.split('[URL_BASE]' + fromUrl).join('[URL_BASE]' + toUrl);
-            text = text.split('[SANDBOX_URL_BASE]' + fromUrl).join('[SANDBOX_URL_BASE]' + toUrl);
-            text = text.split('[ENCODED_URL_BASE]' + encodedFromUrl).join('[ENCODED_URL_BASE]' + encodedToUrl);
-            text = text.split('[ENCODED_SANDBOX_URL_BASE]' + encodedFromUrl).join('[ENCODED_SANDBOX_URL_BASE]' + encodedToUrl);
+            text = text.split(renderTag(tagLanguage, 'URL_BASE') + fromUrl).join(renderTag(tagLanguage, 'URL_BASE') + toUrl);
+            text = text.split(renderTag(tagLanguage,'SANDBOX_URL_BASE') + fromUrl).join(renderTag(tagLanguage, 'SANDBOX_URL_BASE') + toUrl);
+            text = text.split(renderTag(tagLanguage, 'ENCODED_URL_BASE') + encodedFromUrl).join(renderTag(tagLanguage, 'ENCODED_URL_BASE') + encodedToUrl);
+            text = text.split(renderTag(tagLanguage, 'ENCODED_SANDBOX_URL_BASE') + encodedFromUrl).join(renderTag(tagLanguage, 'ENCODED_SANDBOX_URL_BASE') + encodedToUrl);
         }
 
         return text;

@@ -11,6 +11,7 @@ import {getTrustedUrl} from "./urls";
 
 import {initialHeight} from "./sandboxed-ckeditor-shared";
 import {withComponentMixins} from "./decorator-helpers";
+import {getTagLanguageFromEntity} from "./sandbox-common";
 
 const navbarHeight = 34; // Sync this with navbarheight in sandboxed-ckeditor.scss
 
@@ -83,6 +84,7 @@ export class CKEditorHost extends Component {
         const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
+            tagLanguage: getTagLanguageFromEntity(this.props.entity, this.props.entityTypeId),
             initialSource: this.props.initialSource
         };
 
