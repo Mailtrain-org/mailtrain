@@ -43,7 +43,7 @@ class MessageSender {
 
         Option #1
         - settings.type in [MessageType.REGULAR, MessageType.TRIGGERED, MessageType.TEST]
-        - campaignCid / campaignId
+        - campaign / campaignCid / campaignId
         - listId / listCid [optional if campaign is provided]
         - sendConfigurationId [optional if campaign is provided]
         - attachments [optional]
@@ -68,7 +68,9 @@ class MessageSender {
             if (this.type === MessageType.REGULAR || this.type === MessageType.TRIGGERED || this.type === MessageType.TEST) {
                 this.isMassMail = true;
 
-                if (settings.campaignCid) {
+                if (settings.campaign) {
+                    this.campaign = settings.campaign;
+                } else if (settings.campaignCid) {
                     this.campaign = await campaigns.rawGetByTx(tx, 'cid', settings.campaignCid);
                 } else if (settings.campaignId) {
                     this.campaign = await campaigns.rawGetByTx(tx, 'id', settings.campaignId);
@@ -153,6 +155,12 @@ class MessageSender {
                 this.html = this.campaign.data.sourceCustom.html;
                 this.text = this.campaign.data.sourceCustom.text;
                 this.tagLanguage = this.campaign.data.sourceCustom.tag_language;
+            }
+
+            if (settings.rssEntry !== undefined) {
+                this.rssEntry = settings.rssEntry;
+            } else if (this.campaign && this.campaign.data.rssEntry) {
+                this.rssEntry = this.campaign.data.rssEntry;
             }
 
             enforce(this.renderedHtml || (this.campaign && this.campaign.source === CampaignSource.URL) || this.tagLanguage);
@@ -245,11 +253,11 @@ class MessageSender {
         };
     }
 
-    _getExtraTags(campaign) {
+    _getExtraTags() {
         const tags = {};
 
-        if (campaign && campaign.type === CampaignType.RSS_ENTRY) {
-            const rssEntry = campaign.data.rssEntry;
+        if (this.rssEntry) {
+            const rssEntry = this.rssEntry;
             tags['RSS_ENTRY_TITLE'] = rssEntry.title;
             tags['RSS_ENTRY_DATE'] = rssEntry.date;
             tags['RSS_ENTRY_LINK'] = rssEntry.link;
@@ -311,7 +319,7 @@ class MessageSender {
             const flds = this.listsFieldsGrouped.get(list.id);
 
             if (!mergeTags) {
-                mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags(campaign));
+                mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags());
             }
 
             for (const fld of flds) {
@@ -539,7 +547,8 @@ async function sendQueuedMessage(queuedMessage) {
         subject: msgData.subject,
         tagLanguage: msgData.tagLanguage,
         renderedHtml: msgData.renderedHtml,
-        renderedText: msgData.renderedText
+        renderedText: msgData.renderedText,
+        rssEntry: msgData.rssEntry
     });
 
     const campaign = cs.campaign;
@@ -696,9 +705,9 @@ async function queueSubscriptionMessage(sendConfigurationId, to, subject, encryp
     senders.scheduleCheck();
 }
 
-async function getMessage(campaignCid, listCid, subscriptionCid) {
+async function getMessage(campaignCid, listCid, subscriptionCid, settings) {
     const cs = new MessageSender();
-    await cs._init({type: MessageType.REGULAR, campaignCid, listCid});
+    await cs._init({type: MessageType.REGULAR, campaignCid, listCid, ...settings});
 
     const campaign = cs.campaign;
     const list = cs.listsByCid.get(listCid);
@@ -732,7 +741,7 @@ async function getMessage(campaignCid, listCid, subscriptionCid) {
     }
 
     const flds = cs.listsFieldsGrouped.get(list.id);
-    const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, cs._getExtraTags(campaign));
+    const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, cs._getExtraTags());
 
     return await cs._getMessage(mergeTags, list, subscriptionGrouped, false);
 }

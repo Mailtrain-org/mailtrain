@@ -420,7 +420,7 @@ async function list(context, listId, grouped, offset, limit) {
 }
 
 async function listTestUsersTx(tx, context, listId, segmentId, grouped) {
-    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
+    await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewTestSubscriptions');
 
     let entitiesQry = tx(getSubscriptionTableName(listId)).orderBy('id', 'asc').where('is_test', true).limit(TEST_USERS_LIST_LIMIT);
 

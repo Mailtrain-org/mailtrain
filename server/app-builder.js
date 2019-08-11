@@ -23,6 +23,7 @@ const api = require('./routes/api');
 const reports = require('./routes/reports');
 const quickReports = require('./routes/quick-reports');
 const subscriptions = require('./routes/subscriptions');
+const campaigns = require('./routes/campaigns');
 const subscription = require('./routes/subscription');
 const sandboxedMosaico = require('./routes/sandboxed-mosaico');
 const sandboxedCKEditor = require('./routes/sandboxed-ckeditor');
@@ -60,7 +61,7 @@ const index = require('./routes/index');
 
 const interoperableErrors = require('../shared/interoperable-errors');
 
-const { getTrustedUrl } = require('./lib/urls');
+const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('./lib/urls');
 const { AppType } = require('../shared/app');
 
 
@@ -274,6 +275,8 @@ async function createApp(appType) {
         useWith404Fallback('/files', files);
     }
 
+    useWith404Fallback('/campaigns', await campaigns.getRouter(appType));
+
     useWith404Fallback('/mosaico', await sandboxedMosaico.getRouter(appType));
     useWith404Fallback('/ckeditor', await sandboxedCKEditor.getRouter(appType));
     useWith404Fallback('/grapesjs', await sandboxedGrapesJS.getRouter(appType));
@@ -357,11 +360,21 @@ async function createApp(appType) {
             if (err instanceof interoperableErrors.NotLoggedInError) {
                 return res.redirect(getTrustedUrl('/login?next=' + encodeURIComponent(req.originalUrl)));
             } else {
+                let publicPath;
+                if (appType === AppType.TRUSTED) {
+                    publicPath = getTrustedUrl();
+                } else if (appType === AppType.SANDBOXED) {
+                    publicPath = getSandboxUrl();
+                } else if (appType === AppType.PUBLIC) {
+                    publicPath = getPublicUrl();
+                }
+
                 log.verbose('HTTP', err);
                 res.status(err.status || 500);
                 res.render('error', {
                     message: err.message,
-                    error: config.sendStacktracesToClient ? err : {}
+                    error: config.sendStacktracesToClient ? err : {},
+                    publicPath
                 });
             }
         }

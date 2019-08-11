@@ -10,7 +10,7 @@ import {getCampaignLabels} from './helpers';
 import {Table} from "../lib/table";
 import {Button, Icon, ModalDialog} from "../lib/bootstrap-components";
 import axios from "../lib/axios";
-import {getPublicUrl, getUrl} from "../lib/urls";
+import {getPublicUrl, getSandboxUrl, getUrl} from "../lib/urls";
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
 import moment from 'moment-timezone';
@@ -58,10 +58,29 @@ class PreviewForTestUserModalDialog extends Component {
 
     async previewAsync() {
         if (this.isFormWithoutErrors()) {
-            const campaignCid = this.props.entity.cid;
+            const entity = this.props.entity;
+            const campaignCid = entity.cid;
             const [listCid, subscriptionCid] = this.getFormValue('testUser').split(':');
 
-            window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');
+            if (entity.type === CampaignType.RSS) {
+                const result = await axios.post(getUrl('rest/restricted-access-token'), {
+                    method: 'rssPreview',
+                    params: {
+                        campaignCid,
+                        listCid
+                    }
+                });
+
+                const accessToken = result.data;
+                window.open(getSandboxUrl(`campaigns/rss-preview/${campaignCid}/${listCid}/${subscriptionCid}`, accessToken, {withLocale: true}), '_blank');
+
+            } else if (entity.type === CampaignType.REGULAR) {
+                window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');
+
+            } else {
+                throw new Error('Preview not supported');
+            }
+
         } else {
             this.showFormValidation();
         }
