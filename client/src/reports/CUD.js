@@ -226,9 +226,13 @@ export default class CUD extends Component {
         }
 
         if (userFieldsSpec) {
+            var namespace = "";
+            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+                namespace = '/' + getNamespaceIdFilterCookie();
+            }
             for (const spec of userFieldsSpec) {
                 if (spec.type === 'campaign') {
-                    addUserFieldTableSelect(spec, 'rest/campaigns-table', 1,[
+                    addUserFieldTableSelect(spec, 'rest/campaigns-table' + namespace, 1,[
                         {data: 0, title: "#"},
                         {data: 1, title: t('name')},
                         {data: 2, title: t('description')},
@@ -236,7 +240,7 @@ export default class CUD extends Component {
                         {data: 4, title: t('created'), render: data => moment(data).fromNow()}
                     ]);
                 } else if (spec.type === 'list') {
-                    addUserFieldTableSelect(spec, 'rest/lists-table', 1,[
+                    addUserFieldTableSelect(spec, 'rest/lists-table' + namespace, 1,[
                         {data: 0, title: "#"},
                         {data: 1, title: t('name')},
                         {data: 2, title: t('id')},
