@@ -78,9 +78,11 @@ export default class CUD extends Component {
     submitFormValuesMutator(data) {
         const params = {};
 
-        for (const spec of data.user_fields) {
-            const fldId = `param_${spec.id}`;
-            params[spec.id] = data[fldId];
+        if(data.user_fields){
+            for (const spec of data.user_fields) {
+                const fldId = `param_${spec.id}`;
+                params[spec.id] = data[fldId];
+            }
         }
 
         data.params = params;
@@ -98,7 +100,7 @@ export default class CUD extends Component {
                 description: '',
                 report_template: null,
                 namespace: getDefaultNamespace(this.props.permissions),
-                user_fields: []
+                user_fields: null
             });
         }
     }
