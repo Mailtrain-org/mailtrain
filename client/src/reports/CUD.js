@@ -98,7 +98,7 @@ export default class CUD extends Component {
                 description: '',
                 report_template: null,
                 namespace: getDefaultNamespace(this.props.permissions),
-                user_fields: null
+                user_fields: []
             });
         }
     }
