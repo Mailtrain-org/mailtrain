@@ -141,7 +141,7 @@ async function getRouter(appType) {
             const tmpl = await mosaicoTemplates.getById(req.context, castToInteger(req.params.mosaicoTemplateId));
 
             res.set('Content-Type', 'text/html');
-            res.send(base(tmpl.data.html, getTrustedUrl(), getSandboxUrl('', req.context), getPublicUrl()));
+            res.send(base(tmpl.data.html, tmpl.tag_language, getTrustedUrl(), getSandboxUrl('', req.context), getPublicUrl()));
         });
 
         // Mosaico looks for block thumbnails in edres folder relative to index.html of the template. We respond to such requests here.

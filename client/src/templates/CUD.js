@@ -382,7 +382,7 @@ export default class CUD extends Component {
 
                             {typeForm}
 
-                            <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions} disabled={isEdit && (!typeKey || this.templateTypes[typeKey].isTagLanguageSelectorDisabledForEdit)}/>
+                            <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions} disabled={isEdit}/>
                         </>
                     }
 

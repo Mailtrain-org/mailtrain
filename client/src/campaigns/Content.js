@@ -277,7 +277,7 @@ export default class CustomContent extends Component {
                         {customTemplateTypeKey && this.templateTypes[customTemplateTypeKey].typeName}
                     </StaticField>
 
-                    <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={!customTemplateTypeKey || this.templateTypes[customTemplateTypeKey].isTagLanguageSelectorDisabledForEdit}/>
+                    <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={true}/>
 
                     {customTemplateTypeKey && getTypeForm(this, customTemplateTypeKey, true)}
 

@@ -157,7 +157,7 @@
   "campaign_plural": "Campaigns",
   "contentOfTheSelectedCampaignWillBeCopied": "Content of the selected campaign will be copied into this campaign.",
   "renderUrl": "Render URL",
-  "ifAMessageIsSentThenThisUrlWillBePosTed": "If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself.",
+  "ifAMessageIsSentThenThisUrlWillBePosTed": "If a message is sent then this URL will be POSTed to using Merge Tags as POST body. Use this if you want to generate the HTML message yourself. Example: http://www.example.com/foo",
   "deletingCampaign": "Deleting campaign ...",
   "campaignDeleted": "Campaign deleted",
   "formCannotBeEditedBecauseTheCampaignIs": "Form cannot be edited because the campaign is currently being sent out. Wait till the sending is finished and refresh.",

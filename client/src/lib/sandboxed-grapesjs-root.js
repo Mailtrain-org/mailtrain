@@ -54,6 +54,7 @@ export class GrapesJSSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
+        tagLanguage: PropTypes.string,
         initialSource: PropTypes.string,
         initialStyle: PropTypes.string,
         sourceType: PropTypes.string
@@ -75,8 +76,8 @@ export class GrapesJSSandbox extends Component {
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
 
-        const source = unbase(editor.getHtml(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
-        const style = unbase(editor.getCss(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+        const source = unbase(editor.getHtml(), this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+        const style = unbase(editor.getCss(), this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
 
         let html;
 
@@ -96,7 +97,7 @@ export class GrapesJSSandbox extends Component {
 
             const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
             const postHtml = '</body></html>';
-            html = preHtml + unbase(htmlBody, trustedUrlBase, sandboxUrlBase, publicUrlBase, true) + postHtml;
+            html = preHtml + unbase(htmlBody, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true) + postHtml;
         }
 
 
@@ -603,8 +604,8 @@ export class GrapesJSSandbox extends Component {
             config.plugins.push('gjs-preset-newsletter');
         }
 
-        config.components = props.initialSource ? base(props.initialSource, trustedUrlBase, sandboxUrlBase, publicUrlBase) : defaultSource;
-        config.style = props.initialStyle ? base(props.initialStyle, trustedUrlBase, sandboxUrlBase, publicUrlBase) : defaultStyle;
+        config.components = props.initialSource ? base(props.initialSource, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase) : defaultSource;
+        config.style = props.initialStyle ? base(props.initialStyle, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase) : defaultStyle;
 
         config.plugins.push('mailtrain-remove-buttons');
 

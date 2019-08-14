@@ -3,10 +3,10 @@
 const config = require('../lib/config');
 const log = require('../lib/log');
 const knex = require('../lib/knex');
-const feedparser = require('feedparser-promised');
 const { CampaignType, CampaignStatus, CampaignSource } = require('../../shared/campaigns');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
+const {fetch} = require('../lib/feedcheck');
 require('../lib/fork');
 
 const { tLog } = require('../lib/translate');
@@ -18,39 +18,6 @@ const dbCheckInterval = 60 * 1000;
 let running = false;
 
 let periodicTimeout = null;
-
-async function fetch(url) {
-    const httpOptions = {
-        uri: url,
-        headers: {
-            'user-agent': 'Mailtrain',
-            'accept': 'text/html,application/xhtml+xml'
-        }
-    };
-
-    const items = await feedparser.parse(httpOptions);
-
-    const entries = [];
-    for (const item of items) {
-        const entry = {
-            title: item.title,
-            date: item.date || item.pubdate || item.pubDate || new Date(),
-            guid: item.guid || item.link,
-            link: item.link,
-            content: item.description || item.summary,
-            summary: item.summary || item.description,
-            imageUrl: item.image.url,
-        };
-
-        if ('mt:entries-json' in item) {
-            entry.customTags = JSON.parse(item['mt:entries-json']['#'])
-        }
-
-        entries.push(entry);
-    }
-
-    return entries;
-}
 
 async function run() {
     if (running) {

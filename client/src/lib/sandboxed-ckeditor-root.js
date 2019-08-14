@@ -27,7 +27,7 @@ class CKEditorSandbox extends Component {
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
-        const source = this.props.initialSource && base(this.props.initialSource, trustedUrlBase, sandboxUrlBase, publicUrlBase);
+        const source = this.props.initialSource && base(this.props.initialSource, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase);
 
         this.state = {
             source
@@ -37,6 +37,7 @@ class CKEditorSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
+        tagLanguage: PropTypes.string,
         initialSource: PropTypes.string
     }
 
@@ -48,7 +49,7 @@ class CKEditorSandbox extends Component {
         const preHtml = '<!doctype html><html><head><meta charset="utf-8"><title></title></head><body>';
         const postHtml = '</body></html>';
 
-        const unbasedSource = unbase(this.state.source, trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
+        const unbasedSource = unbase(this.state.source, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true);
 
         return {
             source: unbasedSource,

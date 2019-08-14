@@ -142,6 +142,8 @@ ldap:
   # method: ldapjs
   host: localhost
   port: 3002
+  # secure enables ldaps protocol if true. Otherwise, ldap protocol is used.
+  secure: false
   baseDN: ou=users,dc=company
   filter: (|(username={{username}})(mail={{username}}))
   # Username field in LDAP (uid/cn/username)
