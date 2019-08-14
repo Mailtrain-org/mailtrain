@@ -24,6 +24,7 @@ const contextHelpers = require('../lib/context-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
 const messageSender = require('../lib/message-sender');
 const lists = require('./lists');
+const namespaces = require('./namespaces');
 
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
@@ -67,26 +68,32 @@ function hash(entity, content) {
     return hasher.hash(filteredEntity);
 }
 
-async function _listDTAjax(context, namespaceId, params) {
+async function _listDTAjax(context, namespaceFilter, params) {
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
+
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
         params,
         builder => {
             builder = builder.from('campaigns')
-                .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
-                .whereNull('campaigns.parent');
-            if (namespaceId) {
-                builder = builder.where('namespaces.id', namespaceId);
-            }
+                .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace');
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('campaigns.namespace', allowedNamespaces[key]);
+                }
+                builder = builder.whereNull('campaigns.parent');
             return builder;
         },
         ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
 }
 
-async function listDTAjax(context, params) {
-    return await _listDTAjax(context, undefined, params);
+async function listDTAjax(context, params, namespaceId) {
+    return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listByNamespaceDTAjax(context, namespaceId, params) {
@@ -106,14 +113,25 @@ async function listChildrenDTAjax(context, campaignId, params) {
 }
 
 
-async function listWithContentDTAjax(context, params) {
+async function listWithContentDTAjax(context, namespaceFilter, params) {
+    var allowedNamespaces = [];
+    
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('campaigns')
-            .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
-            .whereIn('campaigns.source', [CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.CUSTOM_FROM_CAMPAIGN]),
+        builder => {
+            builder = builder.from('campaigns')
+                .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace');
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('campaigns.namespace', allowedNamespaces[key]);
+                }
+                builder = builder.whereIn('campaigns.source', [CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.CUSTOM_FROM_CAMPAIGN]);
+            return builder;
+        },
         ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
     );
 }

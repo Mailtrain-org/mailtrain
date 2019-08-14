@@ -6,13 +6,20 @@ const campaigns = require('../../models/campaigns');
 const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
 
-
 router.postAsync('/campaigns-table', passport.loggedIn, async (req, res) => {
-    return res.json(await campaigns.listDTAjax(req.context, req.body));
+    return res.json(await campaigns.listDTAjax(req.context, req.body, null));
+});
+
+router.postAsync('/campaigns-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listDTAjax(req.context, req.body, castToInteger(req.params.namespaceId)));
 });
 
 router.postAsync('/campaigns-with-content-table', passport.loggedIn, async (req, res) => {
-    return res.json(await campaigns.listWithContentDTAjax(req.context, req.body));
+    return res.json(await campaigns.listWithContentDTAjax(req.context, null, req.body));
+});
+
+router.postAsync('/campaigns-with-content-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listWithContentDTAjax(req.context, req.params.namespaceId, req.body));
 });
 
 router.postAsync('/campaigns-others-by-list-table/:campaignId/:listIds', passport.loggedIn, async (req, res) => {

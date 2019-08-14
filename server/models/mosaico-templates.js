@@ -10,6 +10,7 @@ const shares = require('./shares');
 const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
 const { allTagLanguages } = require('../../shared/templates');
+const namespaces = require('./namespaces');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'tag_language', 'data', 'namespace']);
 
@@ -27,24 +28,52 @@ async function getById(context, id) {
     });
 }
 
-async function listDTAjax(context, params) {
+async function listDTAjax(context, namespaceFilter, params) {
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'mosaicoTemplate', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('mosaico_templates').innerJoin('namespaces', 'namespaces.id', 'mosaico_templates.namespace'),
+        builder => {
+            builder = builder
+                    .from('mosaico_templates')
+                    .innerJoin('namespaces', 'namespaces.id', 'mosaico_templates.namespace');
+            if (namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
+                }
+            }
+            return builder;
+        },
         [ 'mosaico_templates.id', 'mosaico_templates.name', 'mosaico_templates.description', 'mosaico_templates.type', 'mosaico_templates.tag_language', 'mosaico_templates.created', 'namespaces.name' ]
     );
 }
 
-async function listByTagLanguageDTAjax(context, tagLanguage, params) {
+async function listByTagLanguageDTAjax(context, tagLanguage, namespaceFilter, params) {
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'mosaicoTemplate', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('mosaico_templates')
-            .innerJoin('namespaces', 'namespaces.id', 'mosaico_templates.namespace')
-            .where('mosaico_templates.tag_language', tagLanguage),
+        builder => {
+            builder = builder.from('mosaico_templates')
+            .innerJoin('namespaces', 'namespaces.id', 'mosaico_templates.namespace');
+            if (namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
+                }
+            }
+            builder = builder.where('mosaico_templates.tag_language', tagLanguage);
+            return builder;
+        },
         [ 'mosaico_templates.id', 'mosaico_templates.name', 'mosaico_templates.description', 'mosaico_templates.type', 'mosaico_templates.tag_language', 'mosaico_templates.created', 'namespaces.name' ]
     );
 }

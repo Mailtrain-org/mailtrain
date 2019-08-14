@@ -11,8 +11,10 @@ import {CampaignSource, CampaignStatus, CampaignType} from "../../../shared/camp
 import {getCampaignLabels} from "./helpers";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import {getNamespaceIdFilterCookie} from "../lib/namespace";
 import styles from "./styles.scss";
 import PropTypes from 'prop-types';
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -137,6 +139,10 @@ export default class List extends Component {
             }
         ];
 
+        var campaingsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table"} columns={columns} />;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            campaingsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table/" + getNamespaceIdFilterCookie()} columns={columns} />;
+        }
         return (
             <div>
                 {tableRestActionDialogRender(this)}
@@ -152,7 +158,7 @@ export default class List extends Component {
 
                 <Title>{t('campaigns')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} />
+                {campaingsTable}
             </div>
         );
     }

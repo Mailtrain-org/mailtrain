@@ -13,6 +13,7 @@ const segments = require('./segments');
 const imports = require('./imports');
 const entitySettings = require('../lib/entity-settings');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const namespaces = require('./namespaces');
 
 const {EntityActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
@@ -26,8 +27,13 @@ function hash(entity) {
 }
 
 
-async function _listDTAjax(context, namespaceId, params) {
+async function _listDTAjax(context, namespaceFilter, params) {
     const campaignEntityType = entitySettings.getEntityType('campaign');
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
 
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -37,9 +43,11 @@ async function _listDTAjax(context, namespaceId, params) {
             builder = builder
                 .from('lists')
                 .innerJoin('namespaces', 'namespaces.id', 'lists.namespace');
-            if (namespaceId) {
-                builder = builder.where('lists.namespace', namespaceId);
-            }
+                if (namespaceFilter) {
+                    for(const key in allowedNamespaces){
+                        builder = builder.orWhere('lists.namespace', allowedNamespaces[key]);
+                    }
+                }
             return builder;
         },
         ['lists.id', 'lists.name', 'lists.cid', 'lists.subscribers', 'lists.description', 'namespaces.name',
@@ -59,11 +67,7 @@ async function _listDTAjax(context, namespaceId, params) {
     );
 }
 
-async function listDTAjax(context, params) {
-    return await _listDTAjax(context, undefined, params);
-}
-
-async function listByNamespaceDTAjax(context, namespaceId, params) {
+async function listDTAjax(context, namespaceId, params) {
     return await _listDTAjax(context, namespaceId, params);
 }
 
@@ -274,7 +278,6 @@ async function remove(context, id) {
 module.exports.UnsubscriptionMode = UnsubscriptionMode;
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
-module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listWithSegmentByCampaignDTAjax = listWithSegmentByCampaignDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;

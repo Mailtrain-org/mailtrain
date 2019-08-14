@@ -14,6 +14,7 @@ const {getTrustedUrl} = require('../lib/urls');
 const { tUI } = require('../lib/translate');
 const messageSender = require('../lib/message-sender');
 const {getSystemSendConfigurationId} = require('../../shared/send-configurations');
+const namespaces = require('./namespaces');
 
 const bluebird = require('bluebird');
 
@@ -108,17 +109,35 @@ async function serverValidate(context, data, isOwnAccount) {
     return result;
 }
 
-async function listDTAjax(context, params) {
+async function listDTAjax(context, namespaceFilter, params) {
+
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
+
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'namespace', requiredOperations: ['manageUsers'] }],
         params,
-        builder => builder
-            .from('users')
-            .innerJoin('namespaces', 'namespaces.id', 'users.namespace')
-            .innerJoin('generated_role_names', 'generated_role_names.role', 'users.role')
-            .where('generated_role_names.entity_type', 'global'),
-        [ 'users.id', 'users.username', 'users.name', 'namespaces.name', 'generated_role_names.name' ]
+        builder => {
+            builder = builder
+                .from('users')
+                .innerJoin('namespaces', 'namespaces.id', 'users.namespace')
+                .innerJoin('generated_role_names', 'generated_role_names.role', 'users.role')
+            
+            if (namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('generated_role_names.entity_type', 'global').andWhere('users.namespace', allowedNamespaces[key]);
+                }
+            }else{
+                builder = builder.where('generated_role_names.entity_type', 'global');
+            }
+
+            return builder;
+        },
+        [ 'users.id', 'users.username', 'users.name', 'namespaces.name', 'generated_role_names.name' ] 
     );
 }
 

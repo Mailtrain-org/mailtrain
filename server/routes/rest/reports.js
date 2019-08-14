@@ -35,7 +35,11 @@ router.deleteAsync('/reports/:reportId', passport.loggedIn, passport.csrfProtect
 });
 
 router.postAsync('/reports-table', passport.loggedIn, async (req, res) => {
-    return res.json(await reports.listDTAjax(req.context, req.body));
+    return res.json(await reports.listDTAjax(req.context, null, req.body));
+});
+
+router.postAsync('/reports-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await reports.listDTAjax(req.context, req.params.namespaceId, req.body));
 });
 
 router.postAsync('/report-start/:id', passport.loggedIn, passport.csrfProtection, async (req, res) => {

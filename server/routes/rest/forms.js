@@ -13,7 +13,11 @@ const {castToInteger} = require('../../lib/helpers');
 
 
 router.postAsync('/forms-table', passport.loggedIn, async (req, res) => {
-    return res.json(await forms.listDTAjax(req.context, req.body));
+    return res.json(await forms.listDTAjax(req.context, null, req.body));
+});
+
+router.postAsync('/forms-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await forms.listDTAjax(req.context, req.params.namespaceId, req.body));
 });
 
 router.getAsync('/forms/:formId', passport.loggedIn, async (req, res) => {

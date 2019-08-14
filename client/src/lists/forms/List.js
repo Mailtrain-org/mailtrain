@@ -9,6 +9,8 @@ import {Icon} from "../../lib/bootstrap-components";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+import {getNamespaceIdFilterCookie} from '../../lib/namespace';
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -62,7 +64,10 @@ export default class List extends Component {
                 }
             }
         ];
-
+        var customFormsTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} />;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            customFormsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/forms-table/" + getNamespaceIdFilterCookie()} columns={columns} />;
+        }
         return (
             <div>
                 {tableRestActionDialogRender(this)}
@@ -74,7 +79,7 @@ export default class List extends Component {
 
                 <Title>{t('forms')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} />
+                {customFormsTable}
             </div>
         );
     }

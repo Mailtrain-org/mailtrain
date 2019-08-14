@@ -32,9 +32,16 @@ router.deleteAsync('/namespaces/:nsId', passport.loggedIn, passport.csrfProtecti
     return res.json();
 });
 
+router.getAsync('/namespaces-tree/:nsId', passport.loggedIn, async (req, res) => {
+
+    const tree = await namespaces.listTree(req.context, req.params.nsId, false);
+
+    return res.json(tree);
+});
+
 router.getAsync('/namespaces-tree', passport.loggedIn, async (req, res) => {
 
-    const tree = await namespaces.listTree(req.context);
+    const tree = await namespaces.listTree(req.context, null, false);
 
     return res.json(tree);
 });

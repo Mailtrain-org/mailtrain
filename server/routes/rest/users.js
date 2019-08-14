@@ -35,7 +35,11 @@ router.postAsync('/users-validate', passport.loggedIn, async (req, res) => {
 });
 
 router.postAsync('/users-table', passport.loggedIn, async (req, res) => {
-    return res.json(await users.listDTAjax(req.context, req.body));
+    return res.json(await users.listDTAjax(req.context, null, req.body));
+});
+
+router.postAsync('/users-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await users.listDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 
 

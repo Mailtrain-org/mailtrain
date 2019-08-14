@@ -8,11 +8,11 @@ const {castToInteger} = require('../../lib/helpers');
 
 
 router.postAsync('/lists-table', passport.loggedIn, async (req, res) => {
-    return res.json(await lists.listDTAjax(req.context, req.body));
+    return res.json(await lists.listDTAjax(req.context, null, req.body));
 });
 
-router.postAsync('/lists-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await lists.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
+router.postAsync('/lists-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await lists.listDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 
 router.postAsync('/lists-with-segment-by-campaign-table/:campaignId', passport.loggedIn, async (req, res) => {

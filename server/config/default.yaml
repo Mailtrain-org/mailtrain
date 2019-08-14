@@ -54,6 +54,9 @@ enabledLanguages:
 # Inject custom scripts in subscription/layout.mjml.hbs
 # customSubscriptionScripts: [/custom/hello-world.js]
 
+#Enable to use Namespace Filter
+namespaceFilter:
+  enabled: false
 
 # Enable to use Redis session cache or disable if Redis is not installed
 redis:

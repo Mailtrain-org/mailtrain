@@ -9,6 +9,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const shares = require('./shares');
 const reports = require('./reports');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const namespaces = require('./namespaces');
 
 const allowedKeys = new Set(['name', 'description', 'mime_type', 'user_fields', 'js', 'hbs', 'namespace']);
 
@@ -25,12 +26,26 @@ async function getById(context, id) {
     });
 }
 
-async function listDTAjax(context, params) {
+async function listDTAjax(context, namespaceFilter, params) {
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'reportTemplate', requiredOperations: ['view'] }],
         params,
-        builder => builder.from('report_templates').innerJoin('namespaces', 'namespaces.id', 'report_templates.namespace'),
+        builder => {
+            builder = builder.from('report_templates')
+            .innerJoin('namespaces', 'namespaces.id', 'report_templates.namespace');
+            if (namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
+                }
+            }
+            return builder;
+        },
         [ 'report_templates.id', 'report_templates.name', 'report_templates.description', 'report_templates.created', 'namespaces.name' ]
     );
 }

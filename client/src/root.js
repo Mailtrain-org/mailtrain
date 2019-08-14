@@ -17,7 +17,8 @@ import users from './users/root';
 import sendConfigurations from './send-configurations/root';
 import settings from './settings/root';
 
-import {DropdownLink, getLanguageChooser, NavDropdown, NavLink, Section} from "./lib/page";
+import {DropdownLink, getLanguageChooser, getNamespaceChooser, NavDropdown, NavLink, Section} from "./lib/page";
+import {getNamespaceNameFilterCookie} from "./lib/namespace";
 
 import mailtrainConfig from 'mailtrainConfig';
 import Home from "./Home";
@@ -56,6 +57,10 @@ class Root extends Component {
             async logout() {
                 await axios.post(getUrl('rest/logout'));
                 window.location = getUrl();
+                if(mailtrainConfig.namespaceFilterEnabled){
+                    document.cookie = 'namespaceFilterId' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';//Delete namespaceFilter cookies
+                    document.cookie = 'namespaceFilterName' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';  
+                }
             }
 
             render() {
@@ -64,7 +69,17 @@ class Root extends Component {
                 const topLevelItems = structure.children;
 
                 const topLevelMenu = [];
+                
+                var namespaceFilter = null;
 
+                if(mailtrainConfig.namespaceFilterEnabled){
+                    if(getNamespaceNameFilterCookie()){
+                        namespaceFilter = <NavLink to={'/namespaces/filter'}>{getNamespaceNameFilterCookie()}</NavLink>;
+                    }else{
+                        namespaceFilter = <NavLink to={'/namespaces/filter'}>{'Namespace filter'}</NavLink>;
+                    }
+                }
+                
                 for (const entryKey of topLevelMenuKeys) {
                     const entry = topLevelItems[entryKey];
                     const link = entry.link || entry.externalLink;
@@ -91,6 +106,7 @@ class Root extends Component {
                                 </NavDropdown>
                             </ul>
                             <ul className="navbar-nav mt-navbar-nav-right">
+                                {namespaceFilter}
                                 {getLanguageChooser(t)}
                                 <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
                                     <DropdownLink to="/account"><Icon icon='user'/> {t('account')}</DropdownLink>

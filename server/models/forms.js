@@ -14,6 +14,7 @@ const mjml2html = require('mjml');
 
 const lists = require('./lists');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const namespaces = require("./namespaces");
 
 const formAllowedKeys = new Set([
     'name',
@@ -57,14 +58,28 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
 }
 
-async function listDTAjax(context, params) {
+async function listDTAjax(context, namespaceFilter, params) {
+    var allowedNamespaces = [];
+
+    if(namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    }
+
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'customForm', requiredOperations: ['view'] }],
         params,
-        builder => builder
-            .from('custom_forms')
-            .innerJoin('namespaces', 'namespaces.id', 'custom_forms.namespace'),
+        builder => {
+            builder = builder
+                .from('custom_forms')
+                .innerJoin('namespaces', 'namespaces.id', 'custom_forms.namespace');
+            if (namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
+                }
+            }
+            return builder;
+        },
         ['custom_forms.id', 'custom_forms.name', 'custom_forms.description', 'namespaces.name']
     );
 }

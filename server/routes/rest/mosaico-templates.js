@@ -30,11 +30,19 @@ router.deleteAsync('/mosaico-templates/:mosaicoTemplateId', passport.loggedIn, p
 });
 
 router.postAsync('/mosaico-templates-table', passport.loggedIn, async (req, res) => {
-    return res.json(await mosaicoTemplates.listDTAjax(req.context, req.body));
+    return res.json(await mosaicoTemplates.listDTAjax(req.context, null, req.body));
+});
+
+router.postAsync('/mosaico-templates-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await mosaicoTemplates.listDTAjax(req.context, req.params.namespaceId, req.body));
 });
 
 router.postAsync('/mosaico-templates-by-tag-language-table/:tagLanguage', passport.loggedIn, async (req, res) => {
-    return res.json(await mosaicoTemplates.listByTagLanguageDTAjax(req.context, req.params.tagLanguage, req.body));
+    return res.json(await mosaicoTemplates.listByTagLanguageDTAjax(req.context, req.params.tagLanguage, null, req.body));
+});
+
+router.postAsync('/mosaico-templates-by-tag-language-table/:tagLanguage/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await mosaicoTemplates.listByTagLanguageDTAjax(req.context, req.params.tagLanguage, req.params.namespaceId, req.body));
 });
 
 

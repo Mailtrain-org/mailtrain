@@ -8,6 +8,7 @@ import mailtrainConfig from "mailtrainConfig";
 import {Icon} from "../lib/bootstrap-components";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import {getNamespaceIdFilterCookie} from '../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -59,6 +60,12 @@ export default class List extends Component {
             }
         });
 
+        var usersTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/users-table" columns={columns} />
+
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            usersTable = <Table ref={node => this.table = node} withHeader dataUrl={'rest/users-table/' + getNamespaceIdFilterCookie()} columns={columns} />
+        }
+
         return (
             <div>
                 {tableRestActionDialogRender(this)}
@@ -67,8 +74,7 @@ export default class List extends Component {
                 </Toolbar>
 
                 <Title>{t('users')}</Title>
-
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/users-table" columns={columns} />
+                {usersTable}
             </div>
         );
     }

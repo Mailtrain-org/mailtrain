@@ -25,6 +25,8 @@ import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/na
 import {DeleteModalDialog} from "../lib/modals";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import {getNamespaceIdFilterCookie} from "../lib/namespace";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,

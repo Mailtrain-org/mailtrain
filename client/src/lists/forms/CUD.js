@@ -23,7 +23,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTrustedUrl, getUrl} from "../../lib/urls";
@@ -486,6 +486,13 @@ export default class CUD extends Component {
         const previewListId = this.getFormValue('previewList');
         const selectedTemplate = this.getFormValue('selectedTemplate');
 
+        var customFormsTable = <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />;
+        var listsTable = <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            customFormsTable = <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl={'rest/forms-table/' +getNamespaceIdFilterCookie()} columns={customFormsColumns} selectionLabelIndex={1} />;
+            listsTable = <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl={'rest/lists-table/' + getNamespaceIdFilterCookie()} columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>;
+        }
+
         return (
             <div className={this.state.previewFullscreen ? styles.withElementInFullscreen : ''}>
                 {canDelete &&
@@ -512,12 +519,12 @@ export default class CUD extends Component {
                         <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
                     }
 
-                    {this.getFormValue('fromExistingEntity') ?
-                        <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />
-                    :
+                    {this.getFormValue('fromExistingEntity') && customFormsTable}
+
+                    {!this.getFormValue('fromExistingEntity') &&
                         <>
                             <Fieldset label={t('formsPreview')}>
-                                <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>
+                                {listsTable}
 
                                 { previewListId &&
                                 <div>

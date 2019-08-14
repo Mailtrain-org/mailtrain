@@ -13,6 +13,8 @@ import {getUrl} from "../lib/urls";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+import {getNamespaceIdFilterCookie} from '../lib/namespace';
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -147,6 +149,11 @@ export default class List extends Component {
             }
         ];
 
+        var reportsTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/reports-table" columns={columns} />;
+
+        if(mailtrainConfig.namespaceFilterEnabled &&  getNamespaceIdFilterCookie()){
+            reportsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/reports-table/" + getNamespaceIdFilterCookie()} columns={columns} />;
+        }
 
         return (
             <div>
@@ -162,7 +169,7 @@ export default class List extends Component {
 
                 <Title>{t('reports')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/reports-table" columns={columns} />
+                {reportsTable}
             </div>
         );
     }

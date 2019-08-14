@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import {withTranslation} from './i18n';
 import {TreeTableSelect} from './form';
 import {withComponentMixins} from "./decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 
 @withComponentMixins([
@@ -12,7 +13,11 @@ import {withComponentMixins} from "./decorator-helpers";
 export class NamespaceSelect extends Component {
     render() {
         const t = this.props.t;
-
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            return (
+                <TreeTableSelect id="namespace" label={t('namespace')} dataUrl={"rest/namespaces-tree/" + getNamespaceIdFilterCookie()}/>
+            );
+        }
         return (
             <TreeTableSelect id="namespace" label={t('namespace')} dataUrl="rest/namespaces-tree"/>
         );
@@ -27,8 +32,32 @@ export function validateNamespace(t, state) {
     }
 }
 
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+
 export function getDefaultNamespace(permissions) {
     return permissions.viewUsersNamespace && permissions.createEntityInUsersNamespace ? mailtrainConfig.user.namespace : null;
+}
+
+export function getNamespaceIdFilterCookie() {
+    return getCookie("namespaceFilterId");
+}
+
+export function getNamespaceNameFilterCookie() {
+    return getCookie("namespaceFilterName");
 }
 
 export function namespaceCheckPermissions(createOperation) {

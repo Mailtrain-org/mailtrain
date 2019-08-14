@@ -37,11 +37,11 @@ router.deleteAsync('/send-configurations/:sendConfigurationId', passport.loggedI
 });
 
 router.postAsync('/send-configurations-table', passport.loggedIn, async (req, res) => {
-    return res.json(await sendConfigurations.listDTAjax(req.context, req.body));
+    return res.json(await sendConfigurations.listDTAjax(req.context, null, req.body));
 });
 
-router.postAsync('/send-configurations-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await sendConfigurations.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
+router.postAsync('/send-configurations-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await sendConfigurations.listDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 
 router.postAsync('/send-configurations-with-send-permission-table', passport.loggedIn, async (req, res) => {

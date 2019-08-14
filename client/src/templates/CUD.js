@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../lib/namespace';
 import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
@@ -325,6 +325,12 @@ export default class CUD extends Component {
             { data: 6, title: t('namespace') },
         ];
 
+        var sourceTemplateTable = <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />;
+
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            sourceTemplateTable = <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl={'rest/templates-table/'+getNamespaceIdFilterCookie()} columns={templatesColumns} selectionLabelIndex={1} />;
+        }
+
         return (
             <div className={this.state.elementInFullscreen ? styles.withElementInFullscreen : ''}>
                 {isEdit &&
@@ -362,9 +368,9 @@ export default class CUD extends Component {
                         <CheckBox id="fromExistingEntity" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
                     }
 
-                    {this.getFormValue('fromExistingEntity') ?
-                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
-                    :
+                    {this.getFormValue('fromExistingEntity') && sourceTemplateTable }
+                    
+                    {!this.getFormValue('fromExistingEntity') &&
                         <>
                             {isEdit ?
                                 <StaticField id="type" className={styles.formDisabled} label={t('type')}>

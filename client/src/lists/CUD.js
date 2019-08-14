@@ -22,11 +22,12 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {DeleteModalDialog} from '../lib/modals';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../lib/namespace';
 import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
 import styles from "../lib/styles.scss";
 import {getMailerTypes} from "../send-configurations/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -239,6 +240,12 @@ export default class CUD extends Component {
             }
         }
 
+        var sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
+
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={'rest/send-configurations-table/' + getNamespaceIdFilterCookie()} columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
+        }
+
         return (
             <div>
                 {canDelete &&
@@ -268,8 +275,9 @@ export default class CUD extends Component {
                     <InputField id="contact_email" label={t('contactEmail')} help={t('contactEmailUsedInSubscriptionFormsAnd')}/>
                     <InputField id="homepage" label={t('homepage')} help={t('homepageUrlUsedInSubscriptionFormsAnd')}/>
                     {toNameFields}
-                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
 
+                    {sendConfigTable}
+                    
                     <NamespaceSelect/>
 
                     <Dropdown id="form" label={t('forms')} options={formsOptions} help={t('webAndEmailFormsAndTemplatesUsedIn')}/>

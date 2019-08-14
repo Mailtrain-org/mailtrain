@@ -31,11 +31,11 @@ router.deleteAsync('/templates/:templateId', passport.loggedIn, passport.csrfPro
 });
 
 router.postAsync('/templates-table', passport.loggedIn, async (req, res) => {
-    return res.json(await templates.listDTAjax(req.context, req.body));
+    return res.json(await templates.listDTAjax(req.context, null, req.body));
 });
 
-router.postAsync('/templates-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await templates.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
+router.postAsync('/templates-table/:namespaceId', passport.loggedIn, async (req, res) => {
+    return res.json(await templates.listDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
 });
 
 module.exports = router;

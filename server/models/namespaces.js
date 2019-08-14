@@ -12,7 +12,8 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
-async function listTree(context) {
+
+async function listTree(context, nsId, search) {
     enforce(!context.user.admin, 'listTree is not supposed to be called by assumed admin');
 
     const entityType = entitySettings.getEntityType('namespace');
@@ -33,7 +34,7 @@ async function listTree(context) {
             'namespaces.id', 'namespaces.name', 'namespaces.description', 'namespaces.namespace',
             knex.raw(`GROUP_CONCAT(${entityType.permissionsTable + '.operation'} SEPARATOR \';\') as permissions`)
         ]);
-
+    
     const entries = {};
 
     for (let row of rows) {
@@ -102,6 +103,30 @@ async function listTree(context) {
         delete entry.parent;
     }
 
+    if(nsId && !search){
+        var root = [];
+
+        function process_node(node,topNamespace){
+            var branch = false;
+            if(node){
+                if(node.key == topNamespace){
+                    branch = true;
+                    return node;
+                }
+                if(node.children && !branch){
+                    for(const key in node.children){
+                        const n = process_node(node.children[key], topNamespace);
+                        if(n){
+                            return n;
+                        }
+                    } 
+                }
+            }
+            return null;
+        }
+        root.push(process_node(roots[0], nsId));
+        return root;
+    }
     return roots;
 }
 
@@ -241,6 +266,35 @@ async function remove(context, id) {
     });
 }
 
+async function getAllowedNamespaces(context, topNamespace){
+
+    const tree = await listTree(context, null, true);
+    var allowedNamespaces = [];
+
+    function process_node(node, namespaces, branch, topNamespace){
+        if(node){
+            if(branch){
+                namespaces.push(node.key);
+            }
+            if(node.key == topNamespace){
+                branch = true;
+                namespaces.push(node.key);
+            }
+            if(node.children){
+                for(const key in node.children){
+                    process_node(node.children[key], namespaces, branch, topNamespace);
+                } 
+            }
+        }
+    }
+    if(tree && topNamespace){
+        process_node(tree[0], allowedNamespaces, false, topNamespace);
+        allowedNamespaces.sort();
+    }
+    
+    return allowedNamespaces;
+}
+
 module.exports.hash = hash;
 module.exports.listTree = listTree;
 module.exports.getById = getById;
@@ -249,3 +303,4 @@ module.exports.create = create;
 module.exports.createTx = createTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
+module.exports.getAllowedNamespaces = getAllowedNamespaces;
