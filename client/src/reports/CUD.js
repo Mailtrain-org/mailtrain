@@ -249,6 +249,11 @@ export default class CUD extends Component {
             }
         }
 
+        var reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+            reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl={"rest/report-templates-table/" + getNamespaceIdFilterCookie()} columns={reportTemplateColumns} selectionLabelIndex={1}/>;
+        }
+
         return (
             <div>
                 {canDelete &&
@@ -268,7 +273,7 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
 
-                    <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
+                    {reportTemplateTable}
 
                     <NamespaceSelect/>
 
