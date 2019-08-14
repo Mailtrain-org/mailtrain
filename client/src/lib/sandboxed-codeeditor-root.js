@@ -66,7 +66,7 @@ class CodeEditorSandbox extends Component {
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
-        const source = this.props.initialSource ? base(this.props.initialSource, trustedUrlBase, sandboxUrlBase, publicUrlBase) : defaultSource;
+        const source = this.props.initialSource ? base(this.props.initialSource, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase) : defaultSource;
 
         this.state = {
             source,
@@ -87,6 +87,7 @@ class CodeEditorSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
+        tagLanguage: PropTypes.string,
         initialSource: PropTypes.string,
         sourceType: PropTypes.string,
         initialPreview: PropTypes.bool,
@@ -98,8 +99,8 @@ class CodeEditorSandbox extends Component {
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
         return {
-            html: unbase(this.getHtml(), trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
-            source: unbase(this.state.source, trustedUrlBase, sandboxUrlBase, publicUrlBase, true)
+            html: unbase(this.getHtml(), this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
+            source: unbase(this.state.source, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true)
         };
     }
 
@@ -149,7 +150,7 @@ class CodeEditorSandbox extends Component {
         });
 
         if (!this.refreshTimeoutId) {
-            this.refreshTimeoutId = setTimeout(() => this.refresh(), refreshTimeout);
+            this.refreshTimeoutId = setTimeout(this.refreshHandler, refreshTimeout);
         }
     }
 

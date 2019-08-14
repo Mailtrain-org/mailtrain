@@ -10,6 +10,7 @@ import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 import {GrapesJSSourceType} from "./sandboxed-grapesjs-shared";
+import {getTagLanguageFromEntity} from "./sandbox-common";
 
 @withComponentMixins([
     withTranslation
@@ -57,6 +58,7 @@ export class GrapesJSHost extends Component {
         const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
+            tagLanguage: getTagLanguageFromEntity(this.props.entity, this.props.entityTypeId),
             initialSource: this.props.initialSource,
             initialStyle: this.props.initialStyle,
             sourceType: this.props.sourceType

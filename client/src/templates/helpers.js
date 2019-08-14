@@ -167,7 +167,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 mutState.setIn([prefix + 'mosaicoTemplate', 'value'], null);
             }
         },
-        isTagLanguageSelectorDisabledForEdit: true,
         validate: state => {
             const mosaicoTemplate = state.getIn([prefix + 'mosaicoTemplate', 'value']);
             if (!mosaicoTemplate) {
@@ -256,7 +255,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -346,7 +344,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -408,7 +405,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -495,7 +491,6 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         afterTagLanguageChange: (mutState, isEdit) => {
         },
-        isTagLanguageSelectorDisabledForEdit: false,
         validate: state => {
         }
     };
@@ -681,6 +676,14 @@ export function getEditForm(owner, typeKey, prefix = '') {
                             </th>
                             <td>
                                 <Trans i18nKey="rssEntryImageUrl">RSS entry image URL</Trans>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                {tg('RSS_ENTRY_CUSTOM_TAGS')}
+                            </th>
+                            <td>
+                                <Trans>Mailtrain custom tags. The custom tags can be passed in via <code>mt:entries-json</code> element in RSS entry. The text contents of the elements is interpreted as JSON-formatted object..</Trans>
                             </td>
                         </tr>
                         </tbody>

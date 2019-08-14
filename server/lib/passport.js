@@ -20,7 +20,8 @@ let authMode = 'local';
 let LdapStrategy;
 let ldapStrategyOpts;
 if (config.ldap.enabled) {
-    if (!config.ldap.method || config.ldap.method == 'ldapjs') {
+    const ldapProtocol = config.ldap.secure ? 'ldaps' : 'ldap';
+    if (!config.ldap.method || config.ldap.method === 'ldapjs') {
         try {
             LdapStrategy = require('passport-ldapjs').Strategy; // eslint-disable-line global-require
             authMode = 'ldapjs';
@@ -28,7 +29,7 @@ if (config.ldap.enabled) {
 
             ldapStrategyOpts = {
                 server: {
-                    url: 'ldap://' + config.ldap.host + ':' + config.ldap.port
+                    url: ldapProtocol + '://' + config.ldap.host + ':' + config.ldap.port
                 },
                 base: config.ldap.baseDN,
                 search: {
@@ -46,7 +47,7 @@ if (config.ldap.enabled) {
         }
     }
 
-    if (!LdapStrategy && (!config.ldap.method || config.ldap.method == 'ldapauth')) {
+    if (!LdapStrategy && (!config.ldap.method || config.ldap.method === 'ldapauth')) {
         try {
             LdapStrategy = require('passport-ldapauth').Strategy; // eslint-disable-line global-require
             authMode = 'ldapauth';
@@ -54,7 +55,7 @@ if (config.ldap.enabled) {
 
             ldapStrategyOpts = {
                 server: {
-                    url: 'ldap://' + config.ldap.host + ':' + config.ldap.port,
+                    url: ldapProtocol + '://' + config.ldap.host + ':' + config.ldap.port,
                     searchBase: config.ldap.baseDN,
                     searchFilter: config.ldap.filter,
                     searchAttributes: [config.ldap.uidTag, config.ldap.nameTag, 'mail'],

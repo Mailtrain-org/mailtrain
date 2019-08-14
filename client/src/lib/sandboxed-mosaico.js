@@ -9,6 +9,7 @@ import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";
 import {getTrustedUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
+import {getTagLanguageFromEntity} from "./sandbox-common";
 
 
 @withComponentMixins([
@@ -58,6 +59,7 @@ export class MosaicoHost extends Component {
         const editorData = {
             entityTypeId: this.props.entityTypeId,
             entityId: this.props.entity.id,
+            tagLanguage: getTagLanguageFromEntity(this.props.entity, this.props.entityTypeId),
             templateId: this.props.templateId,
             templatePath: this.props.templatePath,
             initialModel: this.props.initialModel,

@@ -358,7 +358,7 @@ async function rawGetByTx(tx, key, id) {
         .first();
 
     if (!entity) {
-        throw new interoperableErrors.NotFoundError();
+        throw new shares.throwPermissionDenied();
     }
 
     if (entity.lists) {
@@ -422,6 +422,16 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 async function getById(context, id, withPermissions = true, content = Content.ALL) {
     return await knex.transaction(async tx => {
         return await getByIdTx(tx, context, id, withPermissions, content);
+    });
+}
+
+async function getByCid(context, cid) {
+    return await knex.transaction(async tx => {
+        const entity = await rawGetByTx(tx,'cid', cid);
+
+        await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'view');
+
+        return entity;
     });
 }
 
@@ -991,6 +1001,10 @@ async function testSend(context, data) {
                 attachments: []
             };
 
+            if (campaign.type === CampaignType.RSS) {
+                messageData.rssEntry = await feedcheck.getEntryForPreview(campaign.data.feedUrl);
+            }
+
             const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', campaignId);
             for (const attachment of attachments) {
                 messageData.attachments.push({
@@ -1057,6 +1071,30 @@ async function testSend(context, data) {
     senders.scheduleCheck();
 }
 
+async function getRssPreview(context, campaignCid, listCid, subscriptionCid) {
+    const campaign = await getByCid(context, campaignCid);
+    await shares.enforceEntityPermission(context, 'campaign', campaign.id, 'view');
+
+    enforce(campaign.type === CampaignType.RSS);
+
+    const list = await lists.getByCid(context, listCid);
+    await shares.enforceEntityPermission(context, 'list', list.id, 'viewTestSubscriptions');
+
+    const subscription = await subscriptions.getByCid(context, list.id, subscriptionCid);
+
+    if (!subscription.is_test) {
+        shares.throwPermissionDenied();
+    }
+
+    const settings = {
+        campaign, // this prevents message sender from fetching the campaign again
+        rssEntry: await feedcheck.getEntryForPreview(campaign.data.feedUrl)
+    };
+
+    return await messageSender.getMessage(campaignCid, listCid, subscriptionCid, settings);
+}
+
+
 module.exports.Content = Content;
 module.exports.hash = hash;
 
@@ -1073,6 +1111,7 @@ module.exports.listLinkClicksDTAjax = listLinkClicksDTAjax;
 
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
+module.exports.getByCid = getByCid;
 module.exports.create = create;
 module.exports.createRssTx = createRssTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
@@ -1102,3 +1141,4 @@ module.exports.getStatisticsOpened = getStatisticsOpened;
 module.exports.fetchRssCampaign = fetchRssCampaign;
 
 module.exports.testSend = testSend;
+module.exports.getRssPreview = getRssPreview;

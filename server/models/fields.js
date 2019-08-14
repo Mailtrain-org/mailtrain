@@ -8,6 +8,7 @@ const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');
 const validators = require('../../shared/validators');
 const shortid = require('shortid');
+const slugify = require('slugify');
 const segments = require('./segments');
 const { formatDate, formatBirthday, parseDate, parseBirthday } = require('../../shared/date');
 const { getFieldColumn } = require('../../shared/lists');
@@ -542,7 +543,7 @@ async function createTx(tx, context, listId, entity) {
 
     let columnName;
     if (!fieldType.grouped) {
-        columnName = ('custom_' + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '_');
+        columnName = ('custom_' + slugify(entity.name, '_').substring(0, 32) + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '_');
     }
 
     const filteredEntity = filterObject(entity, allowedKeysCreate);

@@ -27,6 +27,7 @@ class MosaicoSandbox extends Component {
     static propTypes = {
         entityTypeId: PropTypes.string,
         entityId: PropTypes.number,
+        tagLanguage: PropTypes.string,
         templateId: PropTypes.number,
         templatePath: PropTypes.string,
         initialModel: PropTypes.string,
@@ -60,9 +61,9 @@ class MosaicoSandbox extends Component {
         html = juice(html);
 
         return {
-            html: unbase(html, trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
-            model: unbase(this.viewModel.exportJSON(), trustedUrlBase, sandboxUrlBase, publicUrlBase),
-            metadata: unbase(this.viewModel.exportMetadata(), trustedUrlBase, sandboxUrlBase, publicUrlBase)
+            html: unbase(html, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase, true),
+            model: unbase(this.viewModel.exportJSON(), this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase),
+            metadata: unbase(this.viewModel.exportMetadata(), this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase)
         };
     }
 
@@ -128,8 +129,8 @@ class MosaicoSandbox extends Component {
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
-        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, trustedUrlBase, sandboxUrlBase, publicUrlBase));
-        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, trustedUrlBase, sandboxUrlBase, publicUrlBase));
+        const metadata = this.props.initialMetadata && JSON.parse(base(this.props.initialMetadata, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase));
+        const model = this.props.initialModel && JSON.parse(base(this.props.initialModel, this.props.tagLanguage, trustedUrlBase, sandboxUrlBase, publicUrlBase));
         const template = this.props.templateId ? getSandboxUrl(`mosaico/templates/${this.props.templateId}/index.html`) : this.props.templatePath;
 
         const allPlugins = plugins.concat(window.mosaicoPlugins);
