@@ -592,7 +592,7 @@ async function scheduleQueued() {
             const expiredCount = await knex('queued')
                 .whereNotIn('send_configuration', sendConfigurationsIdsInProcessing)
                 .where('type', type)
-                .where('created', '<', expirationThreshold.threshold)
+                .where('created', '<', new Date(expirationThreshold.threshold))
                 .del();
 
             if (expiredCount) {
@@ -731,4 +731,3 @@ async function init() {
 
 // noinspection JSIgnoredPromiseFromCall
 init();
-
