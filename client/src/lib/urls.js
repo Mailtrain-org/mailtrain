@@ -15,9 +15,15 @@ function getTrustedUrl(path) {
     return mailtrainConfig.trustedUrlBase + (path || '');
 }
 
-function getSandboxUrl(path, customRestrictedAccessToken) {
+function getSandboxUrl(path, customRestrictedAccessToken, opts) {
     const localRestrictedAccessToken = customRestrictedAccessToken || restrictedAccessToken;
-    return mailtrainConfig.sandboxUrlBase + localRestrictedAccessToken + '/' + (path || '');
+     const url = new URL(localRestrictedAccessToken + '/' + (path || ''), mailtrainConfig.sandboxUrlBase);
+
+    if (opts && opts.withLocale) {
+        url.searchParams.append('locale', i18n.language);
+    }
+
+    return url.toString();
 }
 
 function getPublicUrl(path, opts) {

@@ -11,6 +11,8 @@ const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('
 const { SubscriptionSource } = require('../../../../shared/lists');
 const {DOMParser, XMLSerializer} = require('xmldom');
 const log = require('../../../lib/log');
+const shortid = require('shortid');
+const slugify = require('slugify');
 
 const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];
 const shareableEntityTypes = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'namespace', 'send_configuration', 'mosaico_template'];
@@ -236,15 +238,53 @@ async function migrateUsers(knex) {
     });
 }
 
+async function shortenFieldColumnNames(knex, list) {
+    const fields = await knex('custom_fields').whereNotNull('column').where('list', list.id);
+
+    const fieldsMap = new Map();
+
+    for (const field of fields) {
+        const oldName = field.column;
+        const newName = ('custom_' + slugify(field.name, '_').substring(0,32) + '_' + shortid.generate()).toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+        fieldsMap.set(oldName, newName);
+
+        await knex('custom_fields').where('id', field.id).update('column', newName);
+
+        await knex.schema.table('subscription__' + list.id, table => {
+            table.renameColumn(oldName, newName);
+        });
+    }
+
+
+    function processRule(rule) {
+        if (rule.type === 'all' || rule.type === 'some' || rule.type === 'none') {
+            for (const childRule of rule.rules) {
+                processRule(childRule);
+            }
+        } else {
+            rule.column = fieldsMap.get(rule.column) || rule.column /* this is to handle "email" column */;
+        }
+    }
+
+    const segments = await knex('segments').where('list', list.id);
+    for (const segment of segments) {
+        const settings = JSON.parse(segment.settings);
+        processRule(settings.rootRule);
+        await knex('segments').where('id', segment.id).update({settings: JSON.stringify(settings)});
+    }
+}
+
 async function migrateSubscriptions(knex) {
     await knex.schema.dropTableIfExists('subscription');
 
     const lists = await knex('lists');
     for (const list of lists) {
+        await shortenFieldColumnNames(knex, list);
+
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `unsubscribed` timestamp NULL DEFAULT NULL');
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `source_email` int(11) DEFAULT NULL');
         await knex.schema.raw('ALTER TABLE `subscription__' + list.id + '` ADD `hash_email` varchar(255) CHARACTER SET ascii');
-
 
         const fields = await knex('custom_fields').where('list', list.id);
         const info = await knex('subscription__' + list.id).columnInfo();
@@ -1251,10 +1291,11 @@ exports.up = (knex, Promise) => (async() => {
     await migrateCustomFields(knex);
     log.verbose('Migration', 'Custom fields complete')
 
-    await migrateSubscriptions(knex);
-
     await migrateSegments(knex);
     log.verbose('Migration', 'Segments complete')
+
+    await migrateSubscriptions(knex);
+    log.verbose('Migration', 'Subscriptions complete')
 
     await migrateReports(knex);
     log.verbose('Migration', 'Reports complete')

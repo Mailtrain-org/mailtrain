@@ -34,6 +34,17 @@ log:
 
 queue:
   processes: 5
+
+ldap:
+  enabled: $withLdap
+  host: $ldapHost
+  port: $ldapPort
+  secure: $ldapSecure
+  $ldapBindUserLine
+  $ldapBindPassLine
+  $ldapFilterLine
+  $ldapBaseDNLine
+  $ldapUidTagLine
 EOT
 
 cat > server/services/workers/reports/config/production.yaml <<EOT

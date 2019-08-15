@@ -82,7 +82,7 @@ export default class CUD extends Component {
         ];
 
         this.sourceOptions = [];
-        for (const key in sourceLabelsOrder) {
+        for (const key of sourceLabelsOrder) {
             this.sourceOptions.push({key, label: this.sourceLabels[key]});
         }
 
@@ -134,8 +134,9 @@ export default class CUD extends Component {
 
         if (key === 'data_sourceCustom_tag_language') {
             if (newValue) {
+                const currentType = this.getFormValue('data_sourceCustom_type');
                 const isEdit = !!this.props.entity;
-                this.templateTypes[newValue].afterTagLanguageChange(mutStateData, isEdit);
+                this.templateTypes[currentType].afterTagLanguageChange(mutStateData, isEdit);
             }
         }
 
@@ -720,7 +721,7 @@ export default class CUD extends Component {
 
             templateEdit = <div>
                 <Dropdown id="data_sourceCustom_type" label={t('type')} options={this.customTemplateTypeOptions}/>
-                <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={isEdit && (!customTemplateTypeKey || this.templateTypes[customTemplateTypeKey].isTagLanguageSelectorDisabledForEdit)}/>
+                <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={isEdit}/>
 
                 {customTemplateTypeForm}
             </div>;

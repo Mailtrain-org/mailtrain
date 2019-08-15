@@ -1,8 +1,6 @@
 'use strict';
 
 const passport = require('../lib/passport');
-const shares = require('../models/shares');
-const contextHelpers = require('../lib/context-helpers');
 const router = require('../lib/router-async').create();
 const subscriptions = require('../models/subscriptions');
 const {castToInteger} = require('../lib/helpers');
