@@ -662,7 +662,7 @@ async function queueAPITransactionalMessage(sendConfigurationId, email, subject,
         attachments
     };
 
-    await tx('queued').insert({
+    await knex('queued').insert({
         send_configuration: sendConfigurationId,
         type: MessageType.API_TRANSACTIONAL,
         data: JSON.stringify(msgData)
