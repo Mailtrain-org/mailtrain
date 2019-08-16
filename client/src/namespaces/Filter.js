@@ -130,8 +130,8 @@ export default class Filter extends Component {
                 this.disableForm();
                 this.setFormStatusMessage('info', t('selecting'));
                 const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
-                document.cookie = "namespaceFilterId=" + this.getFormValue('namespace') + "; path=/namespaces";
-                document.cookie = "namespaceFilterName=" + submitResult.name + "; path=/namespaces";
+                document.cookie = "namespaceFilterId=" + this.getFormValue('namespace') + "; path=/";
+                document.cookie = "namespaceFilterName=" + submitResult.name + "; path=/";
             
                 if (submitResult) {
                     if(leave) {

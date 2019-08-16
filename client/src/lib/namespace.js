@@ -61,8 +61,8 @@ export function getNamespaceNameFilterCookie() {
 }
 
 export function deleteNamespaceFilterCookies() {
-    document.cookie = 'namespaceFilterId' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; ; path=/namespaces';//Delete namespaceFilter cookies
-    document.cookie = 'namespaceFilterName' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; ; path=/namespaces';  
+    document.cookie = 'namespaceFilterId' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; ; path=/';//Delete namespaceFilter cookies
+    document.cookie = 'namespaceFilterName' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; ; path=/';  
 }
 
 export function namespaceCheckPermissions(createOperation) {
