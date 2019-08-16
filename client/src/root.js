@@ -18,7 +18,7 @@ import sendConfigurations from './send-configurations/root';
 import settings from './settings/root';
 
 import {DropdownLink, getLanguageChooser, getNamespaceChooser, NavDropdown, NavLink, Section} from "./lib/page";
-import {getNamespaceNameFilterCookie} from "./lib/namespace";
+import {getNamespaceNameFilterCookie, deleteNamespaceFilterCookies} from "./lib/namespace";
 
 import mailtrainConfig from 'mailtrainConfig';
 import Home from "./Home";
@@ -55,12 +55,11 @@ class Root extends Component {
             }
 
             async logout() {
+                if(mailtrainConfig.namespaceFilterEnabled){
+                    deleteNamespaceFilterCookies(); 
+                }
                 await axios.post(getUrl('rest/logout'));
                 window.location = getUrl();
-                if(mailtrainConfig.namespaceFilterEnabled){
-                    document.cookie = 'namespaceFilterId' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';//Delete namespaceFilter cookies
-                    document.cookie = 'namespaceFilterName' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';  
-                }
             }
 
             render() {

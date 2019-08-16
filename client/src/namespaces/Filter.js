@@ -19,7 +19,7 @@ import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import {getDefaultNamespace} from "../lib/namespace";
+import {getDefaultNamespace, deleteNamespaceFilterCookies} from "../lib/namespace";
 import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
@@ -117,8 +117,7 @@ export default class Filter extends Component {
     async submitHandler(leave, disallow) {
 
         if(disallow){
-            document.cookie = 'namespaceFilterId' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';//Delete namespaceFilter cookies
-            document.cookie = 'namespaceFilterName' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';  
+            deleteNamespaceFilterCookies();
             location.reload();
         }else{
             const t = this.props.t;
@@ -131,8 +130,8 @@ export default class Filter extends Component {
                 this.disableForm();
                 this.setFormStatusMessage('info', t('selecting'));
                 const submitResult = await this.validateAndSendFormValuesToURL(sendMethod, url);
-                document.cookie = "namespaceFilterId=" + this.getFormValue('namespace') + ";";
-                document.cookie = "namespaceFilterName=" + submitResult.name + ";";
+                document.cookie = "namespaceFilterId=" + this.getFormValue('namespace') + "; path=/namespaces";
+                document.cookie = "namespaceFilterName=" + submitResult.name + "; path=/namespaces";
             
                 if (submitResult) {
                     if(leave) {
