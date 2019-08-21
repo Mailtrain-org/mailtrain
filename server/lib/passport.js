@@ -197,14 +197,16 @@ if (LdapStrategy) {
             if (err instanceof interoperableErrors.NotFoundError) {
                 const userId = await users.create(contextHelpers.getAdminContext(), {
                     username: profile[config.ldap.uidTag],
+                    email: profile.mail,
                     role: config.ldap.newUserRole,
-                    namespace: config.ldap.newUserNamespaceId
+                    namespace: config.ldap.newUserNamespaceId,
+                    name: profile.cn
                 });
 
                 return {
                     id: userId,
-                    username: profile[config.ldap.uidTag],
-                    name: profile[config.ldap.nameTag],
+                    username: profile.uid,
+                    name: profile.cn,
                     email: profile.mail,
                     role: config.ldap.newUserRole
                 };
