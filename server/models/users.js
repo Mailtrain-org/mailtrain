@@ -27,7 +27,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 
 const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace', 'role']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
-const allowedKeysExternal = new Set(['username', 'namespace', 'role', 'email', 'name']);
+const allowedKeysExternal = new Set(['username', 'namespace', 'role']);
 const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
 const shares = require('./shares');
 const contextHelpers = require('../lib/context-helpers');
@@ -167,9 +167,9 @@ async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
 async function create(context, user) {
     let id;
     await knex.transaction(async tx => {
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
 
         if (passport.isAuthMethodLocal) {
-            await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
             await _validateAndPreprocess(tx, user, true);
 
             const ids = await tx('users').insert(filterObject(user, allowedKeys));
@@ -178,6 +178,7 @@ async function create(context, user) {
         } else {
             const filteredUser = filterObject(user, allowedKeysExternal);
             enforce(user.role in config.roles.global, 'Unknown role');
+
             await namespaceHelpers.validateEntity(tx, user);
 
             const ids = await tx('users').insert(filteredUser);
