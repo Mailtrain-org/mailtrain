@@ -147,6 +147,8 @@ ldap:
   uidTag: username
   # nameTag identifies the attribute to be used for user's full name
   nameTag: username
+  # mailTag identifies the attribute to be used for user's email address
+  mailTag: mail
   passwordresetlink:
   newUserRole: master
   # Global namespace id
