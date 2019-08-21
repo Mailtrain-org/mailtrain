@@ -90,7 +90,7 @@ export default class CUD extends Component {
         } else if (usernameServerValidation && usernameServerValidation.exists) {
             state.setIn(['username', 'error'], t('theUserNameAlreadyExistsInTheSystem'));
         } else if (!usernameServerValidation) {
-            state.setIn(['email', 'error'], t('validationIsInProgress'));
+            state.setIn(['username', 'error'], t('validationIsInProgress'));
         } else {
             state.setIn(['username', 'error'], null);
         }
