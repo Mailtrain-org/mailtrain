@@ -24,7 +24,7 @@ if (config.ldap.enabled) {
     if (!config.ldap.method || config.ldap.method === 'ldapjs') {
         try {
             LdapStrategy = require('passport-ldapjs').Strategy; // eslint-disable-line global-require
-            authMode = 'ldapjs';
+            authMode = 'ldap';
             log.info('LDAP', 'Found module "passport-ldapjs". It will be used for LDAP auth.');
 
             ldapStrategyOpts = {
@@ -34,7 +34,7 @@ if (config.ldap.enabled) {
                 base: config.ldap.baseDN,
                 search: {
                     filter: config.ldap.filter,
-                    attributes: [config.ldap.uidTag, config.ldap.nameTag, 'mail'],
+                    attributes: [config.ldap.uidTag, config.ldap.nameTag, config.ldap.mailTag],
                     scope: 'sub'
                 },
                 uidTag: config.ldap.uidTag,
@@ -58,7 +58,7 @@ if (config.ldap.enabled) {
                     url: ldapProtocol + '://' + config.ldap.host + ':' + config.ldap.port,
                     searchBase: config.ldap.baseDN,
                     searchFilter: config.ldap.filter,
-                    searchAttributes: [config.ldap.uidTag, config.ldap.nameTag, 'mail'],
+                    searchAttributes: [config.ldap.uidTag, config.ldap.nameTag, config.ldap.mailTag],
                     bindDN: config.ldap.bindUser,
                     bindCredentials: config.ldap.bindPassword
                 },
@@ -177,7 +177,7 @@ module.exports.restLogin = (req, res, next) => {
 };
 
 if (LdapStrategy) {
-    log.info('Using LDAP auth (passport-' + authMode + ')');
+    log.info('Using LDAP auth (passport-' + authMode === 'ldap' ? 'ldapjs' : authMode + ')');
     module.exports.authMethod = 'ldap';
     module.exports.isAuthMethodLocal = false;
 
