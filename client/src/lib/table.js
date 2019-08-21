@@ -150,11 +150,17 @@ class Table extends Component {
                         values: keysToFetch
                     });
 
+                    const oldSelectionMap = this.selectionMap;
+                    this.selectionMap = new Map();
                     for (const row of response.data) {
                         const key = row[this.props.selectionKeyIndex];
-                        if (this.selectionMap.has(key)) {
-                            this.selectionMap.set(key, row);
+                        if (oldSelectionMap.has(key)) {
+                            this.selectionMap.set(key, row)
                         }
+                    }
+
+                    if (this.selectionMap.size !== oldSelectionMap.size) {
+                        this.notifySelection(this.props.onSelectionChangedAsync, this.selectionMap);
                     }
                 }
             }

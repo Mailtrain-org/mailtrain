@@ -490,7 +490,8 @@ export default class Status extends Component {
 
         this.state = {
             entity: props.entity,
-            sendConfiguration: null
+            sendConfiguration: null,
+            sendConfigurationNotPermitted: false
         };
 
         const { campaignTypeLabels, campaignStatusLabels } = getCampaignLabels(t);
@@ -507,18 +508,26 @@ export default class Status extends Component {
 
     @withAsyncErrorHandler
     async refreshEntity() {
+        const newState = {}
+
         let resp;
 
         resp = await axios.get(getUrl(`rest/campaigns-stats/${this.props.entity.id}`));
-        const entity = resp.data;
+        newState.entity = resp.data;
 
-        resp = await axios.get(getUrl(`rest/send-configurations-public/${entity.send_configuration}`));
-        const sendConfiguration = resp.data;
+        try {
+            resp = await axios.get(getUrl(`rest/send-configurations-public/${newState.entity.send_configuration}`));
+            newState.sendConfiguration = resp.data;
+        } catch (err) {
+            if (err instanceof interoperableErrors.PermissionDeniedError) {
+                newState.sendConfiguration = null;
+                newState.sendConfigurationNotPermitted = true;
+            } else {
+                throw err;
+            }
+        }
 
-        this.setState({
-            entity,
-            sendConfiguration
-        });
+        this.setState(newState);
     }
 
     async periodicRefreshTask() {
@@ -563,7 +572,11 @@ export default class Status extends Component {
             addOverridable('reply_to', t('replytoEmailAddress'));
             sendSettings.push(<AlignedRow key="subject" label={t('subjectLine')}>{entity.subject}</AlignedRow>);
         } else {
-            sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
+            if (this.state.sendConfigurationNotPermitted) {
+                sendSettings = null;
+            } else {
+                sendSettings =  <AlignedRow>{t('loadingSendConfiguration')}</AlignedRow>
+            }
         }
 
         const listsColumns = [
