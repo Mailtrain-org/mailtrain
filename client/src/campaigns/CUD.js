@@ -35,6 +35,7 @@ import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels} from "./helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import interoperableErrors from "../../../shared/interoperable-errors";
 
 @withComponentMixins([
     withTranslation,
@@ -157,12 +158,22 @@ export default class CUD extends Component {
         if (sendConfigurationId) {
             this.fetchSendConfigurationId = sendConfigurationId;
 
-            const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
+            try {
+                const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
 
-            if (sendConfigurationId === this.fetchSendConfigurationId) {
-                this.setState({
-                    sendConfiguration: result.data
-                });
+                if (sendConfigurationId === this.fetchSendConfigurationId) {
+                    this.setState({
+                        sendConfiguration: result.data
+                    });
+                }
+            } catch (err) {
+                if (err instanceof interoperableErrors.PermissionDeniedError) {
+                    this.setState({
+                        sendConfiguration: null
+                    });
+                } else {
+                    throw err;
+                }
             }
         }
     }
