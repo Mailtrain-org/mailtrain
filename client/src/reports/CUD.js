@@ -78,11 +78,9 @@ export default class CUD extends Component {
     submitFormValuesMutator(data) {
         const params = {};
 
-        if(data.user_fields){
-            for (const spec of data.user_fields) {
-                const fldId = `param_${spec.id}`;
-                params[spec.id] = data[fldId];
-            }
+        for (const spec of data.user_fields) {
+            const fldId = `param_${spec.id}`;
+            params[spec.id] = data[fldId];
         }
 
         data.params = params;
