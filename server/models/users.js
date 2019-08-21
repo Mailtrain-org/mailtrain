@@ -258,7 +258,11 @@ async function getByAccessToken(accessToken) {
 }
 
 async function getByUsername(username) {
-    return await _getBy(contextHelpers.getAdminContext(), 'username', username);
+    try{
+        return await _getBy(contextHelpers.getAdminContext(), 'username', username);
+    }catch(err){
+        throw new interoperableErrors.NotFoundError();
+    }
 }
 
 async function getByUsernameIfPasswordMatch(context, username, password) {

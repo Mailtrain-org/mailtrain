@@ -195,7 +195,7 @@ if (LdapStrategy) {
 
         } catch (err) {
             if (err instanceof interoperableErrors.NotFoundError) {
-                const userId = await users.create(null, {
+                const userId = await users.create(contextHelpers.getAdminContext(), {
                     username: profile[config.ldap.uidTag],
                     role: config.ldap.newUserRole,
                     namespace: config.ldap.newUserNamespaceId
