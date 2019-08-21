@@ -187,9 +187,9 @@ if (LdapStrategy) {
 
             return {
                 id: user.id,
-                username: user.username,
+                username: profile[config.ldap.uidTag],
                 name: profile[config.ldap.nameTag],
-                email: profile.mail,
+                email: profile[config.ldap.mailTag],
                 role: user.role
             };
 
@@ -205,7 +205,7 @@ if (LdapStrategy) {
                     id: userId,
                     username: profile[config.ldap.uidTag],
                     name: profile[config.ldap.nameTag],
-                    email: profile.mail,
+                    email: profile[config.ldap.mailTag],
                     role: config.ldap.newUserRole
                 };
             } else {
