@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import {withTranslation} from './i18n';
 import {TreeTableSelect} from './form';
 import {withComponentMixins} from "./decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 
 @withComponentMixins([

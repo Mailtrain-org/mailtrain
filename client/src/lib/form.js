@@ -818,7 +818,7 @@ class TreeTableSelect extends Component {
         dataUrl: PropTypes.string,
         data: PropTypes.array,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string,
+        format: PropTypes.string
     }
 
     async onSelectionChangedAsync(sel) {
