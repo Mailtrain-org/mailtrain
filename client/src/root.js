@@ -18,7 +18,6 @@ import sendConfigurations from './send-configurations/root';
 import settings from './settings/root';
 
 import {DropdownLink, getLanguageChooser, NavDropdown, NavLink, NavActionLink, Section} from "./lib/page";
-import {getNamespaceNameFilterCookie, getNamespaceIdFilterCookie, deleteNamespaceFilterCookies} from "./lib/namespace";
 import {
     Form,
     withForm,
@@ -76,11 +75,12 @@ class PreviewNamespaceFilterModalDialog extends Component {
 
     componentDidMount() {
         var enabled = false;
-        if(getNamespaceIdFilterCookie()){
+        const localStorage = window.localStorage;
+        if(localStorage.getItem('namespaceFilterId')){
             enabled = true;
         }
         this.populateFormValues({
-            namespace: getNamespaceIdFilterCookie(),
+            namespace: localStorage.getItem('namespaceFilterName'),
             namespaceFilterCheckboxEnabled: enabled
         });
         this.loadTreeData();
@@ -108,8 +108,10 @@ class PreviewNamespaceFilterModalDialog extends Component {
 
         if(this.getFormValue('namespaceFilterCheckboxEnabled')){
             if(this.getFormValue('namespace')){
-                document.cookie = "namespaceFilterId=" + this.getFormValue('namespace') + "; path=/";
-                document.cookie = "namespaceFilterName=" + this.getFormValue('namespace') + "; path=/";
+                const localStorage = window.localStorage;
+                localStorage.setItem('namespaceFilterId', this.getFormValue('namespace'));
+                const response = await axios.get(getUrl('rest/namespaces/' + this.getFormValue('namespace')));
+                localStorage.setItem('namespaceFilterName', response.data.name);
                 this.state.namespaceId = this.getFormValue('namespace');
                 this.state.namespaceName = this.getFormValue('namespace');
                 this.setFormStatusMessage('warning', null);
@@ -118,7 +120,9 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 this.setFormStatusMessage('warning', t('namespaceMustNotBeEmpty'));
             }
         }else{
-            deleteNamespaceFilterCookies();
+            const localStorage = window.localStorage;
+            localStorage.removeItem('namespaceFilterId');
+            localStorage.removeItem('namespaceFilterName');
             this.state.namespaceId = null;
             this.state.namespaceName = "Namespace filter";
             this.setFormStatusMessage('warning', null);
@@ -170,9 +174,6 @@ class Root extends Component {
             }
             
             async logout() {
-                if(mailtrainConfig.namespaceFilterEnabled){
-                    deleteNamespaceFilterCookies(); 
-                }
                 await axios.post(getUrl('rest/logout'));
                 window.location = getUrl();
             }
@@ -208,8 +209,9 @@ class Root extends Component {
 
         
                 if(mailtrainConfig.namespaceFilterEnabled){
-                    if(getNamespaceNameFilterCookie()){
-                        namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{getNamespaceNameFilterCookie()}</NavActionLink>;
+                    const localStorage = window.localStorage;
+                    if(localStorage.getItem('namespaceFilterId')){
+                        namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{localStorage.getItem('namespaceFilterName')}</NavActionLink>;
                     }else{
                         namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{'Namespace filter'}</NavActionLink>;
                     }
