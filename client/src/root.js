@@ -67,7 +67,7 @@ class PreviewNamespaceFilterModalDialog extends Component {
 
     localValidateFormValues(state) {
         const t = this.props.t;
-        if (!state.getIn(['namespace', 'value']) && state.getIn(['namespace_filter_enabled', 'value'])) {
+        if (!state.getIn(['namespace', 'value']) && state.getIn(['namespaceFilterCheckboxEnabled', 'value'])) {
             state.setIn(['namespace', 'error'], t("namespaceHasToBeSelectedToApply"));
         } else {
             state.setIn(['namespace', 'error'], null);
@@ -81,7 +81,7 @@ class PreviewNamespaceFilterModalDialog extends Component {
         }
         this.populateFormValues({
             namespace: getNamespaceIdFilterCookie(),
-            namespace_filter_enabled: enabled
+            namespaceFilterCheckboxEnabled: enabled
         });
         this.loadTreeData();
     }
@@ -95,10 +95,6 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 root.expanded = true;
             }
 
-            if (this.props.entity && !this.isEditGlobal()) {
-                this.removeNsIdSubtree(data);
-            }
-
             if (this.isComponentMounted()) {
                 this.setState({
                     treeData: data
@@ -110,7 +106,7 @@ class PreviewNamespaceFilterModalDialog extends Component {
     async setNamespaceFilterAsync() {
         const t = this.props.t;
 
-        if(this.getFormValue('namespace_filter_enabled')){
+        if(this.getFormValue('namespaceFilterCheckboxEnabled')){
             if(this.getFormValue('namespace')){
                 document.cookie = "namespaceFilterId=" + this.getFormValue('namespace') + "; path=/";
                 document.cookie = "namespaceFilterName=" + this.getFormValue('namespace') + "; path=/";
@@ -144,9 +140,8 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
             ]}>
                 <Form stateOwner={this}>
-                    <TreeTableSelect id="namespace" format="wide" label={t('namespace')} data={this.state.treeData}/>
-                    <hr/>
-                    <CheckBox id="namespace_filter_enabled" format="wide" text={t('enabled')}></CheckBox>
+                    <CheckBox id="namespaceFilterCheckboxEnabled" format="wide" text={t('enableNamespaceFilter')}></CheckBox>
+                    {this.getFormValue('namespaceFilterCheckboxEnabled') && <TreeTableSelect id="namespace" format="wide" label={t('namespace')} data={this.state.treeData}/>}               
                 </Form>
             </ModalDialog>
         );
@@ -154,8 +149,7 @@ class PreviewNamespaceFilterModalDialog extends Component {
 }
 
 @withComponentMixins([
-    withTranslation,
-    withForm
+    withTranslation
 ])
 class Root extends Component {
     constructor(props) {
@@ -169,10 +163,6 @@ class Root extends Component {
 
         // The MainMenu component is defined here in order to avoid recreating menu structure on every change in the main menu
         // This is because Root component depends only on the language, thus it is redrawn (and the structure is recomputed) only when the language changes
-        @withComponentMixins([
-            withTranslation,
-            withForm
-        ])
         class MainMenu extends Component {
             constructor(props) {
                 super(props);
@@ -238,11 +228,12 @@ class Root extends Component {
 
                 if (mailtrainConfig.isAuthenticated) {
                     return (
-                        <>  
-                        <PreviewNamespaceFilterModalDialog
-                            visible={this.state.showModal}
-                            onHide={() => this.setState({showModal: false})}
-                        />  
+                        <>  <ul className="color: #000">
+                            <PreviewNamespaceFilterModalDialog
+                                visible={this.state.showModal}
+                                onHide={() => this.setState({showModal: false})}
+                            />  
+                            </ul>
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
                                 <NavDropdown label={t('administration')}>

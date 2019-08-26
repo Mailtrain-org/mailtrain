@@ -1104,8 +1104,7 @@
   "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
   "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
-  "namespaceFilter": "Filtrado por espacio de nombres",
-  "filter": "Filtro",
-  "disallow": "Desactivar",
-  "selectAndReturn": "Seleccionar y volver"
+  "namespaceFilter": "Filtro por espacio de nombres",
+  "apply": "Aplicar",
+  "enableNamespaceFilter": "Activar filtrado por espacio de nombres"
 }
