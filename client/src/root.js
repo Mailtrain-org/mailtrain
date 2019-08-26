@@ -228,12 +228,11 @@ class Root extends Component {
 
                 if (mailtrainConfig.isAuthenticated) {
                     return (
-                        <>  <ul className="color: #000">
+                        <>  
                             <PreviewNamespaceFilterModalDialog
                                 visible={this.state.showModal}
                                 onHide={() => this.setState({showModal: false})}
                             />  
-                            </ul>
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
                                 <NavDropdown label={t('administration')}>
