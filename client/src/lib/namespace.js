@@ -13,9 +13,9 @@ import mailtrainConfig from 'mailtrainConfig';
 export class NamespaceSelect extends Component {
     render() {
         const t = this.props.t;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
             return (
-                <TreeTableSelect id="namespace" label={t('namespace')} dataUrl={"rest/namespaces-tree/" + getNamespaceIdFilterCookie()}/>
+                <TreeTableSelect id="namespace" label={t('namespace')} dataUrl={"rest/namespaces-tree/" + getNamespaceFilterId()}/>
             );
         }
         return (
@@ -32,37 +32,18 @@ export function validateNamespace(t, state) {
     }
 }
 
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-}
-
 export function getDefaultNamespace(permissions) {
     return permissions.viewUsersNamespace && permissions.createEntityInUsersNamespace ? mailtrainConfig.user.namespace : null;
 }
 
-export function getNamespaceIdFilterCookie() {
-    return getCookie("namespaceFilterId");
+export function getNamespaceFilterId() {
+    const localStorage = window.localStorage;
+    return localStorage.getItem('namespaceFilterId');
 }
 
-export function getNamespaceNameFilterCookie() {
-    return getCookie("namespaceFilterName");
-}
-
-export function deleteNamespaceFilterCookies() {
-    document.cookie = 'namespaceFilterId' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; ; path=/';//Delete namespaceFilter cookies
-    document.cookie = 'namespaceFilterName' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; ; path=/';  
+export function getNamespaceFilterName() {
+    const localStorage = window.localStorage;
+    return localStorage.getItem('namespaceFilterName');
 }
 
 export function namespaceCheckPermissions(createOperation) {
