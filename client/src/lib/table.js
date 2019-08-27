@@ -144,11 +144,12 @@ class Table extends Component {
                     }
                 }
 
-                if (keysToFetch.length > 0) { 
+                if (keysToFetch.length > 0) {
                     const response = await axios.post(getUrl(this.props.dataUrl), {
                         operation: 'getBy',
                         column: this.props.selectionKeyIndex,
-                        values: keysToFetch
+                        values: keysToFetch,
+                        namespaceFilter: this.props.namespaceFilter
                     });
 
                     for (const row of response.data) {
