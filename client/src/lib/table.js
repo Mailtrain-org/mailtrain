@@ -128,6 +128,7 @@ class Table extends Component {
     @withAsyncErrorHandler
     async fetchData(data, callback) {
         // This custom ajax fetch function allows us to properly handle the case when the user is not authenticated.
+        data.namespaceFilter = this.props.namespaceFilter;
         const response = await axios.post(getUrl(this.props.dataUrl), data);
         callback(response.data);
     }
@@ -143,7 +144,7 @@ class Table extends Component {
                     }
                 }
 
-                if (keysToFetch.length > 0) {
+                if (keysToFetch.length > 0) { 
                     const response = await axios.post(getUrl(this.props.dataUrl), {
                         operation: 'getBy',
                         column: this.props.selectionKeyIndex,

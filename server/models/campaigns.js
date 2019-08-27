@@ -68,11 +68,10 @@ function hash(entity, content) {
     return hasher.hash(filteredEntity);
 }
 
-async function _listDTAjax(context, namespaceFilter, params) {
+async function _listDTAjax(context, params) {
     var allowedNamespaces = [];
-
-    if(namespaceFilter){
-        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
     }
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -92,8 +91,8 @@ async function _listDTAjax(context, namespaceFilter, params) {
     );
 }
 
-async function listDTAjax(context, params, namespaceId) {
-    return await _listDTAjax(context, namespaceId, params);
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, params);
 }
 
 async function listByNamespaceDTAjax(context, namespaceId, params) {

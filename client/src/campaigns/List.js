@@ -11,7 +11,7 @@ import {CampaignSource, CampaignStatus, CampaignType} from "../../../shared/camp
 import {getCampaignLabels} from "./helpers";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import {getNamespaceIdFilterCookie} from "../lib/namespace";
+import {getNamespaceFilterId} from "../lib/namespace";
 import styles from "./styles.scss";
 import PropTypes from 'prop-types';
 import mailtrainConfig from 'mailtrainConfig';
@@ -139,10 +139,7 @@ export default class List extends Component {
             }
         ];
 
-        var campaingsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table"} columns={columns} />;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            campaingsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table/" + getNamespaceIdFilterCookie()} columns={columns} />;
-        }
+        var campaingsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table"} namespaceFilter={getNamespaceFilterId()} columns={columns}/>;
         return (
             <div>
                 {tableRestActionDialogRender(this)}

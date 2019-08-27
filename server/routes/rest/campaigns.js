@@ -7,7 +7,7 @@ const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
 
 router.postAsync('/campaigns-table', passport.loggedIn, async (req, res) => {
-    return res.json(await campaigns.listDTAjax(req.context, req.body, null));
+    return res.json(await campaigns.listDTAjax(req.context, req.body));
 });
 
 router.postAsync('/campaigns-table/:namespaceId', passport.loggedIn, async (req, res) => {
