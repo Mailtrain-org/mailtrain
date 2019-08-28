@@ -183,7 +183,7 @@ class Table extends Component {
 
         this.selectionMap = nextSelectionMap;
 
-        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl;
+        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl || this.props.namespaceFilter != null;
     }
 
     componentDidMount() {
@@ -361,7 +361,7 @@ class Table extends Component {
                 jQuery(this.node()).removeClass('selected');
             }
         });
-
+        
         this.updateSelectInfo();
 
         // noinspection JSIgnoredPromiseFromCall

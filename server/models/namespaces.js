@@ -12,8 +12,7 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
-
-async function listTree(context, nsId, search) {
+async function listTree(context) {
     enforce(!context.user.admin, 'listTree is not supposed to be called by assumed admin');
 
     const entityType = entitySettings.getEntityType('namespace');
@@ -34,7 +33,7 @@ async function listTree(context, nsId, search) {
             'namespaces.id', 'namespaces.name', 'namespaces.description', 'namespaces.namespace',
             knex.raw(`GROUP_CONCAT(${entityType.permissionsTable + '.operation'} SEPARATOR \';\') as permissions`)
         ]);
-    
+
     const entries = {};
 
     for (let row of rows) {
@@ -103,30 +102,6 @@ async function listTree(context, nsId, search) {
         delete entry.parent;
     }
 
-    if(nsId && !search){
-        var root = [];
-
-        function process_node(node,topNamespace){
-            var branch = false;
-            if(node){
-                if(node.key == topNamespace){
-                    branch = true;
-                    return node;
-                }
-                if(node.children && !branch){
-                    for(const key in node.children){
-                        const n = process_node(node.children[key], topNamespace);
-                        if(n){
-                            return n;
-                        }
-                    } 
-                }
-            }
-            return null;
-        }
-        root.push(process_node(roots[0], nsId));
-        return root;
-    }
     return roots;
 }
 
@@ -268,7 +243,7 @@ async function remove(context, id) {
 
 async function getAllowedNamespaces(context, topNamespace){
 
-    const tree = await listTree(context, null, true);
+    const tree = await listTree(context);
     var allowedNamespaces = [];
 
     function process_node(node, namespaces, branch, topNamespace){
@@ -289,9 +264,7 @@ async function getAllowedNamespaces(context, topNamespace){
     }
     if(tree && topNamespace){
         process_node(tree[0], allowedNamespaces, false, topNamespace);
-        allowedNamespaces.sort();
     }
-    
     return allowedNamespaces;
 }
 

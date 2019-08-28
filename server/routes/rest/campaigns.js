@@ -10,10 +10,6 @@ router.postAsync('/campaigns-table', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listDTAjax(req.context, req.body));
 });
 
-router.postAsync('/campaigns-table/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await campaigns.listDTAjax(req.context, req.body, castToInteger(req.params.namespaceId)));
-});
-
 router.postAsync('/campaigns-with-content-table', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listWithContentDTAjax(req.context, null, req.body));
 });

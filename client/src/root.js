@@ -4,7 +4,7 @@ import './lib/public-path';
 
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {TranslationRoot, withTranslation} from './lib/i18n';
+import i18n, {TranslationRoot, withTranslation} from './lib/i18n';
 import account from './account/root';
 import login from './login/root';
 import blacklist from './blacklist/root';
@@ -128,6 +128,7 @@ class PreviewNamespaceFilterModalDialog extends Component {
             this.setFormStatusMessage('warning', null);
             this.props.onHide();
         }
+        i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change 
     }
 
     async hideModal() {

@@ -138,8 +138,7 @@ export default class List extends Component {
                 }
             }
         ];
-
-        var campaingsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table"} namespaceFilter={getNamespaceFilterId()} columns={columns}/>;
+        
         return (
             <div>
                 {tableRestActionDialogRender(this)}
@@ -154,8 +153,8 @@ export default class List extends Component {
                 </Toolbar>
 
                 <Title>{t('campaigns')}</Title>
-
-                {campaingsTable}
+                
+                <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table"} namespaceFilter={getNamespaceFilterId()} columns={columns}/>
             </div>
         );
     }
