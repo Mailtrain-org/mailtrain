@@ -20,8 +20,7 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import {deleteNamespaceFilterCookies} from "../lib/namespace";
-
+import {clearNamespaceFilter} from "../lib/namespace";
 @withComponentMixins([
     withTranslation,
     withForm,
@@ -77,9 +76,7 @@ export default class Login extends Component {
 
             if (submitSuccessful) {
                 const nextUrl = qs.parse(this.props.location.search).next || getUrl();
-                if(mailtrainConfig.namespaceFilterEnabled){
-                    deleteNamespaceFilterCookies(); 
-                }
+                clearNamespaceFilter();
                 /* This ensures we get config for the authenticated user */
                 window.location = nextUrl;
             } else {

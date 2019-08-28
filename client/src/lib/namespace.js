@@ -46,6 +46,12 @@ export function getNamespaceFilterName() {
     return localStorage.getItem('namespaceFilterName');
 }
 
+export function clearNamespaceFilter() {
+    const localStorage = window.localStorage;
+    localStorage.removeItem('namespaceFilterId');
+    localStorage.removeItem('namespaceFilterName');
+}
+
 export function namespaceCheckPermissions(createOperation) {
     if (mailtrainConfig.user) {
         return {

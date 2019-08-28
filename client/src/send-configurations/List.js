@@ -11,7 +11,7 @@ import {getMailerTypes} from './helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
-import {getNamespaceIdFilterCookie} from '../lib/namespace';
+import {getNamespaceFilterId} from '../lib/namespace';
 import mailtrainConfig from 'mailtrainConfig';
 
 
@@ -76,8 +76,8 @@ export default class List extends Component {
 
         var sendConfigTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/send-configurations-table" columns={columns} />
 
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            sendConfigTable = <Table ref={node => this.table = node} withHeader dataUrl={'rest/send-configurations-table/' + getNamespaceIdFilterCookie()} columns={columns} />
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            sendConfigTable = <Table ref={node => this.table = node} withHeader dataUrl={'rest/send-configurations-table/' + getNamespaceFilterId()} columns={columns} />
         }
 
         return (

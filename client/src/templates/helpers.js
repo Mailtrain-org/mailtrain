@@ -22,7 +22,7 @@ import {Trans} from "react-i18next";
 import {TagLanguages, renderTag} from "../../../shared/templates";
 
 import styles from "../lib/styles.scss";
-import {getNamespaceIdFilterCookie } from "../lib/namespace";
+import {getNamespaceFilterId } from "../lib/namespace";
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -90,13 +90,13 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         getTypeForm: (owner, isEdit) => {
             const tagLanguageKey = owner.getFormValue(prefix + 'tag_language');
             if (tagLanguageKey) {
-                if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
+                if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
                     return <TableSelect
                     id={prefix + 'mosaicoTemplate'}
                     label={t('mosaicoTemplate')}
                     withHeader
                     dropdown
-                    dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}/` + getNamespaceIdFilterCookie()}
+                    dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}/` + getNamespaceFilterId()}
                     columns={mosaicoTemplatesColumns}
                     selectionLabelIndex={1}
                     disabled={isEdit}/>

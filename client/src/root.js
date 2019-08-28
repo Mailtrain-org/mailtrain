@@ -35,6 +35,7 @@ import {requiresAuthenticatedUser,  withPageHelpers} from './lib/page';
 import {withErrorHandling} from './lib/error-handling';
 import {getUrl} from "./lib/urls";
 import {withAsyncErrorHandler} from './lib/error-handling';
+import {clearNamespaceFilter, getNamespaceFilterName} from './lib/namespace'
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
@@ -75,12 +76,11 @@ class PreviewNamespaceFilterModalDialog extends Component {
 
     componentDidMount() {
         var enabled = false;
-        const localStorage = window.localStorage;
-        if(localStorage.getItem('namespaceFilterId')){
+        if(getNamespaceFilterName()){
             enabled = true;
         }
         this.populateFormValues({
-            namespace: localStorage.getItem('namespaceFilterName'),
+            namespace: getNamespaceFilterName(),
             namespaceFilterCheckboxEnabled: enabled
         });
         this.loadTreeData();
@@ -113,16 +113,14 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 const response = await axios.get(getUrl('rest/namespaces/' + this.getFormValue('namespace')));
                 localStorage.setItem('namespaceFilterName', response.data.name);
                 this.state.namespaceId = this.getFormValue('namespace');
-                this.state.namespaceName = this.getFormValue('namespace');
+                this.state.namespaceName = response.data.name;
                 this.setFormStatusMessage('warning', null);
                 this.props.onHide();
             }else{
                 this.setFormStatusMessage('warning', t('namespaceMustNotBeEmpty'));
             }
         }else{
-            const localStorage = window.localStorage;
-            localStorage.removeItem('namespaceFilterId');
-            localStorage.removeItem('namespaceFilterName');
+            clearNamespaceFilter();
             this.state.namespaceId = null;
             this.state.namespaceName = "Namespace filter";
             this.setFormStatusMessage('warning', null);
@@ -210,9 +208,8 @@ class Root extends Component {
 
         
                 if(mailtrainConfig.namespaceFilterEnabled){
-                    const localStorage = window.localStorage;
-                    if(localStorage.getItem('namespaceFilterId')){
-                        namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{localStorage.getItem('namespaceFilterName')}</NavActionLink>;
+                    if(getNamespaceFilterName()){
+                        namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{getNamespaceFilterName()}</NavActionLink>;
                     }else{
                         namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{'Namespace filter'}</NavActionLink>;
                     }

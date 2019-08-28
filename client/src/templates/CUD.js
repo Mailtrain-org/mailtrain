@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
 import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
@@ -327,8 +327,8 @@ export default class CUD extends Component {
 
         var sourceTemplateTable = <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />;
 
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            sourceTemplateTable = <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl={'rest/templates-table/'+getNamespaceIdFilterCookie()} columns={templatesColumns} selectionLabelIndex={1} />;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            sourceTemplateTable = <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl={'rest/templates-table/'+getNamespaceFilterId()} columns={templatesColumns} selectionLabelIndex={1} />;
         }
 
         return (

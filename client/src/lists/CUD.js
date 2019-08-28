@@ -22,7 +22,7 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {DeleteModalDialog} from '../lib/modals';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
 import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
 import styles from "../lib/styles.scss";
 import {getMailerTypes} from "../send-configurations/helpers";
@@ -242,8 +242,8 @@ export default class CUD extends Component {
 
         var sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
 
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={'rest/send-configurations-table/' + getNamespaceIdFilterCookie()} columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={'rest/send-configurations-table/' + getNamespaceFilterId()} columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
         }
 
         return (

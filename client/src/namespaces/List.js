@@ -11,7 +11,7 @@ import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import mailtrainConfig from 'mailtrainConfig';
 import PropTypes from 'prop-types';
-import {getNamespaceIdFilterCookie} from '../lib/namespace';
+import {getNamespaceFilterId} from '../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -64,8 +64,8 @@ export default class List extends Component {
 
         var namespacesTree = <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} />
 
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            namespacesTree = <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl={"rest/namespaces-tree/" + getNamespaceIdFilterCookie()} actions={actions} />
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            namespacesTree = <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl={"rest/namespaces-tree/" + getNamespaceFilterId()} actions={actions} />
         }
 
         return (

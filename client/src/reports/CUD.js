@@ -25,7 +25,7 @@ import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/na
 import {DeleteModalDialog} from "../lib/modals";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import {getNamespaceIdFilterCookie} from "../lib/namespace";
+import {getNamespaceFilterId} from "../lib/namespace";
 import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
@@ -227,8 +227,8 @@ export default class CUD extends Component {
 
         if (userFieldsSpec) {
             var namespace = "";
-            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-                namespace = '/' + getNamespaceIdFilterCookie();
+            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+                namespace = '/' + getNamespaceFilterId();
             }
             for (const spec of userFieldsSpec) {
                 if (spec.type === 'campaign') {
@@ -254,8 +254,8 @@ export default class CUD extends Component {
         }
 
         var reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl={"rest/report-templates-table/" + getNamespaceIdFilterCookie()} columns={reportTemplateColumns} selectionLabelIndex={1}/>;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl={"rest/report-templates-table/" + getNamespaceFilterId()} columns={reportTemplateColumns} selectionLabelIndex={1}/>;
         }
 
         return (

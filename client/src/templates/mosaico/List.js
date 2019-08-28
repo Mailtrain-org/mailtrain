@@ -12,7 +12,7 @@ import {getTagLanguages} from '../helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import PropTypes from 'prop-types';
-import {getNamespaceIdFilterCookie} from '../../lib/namespace';
+import {getNamespaceFilterId} from '../../lib/namespace';
 import mailtrainConfig from 'mailtrainConfig';
 import { id } from 'brace/worker/css';
 
@@ -92,8 +92,8 @@ export default class List extends Component {
         ];
 
         var mosaicoTemplatesTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/mosaico-templates-table" columns={columns} />;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            mosaicoTemplatesTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/mosaico-templates-table/" + getNamespaceIdFilterCookie()} columns={columns}/>
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            mosaicoTemplatesTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/mosaico-templates-table/" + getNamespaceFilterId()} columns={columns}/>
         }
 
         return (

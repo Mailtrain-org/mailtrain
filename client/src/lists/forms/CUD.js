@@ -23,7 +23,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTrustedUrl, getUrl} from "../../lib/urls";
@@ -488,9 +488,9 @@ export default class CUD extends Component {
 
         var customFormsTable = <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />;
         var listsTable = <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            customFormsTable = <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl={'rest/forms-table/' +getNamespaceIdFilterCookie()} columns={customFormsColumns} selectionLabelIndex={1} />;
-            listsTable = <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl={'rest/lists-table/' + getNamespaceIdFilterCookie()} columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            customFormsTable = <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl={'rest/forms-table/' +getNamespaceFilterId()} columns={customFormsColumns} selectionLabelIndex={1} />;
+            listsTable = <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl={'rest/lists-table/' + getNamespaceFilterId()} columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')}/>;
         }
 
         return (

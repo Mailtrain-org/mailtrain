@@ -11,7 +11,7 @@ import {getTagLanguages, getTemplateTypes} from './helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
-import {getNamespaceIdFilterCookie} from "../lib/namespace";
+import {getNamespaceFilterId} from "../lib/namespace";
 import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
@@ -83,8 +83,8 @@ export default class List extends Component {
         ];
 
         var templatesTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/templates-table" columns={columns} />;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-           templatesTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/templates-table/" + getNamespaceIdFilterCookie()} columns={columns} />; 
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+           templatesTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/templates-table/" + getNamespaceFilterId()} columns={columns} />; 
         }
 
         return (

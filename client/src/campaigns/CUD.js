@@ -22,7 +22,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceIdFilterCookie} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
@@ -558,8 +558,8 @@ export default class CUD extends Component {
 
             const selectedList = this.getFormValue(prefix + 'list');
             var listsTable = <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />;
-            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-                listsTable = <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl={'rest/lists-table/'+ getNamespaceIdFilterCookie()} columns={listsColumns} selectionLabelIndex={1} />;
+            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+                listsTable = <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl={'rest/lists-table/'+ getNamespaceFilterId()} columns={listsColumns} selectionLabelIndex={1} />;
             }
 
             lstsEditEntries.push(
@@ -702,8 +702,8 @@ export default class CUD extends Component {
             // The "key" property here and in the TableSelect below is to tell React that these tables are different and should be rendered by different instances. Otherwise, React will use
             // only one instance, which fails because Table does not handle updates in "columns" property
             templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
-            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-                templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl={'rest/templates-table/'+getNamespaceIdFilterCookie()} columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+                templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl={'rest/templates-table/'+getNamespaceFilterId()} columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
             }
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
@@ -716,8 +716,8 @@ export default class CUD extends Component {
                 { data: 6, title: t('namespace') }
             ];
             templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
-            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-                templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl={'rest/campaigns-with-content-table/' + getNamespaceIdFilterCookie()} columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
+            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+                templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl={'rest/campaigns-with-content-table/' + getNamespaceFilterId()} columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
             }
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
@@ -741,8 +741,8 @@ export default class CUD extends Component {
 
         var sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />;
 
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={'rest/send-configurations-table/' + getNamespaceIdFilterCookie()} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            sendConfigTable = <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl={'rest/send-configurations-table/' + getNamespaceFilterId()} columns={sendConfigurationsColumns} selectionLabelIndex={1} />
         }
 
         return (

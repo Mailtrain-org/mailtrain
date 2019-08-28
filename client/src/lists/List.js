@@ -9,7 +9,7 @@ import {Icon} from "../lib/bootstrap-components";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {withForm} from "../lib/form";
-import {getNamespaceIdFilterCookie} from "../lib/namespace";
+import {getNamespaceFilterId} from "../lib/namespace";
 import PropTypes from 'prop-types';
 import mailtrainConfig from 'mailtrainConfig';
 
@@ -119,8 +119,8 @@ export default class List extends Component {
         ];
 
         var listsTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceIdFilterCookie()){
-            listsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/lists-table/" + getNamespaceIdFilterCookie()} columns={columns} />;
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            listsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/lists-table/" + getNamespaceFilterId()} columns={columns} />;
         }
 
         return (
