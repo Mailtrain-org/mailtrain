@@ -155,7 +155,7 @@ class Table extends Component {
                     for (const row of response.data) {
                         const key = row[this.props.selectionKeyIndex];
                         if (oldSelectionMap.has(key)) {
-                            this.selectionMap.set(key, row)
+                            this.selectionMap.set(key, row);
                         }
                     }
 

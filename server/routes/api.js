@@ -145,15 +145,15 @@ router.getAsync('/subscriptions/:listCid', passport.loggedIn, async (req, res) =
     const start = parseInt(req.query.start || 0, 10);
     const limit = parseInt(req.query.limit || 10000, 10);
 
-    const { subscriptions, total } = await subscriptions.list(list.id, false, start, limit);
+    const result = await subscriptions.list(req.context, list.id, false, start, limit);
 
     res.status(200);
     res.json({
         data: {
-            total: total,
+            total: result.total,
             start: start,
             limit: limit,
-            subscriptions
+            subscriptions: result.subscriptions
         }
     });
 });
