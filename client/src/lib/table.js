@@ -59,7 +59,8 @@ class Table extends Component {
     static defaultProps = {
         selectMode: TableSelectMode.NONE,
         selectionKeyIndex: 0,
-        pageLength: 50
+        pageLength: 50,
+        namespaceFilter: null
     }
 
     refresh() {
@@ -182,8 +183,8 @@ class Table extends Component {
         }
 
         this.selectionMap = nextSelectionMap;
-
-        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl || this.props.namespaceFilter != null;
+        
+        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl || this.props.namespaceFilter !== nextProps.namespaceFilter;
     }
 
     componentDidMount() {
