@@ -118,11 +118,6 @@ export default class List extends Component {
             }
         ];
 
-        var listsTable = <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
-            listsTable = <Table ref={node => this.table = node} withHeader dataUrl={"rest/lists-table/" + getNamespaceFilterId()} columns={columns} />;
-        }
-
         return (
             <div>
                 {tableRestActionDialogRender(this)}
@@ -137,7 +132,7 @@ export default class List extends Component {
 
                 <Title>{t('lists')}</Title>
 
-                {listsTable}
+                <Table namespaceFilter={getNamespaceFilterId()} ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />
             </div>
         );
     }

@@ -38,11 +38,11 @@ async function getById(context, id, withPermissions = true) {
     });
 }
 
-async function _listDTAjax(context, namespaceFilter, params) {
+async function _listDTAjax(context, params) {
     var allowedNamespaces = [];
 
-    if(namespaceFilter){
-        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
     }
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -51,7 +51,7 @@ async function _listDTAjax(context, namespaceFilter, params) {
         params,
         builder => {
             builder = builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace');
-            if (namespaceFilter) {
+            if (params.namespaceFilter) {
                 for(const key in allowedNamespaces){
                     builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
                 }
@@ -62,8 +62,8 @@ async function _listDTAjax(context, namespaceFilter, params) {
     );
 }
 
-async function listDTAjax(context, namespaceId, params) {
-    return await _listDTAjax(context, namespaceId, params);
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, params);
 }
 
 async function _validateAndPreprocess(tx, entity) {

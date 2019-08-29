@@ -27,12 +27,12 @@ function hash(entity) {
 }
 
 
-async function _listDTAjax(context, namespaceFilter, params) {
+async function _listDTAjax(context, params) {
     const campaignEntityType = entitySettings.getEntityType('campaign');
     var allowedNamespaces = [];
 
-    if(namespaceFilter){
-        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
     }
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -43,7 +43,7 @@ async function _listDTAjax(context, namespaceFilter, params) {
             builder = builder
                 .from('lists')
                 .innerJoin('namespaces', 'namespaces.id', 'lists.namespace');
-                if (namespaceFilter) {
+                if (params.namespaceFilter) {
                     for(const key in allowedNamespaces){
                         builder = builder.orWhere('lists.namespace', allowedNamespaces[key]);
                     }
@@ -67,8 +67,8 @@ async function _listDTAjax(context, namespaceFilter, params) {
     );
 }
 
-async function listDTAjax(context, namespaceId, params) {
-    return await _listDTAjax(context, namespaceId, params);
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, params);
 }
 
 async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {

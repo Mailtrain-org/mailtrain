@@ -209,7 +209,7 @@ export default class CUD extends Component {
         const userFieldsSpec = this.getFormValue('user_fields');
         const userFields = [];
 
-        function addUserFieldTableSelect(spec, dataUrl, selIndex, columns) {
+        function addUserFieldTableSelect(spec, namespaceId, dataUrl, selIndex, columns) {
             let dropdown, selectMode;
 
             if (spec.maxOccurences === 1) {
@@ -220,19 +220,15 @@ export default class CUD extends Component {
                 selectMode = TableSelectMode.MULTI;
             }
 
-            const fld = <TableSelect key={spec.id} id={`param_${spec.id}`} label={spec.name} selectionAsArray withHeader dropdown={dropdown} selectMode={selectMode} dataUrl={dataUrl} columns={columns} selectionLabelIndex={selIndex}/>;
+            const fld = <TableSelect namespaceFilter={namespaceId} key={spec.id} id={`param_${spec.id}`} label={spec.name} selectionAsArray withHeader dropdown={dropdown} selectMode={selectMode} dataUrl={dataUrl} columns={columns} selectionLabelIndex={selIndex}/>;
 
             userFields.push(fld);
         }
 
         if (userFieldsSpec) {
-            var namespace = "";
-            if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
-                namespace = '/' + getNamespaceFilterId();
-            }
             for (const spec of userFieldsSpec) {
                 if (spec.type === 'campaign') {
-                    addUserFieldTableSelect(spec, 'rest/campaigns-table' + namespace, 1,[
+                    addUserFieldTableSelect(spec, getNamespaceFilterId(), 'rest/campaigns-table', 1,[
                         {data: 0, title: "#"},
                         {data: 1, title: t('name')},
                         {data: 2, title: t('description')},
@@ -240,7 +236,7 @@ export default class CUD extends Component {
                         {data: 4, title: t('created'), render: data => moment(data).fromNow()}
                     ]);
                 } else if (spec.type === 'list') {
-                    addUserFieldTableSelect(spec, 'rest/lists-table' + namespace, 1,[
+                    addUserFieldTableSelect(spec, getNamespaceFilterId(), 'rest/lists-table', 1,[
                         {data: 0, title: "#"},
                         {data: 1, title: t('name')},
                         {data: 2, title: t('id')},
@@ -253,10 +249,6 @@ export default class CUD extends Component {
             }
         }
 
-        var reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>;
-        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
-            reportTemplateTable = <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl={"rest/report-templates-table/" + getNamespaceFilterId()} columns={reportTemplateColumns} selectionLabelIndex={1}/>;
-        }
 
         return (
             <div>
@@ -277,9 +269,9 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
 
-                    {reportTemplateTable}
+                    <TableSelect namespaceFilter={getNamespaceFilterId()} id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     {userFieldsSpec ?
                         userFields.length > 0 &&
