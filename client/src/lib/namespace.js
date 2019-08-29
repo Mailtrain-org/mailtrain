@@ -13,7 +13,11 @@ import mailtrainConfig from 'mailtrainConfig';
 export class NamespaceSelect extends Component {
     render() {
         const t = this.props.t;
-
+        if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
+            return (
+                <TreeTableSelect id="namespace" label={t('namespace')} dataUrl={"rest/namespaces-tree/" + getNamespaceFilterId()}/>
+            );
+        }
         return (
             <TreeTableSelect id="namespace" label={t('namespace')} dataUrl="rest/namespaces-tree"/>
         );
@@ -30,6 +34,22 @@ export function validateNamespace(t, state) {
 
 export function getDefaultNamespace(permissions) {
     return permissions.viewUsersNamespace && permissions.createEntityInUsersNamespace ? mailtrainConfig.user.namespace : null;
+}
+
+export function getNamespaceFilterId() {
+    const localStorage = window.localStorage;
+    return localStorage.getItem('namespaceFilterId');
+}
+
+export function getNamespaceFilterName() {
+    const localStorage = window.localStorage;
+    return localStorage.getItem('namespaceFilterName');
+}
+
+export function clearNamespaceFilter() {
+    const localStorage = window.localStorage;
+    localStorage.removeItem('namespaceFilterId');
+    localStorage.removeItem('namespaceFilterName');
 }
 
 export function namespaceCheckPermissions(createOperation) {
