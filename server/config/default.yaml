@@ -56,7 +56,7 @@ enabledLanguages:
 
 #Enable to use Namespace Filter
 namespaceFilter:
-  enabled: true
+  enabled: false
 
 # Enable to use Redis session cache or disable if Redis is not installed
 redis:

@@ -9,6 +9,7 @@ import {Icon} from "../../lib/bootstrap-components";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+import { getNamespaceFilterId } from '../../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -74,7 +75,7 @@ export default class List extends Component {
 
                 <Title>{t('forms')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
             </div>
         );
     }

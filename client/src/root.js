@@ -35,7 +35,7 @@ import {requiresAuthenticatedUser,  withPageHelpers} from './lib/page';
 import {withErrorHandling} from './lib/error-handling';
 import {getUrl} from "./lib/urls";
 import {withAsyncErrorHandler} from './lib/error-handling';
-import {clearNamespaceFilter, getNamespaceFilterName} from './lib/namespace'
+import {clearNamespaceFilter, getNamespaceFilterName, getNamespaceFilterId} from './lib/namespace'
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
@@ -76,11 +76,11 @@ class PreviewNamespaceFilterModalDialog extends Component {
 
     componentDidMount() {
         var enabled = false;
-        if(getNamespaceFilterName()){
+        if(getNamespaceFilterId()){
             enabled = true;
         }
         this.populateFormValues({
-            namespace: getNamespaceFilterName(),
+            namespace: getNamespaceFilterId(),
             namespaceFilterCheckboxEnabled: enabled
         });
         this.loadTreeData();
@@ -115,18 +115,16 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 this.state.namespaceId = this.getFormValue('namespace');
                 this.state.namespaceName = response.data.name;
                 this.setFormStatusMessage('warning', null);
-                this.props.onHide();
+                await this.hideModal();
+                i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change 
             }else{
                 this.setFormStatusMessage('warning', t('namespaceMustNotBeEmpty'));
             }
         }else{
             clearNamespaceFilter();
-            this.state.namespaceId = null;
-            this.state.namespaceName = "Namespace filter";
-            this.setFormStatusMessage('warning', null);
-            this.props.onHide();
+            await this.hideModal();
+            i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change   
         }
-        i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change 
     }
 
     async hideModal() {

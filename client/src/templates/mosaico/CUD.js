@@ -18,7 +18,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getMJMLSample, getVersafix} from "../../../../shared/mosaico-templates";
@@ -220,7 +220,7 @@ export default class CUD extends Component {
 
                     <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions}/>
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     {isEdit && typeKey && this.templateTypes[typeKey].getForm(this)}
 

@@ -12,6 +12,7 @@ import axios from '../lib/axios';
 import {getUrl} from '../lib/urls';
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {CampaignType} from "../../../shared/campaigns";
+import { getNamespaceFilterId } from '../lib/namespace';
 
 const Target = {
     CAMPAIGN_ONE: 'campaign_one',
@@ -245,7 +246,7 @@ export class TestSendModalDialog extends Component {
             );
 
             content.push(
-                <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} />
+                <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
             );
 
             if (listCid) {
@@ -286,7 +287,7 @@ export class TestSendModalDialog extends Component {
             ];
 
             content.push(
-                <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} />
+                <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
             );
 
             if (listCid) {
@@ -310,7 +311,7 @@ export class TestSendModalDialog extends Component {
             ];
 
             content.push(
-                <TableSelect key="list" id="list" format="wide" label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
+                <TableSelect key="list" id="list" format="wide" label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
             );
 
             const selectedList = this.getFormValue('list');

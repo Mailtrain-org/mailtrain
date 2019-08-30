@@ -22,6 +22,7 @@ import {Trans} from "react-i18next";
 import {TagLanguages, renderTag} from "../../../shared/templates";
 
 import styles from "../lib/styles.scss";
+import { getNamespaceFilterId } from "../lib/namespace";
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -97,7 +98,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}`}
                     columns={mosaicoTemplatesColumns}
                     selectionLabelIndex={1}
-                    disabled={isEdit}/>
+                    disabled={isEdit}
+                    namespaceFilter={getNamespaceFilterId()}/>
             } else {
                 return null;
             }

@@ -59,7 +59,8 @@ class Table extends Component {
     static defaultProps = {
         selectMode: TableSelectMode.NONE,
         selectionKeyIndex: 0,
-        pageLength: 50
+        pageLength: 50,
+        namespaceFilter: null
     }
 
     refresh() {
@@ -128,6 +129,7 @@ class Table extends Component {
     @withAsyncErrorHandler
     async fetchData(data, callback) {
         // This custom ajax fetch function allows us to properly handle the case when the user is not authenticated.
+        data.namespaceFilter = this.props.namespaceFilter;
         const response = await axios.post(getUrl(this.props.dataUrl), data);
         callback(response.data);
     }
@@ -147,7 +149,8 @@ class Table extends Component {
                     const response = await axios.post(getUrl(this.props.dataUrl), {
                         operation: 'getBy',
                         column: this.props.selectionKeyIndex,
-                        values: keysToFetch
+                        values: keysToFetch,
+                        namespaceFilter: this.props.namespaceFilter
                     });
 
                     const oldSelectionMap = this.selectionMap;
@@ -187,7 +190,7 @@ class Table extends Component {
 
         this.selectionMap = nextSelectionMap;
 
-        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl;
+        return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl || this.props.namespaceFilter !== nextProps.namespaceFilter;
     }
 
     componentDidMount() {

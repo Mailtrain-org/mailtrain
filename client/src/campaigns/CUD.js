@@ -22,7 +22,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
@@ -604,7 +604,7 @@ export default class CUD extends Component {
                         }
                     </div>
                     <div className={campaignsStyles.entryContent}>
-                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} />
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
 
                         {(campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) &&
                             <div>
@@ -707,7 +707,7 @@ export default class CUD extends Component {
 
             // The "key" property here and in the TableSelect below is to tell React that these tables are different and should be rendered by different instances. Otherwise, React will use
             // only one instance, which fails because Table does not handle updates in "columns" property
-            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
+            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help} namespaceFilter={getNamespaceFilterId()}/>;
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
@@ -719,7 +719,7 @@ export default class CUD extends Component {
                 { data: 6, title: t('namespace') }
             ];
 
-            templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
+            templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')} namespaceFilter={getNamespaceFilterId()}/>;
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
@@ -775,7 +775,7 @@ export default class CUD extends Component {
 
                     {extraSettings}
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     <hr/>
 
@@ -785,7 +785,7 @@ export default class CUD extends Component {
 
                     <Fieldset label={t('sendSettings')}>
 
-                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
 
                         {sendSettings}
 

@@ -13,7 +13,7 @@ import {getUrl} from "../lib/urls";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
-
+import {getNamespaceFilterId} from "../lib/namespace";
 @withComponentMixins([
     withTranslation,
     withErrorHandling,
@@ -161,8 +161,8 @@ export default class List extends Component {
                 </Toolbar>
 
                 <Title>{t('reports')}</Title>
-
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/reports-table" columns={columns} />
+                    
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/reports-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
             </div>
         );
     }

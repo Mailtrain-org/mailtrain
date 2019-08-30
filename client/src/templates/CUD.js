@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
 import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
@@ -363,7 +363,7 @@ export default class CUD extends Component {
                     }
 
                     {this.getFormValue('fromExistingEntity') ?
-                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
+                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
                     :
                         <>
                             {isEdit ?
@@ -380,7 +380,7 @@ export default class CUD extends Component {
                         </>
                     }
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     {editForm}
 

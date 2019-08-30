@@ -13,6 +13,7 @@ import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRe
 import {withComponentMixins} from "../lib/decorator-helpers";
 import styles from "./styles.scss";
 import PropTypes from 'prop-types';
+import { getNamespaceFilterId } from '../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -152,7 +153,7 @@ export default class List extends Component {
 
                 <Title>{t('campaigns')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
             </div>
         );
     }
