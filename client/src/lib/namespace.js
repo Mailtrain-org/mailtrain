@@ -11,15 +11,22 @@ import mailtrainConfig from 'mailtrainConfig';
     withTranslation
 ])
 export class NamespaceSelect extends Component {
+    static defaultProps = {
+        namespaceFilter: null
+    }
+
     render() {
         const t = this.props.t;
+<<<<<<< HEAD
         if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
             return (
                 <TreeTableSelect id="namespace" label={t('namespace')} dataUrl={"rest/namespaces-tree/" + getNamespaceFilterId()}/>
             );
         }
+=======
+>>>>>>> development-NamespaceFilterPR
         return (
-            <TreeTableSelect id="namespace" label={t('namespace')} dataUrl="rest/namespaces-tree"/>
+            <TreeTableSelect id="namespace" label={t('namespace')} dataUrl="rest/namespaces-tree" namespaceFilter={this.props.namespaceFilter}/>
         );
     }
 }
@@ -69,4 +76,24 @@ export function namespaceCheckPermissions(createOperation) {
     } else {
         return {};
     }
+}
+
+export function processNamespaceFilterOnTree(tree, topNamespace){
+    var namespaceTree = [];
+    function process_node(node, namespaceTree, topNamespace){
+        if(node){
+            var found = false;
+            if(node.key == topNamespace){
+                namespaceTree.push(node);
+                found = true;
+            }
+            if(node.children && !found){
+                for(const key in node.children){
+                    process_node(node.children[key], namespaceTree, topNamespace);
+                } 
+            }
+        }
+    }
+    process_node(tree, namespaceTree, topNamespace);
+    return namespaceTree;
 }

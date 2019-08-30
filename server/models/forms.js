@@ -58,11 +58,19 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
 }
 
+<<<<<<< HEAD
 async function listDTAjax(context, namespaceFilter, params) {
     var allowedNamespaces = [];
 
     if(namespaceFilter){
         allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+=======
+async function listDTAjax(context, params) {
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+>>>>>>> development-NamespaceFilterPR
     }
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -73,7 +81,11 @@ async function listDTAjax(context, namespaceFilter, params) {
             builder = builder
                 .from('custom_forms')
                 .innerJoin('namespaces', 'namespaces.id', 'custom_forms.namespace');
+<<<<<<< HEAD
             if (namespaceFilter) {
+=======
+            if (params.namespaceFilter) {
+>>>>>>> development-NamespaceFilterPR
                 for(const key in allowedNamespaces){
                     builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
                 }

@@ -79,7 +79,11 @@ export default class List extends Component {
 
                 <Title>{t('namespaces')}</Title>
 
+<<<<<<< HEAD
                 {namespacesTree}
+=======
+                <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

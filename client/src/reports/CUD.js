@@ -21,7 +21,7 @@ import {
 import axios from '../lib/axios';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import moment from 'moment';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -80,9 +80,11 @@ export default class CUD extends Component {
     submitFormValuesMutator(data) {
         const params = {};
 
-        for (const spec of data.user_fields) {
-            const fldId = `param_${spec.id}`;
-            params[spec.id] = data[fldId];
+        if(data.user_fields){
+            for (const spec of data.user_fields) {
+                const fldId = `param_${spec.id}`;
+                params[spec.id] = data[fldId];
+            }
         }
 
         data.params = params;
@@ -234,7 +236,8 @@ export default class CUD extends Component {
                         {data: 2, title: t('description')},
                         {data: 3, title: t('status')},
                         {data: 4, title: t('created'), render: data => moment(data).fromNow()}
-                    ]);
+                    ],
+                    getNamespaceFilterId());
                 } else if (spec.type === 'list') {
                     addUserFieldTableSelect(spec, getNamespaceFilterId(), 'rest/lists-table', 1,[
                         {data: 0, title: "#"},
@@ -242,7 +245,8 @@ export default class CUD extends Component {
                         {data: 2, title: t('id')},
                         {data: 3, title: t('subscribers')},
                         {data: 4, title: t('description')}
-                    ]);
+                    ],
+                    getNamespaceFilterId());
                 } else {
                     userFields.push(<div className="alert alert-danger" role="alert">{t('unknownFieldTypeType', { type: spec.type })}</div>)
                 }
@@ -269,7 +273,11 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
 
+<<<<<<< HEAD
                     <TableSelect namespaceFilter={getNamespaceFilterId()} id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
+=======
+                    <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
 
                     <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 

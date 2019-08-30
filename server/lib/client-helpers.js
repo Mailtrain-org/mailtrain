@@ -50,7 +50,11 @@ async function getAuthenticatedConfig(context) {
         verpEnabled: config.verp.enabled,
         reportsEnabled: config.reports.enabled,
         mapsApiKey: setts.mapsApiKey,
+<<<<<<< HEAD
         builtinZoneMTAEnabled: config.builtinZoneMTA.enabled,
+=======
+        builtinZoneMTAEnabled: config.builtinZoneMTA.enabled, 
+>>>>>>> development-NamespaceFilterPR
         namespaceFilterEnabled: config.namespaceFilter.enabled
     }
 }

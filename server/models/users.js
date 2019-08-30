@@ -109,12 +109,12 @@ async function serverValidate(context, data, isOwnAccount) {
     return result;
 }
 
-async function listDTAjax(context, namespaceFilter, params) {
+async function listDTAjax(context, params) {
 
     var allowedNamespaces = [];
 
-    if(namespaceFilter){
-        allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
     }
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -127,7 +127,7 @@ async function listDTAjax(context, namespaceFilter, params) {
                 .innerJoin('namespaces', 'namespaces.id', 'users.namespace')
                 .innerJoin('generated_role_names', 'generated_role_names.role', 'users.role')
             
-            if (namespaceFilter) {
+            if (params.namespaceFilter) {
                 for(const key in allowedNamespaces){
                     builder = builder.orWhere('generated_role_names.entity_type', 'global').andWhere('users.namespace', allowedNamespaces[key]);
                 }

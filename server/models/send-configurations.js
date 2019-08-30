@@ -23,12 +23,21 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
+<<<<<<< HEAD
 async function _listDTAjax(context, namespaceFilter, params) {
 
     var allowedNamespaces = [];
 
     if(namespaceFilter){
         allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+=======
+async function _listDTAjax(context, params) {
+
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+>>>>>>> development-NamespaceFilterPR
     }
 
     return await dtHelpers.ajaxListWithPermissions(
@@ -39,7 +48,11 @@ async function _listDTAjax(context, namespaceFilter, params) {
             builder = builder
                 .from('send_configurations')
                 .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace');
+<<<<<<< HEAD
             if (namespaceFilter) {
+=======
+            if (params.namespaceFilter) {
+>>>>>>> development-NamespaceFilterPR
                 for(const key in allowedNamespaces){
                     builder = builder.orWhere('send_configurations.namespace', allowedNamespaces[key]);
                 }
@@ -51,10 +64,13 @@ async function _listDTAjax(context, namespaceFilter, params) {
 }
 
 async function listDTAjax(context, namespaceId, params) {
+<<<<<<< HEAD
     return await _listDTAjax(context, namespaceId, params);
 }
 
 async function listByNamespaceDTAjax(context, namespaceId, params) {
+=======
+>>>>>>> development-NamespaceFilterPR
     return await _listDTAjax(context, namespaceId, params);
 }
 
@@ -199,7 +215,6 @@ async function getSystemSendConfiguration() {
 
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
-module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listWithSendPermissionDTAjax = listWithSendPermissionDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;

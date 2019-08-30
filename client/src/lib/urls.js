@@ -7,15 +7,15 @@ import i18n from './i18n';
 
 let restrictedAccessToken = anonymousRestrictedAccessToken;
 
-function setRestrictedAccessToken(token) {
+export function setRestrictedAccessToken(token) {
     restrictedAccessToken = token;
 }
 
-function getTrustedUrl(path) {
+export function getTrustedUrl(path) {
     return mailtrainConfig.trustedUrlBase + (path || '');
 }
 
-function getSandboxUrl(path, customRestrictedAccessToken, opts) {
+export function getSandboxUrl(path, customRestrictedAccessToken, opts) {
     const localRestrictedAccessToken = customRestrictedAccessToken || restrictedAccessToken;
      const url = new URL(localRestrictedAccessToken + '/' + (path || ''), mailtrainConfig.sandboxUrlBase);
 
@@ -26,7 +26,7 @@ function getSandboxUrl(path, customRestrictedAccessToken, opts) {
     return url.toString();
 }
 
-function getPublicUrl(path, opts) {
+export function getPublicUrl(path, opts) {
     const url = new URL(path || '', mailtrainConfig.publicUrlBase);
 
     if (opts && opts.withLocale) {
@@ -36,7 +36,7 @@ function getPublicUrl(path, opts) {
     return url.toString();
 }
 
-function getUrl(path) {
+export function getUrl(path) {
     if (mailtrainConfig.appType === AppType.TRUSTED) {
         return getTrustedUrl(path);
     } else if (mailtrainConfig.appType === AppType.SANDBOXED) {
@@ -46,7 +46,7 @@ function getUrl(path) {
     }
 }
 
-function getBaseDir() {
+export function getBaseDir() {
     if (mailtrainConfig.appType === AppType.TRUSTED) {
         return mailtrainConfig.trustedUrlBaseDir;
     } else if (mailtrainConfig.appType === AppType.SANDBOXED) {
@@ -54,13 +54,4 @@ function getBaseDir() {
     } else if (mailtrainConfig.appType === AppType.PUBLIC) {
         return mailtrainConfig.publicUrlBaseDir;
     }
-}
-
-export {
-    getTrustedUrl,
-    getSandboxUrl,
-    getPublicUrl,
-    getUrl,
-    getBaseDir,
-    setRestrictedAccessToken
 }

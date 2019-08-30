@@ -11,7 +11,11 @@ import {withComponentMixins} from "../lib/decorator-helpers";
 import {withForm} from "../lib/form";
 import {getNamespaceFilterId} from "../lib/namespace";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import mailtrainConfig from 'mailtrainConfig';
+=======
+import { getNamespaceFilterId } from '../lib/namespace';
+>>>>>>> development-NamespaceFilterPR
 
 @withComponentMixins([
     withTranslation,
@@ -132,7 +136,11 @@ export default class List extends Component {
 
                 <Title>{t('lists')}</Title>
 
+<<<<<<< HEAD
                 <Table namespaceFilter={getNamespaceFilterId()} ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />
+=======
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

@@ -13,9 +13,13 @@ import {getUrl} from "../lib/urls";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import {getNamespaceFilterId} from '../lib/namespace';
 import mailtrainConfig from 'mailtrainConfig';
 
+=======
+import {getNamespaceFilterId} from "../lib/namespace";
+>>>>>>> development-NamespaceFilterPR
 @withComponentMixins([
     withTranslation,
     withErrorHandling,
@@ -168,8 +172,13 @@ export default class List extends Component {
                 </Toolbar>
 
                 <Title>{t('reports')}</Title>
+<<<<<<< HEAD
 
                 {reportsTable}
+=======
+                    
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/reports-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

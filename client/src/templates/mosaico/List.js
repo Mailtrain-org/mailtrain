@@ -12,10 +12,14 @@ import {getTagLanguages} from '../helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import {getNamespaceFilterId} from '../../lib/namespace';
 import mailtrainConfig from 'mailtrainConfig';
 import { id } from 'brace/worker/css';
 
+=======
+import {getNamespaceFilterId} from "../../lib/namespace";
+>>>>>>> development-NamespaceFilterPR
 
 @withComponentMixins([
     withTranslation,
@@ -111,7 +115,11 @@ export default class List extends Component {
 
                 <Title>{t('mosaicoTemplates')}</Title>
 
+<<<<<<< HEAD
                 {mosaicoTemplatesTable}
+=======
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/mosaico-templates-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

@@ -26,11 +26,19 @@ async function getById(context, id) {
     });
 }
 
+<<<<<<< HEAD
 async function listDTAjax(context, namespaceFilter, params) {
     var allowedNamespaces = [];
 
     if(namespaceFilter){
         allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+=======
+async function listDTAjax(context, params) {
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+>>>>>>> development-NamespaceFilterPR
     }
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -39,7 +47,11 @@ async function listDTAjax(context, namespaceFilter, params) {
         builder => {
             builder = builder.from('report_templates')
             .innerJoin('namespaces', 'namespaces.id', 'report_templates.namespace');
+<<<<<<< HEAD
             if (namespaceFilter) {
+=======
+            if (params.namespaceFilter) {
+>>>>>>> development-NamespaceFilterPR
                 for(const key in allowedNamespaces){
                     builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
                 }

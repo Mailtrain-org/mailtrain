@@ -9,8 +9,12 @@ import {Icon} from "../../lib/bootstrap-components";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import {getNamespaceFilterId} from '../../lib/namespace';
 import mailtrainConfig from 'mailtrainConfig';
+=======
+import { getNamespaceFilterId } from '../../lib/namespace';
+>>>>>>> development-NamespaceFilterPR
 
 @withComponentMixins([
     withTranslation,
@@ -79,7 +83,11 @@ export default class List extends Component {
 
                 <Title>{t('forms')}</Title>
 
+<<<<<<< HEAD
                 {customFormsTable}
+=======
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/forms-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

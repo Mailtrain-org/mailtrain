@@ -14,7 +14,11 @@ import {withComponentMixins} from "../lib/decorator-helpers";
 import {getNamespaceFilterId} from "../lib/namespace";
 import styles from "./styles.scss";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import mailtrainConfig from 'mailtrainConfig';
+=======
+import { getNamespaceFilterId } from '../lib/namespace';
+>>>>>>> development-NamespaceFilterPR
 
 @withComponentMixins([
     withTranslation,
@@ -153,8 +157,13 @@ export default class List extends Component {
                 </Toolbar>
 
                 <Title>{t('campaigns')}</Title>
+<<<<<<< HEAD
                 
                 <Table ref={node => this.table = node} withHeader dataUrl={"rest/campaigns-table"} namespaceFilter={getNamespaceFilterId()} columns={columns}/>
+=======
+
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

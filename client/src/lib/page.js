@@ -485,7 +485,7 @@ export class SectionContent extends Component {
             return renderRoute(
                 route,
                 PanelRoute,
-                () => renderFrameWithContent(t,false, false, null, null, getLoadingMessage(this.props.t)),
+                () => renderFrameWithContent(t, false, false, null, null, getLoadingMessage(this.props.t)),
                 flashMessage,
                 props
             );

@@ -242,11 +242,11 @@ async function getByEmail(context, listId, email, grouped = true) {
     return result;
 }
 
-async function getByCid(context, listId, cid, grouped = true, isTest = true) {
+async function getByCid(context, listId, cid, grouped = true, isTest = false) {
     return await _getBy(context, listId, 'cid', cid, grouped, isTest);
 }
 
-async function getByCidTx(tx, context, listId, cid, grouped = true, isTest = true) {
+async function getByCidTx(tx, context, listId, cid, grouped = true, isTest = false) {
     return await _getByTx(tx, context, listId, 'cid', cid, grouped, isTest);
 }
 

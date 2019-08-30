@@ -8,7 +8,11 @@ import mailtrainConfig from "mailtrainConfig";
 import {Icon} from "../lib/bootstrap-components";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
+<<<<<<< HEAD
 import {getNamespaceFilterId} from '../lib/namespace';
+=======
+import { getNamespaceFilterId } from "../lib/namespace";
+>>>>>>> development-NamespaceFilterPR
 
 @withComponentMixins([
     withTranslation,
@@ -74,7 +78,12 @@ export default class List extends Component {
                 </Toolbar>
 
                 <Title>{t('users')}</Title>
+<<<<<<< HEAD
                 {usersTable}
+=======
+
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/users-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

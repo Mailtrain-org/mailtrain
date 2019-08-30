@@ -1026,6 +1026,10 @@
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
   "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
   "namespaceFilter": "Namespace filter",
+<<<<<<< HEAD
   "apply": "Apply",
   "enableNamespaceFilter": "Enable Namespace Filter"
+=======
+  "apply": "Apply"
+>>>>>>> development-NamespaceFilterPR
 }

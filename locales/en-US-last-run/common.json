@@ -1024,8 +1024,14 @@
   "thePasswordMustContainAtLeastOne": "The password must contain at least one lowercase letter",
   "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
+<<<<<<< HEAD
   "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character", 
   "namespaceFilter": "Namespace filter",
   "apply": "Apply",
   "enableNamespaceFilter": "Enable Namespace Filter"
+=======
+  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
+  "namespaceFilter": "Namespace filter",
+  "apply": "Apply"
+>>>>>>> development-NamespaceFilterPR
 }

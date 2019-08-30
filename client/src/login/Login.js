@@ -20,7 +20,12 @@ import interoperableErrors from '../../../shared/interoperable-errors';
 import mailtrainConfig from 'mailtrainConfig';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
+<<<<<<< HEAD
 import {clearNamespaceFilter} from "../lib/namespace";
+=======
+import { clearNamespaceFilter } from '../lib/namespace';
+
+>>>>>>> development-NamespaceFilterPR
 @withComponentMixins([
     withTranslation,
     withForm,

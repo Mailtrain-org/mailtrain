@@ -153,11 +153,17 @@ class Table extends Component {
                         namespaceFilter: this.props.namespaceFilter
                     });
 
+                    const oldSelectionMap = this.selectionMap;
+                    this.selectionMap = new Map();
                     for (const row of response.data) {
                         const key = row[this.props.selectionKeyIndex];
-                        if (this.selectionMap.has(key)) {
+                        if (oldSelectionMap.has(key)) {
                             this.selectionMap.set(key, row);
                         }
+                    }
+
+                    if (this.selectionMap.size !== oldSelectionMap.size) {
+                        this.notifySelection(this.props.onSelectionChangedAsync, this.selectionMap);
                     }
                 }
             }
@@ -183,7 +189,11 @@ class Table extends Component {
         }
 
         this.selectionMap = nextSelectionMap;
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> development-NamespaceFilterPR
         return updateDueToSelectionChange || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl || this.props.namespaceFilter !== nextProps.namespaceFilter;
     }
 

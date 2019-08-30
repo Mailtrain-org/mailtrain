@@ -368,9 +368,15 @@ export default class CUD extends Component {
                         <CheckBox id="fromExistingEntity" label={t('template')} text={t('cloneFromAnExistingTemplate')}/>
                     }
 
+<<<<<<< HEAD
                     {this.getFormValue('fromExistingEntity') && sourceTemplateTable }
                     
                     {!this.getFormValue('fromExistingEntity') &&
+=======
+                    {this.getFormValue('fromExistingEntity') ?
+                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+                    :
+>>>>>>> development-NamespaceFilterPR
                         <>
                             {isEdit ?
                                 <StaticField id="type" className={styles.formDisabled} label={t('type')}>
@@ -386,7 +392,7 @@ export default class CUD extends Component {
                         </>
                     }
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     {editForm}
 

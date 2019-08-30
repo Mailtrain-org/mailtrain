@@ -35,7 +35,11 @@ import {requiresAuthenticatedUser,  withPageHelpers} from './lib/page';
 import {withErrorHandling} from './lib/error-handling';
 import {getUrl} from "./lib/urls";
 import {withAsyncErrorHandler} from './lib/error-handling';
+<<<<<<< HEAD
 import {clearNamespaceFilter, getNamespaceFilterName} from './lib/namespace'
+=======
+import {clearNamespaceFilter, getNamespaceFilterName, getNamespaceFilterId} from './lib/namespace'
+>>>>>>> development-NamespaceFilterPR
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
@@ -76,11 +80,19 @@ class PreviewNamespaceFilterModalDialog extends Component {
 
     componentDidMount() {
         var enabled = false;
+<<<<<<< HEAD
         if(getNamespaceFilterName()){
             enabled = true;
         }
         this.populateFormValues({
             namespace: getNamespaceFilterName(),
+=======
+        if(getNamespaceFilterId()){
+            enabled = true;
+        }
+        this.populateFormValues({
+            namespace: getNamespaceFilterId(),
+>>>>>>> development-NamespaceFilterPR
             namespaceFilterCheckboxEnabled: enabled
         });
         this.loadTreeData();
@@ -115,18 +127,29 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 this.state.namespaceId = this.getFormValue('namespace');
                 this.state.namespaceName = response.data.name;
                 this.setFormStatusMessage('warning', null);
+<<<<<<< HEAD
                 this.props.onHide();
+=======
+                await this.hideModal();
+                i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change 
+>>>>>>> development-NamespaceFilterPR
             }else{
                 this.setFormStatusMessage('warning', t('namespaceMustNotBeEmpty'));
             }
         }else{
             clearNamespaceFilter();
+<<<<<<< HEAD
             this.state.namespaceId = null;
             this.state.namespaceName = "Namespace filter";
             this.setFormStatusMessage('warning', null);
             this.props.onHide();
         }
         i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change 
+=======
+            await this.hideModal();
+            i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change   
+        }
+>>>>>>> development-NamespaceFilterPR
     }
 
     async hideModal() {
@@ -143,7 +166,11 @@ class PreviewNamespaceFilterModalDialog extends Component {
                 { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
             ]}>
                 <Form stateOwner={this}>
+<<<<<<< HEAD
                     <CheckBox id="namespaceFilterCheckboxEnabled" format="wide" text={t('enableNamespaceFilter')}></CheckBox>
+=======
+                    <CheckBox id="namespaceFilterCheckboxEnabled" format="wide" text={t('enable')}></CheckBox>
+>>>>>>> development-NamespaceFilterPR
                     {this.getFormValue('namespaceFilterCheckboxEnabled') && <TreeTableSelect id="namespace" format="wide" label={t('namespace')} data={this.state.treeData}/>}               
                 </Form>
             </ModalDialog>

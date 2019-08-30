@@ -66,10 +66,16 @@ body.mailtrain {
   .app-header {
 
     .navbar {
+<<<<<<< HEAD
       //Both used for namespaceFilterModal
       h4{color: #23282c};
       label{color: #23282c};
 
+=======
+      //Both are used for namespaceFilterModal
+      h4{color: #23282c};
+      label{color: #23282c};
+>>>>>>> development-NamespaceFilterPR
       padding: 0 15px;
 
       .navbar-brand {

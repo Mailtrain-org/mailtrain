@@ -35,6 +35,7 @@ import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels} from "./helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import interoperableErrors from "../../../shared/interoperable-errors";
 
 @withComponentMixins([
     withTranslation,
@@ -157,12 +158,22 @@ export default class CUD extends Component {
         if (sendConfigurationId) {
             this.fetchSendConfigurationId = sendConfigurationId;
 
-            const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
+            try {
+                const result = await axios.get(getUrl(`rest/send-configurations-public/${sendConfigurationId}`));
 
-            if (sendConfigurationId === this.fetchSendConfigurationId) {
-                this.setState({
-                    sendConfiguration: result.data
-                });
+                if (sendConfigurationId === this.fetchSendConfigurationId) {
+                    this.setState({
+                        sendConfiguration: result.data
+                    });
+                }
+            } catch (err) {
+                if (err instanceof interoperableErrors.PermissionDeniedError) {
+                    this.setState({
+                        sendConfiguration: null
+                    });
+                } else {
+                    throw err;
+                }
             }
         }
     }
@@ -597,8 +608,12 @@ export default class CUD extends Component {
                         }
                     </div>
                     <div className={campaignsStyles.entryContent}>
+<<<<<<< HEAD
                         
                         {listsTable}
+=======
+                        <TableSelect id={prefix + 'list'} label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
 
                         {(campaignTypeKey === CampaignType.REGULAR || campaignTypeKey === CampaignType.RSS) &&
                             <div>
@@ -701,10 +716,14 @@ export default class CUD extends Component {
 
             // The "key" property here and in the TableSelect below is to tell React that these tables are different and should be rendered by different instances. Otherwise, React will use
             // only one instance, which fails because Table does not handle updates in "columns" property
+<<<<<<< HEAD
             templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
             if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
                 templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl={'rest/templates-table/'+getNamespaceFilterId()} columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
             }
+=======
+            templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help} namespaceFilter={getNamespaceFilterId()}/>;
+>>>>>>> development-NamespaceFilterPR
 
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
@@ -715,10 +734,16 @@ export default class CUD extends Component {
                 { data: 5, title: t('created'), render: data => moment(data).fromNow() },
                 { data: 6, title: t('namespace') }
             ];
+<<<<<<< HEAD
             templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
             if(mailtrainConfig.namespaceFilterEnabled && getNamespaceFilterId()){
                 templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl={'rest/campaigns-with-content-table/' + getNamespaceFilterId()} columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
             }
+=======
+
+            templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')} namespaceFilter={getNamespaceFilterId()}/>;
+
+>>>>>>> development-NamespaceFilterPR
         } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
 
@@ -779,7 +804,7 @@ export default class CUD extends Component {
 
                     {extraSettings}
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     <hr/>
 
@@ -788,8 +813,13 @@ export default class CUD extends Component {
                     <hr/>
 
                     <Fieldset label={t('sendSettings')}>
+<<<<<<< HEAD
                         
                         {sendConfigTable}
+=======
+
+                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
 
                         {sendSettings}
 

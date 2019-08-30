@@ -11,8 +11,13 @@ import {getTagLanguages, getTemplateTypes} from './helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import {getNamespaceFilterId} from "../lib/namespace";
 import mailtrainConfig from 'mailtrainConfig';
+=======
+import { getNamespaceFilterId } from '../lib/namespace';
+
+>>>>>>> development-NamespaceFilterPR
 
 @withComponentMixins([
     withTranslation,
@@ -96,7 +101,11 @@ export default class List extends Component {
 
                 <Title>{t('templates')}</Title>
 
+<<<<<<< HEAD
                 <Table namespaceFilter={getNamespaceFilterId()} ref={node => this.table = node} withHeader dataUrl="rest/templates-table" columns={columns} />
+=======
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/templates-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

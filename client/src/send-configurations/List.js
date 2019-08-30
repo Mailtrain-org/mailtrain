@@ -11,8 +11,12 @@ import {getMailerTypes} from './helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import {getNamespaceFilterId} from '../lib/namespace';
 import mailtrainConfig from 'mailtrainConfig';
+=======
+import { getNamespaceFilterId } from '../lib/namespace';
+>>>>>>> development-NamespaceFilterPR
 
 
 @withComponentMixins([
@@ -91,7 +95,11 @@ export default class List extends Component {
 
                 <Title>{t('sendConfigurations-1')}</Title>
 
+<<<<<<< HEAD
                 {sendConfigTable}
+=======
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/send-configurations-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
             </div>
         );
     }

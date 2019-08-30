@@ -513,18 +513,27 @@ export default class CUD extends Component {
 
                     <TextArea id="description" label={t('description')}/>
 
-                    <NamespaceSelect/>
+                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
 
                     {!isEdit &&
                         <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
                     }
 
+<<<<<<< HEAD
                     {this.getFormValue('fromExistingEntity') && customFormsTable}
 
                     {!this.getFormValue('fromExistingEntity') &&
                         <>
                             <Fieldset label={t('formsPreview')}>
                                 {listsTable}
+=======
+                    {this.getFormValue('fromExistingEntity') ?
+                        <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+                    :
+                        <>
+                            <Fieldset label={t('formsPreview')}>
+                                <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')} namespaceFilter={getNamespaceFilterId()}/>
+>>>>>>> development-NamespaceFilterPR
 
                                 { previewListId &&
                                 <div>

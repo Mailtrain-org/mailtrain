@@ -112,11 +112,19 @@ async function listChildrenDTAjax(context, campaignId, params) {
 }
 
 
+<<<<<<< HEAD
 async function listWithContentDTAjax(context, namespaceFilter, params) {
     var allowedNamespaces = [];
     
     if(namespaceFilter){
         allowedNamespaces = await namespaces.getAllowedNamespaces(context, namespaceFilter);
+=======
+async function listWithContentDTAjax(context, params) {
+    var allowedNamespaces = [];
+    
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+>>>>>>> development-NamespaceFilterPR
     }
     return await dtHelpers.ajaxListWithPermissions(
         context,
@@ -125,8 +133,15 @@ async function listWithContentDTAjax(context, namespaceFilter, params) {
         builder => {
             builder = builder.from('campaigns')
                 .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace');
+<<<<<<< HEAD
                 for(const key in allowedNamespaces){
                     builder = builder.orWhere('campaigns.namespace', allowedNamespaces[key]);
+=======
+                if(params.namespaceFilter){
+                    for(const key in allowedNamespaces){
+                        builder = builder.orWhere('campaigns.namespace', allowedNamespaces[key]);
+                    }
+>>>>>>> development-NamespaceFilterPR
                 }
                 builder = builder.whereIn('campaigns.source', [CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.CUSTOM_FROM_CAMPAIGN]);
             return builder;
