@@ -6,8 +6,7 @@ mysql:
 
 mailtrain:
   url: http://localhost:3000/
-  namespaces:
-    campaigns: 2
+  namespace: 1
   userRole: mailtrainUser
 
 www:

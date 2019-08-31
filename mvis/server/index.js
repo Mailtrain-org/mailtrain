@@ -15,6 +15,9 @@ em.on('knex.migrate', async () => {
 em.on('app.installAPIRoutes', app => {
     const embedApi = require('./routes/api/embed');
     app.use('/api', embedApi);
+
+    const eventsApi = require('./routes/api/events');
+    app.use('/api', eventsApi);
 });
 
 require('../ivis-core/server/index');

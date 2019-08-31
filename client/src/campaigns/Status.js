@@ -615,7 +615,7 @@ export default class Status extends Component {
                 <Title>{t('campaignStatus')}</Title>
 
                 <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('delivered')}>{entity.delivered}</AlignedRow>
+                <AlignedRow label={t('Sent')}>{entity.delivered}</AlignedRow>
                 <AlignedRow label={t('status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
 
                 {sendSettings}

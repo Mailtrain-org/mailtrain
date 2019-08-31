@@ -1,7 +1,37 @@
 'use strict';
 
+const moment = require('moment');
+
+const activityQueueLenthThreshold = 100;
+const actitivyQueue = [];
+
+let processQueueIsRunning = false;
+
+async function processQueue() {
+    if (processQueueIsRunning) {
+        return;
+    }
+
+    processQueueIsRunning = true;
+
+    // XXX submit data to IVIS if configured in config
+
+    actitivyQueue.splice(0);
+
+    processQueueIsRunning = false;
+}
+
 async function _logActivity(typeId, data) {
-    // TODO
+    actitivyQueue.push({
+        typeId,
+        data,
+        timestamp: moment.utc().toISOString()
+    });
+
+    if (actitivyQueue.length >= activityQueueLenthThreshold) {
+        // noinspection ES6MissingAwait
+        processQueue();
+    }
 }
 
 /*

@@ -4,7 +4,11 @@ const config = require('../lib/config');
 const log = require('../lib/log');
 const mailers = require('../lib/mailers');
 const messageSender = require('../lib/message-sender');
+const {CampaignTrackerActivityType} = require('../../shared/activity-log');
+const activityLog = require('../lib/activity-log');
 require('../lib/fork');
+
+const MessageType = messageSender.MessageType;
 
 const workerId = Number.parseInt(process.argv[2]);
 let running = false;
@@ -25,6 +29,8 @@ async function processCampaignMessages(campaignId, messages) {
     for (const campaignMessage of messages) {
         try {
             await cs.sendRegularCampaignMessage(campaignMessage);
+
+            await activityLog.logCampaignTrackerActivity(CampaignTrackerActivityType.SENT, campaignId, campaignMessage.list, campaignMessage.subscription);
 
             log.verbose('Senders', 'Message sent and status updated for %s:%s', campaignMessage.list, campaignMessage.subscription);
         } catch (err) {
@@ -58,6 +64,8 @@ async function processQueuedMessages(sendConfigurationId, messages) {
 
     for (const queuedMessage of messages) {
 
+        const messageType = queuedMessage.type;
+
         const msgData = queuedMessage.data;
         let target = '';
         if (msgData.listId && msgData.subscriptionId) {
@@ -74,6 +82,11 @@ async function processQueuedMessages(sendConfigurationId, messages) {
 
         try {
             await messageSender.sendQueuedMessage(queuedMessage);
+
+            if ((messageType === MessageType.TRIGGERED || messageType === MessageType.TEST) && msgData.campaignId && msgData.listId && msgData.subscriptionId) {
+                await activityLog.logCampaignTrackerActivity(CampaignTrackerActivityType.SENT, msgData.campaignId, msgData.listId, msgData.subscriptionId);
+            }
+
             log.verbose('Senders', `Message sent and status updated for ${target}`);
         } catch (err) {
             if (err instanceof mailers.SendConfigurationError) {

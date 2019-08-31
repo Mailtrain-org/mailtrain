@@ -30,10 +30,12 @@ const ListActivityType = {
 };
 
 const CampaignTrackerActivityType = {
-    DELIVERED: 1,
+    SENT: 1,
     BOUNCED: 2,
-    OPENED: 3,
-    CLICKED: 4
+    UNSUBSCRIBED: 3,
+    COMPLAINED: 4,
+    OPENED: 5,
+    CLICKED: 6
 };
 
 const BlacklistActivityType = {
@@ -46,3 +48,4 @@ module.exports.EntityActivityType = EntityActivityType;
 module.exports.BlacklistActivityType = BlacklistActivityType;
 module.exports.CampaignActivityType = CampaignActivityType;
 module.exports.ListActivityType = ListActivityType;
+module.exports.CampaignTrackerActivityType = CampaignTrackerActivityType;
