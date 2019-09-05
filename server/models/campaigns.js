@@ -769,11 +769,9 @@ async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaig
         ])
         .first();
 
-    if (!message) {
-        throw new Error('Invalid campaign.');
+    if (message) { // If a test is send before the campaign is sent, the corresponding entry does not exists in campaign_messages. We ignore such situations as the subscriber gets unsubscribed anyway. We just don't account it to the campaign.
+        await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
     }
-
-    await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
 }
 
 

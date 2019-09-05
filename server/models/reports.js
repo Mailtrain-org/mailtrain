@@ -236,6 +236,8 @@ async function _getCampaignStatistics(campaign, select, joins, unionQryFn, listQ
             commonFieldsMapping[`${prefix}:link`] = alias + '.link';
             commonFieldsMapping[`${prefix}:country`] = alias + '.country';
             commonFieldsMapping[`${prefix}:deviceType`] = alias + '.device_type';
+            commonFieldsMapping[`${prefix}:ip`] = alias + '.ip';
+            commonFieldsMapping[`${prefix}:created`] = alias + '.created';
 
             knexJoinFns.push((qry, cpgListId) => qry.leftJoin('campaign_links AS ' + alias, getConds(alias, cpgListId)));
 
