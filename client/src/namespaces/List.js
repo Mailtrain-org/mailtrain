@@ -11,7 +11,7 @@ import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import mailtrainConfig from 'mailtrainConfig';
 import PropTypes from 'prop-types';
-import {getNamespaceFilterId} from '../lib/namespace';
+import {NamespaceFilterContext} from '../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -73,7 +73,7 @@ export default class List extends Component {
 
                 <Title>{t('namespaces')}</Title>
 
-                <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} namespaceFilter={getNamespaceFilterId()}/>
+                <NamespaceFilterContext.Consumer>{(context) => <TreeTable ref={node => this.table = node} withHeader withDescription dataUrl="rest/namespaces-tree" actions={actions} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             </div>
         );
     }

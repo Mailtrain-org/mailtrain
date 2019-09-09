@@ -22,7 +22,7 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {DeleteModalDialog} from '../lib/modals';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, NamespaceFilterContext} from '../lib/namespace';
 import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
 import styles from "../lib/styles.scss";
 import {getMailerTypes} from "../send-configurations/helpers";
@@ -268,14 +268,14 @@ export default class CUD extends Component {
                     <InputField id="contact_email" label={t('contactEmail')} help={t('contactEmailUsedInSubscriptionFormsAnd')}/>
                     <InputField id="homepage" label={t('homepage')} help={t('homepageUrlUsedInSubscriptionFormsAnd')}/>
                     {toNameFields}
-                    <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')} namespaceFilter={getNamespaceFilterId()}/>
+                    <NamespaceFilterContext.Consumer>{(context) => <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
-                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
+                    <NamespaceFilterContext.Consumer>{(context) => <NamespaceSelect namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
                     <Dropdown id="form" label={t('forms')} options={formsOptions} help={t('webAndEmailFormsAndTemplatesUsedIn')}/>
 
                     {this.getFormValue('form') === 'custom' &&
-                        <TableSelect id="default_form" label={t('customForms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans i18nKey="theCustomFormUsedForThisListYouCanCreate">The custom form used for this list. You can create a form <a href={`/lists/forms/create`}>here</a>.</Trans>} namespaceFilter={getNamespaceFilterId()}/>
+                        <NamespaceFilterContext.Consumer>{(context) => <TableSelect id="default_form" label={t('customForms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} help={<Trans i18nKey="theCustomFormUsedForThisListYouCanCreate">The custom form used for this list. You can create a form <a href={`/lists/forms/create`}>here</a>.</Trans>} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
                     }
 
                     <CheckBox id="public_subscribe" label={t('subscription')} text={t('allowPublicUsersToSubscribeThemselves')}/>

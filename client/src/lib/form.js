@@ -837,7 +837,7 @@ class TreeTableSelect extends Component {
         const htmlId = 'form_' + id;
 
         const className = owner.addFormValidationClass('' , id);
-
+        
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync} namespaceFilter={props.namespaceFilter}/>
         );

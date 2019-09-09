@@ -23,7 +23,7 @@ import {
     withFormErrorHandlers
 } from '../../lib/form';
 import {withErrorHandling} from '../../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, NamespaceFilterContext} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTrustedUrl, getUrl} from "../../lib/urls";
@@ -506,18 +506,18 @@ export default class CUD extends Component {
 
                     <TextArea id="description" label={t('description')}/>
 
-                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
+                    <NamespaceFilterContext>{(context) => <NamespaceSelect namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext>
 
                     {!isEdit &&
                         <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
                     }
 
                     {this.getFormValue('fromExistingEntity') ?
-                        <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+                        <NamespaceFilterContext>{(context) => <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext>
                     :
                         <>
                             <Fieldset label={t('formsPreview')}>
-                                <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')} namespaceFilter={getNamespaceFilterId()}/>
+                                <NamespaceFilterContext.Consumer>{(context) => <TableSelect id="previewList" label={t('listToPreviewOn')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} help={t('selectListWhoseFieldsWillBeUsedToPreview')} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
                                 { previewListId &&
                                 <div>

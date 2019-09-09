@@ -50,18 +50,32 @@ async function _listDTAjax(context, params) {
     );
 }
 
-async function listDTAjax(context, namespaceId, params) {
-    return await _listDTAjax(context, namespaceId, params);
+async function listDTAjax(context, params) {
+    return await _listDTAjax(context, params);
 }
 
 async function listWithSendPermissionDTAjax(context, params) {
+    
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+    }
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'sendConfiguration', requiredOperations: ['sendWithoutOverrides', 'sendWithAllowedOverrides', 'sendWithAnyOverrides'] }],
         params,
-        builder => builder
-            .from('send_configurations')
-            .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace'),
+        builder => {
+            builder = builder
+                .from('send_configurations')
+                .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace');
+            if (params.namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('send_configurations.namespace', allowedNamespaces[key]);
+                }
+            }
+            return builder;
+        },
         ['send_configurations.id', 'send_configurations.name', 'send_configurations.cid', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
     );
 }

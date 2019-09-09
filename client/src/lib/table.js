@@ -418,8 +418,8 @@ class Table extends Component {
         if (this.props.selectMode !== TableSelectMode.NONE) {
             className += ' table-hover';
         }
-
-        return (
+    
+        return (         
             <div>
                 <table ref={(domElem) => { this.domTable = domElem; }} className={className} cellSpacing="0" width="100%" />
             </div>

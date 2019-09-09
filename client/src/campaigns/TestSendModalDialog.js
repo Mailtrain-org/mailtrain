@@ -12,7 +12,7 @@ import axios from '../lib/axios';
 import {getUrl} from '../lib/urls';
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {CampaignType} from "../../../shared/campaigns";
-import { getNamespaceFilterId } from '../lib/namespace';
+import {NamespaceFilterContext} from '../lib/namespace';
 
 const Target = {
     CAMPAIGN_ONE: 'campaign_one',
@@ -242,16 +242,16 @@ export class TestSendModalDialog extends Component {
             ];
 
             content.push(
-                <TableSelect key="sendConfiguration" id="sendConfiguration" format="wide" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-with-send-permission-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                <NamespaceFilterContext.Consumer>{(context) => <TableSelect key="sendConfiguration" id="sendConfiguration" format="wide" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-with-send-permission-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             );
 
             content.push(
-                <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+                <NamespaceFilterContext.Consumer>{(context) => <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             );
 
             if (listCid) {
                 content.push(
-                    <TableSelect key="testUserSubscriptionCid" id="testUserSubscriptionCid" format="wide" label={t('subscription')} withHeader dropdown dataUrl={`rest/subscriptions-test-user-table/${listCid}`} columns={testUsersColumns} selectionKeyIndex={1} selectionLabelIndex={2} />
+                    <TableSelect key="testUserSubscriptionCid" id="testUserSubscriptionCid" format="wide" label={t('subscription')} withHeader dropdown dataUrl={`rest/subscriptions-test-user-table/${listCid}`} columns={testUsersColumns} selectionKeyIndex={1} selectionLabelIndex={2}/>
                 );
             }
         }
@@ -287,7 +287,7 @@ export class TestSendModalDialog extends Component {
             ];
 
             content.push(
-                <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+                <NamespaceFilterContext.Consumer>{(context) => <TableSelect key="listCid" id="listCid" format="wide" label={t('list')} withHeader dropdown dataUrl={`rest/lists-table`} columns={listsColumns} selectionKeyIndex={2} selectionLabelIndex={1} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             );
 
             if (listCid) {
@@ -311,7 +311,7 @@ export class TestSendModalDialog extends Component {
             ];
 
             content.push(
-                <TableSelect key="list" id="list" format="wide" label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} namespaceFilter={getNamespaceFilterId()}/>
+                <NamespaceFilterContext.Consumer>{(context) => <TableSelect key="list" id="list" format="wide" label={t('list')} withHeader dropdown dataUrl='rest/lists-table' columns={listsColumns} selectionLabelIndex={1} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             );
 
             const selectedList = this.getFormValue('list');

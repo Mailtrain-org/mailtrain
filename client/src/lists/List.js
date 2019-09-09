@@ -10,7 +10,7 @@ import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRe
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {withForm} from "../lib/form";
 import PropTypes from 'prop-types';
-import { getNamespaceFilterId } from '../lib/namespace';
+import {NamespaceFilterContext} from '../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -131,7 +131,7 @@ export default class List extends Component {
 
                 <Title>{t('lists')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} namespaceFilter={getNamespaceFilterId()}/>
+                <NamespaceFilterContext.Consumer>{(context) => <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             </div>
         );
     }

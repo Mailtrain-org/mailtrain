@@ -20,7 +20,7 @@ import {
     withFormErrorHandlers
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace, getNamespaceFilterId} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, NamespaceFilterContext} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 
 import {getMailerTypes} from "./helpers";
@@ -223,7 +223,7 @@ export default class CUD extends Component {
                     }
 
                     <TextArea id="description" label={t('description')}/>
-                    <NamespaceSelect namespaceFilter={getNamespaceFilterId()}/>
+                    <NamespaceFilterContext.Consumer>{(context) => <NamespaceSelect namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
                     <Fieldset label={t('emailHeader')}>
                         <InputField id="from_email" label={t('defaultFromEmail')}/>

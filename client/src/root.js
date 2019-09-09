@@ -4,7 +4,7 @@ import './lib/public-path';
 
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import i18n, {TranslationRoot, withTranslation} from './lib/i18n';
+import {TranslationRoot, withTranslation} from './lib/i18n';
 import account from './account/root';
 import login from './login/root';
 import blacklist from './blacklist/root';
@@ -35,14 +35,13 @@ import {requiresAuthenticatedUser,  withPageHelpers} from './lib/page';
 import {withErrorHandling} from './lib/error-handling';
 import {getUrl} from "./lib/urls";
 import {withAsyncErrorHandler} from './lib/error-handling';
-import {clearNamespaceFilter, getNamespaceFilterName, getNamespaceFilterId} from './lib/namespace'
+import {clearNamespaceFilter, getNamespaceFilterId, NamespaceFilterProvider, NamespaceFilterContext} from './lib/namespace'
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
 if (mailtrainConfig.reportsEnabled) {
     topLevelMenuKeys.push('reports');
 }
-
 
 @withComponentMixins([
     withTranslation,
@@ -103,27 +102,28 @@ class PreviewNamespaceFilterModalDialog extends Component {
         
     }
 
-    async setNamespaceFilterAsync() {
+    async setNamespaceFilterAsync(updateNamespace) {
         const t = this.props.t;
-
+        const localStorage = window.localStorage;
         if(this.getFormValue('namespaceFilterCheckboxEnabled')){
             if(this.getFormValue('namespace')){
-                const localStorage = window.localStorage;
-                localStorage.setItem('namespaceFilterId', this.getFormValue('namespace'));
                 const response = await axios.get(getUrl('rest/namespaces/' + this.getFormValue('namespace')));
-                localStorage.setItem('namespaceFilterName', response.data.name);
-                this.state.namespaceId = this.getFormValue('namespace');
-                this.state.namespaceName = response.data.name;
                 this.setFormStatusMessage('warning', null);
+                this.setState({namespaceId: this.getFormValue('namespace'), namespaceName: response.data.name});
+                localStorage.setItem("namespaceFilterId", this.getFormValue('namespace'));
+                localStorage.setItem("namespaceFilterName", response.data.name);
+                await updateNamespace(this.getFormValue('namespace'), response.data.name);
                 await this.hideModal();
-                i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change 
             }else{
                 this.setFormStatusMessage('warning', t('namespaceMustNotBeEmpty'));
             }
         }else{
+            this.setState({namespaceId: null, namespaceName: 'Namespace Filter'});
+            localStorage.setItem("namespaceFilterId", null);
+            localStorage.setItem("namespaceFilterName", "Namespace Filter");
+            await updateNamespace(null, t('namespaceFilter'));
             clearNamespaceFilter();
             await this.hideModal();
-            i18n.changeLanguage();//FIXME Using this temporarily because it produces re-render effect without language change   
         }
     }
 
@@ -136,15 +136,18 @@ class PreviewNamespaceFilterModalDialog extends Component {
         const t = this.props.t;
 
         return (
-            <ModalDialog hidden={!this.props.visible} title={t('namespaceFilter')} onCloseAsync={() => this.hideModal()} buttons={[
-                { label: t('apply'), className: 'btn-primary', onClickAsync: ::this.setNamespaceFilterAsync },
-                { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
-            ]}>
-                <Form stateOwner={this}>
-                    <CheckBox id="namespaceFilterCheckboxEnabled" format="wide" text={t('enable')}></CheckBox>
-                    {this.getFormValue('namespaceFilterCheckboxEnabled') && <TreeTableSelect id="namespace" format="wide" label={t('namespace')} data={this.state.treeData}/>}               
-                </Form>
-            </ModalDialog>
+            <NamespaceFilterContext.Consumer>
+                {(context) =>
+                <ModalDialog hidden={!this.props.visible} title={t('namespaceFilter')} onCloseAsync={() => this.hideModal()} buttons={[
+                    { label: t('apply'), className: 'btn-primary', onClickAsync: async () => await this.setNamespaceFilterAsync(context.setNamespace)},
+                    { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
+                ]}> 
+                    <Form stateOwner={this}>
+                        <CheckBox id="namespaceFilterCheckboxEnabled" format="wide" text={t('enable')}></CheckBox>
+                        {this.getFormValue('namespaceFilterCheckboxEnabled') && <TreeTableSelect id="namespace" format="wide" label={t('namespace')} data={this.state.treeData}/>}               
+                    </Form>
+                </ModalDialog>}
+            </NamespaceFilterContext.Consumer>
         );
     }
 }
@@ -172,6 +175,7 @@ class Root extends Component {
             
             async logout() {
                 await axios.post(getUrl('rest/logout'));
+                clearNamespaceFilter();
                 window.location = getUrl();
             }
 
@@ -204,15 +208,7 @@ class Root extends Component {
                 
                 var namespaceFilter = null;
 
-        
-                if(mailtrainConfig.namespaceFilterEnabled){
-                    if(getNamespaceFilterName()){
-                        namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{getNamespaceFilterName()}</NavActionLink>;
-                    }else{
-                        namespaceFilter = <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{'Namespace filter'}</NavActionLink>;
-                    }
-                }
-                
+               
                 for (const entryKey of topLevelMenuKeys) {
                     const entry = topLevelItems[entryKey];
                     const link = entry.link || entry.externalLink;
@@ -243,7 +239,7 @@ class Root extends Component {
                                 </NavDropdown>
                             </ul>
                             <ul className="navbar-nav mt-navbar-nav-right">
-                                {namespaceFilter}
+                                {mailtrainConfig.namespaceFilterEnabled && <NamespaceFilterContext.Consumer>{(context) => <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{context.namespaceName}</NavActionLink>}</NamespaceFilterContext.Consumer>}
                                 {getLanguageChooser(t)}
                                 <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
                                     <DropdownLink to="/account"><Icon icon='user'/> {t('account')}</DropdownLink>
@@ -291,7 +287,7 @@ class Root extends Component {
 }
 
 export default function() {
-    ReactDOM.render(<TranslationRoot><Root/></TranslationRoot>,document.getElementById('root'));
+    ReactDOM.render(<TranslationRoot><NamespaceFilterProvider><Root/></NamespaceFilterProvider></TranslationRoot>,document.getElementById('root'));
 };
 
 

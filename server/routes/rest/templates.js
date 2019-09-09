@@ -34,8 +34,4 @@ router.postAsync('/templates-table', passport.loggedIn, async (req, res) => {
     return res.json(await templates.listDTAjax(req.context, req.body));
 });
 
-router.postAsync('/templates-by-namespace-table/:namespaceId', passport.loggedIn, async (req, res) => {
-    return res.json(await templates.listByNamespaceDTAjax(req.context, castToInteger(req.params.namespaceId), req.body));
-});
-
 module.exports = router;

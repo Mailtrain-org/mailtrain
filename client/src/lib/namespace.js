@@ -89,3 +89,22 @@ export function processNamespaceFilterOnTree(tree, topNamespace){
     process_node(tree, namespaceTree, topNamespace);
     return namespaceTree;
 }
+
+export const NamespaceFilterContext = React.createContext()
+
+export class NamespaceFilterProvider extends Component {
+
+    state = {
+       namespaceId : null,
+       namespaceName: "Namespace Filter",
+       setNamespace: (id, name) => {
+            this.setState({namespaceId: id, namespaceName: name})
+       }
+    }
+   
+    render() {
+       return <NamespaceFilterContext.Provider value={this.state}>
+         {this.props.children}
+       </NamespaceFilterContext.Provider>
+     }
+}
