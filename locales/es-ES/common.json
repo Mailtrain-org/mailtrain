@@ -915,6 +915,7 @@
   "beginsWithBeginRsaPrivateKey": "Begins with \"-----BEGIN RSA PRIVATE KEY-----\"",
   "signingIsDisabledWithoutAValidPrivateKey": "Signing is disabled without a valid private key.",
   "accessKey": "Access key",
+  "accessSecret": "Access Secret",
   "awsAccessKeyId": "AWS access key ID",
   "awsSecretAccessKey": "AWS secret access key",
   "region": "Region",

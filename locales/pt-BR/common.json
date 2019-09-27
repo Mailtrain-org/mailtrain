@@ -916,6 +916,7 @@
   "beginsWithBeginRsaPrivateKey": "Começa com \"----- INICIO DA CHAVE PRIVADA RSA ----- \"",
   "signingIsDisabledWithoutAValidPrivateKey": "A assinatura está desativada sem uma chave privada válida.",
   "accessKey": "Chave de acesso",
+  "accessSecret": "Acesso secreto",
   "awsAccessKeyId": "ID da chave de acesso da AWS",
   "awsSecretAccessKey": "Chave de acesso secreto da AWS",
   "region": "Região",
