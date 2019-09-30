@@ -90,7 +90,7 @@
     "mailparser": "^2.0.5",
     "marked": "^0.3.6",
     "memory-cache": "^0.2.0",
-    "mjml": "3.3.5",
+    "mjml": "4.5.0",
     "mkdirp": "^0.5.1",
     "moment-timezone": "^0.5.13",
     "morgan": "^1.8.2",
