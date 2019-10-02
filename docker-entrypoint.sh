@@ -12,6 +12,9 @@ Optional parameters:
   --mongoHost XXX       - sets mongo host (default: mongo)
   --redisHost XXX       - sets redis host (default: redis)
   --mySqlHost XXX       - sets mysql host (default: mysql)
+  --mySqlDatabase XXX   - sets mysql database (default: mailtrain)
+  --mySqlUser XXX       - sets mysql user (default: mailtrain)
+  --mySqlPassword XXX   - sets mysql password (default: mailtrain)
   --withLdap            - use if you want to enable LDAP authentication
   --ldapHost XXX        - LDAP Host for authentication (default: ldap)
   --ldapPort XXX        - LDAP port (default: 389)
@@ -43,6 +46,9 @@ ldapUidTag=""
 mongoHost=mongo
 redisHost=redis
 mySqlHost=mysql
+mySqlDatabase=mailtrain
+mySqlUser=mailtrain
+mySqlPassword=mailtrain
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -75,6 +81,18 @@ while [ $# -gt 0 ]; do
             ;;
         --mySqlHost)
             mySqlHost="$2"
+            shift 2
+            ;;
+        --mySqlDatabase)
+            mySqlDatabase="$2"
+            shift 2
+            ;;
+        --mySqlUser)
+            mySqlUser="$2"
+            shift 2
+            ;;
+        --mySqlPassword)
+            mySqlPassword="$2"
             shift 2
             ;;
         --withLdap)
@@ -156,6 +174,9 @@ www:
 
 mysql:
   host: $mySqlHost
+  database: $mySqlDatabase
+  user: $mySqlUser
+  password: $mySqlPassword
 
 redis:
   enabled: true
@@ -199,3 +220,4 @@ while ! nc -z $mongoHost 27017; do sleep 1; done
 
 cd server
 NODE_ENV=production node index.js
+
