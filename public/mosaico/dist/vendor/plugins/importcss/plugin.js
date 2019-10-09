@@ -1,273 +1,264 @@
-/**
- * plugin.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
+(function () {
+var importcss = (function () {
+  'use strict';
 
-/*global tinymce:true */
+  var PluginManager = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-tinymce.PluginManager.add('importcss', function(editor) {
-	var self = this, each = tinymce.each;
+  var DOMUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-	function removeCacheSuffix(url) {
-		var cacheSuffix = tinymce.Env.cacheSuffix;
+  var EditorManager = tinymce.util.Tools.resolve('tinymce.EditorManager');
 
-		if (typeof url == 'string') {
-			url = url.replace('?' + cacheSuffix, '').replace('&' + cacheSuffix, '');
-		}
+  var Env = tinymce.util.Tools.resolve('tinymce.Env');
 
-		return url;
-	}
+  var Tools = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
-	function isSkinContentCss(href) {
-		var settings = editor.settings, skin = settings.skin !== false ? settings.skin || 'lightgray' : false;
+  var shouldMergeClasses = function (editor) {
+    return editor.getParam('importcss_merge_classes');
+  };
+  var shouldImportExclusive = function (editor) {
+    return editor.getParam('importcss_exclusive');
+  };
+  var getSelectorConverter = function (editor) {
+    return editor.getParam('importcss_selector_converter');
+  };
+  var getSelectorFilter = function (editor) {
+    return editor.getParam('importcss_selector_filter');
+  };
+  var getCssGroups = function (editor) {
+    return editor.getParam('importcss_groups');
+  };
+  var shouldAppend = function (editor) {
+    return editor.getParam('importcss_append');
+  };
+  var getFileFilter = function (editor) {
+    return editor.getParam('importcss_file_filter');
+  };
+  var $_fhe373e5je5o2u1g = {
+    shouldMergeClasses: shouldMergeClasses,
+    shouldImportExclusive: shouldImportExclusive,
+    getSelectorConverter: getSelectorConverter,
+    getSelectorFilter: getSelectorFilter,
+    getCssGroups: getCssGroups,
+    shouldAppend: shouldAppend,
+    getFileFilter: getFileFilter
+  };
 
-		if (skin) {
-			var skinUrl = settings.skin_url;
+  var removeCacheSuffix = function (url) {
+    var cacheSuffix = Env.cacheSuffix;
+    if (typeof url === 'string') {
+      url = url.replace('?' + cacheSuffix, '').replace('&' + cacheSuffix, '');
+    }
+    return url;
+  };
+  var isSkinContentCss = function (editor, href) {
+    var settings = editor.settings, skin = settings.skin !== false ? settings.skin || 'lightgray' : false;
+    if (skin) {
+      var skinUrl = settings.skin_url ? editor.documentBaseURI.toAbsolute(settings.skin_url) : EditorManager.baseURL + '/skins/' + skin;
+      return href === skinUrl + '/content' + (editor.inline ? '.inline' : '') + '.min.css';
+    }
+    return false;
+  };
+  var compileFilter = function (filter) {
+    if (typeof filter === 'string') {
+      return function (value) {
+        return value.indexOf(filter) !== -1;
+      };
+    } else if (filter instanceof RegExp) {
+      return function (value) {
+        return filter.test(value);
+      };
+    }
+    return filter;
+  };
+  var getSelectors = function (editor, doc, fileFilter) {
+    var selectors = [], contentCSSUrls = {};
+    function append(styleSheet, imported) {
+      var href = styleSheet.href, rules;
+      href = removeCacheSuffix(href);
+      if (!href || !fileFilter(href, imported) || isSkinContentCss(editor, href)) {
+        return;
+      }
+      Tools.each(styleSheet.imports, function (styleSheet) {
+        append(styleSheet, true);
+      });
+      try {
+        rules = styleSheet.cssRules || styleSheet.rules;
+      } catch (e) {
+      }
+      Tools.each(rules, function (cssRule) {
+        if (cssRule.styleSheet) {
+          append(cssRule.styleSheet, true);
+        } else if (cssRule.selectorText) {
+          Tools.each(cssRule.selectorText.split(','), function (selector) {
+            selectors.push(Tools.trim(selector));
+          });
+        }
+      });
+    }
+    Tools.each(editor.contentCSS, function (url) {
+      contentCSSUrls[url] = true;
+    });
+    if (!fileFilter) {
+      fileFilter = function (href, imported) {
+        return imported || contentCSSUrls[href];
+      };
+    }
+    try {
+      Tools.each(doc.styleSheets, function (styleSheet) {
+        append(styleSheet);
+      });
+    } catch (e) {
+    }
+    return selectors;
+  };
+  var defaultConvertSelectorToFormat = function (editor, selectorText) {
+    var format;
+    var selector = /^(?:([a-z0-9\-_]+))?(\.[a-z0-9_\-\.]+)$/i.exec(selectorText);
+    if (!selector) {
+      return;
+    }
+    var elementName = selector[1];
+    var classes = selector[2].substr(1).split('.').join(' ');
+    var inlineSelectorElements = Tools.makeMap('a,img');
+    if (selector[1]) {
+      format = { title: selectorText };
+      if (editor.schema.getTextBlockElements()[elementName]) {
+        format.block = elementName;
+      } else if (editor.schema.getBlockElements()[elementName] || inlineSelectorElements[elementName.toLowerCase()]) {
+        format.selector = elementName;
+      } else {
+        format.inline = elementName;
+      }
+    } else if (selector[2]) {
+      format = {
+        inline: 'span',
+        title: selectorText.substr(1),
+        classes: classes
+      };
+    }
+    if ($_fhe373e5je5o2u1g.shouldMergeClasses(editor) !== false) {
+      format.classes = classes;
+    } else {
+      format.attributes = { class: classes };
+    }
+    return format;
+  };
+  var getGroupsBySelector = function (groups, selector) {
+    return Tools.grep(groups, function (group) {
+      return !group.filter || group.filter(selector);
+    });
+  };
+  var compileUserDefinedGroups = function (groups) {
+    return Tools.map(groups, function (group) {
+      return Tools.extend({}, group, {
+        original: group,
+        selectors: {},
+        filter: compileFilter(group.filter),
+        item: {
+          text: group.title,
+          menu: []
+        }
+      });
+    });
+  };
+  var isExclusiveMode = function (editor, group) {
+    return group === null || $_fhe373e5je5o2u1g.shouldImportExclusive(editor) !== false;
+  };
+  var isUniqueSelector = function (editor, selector, group, globallyUniqueSelectors) {
+    return !(isExclusiveMode(editor, group) ? selector in globallyUniqueSelectors : selector in group.selectors);
+  };
+  var markUniqueSelector = function (editor, selector, group, globallyUniqueSelectors) {
+    if (isExclusiveMode(editor, group)) {
+      globallyUniqueSelectors[selector] = true;
+    } else {
+      group.selectors[selector] = true;
+    }
+  };
+  var convertSelectorToFormat = function (editor, plugin, selector, group) {
+    var selectorConverter;
+    if (group && group.selector_converter) {
+      selectorConverter = group.selector_converter;
+    } else if ($_fhe373e5je5o2u1g.getSelectorConverter(editor)) {
+      selectorConverter = $_fhe373e5je5o2u1g.getSelectorConverter(editor);
+    } else {
+      selectorConverter = function () {
+        return defaultConvertSelectorToFormat(editor, selector);
+      };
+    }
+    return selectorConverter.call(plugin, selector, group);
+  };
+  var setup = function (editor) {
+    editor.on('renderFormatsMenu', function (e) {
+      var globallyUniqueSelectors = {};
+      var selectorFilter = compileFilter($_fhe373e5je5o2u1g.getSelectorFilter(editor)), ctrl = e.control;
+      var groups = compileUserDefinedGroups($_fhe373e5je5o2u1g.getCssGroups(editor));
+      var processSelector = function (selector, group) {
+        if (isUniqueSelector(editor, selector, group, globallyUniqueSelectors)) {
+          markUniqueSelector(editor, selector, group, globallyUniqueSelectors);
+          var format = convertSelectorToFormat(editor, editor.plugins.importcss, selector, group);
+          if (format) {
+            var formatName = format.name || DOMUtils.DOM.uniqueId();
+            editor.formatter.register(formatName, format);
+            return Tools.extend({}, ctrl.settings.itemDefaults, {
+              text: format.title,
+              format: formatName
+            });
+          }
+        }
+        return null;
+      };
+      if (!$_fhe373e5je5o2u1g.shouldAppend(editor)) {
+        ctrl.items().remove();
+      }
+      Tools.each(getSelectors(editor, e.doc || editor.getDoc(), compileFilter($_fhe373e5je5o2u1g.getFileFilter(editor))), function (selector) {
+        if (selector.indexOf('.mce-') === -1) {
+          if (!selectorFilter || selectorFilter(selector)) {
+            var selectorGroups = getGroupsBySelector(groups, selector);
+            if (selectorGroups.length > 0) {
+              Tools.each(selectorGroups, function (group) {
+                var menuItem = processSelector(selector, group);
+                if (menuItem) {
+                  group.item.menu.push(menuItem);
+                }
+              });
+            } else {
+              var menuItem = processSelector(selector, null);
+              if (menuItem) {
+                ctrl.add(menuItem);
+              }
+            }
+          }
+        }
+      });
+      Tools.each(groups, function (group) {
+        if (group.item.menu.length > 0) {
+          ctrl.add(group.item);
+        }
+      });
+      e.control.renderNew();
+    });
+  };
+  var $_19mf6ne0je5o2u18 = {
+    defaultConvertSelectorToFormat: defaultConvertSelectorToFormat,
+    setup: setup
+  };
 
-			if (skinUrl) {
-				skinUrl = editor.documentBaseURI.toAbsolute(skinUrl);
-			} else {
-				skinUrl = tinymce.baseURL + '/skins/' + skin;
-			}
+  var get = function (editor) {
+    var convertSelectorToFormat = function (selectorText) {
+      return $_19mf6ne0je5o2u18.defaultConvertSelectorToFormat(editor, selectorText);
+    };
+    return { convertSelectorToFormat: convertSelectorToFormat };
+  };
+  var $_dp4sxzdzje5o2u16 = { get: get };
 
-			return href === skinUrl + '/content' + (editor.inline ? '.inline' : '') + '.min.css';
-		}
+  PluginManager.add('importcss', function (editor) {
+    $_19mf6ne0je5o2u18.setup(editor);
+    return $_dp4sxzdzje5o2u16.get(editor);
+  });
+  function Plugin () {
+  }
 
-		return false;
-	}
+  return Plugin;
 
-	function compileFilter(filter) {
-		if (typeof filter == "string") {
-			return function(value) {
-				return value.indexOf(filter) !== -1;
-			};
-		} else if (filter instanceof RegExp) {
-			return function(value) {
-				return filter.test(value);
-			};
-		}
-
-		return filter;
-	}
-
-	function getSelectors(doc, fileFilter) {
-		var selectors = [], contentCSSUrls = {};
-
-		function append(styleSheet, imported) {
-			var href = styleSheet.href, rules;
-
-			href = removeCacheSuffix(href);
-
-			if (!href || !fileFilter(href, imported) || isSkinContentCss(href)) {
-				return;
-			}
-
-			each(styleSheet.imports, function(styleSheet) {
-				append(styleSheet, true);
-			});
-
-			try {
-				rules = styleSheet.cssRules || styleSheet.rules;
-			} catch (e) {
-				// Firefox fails on rules to remote domain for example:
-				// @import url(//fonts.googleapis.com/css?family=Pathway+Gothic+One);
-			}
-
-			each(rules, function(cssRule) {
-				if (cssRule.styleSheet) {
-					append(cssRule.styleSheet, true);
-				} else if (cssRule.selectorText) {
-					each(cssRule.selectorText.split(','), function(selector) {
-						selectors.push(tinymce.trim(selector));
-					});
-				}
-			});
-		}
-
-		each(editor.contentCSS, function(url) {
-			contentCSSUrls[url] = true;
-		});
-
-		if (!fileFilter) {
-			fileFilter = function(href, imported) {
-				return imported || contentCSSUrls[href];
-			};
-		}
-
-		try {
-			each(doc.styleSheets, function(styleSheet) {
-				append(styleSheet);
-			});
-		} catch (e) {
-			// Ignore
-		}
-
-		return selectors;
-	}
-
-	function defaultConvertSelectorToFormat(selectorText) {
-		var format;
-
-		// Parse simple element.class1, .class1
-		var selector = /^(?:([a-z0-9\-_]+))?(\.[a-z0-9_\-\.]+)$/i.exec(selectorText);
-		if (!selector) {
-			return;
-		}
-
-		var elementName = selector[1];
-		var classes = selector[2].substr(1).split('.').join(' ');
-		var inlineSelectorElements = tinymce.makeMap('a,img');
-
-		// element.class - Produce block formats
-		if (selector[1]) {
-			format = {
-				title: selectorText
-			};
-
-			if (editor.schema.getTextBlockElements()[elementName]) {
-				// Text block format ex: h1.class1
-				format.block = elementName;
-			} else if (editor.schema.getBlockElements()[elementName] || inlineSelectorElements[elementName.toLowerCase()]) {
-				// Block elements such as table.class and special inline elements such as a.class or img.class
-				format.selector = elementName;
-			} else {
-				// Inline format strong.class1
-				format.inline = elementName;
-			}
-		} else if (selector[2]) {
-			// .class - Produce inline span with classes
-			format = {
-				inline: 'span',
-				title: selectorText.substr(1),
-				classes: classes
-			};
-		}
-
-		// Append to or override class attribute
-		if (editor.settings.importcss_merge_classes !== false) {
-			format.classes = classes;
-		} else {
-			format.attributes = {"class": classes};
-		}
-
-		return format;
-	}
-
-	function getGroupsBySelector(groups, selector) {
-		return tinymce.util.Tools.grep(groups, function (group) {
-			return !group.filter || group.filter(selector);
-		});
-	}
-
-	function compileUserDefinedGroups(groups) {
-		return tinymce.util.Tools.map(groups, function(group) {
-			return tinymce.util.Tools.extend({}, group, {
-				original: group,
-				selectors: {},
-				filter: compileFilter(group.filter),
-				item: {
-					text: group.title,
-					menu: []
-				}
-			});
-		});
-	}
-
-	function isExclusiveMode(editor, group) {
-		// Exclusive mode can only be disabled when there are groups allowing the same style to be present in multiple groups
-		return group === null || editor.settings.importcss_exclusive !== false;
-	}
-
-	function isUniqueSelector(selector, group, globallyUniqueSelectors) {
-		return !(isExclusiveMode(editor, group) ? selector in globallyUniqueSelectors : selector in group.selectors);
-	}
-
-	function markUniqueSelector(selector, group, globallyUniqueSelectors) {
-		if (isExclusiveMode(editor, group)) {
-			globallyUniqueSelectors[selector] = true;
-		} else {
-			group.selectors[selector] = true;
-		}
-	}
-
-	function convertSelectorToFormat(plugin, selector, group) {
-		var selectorConverter, settings = editor.settings;
-
-		if (group && group.selector_converter) {
-			selectorConverter = group.selector_converter;
-		} else if (settings.importcss_selector_converter) {
-			selectorConverter = settings.importcss_selector_converter;
-		} else {
-			selectorConverter = defaultConvertSelectorToFormat;
-		}
-
-		return selectorConverter.call(plugin, selector, group);
-	}
-
-	editor.on('renderFormatsMenu', function(e) {
-		var settings = editor.settings, globallyUniqueSelectors = {};
-		var selectorFilter = compileFilter(settings.importcss_selector_filter), ctrl = e.control;
-		var groups = compileUserDefinedGroups(settings.importcss_groups);
-
-		var processSelector = function (selector, group) {
-			if (isUniqueSelector(selector, group, globallyUniqueSelectors)) {
-				markUniqueSelector(selector, group, globallyUniqueSelectors);
-
-				var format = convertSelectorToFormat(self, selector, group);
-				if (format) {
-					var formatName = format.name || tinymce.DOM.uniqueId();
-					editor.formatter.register(formatName, format);
-
-					return tinymce.extend({}, ctrl.settings.itemDefaults, {
-						text: format.title,
-						format: formatName
-					});
-				}
-			}
-
-			return null;
-		};
-
-		if (!editor.settings.importcss_append) {
-			ctrl.items().remove();
-		}
-
-		each(getSelectors(e.doc || editor.getDoc(), compileFilter(settings.importcss_file_filter)), function(selector) {
-			if (selector.indexOf('.mce-') === -1) {
-				if (!selectorFilter || selectorFilter(selector)) {
-					var selectorGroups = getGroupsBySelector(groups, selector);
-
-					if (selectorGroups.length > 0) {
-						tinymce.util.Tools.each(selectorGroups, function (group) {
-							var menuItem = processSelector(selector, group);
-							if (menuItem) {
-								group.item.menu.push(menuItem);
-							}
-						});
-					} else {
-						var menuItem = processSelector(selector, null);
-						if (menuItem) {
-							ctrl.add(menuItem);
-						}
-					}
-				}
-			}
-		});
-
-		each(groups, function(group) {
-			if (group.item.menu.length > 0) {
-				ctrl.add(group.item);
-			}
-		});
-
-		e.control.renderNew();
-	});
-
-	// Expose default convertSelectorToFormat implementation
-	self.convertSelectorToFormat = defaultConvertSelectorToFormat;
-});
+}());
+})();

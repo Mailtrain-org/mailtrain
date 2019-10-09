@@ -1,100 +1,168 @@
-/**
- * plugin.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
+(function () {
+var contextmenu = (function () {
+  'use strict';
 
-/*global tinymce:true */
+  var Cell = function (initial) {
+    var value = initial;
+    var get = function () {
+      return value;
+    };
+    var set = function (v) {
+      value = v;
+    };
+    var clone = function () {
+      return Cell(get());
+    };
+    return {
+      get: get,
+      set: set,
+      clone: clone
+    };
+  };
 
-tinymce.PluginManager.add('contextmenu', function(editor) {
-	var menu, contextmenuNeverUseNative = editor.settings.contextmenu_never_use_native;
+  var PluginManager = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-	var isNativeOverrideKeyEvent = function (e) {
-		return e.ctrlKey && !contextmenuNeverUseNative;
-	};
+  var get = function (visibleState) {
+    var isContextMenuVisible = function () {
+      return visibleState.get();
+    };
+    return { isContextMenuVisible: isContextMenuVisible };
+  };
+  var $_83e2539zje5o2tf0 = { get: get };
 
-	var isMacWebKit = function () {
-		return tinymce.Env.mac && tinymce.Env.webkit;
-	};
+  var shouldNeverUseNative = function (editor) {
+    return editor.settings.contextmenu_never_use_native;
+  };
+  var getContextMenu = function (editor) {
+    return editor.getParam('contextmenu', 'link openlink image inserttable | cell row column deletetable');
+  };
+  var $_gvusoa1je5o2tf2 = {
+    shouldNeverUseNative: shouldNeverUseNative,
+    getContextMenu: getContextMenu
+  };
 
-	/**
-	 * This takes care of a os x native issue where it expands the selection
-	 * to the word at the caret position to do "lookups". Since we are overriding
-	 * the context menu we also need to override this expanding so the behavior becomes
-	 * normalized. Firefox on os x doesn't expand to the word when using the context menu.
-	 */
-	editor.on('mousedown', function (e) {
-		if (isMacWebKit() && e.button === 2 && !isNativeOverrideKeyEvent(e)) {
-			if (editor.selection.isCollapsed()) {
-				editor.once('contextmenu', function (e) {
-					editor.selection.placeCaretAt(e.clientX, e.clientY);
-				});
-			}
-		}
-	});
+  var DOMUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-	editor.on('contextmenu', function(e) {
-		var contextmenu;
+  var getUiContainer = function (editor) {
+    return DOMUtils.DOM.select(editor.settings.ui_container)[0];
+  };
 
-		if (isNativeOverrideKeyEvent(e)) {
-			return;
-		}
+  var nu = function (x, y) {
+    return {
+      x: x,
+      y: y
+    };
+  };
+  var transpose = function (pos, dx, dy) {
+    return nu(pos.x + dx, pos.y + dy);
+  };
+  var fromPageXY = function (e) {
+    return nu(e.pageX, e.pageY);
+  };
+  var fromClientXY = function (e) {
+    return nu(e.clientX, e.clientY);
+  };
+  var transposeUiContainer = function (element, pos) {
+    if (element && DOMUtils.DOM.getStyle(element, 'position', true) !== 'static') {
+      var containerPos = DOMUtils.DOM.getPos(element);
+      var dx = containerPos.x - element.scrollLeft;
+      var dy = containerPos.y - element.scrollTop;
+      return transpose(pos, -dx, -dy);
+    } else {
+      return transpose(pos, 0, 0);
+    }
+  };
+  var transposeContentAreaContainer = function (element, pos) {
+    var containerPos = DOMUtils.DOM.getPos(element);
+    return transpose(pos, containerPos.x, containerPos.y);
+  };
+  var getPos = function (editor, e) {
+    if (editor.inline) {
+      return transposeUiContainer(getUiContainer(editor), fromPageXY(e));
+    } else {
+      var iframePos = transposeContentAreaContainer(editor.getContentAreaContainer(), fromClientXY(e));
+      return transposeUiContainer(getUiContainer(editor), iframePos);
+    }
+  };
+  var $_efnr8za2je5o2tf4 = { getPos: getPos };
 
-		e.preventDefault();
-		contextmenu = editor.settings.contextmenu || 'link image inserttable | cell row column deletetable';
+  var Factory = tinymce.util.Tools.resolve('tinymce.ui.Factory');
 
-		// Render menu
-		if (!menu) {
-			var items = [];
+  var Tools = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
-			tinymce.each(contextmenu.split(/[ ,]/), function(name) {
-				var item = editor.menuItems[name];
+  var renderMenu = function (editor, visibleState) {
+    var menu, contextmenu;
+    var items = [];
+    contextmenu = $_gvusoa1je5o2tf2.getContextMenu(editor);
+    Tools.each(contextmenu.split(/[ ,]/), function (name) {
+      var item = editor.menuItems[name];
+      if (name === '|') {
+        item = { text: name };
+      }
+      if (item) {
+        item.shortcut = '';
+        items.push(item);
+      }
+    });
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].text === '|') {
+        if (i === 0 || i === items.length - 1) {
+          items.splice(i, 1);
+        }
+      }
+    }
+    menu = Factory.create('menu', {
+      items: items,
+      context: 'contextmenu',
+      classes: 'contextmenu'
+    });
+    menu.uiContainer = getUiContainer(editor);
+    menu.renderTo(getUiContainer(editor));
+    menu.on('hide', function (e) {
+      if (e.control === this) {
+        visibleState.set(false);
+      }
+    });
+    editor.on('remove', function () {
+      menu.remove();
+      menu = null;
+    });
+    return menu;
+  };
+  var show = function (editor, pos, visibleState, menu) {
+    if (menu.get() === null) {
+      menu.set(renderMenu(editor, visibleState));
+    } else {
+      menu.get().show();
+    }
+    menu.get().moveTo(pos.x, pos.y);
+    visibleState.set(true);
+  };
+  var $_190ocla5je5o2tf7 = { show: show };
 
-				if (name == '|') {
-					item = {text: name};
-				}
+  var isNativeOverrideKeyEvent = function (editor, e) {
+    return e.ctrlKey && !$_gvusoa1je5o2tf2.shouldNeverUseNative(editor);
+  };
+  var setup = function (editor, visibleState, menu) {
+    editor.on('contextmenu', function (e) {
+      if (isNativeOverrideKeyEvent(editor, e)) {
+        return;
+      }
+      e.preventDefault();
+      $_190ocla5je5o2tf7.show(editor, $_efnr8za2je5o2tf4.getPos(editor, e), visibleState, menu);
+    });
+  };
+  var $_bj2cmqa0je5o2tf1 = { setup: setup };
 
-				if (item) {
-					item.shortcut = ''; // Hide shortcuts
-					items.push(item);
-				}
-			});
+  PluginManager.add('contextmenu', function (editor) {
+    var menu = Cell(null), visibleState = Cell(false);
+    $_bj2cmqa0je5o2tf1.setup(editor, visibleState, menu);
+    return $_83e2539zje5o2tf0.get(visibleState);
+  });
+  function Plugin () {
+  }
 
-			for (var i = 0; i < items.length; i++) {
-				if (items[i].text == '|') {
-					if (i === 0 || i == items.length - 1) {
-						items.splice(i, 1);
-					}
-				}
-			}
+  return Plugin;
 
-			menu = new tinymce.ui.Menu({
-				items: items,
-				context: 'contextmenu',
-				classes: 'contextmenu'
-			}).renderTo();
-
-			editor.on('remove', function() {
-				menu.remove();
-				menu = null;
-			});
-		} else {
-			menu.show();
-		}
-
-		// Position menu
-		var pos = {x: e.pageX, y: e.pageY};
-
-		if (!editor.inline) {
-			pos = tinymce.DOM.getPos(editor.getContentAreaContainer());
-			pos.x += e.clientX;
-			pos.y += e.clientY;
-		}
-
-		menu.moveTo(pos.x, pos.y);
-	});
-});
+}());
+})();

@@ -1,9 +1,7 @@
 @font-face {
-    font-family: 'Noto Sans';
-    src: url('NotoSans-Regular-webfont.eot');
-    src: url('NotoSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('NotoSans-Regular-webfont.woff') format('woff'),
-         url('NotoSans-Regular-webfont.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+	font-family: 'Noto Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: url('./noto-sans-400-normal.eot');
+	src: local('Noto Sans'), local('NotoSans'), url('./noto-sans-400-normal.eot#iefix') format('embedded-opentype'), url('./noto-sans-400-normal.woff') format('woff'), url('./noto-sans-400-normal.ttf') format('truetype');
 }
