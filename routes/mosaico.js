@@ -30,7 +30,7 @@ router.get('/editor', passport.csrfProtection, (req, res) => {
             }
             language = language.split('_')[0];
             try {
-                let file = path.join(__dirname, '..', 'public', 'mosaico', 'dist', 'lang', 'mosaico-' + language + '.json');
+                let file = path.join(__dirname, '..', 'public', 'mosaico', 'rs', 'lang', 'mosaico-' + language + '.json');
                 return fs.readFileSync(file, 'utf8');
             } catch (err) {
                 return null;
