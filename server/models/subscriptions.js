@@ -616,6 +616,7 @@ async function _update(tx, listId, groupedFieldsMap, existing, filteredEntity) {
     }
 
     if (filteredEntity) {
+        filteredEntity.updated = new Date();
         await tx(getSubscriptionTableName(listId)).where('id', existing.id).update(filteredEntity);
 
         if ('status' in filteredEntity) {
