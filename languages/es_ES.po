@@ -66,7 +66,7 @@ msgstr "Añadir"
 
 #: views/blacklist.hbs:6
 msgid "Email"
-msgstr "Correo eléctronico"
+msgstr "Correo electrónico"
 
 #: views/campaigns/blacklisted.hbs:2 views/campaigns/bounced.hbs:2
 #: views/campaigns/campaigns.hbs:2 views/campaigns/campaigns.hbs:7
@@ -134,7 +134,7 @@ msgstr "Motivo"
 
 #: views/campaigns/blacklisted.hbs:11
 msgid "Time"
-msgstr "Fecha"
+msgstr "Hora"
 
 #: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
 msgid "Bounced info"
@@ -151,7 +151,7 @@ msgstr "Respuesta del SMTP"
 
 #: views/campaigns/bounced.hbs:11
 msgid "Bounce time"
-msgstr "Fecha"
+msgstr "Hora de bounce"
 
 #: views/campaigns/campaigns.hbs:3 views/campaigns/create-triggered.hbs:26
 #: views/campaigns/create.hbs:3 views/campaigns/create.hbs:4
@@ -228,11 +228,11 @@ msgstr "URL"
 
 #: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:64
 msgid "Clicks"
-msgstr "Clicks"
+msgstr "Clics"
 
 #: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:65
 msgid "% of clicks"
-msgstr "% de clicks"
+msgstr "% de clics"
 
 #: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:66
 msgid "% of messages"
@@ -244,11 +244,11 @@ msgstr "Clics agregados"
 
 #: views/campaigns/clicked.hbs:11
 msgid "Subscribers who clicked on a link:"
-msgstr "Suscriptores que hicieron click en un enlace:"
+msgstr "Suscriptores que hicieron clic en un enlace:"
 
 #: views/campaigns/clicked.hbs:12
 msgid "Subscribers who clicked on this link:"
-msgstr "Suscriptores que hicieron click en este enlace:"
+msgstr "Suscriptores que hicieron clic en este enlace:"
 
 #: views/campaigns/clicked.hbs:13 views/campaigns/opened.hbs:7
 msgid "Stats by country"
@@ -260,11 +260,11 @@ msgstr "Estadísticas por dispositivo"
 
 #: views/campaigns/clicked.hbs:18
 msgid "First click time"
-msgstr "Fecha del primer click"
+msgstr "Fecha del primer clic"
 
 #: views/campaigns/clicked.hbs:19
 msgid "Click count"
-msgstr "Número de clicks"
+msgstr "Número de clics"
 
 #: views/campaigns/complained.hbs:3 views/campaigns/complained.hbs:4
 msgid "Complained info"
@@ -370,7 +370,7 @@ msgstr "Email \"en nombre de (from)\""
 #: views/campaigns/edit-triggered.hbs:17 views/campaigns/edit.hbs:18
 #: views/settings.hbs:23
 msgid "This is the name your emails will come from"
-msgstr "Este es el nombre con el que se enviaran sus correos electrónicos"
+msgstr "Este es el nombre con el que se enviarán sus correos electrónicos"
 
 #: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:20
 #: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
@@ -496,7 +496,7 @@ msgstr ""
 #: views/campaigns/edit-rss.hbs:24 views/campaigns/edit-triggered.hbs:27
 #: views/campaigns/edit.hbs:35
 msgid "Delete Campaign"
-msgstr "Eliminar Camppaña"
+msgstr "Eliminar Campaña"
 
 #: views/campaigns/edit-rss.hbs:25 views/campaigns/edit-triggered.hbs:28
 #: views/campaigns/edit.hbs:36 views/lists/edit.hbs:20
@@ -681,7 +681,7 @@ msgstr "Clics"
 
 #: views/campaigns/view.hbs:33 views/campaigns/view.hbs:70
 msgid "List subscribers who clicked on a link"
-msgstr "Lista de suscriptores que han hecho clic en este boletín"
+msgstr "Lista de suscriptores que han hecho clic en un enlace"
 
 #: views/campaigns/view.hbs:34
 msgid ""
@@ -712,7 +712,7 @@ msgstr "¿Estás seguro? Esta acción restablecerá la programación"
 
 #: views/campaigns/view.hbs:40
 msgid "Cancel"
-msgstr "Cancelado"
+msgstr "Cancelar"
 
 #: views/campaigns/view.hbs:41
 msgid "Sending scheduled"
