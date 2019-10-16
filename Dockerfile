@@ -29,10 +29,7 @@ COPY . /app
 RUN set -ex; \
    cd client \
    && npm install \
-   && npm run build \
-   && rm -rf node_modules \
-   && npm install --production \
-   && modclean --patterns="default:*" -r -P -f
+   && npm run build
 
 # Final Image
 FROM alpine:latest
