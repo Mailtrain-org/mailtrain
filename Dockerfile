@@ -4,7 +4,7 @@ FROM node:10-alpine as builder
 # Install system dependencies
 RUN set -ex; \
     apk add --update --no-cache \
-    make gcc g++ git
+    make gcc g++ git python
 
 # Copy package.json dependencies
 COPY server/package.json /app/server/package.json
