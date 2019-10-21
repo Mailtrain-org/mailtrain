@@ -138,10 +138,10 @@ async function run() {
                     }
                 }
 
-                sqlQry = sqlQry.where(column, '<=', new Date(currentTs - trigger.seconds));
+                sqlQry = sqlQry.where(column, '<=', new Date(currentTs - trigger.seconds * 1000));
 
                 if (trigger.last_check !== null) {
-                    sqlQry = sqlQry.where(column, '>', trigger.last_check);
+                    sqlQry = sqlQry.where(column, '>', new Date(trigger.last_check - trigger.seconds * 1000));
                 }
 
                 const subscribers = await sqlQry;
