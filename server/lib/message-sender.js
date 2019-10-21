@@ -579,6 +579,16 @@ async function sendQueuedMessage(queuedMessage) {
     }
 
     if (messageType === MessageType.TRIGGERED) {
+        await knex.raw(knex('campaign_messages').insert({
+            campaign: campaign.id,
+            list: result.list.id,
+            subscription: result.subscriptionGrouped.id,
+            send_configuration: queuedMessage.send_configuration,
+            status: CampaignMessageStatus.SENT,
+            response: result.response,
+            response_id: result.response_id,
+            hash_email: result.subscriptionGrouped.hash_email
+        }).toString().replace(/^insert/i, 'insert ignore'));
         await knex('campaigns').where('id', campaign.id).increment('delivered');
     }
 
