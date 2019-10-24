@@ -21,7 +21,7 @@ import {
 import axios from '../lib/axios';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import moment from 'moment';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, NamespaceFilterContext} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -220,7 +220,7 @@ export default class CUD extends Component {
                 selectMode = TableSelectMode.MULTI;
             }
 
-            const fld = <TableSelect key={spec.id} id={`param_${spec.id}`} label={spec.name} selectionAsArray withHeader dropdown={dropdown} selectMode={selectMode} dataUrl={dataUrl} columns={columns} selectionLabelIndex={selIndex}/>;
+            const fld = <NamespaceFilterContext.Consumer>{(context) => <TableSelect namespaceFilter={context.namespaceId} key={spec.id} id={`param_${spec.id}`} label={spec.name} selectionAsArray withHeader dropdown={dropdown} selectMode={selectMode} dataUrl={dataUrl} columns={columns} selectionLabelIndex={selIndex}/>}</NamespaceFilterContext.Consumer>;
 
             userFields.push(fld);
         }
@@ -268,9 +268,9 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
 
-                    <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1}/>
+                    <NamespaceFilterContext.Consumer>{(context) => <TableSelect id="report_template" label={t('reportTemplate-1')} withHeader dropdown dataUrl="rest/report-templates-table" columns={reportTemplateColumns} selectionLabelIndex={1} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
-                    <NamespaceSelect/>
+                    <NamespaceFilterContext.Consumer>{(context) => <NamespaceSelect namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
                     {userFieldsSpec ?
                         userFields.length > 0 &&

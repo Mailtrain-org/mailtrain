@@ -13,6 +13,7 @@ const contextHelpers = require('../lib/context-helpers');
 const mailers = require('../lib/mailers');
 const senders = require('../lib/senders');
 const dependencyHelpers = require('../lib/dependency-helpers');
+const namespaces = require('./namespaces');
 
 const allowedKeys = new Set(['name', 'description', 'from_email', 'from_email_overridable', 'from_name', 'from_name_overridable', 'reply_to', 'reply_to_overridable', 'x_mailer', 'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
 
@@ -22,7 +23,14 @@ function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));
 }
 
-async function _listDTAjax(context, namespaceId, params) {
+async function _listDTAjax(context, params) {
+
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+    }
+
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'sendConfiguration', requiredOperations: ['viewPublic'] }],
@@ -31,8 +39,10 @@ async function _listDTAjax(context, namespaceId, params) {
             builder = builder
                 .from('send_configurations')
                 .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace');
-            if (namespaceId) {
-                builder = builder.where('send_configurations.namespace', namespaceId);
+            if (params.namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('send_configurations.namespace', allowedNamespaces[key]);
+                }
             }
             return builder;
         },
@@ -41,21 +51,31 @@ async function _listDTAjax(context, namespaceId, params) {
 }
 
 async function listDTAjax(context, params) {
-    return await _listDTAjax(context, undefined, params);
-}
-
-async function listByNamespaceDTAjax(context, namespaceId, params) {
-    return await _listDTAjax(context, namespaceId, params);
+    return await _listDTAjax(context, params);
 }
 
 async function listWithSendPermissionDTAjax(context, params) {
+    
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+    }
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'sendConfiguration', requiredOperations: ['sendWithoutOverrides', 'sendWithAllowedOverrides', 'sendWithAnyOverrides'] }],
         params,
-        builder => builder
-            .from('send_configurations')
-            .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace'),
+        builder => {
+            builder = builder
+                .from('send_configurations')
+                .innerJoin('namespaces', 'namespaces.id', 'send_configurations.namespace');
+            if (params.namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('send_configurations.namespace', allowedNamespaces[key]);
+                }
+            }
+            return builder;
+        },
         ['send_configurations.id', 'send_configurations.name', 'send_configurations.cid', 'send_configurations.description', 'send_configurations.mailer_type', 'send_configurations.created', 'namespaces.name']
     );
 }
@@ -189,7 +209,6 @@ async function getSystemSendConfiguration() {
 
 module.exports.hash = hash;
 module.exports.listDTAjax = listDTAjax;
-module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listWithSendPermissionDTAjax = listWithSendPermissionDTAjax;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;

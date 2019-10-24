@@ -11,6 +11,7 @@ import mailtrainConfig from 'mailtrainConfig';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+import {NamespaceFilterContext} from '../../lib/namespace';
 
 @withComponentMixins([
     withTranslation,
@@ -83,7 +84,7 @@ export default class List extends Component {
 
                 <Title>{t('reportTemplates')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/report-templates-table" columns={columns} />
+                <NamespaceFilterContext.Consumer>{(context) => <Table ref={node => this.table = node} withHeader dataUrl="rest/report-templates-table" columns={columns} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
             </div>
         );
     }

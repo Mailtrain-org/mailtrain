@@ -821,6 +821,10 @@ class TreeTableSelect extends Component {
         format: PropTypes.string
     }
 
+    static defaultProps = {
+        namespaceFilter: null
+    }
+
     async onSelectionChangedAsync(sel) {
         const owner = this.getFormStateOwner();
         owner.updateFormValue(this.props.id, sel);
@@ -833,9 +837,9 @@ class TreeTableSelect extends Component {
         const htmlId = 'form_' + id;
 
         const className = owner.addFormValidationClass('' , id);
-
+        
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync} />
+            <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync} namespaceFilter={props.namespaceFilter}/>
         );
     }
 }
@@ -877,7 +881,8 @@ class TableSelect extends Component {
     static defaultProps = {
         selectMode: TableSelectMode.SINGLE,
         selectionLabelIndex: 0,
-        pageLength: 10
+        pageLength: 10,
+        namespaceFilter: null
     }
 
     async onSelectionChangedAsync(sel, data) {
@@ -940,7 +945,7 @@ class TableSelect extends Component {
                         }
                     </div>
                     <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
-                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync} namespaceFilter={props.namespaceFilter}/>
                     </div>
                 </div>
             );
@@ -948,7 +953,7 @@ class TableSelect extends Component {
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div>
-                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} pageLength={props.pageLength} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} pageLength={props.pageLength} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync} namespaceFilter={props.namespaceFilter}/>
                     </div>
                 </div>
             );

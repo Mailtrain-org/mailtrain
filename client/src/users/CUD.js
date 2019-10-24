@@ -19,7 +19,7 @@ import {withErrorHandling} from '../lib/error-handling';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import passwordValidator from '../../../shared/password-validator';
 import mailtrainConfig from 'mailtrainConfig';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
+import {getDefaultNamespace, NamespaceSelect, validateNamespace, NamespaceFilterContext} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
@@ -256,7 +256,7 @@ export default class CUD extends Component {
                         </div>
                     }
                     <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={'rest/shares-roles-table/global'} columns={rolesColumns} selectionLabelIndex={1}/>
-                    <NamespaceSelect/>
+                    <NamespaceFilterContext.Consumer>{(context) => <NamespaceSelect namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>

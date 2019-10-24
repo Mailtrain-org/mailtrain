@@ -24,7 +24,7 @@ import mailtrainConfig from 'mailtrainConfig';
 import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import {getDefaultNamespace} from "../lib/namespace";
+import {getDefaultNamespace, NamespaceFilterContext} from "../lib/namespace";
 
 @withComponentMixins([
     withTranslation,
@@ -217,7 +217,7 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('description')}/>
 
                     {!this.isEditGlobal() &&
-                    <TreeTableSelect id="namespace" label={t('parentNamespace')} data={this.state.treeData}/>}
+                    <NamespaceFilterContext.Consumer>{(context) => <TreeTableSelect id="namespace" label={t('parentNamespace')} data={this.state.treeData} namespaceFilter={context.namespaceId}/>}</NamespaceFilterContext.Consumer>}
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>

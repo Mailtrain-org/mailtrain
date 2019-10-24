@@ -241,6 +241,33 @@ async function remove(context, id) {
     });
 }
 
+async function getAllowedNamespaces(context, topNamespace){
+
+    const tree = await listTree(context);
+    var allowedNamespaces = [];
+
+    function process_node(node, namespaces, branch, topNamespace){
+        if(node){
+            if(branch){
+                namespaces.push(node.key);
+            }
+            if(node.key == topNamespace){
+                branch = true;
+                namespaces.push(node.key);
+            }
+            if(node.children){
+                for(const key in node.children){
+                    process_node(node.children[key], namespaces, branch, topNamespace);
+                } 
+            }
+        }
+    }
+    if(tree && topNamespace){
+        process_node(tree[0], allowedNamespaces, false, topNamespace);
+    }
+    return allowedNamespaces;
+}
+
 module.exports.hash = hash;
 module.exports.listTree = listTree;
 module.exports.getById = getById;
@@ -249,3 +276,4 @@ module.exports.create = create;
 module.exports.createTx = createTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
+module.exports.getAllowedNamespaces = getAllowedNamespaces;

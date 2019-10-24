@@ -12,6 +12,7 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
 const { allTagLanguages } = require('../../shared/templates');
 const messageSender = require('../lib/message-sender');
+const namespaces = require('./namespaces');
 
 const allowedKeys = new Set(['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace']);
 
@@ -37,15 +38,23 @@ async function getById(context, id, withPermissions = true) {
     });
 }
 
-async function _listDTAjax(context, namespaceId, params) {
+async function _listDTAjax(context, params) {
+    var allowedNamespaces = [];
+
+    if(params.namespaceFilter){
+        allowedNamespaces = await namespaces.getAllowedNamespaces(context, params.namespaceFilter);
+    }
+
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'template', requiredOperations: ['view'] }],
         params,
         builder => {
             builder = builder.from('templates').innerJoin('namespaces', 'namespaces.id', 'templates.namespace');
-            if (namespaceId) {
-                builder = builder.where('namespaces.id', namespaceId);
+            if (params.namespaceFilter) {
+                for(const key in allowedNamespaces){
+                    builder = builder.orWhere('namespaces.id', allowedNamespaces[key]);
+                }
             }
             return builder;
         },
@@ -54,11 +63,7 @@ async function _listDTAjax(context, namespaceId, params) {
 }
 
 async function listDTAjax(context, params) {
-    return await _listDTAjax(context, undefined, params);
-}
-
-async function listByNamespaceDTAjax(context, namespaceId, params) {
-    return await _listDTAjax(context, namespaceId, params);
+    return await _listDTAjax(context, params);
 }
 
 async function _validateAndPreprocess(tx, entity) {
@@ -177,7 +182,6 @@ module.exports.hash = hash;
 module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.listDTAjax = listDTAjax;
-module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;

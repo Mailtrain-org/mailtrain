@@ -17,14 +17,25 @@ import users from './users/root';
 import sendConfigurations from './send-configurations/root';
 import settings from './settings/root';
 
-import {DropdownLink, getLanguageChooser, NavDropdown, NavLink, Section} from "./lib/page";
+import {DropdownLink, getLanguageChooser, NavDropdown, NavLink, NavActionLink, Section} from "./lib/page";
+import {
+    Form,
+    withForm,
+    CheckBox, 
+    TreeTableSelect
+} from './lib/form';
 
 import mailtrainConfig from 'mailtrainConfig';
 import Home from "./Home";
-import {DropdownActionLink, Icon} from "./lib/bootstrap-components";
+import {DropdownActionLink, Icon, ModalDialog} from "./lib/bootstrap-components";
 import axios from './lib/axios';
-import {getUrl} from "./lib/urls";
 import {withComponentMixins} from "./lib/decorator-helpers";
+import PropTypes from 'prop-types';
+import {requiresAuthenticatedUser,  withPageHelpers} from './lib/page';
+import {withErrorHandling} from './lib/error-handling';
+import {getUrl} from "./lib/urls";
+import {withAsyncErrorHandler} from './lib/error-handling';
+import {clearNamespaceFilter, getNamespaceFilterId, NamespaceFilterProvider, NamespaceFilterContext} from './lib/namespace'
 
 const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
 
@@ -32,6 +43,114 @@ if (mailtrainConfig.reportsEnabled) {
     topLevelMenuKeys.push('reports');
 }
 
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
+class PreviewNamespaceFilterModalDialog extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {namespaceId: null, namespaceName: this.props.t("namespaceFilter")};
+        this.initForm({
+            leaveConfirmation: false
+        });
+    }
+
+    static propTypes = {
+        visible: PropTypes.bool.isRequired,
+        onHide: PropTypes.func.isRequired,
+    }
+
+    localValidateFormValues(state) {
+        const t = this.props.t;
+        if (!state.getIn(['namespace', 'value']) && state.getIn(['namespaceFilterCheckboxEnabled', 'value'])) {
+            state.setIn(['namespace', 'error'], t("namespaceHasToBeSelectedToApply"));
+        } else {
+            state.setIn(['namespace', 'error'], null);
+        }
+    }
+
+    componentDidMount() {
+        var enabled = false;
+        if(getNamespaceFilterId()){
+            enabled = true;
+        }
+        this.populateFormValues({
+            namespace: getNamespaceFilterId(),
+            namespaceFilterCheckboxEnabled: enabled
+        });
+        this.loadTreeData();
+    }
+
+    @withAsyncErrorHandler
+    async loadTreeData() {
+
+            const response = await axios.get(getUrl('rest/namespaces-tree'));
+            const data = response.data;
+            for (const root of data) {
+                root.expanded = true;
+            }
+
+            if (this.isComponentMounted()) {
+                this.setState({
+                    treeData: data
+                });
+            }
+        
+    }
+
+    async setNamespaceFilterAsync(updateNamespace) {
+        const t = this.props.t;
+        const localStorage = window.localStorage;
+        if(this.getFormValue('namespaceFilterCheckboxEnabled')){
+            if(this.getFormValue('namespace')){
+                const response = await axios.get(getUrl('rest/namespaces/' + this.getFormValue('namespace')));
+                this.setFormStatusMessage('warning', null);
+                this.setState({namespaceId: this.getFormValue('namespace'), namespaceName: response.data.name});
+                localStorage.setItem("namespaceFilterId", this.getFormValue('namespace'));
+                localStorage.setItem("namespaceFilterName", response.data.name);
+                await updateNamespace(this.getFormValue('namespace'), response.data.name);
+                await this.hideModal();
+            }else{
+                this.setFormStatusMessage('warning', t('namespaceMustNotBeEmpty'));
+            }
+        }else{
+            this.setState({namespaceId: null, namespaceName: 'Namespace Filter'});
+            localStorage.setItem("namespaceFilterId", null);
+            localStorage.setItem("namespaceFilterName", "Namespace Filter");
+            await updateNamespace(null, t('namespaceFilter'));
+            clearNamespaceFilter();
+            await this.hideModal();
+        }
+    }
+
+    async hideModal() {
+        this.setFormStatusMessage('warning', null);
+        this.props.onHide();
+    }
+
+    render() {
+        const t = this.props.t;
+
+        return (
+            <NamespaceFilterContext.Consumer>
+                {(context) =>
+                <ModalDialog hidden={!this.props.visible} title={t('namespaceFilter')} onCloseAsync={() => this.hideModal()} buttons={[
+                    { label: t('apply'), className: 'btn-primary', onClickAsync: async () => await this.setNamespaceFilterAsync(context.setNamespace)},
+                    { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
+                ]}> 
+                    <Form stateOwner={this}>
+                        <CheckBox id="namespaceFilterCheckboxEnabled" format="wide" text={t('enable')}></CheckBox>
+                        {this.getFormValue('namespaceFilterCheckboxEnabled') && <TreeTableSelect id="namespace" format="wide" label={t('namespace')} data={this.state.treeData}/>}               
+                    </Form>
+                </ModalDialog>}
+            </NamespaceFilterContext.Consumer>
+        );
+    }
+}
 
 @withComponentMixins([
     withTranslation
@@ -51,11 +170,33 @@ class Root extends Component {
         class MainMenu extends Component {
             constructor(props) {
                 super(props);
+                this.state = {showModal: false};      
             }
-
+            
             async logout() {
                 await axios.post(getUrl('rest/logout'));
+                clearNamespaceFilter();
                 window.location = getUrl();
+            }
+
+            async showNamespaceFilterModal() {
+                this.showModal();
+            }
+
+            showModal() { 
+                this.setState({
+                    showModal: true
+                });
+            }
+
+            async hideModal() {
+                this.hide();
+            }
+
+            hide() { 
+                this.setState({
+                    showModal: false
+                });
             }
 
             render() {
@@ -64,7 +205,10 @@ class Root extends Component {
                 const topLevelItems = structure.children;
 
                 const topLevelMenu = [];
+                
+                var namespaceFilter = null;
 
+               
                 for (const entryKey of topLevelMenuKeys) {
                     const entry = topLevelItems[entryKey];
                     const link = entry.link || entry.externalLink;
@@ -78,7 +222,11 @@ class Root extends Component {
 
                 if (mailtrainConfig.isAuthenticated) {
                     return (
-                        <>
+                        <>  
+                            <PreviewNamespaceFilterModalDialog
+                                visible={this.state.showModal}
+                                onHide={() => this.setState({showModal: false})}
+                            />  
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
                                 <NavDropdown label={t('administration')}>
@@ -91,11 +239,12 @@ class Root extends Component {
                                 </NavDropdown>
                             </ul>
                             <ul className="navbar-nav mt-navbar-nav-right">
+                                {mailtrainConfig.namespaceFilterEnabled && <NamespaceFilterContext.Consumer>{(context) => <NavActionLink onClickAsync={::this.showNamespaceFilterModal}>{context.namespaceName}</NavActionLink>}</NamespaceFilterContext.Consumer>}
                                 {getLanguageChooser(t)}
                                 <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
                                     <DropdownLink to="/account"><Icon icon='user'/> {t('account')}</DropdownLink>
                                     <DropdownActionLink onClickAsync={::this.logout}><Icon icon='sign-out-alt'/> {t('logOut')}</DropdownActionLink>
-                                </NavDropdown>
+                                </NavDropdown>        
                             </ul>
                         </>
                     );
@@ -138,7 +287,7 @@ class Root extends Component {
 }
 
 export default function() {
-    ReactDOM.render(<TranslationRoot><Root/></TranslationRoot>,document.getElementById('root'));
+    ReactDOM.render(<TranslationRoot><NamespaceFilterProvider><Root/></NamespaceFilterProvider></TranslationRoot>,document.getElementById('root'));
 };
 
 

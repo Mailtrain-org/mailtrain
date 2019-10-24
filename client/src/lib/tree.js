@@ -17,6 +17,7 @@ import {withAsyncErrorHandler, withErrorHandling} from './error-handling';
 import styles from "./styles.scss";
 import {getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
+import { processNamespaceFilterOnTree } from './namespace';
 
 const TreeSelectMode = {
     NONE: 0,
@@ -61,7 +62,11 @@ class TreeTable extends Component {
     @withAsyncErrorHandler
     async loadData() {
         const response = await axios.get(getUrl(this.props.dataUrl));
-        const treeData = response.data;
+        var treeData = response.data;
+
+        if(this.props.namespaceFilter){
+            treeData = processNamespaceFilterOnTree(treeData[0], this.props.namespaceFilter);
+        }
 
         for (const root of treeData) {
             root.expanded = true;
@@ -93,7 +98,7 @@ class TreeTable extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.selection !== nextProps.selection || this.props.data !== nextProps.data || this.props.dataUrl !== nextProps.dataUrl ||
-            this.state.treeData != nextState.treeData || this.props.className !== nextProps.className;
+            this.state.treeData != nextState.treeData || this.props.className !== nextProps.className || this.props.namespaceFilter !== nextProps.namespaceFilter;
     }
 
     // XSS protection
@@ -219,6 +224,8 @@ class TreeTable extends Component {
             });
         } else if (this.props.dataUrl && prevProps.dataUrl !== this.props.dataUrl) {
             // noinspection JSIgnoredPromiseFromCall
+            this.loadData();
+        } else if (this.props.namespaceFilter !== prevProps.namespaceFilter) {
             this.loadData();
         }
 

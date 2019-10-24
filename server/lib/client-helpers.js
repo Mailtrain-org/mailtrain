@@ -23,6 +23,7 @@ async function getAnonymousConfig(context, appType) {
         sandboxUrlBaseDir: urls.getSandboxUrlBaseDir(),
         publicUrlBase: urls.getPublicUrlBase(),
         publicUrlBaseDir: urls.getPublicUrlBaseDir(),
+        namespaceFilterEnabled: config.namespaceFilter.enabled,
         appType
     }
 }
@@ -49,7 +50,8 @@ async function getAuthenticatedConfig(context) {
         verpEnabled: config.verp.enabled,
         reportsEnabled: config.reports.enabled,
         mapsApiKey: setts.mapsApiKey,
-        builtinZoneMTAEnabled: config.builtinZoneMTA.enabled
+        builtinZoneMTAEnabled: config.builtinZoneMTA.enabled, 
+        namespaceFilterEnabled: config.namespaceFilter.enabled
     }
 }
 
