@@ -140,7 +140,7 @@ async function addOrGet(campaignId, url) {
     }
 }
 
-async function updateLinks(source, tagLanguage, mergeTags, campaign, list, subscription) {
+async function updateLinks(source, tagLanguage='simple', mergeTags, campaign, list, subscription) {
     if ((campaign.open_tracking_disabled && campaign.click_tracking_disabled) || !source || !source.trim()) {
         // tracking is disabled, do not modify the message
         return source;

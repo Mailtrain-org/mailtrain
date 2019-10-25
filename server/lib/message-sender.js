@@ -214,7 +214,7 @@ class MessageSender {
 
             html = response.body;
             text = '';
-            renderTags = false;
+            renderTags = true;
         }
 
         const attachments = this.attachments.slice();
@@ -236,8 +236,10 @@ class MessageSender {
                 html = await links.updateLinks(html, this.tagLanguage, mergeTags, campaign, list, subscriptionGrouped);
             }
 
-            // When no list and subscriptionGrouped is provided, formatCampaignTemplate works the same way as formatTemplate
-            html = tools.formatCampaignTemplate(html, this.tagLanguage, mergeTags, true, campaign, list, subscriptionGrouped);
+            if (campaign.source !== CampaignSource.URL) {
+              // When no list and subscriptionGrouped is provided, formatCampaignTemplate works the same way as formatTemplate
+              html = tools.formatCampaignTemplate(html, this.tagLanguage, mergeTags, true, campaign, list, subscriptionGrouped);
+            }
         }
 
         const generateText = !!(text || '').trim();
