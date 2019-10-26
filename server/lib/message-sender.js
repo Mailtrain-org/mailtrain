@@ -212,8 +212,14 @@ class MessageSender {
                 throw new Error(`Received status code ${httpResponse.statusCode} from ${sourceUrl}`);
             }
 
-            html = response.body;
-            text = '';
+            try {
+              const responseJSON = JSON.parse(response.body);
+              html = responseJSON.html;
+              text = responseJSON.text;
+            } catch () {
+              html = response.body;
+            }
+
             renderTags = false;
         }
 
