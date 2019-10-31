@@ -14,7 +14,7 @@ const sendConfigurations = require('../models/send-configurations');
 const links = require('../models/links');
 const {CampaignSource, CampaignType} = require('../../shared/campaigns');
 const {toNameTagLangauge} = require('../../shared/lists');
-const {CampaignMessageStatus} = require('../../shared/campaigns');
+const {CampaignMessageStatus, CampaignMessageErrorCode} = require('../../shared/campaigns');
 const tools = require('./tools');
 const htmlToText = require('html-to-text');
 const request = require('request-promise');
@@ -202,14 +202,26 @@ class MessageSender {
 
             const sourceUrl = campaign.data.sourceUrl;
 
-            const response = await request.post({
-                uri: sourceUrl,
-                form,
-                resolveWithFullResponse: true
-            });
+            let response;
+            try {
+                response = await request.post({
+                    uri: sourceUrl,
+                    form,
+                    resolveWithFullResponse: true
+                });
+            } catch (e) {
+                log.error('MessageSender', `Error pulling content from URL (${sourceUrl})`);
+                response = {statusCode: e.message};
+            }
 
             if (response.statusCode !== 200) {
-                throw new Error(`Received status code ${httpResponse.statusCode} from ${sourceUrl}`);
+                const statusError = new Error(`Received status code ${response.statusCode} from ${sourceUrl}`);
+                if (response.statusCode >= 500) {
+                  statusError.code = CampaignMessageErrorCode.RETRY;
+                } else {
+                  statusError.code = CampaignMessageErrorCode.NORETRY;
+                }
+                throw statusError;
             }
 
             html = response.body;
@@ -504,13 +516,21 @@ class MessageSender {
         try {
             result = await this._sendMessage({listId: campaignMessage.list, subscriptionId: campaignMessage.subscription});
         } catch (err) {
-            await knex('campaign_messages')
+            if (err.code === CampaignMessageErrorCode.NORETRY) {
+              await knex('campaign_messages')
+                .where({id: campaignMessage.id})
+                .update({
+                  status: CampaignMessageStatus.FAILED,
+                  updated: new Date()
+                });
+            } else {
+              await knex('campaign_messages')
                 .where({id: campaignMessage.id})
                 .update({
                     status: CampaignMessageStatus.SCHEDULED,
                     updated: new Date()
                 });
-
+            }
             throw err;
         }
 
