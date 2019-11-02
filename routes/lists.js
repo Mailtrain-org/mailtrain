@@ -393,6 +393,7 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
                 subscription.customFields = fields.getRow(fieldList, subscription, false, true);
                 subscription.useEditor = true;
                 subscription.isSubscribed = subscription.status === 1;
+                subscription.isBounced = subscription.status === 3;
 
                 let tzfound = false;
                 subscription.timezones = moment.tz.names().map(tz => {
@@ -457,6 +458,31 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
                 }
                 req.flash('success', util.format(_('%s was successfully unsubscribed from your list'), subscription.email));
+                res.redirect('/lists/view/' + list.id);
+            });
+        });
+    });
+});
+
+router.post('/subscription/reactivate', passport.parseForm, passport.csrfProtection, (req, res) => {
+    lists.get(req.body.list, (err, list) => {
+        if (err || !list) {
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
+            return res.redirect('/lists');
+        }
+
+        subscriptions.get(list.id, req.body.cid, (err, subscription) => {
+            if (err || !subscription) {
+                req.flash('danger', err && err.message || err || _('Could not find subscriber with specified ID'));
+                return res.redirect('/lists/view/' + list.id);
+            }
+
+            subscriptions.changeStatus(list.id, subscription.id, false, subscriptions.Status.SUBSCRIBED, (err, found) => {
+                if (err) {
+                    req.flash('danger', err && err.message || err || _('Could not reactivate user'));
+                    return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
+                }
+                req.flash('success', util.format(_('%s was successfully reactivated from your list'), subscription.email));
                 res.redirect('/lists/view/' + list.id);
             });
         });
