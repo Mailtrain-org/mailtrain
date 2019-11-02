@@ -62,7 +62,7 @@
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "csurf": "^1.9.0",
-    "csv-parse": "^1.2.3",
+    "csv-parse": "^4.6.5",
     "device": "^0.3.8",
     "dompurify": "^1.0.2",
     "escape-html": "^1.0.3",
