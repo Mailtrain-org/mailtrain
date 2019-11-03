@@ -24,7 +24,7 @@ title="mailtrain"
 # Enabled HTML editors
 editors=[
   ["summernote", "Summernote"],
-  ["grapejs", "GrapeJS"],
+  ["grapejs", "GrapesJS"],
   ["mosaico", "Mosaico"],
   ["codeeditor", "Code Editor"]
 ]
