@@ -179,8 +179,10 @@ router.post('/ajax', (req, res) => {
             data: data.map((row, i) => [
                 (Number(req.body.start) || 0) + 1 + i,
                 '<span class="glyphicon glyphicon-file" aria-hidden="true"></span> ' + htmlescape(row.name || ''),
+                templates.editorName(row.editorName),
+                row.editorData && row.editorData.indexOf('"mjml":') > -1 ? 'MJML' : 'HTML',
                 htmlescape(striptags(row.description) || ''),
-                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/templates/edit/' + row.id + '">' + _('Edit') + '</a>' ]
+                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/templates/edit/' + row.id + '"> ' + _('Edit') + '</a>' ]
             )
         });
     });
