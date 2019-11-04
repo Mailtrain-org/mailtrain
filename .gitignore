@@ -5,6 +5,8 @@ node_modules
 npm-debug.log
 package-lock.json
 .DS_Store
+/.vscode
+*.swp
 config/development*
 config/production*
 config/test*
