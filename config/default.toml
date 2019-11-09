@@ -195,13 +195,14 @@ canvasBackgroundStyle = "bluish"
 canvasLabelsColor = "#4b5666"
 
 [views.template]
-
-showeditor = false
+showeditor=false
 
 [views.lists]
+statuscolored=false
 
-statuscolored = false
-
+[geoip]
+# Alternative directory containing the files geoip-country.dat and geoip-country6.dat
+datadirectory=false
 
 [reports]
 # The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be

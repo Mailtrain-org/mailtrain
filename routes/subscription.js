@@ -16,7 +16,7 @@ let _ = require('../lib/translate')._;
 let util = require('util');
 let cors = require('cors');
 let cache = require('memory-cache');
-let geoip = require('geoip-ultralight');
+let geoip = require('geoip-country');
 let confirmations = require('../lib/models/confirmations');
 let mailHelpers = require('../lib/subscription-mail-helpers');
 
@@ -74,7 +74,8 @@ function checkAndExecuteConfirmation(req, action, errorMsg, next, exec) {
 router.get('/confirm/subscribe/:cid', (req, res, next) => {
     checkAndExecuteConfirmation(req, 'subscribe', 'Request invalid or already completed. If your subscription request is still pending, please subscribe again.', next, (confirmation, list) => {
         const data = confirmation.data;
-        let optInCountry = geoip.lookupCountry(confirmation.ip) || null;
+        let geodata = geoip.lookup(confirmation.ip);
+        let optInCountry = geodata && geodata.country || null;
 
         const meta = {
             cid: req.params.cid,
