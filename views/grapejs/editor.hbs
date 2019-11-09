@@ -18,6 +18,10 @@
         width: 100%;
     }
 
+    .gjs-one-bg {
+        background: #373d49;
+    }
+
     #toast-container {
         top: auto !important;
         bottom: 5px;
@@ -31,14 +35,22 @@
         font-family: Helvetica, sans-serif;
     }
     #toast-container > div {
-        opacity: 0.95;
+        opacity: 0.98;
     }
+    .toast-warning {
+        background-color: rgb(226, 116, 13)
+    }
+
     #merge-tag-reference-container {
         text-align: left;
         font-size: 14px;
     }
     #merge-tag-reference-container table th {
         padding: 5px 20px 5px 0;
+    }
+
+    [data-tooltip]::after {
+        font-size: 11px;
     }
 </style>
 
@@ -135,52 +147,52 @@
                     'X-CSRF-TOKEN': '{{csrfToken}}',
                 },
             },
-            styleManager: {
-		        clearProperties: true,
-            },
+
             container : '#gjs',
             fromElement: false,
+            avoidInlineStyle: 0,
             plugins: [],
             pluginsOpts: {},
         };
 
         if (mode === 'mjml') {
-            var serializer = new XMLSerializer();
-            var doc = new DOMParser().parseFromString(resource.editorData.mjml, 'text/xml');
+            var doc = document.createElement('mjml');
+            doc.innerHTML = resource.editorData.mjml.replace(/<[/]?mjml>/g, '');
 
-            // convert relative to absolute urls
-            ['mj-wrapper', 'mj-section', 'mj-navbar', 'mj-hero', 'mj-image'].forEach(function(tagName) {
-                var elements = doc.getElementsByTagName(tagName);
-
-                for (var i = 0; i < elements.length; i++) {
-                    var node = elements[i];
-                    var attrName = tagName === 'mj-image' ? 'src' : 'background-url';
-                    var url = node.getAttribute(attrName);
-
-                    if (url && url.substring(0, 2) === './') {
-                        var absoluteUrl = serviceUrl + 'grapejs/templates/' + resource.editorData.template + '/' + url.substring(2);
-                        node.setAttribute(attrName, absoluteUrl);
-                    }
-                }
-            });
-
-            var title = doc.getElementsByTagName('mj-title')[0];
-            if (title) {
-                title.textContent = resource.name;
+            // Document head with title
+            var head  = doc.getElementsByTagName('mj-head')[0];
+            if (!head) {
+                document.createElement('mj-head')
+                document.prepend(head);
             }
 
-            var head = doc.getElementsByTagName('mj-head')[0];
-            var mjHead = head ? serializer.serializeToString(head) : '<mj-head></mj-head>';
+            var title = head.getElementsByTagName('mj-title')[0];
+            if (title) {
+                title.textContent = resource.name;
+            } else {
+                title = document.createElement('mj-title');
+                title.textContent = resource.name;
+                head.prepend(title);
+            }
 
-            var container = doc.getElementsByTagName('mj-container')[0];
-            var mjContainer = container ? serializer.serializeToString(container) : '<mj-container></mj-container>';
+            c.plugins.push('grapesjs-mjml', 'gjs-preset-mjml');
 
-            c.plugins.push('gjs-mjml', 'gjs-preset-mjml');
-            c.pluginsOpts['gjs-mjml'] = {
-                preMjml: '<mjml>' + mjHead + '<mj-body>',
-                postMjml: '</mj-body></mjml>',
+            c.pluginsOpts['grapesjs-mjml'] = {
+                editorBackgroundColor: "{{{editor.config.mjml.editorBackgroundColor}}}",
+                canvasBackgroundStyle: "{{{editor.config.mjml.canvasBackgroundStyle}}}",
+                canvasLabelsColor: "{{{editor.config.mjml.canvasLabelsColor}}}",
             };
-            c.components = mjContainer;
+
+            c.pluginsOpts['gjs-preset-mjml'] = {
+                mailtrain: {
+                    id: resource.id,
+                    subject: resource.subject,
+                    serviceUrl: serviceUrl,
+                    template: resource.editorData.template
+                }
+            };
+
+            c.components = doc.outerHTML;
         }
 
         if (mode === 'html') {
@@ -212,10 +224,6 @@
         editor.AssetManager.add(data.files);
     });
 
-    function getMjml() {
-        var c = config.pluginsOpts['gjs-mjml'];
-        return c.preMjml + editor.getHtml() + c.postMjml;
-    }
 
     function getPreparedHtml(callback) {
         var html;
@@ -286,7 +294,7 @@
         getPreparedHtml(function(html) {
             var editorData = '{{editor.mode}}' === 'mjml' ? {
                 template: resource.editorData.template,
-                mjml: getMjml(),
+                mjml: editor.getHtml(),
             } : {
                 template: resource.editorData.template,
                 css: editor.getCss(),
@@ -308,6 +316,7 @@
                 .success(function() {
                     window.bridge.lastSavedHtml = html;
                     toastr.success('Sucessfully saved');
+                    editor.UndoManager.clear();
                 })
                 .fail(function(data) {
                     toastr.error(data.responseText || 'An error occured while saving the document');
@@ -324,7 +333,8 @@
     // Close Button
 
     $('#mt-close').on('click', function() {
-        if (confirm('Unsaved changes will be lost. Close now?') === true) {
+        var haveChanges = (editor.UndoManager.hasUndo() || editor.UndoManager.hasRedo());
+        if (!haveChanges || confirm('Unsaved changes will be lost. Close now?') === true) {
             window.bridge.exit
                 ? window.bridge.exit()
                 : window.location.href = '/{{type}}s/edit/{{resource.id}}?tab=template';
@@ -346,26 +356,20 @@
     var testContentEl = testContainer.querySelector('input[name=html]');
 
     cmdm.add('send-test', {
-        run(editor, sender) {
+        run(editor, sender = {}) {
             // TODO: Show a spinner
             getPreparedHtml(function(html) {
-                sender.set('active', 0);
                 var mdlDialog = document.querySelector('.gjs-mdl-dialog');
                 testContentEl.value = html;
                 mdlDialog.className += ' ' + mdlClass;
                 testContainer.style.display = 'block';
                 md.setTitle('Test your Newsletter');
-                
-                var modalContent = $('<div>').append(testContainer).html();
-                for(var i=0; i<100; i++) {
-                    try {
-                        md.setContent(modalContent);
-                        break;
-                    } catch(err) {}
-                }
-                
+
+                var modalContent = $('<div/>').append(testContainer)[0].outerHTML;
+                md.setContent(modalContent);
+
                 testContainerCopy = $(".gjs-mdl-dialog #test-form");
-                
+
                 var statusFormElC = document.querySelector('.gjs-mdl-dialog .form-status');
                 var statusFormEl = document.querySelector('.gjs-mdl-dialog .form-status i');
 
@@ -380,7 +384,7 @@
                             statusFormElC.style.opacity = '0';
                             statusFormEl.removeAttribute('data-tooltip');
                             md.close();
-                            toastr.success('Testmail sent');
+                            toastr.success('Test mail sent');
                         } else if (res.errors) {
                             statusFormEl.className = 'fa fa-exclamation-circle';
                             statusFormEl.setAttribute('data-tooltip', res.errors);
@@ -403,50 +407,39 @@
                     var email = $('.gjs-mdl-dialog #test-form input[name=email]').val();
                     isValidEmail(email) && localStorage.setItem('testemail', email);
                 });
-                
+
                 md.open();
-                md.getModel().once('change:open', function() {
+                md.onceClose(function() {
+                    md.setContent(' ');
                     mdlDialog.className = mdlDialog.className.replace(mdlClass, '');
+                    sender.set && sender.set('active', 0);
                     //clean status
                 });
             });
         }
     });
 
-    pnm.addButton('options', {
-        id: 'send-test',
-        className: 'fa fa-paper-plane',
-        command: 'send-test',
-        attributes: {
-            'title': 'Test Newsletter',
-            'data-tooltip-pos': 'bottom',
-        },
-    });
-
-
 
     // Merge Tag Reference command
 
     var mergeTagReferenceContainer = document.getElementById('merge-tag-reference-container');
     cmdm.add('open-merge-tag-reference', {
-        run(editor, sender) {
-            sender.set('active', 0);
+        run(editor, sender = {}) {
             var mdlDialog = document.querySelector('.gjs-mdl-dialog');
             mdlDialog.className += ' gjs-mdl-dialog-lg';
             mergeTagReferenceContainer.style.display = 'block';
             md.setTitle('Merge tag reference');
-            for(var i=0; i<100; i++) {
-                try {
-                    md.setContent(mergeTagReferenceContainer);
-                    break;
-                } catch(err) {}
-            }
+            md.setContent(mergeTagReferenceContainer);
             md.open();
-            md.getModel().once('change:open', function() {
+            md.onceClose(function() {
+                md.setContent(' ');
                 mdlDialog.className = mdlDialog.className.replace('gjs-mdl-dialog-lg', '');
+                sender.set && sender.set('active', 0);
             });
         }
     });
+
+    // Add buttons
 
     pnm.addButton('options', {
         id: 'view-merge-tag-reference',
@@ -459,20 +452,56 @@
     });
 
 
+    pnm.addButton('options', {
+            id: 'send-test',
+            className: 'fa fa-paper-plane',
+            command: 'send-test',
+            attributes: {
+                'title': 'Test Newsletter',
+                'data-tooltip-pos': 'bottom'
+            },
+        });
+
     // Simple warn notifier
 
-    var origWarn = console.warn;
     toastr.options = {
         closeButton: true,
         preventDuplicates: true,
         showDuration: 250,
         hideDuration: 150
     };
-    console.warn = function(msg) {
-        toastr.warning(msg);
-        origWarn(msg);
+
+    console.lastLog = [];
+    console.origWarn = console.warn.bind(console);
+    console.origError = console.error.bind(console);
+
+    var console2toastrTimeout;
+    var console2toastr = function(callback, args) {
+        clearTimeout(console2toastrTimeout);
+        var messages = Array.from(args).map((e) => typeof (e) === 'object' ? e.message : e);
+        messages.forEach(function (msg) {
+            if (console.lastLog.indexOf(msg) === -1) callback(msg);
+        });
+        console.lastLog = messages;
+        console2toastrTimeout = setTimeout(function () { console.lastLog.length = 0; }, 1000);
     };
 
+    console.warn = function() {
+        console2toastr(toastr.warning.bind(toastr), arguments);
+        console.origWarn.apply(console, arguments);
+    };
+
+    console.error = function () {
+        console2toastr(toastr.error.bind(toastr), arguments);
+        console.origError.apply(console, arguments);
+    };
+
+    // Disable history to use delete key
+
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
 
     // Beautify tooltips
 

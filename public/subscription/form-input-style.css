@@ -11,7 +11,7 @@ Alerts:       ...
 /* --- General -------- */
 
 form {
-  margin: .5em 0 1em;
+    margin: .5em 0 1em;
 }
 
 .form-group {
@@ -57,10 +57,10 @@ input[type='url'],
 textarea,
 select {
     -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none;
-    background-color: transparent;
-    border: 2px solid #DCE4EC;
+    -moz-appearance: none;
+    appearance: none;
+    background: #FFF;
+    border: 2px solid #d3d7db;
     border-radius: 4px;
     box-shadow: none;
     box-sizing: border-box;
@@ -85,10 +85,11 @@ select:focus {
 }
 
 input[readonly] {
-    color: #999999;
+    color: #92908e;
 }
+
 input[readonly]:focus {
-    border-color: #DCE4EC;
+    border-color: #C5CCD2;
 }
 
 input[type="checkbox"],
@@ -135,7 +136,7 @@ textarea {
     border-top-right-radius: 4px;
 }
 
-.input-group-addon > * {
+.input-group-addon>* {
     line-height: 2.8em;
 }
 
@@ -156,15 +157,34 @@ textarea {
     display: none;
 }
 
-.alert-success { color: #397740; background-color: #DEF0D9; border-color: #CFEAC8; }
-.alert-info    { color: #33708E; background-color: #D9EDF6; border-color: #BCDFF0; }
-.alert-warning { color: #8A6D3F; background-color: #FCF8E4; border-color: #F9F2CE; }
-.alert-danger  { color: #AA4144; background-color: #F2DEDE; border-color: #EBCCCC; }
+.alert-success {
+    color: #397740;
+    background-color: #DEF0D9;
+    border-color: #CFEAC8;
+}
+
+.alert-info {
+    color: #33708E;
+    background-color: #D9EDF6;
+    border-color: #BCDFF0;
+}
+
+.alert-warning {
+    color: #8A6D3F;
+    background-color: #FCF8E4;
+    border-color: #F9F2CE;
+}
+
+.alert-danger {
+    color: #AA4144;
+    background-color: #F2DEDE;
+    border-color: #EBCCCC;
+}
 
 
 /* --- GPG Key ------------- */
 
-.form-group.gpg > label {
+.form-group.gpg>label {
     display: inline-block;
 }
 
