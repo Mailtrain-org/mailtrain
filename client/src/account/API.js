@@ -292,7 +292,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token={accessToken}`)}' \<br/>
+                <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com&amp;'</pre>
 
                 <h4>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h4>
