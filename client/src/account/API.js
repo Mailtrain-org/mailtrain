@@ -293,7 +293,7 @@ export default class API extends Component {
                 </p>
 
                 <pre>curl -XPOST '{getUrl(`api/blacklist/add?access_token=${accessToken}`)}' \<br/>
---data 'EMAIL=test@example.com&amp;'</pre>
+--data 'EMAIL=test@example.com'</pre>
 
                 <h4>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h4>
 
@@ -320,7 +320,7 @@ export default class API extends Component {
                 </p>
 
                 <pre>curl -XPOST '{getUrl(`api/blacklist/delete?access_token=${accessToken}`)}' \<br/>
---data 'EMAIL=test@example.com&amp;'</pre>
+--data 'EMAIL=test@example.com'</pre>
 
                 <h4>GET /api/lists/:email – {t('getTheListsAUserHasSubscribedTo')}</h4>
 
