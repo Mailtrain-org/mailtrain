@@ -24,7 +24,8 @@ router.all('/*', (req, res, next) => {
 
 router.get('/', (req, res) => {
     res.render('templates/templates', {
-        title: _('Templates')
+        title: _('Templates'),
+        showEditor: config.views.template.showeditor || false
     });
 });
 
@@ -176,14 +177,24 @@ router.post('/ajax', (req, res) => {
             draw: req.body.draw,
             recordsTotal: total,
             recordsFiltered: filteredTotal,
-            data: data.map((row, i) => [
-                (Number(req.body.start) || 0) + 1 + i,
-                '<span class="glyphicon glyphicon-file" aria-hidden="true"></span> ' + htmlescape(row.name || ''),
-                templates.editorName(row.editorName),
-                row.editorData && row.editorData.indexOf('"mjml":') > -1 ? 'MJML' : 'HTML',
-                htmlescape(striptags(row.description) || ''),
-                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/templates/edit/' + row.id + '"> ' + _('Edit') + '</a>' ]
-            )
+            data: data.map((row, i) => {
+                let templateRow = [
+                    (Number(req.body.start) || 0) + 1 + i,
+                    '<span class="glyphicon glyphicon-file" aria-hidden="true"></span> ' + htmlescape(row.name || '')
+                ];
+                if (config.views.template.showeditor) {
+                    templateRow.push(
+                        templates.editorName(row.editorName),
+                        row.editorData && row.editorData.indexOf('"mjml":') > -1 ? 'MJML' : 'HTML'
+                    );
+                }
+                templateRow.push(
+                    htmlescape(striptags(row.description) || ''),
+                    '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/templates/edit/' + row.id + '"> ' + _('Edit') + '</a>'
+                );
+                return templateRow;
+
+            })
         });
     });
 });
