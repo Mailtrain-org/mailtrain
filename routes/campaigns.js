@@ -287,7 +287,7 @@ router.post('/ajax', (req, res) => {
                 htmlescape(striptags(row.description) || ''),
                 getStatusText(row),
                 '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>'
-            ].concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/campaigns/edit/' + row.id + '">' + _('Edit') + '</a>'))
+            ].concat('<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <a href="/campaigns/edit/' + row.id + '">' + _('Edit') + '</a>'))
         });
     });
 });
@@ -617,8 +617,8 @@ router.post('/clicked/ajax/:id/:linkId/stats', (req, res) => {
 
                 res.json({
                     draw: req.body.draw,
-                    total: total,
-                    data: data
+                    total,
+                    data
                 });
             });
         });
