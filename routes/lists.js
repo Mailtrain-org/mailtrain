@@ -12,6 +12,7 @@ let forms = require('../lib/models/forms');
 let tools = require('../lib/tools');
 let striptags = require('striptags');
 let htmlescape = require('escape-html');
+let getName = require('country-list').getName;
 let multer = require('multer');
 let os = require('os');
 let humanize = require('humanize');
@@ -167,7 +168,7 @@ router.post('/ajax', (req, res) => {
                 '<code>' + row.cid + '</code>',
                 row.subscribers,
                 htmlescape(striptags(row.description) || ''),
-                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/edit/' + row.id + '">' + _('Edit') + '</a>' ]
+                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <a href="/lists/edit/' + row.id + '">' + _('Edit') + '</a>' ]
             )
         });
     });
@@ -254,7 +255,7 @@ router.post('/ajax/:id', (req, res) => {
                         } else {
                             return htmlescape(cRow.value || '');
                         }
-                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>'))
+                    })).concat(config.views.lists.statuscolored ? '<span class="subscriber-status-' + row.status + '">' + statuses[row.status] + '</span>' : statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>'))
                 });
             });
         });
@@ -312,6 +313,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                 list.csrfToken = req.csrfToken();
                 list.customFields = fieldList.filter(field => field.visible);
                 list.customSort = list.customFields.length ? ',' + list.customFields.map(() => '0').join(',') : '';
+                list.statusColored = config.views.lists.statuscolored;
 
                 list.showSubscriptions = req.query.tab === 'subscriptions' || !req.query.tab;
                 list.showImports = req.query.tab === 'imports';
@@ -387,13 +389,26 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
                     fieldList = [];
                 }
 
+                let statuses = [_('Unknown'), _('Subscribed'), _('Unsubscribed'), _('Bounced'), _('Complained')];
+
                 subscription.list = list;
                 subscription.csrfToken = req.csrfToken();
 
                 subscription.customFields = fields.getRow(fieldList, subscription, false, true);
                 subscription.useEditor = true;
+                subscription.createdDate = moment(subscription.created).format('lll');
+                subscription.modifiedDate = moment(subscription.statusChange).format('lll');
+
+                subscription.statusTitle = statuses[subscription.status];
                 subscription.isSubscribed = subscription.status === 1;
                 subscription.isBounced = subscription.status === 3;
+
+                let country = {};
+                if (subscription.optInCountry) {
+                    country.name = getName(subscription.optInCountry);
+                    country.code = subscription.optInCountry.toLowerCase();
+                }
+                subscription.country = country;
 
                 let tzfound = false;
                 subscription.timezones = moment.tz.names().map(tz => {

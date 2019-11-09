@@ -1,16 +1,28 @@
+@import "flags/flags.css";
+
 .glyphicon.spinning {
     animation: spin 1s infinite linear;
     -webkit-animation: spin2 1s infinite linear;
 }
 
 @keyframes spin {
-    from { transform: scale(1) rotate(0deg); }
-    to { transform: scale(1) rotate(360deg); }
+    from {
+        transform: scale(1) rotate(0deg);
+    }
+
+    to {
+        transform: scale(1) rotate(360deg);
+    }
 }
 
 @-webkit-keyframes spin2 {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(360deg); }
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+
+    to {
+        -webkit-transform: rotate(360deg);
+    }
 }
 
 /* Supporting wider description lists */
@@ -23,11 +35,25 @@
     .dl-horizontal dd {
         margin-left: 220px;
     }
+
 }
+
+@media screen and (max-width: 767px) {
+    .text-xs-center {
+        text-align: center;
+    }
+
+    .form-group .col-xs-12 button {
+        margin-bottom: 20px;
+    }
+
+}
+
 
 h2 .glyphicon {
     font-size: .75em;
 }
+
 h3 .glyphicon {
     font-size: .8em;
 }
@@ -46,4 +72,78 @@ tbody>tr.selected {
 
 .row-actions .row-action:last-child {
     padding-right: 0px;
+}
+
+
+span.subscriber-status-1 {
+    /* subscribed */
+    color: #2b5718;
+}
+
+span.subscriber-status-0,
+span.subscriber-status-2 {
+    /* unknow / unsubscribed */
+    color: #b3aba0;
+}
+
+span.subscriber-status-3 {
+    /* bounced */
+    color: #aa3203;
+}
+
+span.subscriber-status-4 {
+    /* complained */
+    color: #7b0833;
+}
+
+/* subscriber line status */
+tr.subscriber-status-1 td:first-child {
+    border-right: solid 3px #87ad77;
+    text-align:center;
+    padding-right: 10px;
+}
+
+tr.subscriber-status-0 td:first-child,
+tr.subscriber-status-2 td:first-child {
+    border-right: solid 3px #c7bfb4;
+    text-align:center;
+    padding-right: 10px;
+}
+
+tr.subscriber-status-3 td:first-child {
+    border-right: solid 3px #df6b3d;
+    text-align:center;
+    padding-right: 10px;
+}
+
+tr.subscriber-status-4 td:first-child {
+    border-right: solid 3px #c94475;
+    text-align:center;
+    padding-right: 10px;
+}
+
+/* subscribers status icon */
+.status-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.status-icon.subscriber-status-1 {
+    background-color: #2b5718;
+}
+
+.status-icon.subscriber-status-0,
+.status-icon.subscriber-status-2 {
+    background-color: #b3aba0;
+}
+
+.status-icon.subscriber-status-3 {
+    background-color: #aa3203;
+}
+
+.status-icon.subscriber-status-4 {
+    background-color: #7b0833;
 }
