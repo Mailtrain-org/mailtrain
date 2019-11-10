@@ -864,30 +864,43 @@ router.post('/publickey', passport.parseForm, (req, res, next) => {
             return next(err);
         }
 
-        let privKey;
-        try {
-            privKey = openpgp.key.readArmored(configItems.pgpPrivateKey).keys[0];
-            if (configItems.pgpPassphrase && !privKey.decrypt(configItems.pgpPassphrase)) {
-                privKey = false;
-            }
-        } catch (E) {
-            // just ignore if failed
-        }
-
-        if (!privKey) {
+        const sendError = () => {
             err = new Error(_('Public key is not set'));
             err.status = 404;
             return next(err);
         }
 
-        let pubkey = privKey.toPublic().armor();
+        const sendResult = (privKey) => {
+            let pubkey = privKey.toPublic().armor();
+            res.writeHead(200, {
+                'Content-Type': 'application/octet-stream',
+                'Content-Disposition': 'attachment; filename=public.asc'
+            });
+            res.end(pubkey);
+        }
 
-        res.writeHead(200, {
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename=public.asc'
-        });
-
-        res.end(pubkey);
+        openpgp.key.readArmored(configItems.pgpPrivateKey).
+            then((armored) => {
+                let privKey = armored.keys[0];
+                if (configItems.pgpPassphrase) {
+                    privKey.decrypt(configItems.pgpPassphrase).
+                        then((success) => {
+                            if (success) {
+                                sendResult(privKey);
+                            }
+                        }).
+                        catch((error) => {
+                            log.error('GPG', error);
+                            sendError();
+                        })
+                } else {
+                    sendResult(privKey);
+                }
+            }).
+            catch((error) => {
+                log.error('GPG', error);
+                sendError();
+            });
     });
 });
 

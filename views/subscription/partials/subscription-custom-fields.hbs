@@ -70,7 +70,7 @@
                 <button class="btn-download-pubkey" type="submit" form="download-pubkey">{{#translate}}Download signature verification key{{/translate}}</button>
             {{/if}}
             <textarea class="form-control gpg-text" rows="4" name="{{column}}" placeholder="{{#translate}}Begins with{{/translate}} &#39;-----BEGIN PGP PUBLIC KEY BLOCK-----&#39;">{{value}}</textarea>
-            <span class="help-block">
+            <span class="help-block" style="padding:10px 0;">
                 {{#translate}}Insert your GPG public key here to encrypt messages sent to your address{{/translate}} <em>({{#translate}}optional{{/translate}})</em>
             </span>
         </div>
