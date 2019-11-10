@@ -277,7 +277,7 @@ export default class CUD extends Component {
                     const label = matches[2].trim();
                     options.push({ key, label });
                 } else {
-                    errors.push(t('errrorOnLineLine', { line: lineIdx + 1}));
+                    errors.push(t('errorOnLineLine', { line: lineIdx + 1}));
                 }
             }
         }

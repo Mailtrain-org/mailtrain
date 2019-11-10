@@ -426,7 +426,7 @@
   "defaultValueIsNotAProperlyFormattedDate": "O valor padrão não é uma data formatada corretamente",
   "defaultValueIsNotAProperlyFormatted": "O valor padrão não é uma data de aniversário formatada corretamente",
   "defaultValueIsNotOneOfTheAllowedOptions": "O valor padrão não é uma das opções permitidas",
-  "errrorOnLineLine": "Errror on line {{line}}",
+  "errorOnLineLine": "Error on line {{line}}",
   "fieldUpdated": "Field updated",
   "fieldUpdated - TODO: update line above and then delete this line to mark that the translation has been fixed": "Field updated",
   "fieldCreated": "Field created",
