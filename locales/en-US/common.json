@@ -1027,5 +1027,6 @@
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
   "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
   "tagLanguage": "Tag language",
-  "tagLanguageMustBeSelected": "Tag language must be selected"
+  "tagLanguageMustBeSelected": "Tag language must be selected",
+  "helpText": "Help text"
 }
