@@ -1025,5 +1025,7 @@
   "thePasswordMustContainAtLeastOne": "The password must contain at least one lowercase letter",
   "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
-  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character"
+  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
+  "tagLanguage": "Tag language",
+  "tagLanguageMustBeSelected": "Tag language must be selected"
 }
