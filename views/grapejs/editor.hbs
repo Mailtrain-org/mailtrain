@@ -167,13 +167,11 @@
             }
 
             var title = head.getElementsByTagName('mj-title')[0];
-            if (title) {
-                title.textContent = resource.name;
-            } else {
+            if (!title) {
                 title = document.createElement('mj-title');
-                title.textContent = resource.name;
                 head.prepend(title);
             }
+            c.needTitle = title.textContent.trim() === '';
 
             c.plugins.push('grapesjs-mjml', 'gjs-preset-mjml');
 
@@ -503,9 +501,9 @@
         history.go(1);
     };
 
-    // Beautify tooltips
 
     $(document).ready(function() {
+        // Beautify tooltips
         $('*[title]').each(function() {
             var el = $(this);
             var title = el.attr('title').trim();
@@ -514,6 +512,18 @@
                 el.attr('title', '');
             }
         });
+
+        // Set title for mjml
+        if (config.needTitle) {
+            var titleEl = editor.getWrapper().findType('mj-title')[0];
+            if (titleEl) {
+                var preferSubject = resource.subject ? confirm("Prefer the subject as the landing page title? (default to campaign name)") : false;
+                var thetitle = preferSubject ? resource.subject : resource.name;
+                titleEl.set('content', thetitle);
+                config.needTitle = false;
+
+            }
+        }
     });
 
 </script>
