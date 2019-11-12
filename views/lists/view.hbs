@@ -207,14 +207,39 @@
 </div>
 {{#if statusColored }}
 <script>
-    function updateSubscribersRows () {
-        for (i = 0; i < 5; i++) {
-            $('.dataTable tr:has(span.subscriber-status-' + i + ')').addClass('subscriber-status-' + i);
+    (function(){
+        function updateSubscribersRows () {
+            $('.dataTable thead tr').removeClass('highlight');
+            if ($(document).scrollTop() > 400) {
+                $('html, body').stop().animate({ scrollTop: 0 }, 300, function () {
+                    $('.dataTable thead tr').addClass('highlight');
+                });
+            }
+
+            for (i = 0; i < 5; i++) {
+                $('.dataTable tr:has(span.subscriber-status-' + i + ')').addClass('subscriber-status-' + i);
+            }
+            $(window).trigger('resize');
         }
-    }
-    document.addEventListener("DOMContentLoaded", function (event) {
-        updateSubscribersRows();
-        $('body').on('DOMSubtreeModified', '.dataTables_info', updateSubscribersRows);
-    });
+        function updateTableWidth () {
+            var container = $('.container');
+            var containerWidth = container.width();
+            var tableWidth = $('.dataTable').width();
+
+            console.log(containerWidth);
+            console.log(tableWidth);
+
+            if (tableWidth > containerWidth) {
+                container.css({ width: 'auto', 'max-width': tableWidth + 100 + 'px' });
+                $(window).off('resize', updateTableWidth);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            updateSubscribersRows();
+            $('body').on('DOMSubtreeModified', '.dataTables_info', updateSubscribersRows);
+            $(window).resize(updateTableWidth);
+        });
+    })();
 </script>
 {{/if}}

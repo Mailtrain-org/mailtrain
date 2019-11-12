@@ -25,6 +25,20 @@
     }
 }
 
+.highlight {
+    animation: highlight 0.5s;
+}
+
+@keyframes highlight {
+    0% {
+        background-color: rgba(230, 90, 10, 1.0);
+    }
+    100% {
+        background-color: rgba(255, 255, 255, 0);
+    }
+}
+
+#
 /* Supporting wider description lists */
 
 @media screen and (min-width: 768px) {
@@ -99,26 +113,26 @@ span.subscriber-status-4 {
 /* subscriber line status */
 tr.subscriber-status-1 td:first-child {
     border-right: solid 3px #87ad77;
-    text-align:center;
+    text-align: center;
     padding-right: 10px;
 }
 
 tr.subscriber-status-0 td:first-child,
 tr.subscriber-status-2 td:first-child {
     border-right: solid 3px #c7bfb4;
-    text-align:center;
+    text-align: center;
     padding-right: 10px;
 }
 
 tr.subscriber-status-3 td:first-child {
     border-right: solid 3px #df6b3d;
-    text-align:center;
+    text-align: center;
     padding-right: 10px;
 }
 
 tr.subscriber-status-4 td:first-child {
     border-right: solid 3px #c94475;
-    text-align:center;
+    text-align: center;
     padding-right: 10px;
 }
 
