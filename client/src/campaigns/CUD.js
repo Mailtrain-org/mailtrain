@@ -401,7 +401,7 @@ export default class CUD extends Component {
             }
 
             if (!state.getIn(['data_sourceCustom_tag_language', 'value'])) {
-                state.setIn(['data_sourceCustom_tag_language', 'error'], t('Tag language must be selected'));
+                state.setIn(['data_sourceCustom_tag_language', 'error'], t('tagLanguageMustBeSelected'));
             }
 
             if (customTemplateTypeKey) {
@@ -732,7 +732,7 @@ export default class CUD extends Component {
 
             templateEdit = <div>
                 <Dropdown id="data_sourceCustom_type" label={t('type')} options={this.customTemplateTypeOptions}/>
-                <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={isEdit}/>
+                <Dropdown id="data_sourceCustom_tag_language" label={t('tagLanguage')} options={this.customTemplateTagLanguageOptions} disabled={isEdit}/>
 
                 {customTemplateTypeForm}
             </div>;

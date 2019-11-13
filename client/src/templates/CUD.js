@@ -171,7 +171,7 @@ export default class CUD extends Component {
             }
 
             if (!state.getIn(['tag_language', 'value'])) {
-                state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
+                state.setIn(['tag_language', 'error'], t('tagLanguageMustBeSelected'));
             }
 
             if (typeKey) {
@@ -320,7 +320,7 @@ export default class CUD extends Component {
             { data: 1, title: t('name') },
             { data: 2, title: t('description') },
             { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-            { data: 4, title: t('Tag language'), render: data => this.tagLanguages[data].name },
+            { data: 4, title: t('tagLanguage'), render: data => this.tagLanguages[data].name },
             { data: 5, title: t('created'), render: data => moment(data).fromNow() },
             { data: 6, title: t('namespace') },
         ];
@@ -376,7 +376,7 @@ export default class CUD extends Component {
 
                             {typeForm}
 
-                            <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions} disabled={isEdit}/>
+                            <Dropdown id="tag_language" label={t('tagLanguage')} options={tagLanguageOptions} disabled={isEdit}/>
                         </>
                     }
 
