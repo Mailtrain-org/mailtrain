@@ -33,6 +33,7 @@
     0% {
         background-color: rgba(230, 90, 10, 1.0);
     }
+
     100% {
         background-color: rgba(255, 255, 255, 0);
     }
@@ -88,6 +89,9 @@ tbody>tr.selected {
     padding-right: 0px;
 }
 
+.navbar-brand i {
+    vertical-align: text-top;
+}
 
 span.subscriber-status-1 {
     /* subscribed */
