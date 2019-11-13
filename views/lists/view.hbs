@@ -226,9 +226,6 @@
             var containerWidth = container.width();
             var tableWidth = $('.dataTable').width();
 
-            console.log(containerWidth);
-            console.log(tableWidth);
-
             if (tableWidth > containerWidth) {
                 container.css({ width: 'auto', 'max-width': tableWidth + 100 + 'px' });
                 $(window).off('resize', updateTableWidth);
