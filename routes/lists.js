@@ -190,8 +190,25 @@ router.post('/ajax/:id', (req, res) => {
             }
 
             let columns = ['#', 'email', 'first_name', 'last_name'].concat(fieldList.filter(field => field.visible).map(field => field.column)).concat(['status', 'created']);
+            let searchFields = ['email', 'first_name', 'last_name'];
 
-            subscriptions.filter(list.id, req.body, columns, req.query.segment, (err, data, total, filteredTotal) => {
+            if (('search' in req.body) && req.body.search.value) {
+                const search = req.body.search.value.toLowerCase();
+                const statusTypes = ['subscribed', 'unsubscribed', 'bounced', 'complained'];
+
+                if (statusTypes.includes(search)) {
+                    searchFields = ['status'];
+                    req.body.search.value = String(statusTypes.indexOf(search) + 1);
+                } else if (fieldList.length) {
+                    const searcheableTypes = ['text', 'longtext', 'website'].concat(/^[0-9]+$/.test(search) ? ['number'] : []);
+                    let additionalSearchFields = fieldList.filter(field => {
+                        return ((searcheableTypes.indexOf(field.type) > -1) && (config.search.inhiddenfields ? true : field.visible));
+                    }).map(field => field.column);
+                    searchFields = searchFields.concat(additionalSearchFields);
+                }
+            }
+
+            subscriptions.filter(list.id, req.body, columns, req.query.segment, searchFields, (err, data, total, filteredTotal) => {
                 if (err) {
                     return res.json({
                         error: err.message || err,

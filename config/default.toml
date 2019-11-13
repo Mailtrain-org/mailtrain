@@ -204,6 +204,9 @@ statuscolored=false
 # Alternative directory containing the files geoip-country.dat and geoip-country6.dat
 datadirectory=false
 
+[search]
+inhiddenfields=true
+
 [reports]
 # The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be
 # properly protected.
