@@ -923,7 +923,9 @@ function webNotice(type, req, res, next) {
 
             let data = {
                 title: list.name,
+                lcid: req.params.cid,
                 homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                serviceUrl: configItems.serviceUrl,
                 defaultAddress: configItems.defaultAddress,
                 defaultPostaddress: configItems.defaultPostaddress,
                 contactAddress: configItems.defaultAddress,
