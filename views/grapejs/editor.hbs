@@ -179,6 +179,7 @@
                 editorBackgroundColor: "{{{editor.config.mjml.editorBackgroundColor}}}",
                 canvasBackgroundStyle: "{{{editor.config.mjml.canvasBackgroundStyle}}}",
                 canvasLabelsColor: "{{{editor.config.mjml.canvasLabelsColor}}}",
+                fallbackImagePath: "/editorapi/img?src=&method=placeholder&params={width}%2C{height}"
             };
 
             c.pluginsOpts['gjs-preset-mjml'] = {
@@ -257,18 +258,44 @@
         frame.onload = function() {
             var imgs = frameDoc.querySelectorAll('img');
 
+            var stats = {
+                processed: 0,
+                empties: 0,
+                failed: 0
+            }
+            var counter = 0;
+
+            var imagesProcedeed = function () {
+                //console.dir('total', imgs.length,'empty:', stats.empties, 'failed:', stats.failed, 'processed:', stats.processed, 'counter', counter);
+                if (stats.processed < (imgs.length - stats.empties) && counter < 10) {
+                    counter++;
+                    setTimeout(imagesProcedeed, 200);
+                } else {
+                    var toastrOptions = { timeOut: 10000 };
+                    if (stats.empties) { toastr.warning('Found ' + stats.empties + ' empty images found while processing the final document.', 'Empty images found (' + stats.empties + ')', toastrOptions); }
+                    if (stats.failed) { toastr.error(stats.failed + ' errors occured while processing the images in the final document.', 'Image processing errors (' + stats.failed + ')', toastrOptions); }
+
+                    html = '<!doctype html>' + frameDoc.documentElement.outerHTML;
+                    document.body.removeChild(frame);
+                    callback(html);
+                }
+            }
+
             for (var i = 0; i < imgs.length; i++) {
                 var img = imgs[i];
                 var m = img.src.match(/\/editorapi\/img\?src=([^&]*)/);
                 var encodedSrc = m && m[1] || encodeURIComponent(img.src);
+                if ((m && m[1] === '') || img.src.trim() === '' || img.src === window.location.href) { stats.empties++; continue; }
+
                 if (isLocalImage(decodeURIComponent(encodedSrc))) {
+                    img.onerror = function() { stats.failed++; };
+                    img.onloadend = function() { stats.processed++; };
                     img.src = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + img.clientWidth + '%2C' + img.clientHeight;
+                } else {
+                    stats.processed++;
                 }
             }
-
-            html = '<!doctype html>' + frameDoc.documentElement.outerHTML;
-            document.body.removeChild(frame);
-            callback(html);
+            setTimeout(imagesProcedeed, 100);
         };
 
         frameDoc.open();
