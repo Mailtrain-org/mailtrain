@@ -255,6 +255,12 @@
             return a1.host === a2.host;
         };
 
+        var isRetina = function(element) {
+                if (element.tagName === 'IMG' && element.src.indexOf('@2x') > -1) return true;
+                if (element.classList.contains('retina')) return true;
+                return element.parentNode && element.parentNode.tagName !== 'DIV' && isRetina(element.parentNode);
+        }
+
         frame.onload = function() {
             var imgs = frameDoc.querySelectorAll('img');
 
@@ -290,7 +296,13 @@
                 if (isLocalImage(decodeURIComponent(encodedSrc))) {
                     img.onerror = function() { stats.failed++; };
                     img.onloadend = function() { stats.processed++; };
-                    img.src = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + img.clientWidth + '%2C' + img.clientHeight;
+                    var w = img.clientWidth;
+                    var h = img.clientHeight;
+                    if (isRetina(img)) {
+                        w = w * 2;
+                        h = h * 2;
+                    }
+                    img.src = '/editorapi/img?src=' + encodedSrc + '&method=resize&params=' + w + '%2C' + h;
                 } else {
                     stats.processed++;
                 }

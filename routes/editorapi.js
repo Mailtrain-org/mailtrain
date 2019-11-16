@@ -44,7 +44,7 @@ jqueryFileUpload.on('begin', fileInfo => {
     fileInfo.name = fileInfo.name
         .toLowerCase()
         .replace(/ /g, '-')
-        .replace(/[^a-z0-9+-.]+/g, '');
+        .replace(/[^a-z0-9@+-.]+/g, '');
 });
 
 const listImages = (dir, dirURL, callback) => {
@@ -422,7 +422,7 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
             try {
                 JSON.parse(mockres._getData()).files.forEach(file => {
                     data.push({
-                        src: file.url
+                        src: decodeURIComponent(file.url)
                     });
                 });
                 res.json({
