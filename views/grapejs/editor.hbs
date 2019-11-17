@@ -157,7 +157,7 @@
 
         if (mode === 'mjml') {
             var doc = document.createElement('mjml');
-            doc.innerHTML = resource.editorData.mjml.replace(/<[/]?mjml>/g, '');
+            doc.innerHTML = resource.editorData.mjml.replace(/<[/]?mjml>/g, '').replace(/<([a-zA-Z-]+)\s([^>]*)\/>/g, "<$1 $2></$1>");
 
             // Document head with title
             var head  = doc.getElementsByTagName('mj-head')[0];
@@ -190,7 +190,6 @@
                     template: resource.editorData.template
                 }
             };
-
             c.components = doc.outerHTML;
         }
 
