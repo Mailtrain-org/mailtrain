@@ -1,223 +1,120 @@
 #!/bin/bash
+# Entrypoint for Docker Container
+
 set -e
 
-function printHelp {
-    cat <<EOF
+URL_BASE_TRUSTED=${URL_BASE_TRUSTED:-'http://localhost:3000'}
+URL_BASE_SANDBOX=${URL_BASE_SANDBOX:-'http://localhost:3003'}
+URL_BASE_PUBLIC=${URL_BASE_PUBLIC:-'http://localhost:3004'}
+WWW_PROXY=${WWW_PROXY:-'false'}
+WITH_LDAP=${WITH_LDAP:-'false'}
+LDAP_HOST=${LDAP_HOST:-'ldap'}
+LDAP_PORT=${LDAP_PORT:-'389'}
+LDAP_SECURE=${LDAP_SECURE:-'false'}
+LDAP_BIND_USER=${LDAP_BIND_USER:-}
+LDAP_BIND_PASS=${LDAP_BIND_PASS:-}
+LDAP_FILTER=${LDAP_FILTER:-}
+LDAP_BASEDN=${LDAP_BASEDN:-}
+LDAP_UIDTAG=${LDAP_UIDTAG:-}
+MONGO_HOST=${MONG_HOST:-'mongo'}
+REDIS_HOST=${REDIS_HOST:-'redis'}
+MYSQL_HOST=${MYSQL_HOST:-'mysql'}
+MYSQL_DATABASE=${MYSQL_DATABASE:-'mailtrain'}
+MYSQL_USER=${MYSQL_USER:-'mailtrain'}
+MYSQL_PASSWORD=${MYSQL_PASSWORD=:-'mailtrain'}
 
-Optional parameters:
-  --trustedUrlBase XXX  - sets the trusted url of the instance (default: http://localhost:3000)
-  --sandboxUrlBase XXX  - sets the sandbox url of the instance (default: http://localhost:3003)
-  --publicUrlBase XXX   - sets the public url of the instance (default: http://localhost:3004)
-  --withProxy           - use if Mailtrain is behind an http reverse proxy
-  --mongoHost XXX       - sets mongo host (default: mongo)
-  --redisHost XXX       - sets redis host (default: redis)
-  --mySqlHost XXX       - sets mysql host (default: mysql)
-  --mySqlDatabase XXX   - sets mysql database (default: mailtrain)
-  --mySqlUser XXX       - sets mysql user (default: mailtrain)
-  --mySqlPassword XXX   - sets mysql password (default: mailtrain)
-  --withLdap            - use if you want to enable LDAP authentication
-  --ldapHost XXX        - LDAP Host for authentication (default: ldap)
-  --ldapPort XXX        - LDAP port (default: 389)
-  --ldapSecure          - use if you want to use LDAP with ldaps protocol
-  --ldapBindUser XXX    - User for LDAP connexion
-  --ldapBindPass XXX    - Password for LDAP connexion
-  --ldapFilter XXX      - LDAP filter
-  --ldapBaseDN XXX      - LDAP base DN
-  --ldapUidTag XXX      - LDAP UID tag (e.g. uid/cn/username)
-EOF
-
+# Warning for users that already rely on the MAILTRAIN_SETTING variable
+# Can probably be removed in the future.
+MAILTRAIN_SETTING=${MAILTRAIN_SETTINGS:-}
+if [ ! -z "$MAILTRAIN_SETTING" ]; then
+    echo 'Error: MAILTRAIN_SETTINGS is no longer supported. See README'
     exit 1
-}
-
-
-urlBaseTrusted=http://localhost:3000
-urlBaseSandbox=http://localhost:3003
-urlBasePublic=http://localhost:3004
-wwwProxy=false
-withLdap=false
-ldapHost=ldap
-ldapPort=389
-ldapSecure=false
-ldapBindUser=""
-ldapBindPass=""
-ldapFilter=""
-ldapBaseDN=""
-ldapUidTag=""
-mongoHost=mongo
-redisHost=redis
-mySqlHost=mysql
-mySqlDatabase=mailtrain
-mySqlUser=mailtrain
-mySqlPassword=mailtrain
-
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --help)
-            printHelp
-            ;;
-        --trustedUrlBase)
-            urlBaseTrusted="$2"
-            shift 2
-            ;;
-        --sandboxUrlBase)
-            urlBaseSandbox="$2"
-            shift 2
-            ;;
-        --publicUrlBase)
-            urlBasePublic="$2"
-            shift 2
-            ;;
-        --withProxy)
-            wwwProxy=true
-            shift 1
-            ;;
-        --mongoHost)
-            mongoHost="$2"
-            shift 2
-            ;;
-        --redisHost)
-            redisHost="$2"
-            shift 2
-            ;;
-        --mySqlHost)
-            mySqlHost="$2"
-            shift 2
-            ;;
-        --mySqlDatabase)
-            mySqlDatabase="$2"
-            shift 2
-            ;;
-        --mySqlUser)
-            mySqlUser="$2"
-            shift 2
-            ;;
-        --mySqlPassword)
-            mySqlPassword="$2"
-            shift 2
-            ;;
-        --withLdap)
-            withLdap=true
-            shift 1
-            ;;
-        --ldapHost)
-            ldapHost="$2"
-            shift 2
-            ;;
-        --ldapPort)
-            ldapPort="$2"
-            shift 2
-            ;;
-        --ldapSecure)
-            ldapSecure=true
-            shift 1
-            ;;
-        --ldapBindUser)
-            ldapBindUser="$2"
-            shift 2
-            ;;
-        --ldapBindPass)
-            ldapBindPass="$2"
-            shift 2
-            ;;
-        --ldapFilter)
-            ldapFilter="$2"
-            shift 2
-            ;;
-        --ldapBaseDN)
-            ldapBaseDN="$2"
-            shift 2
-            ;;
-        --ldapUidTag)
-            ldapUidTag="$2"
-            shift 2
-            ;;
-        *)
-            echo "Error: unrecognized option $1."
-            printHelp
-    esac
-done
-
-if [ "$ldapBindUser" == "" ]; then
-  ldapBindUserLine=""
-else
-  ldapBindUserLine="bindUser: $ldapBindUser"
-fi
-if [ "$ldapBindPass" == "" ]; then
-  ldapBindPassLine=""
-else
-  ldapBindPassLine="bindPassword: $ldapBindPass"
-fi
-if [ "$ldapFilter" == "" ]; then
-  ldapFilterLine=""
-else
-  ldapFilterLine="filter: $ldapFilter"
-fi
-if [ "$ldapBaseDN" == "" ]; then
-  ldapBaseDNLine=""
-else
-  ldapBaseDNLine="baseDN: $ldapBaseDN"
-fi
-if [ "$ldapUidTag" == "" ]; then
-  ldapUidTagLine=""
-else
-  ldapUidTagLine="uidTag: $ldapUidTag"
 fi
 
-cat > server/config/production.yaml <<EOT
-www:
-  host: 0.0.0.0
-  proxy: $wwwProxy
-  secret: "`pwgen -1`"
-  trustedUrlBase: $urlBaseTrusted
-  sandboxUrlBase: $urlBaseSandbox
-  publicUrlBase: $urlBasePublic
+if [ -f application/config/config.php ]; then
+    echo 'Info: application/production.yaml already provisioned'
+else
+    echo 'Info: Generating application/production.yaml'
 
-mysql:
-  host: $mySqlHost
-  database: $mySqlDatabase
-  user: $mySqlUser
-  password: $mySqlPassword
+    # Basic configuration
+    cat > server/config/production.yaml <<EOT
+    www:
+      host: 0.0.0.0
+      proxy: $WWW_PROXY
+      secret: "`pwgen -1`"
+      trustedUrlBase: $URL_BASE_TRUSTED
+      sandboxUrlBase: $URL_BASE_SANDBOX
+      publicUrlBase: $URL_BASE_PUBLIC
 
-redis:
-  enabled: true
-  host: $redisHost
+    mysql:
+      host: $MYSQL_HOST
+      database: $MYSQL_DATABASE
+      user: $MYSQL_USER
+      password: $MYSQL_PASSWORD
 
-log:
-  level: info
+    redis:
+      enabled: true
+      host: $REDIS_HOST
 
-builtinZoneMTA:
-  log:
-    level: warn
-  mongo: mongodb://${mongoHost}:27017/zone-mta
-  redis: redis://${redisHost}:6379/2
+    log:
+      level: info
 
-queue:
-  processes: 5
+    builtinZoneMTA:
+      log:
+        level: warn
+      mongo: mongodb://${MONGO_HOST}:27017/zone-mta
+      redis: redis://${REDIS_HOST}:6379/2
 
-ldap:
-  enabled: $withLdap
-  host: $ldapHost
-  port: $ldapPort
-  secure: $ldapSecure
-  $ldapBindUserLine
-  $ldapBindPassLine
-  $ldapFilterLine
-  $ldapBaseDNLine
-  $ldapUidTagLine
+    queue:
+      processes: 5
 EOT
 
-cat > server/services/workers/reports/config/production.yaml <<EOT
-mysql:
-  host: $mySqlHost
-log:
-  level: warn
+    # Manage LDAP if enabled
+    if [ "$WITH_LDAP" = "true" ]; then
+        echo 'Info: LDAP enabled'
+    cat >> server/config/production.yaml <<EOT
+    ldap:
+      enabled: true
+      host: $LDAP_HOST
+      port: $LDAP_PORT
+      secure: $LDAP_SECURE
+      bindUser: $LDAP_BIND_USER
+      bindPasswort: $LDAP_BIND_PASS
+      filter: $LDAP_FILTER
+      baseDN: $LDAP_BASEDN
+      uidTag: $LDAP_UIDTAG
 EOT
+    else
+        echo 'Info: LDAP not enabled'
+    cat >> server/config/production.yaml <<EOT
+    ldap:
+      enabled: false
+EOT
+    fi
+
+fi
+
+if [ -f server/services/workers/reports/config/production.yaml ]; then
+    echo 'Info: server/production.yaml already provisioned'
+else
+    echo 'Info: Generating server/production.yaml'
+    cat > server/services/workers/reports/config/production.yaml <<EOT
+    mysql:
+      host: $MYSQL_HOST
+    log:
+      level: warn
+EOT
+fi
 
 # Wait for the other services to start
-while ! nc -z $mySqlHost 3306; do sleep 1; done
-while ! nc -z $redisHost 6379; do sleep 1; done
-while ! nc -z $mongoHost 27017; do sleep 1; done
+echo 'Info: Waiting for MySQL Server'
+while ! nc -z $MYSQL_HOST 3306; do sleep 1; done
+
+echo 'Info: Waiting for Redis Server'
+while ! nc -z $REDIS_HOST 6379; do sleep 1; done
+
+echo 'Info: Waiting for MongoDB Server'
+while ! nc -z $MONGO_HOST 27017; do sleep 1; done
 
 cd server
 NODE_ENV=production node index.js
-
