@@ -23,7 +23,6 @@ services:
 
   mailtrain:
     build: .
-    command: ${MAILTRAIN_SETTINGS}
     ports:
     - "3000:3000"
     - "3003:3003"
