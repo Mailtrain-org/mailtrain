@@ -21,7 +21,7 @@ REDIS_HOST=${REDIS_HOST:-'redis'}
 MYSQL_HOST=${MYSQL_HOST:-'mysql'}
 MYSQL_DATABASE=${MYSQL_DATABASE:-'mailtrain'}
 MYSQL_USER=${MYSQL_USER:-'mailtrain'}
-MYSQL_PASSWORD=${MYSQL_PASSWORD=:-'mailtrain'}
+MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
