@@ -65,7 +65,7 @@ async function run() {
                         sqlQry = sqlQry.innerJoin(
                             function () {
                                 return this.from('campaign_messages')
-                                    .where('campaign_messages.campaign', campaign.id)
+                                    .where('campaign_messages.campaign', trigger.source_campaign)
                                     .where('campaign_messages.list', cpgList.list)
                                     .as('campaign_messages');
                             }, 'campaign_messages.subscription', subsTable + '.id');
@@ -76,7 +76,7 @@ async function run() {
                         sqlQry = sqlQry.innerJoin(
                             function () {
                                 return this.from('campaign_links')
-                                    .where('campaign_links.campaign', campaign.id)
+                                    .where('campaign_links.campaign', trigger.source_campaign)
                                     .where('campaign_links.list', cpgList.list)
                                     .where('campaign_links.link', links.LinkId.OPEN)
                                     .as('campaign_links');
@@ -88,7 +88,7 @@ async function run() {
                         sqlQry = sqlQry.innerJoin(
                             function () {
                                 return this.from('campaign_links')
-                                    .where('campaign_links.campaign', campaign.id)
+                                    .where('campaign_links.campaign', trigger.source_campaign)
                                     .where('campaign_links.list', cpgList.list)
                                     .where('campaign_links.link', links.LinkId.GENERAL_CLICK)
                                     .as('campaign_links');
@@ -100,7 +100,7 @@ async function run() {
                         sqlQry = sqlQry.innerJoin(
                             function () {
                                 return this.from('campaign_messages')
-                                    .where('campaign_messages.campaign', campaign.id)
+                                    .where('campaign_messages.campaign', trigger.source_campaign)
                                     .where('campaign_messages.list', cpgList.list)
                                     .as('campaign_messages');
                             }, 'campaign_messages.subscription', subsTable + '.id')
@@ -109,7 +109,7 @@ async function run() {
                                     .select('*')
                                     .from('campaign_links')
                                     .whereRaw(`campaign_links.subscription = ${subsTable}.id`)
-                                    .where('campaign_links.campaign', campaign.id)
+                                    .where('campaign_links.campaign', trigger.source_campaign)
                                     .where('campaign_links.list', cpgList.list)
                                     .where('campaign_links.link', links.LinkId.OPEN);
                             });
@@ -120,7 +120,7 @@ async function run() {
                         sqlQry = sqlQry.innerJoin(
                             function () {
                                 return this.from('campaign_messages')
-                                    .where('campaign_messages.campaign', campaign.id)
+                                    .where('campaign_messages.campaign', trigger.source_campaign)
                                     .where('campaign_messages.list', cpgList.list)
                                     .as('campaign_messages');
                             }, 'campaign_messages.subscription', subsTable + '.id')
@@ -129,7 +129,7 @@ async function run() {
                                     .select('*')
                                     .from('campaign_links')
                                     .whereRaw(`campaign_links.subscription = ${subsTable}.id`)
-                                    .where('campaign_links.campaign', campaign.id)
+                                    .where('campaign_links.campaign', trigger.source_campaign)
                                     .where('campaign_links.list', cpgList.list)
                                     .where('campaign_links.link', links.LinkId.GENERAL_CLICK);
                             });
