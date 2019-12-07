@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -97,7 +98,13 @@ module.exports = {
         mailtrainConfig: 'mailtrainConfig'
     },
     plugins: [
-//        new webpack.optimize.UglifyJsPlugin(),
+      new CopyPlugin([
+        { from: './node_modules/jquery/dist/jquery.min.js', to: path.resolve(__dirname, 'dist') },
+        { from: './node_modules/popper.js/dist/popper.min.js', to: path.resolve(__dirname, 'dist') },
+        { from: './node_modules/bootstrap/dist/js/bootstrap.min.js', to: path.resolve(__dirname, 'dist') },
+        { from: './node_modules/@coreui/coreui/dist/js/coreui.min.js', to: path.resolve(__dirname, 'dist') },
+        { from: './node_modules/@fortawesome/fontawesome-free/webfonts/', to: path.resolve(__dirname, 'dist', 'webfonts'), toType: 'dir'}
+      ]),
     ],
     watchOptions: {
         ignored: 'node_modules/',

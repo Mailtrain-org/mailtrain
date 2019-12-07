@@ -16,19 +16,20 @@ COPY shared/package-lock.json /app/shared/package-lock.json
 COPY zone-mta/package.json /app/zone-mta/package.json
 COPY zone-mta/package-lock.json /app/zone-mta/package-lock.json
 
-WORKDIR /app/
-
 # Install dependencies in each directory
-RUN set -ex; \
-   for idx in client shared server zone-mta; do (cd $idx && npm install); done
+RUN cd /app/client && npm install
+RUN cd /app/shared && npm install --production
+RUN cd /app/server && npm install --production
+RUN cd /app/zone-mta && npm install --production
 
 # Later, copy the app files. That improves development speed as buiding the Docker image will not have
 # to download and install all the NPM dependencies every time there's a change in the source code
 COPY . /app
 
 RUN set -ex; \
-   cd client && \
-   npm run build
+   cd /app/client && \
+   npm run build && \
+   rm -rf node_modules
 
 # Final Image
 FROM node:10-alpine
