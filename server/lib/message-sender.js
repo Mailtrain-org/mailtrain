@@ -585,6 +585,7 @@ async function sendQueuedMessage(queuedMessage) {
             subscriptionId: msgData.subscriptionId,
             listId: msgData.listId,
             to: msgData.to,
+            mergeTags: msgData.mergeTags,
             encryptionKeys: msgData.encryptionKeys
         });
     } catch (err) {
