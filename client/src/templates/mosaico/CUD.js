@@ -132,7 +132,7 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['tag_language', 'value'])) {
-            state.setIn(['tag_language', 'error'], t('Tag language must be selected'));
+            state.setIn(['tag_language', 'error'], t('tagLanguageMustBeSelected'));
         } else {
             state.setIn(['tag_language', 'error'], null);
         }
@@ -218,7 +218,7 @@ export default class CUD extends Component {
                         <Dropdown id="type" label={t('type')} options={this.typeOptions}/>
                     }
 
-                    <Dropdown id="tag_language" label={t('Tag language')} options={tagLanguageOptions}/>
+                    <Dropdown id="tag_language" label={t('tagLanguage')} options={tagLanguageOptions}/>
 
                     <NamespaceSelect/>
 

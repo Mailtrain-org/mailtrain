@@ -291,7 +291,7 @@ export function getMailerTypes(t) {
                 <Fieldset label={t('mailerSettings')}>
                     <Dropdown id="mailer_type" label={t('mailerType')} options={typeOptions}/>
                     <InputField id="sesKey" label={t('accessKey')} placeholder={t('awsAccessKeyId')}/>
-                    <InputField id="sesSecret" label={t('port')} placeholder={t('awsSecretAccessKey')}/>
+                    <InputField id="sesSecret" label={t('accessSecret')} placeholder={t('awsSecretAccessKey')} type="password"/>
                     <Dropdown id="sesRegion" label={t('region')} options={sesRegionOptions}/>
                 </Fieldset>
                 <Fieldset label={t('advancedMailerSettings')}>

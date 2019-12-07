@@ -45,7 +45,7 @@ export default class List extends Component {
             { data: 1, title: t('name') },
             { data: 2, title: t('description') },
             { data: 3, title: t('type'), render: data => this.templateTypes[data].typeName },
-            { data: 4, title: t('Tag language'), render: data => this.tagLanguages[data].name },
+            { data: 4, title: t('tagLanguage'), render: data => this.tagLanguages[data].name },
             { data: 5, title: t('created'), render: data => moment(data).fromNow() },
             { data: 6, title: t('namespace') },
             {

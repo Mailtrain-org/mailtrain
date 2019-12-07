@@ -56,6 +56,11 @@ const langCodes = {
         getLabel: t => 'Português',
         longCode: 'pt-BR'
     },
+    'de-DE': {
+        getShortLabel: t => 'DE',
+        getLabel: t => 'Deutsch',
+        longCode: 'de-DE'
+    },
     'fk-FK': {
         getShortLabel: t => 'FK',
         getLabel: t => 'Fake',

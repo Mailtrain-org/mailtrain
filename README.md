@@ -193,17 +193,35 @@ These are the steps to start Mailtrain via docker-compose:
     docker-compose up
     ```
 
-    You can specify Mailtrain's URL bases via the `MAILTRAIN_SETTINGS` environment variable as follows. The `--withProxy` parameter is to be used when Mailtrain is put behind a reverse proxy.
-    ```
-    MAILTRAIN_SETTINGS="--trustedUrlBase https://mailtrain.example.com --sandboxUrlBase https://sbox.mailtrain.example.com --publicUrlBase https://lists.example.com --withProxy" docker-compose up
-    ```
-
 3. Open the trusted endpoint http://localhost:3000
 
 4. Authenticate as `admin`:`test`
 
 The instructions above use an automatically built Docker image on DockerHub (https://hub.docker.com/r/mailtrain/mailtrain). If you want to build the Docker image yourself (e.g. when doing development), use the `docker-compose-local.yml` located in the project's root directory.
 
+### Docker Environment Variables
+
+| Parameter        | Description |
+| ---------        | ----------- |
+| URL_BASE_TRUSTED | sets the trusted url of the instance (default: http://localhost:3000) |
+| URL_BASE_SANDBOX | sets the sandbox url of the instance (default: http://localhost:3003) |
+| URL_BASE_PUBLIC  | sets the public url of the instance (default: http://localhost:3004)  |
+| WITH_PROXY       | use if Mailtrain is behind an http reverse proxy                      |
+| MONGO_HOST       | sets mongo host (default: mongo)                                      |
+| REDIS_HOST       | sets redis host (default: redis)                                      |
+| MYSQL_HOST       | sets mysql host (default: mysql)                                      |
+| MYSQL_DATABASE   | sets mysql database (default: mailtrain)                              |
+| MYSQL_USER       | sets mysql user (default: mailtrain)                                  |
+| MYSQL_PASSWORD   | sets mysql password (default: mailtrain)                              |
+| WITH_LDAP        | use if you want to enable LDAP authentication                         |
+| LDAP_HOST        | LDAP Host for authentication (default: ldap)                          |
+| LDAP_PORT        | LDAP port (default: 389)                                              |
+| LDAP_SECURE      | use if you want to use LDAP with ldaps protocol                       |
+| LDAP_BIND_USER   | User for LDAP connexion                                               |
+| LDAP_BIND_PASS   | Password for LDAP connexion                                           |
+| LDAP_FILTER      | LDAP filter                                                           |
+| LDAP_BASEDN      | LDAP base DN                                                          |
+| LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
 
 ## License
 

@@ -361,7 +361,7 @@ async function processCampaign(campaignId) {
             }
 
             const subs = await knex('campaign_messages')
-                .where({status: CampaignMessageStatus.SCHEDULED})
+                .where({status: CampaignMessageStatus.SCHEDULED, campaign: campaignId})
                 .whereNotIn('hash_email', messagesInProcessing.map(x => x.hash_email))
                 .limit(retrieveBatchSize);
 

@@ -12,6 +12,7 @@ defaultLanguage: en-US
 enabledLanguages:
 - en-US
 - es-ES
+- de-DE
 - fk-FK
 
 mysql:

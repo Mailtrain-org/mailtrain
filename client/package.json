@@ -72,6 +72,7 @@
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
     "clean-css-cli": "^4.2.1",
+    "copy-webpack-plugin": "^5.0.5",
     "css-loader": "^2.1.0",
     "file-loader": "^3.0.1",
     "node-sass": "^4.12.0",

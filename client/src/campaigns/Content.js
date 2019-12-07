@@ -131,7 +131,7 @@ export default class CustomContent extends Component {
         const t = this.props.t;
 
         if (!state.getIn(['data_sourceCustom_tag_language', 'value'])) {
-            state.setIn(['data_sourceCustom_tag_language', 'error'], t('Tag language must be selected'));
+            state.setIn(['data_sourceCustom_tag_language', 'error'], t('tagLanguageMustBeSelected'));
         } else {
             state.setIn(['data_sourceCustom_tag_language', 'error'], null);
         }
@@ -277,7 +277,7 @@ export default class CustomContent extends Component {
                         {customTemplateTypeKey && this.templateTypes[customTemplateTypeKey].typeName}
                     </StaticField>
 
-                    <Dropdown id="data_sourceCustom_tag_language" label={t('Tag language')} options={this.customTemplateTagLanguageOptions} disabled={true}/>
+                    <Dropdown id="data_sourceCustom_tag_language" label={t('tagLanguage')} options={this.customTemplateTagLanguageOptions} disabled={true}/>
 
                     {customTemplateTypeKey && getTypeForm(this, customTemplateTypeKey, true)}
 
