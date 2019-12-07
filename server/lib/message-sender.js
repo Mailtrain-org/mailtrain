@@ -14,7 +14,7 @@ const sendConfigurations = require('../models/send-configurations');
 const links = require('../models/links');
 const {CampaignSource, CampaignType} = require('../../shared/campaigns');
 const {toNameTagLangauge} = require('../../shared/lists');
-const {CampaignMessageStatus, CampaignMessageErrorCode} = require('../../shared/campaigns');
+const {CampaignMessageStatus, CampaignMessageErrorType} = require('../../shared/campaigns');
 const tools = require('./tools');
 const htmlToText = require('html-to-text');
 const request = require('request-promise');
@@ -209,17 +209,17 @@ class MessageSender {
                     form,
                     resolveWithFullResponse: true
                 });
-            } catch (e) {
+            } catch (exc) {
                 log.error('MessageSender', `Error pulling content from URL (${sourceUrl})`);
-                response = {statusCode: e.message};
+                response = {statusCode: exc.message};
             }
 
             if (response.statusCode !== 200) {
                 const statusError = new Error(`Received status code ${response.statusCode} from ${sourceUrl}`);
                 if (response.statusCode >= 500) {
-                  statusError.code = CampaignMessageErrorCode.RETRY;
+                  statusError.campaignMessageErrorType = CampaignMessageErrorType.TRANSIENT;
                 } else {
-                  statusError.code = CampaignMessageErrorCode.NORETRY;
+                  statusError.campaignMessageErrorType = CampaignMessageErrorType.PERMANENT;
                 }
                 throw statusError;
             }
@@ -516,7 +516,7 @@ class MessageSender {
         try {
             result = await this._sendMessage({listId: campaignMessage.list, subscriptionId: campaignMessage.subscription});
         } catch (err) {
-            if (err.code === CampaignMessageErrorCode.NORETRY) {
+            if (err.campaignMessageErrorType === CampaignMessageErrorType.PERMANENT) {
               await knex('campaign_messages')
                 .where({id: campaignMessage.id})
                 .update({

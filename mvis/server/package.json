@@ -16,7 +16,7 @@
     "js-yaml": "^3.12.0",
     "knex": "^0.16.3",
     "moment": "^2.18.1",
-    "moment-timezone": "^0.5.21",
+    "moment-timezone": "^0.5.27",
     "mysql": "^2.16.0",
     "npmlog": "^4.0.2"
   }
