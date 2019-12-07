@@ -8,6 +8,7 @@ const Entity = {
 const Event = {
     [Entity.SUBSCRIPTION]: {
         CREATED: 'created',
+        UPDATED: 'updated',
         LATEST_OPEN: 'latest_open',
         LATEST_CLICK: 'latest_click'
     },
@@ -28,6 +29,7 @@ const EntityVals = {
 const EventVals = {
     [Entity.SUBSCRIPTION]: {
         created: 'CREATED',
+        updated: 'UPDATED',
         latest_open: 'LATEST_OPEN',
         latest_click: 'LATEST_CLICK'
     },

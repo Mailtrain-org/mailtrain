@@ -145,6 +145,7 @@
   "addList": "Add list",
   "type": "Type",
   "created": "Created",
+  "updated": "Updated",
   "override": "Override",
   "fromName": "\"From\" name",
   "fromEmailAddress": "\"From\" email address",

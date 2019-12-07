@@ -54,6 +54,7 @@ export default class CUD extends Component {
         this.eventOptions = {
             [Entity.SUBSCRIPTION]: [
                 {key: SubscriptionEvent.CREATED, label: eventLabels[Entity.SUBSCRIPTION][SubscriptionEvent.CREATED]},
+                {key: SubscriptionEvent.UPDATED, label: eventLabels[Entity.SUBSCRIPTION][SubscriptionEvent.UPDATED]},
                 {key: SubscriptionEvent.LATEST_OPEN, label: eventLabels[Entity.SUBSCRIPTION][SubscriptionEvent.LATEST_OPEN]},
                 {key: SubscriptionEvent.LATEST_CLICK, label: eventLabels[Entity.SUBSCRIPTION][SubscriptionEvent.LATEST_CLICK]}
             ],

@@ -195,6 +195,7 @@ async function create(context, entity) {
             '  `latest_open` timestamp NULL DEFAULT NULL,\n' +
             '  `latest_click` timestamp NULL DEFAULT NULL,\n' +
             '  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
+            '  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n' +
             '  PRIMARY KEY (`id`),\n' +
             '  UNIQUE KEY `hash_email` (`hash_email`),\n' +
             '  UNIQUE KEY `cid` (`cid`),\n' +
@@ -204,7 +205,8 @@ async function create(context, entity) {
             '  KEY `is_test` (`is_test`),\n' +
             '  KEY `latest_open` (`latest_open`),\n' +
             '  KEY `latest_click` (`latest_click`),\n' +
-            '  KEY `created` (`created`)\n' +
+            '  KEY `created` (`created`),\n' +
+            '  KEY `updated` (`updated`)\n' +
             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: id });

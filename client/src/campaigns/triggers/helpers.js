@@ -15,6 +15,7 @@ export function getTriggerTypes(t) {
     const eventLabels = {
         [Entity.SUBSCRIPTION]: {
             [SubscriptionEvent.CREATED]: t('created'),
+            [SubscriptionEvent.UPDATED]: t('updated'),
             [SubscriptionEvent.LATEST_OPEN]: t('latestOpen'),
             [SubscriptionEvent.LATEST_CLICK]: t('latestClick')
         },
