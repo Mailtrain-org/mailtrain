@@ -52,6 +52,7 @@ async function run() {
                     .where(function () {
                         addSegmentQuery(this);
                     })
+                    .where(subsTable + '.status', SubscriptionStatus.SUBSCRIBED)
                     .whereNull('related_trigger_messages.id') // This means only those where the trigger has not fired yet somewhen in the past
                     .select(subsTable + '.id');
 
