@@ -141,7 +141,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             return null;
         },
         initData: () => ({
-            [prefix + 'mosaicoTemplate']: '',
+            [prefix + 'mosaicoTemplate']: null,
             [prefix + 'mosaicoData']: {}
         }),
         afterLoad: data => {
