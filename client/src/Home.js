@@ -20,7 +20,7 @@ export default class List extends Component {
         return (
             <div>
                 <h2>{t('Mailtrain 2 beta')}</h2>
-                <div>{t('Build') + ' 2019-09-05-1547'}</div>
+                <div>{t('Build') + ' 2019-12-07-1409'}</div>
             </div>
         );
     }
