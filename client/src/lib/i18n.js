@@ -1,7 +1,8 @@
 'use strict';
 
 import React from 'react';
-import {I18nextProvider, withNamespaces} from 'react-i18next';
+import * as ri18n from 'react-i18next';
+import {I18nextProvider} from 'react-i18next';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import mailtrainConfig from 'mailtrainConfig';
@@ -70,7 +71,7 @@ export const withTranslation = createComponentMixin({
     contexts: [{context: TranslationContext, propName: 't'}]
 });
 
-const TranslationContextProvider = withNamespaces()(props => {
+const TranslationContextProvider = ri18n.withTranslation()(props => {
     return (
         <TranslationContext.Provider value={props.t}>
             {props.children}

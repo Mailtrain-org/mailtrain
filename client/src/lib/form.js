@@ -14,8 +14,8 @@ import {Button} from "./bootstrap-components";
 import {SketchPicker} from 'react-color';
 
 import ACEEditorRaw from 'react-ace';
-import 'brace/theme/github';
-import 'brace/ext/searchbox';
+import 'ace-builds/src-noconflict/theme-github';
+import 'ace-builds/src-noconflict/ext-searchbox';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';

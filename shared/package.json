@@ -12,8 +12,8 @@
     "node": ">=10.0.0"
   },
   "dependencies": {
-    "moment": "^2.23.0",
-    "moment-timezone": "^0.5.26",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.27",
     "owasp-password-strength-test": "github:bures/owasp-password-strength-test"
   },
   "devDependencies": {

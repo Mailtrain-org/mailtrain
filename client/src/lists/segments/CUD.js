@@ -18,7 +18,7 @@ import {withErrorHandling} from "../../lib/error-handling";
 import {DeleteModalDialog} from "../../lib/modals";
 
 import styles from "./CUD.scss";
-import {DragDropContext} from "react-dnd";
+import { DndProvider } from 'react-dnd';
 import HTML5Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
 import SortableTree from "react-sortable-tree";
@@ -32,7 +32,6 @@ import clone from "clone";
 // https://stackoverflow.com/a/4819886/1601953
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
 
-@DragDropContext(isTouchDevice ? TouchBackend : HTML5Backend)
 @withComponentMixins([
     withTranslation,
     withForm,
@@ -324,81 +323,82 @@ export default class CUD extends Component {
         }
 
         return (
+            <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
+                <div>
+                    {isEdit &&
+                        <DeleteModalDialog
+                            stateOwner={this}
+                            visible={this.props.action === 'delete'}
+                            deleteUrl={`rest/segments/${this.props.list.id}/${this.props.entity.id}`}
+                            backUrl={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/edit`}
+                            successUrl={`/lists/${this.props.list.id}/segments`}
+                            deletingMsg={t('deletingSegment')}
+                            deletedMsg={t('segmentDeleted')}/>
+                    }
 
-            <div>
-                {isEdit &&
-                    <DeleteModalDialog
-                        stateOwner={this}
-                        visible={this.props.action === 'delete'}
-                        deleteUrl={`rest/segments/${this.props.list.id}/${this.props.entity.id}`}
-                        backUrl={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/edit`}
-                        successUrl={`/lists/${this.props.list.id}/segments`}
-                        deletingMsg={t('deletingSegment')}
-                        deletedMsg={t('segmentDeleted')}/>
-                }
+                    <Title>{isEdit ? t('editSegment') : t('createSegment')}</Title>
 
-                <Title>{isEdit ? t('editSegment') : t('createSegment')}</Title>
+                    <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
+                        <h3>{t('segmentOptions')}</h3>
 
-                <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <h3>{t('segmentOptions')}</h3>
+                        <InputField id="name" label={t('name')} />
+                        <Dropdown id="rootRuleType" label={t('toplevelMatchType')} options={ruleHelpers.getCompositeRuleTypeOptions()} />
+                    </Form>
 
-                    <InputField id="name" label={t('name')} />
-                    <Dropdown id="rootRuleType" label={t('toplevelMatchType')} options={ruleHelpers.getCompositeRuleTypeOptions()} />
-                </Form>
+                    <hr />
 
-                <hr />
+                    <div className={styles.rulePane + ruleOptionsVisibilityClass}>
+                        <div className={styles.leftPane}>
+                            <div className={styles.leftPaneInner}>
+                                <Toolbar>
+                                    <Button className="btn-secondary" label={t('addCompositeRule')} onClickAsync={::this.addCompositeRule}/>
+                                    <Button className="btn-secondary" label={t('addRule')} onClickAsync={::this.addPrimitiveRule}/>
+                                </Toolbar>
 
-                <div className={styles.rulePane + ruleOptionsVisibilityClass}>
-                    <div className={styles.leftPane}>
-                        <div className={styles.leftPaneInner}>
-                            <Toolbar>
-                                <Button className="btn-secondary" label={t('addCompositeRule')} onClickAsync={::this.addCompositeRule}/>
-                                <Button className="btn-secondary" label={t('addRule')} onClickAsync={::this.addPrimitiveRule}/>
-                            </Toolbar>
+                                <h3>{t('rules')}</h3>
 
-                            <h3>{t('rules')}</h3>
+                                <div className="clearfix"/>
 
-                            <div className="clearfix"/>
+                                <div className={styles.ruleTree}>
+                                    <SortableTree
+                                        treeData={this.state.rulesTree}
+                                        onChange={rulesTree => this.onRulesChanged(rulesTree)}
+                                        isVirtualized={false}
+                                        canDrop={ data => !data.nextParent || (ruleHelpers.isCompositeRuleType(data.nextParent.rule.type)) }
+                                        generateNodeProps={data => ({
+                                            buttons: [
+                                                <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon icon="edit" title={t('edit')}/></ActionLink>,
+                                                <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="trash-alt" title={t('delete')}/></ActionLink>
+                                            ]
+                                        })}
+                                    />
+                                </div>
+                            </div>
 
-                            <div className={styles.ruleTree}>
-                                <SortableTree
-                                    treeData={this.state.rulesTree}
-                                    onChange={rulesTree => this.onRulesChanged(rulesTree)}
-                                    isVirtualized={false}
-                                    canDrop={ data => !data.nextParent || (ruleHelpers.isCompositeRuleType(data.nextParent.rule.type)) }
-                                    generateNodeProps={data => ({
-                                        buttons: [
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.showRuleOptions(data.node.rule)} className={styles.ruleActionLink}><Icon icon="edit" title={t('edit')}/></ActionLink>,
-                                            <ActionLink onClickAsync={async () => !this.state.ruleOptionsVisible && this.deleteRule(data.node.rule)} className={styles.ruleActionLink}><Icon icon="trash-alt" title={t('delete')}/></ActionLink>
-                                        ]
-                                    })}
-                                />
+                            <div className={styles.leftPaneOverlay} />
+
+                            <div className={styles.paneDivider}>
+                                <div className={styles.paneDividerSolidBackground}/>
                             </div>
                         </div>
 
-                        <div className={styles.leftPaneOverlay} />
-
-                        <div className={styles.paneDivider}>
-                            <div className={styles.paneDividerSolidBackground}/>
+                        <div className={styles.rightPane}>
+                            <div className={styles.rightPaneInner}>
+                                {selectedRule &&
+                                    <RuleSettingsPane rule={selectedRule} fields={this.props.fields} onChange={this.onRuleSettingsPaneUpdatedHandler} onClose={this.onRuleSettingsPaneCloseHandler} onDelete={this.onRuleSettingsPaneDeleteHandler} forceShowValidation={this.isFormValidationShown()}/>}
+                            </div>
                         </div>
                     </div>
 
-                    <div className={styles.rightPane}>
-                        <div className={styles.rightPaneInner}>
-                            {selectedRule &&
-                                <RuleSettingsPane rule={selectedRule} fields={this.props.fields} onChange={this.onRuleSettingsPaneUpdatedHandler} onClose={this.onRuleSettingsPaneCloseHandler} onDelete={this.onRuleSettingsPaneDeleteHandler} forceShowValidation={this.isFormValidationShown()}/>}
-                        </div>
-                    </div>
+                    <hr/>
+                    <ButtonRow format="wide" className={`col-12 ${styles.toolbar}`}>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('save')} onClickAsync={async () => await this.submitHandler(false)}/>
+                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
+
+                        {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/> }
+                    </ButtonRow>
                 </div>
-
-                <hr/>
-                <ButtonRow format="wide" className={`col-12 ${styles.toolbar}`}>
-                    <Button type="submit" className="btn-primary" icon="check" label={t('save')} onClickAsync={async () => await this.submitHandler(false)}/>
-                    <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
-
-                    {isEdit && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/lists/${this.props.list.id}/segments/${this.props.entity.id}/delete`}/> }
-                </ButtonRow>
-            </div>
+            </DndProvider>
         );
     }
 }

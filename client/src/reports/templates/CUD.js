@@ -21,9 +21,9 @@ import {
 import {withErrorHandling} from '../../lib/error-handling';
 import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../../lib/namespace';
 import {DeleteModalDialog} from "../../lib/modals";
-import 'brace/mode/javascript';
-import 'brace/mode/json';
-import 'brace/mode/handlebars';
+import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/mode-handlebars';
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 @withComponentMixins([

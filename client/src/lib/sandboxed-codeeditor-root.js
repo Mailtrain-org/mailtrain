@@ -11,9 +11,9 @@ import styles from "./sandboxed-codeeditor.scss";
 import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
 import {base, unbase} from "../../../shared/templates";
 import ACEEditorRaw from 'react-ace';
-import 'brace/theme/github';
-import 'brace/ext/searchbox';
-import 'brace/mode/html';
+import 'ace-builds/src-noconflict/theme-github';
+import 'ace-builds/src-noconflict/ext-searchbox';
+import 'ace-builds/src-noconflict/mode-html';
 import {CodeEditorSourceType} from "./sandboxed-codeeditor-shared";
 
 import mjml2html from "./mjml";

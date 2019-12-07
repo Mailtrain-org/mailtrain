@@ -100,7 +100,7 @@ module.exports = {
     plugins: [
       new CopyPlugin([
         { from: './node_modules/jquery/dist/jquery.min.js', to: path.resolve(__dirname, 'dist') },
-        { from: './node_modules/popper.js/dist/popper.min.js', to: path.resolve(__dirname, 'dist') },
+        { from: './node_modules/popper.js/dist/umd/popper.min.js', to: path.resolve(__dirname, 'dist') },
         { from: './node_modules/bootstrap/dist/js/bootstrap.min.js', to: path.resolve(__dirname, 'dist') },
         { from: './node_modules/@coreui/coreui/dist/js/coreui.min.js', to: path.resolve(__dirname, 'dist') },
         { from: './node_modules/@fortawesome/fontawesome-free/webfonts/', to: path.resolve(__dirname, 'dist', 'webfonts'), toType: 'dir'}

@@ -13,7 +13,7 @@ import {
     TextArea
 } from "../../lib/form";
 import {formatBirthday, formatDate, parseBirthday, parseDate} from "../../../../shared/date";
-import 'brace/mode/json';
+import 'ace-builds/src-noconflict/mode-json';
 
 export function getSubscriptionStatusLabels(t) {
 
