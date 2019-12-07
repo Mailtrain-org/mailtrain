@@ -588,7 +588,7 @@ async function sendQueuedMessage(queuedMessage) {
             encryptionKeys: msgData.encryptionKeys
         });
     } catch (err) {
-        await knex.insert({
+        await knex('queued').insert({
             id: queuedMessage.id,
             send_configuration: queuedMessage.send_configuration,
             type: queuedMessage.type,
@@ -599,16 +599,18 @@ async function sendQueuedMessage(queuedMessage) {
     }
 
     if (messageType === MessageType.TRIGGERED) {
-        await knex.raw(knex('campaign_messages').insert({
+        await knex('campaign_messages').insert({
+            hash_email: result.subscriptionGrouped.hash_email,
+            subscription: result.subscriptionGrouped.id,
             campaign: campaign.id,
             list: result.list.id,
-            subscription: result.subscriptionGrouped.id,
             send_configuration: queuedMessage.send_configuration,
             status: CampaignMessageStatus.SENT,
             response: result.response,
             response_id: result.response_id,
-            hash_email: result.subscriptionGrouped.hash_email
-        }).toString().replace(/^insert/i, 'insert ignore'));
+            updated: new Date()
+        });
+
         await knex('campaigns').where('id', campaign.id).increment('delivered');
     }
 
