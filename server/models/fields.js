@@ -310,7 +310,12 @@ async function listTx(tx, listId) {
 async function list(context, listId) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewFields']);
-        return await listTx(tx, listId);
+        const flds = await listTx(tx, listId);
+
+        return flds.map(fld => {
+            fld.settings = JSON.parse(fld.settings);
+            return fld;
+        });
     });
 }
 

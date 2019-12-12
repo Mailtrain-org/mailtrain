@@ -10,6 +10,7 @@ services:
     - MYSQL_PASSWORD=mailtrain
     volumes:
     - mysql-data:/var/lib/mysql
+    command: mysqld --sql_mode=""
 
   redis:
     image: redis:5
