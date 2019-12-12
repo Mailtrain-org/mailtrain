@@ -38,57 +38,57 @@ else
 
     # Basic configuration
     cat > server/config/production.yaml <<EOT
-    www:
-      host: 0.0.0.0
-      proxy: $WWW_PROXY
-      secret: "`pwgen -1`"
-      trustedUrlBase: $URL_BASE_TRUSTED
-      sandboxUrlBase: $URL_BASE_SANDBOX
-      publicUrlBase: $URL_BASE_PUBLIC
+www:
+  host: 0.0.0.0
+  proxy: $WWW_PROXY
+  secret: "`pwgen -1`"
+  trustedUrlBase: $URL_BASE_TRUSTED
+  sandboxUrlBase: $URL_BASE_SANDBOX
+  publicUrlBase: $URL_BASE_PUBLIC
 
-    mysql:
-      host: $MYSQL_HOST
-      database: $MYSQL_DATABASE
-      user: $MYSQL_USER
-      password: $MYSQL_PASSWORD
+mysql:
+  host: $MYSQL_HOST
+  database: $MYSQL_DATABASE
+  user: $MYSQL_USER
+  password: $MYSQL_PASSWORD
 
-    redis:
-      enabled: true
-      host: $REDIS_HOST
+redis:
+  enabled: true
+  host: $REDIS_HOST
 
-    log:
-      level: info
+log:
+  level: info
 
-    builtinZoneMTA:
-      log:
-        level: warn
-      mongo: mongodb://${MONGO_HOST}:27017/zone-mta
-      redis: redis://${REDIS_HOST}:6379/2
+builtinZoneMTA:
+  log:
+    level: warn
+  mongo: mongodb://${MONGO_HOST}:27017/zone-mta
+  redis: redis://${REDIS_HOST}:6379/2
 
-    queue:
-      processes: 5
+queue:
+  processes: 5
 EOT
 
     # Manage LDAP if enabled
     if [ "$WITH_LDAP" = "true" ]; then
         echo 'Info: LDAP enabled'
     cat >> server/config/production.yaml <<EOT
-    ldap:
-      enabled: true
-      host: $LDAP_HOST
-      port: $LDAP_PORT
-      secure: $LDAP_SECURE
-      bindUser: $LDAP_BIND_USER
-      bindPasswort: $LDAP_BIND_PASS
-      filter: $LDAP_FILTER
-      baseDN: $LDAP_BASEDN
-      uidTag: $LDAP_UIDTAG
+ldap:
+  enabled: true
+  host: $LDAP_HOST
+  port: $LDAP_PORT
+  secure: $LDAP_SECURE
+  bindUser: $LDAP_BIND_USER
+  bindPasswort: $LDAP_BIND_PASS
+  filter: $LDAP_FILTER
+  baseDN: $LDAP_BASEDN
+  uidTag: $LDAP_UIDTAG
 EOT
     else
         echo 'Info: LDAP not enabled'
     cat >> server/config/production.yaml <<EOT
-    ldap:
-      enabled: false
+ldap:
+  enabled: false
 EOT
     fi
 
@@ -99,10 +99,10 @@ if [ -f server/services/workers/reports/config/production.yaml ]; then
 else
     echo 'Info: Generating server/production.yaml'
     cat > server/services/workers/reports/config/production.yaml <<EOT
-    mysql:
-      host: $MYSQL_HOST
-    log:
-      level: warn
+mysql:
+  host: $MYSQL_HOST
+log:
+  level: warn
 EOT
 fi
 
