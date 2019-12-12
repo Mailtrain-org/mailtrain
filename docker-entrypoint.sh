@@ -37,7 +37,7 @@ else
     echo 'Info: Generating application/production.yaml'
 
     # Basic configuration
-    cat > server/config/production.yaml <<EOT
+    cat >> server/config/production.yaml <<EOT
 www:
   host: 0.0.0.0
   proxy: $WWW_PROXY
@@ -55,9 +55,6 @@ mysql:
 redis:
   enabled: true
   host: $REDIS_HOST
-
-log:
-  level: info
 
 builtinZoneMTA:
   log:
