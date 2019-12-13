@@ -324,13 +324,12 @@ function formatMessage(message, callback) {
                         return callback(err);
                     }
 
-                    message.subscription.mergeTags = {
+                    message.subscription.mergeTags = Object.assign({
                         EMAIL: message.subscription.email,
                         FIRST_NAME: message.subscription.firstName,
                         LAST_NAME: message.subscription.lastName,
-                        FULL_NAME: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' '),
-                        ...tools.artstationMergeTags(message.subscription),
-                    };
+                        FULL_NAME: [].concat(message.subscription.firstName || []).concat(message.subscription.lastName || []).join(' ')
+                    }, tools.artstationMergeTags(message.subscription));
 
                     let encryptionKeys = [];
                     fields.getRow(fieldList, message.subscription, false, true).forEach(field => {
