@@ -516,7 +516,10 @@ class MessageSender {
         try {
             result = await this._sendMessage({listId: campaignMessage.list, subscriptionId: campaignMessage.subscription});
         } catch (err) {
-            if (err.campaignMessageErrorType === CampaignMessageErrorType.PERMANENT) {
+            if (
+              err.campaignMessageErrorType === CampaignMessageErrorType.PERMANENT ||
+              err.retryable === false
+            ) {
               await knex('campaign_messages')
                 .where({id: campaignMessage.id})
                 .update({
