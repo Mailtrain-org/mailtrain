@@ -119,6 +119,13 @@ async function createConfig() {
             }
         },
 
+        pools: {
+            default: {
+              address: '0.0.0.0',
+              name: config.builtinZoneMTA.poolName || os.hostname()
+            }
+        },
+
         zones: {
             default: {
                 preferIPv6: false,
