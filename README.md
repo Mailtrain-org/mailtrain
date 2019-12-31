@@ -222,6 +222,7 @@ The instructions above use an automatically built Docker image on DockerHub (htt
 | LDAP_FILTER      | LDAP filter                                                           |
 | LDAP_BASEDN      | LDAP base DN                                                          |
 | LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
+| POOL_NAME        | sets builtin Zone-MTA pool name (default: os.hostname())              |
 
 ## License
 

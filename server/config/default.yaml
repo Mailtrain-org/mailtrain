@@ -257,6 +257,7 @@ builtinZoneMTA:
     level: warn
   processes: 2
   connections: 5
+  # poolName: 'mail.example.com' # defaults to os.hostname()
 
 seleniumWebDriver:
   browser: phantomjs
