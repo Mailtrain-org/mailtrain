@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const bluebird = require('bluebird');
+const os = require('os');
 
 let zoneMtaProcess = null;
 
