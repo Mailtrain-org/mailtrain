@@ -90,8 +90,8 @@ export default class CUD extends Component {
 
         const tree = [];
         for (const rule of rules) {
-            const ruleTypeSettings = ruleHelpers.getRuleTypeSettings(rule);
-            const title = ruleTypeSettings ? ruleTypeSettings.treeLabel(rule) : this.props.t('newRule');
+            const ruleTreeLabel = ruleHelpers.getTreeLabel(rule);
+            const title = ruleTreeLabel ||  this.props.t('newRule');
 
             tree.push({
                 rule,

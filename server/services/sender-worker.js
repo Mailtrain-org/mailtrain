@@ -6,6 +6,8 @@ const mailers = require('../lib/mailers');
 const messageSender = require('../lib/message-sender');
 const {CampaignTrackerActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
+
+// TODO - use extension manager to add check to cleanExit (in fork) that waits for sendRegularCampaignMessage or sendQueuedMessage to finish
 require('../lib/fork');
 
 const MessageType = messageSender.MessageType;

@@ -25,7 +25,7 @@ export default class RuleSettingsPane extends PureComponent {
 
         const t = props.t;
         this.ruleHelpers = getRuleHelpers(t, props.fields);
-        this.fieldTypes = getFieldTypes(t);
+        this.fieldTypes = { ...getFieldTypes(t), ...this.ruleHelpers.extraFieldTypes };
 
         this.state = {};
 
@@ -54,9 +54,11 @@ export default class RuleSettingsPane extends PureComponent {
             if (!ruleHelpers.isCompositeRuleType(rule.type)) { // rule.type === null signifies primitive rule where the type has not been determined yet
                 data = ruleHelpers.primitiveRuleTypesFormDataDefaults;
 
-                const settings = ruleHelpers.getRuleTypeSettings(rule);
-                if (settings) {
-                    Object.assign(data, settings.getFormData(rule));
+                const colDef = ruleHelpers.getColumnDef(rule.column);
+                if (colDef) {
+                    const colType = colDef.type;
+                    const settings = ruleHelpers.primitiveRuleTypes[colType][rule.type];
+                    Object.assign(data, settings.getFormData(rule, colDef));
                 }
 
                 data.type = rule.type || ''; // On '', we display label "--SELECT--" in the type dropdown. Null would not be accepted by React.
@@ -92,8 +94,10 @@ export default class RuleSettingsPane extends PureComponent {
             if (!ruleHelpers.isCompositeRuleType(rule.type)) {
                 rule.column = this.getFormValue('column');
 
-                const settings = this.ruleHelpers.getRuleTypeSettings(rule);
-                settings.assignRuleSettings(rule, key => this.getFormValue(key));
+                const colDef = ruleHelpers.getColumnDef(rule.column);
+                const colType = colDef.type;
+                const settings = ruleHelpers.primitiveRuleTypes[colType][rule.type];
+                settings.assignRuleSettings(rule, key => this.getFormValue(key), colDef);
             }
 
             this.props.onChange(false);
@@ -118,11 +122,12 @@ export default class RuleSettingsPane extends PureComponent {
 
             const column = state.getIn(['column', 'value']);
             if (column) {
-                const colType = ruleHelpers.getColumnType(column);
+                const colDef = ruleHelpers.getColumnDef(column);
 
                 if (ruleType) {
+                    const colType = colDef.type;
                     const settings = ruleHelpers.primitiveRuleTypes[colType][ruleType];
-                    settings.validate(state);
+                    settings.validate(state, colDef);
                 }
             } else {
                 state.setIn(['column', 'error'], t('fieldMustBeSelected'));
@@ -138,9 +143,10 @@ export default class RuleSettingsPane extends PureComponent {
             const column = mutStateData.getIn(['column', 'value']);
 
             if (column) {
-                const colType = ruleHelpers.getColumnType(column);
+                const colDef = ruleHelpers.getColumnDef(column);
 
                 if (type) {
+                    const colType = colDef.type;
                     const settings = ruleHelpers.primitiveRuleTypes[colType][type];
                     if (!settings) {
                         // The existing rule type does not fit the newly changed column. This resets the rule type chooser to "--- Select ---"
@@ -187,8 +193,9 @@ export default class RuleSettingsPane extends PureComponent {
 
             const ruleColumn = this.getFormValue('column');
             if (ruleColumn) {
-                const colType = ruleHelpers.getColumnType(ruleColumn);
-                if (colType) {
+                const colDef = ruleHelpers.getColumnDef(ruleColumn);
+                if (colDef) {
+                    const colType = colDef.type;
                     const ruleTypeOptions = ruleHelpers.getPrimitiveRuleTypeOptions(colType);
                     ruleTypeOptions.unshift({ key: '', label: t('select-1')});
 
@@ -197,7 +204,7 @@ export default class RuleSettingsPane extends PureComponent {
 
                         const ruleType = this.getFormValue('type');
                         if (ruleType) {
-                            ruleSettings = ruleHelpers.primitiveRuleTypes[colType][ruleType].getForm();
+                            ruleSettings = ruleHelpers.primitiveRuleTypes[colType][ruleType].getForm(colDef);
                         }
                     }
                 }
