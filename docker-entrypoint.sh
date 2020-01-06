@@ -22,6 +22,7 @@ MYSQL_HOST=${MYSQL_HOST:-'mysql'}
 MYSQL_DATABASE=${MYSQL_DATABASE:-'mailtrain'}
 MYSQL_USER=${MYSQL_USER:-'mailtrain'}
 MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
+POOL_NAME=${POOL_NAME:-$(hostname)}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
@@ -61,6 +62,7 @@ builtinZoneMTA:
     level: warn
   mongo: mongodb://${MONGO_HOST}:27017/zone-mta
   redis: redis://${REDIS_HOST}:6379/2
+  poolName: $POOL_NAME
 
 queue:
   processes: 5

@@ -12,6 +12,7 @@ const subscriptions = require('./subscriptions');
 const dependencyHelpers = require('../lib/dependency-helpers');
 const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
+const {SubscriptionStatus} = require('../../shared/lists');
 
 const allowedKeys = new Set(['name', 'settings']);
 
@@ -41,6 +42,16 @@ const predefColumns = [
     {
         column: 'is_test',
         type: 'option'
+    },
+    {
+        column: 'status',
+        type: 'dropdown-static',
+        options: {
+            subscribed: 1,
+            unsubscribed: 2,
+            bounced: 3,
+            complained: 4
+        }
     }
 ];
 
@@ -85,36 +96,37 @@ const primitiveRuleTypes = {
     birthday: {},
     option: {},
     'dropdown-enum': {},
-    'radio-enum': {}
+    'radio-enum': {},
+    'dropdown-static': {}
 };
 
 
 function stringValueSettings(sqlOperator, allowEmpty) {
     return {
-        validate: rule => {
+        validate: (rule, fldDef) => {
             enforce(typeof rule.value === 'string', 'Invalid value type in rule');
             enforce(allowEmpty || rule.value, 'Value in rule must not be empty');
         },
-        addQuery: (subsTableName, query, rule) => query.where(subsTableName + '. ' + rule.column, sqlOperator, rule.value)
+        addQuery: (subsTableName, query, rule, fldDef) => query.where(subsTableName + '. ' + rule.column, sqlOperator, rule.value)
     };
 }
 
 function numberValueSettings(sqlOperator) {
     return {
-        validate: rule => {
+        validate: (rule, fldDef) => {
             enforce(typeof rule.value === 'number', 'Invalid value type in rule');
         },
-        addQuery: (subsTableName, query, rule) => query.where(subsTableName + '. ' + rule.column, sqlOperator, rule.value)
+        addQuery: (subsTableName, query, rule, fldDef) => query.where(subsTableName + '. ' + rule.column, sqlOperator, rule.value)
     };
 }
 
 function dateValueSettings(thisDaySqlOperator, nextDaySqlOperator) {
     return {
-        validate: rule => {
+        validate: (rule, fldDef) => {
             const date = moment.utc(rule.value);
             enforce(date.isValid(), 'Invalid date value');
         },
-        addQuery: (subsTableName, query, rule) => {
+        addQuery: (subsTableName, query, rule, fldDef) => {
             const thisDay = moment.utc(rule.value).startOf('day');
             const nextDay = moment(thisDay).add(1, 'days');
 
@@ -131,10 +143,10 @@ function dateValueSettings(thisDaySqlOperator, nextDaySqlOperator) {
 
 function dateRelativeValueSettings(todaySqlOperator, tomorrowSqlOperator) {
     return {
-        validate: rule => {
+        validate: (rule, fldDef) => {
             enforce(typeof rule.value === 'number', 'Invalid value type in rule');
         },
-        addQuery: (subsTableName, query, rule) => {
+        addQuery: (subsTableName, query, rule, fldDef) => {
             const todayWithOffset = moment.utc().startOf('day').add(rule.value, 'days');
             const tomorrowWithOffset = moment(todayWithOffset).add(1, 'days');
 
@@ -151,8 +163,18 @@ function dateRelativeValueSettings(todaySqlOperator, tomorrowSqlOperator) {
 
 function optionValueSettings(value) {
     return {
-        validate: rule => {},
-        addQuery: (subsTableName, query, rule) => query.where(subsTableName + '. ' + rule.column, value)
+        validate: (rule, fldDef) => {},
+        addQuery: (subsTableName, query, rule, fldDef) => query.where(subsTableName + '. ' + rule.column, value)
+    };
+}
+
+function staticEnumValueSettings(sqlOperator) {
+    return {
+        validate: (rule, fldDef) => {
+            enforce(rule.value, 'Value in rule must not be empty');
+            enforce(rule.value in fldDef.options, 'Value is not permitted')
+        },
+        addQuery: (subsTableName, query, rule, fldDef) => query.where(subsTableName + '. ' + rule.column, sqlOperator, fldDef.options[rule.value])
     };
 }
 
@@ -212,6 +234,15 @@ primitiveRuleTypes['radio-enum'].le = stringValueSettings('<=', false);
 primitiveRuleTypes['radio-enum'].gt = stringValueSettings('>', false);
 primitiveRuleTypes['radio-enum'].ge = stringValueSettings('>=', false);
 
+primitiveRuleTypes['radio-enum'].eq = stringValueSettings('=', true);
+primitiveRuleTypes['radio-enum'].like = stringValueSettings('LIKE', true);
+primitiveRuleTypes['radio-enum'].re = stringValueSettings('REGEXP', true);
+primitiveRuleTypes['radio-enum'].lt = stringValueSettings('<', false);
+primitiveRuleTypes['radio-enum'].le = stringValueSettings('<=', false);
+primitiveRuleTypes['radio-enum'].gt = stringValueSettings('>', false);
+primitiveRuleTypes['radio-enum'].ge = stringValueSettings('>=', false);
+
+primitiveRuleTypes['dropdown-static'].eq = staticEnumValueSettings('=', true);
 
 
 function hash(entity) {
@@ -283,8 +314,9 @@ async function _validateAndPreprocess(tx, listId, entity, isCreate) {
                 validateRule(childRule);
             }
         } else {
-            const colType = fieldsByColumn[rule.column].type;
-            primitiveRuleTypes[colType][rule.type].validate(rule);
+            const fldDef = fieldsByColumn[rule.column];
+            const colType = fldDef.type;
+            primitiveRuleTypes[colType][rule.type].validate(rule, fldDef);
         }
     }
 
@@ -421,8 +453,9 @@ async function getQueryGeneratorTx(tx, listId, id) {
                 processRule(subQuery, childRule);
             });
         } else {
-            const colType = fieldsByColumn[rule.column].type;
-            primitiveRuleTypes[colType][rule.type].addQuery(subsTableName, query, rule);
+            const fldDef = fieldsByColumn[rule.column];
+            const colType = fldDef.type;
+            primitiveRuleTypes[colType][rule.type].addQuery(subsTableName, query, rule, fldDef);
         }
     }
 

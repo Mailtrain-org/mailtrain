@@ -222,6 +222,7 @@ The instructions above use an automatically built Docker image on DockerHub (htt
 | LDAP_FILTER      | LDAP filter                                                           |
 | LDAP_BASEDN      | LDAP base DN                                                          |
 | LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
+| POOL_NAME        | sets builtin Zone-MTA pool name (default: os.hostname())              |
 
 If you are using docker-compose to run Mailtrain in production and need to pass your own overrides of these env-vars in a custom override like `docker-compose.override.yml`:
 

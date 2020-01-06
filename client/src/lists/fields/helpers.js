@@ -6,22 +6,22 @@ export function getFieldTypes(t) {
 
     const fieldTypes = {
         text: {
-            label: t('text'),
+            label: t('text')
         },
         website: {
-            label: t('website'),
+            label: t('website')
         },
         longtext: {
-            label: t('multilineText'),
+            label: t('multilineText')
         },
         gpg: {
-            label: t('gpgPublicKey'),
+            label: t('gpgPublicKey')
         },
         number: {
-            label: t('number'),
+            label: t('number')
         },
         'checkbox-grouped': {
-            label: t('checkboxesFromOptionFields'),
+            label: t('checkboxesFromOptionFields')
         },
         'radio-grouped': {
             label: t('radioButtonsFromOptionFields')

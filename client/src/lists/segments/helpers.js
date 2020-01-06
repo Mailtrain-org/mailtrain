@@ -214,16 +214,23 @@ export function getRuleHelpers(t, fields) {
         }
     };
 
+    ruleHelpers.primitiveRuleTypes['dropdown-static'] = {
+        eq: {
+            dropdownLabel: t('equalTo'),
+            treeLabel: rule => t('valueInColumnColNameIsEqualToValue', {colName: ruleHelpers.getColumnName(rule.column), value: rule.value}),
+        }
+    };
+
 
     const stringValueSettings = allowEmpty => ({
-        getForm: () => <InputField id="value" label={t('value')} />,
-        getFormData: rule => ({
+        getForm: fldDef => <InputField id="value" label={t('value')} />,
+        getFormData: (rule, fldDef) => ({
             value: rule.value
         }),
-        assignRuleSettings: (rule, getter) => {
+        assignRuleSettings: (rule, getter, fldDef) => {
             rule.value = getter('value');
         },
-        validate: state => {
+        validate: (state, fldDef) => {
             if (!allowEmpty && !state.getIn(['value', 'value'])) {
                 state.setIn(['value', 'error'], t('valueMustNotBeEmpty'));
             } else {
@@ -233,14 +240,14 @@ export function getRuleHelpers(t, fields) {
     });
 
     const numberValueSettings = {
-        getForm: () => <InputField id="value" label={t('value')} />,
-        getFormData: rule => ({
+        getForm: fldDef => <InputField id="value" label={t('value')} />,
+        getFormData: (rule, fldDef) => ({
             value: rule.value.toString()
         }),
-        assignRuleSettings: (rule, getter) => {
+        assignRuleSettings: (rule, getter, fldDef) => {
             rule.value = parseInt(getter('value'));
         },
-        validate: state => {
+        validate: (state, fldDef) => {
             const value = state.getIn(['value', 'value']).trim();
             if (value === '') {
                 state.setIn(['value', 'error'], t('valueMustNotBeEmpty'));
@@ -253,14 +260,14 @@ export function getRuleHelpers(t, fields) {
     };
 
     const birthdayValueSettings = {
-        getForm: () => <DatePicker id="birthday" label={t('date')} birthday />,
-        getFormData: rule => ({
+        getForm: fldDef => <DatePicker id="birthday" label={t('date')} birthday />,
+        getFormData: (rule, fldDef) => ({
             birthday: formatBirthday(DateFormat.INTL, rule.value)
         }),
-        assignRuleSettings: (rule, getter) => {
+        assignRuleSettings: (rule, getter, fldDef) => {
             rule.value = parseBirthday(DateFormat.INTL, getter('birthday')).toISOString();
         },
-        validate: state => {
+        validate: (state, fldDef) => {
             const value = state.getIn(['birthday', 'value']);
             const date = parseBirthday(DateFormat.INTL, value);
             if (!value) {
@@ -274,14 +281,14 @@ export function getRuleHelpers(t, fields) {
     };
 
     const dateValueSettings = {
-        getForm: () => <DatePicker id="date" label={t('date')} />,
-        getFormData: rule => ({
+        getForm: fldDef => <DatePicker id="date" label={t('date')} />,
+        getFormData: (rule, fldDef) => ({
             date: formatDate(DateFormat.INTL, rule.value)
         }),
-        assignRuleSettings: (rule, getter) => {
+        assignRuleSettings: (rule, getter, fldDef) => {
             rule.value = parseDate(DateFormat.INTL, getter('date')).toISOString();
         },
-        validate: state => {
+        validate: (state, fldDef) => {
             const value = state.getIn(['date', 'value']);
             const date = parseDate(DateFormat.INTL, value);
             if (!value) {
@@ -295,7 +302,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const dateRelativeValueSettings = {
-        getForm: () =>
+        getForm: fldDef =>
             <div>
                 <InputField id="daysValue" label={t('numberOfDays')}/>
                 <Dropdown id="direction" label={t('beforeAfter')} options={[
@@ -303,15 +310,15 @@ export function getRuleHelpers(t, fields) {
                     { key: 'after', label: t('afterCurrentDate') }
                 ]}/>
             </div>,
-        getFormData: rule => ({
+        getFormData: (rule, fldDef) => ({
             daysValue: Math.abs(rule.value).toString(),
             direction: rule.value >= 0 ? 'after' : 'before'
         }),
-        assignRuleSettings: (rule, getter) => {
+        assignRuleSettings: (rule, getter, fldDef) => {
             const direction = getter('direction');
             rule.value = parseInt(getter('daysValue')) * (direction === 'before' ? -1 : 1);
         },
-        validate: state => {
+        validate: (state, fldDef) => {
             const value = state.getIn(['daysValue', 'value']);
             if (!value) {
                 state.setIn(['daysValue', 'error'], t('numberOfDaysMustNotBeEmpty'));
@@ -324,10 +331,43 @@ export function getRuleHelpers(t, fields) {
     };
 
     const optionValueSettings = {
-        getForm: () => null,
-        getFormData: rule => ({}),
-        assignRuleSettings: (rule, getter) => {},
+        getForm: fldDef => null,
+        getFormData: (rule, fldDef) => ({}),
+        assignRuleSettings: (rule, getter, fldDef) => {},
         validate: state => {}
+    };
+
+    const staticEnumValueSettings = {
+        getForm: fldDef => {
+            const opts = [];
+            for (const opt in fldDef.options) {
+                opts.push({key: opt, label: fldDef.options[opt]});
+            }
+
+            return <Dropdown id="value" label={t('value')} options={opts}/>;
+        },
+        getFormData: (rule, fldDef) => {
+            let value;
+            if (rule.value in fldDef.options) {
+                value = rule.value;
+            } else {
+                value = fldDef.default
+            }
+
+            return {
+                value
+            };
+        },
+        assignRuleSettings: (rule, getter, fldDef) => {
+            let value = getter('value');
+            if (!(value in fldDef.options)) {
+                value = fldDef.default
+            }
+
+            rule.value = value;
+        },
+        validate: (state, fldDef) => {
+        }
     };
 
 
@@ -349,6 +389,7 @@ export function getRuleHelpers(t, fields) {
     assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['dropdown-enum'], ['lt', 'le', 'gt', 'ge'], stringValueSettings(false));
     assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['radio-enum'], ['eq', 'like', 're'], stringValueSettings(true));
     assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['radio-enum'], ['lt', 'le', 'gt', 'ge'], stringValueSettings(false));
+    assignSettingsToRuleTypes(ruleHelpers.primitiveRuleTypes['dropdown-static'], ['eq'], staticEnumValueSettings);
 
     ruleHelpers.primitiveRuleTypesFormDataDefaults = {
         value: '',
@@ -374,7 +415,8 @@ export function getRuleHelpers(t, fields) {
             date: ['eq', 'lt', 'le', 'gt', 'ge', 'eqTodayPlusDays', 'ltTodayPlusDays', 'leTodayPlusDays', 'gtTodayPlusDays', 'geTodayPlusDays'],
             option: ['isTrue', 'isFalse'],
             'dropdown-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge'],
-            'radio-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge']
+            'radio-enum': ['eq', 'like', 're', 'lt', 'le', 'gt', 'ge'],
+            'dropdown-static': ['eq'],
         };
 
         return order[columnType].map(key => ({ key, label: ruleHelpers.primitiveRuleTypes[columnType][key].dropdownLabel }));
@@ -411,7 +453,20 @@ export function getRuleHelpers(t, fields) {
             column: 'is_test',
             name: t('testUser'),
             type: 'option'
+        },
+        {
+            column: 'status',
+            name: t('Status'),
+            type: 'dropdown-static',
+            options: {
+                subscribed: t('Subscribed'),
+                unsubscribed: t('Unsubscribed'),
+                bounced: t('Bounced'),
+                complained: t('Complained')
+            },
+            default: 'subscribed'
         }
+
     ];
 
     ruleHelpers.fields = [
@@ -424,10 +479,10 @@ export function getRuleHelpers(t, fields) {
         ruleHelpers.fieldsByColumn[fld.column] = fld;
     }
 
-    ruleHelpers.getColumnType = column => {
+    ruleHelpers.getColumnDef = column => {
         const field = ruleHelpers.fieldsByColumn[column];
         if (field) {
-            return field.type;
+            return field;
         }
     };
 
@@ -438,21 +493,29 @@ export function getRuleHelpers(t, fields) {
         }
     };
 
-    ruleHelpers.getRuleTypeSettings = rule => {
-        if (ruleHelpers.isCompositeRuleType(rule.type)) {
-            return ruleHelpers.compositeRuleTypes[rule.type];
-        } else {
-            const colType = ruleHelpers.getColumnType(rule.column);
+    ruleHelpers.isCompositeRuleType = ruleType => ruleType in ruleHelpers.compositeRuleTypes;
 
-            if (colType) {
+    ruleHelpers.getTreeLabel = rule => {
+        if (ruleHelpers.isCompositeRuleType(rule.type)) {
+            return ruleHelpers.compositeRuleTypes[rule.type].treeLabel(rule);
+        } else {
+            const colDef = ruleHelpers.getColumnDef(rule.column);
+
+            if (colDef) {
+                const colType = colDef.type;
                 if (rule.type in ruleHelpers.primitiveRuleTypes[colType]) {
-                    return ruleHelpers.primitiveRuleTypes[colType][rule.type];
+                    return ruleHelpers.primitiveRuleTypes[colType][rule.type].treeLabel(rule);
                 }
             }
         }
     };
 
-    ruleHelpers.isCompositeRuleType = ruleType => ruleType in ruleHelpers.compositeRuleTypes;
+
+    ruleHelpers.extraFieldTypes = {
+        'dropdown-static': {
+            label: t('Dropdown')
+        }
+    };
 
     return ruleHelpers;
 }
