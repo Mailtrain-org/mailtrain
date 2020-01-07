@@ -682,7 +682,7 @@ async function queueCampaignMessageTx(tx, sendConfigurationId, listId, subscript
     });
 }
 
-async function queueAPITransactionalMessage(sendConfigurationId, email, subject, html, text, tagLanguage, mergeTags, attachments) {
+async function queueAPITransactionalMessage(tx, sendConfigurationId, email, subject, html, text, tagLanguage, mergeTags, attachments) {
     const msgData = {
         to: {
             address: email
