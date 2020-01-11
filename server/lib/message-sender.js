@@ -682,7 +682,7 @@ async function queueCampaignMessageTx(tx, sendConfigurationId, listId, subscript
     });
 }
 
-async function queueAPITransactionalMessage(tx, sendConfigurationId, email, subject, html, text, tagLanguage, mergeTags, attachments) {
+async function queueAPITransactionalMessageTx(tx, sendConfigurationId, email, subject, html, text, tagLanguage, mergeTags, attachments) {
     const msgData = {
         to: {
             address: email
@@ -788,4 +788,4 @@ module.exports.queueCampaignMessageTx = queueCampaignMessageTx;
 module.exports.queueSubscriptionMessage = queueSubscriptionMessage;
 module.exports.dropQueuedMessage = dropQueuedMessage;
 module.exports.getMessage = getMessage;
-module.exports.queueAPITransactionalMessage = queueAPITransactionalMessage;
+module.exports.queueAPITransactionalMessageTx = queueAPITransactionalMessageTx;

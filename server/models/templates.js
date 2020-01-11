@@ -163,13 +163,13 @@ async function remove(context, id) {
 }
 
 async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments) {
-	await knex.transaction(async tx => {
-		const template = await getById(context, templateId, false);
+    const template = await getById(context, templateId, false);
 
-		await shares.enforceEntityPermission(context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
+    await shares.enforceEntityPermission(context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
 
+    await knex.transaction(async tx => {
 		for (const email of emails) {
-			await messageSender.queueAPITransactionalMessage(tx, sendConfigurationId, email, subject, template.html, template.text, template.tag_language, {...mergeTags,  EMAIL: email }, attachments);
+			await messageSender.queueAPITransactionalMessageTx(tx, sendConfigurationId, email, subject, template.html, template.text, template.tag_language, {...mergeTags,  EMAIL: email }, attachments);
 		}
 	});
 }
