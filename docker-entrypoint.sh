@@ -3,6 +3,8 @@
 
 set -e
 
+default_filter="(|(username={{username}})(mail={{username}}))"
+
 URL_BASE_TRUSTED=${URL_BASE_TRUSTED:-'http://localhost:3000'}
 URL_BASE_SANDBOX=${URL_BASE_SANDBOX:-'http://localhost:3003'}
 URL_BASE_PUBLIC=${URL_BASE_PUBLIC:-'http://localhost:3004'}
@@ -11,11 +13,14 @@ WITH_LDAP=${WITH_LDAP:-'false'}
 LDAP_HOST=${LDAP_HOST:-'ldap'}
 LDAP_PORT=${LDAP_PORT:-'389'}
 LDAP_SECURE=${LDAP_SECURE:-'false'}
-LDAP_BIND_USER=${LDAP_BIND_USER:-}
-LDAP_BIND_PASS=${LDAP_BIND_PASS:-}
-LDAP_FILTER=${LDAP_FILTER:-}
-LDAP_BASEDN=${LDAP_BASEDN:-}
-LDAP_UIDTAG=${LDAP_UIDTAG:-}
+LDAP_BIND_USER=${LDAP_BIND_USER:-'name@company.net'}
+LDAP_BIND_PASS=${LDAP_BIND_PASS:-'mySecretPassword'}
+LDAP_FILTER=${LDAP_FILTER:-${default_filter}}
+LDAP_BASEDN=${LDAP_BASEDN:-ou=users,dc=company}
+LDAP_UIDTAG=${LDAP_UIDTAG:-'username'}
+LDAP_MAILTAG=${LDAP_MAILTAG:-'mail'}
+LDAP_NAMETAG=${LDAP_NAMETAG:-'username'}
+LDAP_METHOD=${LDAP_METHOD:-'ldapjs'}
 MONGO_HOST=${MONG_HOST:-'mongo'}
 REDIS_HOST=${REDIS_HOST:-'redis'}
 MYSQL_HOST=${MYSQL_HOST:-'mysql'}
@@ -81,10 +86,13 @@ EOT
       port: $LDAP_PORT
       secure: $LDAP_SECURE
       bindUser: $LDAP_BIND_USER
-      bindPasswort: $LDAP_BIND_PASS
+      bindPassword: $LDAP_BIND_PASS
       filter: $LDAP_FILTER
       baseDN: $LDAP_BASEDN
       uidTag: $LDAP_UIDTAG
+      mailTag: $LDAP_MAILTAG
+      nameTag: $LDAP_NAMETAG
+      method: $LDAP_METHOD
 EOT
     else
         echo 'Info: LDAP not enabled'
