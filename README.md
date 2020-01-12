@@ -224,6 +224,26 @@ The instructions above use an automatically built Docker image on DockerHub (htt
 | LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
 | POOL_NAME        | sets builtin Zone-MTA pool name (default: os.hostname())              |
 
+If you are using docker-compose to run Mailtrain in production and need to pass your own overrides of these env-vars in a custom override like `docker-compose.override.yml`:
+
+```
+version: '3'
+services:
+  mailtrain:
+    environment:
+    - URL_BASE_TRUSTED
+    - URL_BASE_SANDBOX
+    - URL_BASE_PUBLIC
+```
+
+You can now override URL_BASE_TRUSTED, URL_BASE_SANDBOX and URL_BASE_PUBLIC in an `.env` file and run this command to build or run it
+
+`docker-compose -f docker-compose.yml -f docker-compose.override.yml build (or up)`
+
+or you can pass this env-vars in the shell-command like this
+
+`URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-vars..) docker-compose -f docker-compose.yml -f docker-compose.override.yml build (or up)`
+
 ## License
 
   **GPL-V3.0**
