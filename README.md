@@ -176,7 +176,7 @@ An example of such proxy would be:
 - http://localhost:3003 -> https://sbox.mailtrain.example.com
 - http://localhost:3004 -> https://lists.example.com
 
-To deploy Mailtrain with Docker, you need the following three dependencies installed:
+To deploy Mailtrain with Docker, you need the following two dependencies installed:
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
@@ -200,13 +200,20 @@ These are the steps to start Mailtrain via docker-compose:
 The instructions above use an automatically built Docker image on DockerHub (https://hub.docker.com/r/mailtrain/mailtrain). If you want to build the Docker image yourself (e.g. when doing development), use the `docker-compose-local.yml` located in the project's root directory.
 
 ### Docker Environment Variables
+When using Docker, you can override the default Mailtrain settings via the following environment variables. These variables have to be defined in the docker-compose config
+file. You can give them a value directly in the `docker-compose.yml` config file. 
+
+Alternatively, you can just declare them there leaving their value empty 
+(see https://docs.docker.com/compose/environment-variables/#pass-environment-variables-to-containers). In that case, the 
+value can be provided via a file called `.env` or via environment 
+variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-vars..) docker-compose -f docker-compose.yml build (or up)`)  
 
 | Parameter        | Description |
 | ---------        | ----------- |
 | URL_BASE_TRUSTED | sets the trusted url of the instance (default: http://localhost:3000) |
 | URL_BASE_SANDBOX | sets the sandbox url of the instance (default: http://localhost:3003) |
 | URL_BASE_PUBLIC  | sets the public url of the instance (default: http://localhost:3004)  |
-| WWWW_PROXY       | use if Mailtrain is behind an http reverse proxy (default: false)     |
+| WWW_PROXY       | use if Mailtrain is behind an http reverse proxy (default: false)     |
 | MONGO_HOST       | sets mongo host (default: mongo)                                      |
 | REDIS_HOST       | sets redis host (default: redis)                                      |
 | MYSQL_HOST       | sets mysql host (default: mysql)                                      |
@@ -224,7 +231,7 @@ The instructions above use an automatically built Docker image on DockerHub (htt
 | LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
 | POOL_NAME        | sets builtin Zone-MTA pool name (default: os.hostname())              |
 
-If you are using docker-compose to run Mailtrain in production and need to pass your own overrides of these env-vars in a custom override like `docker-compose.override.yml`:
+If you don't want to modify the original `docker-compose.yml`, you can put your overrides to another file (e.g. `docker-compose.override.yml`) -- like the one below.
 
 ```
 version: '3'
@@ -236,13 +243,6 @@ services:
     - URL_BASE_PUBLIC
 ```
 
-You can now override URL_BASE_TRUSTED, URL_BASE_SANDBOX and URL_BASE_PUBLIC in an `.env` file and run this command to build or run it
-
-`docker-compose -f docker-compose.yml -f docker-compose.override.yml build (or up)`
-
-or you can pass this env-vars in the shell-command like this
-
-`URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-vars..) docker-compose -f docker-compose.yml -f docker-compose.override.yml build (or up)`
 
 ## License
 

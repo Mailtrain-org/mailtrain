@@ -33,7 +33,7 @@ POOL_NAME=${POOL_NAME:-$(hostname)}
 # Can probably be removed in the future.
 MAILTRAIN_SETTING=${MAILTRAIN_SETTINGS:-}
 if [ ! -z "$MAILTRAIN_SETTING" ]; then
-    echo 'Error: MAILTRAIN_SETTINGS is no longer supported. See README'
+    echo 'Error: MAILTRAIN_SETTINGS is no longer supported. See README.md'
     exit 1
 fi
 
