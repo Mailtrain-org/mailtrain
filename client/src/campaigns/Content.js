@@ -24,6 +24,7 @@ import {getUrl} from "../lib/urls";
 import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {ContentModalDialog} from "../lib/modals";
+import {Trans} from "react-i18next";
 
 
 @withComponentMixins([
@@ -62,6 +63,7 @@ export default class CustomContent extends Component {
         };
 
         this.initForm({
+            leaveConfirmation: props.entity.permissions.includes('edit'),
             getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
             onChangeBeforeValidation: {
                 data_sourceCustom_tag_language: ::this.onTagLanguageChanged
@@ -249,8 +251,7 @@ export default class CustomContent extends Component {
 
     render() {
         const t = this.props.t;
-
-        // TODO: Toggle HTML preview
+        const canModify = this.props.entity.permissions.includes('edit');
 
         const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
 
@@ -272,6 +273,12 @@ export default class CustomContent extends Component {
 
                 <Title>{t('editCustomContent')}</Title>
 
+                {!canModify &&
+                <div className="alert alert-warning" role="alert">
+                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this campaign. Any changes that you perform here will be lost.</Trans>
+                </div>
+                }
+
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <StaticField id="data_sourceCustom_type" className={styles.formDisabled} label={t('customTemplateEditor')}>
                         {customTemplateTypeKey && this.templateTypes[customTemplateTypeKey].typeName}
@@ -284,9 +291,13 @@ export default class CustomContent extends Component {
                     {customTemplateTypeKey && getEditForm(this, customTemplateTypeKey, 'data_sourceCustom_')}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
+                        {canModify &&
+                            <>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.LEAVE)}/>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
+                            </>
+                        }
                         <Button className="btn-success" icon="at" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>

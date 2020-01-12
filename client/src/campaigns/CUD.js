@@ -36,6 +36,7 @@ import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels} from "./helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import interoperableErrors from "../../../shared/interoperable-errors";
+import {Trans} from "react-i18next";
 
 @withComponentMixins([
     withTranslation,
@@ -104,6 +105,7 @@ export default class CUD extends Component {
         this.nextListEntryId = 0;
 
         this.initForm({
+            leaveConfirmation: !props.entity || props.entity.permissions.includes('edit'),
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
             },
@@ -535,6 +537,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canModify = !isEdit || this.props.entity.permissions.includes('edit');
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         let extraSettings = null;
@@ -751,6 +754,12 @@ export default class CUD extends Component {
 
                 <Title>{isEdit ? this.editTitles[this.getFormValue('type')] : this.createTitles[this.getFormValue('type')]}</Title>
 
+                {!canModify &&
+                <div className="alert alert-warning" role="alert">
+                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this campaign. Any changes that you perform here will be lost.</Trans>
+                </div>
+                }
+
                 {isEdit && this.props.entity.status === CampaignStatus.SENDING &&
                     <div className={`alert alert-info`} role="alert">
                         {t('formCannotBeEditedBecauseTheCampaignIs')}
@@ -808,13 +817,17 @@ export default class CUD extends Component {
                     {templateEdit}
 
                     <ButtonRow>
-                        {!isEdit && (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) ?
-                            <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
-                        :
+                        {canModify &&
                             <>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
-                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
+                                {!isEdit && (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) ?
+                                    <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
+                                :
+                                    <>
+                                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
+                                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
+                                    </>
+                                }
                             </>
                         }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.entity.id}/delete`}/> }

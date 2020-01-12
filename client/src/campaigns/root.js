@@ -48,7 +48,7 @@ function getMenus(t) {
                         status: {
                             title: t('status'),
                             link: params => `/campaigns/${params.campaignId}/status`,
-                            visible: resolved => resolved.campaign.permissions.includes('viewStats'),
+                            visible: resolved => resolved.campaign.permissions.includes('view'),
                             panelRender: props => <Status entity={props.resolved.campaign} />
                         },
                         statistics: {
@@ -101,7 +101,7 @@ function getMenus(t) {
                         ':action(edit|delete)': {
                             title: t('edit'),
                             link: params => `/campaigns/${params.campaignId}/edit`,
-                            visible: resolved => resolved.campaign.permissions.includes('edit'),
+                            visible: resolved => resolved.campaign.permissions.includes('view') || resolved.campaign.permissions.includes('edit'),
                             panelRender: props => <CampaignsCUD action={props.match.params.action} entity={props.resolved.campaign} permissions={props.permissions} />
                         },
                         content: {
@@ -110,7 +110,7 @@ function getMenus(t) {
                             resolve: {
                                 campaignContent: params => `rest/campaigns-content/${params.campaignId}`
                             },
-                            visible: resolved => resolved.campaign.permissions.includes('edit') && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || resolved.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN),
+                            visible: resolved => (resolved.campaign.permissions.includes('view') || resolved.campaign.permissions.includes('edit')) && (resolved.campaign.source === CampaignSource.CUSTOM || resolved.campaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || resolved.campaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN),
                             panelRender: props => <Content entity={props.resolved.campaignContent} setPanelInFullScreen={props.setPanelInFullScreen} />
                         },
                         files: {

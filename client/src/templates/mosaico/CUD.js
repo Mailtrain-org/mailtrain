@@ -26,6 +26,7 @@ import {getTemplateTypes, getTemplateTypesOrder} from "./helpers";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import styles from "../../lib/styles.scss";
 import {getTagLanguages} from "../helpers";
+import {Trans} from "react-i18next";
 
 @withComponentMixins([
     withTranslation,
@@ -51,7 +52,9 @@ export default class CUD extends Component {
 
         this.state = {};
 
-        this.initForm();
+        this.initForm({
+            leaveConfirmation: !props.entity || props.entity.permissions.includes('edit'),
+        });
     }
 
     static propTypes = {
@@ -183,6 +186,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canModify = !isEdit || this.props.entity.permissions.includes('edit');
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const typeKey = this.getFormValue('type');
@@ -207,6 +211,12 @@ export default class CUD extends Component {
 
                 <Title>{isEdit ? t('editMosaicoTemplate') : t('createMosaicoTemplate')}</Title>
 
+                {!canModify &&
+                <div className="alert alert-warning" role="alert">
+                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this Mosaico template. Any changes that you perform here will be lost.</Trans>
+                </div>
+                }
+
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('name')}/>
                     <TextArea id="description" label={t('description')}/>
@@ -225,13 +235,17 @@ export default class CUD extends Component {
                     {isEdit && typeKey && this.templateTypes[typeKey].getForm(this)}
 
                     <ButtonRow>
-                        {isEdit ?
-                        <>
-                            <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                            <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
-                        </>
-                        :
-                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
+                        {canModify &&
+                            <>
+                                {isEdit ?
+                                    <>
+                                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
+                                    </>
+                                :
+                                    <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
+                                }
+                            </>
                         }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/mosaico/${this.props.entity.id}/delete`}/>}
                         {isEdit && typeKey && this.templateTypes[typeKey].getButtons(this)}

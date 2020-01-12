@@ -76,19 +76,21 @@ export default class List extends Component {
                     const status = data[5];
                     const campaignSource = data[7];
 
-                    if (perms.includes('viewStats')) {
+                    if (perms.includes('view')) {
                         actions.push({
                             label: <Icon icon="envelope" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`
                         });
+                    }
 
+                    if (perms.includes('viewStats')) {
                         actions.push({
                             label: <Icon icon="signal" title={t('statistics')}/>,
                             link: `/campaigns/${data[0]}/statistics`
                         });
                     }
 
-                    if (perms.includes('edit')) {
+                    if (perms.includes('view') || perms.includes('edit')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/campaigns/${data[0]}/edit`
@@ -152,7 +154,7 @@ export default class List extends Component {
 
                 <Title>{t('campaigns')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} />
+                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} order={[5, 'desc']} />
             </div>
         );
     }

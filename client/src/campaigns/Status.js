@@ -317,6 +317,9 @@ class SendControls extends Component {
         const t = this.props.t;
         const entity = this.props.entity;
 
+        const testSendPermitted = entity.permissions.includes('sendToTestUsers');
+        const sendPermitted = entity.permissions.includes('send');
+
         const dialogs = (
             <>
                 <TestSendModalDialog
@@ -342,52 +345,96 @@ class SendControls extends Component {
         const testButtons = (
             <>
                 <Button className="btn-success" label={t('Preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
-                <Button className="btn-success" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+                {testSendPermitted && <Button className="btn-success" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>}
             </>
         );
 
+        let sendStatus = null;
         if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
+            sendStatus = (
+                <AlignedRow label={t('sendStatus')}>
+                    {entity.status === CampaignStatus.SCHEDULED ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
+                </AlignedRow>
+            );
 
-            const timezoneColumns = [
-                { data: 0, title: t('Timezone') }
-            ];
+        } else if (entity.status === CampaignStatus.PAUSING) {
+            sendStatus = (
+                <AlignedRow label={t('sendStatus')}>
+                    {t('Campaign is being paused. Please wait.')}
+                </AlignedRow>
+            );
 
-            const dateValue = (this.getFormValue('date') || '').trim();
-            const timeValue = (this.getFormValue('time') || '').trim();
-            const timezone = this.getFormValue('timezone');
+        } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
+            sendStatus = (
+                <AlignedRow label={t('sendStatus')}>
+                    {t('campaignIsBeingSentOut')}
+                </AlignedRow>
+            );
 
-            let dateTimeHelp = t('Select date, time and a timezone to display the date and time with offset');
-            let dateTimeAlert = null;
-            if (moment(dateValue, 'YYYY-MM-DD', true).isValid() && moment(timeValue, 'HH:mm', true).isValid() && timezone) {
-                const dateTime = moment.tz(dateValue + ' ' + timeValue, 'YYYY-MM-DD HH:mm', timezone);
+        } else if (entity.status === CampaignStatus.FINISHED) {
+            sendStatus = (
+                <AlignedRow label={t('sendStatus')}>
+                    {sendPermitted ? t('allMessagesSent!HitContinueIfYouYouWant') : t('All messages sent!')}
+                </AlignedRow>
+            );
 
-                dateTimeHelp = dateTime.toString();
-                if (!moment().isBefore(dateTime)) {
-                    dateTimeAlert = <div className="alert alert-danger" role="alert">{t('Scheduled date/time seems to be in the past. If you schedule the send, campaign will be sent immediately.')}</div>;
+        } else if (entity.status === CampaignStatus.INACTIVE) {
+            sendStatus = (
+                <AlignedRow label={t('sendStatus')}>
+                    {sendPermitted ? t('yourCampaignIsCurrentlyDisabledClick') : t('Your campaign is currently disabled.')}
+                </AlignedRow>
+            );
+
+        } else if (entity.status === CampaignStatus.ACTIVE) {
+            sendStatus = (
+                <AlignedRow label={t('sendStatus')}>
+                    {t('yourCampaignIsEnabledAndSendingMessages')}
+                </AlignedRow>
+            );
+        }
+
+        let content = null;
+        let sendButtons = null;
+        if (sendPermitted) {
+            if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
+
+                const timezoneColumns = [
+                    { data: 0, title: t('Timezone') }
+                ];
+
+                const dateValue = (this.getFormValue('date') || '').trim();
+                const timeValue = (this.getFormValue('time') || '').trim();
+                const timezone = this.getFormValue('timezone');
+
+                let dateTimeHelp = t('Select date, time and a timezone to display the date and time with offset');
+                let dateTimeAlert = null;
+                if (moment(dateValue, 'YYYY-MM-DD', true).isValid() && moment(timeValue, 'HH:mm', true).isValid() && timezone) {
+                    const dateTime = moment.tz(dateValue + ' ' + timeValue, 'YYYY-MM-DD HH:mm', timezone);
+
+                    dateTimeHelp = dateTime.toString();
+                    if (!moment().isBefore(dateTime)) {
+                        dateTimeAlert = <div className="alert alert-danger" role="alert">{t('Scheduled date/time seems to be in the past. If you schedule the send, campaign will be sent immediately.')}</div>;
+                    }
                 }
-            }
 
-
-            return (
-                <div>{dialogs}
-                    <AlignedRow label={t('sendStatus')}>
-                        {entity.status === CampaignStatus.SCHEDULED ? t('campaignIsScheduledForDelivery') : t('campaignIsReadyToBeSentOut')}
-                    </AlignedRow>
-
+                content = (
                     <Form stateOwner={this}>
                         <CheckBox id="sendLater" label={t('sendLater')} text={t('scheduleDeliveryAtAParticularDatetime')}/>
                         {this.getFormValue('sendLater') &&
-                            <div>
-                                <DatePicker id="date" label={t('date')} />
-                                <InputField id="time" label={t('time')} help={t('enter24HourTimeInFormatHhmmEg1348')}/>
-                                <TableSelect id="timezone" label={t('Timezone')} dropdown columns={timezoneColumns} selectionKeyIndex={0} selectionLabelIndex={0} data={this.timezoneOptions}
-                                    help={dateTimeHelp}
-                                />
-                                {dateTimeAlert && <AlignedRow>{dateTimeAlert}</AlignedRow>}
-                            </div>
+                        <div>
+                            <DatePicker id="date" label={t('date')} />
+                            <InputField id="time" label={t('time')} help={t('enter24HourTimeInFormatHhmmEg1348')}/>
+                            <TableSelect id="timezone" label={t('Timezone')} dropdown columns={timezoneColumns} selectionKeyIndex={0} selectionLabelIndex={0} data={this.timezoneOptions}
+                                         help={dateTimeHelp}
+                            />
+                            {dateTimeAlert && <AlignedRow>{dateTimeAlert}</AlignedRow>}
+                        </div>
                         }
                     </Form>
-                    <ButtonRow className={campaignsStyles.sendButtonRow}>
+                );
+
+                sendButtons = (
+                    <>
                         {this.getFormValue('sendLater') ?
                             <Button className="btn-primary" icon="play" label={entity.status === CampaignStatus.SCHEDULED ? t('rescheduleSend') : t('scheduleSend')} onClickAsync={::this.confirmSchedule}/>
                             :
@@ -396,83 +443,61 @@ class SendControls extends Component {
                         {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
-                        {testButtons}
-                    </ButtonRow>
-                </div>
-            );
+                    </>
+                );
 
-        } else if (entity.status === CampaignStatus.PAUSING) {
-            return (
-                <div>{dialogs}
-                    <AlignedRow label={t('sendStatus')}>
-                        {t('Campaign is being paused. Please wait.')}
-                    </AlignedRow>
-                    <ButtonRow>
+            } else if (entity.status === CampaignStatus.PAUSING) {
+                sendButtons = (
+                    <>
                         <Button className="btn-primary" icon="pause" label={t('Pausing')} disabled={true}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
-                        {testButtons}
-                    </ButtonRow>
-                </div>
-            );
+                    </>
+                );
 
-        } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
-            return (
-                <div>{dialogs}
-                    <AlignedRow label={t('sendStatus')}>
-                        {t('campaignIsBeingSentOut')}
-                    </AlignedRow>
-                    <ButtonRow>
+            } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
+                sendButtons = (
+                    <>
                         <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
-                        {testButtons}
-                    </ButtonRow>
-                </div>
-            );
+                    </>
+                );
 
-        } else if (entity.status === CampaignStatus.FINISHED) {
-            return (
-                <div>{dialogs}
-                    <AlignedRow label={t('sendStatus')}>
-                        {t('allMessagesSent!HitContinueIfYouYouWant')}
-                    </AlignedRow>
-                    <ButtonRow>
+            } else if (entity.status === CampaignStatus.FINISHED) {
+                sendButtons = (
+                    <>
                         <Button className="btn-primary" icon="play" label={t('continue')} onClickAsync={::this.confirmStart}/>
                         <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
-                        {testButtons}
-                    </ButtonRow>
-                </div>
-            );
+                    </>
+                );
 
-        } else if (entity.status === CampaignStatus.INACTIVE) {
-            return (
-                <div>{dialogs}
-                    <AlignedRow label={t('sendStatus')}>
-                        {t('yourCampaignIsCurrentlyDisabledClick')}
-                    </AlignedRow>
-                    <ButtonRow>
+            } else if (entity.status === CampaignStatus.INACTIVE) {
+                sendButtons = (
+                    <>
                         <Button className="btn-primary" icon="play" label={t('enable')} onClickAsync={::this.enableAsync}/>
-                        {testButtons}
-                    </ButtonRow>
-                </div>
-            );
+                    </>
+                );
 
-        } else if (entity.status === CampaignStatus.ACTIVE) {
-            return (
-                <div>{dialogs}
-                    <AlignedRow label={t('sendStatus')}>
-                        {t('yourCampaignIsEnabledAndSendingMessages')}
-                    </AlignedRow>
-                    <ButtonRow>
+            } else if (entity.status === CampaignStatus.ACTIVE) {
+                sendButtons = (
+                    <>
                         <Button className="btn-primary" icon="stop" label={t('disable')} onClickAsync={::this.disableAsync}/>
-                        {testButtons}
-                    </ButtonRow>
-                </div>
-            );
-
-        } else {
-            return null;
+                    </>
+                );
+            }
         }
+
+        return (
+            <div>
+                {dialogs}
+                {sendStatus}
+                {content}
+                <ButtonRow className={campaignsStyles.sendButtonRow}>
+                    {sendButtons}
+                    {testButtons}
+                </ButtonRow>
+            </div>
+        );
     }
 }
 
@@ -508,11 +533,11 @@ export default class Status extends Component {
 
     @withAsyncErrorHandler
     async refreshEntity() {
-        const newState = {}
+        const newState = {};
 
         let resp;
 
-        resp = await axios.get(getUrl(`rest/campaigns-stats/${this.props.entity.id}`));
+        resp = await axios.get(getUrl(`rest/campaigns-settings/${this.props.entity.id}`));
         newState.entity = resp.data;
 
         try {
@@ -598,7 +623,7 @@ export default class Status extends Component {
                     const campaignType = data[4];
                     const campaignSource = data[7];
 
-                    if (perms.includes('viewStats')) {
+                    if (perms.includes('view')) {
                         actions.push({
                             label: <Icon icon="send" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`

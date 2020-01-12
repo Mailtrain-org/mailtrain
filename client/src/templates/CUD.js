@@ -2,6 +2,7 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {Trans} from 'react-i18next';
 import {withTranslation} from '../lib/i18n';
 import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
 import {
@@ -56,6 +57,7 @@ export default class CUD extends Component {
         };
 
         this.initForm({
+            leaveConfirmation: !props.entity || props.entity.permissions.includes('edit'),
             getPreSubmitUpdater: ::this.getPreSubmitFormValuesUpdater,
             onChangeBeforeValidation: {
                 type: ::this.onTypeChanged,
@@ -292,6 +294,7 @@ export default class CUD extends Component {
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
+        const canModify = !isEdit || this.props.entity.permissions.includes('edit');
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const typeOptions = [];
@@ -332,7 +335,9 @@ export default class CUD extends Component {
                         mode={TestSendModalDialogMode.TEMPLATE}
                         visible={this.state.showTestSendModal}
                         onHide={() => this.setState({showTestSendModal: false})}
-                        getDataAsync={this.sendModalGetDataHandler}/>
+                        getDataAsync={this.sendModalGetDataHandler}
+                        template={this.props.entity}
+                    />
                 }
                 {isEdit &&
                     <ContentModalDialog
@@ -353,6 +358,12 @@ export default class CUD extends Component {
                 }
 
                 <Title>{isEdit ? t('editTemplate') : t('createTemplate')}</Title>
+
+                {!canModify &&
+                    <div className="alert alert-warning" role="alert">
+                        <Trans><b>Warning!</b> You do not have necessary permissions to edit this template. Any changes that you perform here will be lost.</Trans>
+                    </div>
+                }
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="name" label={t('name')}/>
@@ -385,8 +396,12 @@ export default class CUD extends Component {
                     {editForm}
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                        {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>}
+                        {canModify &&
+                            <>
+                                <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                                {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>}
+                            </>
+                        }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/templates/${this.props.entity.id}/delete`}/> }
                         {isEdit && <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/> }
                     </ButtonRow>

@@ -43,7 +43,7 @@ function getMenus(t) {
                         ':action(edit|delete)': {
                             title: t('edit'),
                             link: params => `/templates/${params.templateId}/edit`,
-                            visible: resolved => resolved.template.permissions.includes('edit'),
+                            visible: resolved => resolved.template.permissions.includes('view') || resolved.template.permissions.includes('edit'),
                             panelRender: props => <TemplatesCUD action={props.match.params.action} entity={props.resolved.template} permissions={props.permissions} setPanelInFullScreen={props.setPanelInFullScreen} />
                         },
                         files: {
@@ -82,7 +82,7 @@ function getMenus(t) {
                                 ':action(edit|delete)': {
                                     title: t('edit'),
                                     link: params => `/templates/mosaico/${params.mosaiceTemplateId}/edit`,
-                                    visible: resolved => resolved.mosaicoTemplate.permissions.includes('edit'),
+                                    visible: resolved => resolved.mosaicoTemplate.permissions.includes('view') || resolved.mosaicoTemplate.permissions.includes('edit'),
                                     panelRender: props => <MosaicoCUD action={props.match.params.action} entity={props.resolved.mosaicoTemplate} permissions={props.permissions}/>
                                 },
                                 files: {

@@ -1062,6 +1062,11 @@ async function testSend(context, data) {
 
             const list = await lists.getByCidTx(tx, context, data.listCid);
             const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid, true, true);
+
+            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', data.sendConfigurationId, 'sendWithoutOverrides');
+            await shares.enforceEntityPermissionTx(tx, context, 'template', data.templateId, 'sendToTestUsers');
+            await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'sendToTestUsers');
+
             await processSubscriber(data.sendConfigurationId, list.id, subscriber.id, messageData);
         }
     });

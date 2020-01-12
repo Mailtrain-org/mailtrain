@@ -52,7 +52,8 @@ export class TestSendModalDialog extends Component {
         mode: PropTypes.number.isRequired,
         onHide: PropTypes.func.isRequired,
         getDataAsync: PropTypes.func,
-        campaign: PropTypes.object
+        campaign: PropTypes.object,
+        template: PropTypes.object
     }
 
     onListChanged(mutStateData, key, oldValue, newValue) {
@@ -101,6 +102,7 @@ export class TestSendModalDialog extends Component {
                 }
 
                 if (mode === TestSendModalDialogMode.TEMPLATE) {
+                    data.templateId = props.template.id;
                     data.listCid = this.getFormValue('listCid');
                     data.subscriptionCid = this.getFormValue('testUserSubscriptionCid');
                     data.sendConfigurationId = this.getFormValue('sendConfiguration');

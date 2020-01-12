@@ -167,6 +167,7 @@ export default class CUD extends Component {
                 this.setFormStatusMessage('warning', t('thereAreErrorsInTheFormPleaseFixThemAnd'));
             }
         } catch (error) {
+            console.log(error)
             if (error instanceof interoperableErrors.DuplicitEmailError) {
                 this.setFormStatusMessage('danger',
                     <span>

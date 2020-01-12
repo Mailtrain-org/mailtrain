@@ -53,13 +53,15 @@ class Table extends Component {
         onSelectionDataAsync: PropTypes.func,
         withHeader: PropTypes.bool,
         refreshInterval: PropTypes.number,
-        pageLength: PropTypes.number
+        pageLength: PropTypes.number,
+        order: PropTypes.array
     }
 
     static defaultProps = {
         selectMode: TableSelectMode.NONE,
         selectionKeyIndex: 0,
-        pageLength: 50
+        pageLength: 50,
+        order: [[0, 'asc']]
     }
 
     refresh() {
@@ -277,6 +279,7 @@ class Table extends Component {
 
         const dtOptions = {
             columns,
+            order: this.props.order,
             autoWidth: false,
             pageLength: this.props.pageLength,
             dom: // This overrides Bootstrap 4 settings. It may need to be updated if there are updates in the DataTables Bootstrap 4 plugin.

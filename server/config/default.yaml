@@ -295,7 +295,7 @@ defaultRoles:
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
-        template: [view, edit, delete, share, viewFiles, manageFiles]
+        template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
         reportTemplate: [view, edit, delete, share, execute]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
@@ -310,7 +310,7 @@ defaultRoles:
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
-        template: [view, edit, delete, share, viewFiles, manageFiles]
+        template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
         reportTemplate: [view, share, execute]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
@@ -323,7 +323,7 @@ defaultRoles:
       children:
         sendConfiguration: [viewPublic]
         campaign: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, sendToTestUsers, viewStats, fetchRss]
-        template: [view, edit, delete, viewFiles, manageFiles]
+        template: [view, edit, delete, viewFiles, manageFiles, sendToTestUsers]
         mosaicoTemplate: [view, viewFiles]
         namespace: [view, createTemplate, createCampaign]
 
@@ -385,7 +385,7 @@ defaultRoles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFiles, manageFiles]
+      permissions: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
     viewer:
       name: Viewer
       description: The user can view the template but cannot edit it.

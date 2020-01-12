@@ -53,7 +53,7 @@ export default class List extends Component {
                     const actions = [];
                     const perms = data[7];
 
-                    if (perms.includes('edit')) {
+                    if (perms.includes('view') || perms.includes('edit')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/templates/${data[0]}/edit`
