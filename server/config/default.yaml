@@ -352,6 +352,10 @@ defaultRoles:
       name: Master
       description: All permissions
       permissions: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
+    sender:
+      name: Sender
+      description: The user can use the list in setting up a campaign, view the subscriptions, and send an email to test users and to the whole list.
+      permissions: [view, viewFields, viewSegments, viewTestSubscriptions, viewSubscriptions, send, sendToTestUsers]
     campaignsCreator:
       name: Campaigns Creator
       description: The user can only use the list in setting up a campaign and to send email to test users. This gives no permission to view subscriptions or to send to the whole list.
