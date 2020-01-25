@@ -258,7 +258,7 @@ router.postAsync('/blacklist/delete', passport.loggedIn, async (req, res) => {
         throw new APIError('EMAIL argument is required', 400);
     }
 
-    await blacklist.remove(req.oontext, input.EMAIL);
+    await blacklist.remove(req.context, input.EMAIL);
 
     res.json({
         data: []
