@@ -31,7 +31,7 @@ if [ ! -z "$MAILTRAIN_SETTING" ]; then
     exit 1
 fi
 
-if [ -f application/config/config.php ]; then
+if [ -f server/config/production.yaml ]; then
     echo 'Info: application/production.yaml already provisioned'
 else
     echo 'Info: Generating application/production.yaml'
