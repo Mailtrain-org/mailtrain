@@ -121,6 +121,32 @@ async function getByCid(context, cid) {
     });
 }
 
+async function getByNamespaceIdTx(tx, context, namespaceId) {
+  // FIXME - this methods is rather suboptimal if there are many lists. It quite needs permission caching in shares.js
+
+  const rows = await tx('lists').where('namespace', namespaceId);
+  await shares.enforceEntityPermissionTx(tx, context, 'namespace', namespaceId, 'view');
+
+  const allowed = [];
+
+  for (const list of rows) {
+    try {
+      await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'view');
+    } catch(e) {
+      continue
+    }
+    allowed.push(list);
+  }
+
+  return allowed;
+}
+
+async function getByNamespaceId(context, namespaceId) {
+  return await knex.transaction(async tx => {
+    return getByNamespaceIdTx(tx, context, namespaceId);
+  });
+}
+
 async function _validateAndPreprocess(tx, entity) {
     await namespaceHelpers.validateEntity(tx, entity);
     enforce(entity.unsubscription_mode >= UnsubscriptionMode.MIN && entity.unsubscription_mode <= UnsubscriptionMode.MAX, 'Unknown unsubscription mode');
@@ -283,6 +309,7 @@ module.exports.getById = getById;
 module.exports.getByIdWithListFields = getByIdWithListFields;
 module.exports.getByCidTx = getByCidTx;
 module.exports.getByCid = getByCid;
+module.exports.getByNamespaceId = getByNamespaceId;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
