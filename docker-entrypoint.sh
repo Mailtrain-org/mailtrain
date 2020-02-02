@@ -8,7 +8,9 @@ default_filter="(|(username={{username}})(mail={{username}}))"
 URL_BASE_TRUSTED=${URL_BASE_TRUSTED:-'http://localhost:3000'}
 URL_BASE_SANDBOX=${URL_BASE_SANDBOX:-'http://localhost:3003'}
 URL_BASE_PUBLIC=${URL_BASE_PUBLIC:-'http://localhost:3004'}
+WWW_HOST=${WWW_HOST:-'0.0.0.0'}
 WWW_PROXY=${WWW_PROXY:-'false'}
+WWW_SECRET=${WWW_SECRET:-$(pwgen -1)}
 WITH_LDAP=${WITH_LDAP:-'false'}
 LDAP_HOST=${LDAP_HOST:-'ldap'}
 LDAP_PORT=${LDAP_PORT:-'389'}
@@ -45,9 +47,9 @@ else
     # Basic configuration
     cat >> server/config/production.yaml <<EOT
 www:
-  host: 0.0.0.0
+  host: $WWW_HOST
   proxy: $WWW_PROXY
-  secret: "`pwgen -1`"
+  secret: $WWW_SECRET
   trustedUrlBase: $URL_BASE_TRUSTED
   sandboxUrlBase: $URL_BASE_SANDBOX
   publicUrlBase: $URL_BASE_PUBLIC

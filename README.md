@@ -213,7 +213,9 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | URL_BASE_TRUSTED | sets the trusted url of the instance (default: http://localhost:3000) |
 | URL_BASE_SANDBOX | sets the sandbox url of the instance (default: http://localhost:3003) |
 | URL_BASE_PUBLIC  | sets the public url of the instance (default: http://localhost:3004)  |
+| WWW_HOST         | sets the address that the server binds to (default: 0.0.0.0)          |
 | WWW_PROXY        | use if Mailtrain is behind an http reverse proxy (default: false)     |
+| WWW_SECRET       | sets the secret for the express session (default: `$(pwgen -1)`)      |
 | MONGO_HOST       | sets mongo host (default: mongo)                                      |
 | REDIS_HOST       | sets redis host (default: redis)                                      |
 | MYSQL_HOST       | sets mysql host (default: mysql)                                      |
