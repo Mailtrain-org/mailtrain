@@ -27,11 +27,13 @@ LDAP_MAILTAG=${LDAP_MAILTAG:-'mail'}
 LDAP_NAMETAG=${LDAP_NAMETAG:-'username'}
 LDAP_METHOD=${LDAP_METHOD:-'ldapjs'}
 MONGO_HOST=${MONGO_HOST:-'mongo'}
+WITH_REDIS=${WITH_REDIS:-'true'}
 REDIS_HOST=${REDIS_HOST:-'redis'}
 MYSQL_HOST=${MYSQL_HOST:-'mysql'}
 MYSQL_DATABASE=${MYSQL_DATABASE:-'mailtrain'}
 MYSQL_USER=${MYSQL_USER:-'mailtrain'}
 MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
+WITH_ZONE_MTA=${WITH_ZONE_MTA:-'true'}
 POOL_NAME=${POOL_NAME:-$(hostname)}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
@@ -67,10 +69,11 @@ mysql:
   password: $MYSQL_PASSWORD
 
 redis:
-  enabled: true
+  enabled: $WITH_REDIS
   host: $REDIS_HOST
 
 builtinZoneMTA:
+  enabled: $WITH_ZONE_MTA
   log:
     level: warn
   mongo: mongodb://${MONGO_HOST}:27017/zone-mta
@@ -125,11 +128,15 @@ fi
 echo 'Info: Waiting for MySQL Server'
 while ! nc -z $MYSQL_HOST 3306; do sleep 1; done
 
-echo 'Info: Waiting for Redis Server'
-while ! nc -z $REDIS_HOST 6379; do sleep 1; done
+if [ "$WITH_REDIS" = "true" ]; then
+  echo 'Info: Waiting for Redis Server'
+  while ! nc -z $REDIS_HOST 6379; do sleep 1; done
+fi
 
-echo 'Info: Waiting for MongoDB Server'
-while ! nc -z $MONGO_HOST 27017; do sleep 1; done
+if [ "$WITH_ZONE_MTA" = "true" ]; then
+  echo 'Info: Waiting for MongoDB Server'
+  while ! nc -z $MONGO_HOST 27017; do sleep 1; done
+fi
 
 cd server
 NODE_ENV=production node index.js
