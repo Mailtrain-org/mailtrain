@@ -5,9 +5,12 @@ set -e
 
 default_filter="(|(username={{username}})(mail={{username}}))"
 
-URL_BASE_TRUSTED=${URL_BASE_TRUSTED:-'http://localhost:3000'}
-URL_BASE_SANDBOX=${URL_BASE_SANDBOX:-'http://localhost:3003'}
-URL_BASE_PUBLIC=${URL_BASE_PUBLIC:-'http://localhost:3004'}
+URL_BASE_TRUSTED=${URL_BASE_TRUSTED:-'http://localhost'}
+URL_BASE_SANDBOX=${URL_BASE_SANDBOX:-'http://localhost'}
+URL_BASE_PUBLIC=${URL_BASE_PUBLIC:-'http://localhost'}
+PORT_TRUSTED=${PORT_TRUSTED:-'3000'}
+PORT_SANDBOX=${PORT_SANDBOX:-'3003'}
+PORT_PUBLIC=${PORT_PUBLIC:-'3004'}
 WWW_HOST=${WWW_HOST:-'0.0.0.0'}
 WWW_PROXY=${WWW_PROXY:-'false'}
 WWW_SECRET=${WWW_SECRET:-$(pwgen -1)}
@@ -50,9 +53,12 @@ www:
   host: $WWW_HOST
   proxy: $WWW_PROXY
   secret: $WWW_SECRET
-  trustedUrlBase: $URL_BASE_TRUSTED
-  sandboxUrlBase: $URL_BASE_SANDBOX
-  publicUrlBase: $URL_BASE_PUBLIC
+  trustedPort: $PORT_TRUSTED
+  sandboxPort: $PORT_SANDBOX
+  publicPort: $PORT_PUBLIC
+  trustedUrlBase: $URL_BASE_TRUSTED:${PORT_TRUSTED}
+  sandboxUrlBase: $URL_BASE_SANDBOX:${PORT_SANDBOX}
+  publicUrlBase: $URL_BASE_PUBLIC:${PORT_PUBLIC}
 
 mysql:
   host: $MYSQL_HOST
