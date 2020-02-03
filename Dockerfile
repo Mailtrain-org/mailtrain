@@ -9,6 +9,7 @@ RUN apk add git
 ENV TZ=America/Argentina/Buenos_Aires
 
 RUN npm install -f
+RUN npm install posix --save
 
 COPY . /app/
 
