@@ -88,12 +88,12 @@ postsize="2MB"
 
 [mysql]
 host="localhost"
-user="mailtrain"
-password="mailtrain"
+user="root"
+password="root"
 database="mailtrain"
 # Some installations, eg. MAMP can use a different port (8889)
 # MAMP users should also turn on "Allow network access to MySQL" otherwise MySQL might not be accessible
-port=3306
+port=8889
 charset="utf8mb4"
 # The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
 timezone="local"
