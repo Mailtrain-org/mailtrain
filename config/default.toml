@@ -58,7 +58,7 @@ level="verbose"
 
 [www]
 # HTTP port to listen on
-port=3000
+port=3001
 # HTTP interface to listen on
 host="0.0.0.0"
 # Enable HTTPS
@@ -87,13 +87,13 @@ postsize="2MB"
 #tmpdir="/tmp"
 
 [mysql]
-host="srv-captain--db-mysql-itopps"
+host="localhost"
 user="root"
-password="86CA89311DA8862F3F065E14D011CDBA481B6A86403AE02DF3FF0FAD8239A8FF0BF15A46FCA1A05819929E95A95FBE08A27C0E7D0246E9A8D6E609A2B82B28F7"
+password="root"
 database="mailtrain"
 # Some installations, eg. MAMP can use a different port (8889)
 # MAMP users should also turn on "Allow network access to MySQL" otherwise MySQL might not be accessible
-port=3306
+port=8889
 charset="utf8mb4"
 # The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
 timezone="local"

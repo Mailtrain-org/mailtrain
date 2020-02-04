@@ -8,11 +8,11 @@ RUN apk add --no-cache tzdata
 RUN apk add git
 ENV TZ=America/Argentina/Buenos_Aires
 
-RUN npm install -f
-RUN npm install posix --save
+RUN npm install -g npm
+RUN npm install --prod -f
 
 COPY . /app/
 
-EXPOSE 3000  
+EXPOSE 3001
 
-CMD npm run start
+CMD NODE_ENV=prod npm run start
