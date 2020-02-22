@@ -1,0 +1,216 @@
+# This file is the default config file for Mailtrain. To use a environment specific
+# configuration add new file {ENV}.{ext} (eg. "production.toml") to the same folder.
+# {ENV} is defined by NODE_ENV environment variable.
+#
+# Do not modify this file directly, otherwise you might lose your modifications when upgrading
+#
+# You should only define the options you want to change in your additional config file.
+# For example if the only thing you want to change is the port number for the www server
+# then your additional config file should look like this:
+#   # production.toml
+#   [www]
+#   port=80
+# or if you want to use Javascript instead of TOML then the same file could look like this:
+#   // production.js
+#   module.exports = {
+#       www: {
+#           port: 80
+#       }
+#   };
+
+# Process title visible in monitoring logs and process listing
+title="mailtrain"
+
+# Enabled HTML editors
+editors=[
+  ["summernote", "Summernote"],
+  ["grapejs", "GrapeJS"],
+  ["mosaico", "Mosaico"],
+  ["codeeditor", "Code Editor"]
+]
+
+# Default language to use
+language="en"
+
+# Inject custom styles in layout.hbs
+# customstyles=["/custom/hello-world.css"]
+
+# Inject custom scripts in layout.hbs
+# customscripts=["/custom/hello-world.js"]
+
+# Inject custom scripts in subscription/layout.mjml.hbs
+# customsubscriptionscripts=["/custom/hello-world.js"]
+
+# If you start out as a root user (eg. if you want to use ports lower than 1000)
+# then you can downgrade the user once all services are up and running
+#user="mailtrain"
+#group="mailtrain"
+
+# If Mailtrain is started as root, "Reports" feature drops the privileges of script generating the report to disallow
+# any modifications of Mailtrain code and even prohibits reading the production configuration (which contains the MySQL
+# password for read/write operations). The rouser/rogroup determines the user to be used
+#rouser="nobody"
+#rogroup="nogroup"
+
+[log]
+# silly|verbose|info|http|warn|error|silent
+level="verbose"
+
+[www]
+# HTTP port to listen on
+port=3001
+# HTTP interface to listen on
+host="0.0.0.0"
+# Enable HTTPS
+https=false
+# HTTPS certificate file name
+cert="cert.pem"
+# HTTPS certificate private key file name
+key="key.pem"
+# HTTPS ca certificate file name
+#ca="ca-certificate.pem"
+# HTTPS Diffie Hellman parameters (generate with openssl dhparam)
+#dhparams="dhparams.pem"
+# Secret for signing the session ID cookie
+secret="a cat"
+# Session length in seconds when "remember me" is checked
+remember=2592000 # 30 days
+# logger interface for expressjs morgan
+log="dev"
+# Is the server behind a proxy? true/false
+# Set this to true if you are serving Mailtrain as a virtual domain through Nginx or Apache
+proxy=false
+# maximum POST body size
+postsize="2MB"
+# Uncomment to set uploads folder location for temporary data. Defaults to os.tmpdir()
+# If the service is started by `npm start` then os.tmpdir() points to CWD
+#tmpdir="/tmp"
+
+[mysql]
+host="srv-captain--db-mysql-itopps"
+user="root"
+password="86CA89311DA8862F3F065E14D011CDBA481B6A86403AE02DF3FF0FAD8239A8FF0BF15A46FCA1A05819929E95A95FBE08A27C0E7D0246E9A8D6E609A2B82B28F7"
+database="mailtrain"
+# Some installations, eg. MAMP can use a different port (8889)
+# MAMP users should also turn on "Allow network access to MySQL" otherwise MySQL might not be accessible
+port=3306
+charset="utf8mb4"
+# The timezone configured on the MySQL server. This can be 'local', 'Z', or an offset in the form +HH:MM or -HH:MM
+timezone="local"
+
+[redis]
+# enable to use Redis session cache or disable if Redis is not installed
+enabled=false
+host="localhost"
+port=6379
+db=5
+# Uncomment if your Redis installation requires a password
+#password=""
+
+[verp]
+# Enable to start an MX server that detects bounced messages using VERP
+# In most cases you do not want to use it
+# Requires root privileges
+enabled=false
+port=2525
+host="0.0.0.0"
+# With DMARC, the Return-Path and From address must match the same domain.
+# By default we get around this by using the VERP address in the Sender header,
+# with the side effect that some email clients diplay an ugly "on behalf of" message.
+# You can safely disable this Sender header if you're not using DMARC or your
+# VERP hostname is in the same domain as the From address.
+# disablesenderheader=true
+
+[ldap]
+# enable to use ldap user backend
+enabled=false
+url="ldap://localhost:3002"
+baseDN="ou=users,dc=company"
+filter="(|(username={{username}})(mail={{username}}))"
+#Username field in LDAP (uid/cn/username)
+uidTag="username"
+passwordresetlink=""
+# Use a different user to bind LDAP (final bind DN will be: {{uidTag}}={{bindUser}},{{baseDN}})
+bindUser=""
+bindPassword=""
+#ca="self-signed-ca.pem"
+
+[ldapauth]
+# Alternative LDAP implementation using the more popular passport-ldapauth library.
+enabled=false
+url="ldap://localhost:389"
+# Subtree in which the searchrequest for the user is done
+baseDN="ou=users,dc=company"
+# What whe are searching for. This should return a single user.
+filter="(|(sAMAccountName={{username}})(mail={{username}}))"
+# Username field in LDAP, used to identify the user in Mailtrain (uid/cn/username/sAMAccountName)
+uidTag="sAMAccountName"
+passwordresetlink=""
+# Credentials for the initial search operation (final bind DN will be exactly as specified)
+bindUser="name@company.net"
+bindPassword="mySecretPassword"
+#ca="self-signed-ca.pem"
+
+[postfixbounce]
+# Enable to allow writing Postfix bounce log to Mailtrain listener
+# If enabled, tail mail.log to Mailtrain with the following command:
+#     tail -f -n +0 /var/log/mail.log | nc localhost 5699 -
+enabled=false
+port=5699
+# allow connections from localhost only
+host="127.0.0.1"
+
+# extra options for nodemailer
+[nodemailer]
+#textEncoding="base64"
+
+[queue]
+# How many parallel sender processes to spawn
+# You can use more than 1 process only if you have Redis enabled
+processes=1
+
+[cors]
+# Allow subscription widgets to be embedded
+# origins=['https://www.example.com']
+
+[mosaico]
+# Installed templates
+templates=[["versafix-1", "Versafix One"]]
+# Inject custom scripts
+# customscripts=["/mosaico/custom/my-mosaico-plugin.js"]
+
+[grapejs]
+# Installed templates
+templates=[
+  ["demo", "HTML Template"],
+  ["aves", "MJML Template"]
+]
+
+[reports]
+# The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be
+# properly protected.
+# Reports rely on custom user defined Javascript snippets defined in the report template. The snippets are run on the
+# server when generating a report. As these snippets are stored in the DB, they pose a security risk because they can
+# help gaining access to the server if the DB cannot
+# be properly protected (e.g. if it is shared with another application with security weaknesses).
+# Mailtrain mitigates this problem by running the custom Javascript snippets in a chrooted environment and under a
+# DB user that cannot modify the database (see userRO in [mysql] above). However the chrooted environment is available
+# only if Mailtrain is started as root. The chrooted environment still does not prevent the custom JS script in
+# performing network operations and in generating XSS attacks as part of the report.
+# The bottom line is that if people who are creating report templates or have write access to the DB cannot be trusted,
+# then it's safer to switch off the reporting functionality below.
+enabled=false
+
+[testserver]
+# Starts a vanity server that redirects all mail to /dev/null
+# Mostly needed for local development
+enabled=false
+port=5587
+mailboxserverport=3001
+host="0.0.0.0"
+username="testuser"
+password="testpass"
+logger=false
+
+[seleniumwebdriver]
+browser="phantomjs"

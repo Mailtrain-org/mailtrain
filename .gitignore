@@ -6,7 +6,7 @@ npm-debug.log
 package-lock.json
 .DS_Store
 config/development*
-config/production*
+# config/production*
 config/test*
 workers/reports/config/development.*
 workers/reports/config/production.*
