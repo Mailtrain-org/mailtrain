@@ -15,4 +15,4 @@ COPY . /app/
 
 EXPOSE 3001
 
-CMD NODE_ENV=prod npm run start
+CMD npm run prod

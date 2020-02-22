@@ -58,7 +58,7 @@ level="verbose"
 
 [www]
 # HTTP port to listen on
-port=3000
+port=3001
 # HTTP interface to listen on
 host="0.0.0.0"
 # Enable HTTPS
