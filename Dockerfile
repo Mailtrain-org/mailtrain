@@ -1,4 +1,4 @@
-FROM node:10.13.0-alpine
+FROM node:13.8.0-alpine
 
 WORKDIR /app  
 
@@ -10,10 +10,7 @@ RUN apk add --no-cache tzdata
 RUN apk add git
 ENV TZ=America/Argentina/Buenos_Aires
 
-
-RUN npm install -g npm
 RUN npm install --prod -f
-RUN npm install -g posix
 
 COPY . /app/
 
