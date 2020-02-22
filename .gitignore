@@ -29,6 +29,6 @@ public/grapejs/templates/*
 !public/grapejs/templates/demo
 !public/grapejs/templates/aves
 
-config/production.toml
+# config/production.toml
 workers/reports/config/production.toml
 docker-compose.override.yml
