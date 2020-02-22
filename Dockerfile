@@ -10,6 +10,7 @@ ENV TZ=America/Argentina/Buenos_Aires
 
 RUN npm install -g npm
 RUN npm install --prod -f
+RUN npm install -g posix
 
 COPY . /app/
 
