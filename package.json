@@ -7,7 +7,7 @@
   "scripts": {
     "test": "grunt",
     "start": "node index.js",
-    "prod": "NODE_ENV=prod node index.js",
+    "prod": "NODE_ENV=production node index.js",
     "sqlinit": "node setup/sql/init.js",
     "sqldump": "node setup/sql/dump.js | sed -e '/^\\/\\*.*\\*\\/;$/d' -e 's/.[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]./NOW()/g' > setup/sql/mailtrain${DUMP_NAME_SUFFIX}.sql",
     "sqldrop": "node setup/sql/drop.js",
