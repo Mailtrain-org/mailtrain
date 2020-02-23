@@ -3,6 +3,21 @@
     -webkit-animation: spin2 1s infinite linear;
 }
 
+.navbar-default .navbar-nav > li > a {
+    color: #000!important;
+}
+
+.navbar-default .navbar-nav > li > a:hover {
+    color: white!important;
+    background-color: rgb(33, 15, 145);
+}
+
+.navbar-default .navbar-nav > .active > a {
+    color: white!important;
+    background-color: rgb(67, 33, 145);
+}
+
+
 @keyframes spin {
     from { transform: scale(1) rotate(0deg); }
     to { transform: scale(1) rotate(360deg); }
@@ -12,6 +27,7 @@
     from { -webkit-transform: rotate(0deg); }
     to { -webkit-transform: rotate(360deg); }
 }
+
 
 /* Supporting wider description lists */
 
