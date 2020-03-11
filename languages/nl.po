@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Language-Team: \n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2020-03-11 14:07+0100\n"
+"PO-Revision-Date: 2020-03-11 21:17+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,7 +15,7 @@ msgstr ""
 
 #: views/archive/layout.hbs:1 views/layout.hbs:1
 msgid "Self hosted email newsletter app"
-msgstr ""
+msgstr "Zelf gehoste e-mail nieuwsbrief app"
 
 #: views/blacklist.hbs:1 views/campaigns/blacklisted.hbs:1
 #: views/campaigns/bounced.hbs:1 views/campaigns/campaigns.hbs:1
@@ -49,24 +49,24 @@ msgstr ""
 #: views/users/account.hbs:1 views/users/api.hbs:1 views/users/forgot.hbs:1
 #: views/users/login.hbs:1 views/users/reset.hbs:1 app.js:169
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: views/blacklist.hbs:2 views/blacklist.hbs:3 views/layout.hbs:7
 #: views/lists/subscription/edit.hbs:15
 msgid "Blacklist"
-msgstr ""
+msgstr "Zwarte lijst"
 
 #: views/blacklist.hbs:4 views/users/api.hbs:77
 msgid "Add email to blacklist"
-msgstr ""
+msgstr "E-mail toevoegen aan zwarte lijst"
 
 #: views/blacklist.hbs:5
 msgid "Add"
-msgstr ""
+msgstr "Toevoegen"
 
 #: views/blacklist.hbs:6
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: views/campaigns/blacklisted.hbs:2 views/campaigns/bounced.hbs:2
 #: views/campaigns/campaigns.hbs:2 views/campaigns/campaigns.hbs:7
@@ -78,11 +78,11 @@ msgstr ""
 #: views/campaigns/unsubscribed.hbs:2 views/campaigns/upload-attachment.hbs:2
 #: views/campaigns/view.hbs:2 lib/tools.js:133 routes/campaigns.js:35
 msgid "Campaigns"
-msgstr ""
+msgstr "Campagnes"
 
 #: views/campaigns/blacklisted.hbs:3 views/campaigns/blacklisted.hbs:4
 msgid "Blacklisted info"
-msgstr ""
+msgstr "Zwarte lijst info"
 
 #: views/campaigns/blacklisted.hbs:5 views/campaigns/bounced.hbs:5
 #: views/campaigns/clicked.hbs:5 views/campaigns/complained.hbs:5
@@ -91,11 +91,11 @@ msgstr ""
 #: views/campaigns/opened.hbs:5 views/campaigns/unsubscribed.hbs:5
 #: views/campaigns/upload-attachment.hbs:6
 msgid "View campaign"
-msgstr ""
+msgstr "Campagne bekijken"
 
 #: views/campaigns/blacklisted.hbs:6
 msgid "Subscribers who blacklisted by global blacklist:"
-msgstr ""
+msgstr "Abonnees die op de zwarte lijst staan door de algemene zwarte lijst:"
 
 #: views/campaigns/blacklisted.hbs:7 views/campaigns/bounced.hbs:7
 #: views/campaigns/clicked.hbs:15 views/campaigns/complained.hbs:7
@@ -104,7 +104,7 @@ msgstr ""
 #: views/lists/subscription/import-failed.hbs:8 views/lists/view.hbs:19
 #: views/triggers/triggered.hbs:6
 msgid "Address"
-msgstr ""
+msgstr "Adres"
 
 #: views/campaigns/blacklisted.hbs:8 views/campaigns/bounced.hbs:8
 #: views/campaigns/clicked.hbs:16 views/campaigns/complained.hbs:8
@@ -115,7 +115,7 @@ msgstr ""
 #: views/subscription/partials/subscription-custom-fields.hbs:3
 #: views/triggers/triggered.hbs:7
 msgid "First Name"
-msgstr ""
+msgstr "Voornaam"
 
 #: views/campaigns/blacklisted.hbs:9 views/campaigns/bounced.hbs:9
 #: views/campaigns/clicked.hbs:17 views/campaigns/complained.hbs:9
@@ -126,50 +126,50 @@ msgstr ""
 #: views/subscription/partials/subscription-custom-fields.hbs:4
 #: views/triggers/triggered.hbs:8
 msgid "Last Name"
-msgstr ""
+msgstr "Familienaam"
 
 #: views/campaigns/blacklisted.hbs:10
 msgid "Reason"
-msgstr ""
+msgstr "Reden"
 
 #: views/campaigns/blacklisted.hbs:11
 msgid "Time"
-msgstr ""
+msgstr "Tijd"
 
 #: views/campaigns/bounced.hbs:3 views/campaigns/bounced.hbs:4
 msgid "Bounced info"
-msgstr ""
+msgstr "Bounced info"
 
 #: views/campaigns/bounced.hbs:6
 msgid "Subscribers who bounced and were unsubscribed:"
-msgstr ""
+msgstr "Abonnees die zijn teruggestuurd en werden afgemeld:"
 
 #: views/campaigns/bounced.hbs:10 views/campaigns/complained.hbs:10
 #: views/campaigns/delivered.hbs:10 views/campaigns/unsubscribed.hbs:10
 msgid "SMTP response"
-msgstr ""
+msgstr "SMTP antwoord"
 
 #: views/campaigns/bounced.hbs:11
 msgid "Bounce time"
-msgstr ""
+msgstr "Bounce tijd"
 
 #: views/campaigns/campaigns.hbs:3 views/campaigns/create-triggered.hbs:26
 #: views/campaigns/create.hbs:3 views/campaigns/create.hbs:4
 #: views/campaigns/create.hbs:30
 msgid "Create Campaign"
-msgstr ""
+msgstr "Campagne maken"
 
 #: views/campaigns/campaigns.hbs:4
 msgid "Regular Campaign"
-msgstr ""
+msgstr "Normale campagne"
 
 #: views/campaigns/campaigns.hbs:5
 msgid "RSS Campaign"
-msgstr ""
+msgstr "RSS campagne"
 
 #: views/campaigns/campaigns.hbs:6
 msgid "Triggered Campaign"
-msgstr ""
+msgstr "Getriggerde campagne"
 
 #: views/campaigns/campaigns.hbs:8 views/campaigns/create-rss.hbs:6
 #: views/campaigns/create-triggered.hbs:5 views/campaigns/create.hbs:5
@@ -185,7 +185,7 @@ msgstr ""
 #: views/reports/partials/report-fields.hbs:9 views/reports/reports.hbs:6
 #: views/templates/templates.hbs:5 views/triggers/triggers.hbs:5
 msgid "Name"
-msgstr ""
+msgstr "Naam"
 
 #: views/campaigns/campaigns.hbs:9 views/campaigns/create-rss.hbs:8
 #: views/campaigns/create-triggered.hbs:7 views/campaigns/create.hbs:7
@@ -203,85 +203,85 @@ msgstr ""
 #: views/templates/templates.hbs:6 views/triggers/create.hbs:7
 #: views/triggers/edit.hbs:8 views/triggers/triggers.hbs:7
 msgid "Description"
-msgstr ""
+msgstr "Beschrijving"
 
 #: views/campaigns/campaigns.hbs:10 views/campaigns/view.hbs:75
 #: views/lists/view.hbs:22 views/lists/view.hbs:30
 #: views/triggers/triggers.hbs:6
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: views/campaigns/campaigns.hbs:11 views/campaigns/view.hbs:76
 #: views/lists/view.hbs:23 views/lists/view.hbs:24
 #: views/report-templates/report-templates.hbs:12
 #: views/reports/partials/report-fields.hbs:7 views/reports/reports.hbs:9
 msgid "Created"
-msgstr ""
+msgstr "Aangemaakt"
 
 #: views/campaigns/clicked.hbs:3 views/campaigns/clicked.hbs:4
 msgid "Link info"
-msgstr ""
+msgstr "Link info"
 
 #: views/campaigns/clicked.hbs:6 views/campaigns/view.hbs:63
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: views/campaigns/clicked.hbs:7 views/campaigns/view.hbs:64
 msgid "Clicks"
-msgstr ""
+msgstr "Kliks"
 
 #: views/campaigns/clicked.hbs:8 views/campaigns/view.hbs:65
 msgid "% of clicks"
-msgstr ""
+msgstr "% van kliks"
 
 #: views/campaigns/clicked.hbs:9 views/campaigns/view.hbs:66
 msgid "% of messages"
-msgstr ""
+msgstr "% van berichten"
 
 #: views/campaigns/clicked.hbs:10 views/campaigns/view.hbs:69
 msgid "Aggregated clicks"
-msgstr ""
+msgstr "Geaggregeerde klikken"
 
 #: views/campaigns/clicked.hbs:11
 msgid "Subscribers who clicked on a link:"
-msgstr ""
+msgstr "Abonnees die op een link hebben geklikt:"
 
 #: views/campaigns/clicked.hbs:12
 msgid "Subscribers who clicked on this link:"
-msgstr ""
+msgstr "Abonnees die op deze link hebben geklikt:"
 
 #: views/campaigns/clicked.hbs:13 views/campaigns/opened.hbs:7
 msgid "Stats by country"
-msgstr ""
+msgstr "Statistieken per land"
 
 #: views/campaigns/clicked.hbs:14 views/campaigns/opened.hbs:8
 msgid "Stats by device type"
-msgstr ""
+msgstr "Statistieken per apparaattype"
 
 #: views/campaigns/clicked.hbs:18
 msgid "First click time"
-msgstr ""
+msgstr "Eerste klik tijd"
 
 #: views/campaigns/clicked.hbs:19
 msgid "Click count"
-msgstr ""
+msgstr "Aantal kliks"
 
 #: views/campaigns/complained.hbs:3 views/campaigns/complained.hbs:4
 msgid "Complained info"
-msgstr ""
+msgstr "Klachten info"
 
 #: views/campaigns/complained.hbs:6
 msgid "Subscribers who complained and were unsubscribed:"
-msgstr ""
+msgstr "Abonnees die hebben geklaagd en zich hebben afgemeld:"
 
 #: views/campaigns/complained.hbs:11
 msgid "Complain time"
-msgstr ""
+msgstr "Klacht tijd"
 
 #: views/campaigns/create-rss.hbs:3 views/campaigns/create-rss.hbs:4
 #: views/campaigns/create-rss.hbs:21
 msgid "Create RSS Campaign"
-msgstr ""
+msgstr "Maak een RSS-campagne"
 
 #: views/campaigns/create-rss.hbs:5 views/campaigns/edit-rss.hbs:6
 msgid ""
@@ -289,12 +289,15 @@ msgid ""
 "new entry is found from this feed it is sent to selected list as an email "
 "message."
 msgstr ""
+"Een RSS-campagne stelt een tracker in tegen het geselecteerde RSS-feedadres. "
+"Wanneer er een nieuw item wordt toegevoegd in deze feed, wordt dit als een e-"
+"mailbericht naar de geselecteerde lijst verzonden."
 
 #: views/campaigns/create-rss.hbs:7 views/campaigns/create-triggered.hbs:6
 #: views/campaigns/create.hbs:6 views/campaigns/edit-rss.hbs:9
 #: views/campaigns/edit-triggered.hbs:10 views/campaigns/edit.hbs:11
 msgid "Campaign Name"
-msgstr ""
+msgstr "Campagne naam"
 
 #: views/campaigns/create-rss.hbs:9 views/campaigns/create-triggered.hbs:8
 #: views/campaigns/create.hbs:8 views/campaigns/edit-rss.hbs:11
@@ -305,7 +308,7 @@ msgstr ""
 #: views/templates/edit.hbs:10 views/triggers/create.hbs:9
 #: views/triggers/edit.hbs:10
 msgid "HTML is allowed"
-msgstr ""
+msgstr "HTML is toegestaan"
 
 #: views/campaigns/create-rss.hbs:10 views/campaigns/create-triggered.hbs:9
 #: views/campaigns/create.hbs:9 views/campaigns/edit-rss.hbs:12
@@ -314,7 +317,7 @@ msgstr ""
 #: views/triggers/create.hbs:10 views/triggers/edit.hbs:12
 #: views/triggers/triggers.hbs:8
 msgid "List"
-msgstr ""
+msgstr "Lijst"
 
 #: views/campaigns/create-rss.hbs:11 views/campaigns/create-triggered.hbs:10
 #: views/campaigns/create-triggered.hbs:14 views/campaigns/create.hbs:10
@@ -333,7 +336,7 @@ msgstr ""
 #: views/triggers/edit.hbs:19 views/triggers/edit.hbs:22
 #: views/triggers/edit.hbs:24 views/triggers/edit.hbs:28
 msgid "Select"
-msgstr ""
+msgstr "Selecteer"
 
 #: views/campaigns/create-rss.hbs:12 views/campaigns/create-triggered.hbs:11
 #: views/campaigns/create.hbs:11 views/campaigns/edit-rss.hbs:14
@@ -341,80 +344,84 @@ msgstr ""
 #: views/triggers/create-select.hbs:8 views/triggers/create.hbs:11
 #: views/triggers/edit.hbs:13
 msgid "subscribers"
-msgstr ""
+msgstr "abonnees"
 
 #: views/campaigns/create-rss.hbs:13 views/campaigns/edit-rss.hbs:15
 msgid "RSS Feed Url"
-msgstr ""
+msgstr "RSS Feed Url"
 
 #: views/campaigns/create-rss.hbs:14 views/campaigns/edit-rss.hbs:16
 msgid ""
 "New entries from this RSS URL are sent out to list subscribers as email "
 "messages"
 msgstr ""
+"Nieuwe items van deze RSS-URL worden als e-mailberichten naar lijstabonnees "
+"verzonden"
 
 #: views/campaigns/create-rss.hbs:15 views/campaigns/create-triggered.hbs:18
 #: views/campaigns/create.hbs:18 views/campaigns/edit-rss.hbs:18
 #: views/campaigns/edit-triggered.hbs:16 views/campaigns/edit.hbs:17
 #: views/campaigns/view.hbs:12
 msgid "Email \"from name\""
-msgstr ""
+msgstr "E-mail \"van naam\""
 
 #: views/campaigns/create-rss.hbs:16 views/campaigns/create-triggered.hbs:19
 #: views/campaigns/create.hbs:19 views/campaigns/edit-rss.hbs:19
 #: views/campaigns/edit-triggered.hbs:17 views/campaigns/edit.hbs:18
 #: views/settings.hbs:25
 msgid "This is the name your emails will come from"
-msgstr ""
+msgstr "Dit is de naam waar uw e-mails vandaan zullen komen"
 
 #: views/campaigns/create-rss.hbs:17 views/campaigns/create-triggered.hbs:20
 #: views/campaigns/create.hbs:20 views/campaigns/edit-rss.hbs:20
 #: views/campaigns/edit-triggered.hbs:18 views/campaigns/edit.hbs:19
 #: views/campaigns/view.hbs:13
 msgid "Email \"from\" address"
-msgstr ""
+msgstr "E-mail \"van\" adres"
 
 #: views/campaigns/create-rss.hbs:18 views/campaigns/create-triggered.hbs:21
 #: views/campaigns/edit-rss.hbs:21 views/campaigns/edit-triggered.hbs:19
 #: views/settings.hbs:27
 msgid "This is the address people will send replies to"
-msgstr ""
+msgstr "Dit is het adres waarnaar mensen zullen antwoorden"
 
 #: views/campaigns/create-rss.hbs:19 views/campaigns/create-triggered.hbs:24
 #: views/campaigns/create.hbs:28 views/campaigns/edit-rss.hbs:22
 #: views/campaigns/edit-triggered.hbs:22 views/campaigns/edit.hbs:27
 msgid "Disable opened tracking"
-msgstr ""
+msgstr "Schakel geopend volgen uit"
 
 #: views/campaigns/create-rss.hbs:20 views/campaigns/create-triggered.hbs:25
 #: views/campaigns/create.hbs:29 views/campaigns/edit-rss.hbs:23
 #: views/campaigns/edit-triggered.hbs:23 views/campaigns/edit.hbs:28
 msgid "Disable clicked tracking"
-msgstr ""
+msgstr "Tracking op klikken uitschakelen"
 
 #: views/campaigns/create-triggered.hbs:3
 #: views/campaigns/create-triggered.hbs:4
 msgid "Create Triggered Campaign"
-msgstr ""
+msgstr "Maak een getriggerde campagne"
 
 #: views/campaigns/create-triggered.hbs:12 views/campaigns/create.hbs:12
 #: views/campaigns/edit-triggered.hbs:7 views/campaigns/edit.hbs:7
 #: views/lists/fields/create.hbs:32 views/lists/fields/edit.hbs:34
 #: views/reports/reports.hbs:7 views/templates/create.hbs:13
 msgid "Template"
-msgstr ""
+msgstr "Sjabloon"
 
 #: views/campaigns/create-triggered.hbs:13 views/campaigns/create.hbs:13
 msgid "Select a template:"
-msgstr ""
+msgstr "Selecteer een sjabloon:"
 
 #: views/campaigns/create-triggered.hbs:15 views/campaigns/create.hbs:15
 msgid "Selecting a template creates a campaign specific copy from it"
 msgstr ""
+"Als u een sjabloon selecteert, wordt er een campagnespecifieke kopie van "
+"gemaakt"
 
 #: views/campaigns/create-triggered.hbs:16 views/campaigns/create.hbs:16
 msgid "Or alternatively use an URL as the message content source:"
-msgstr ""
+msgstr "Of gebruik als alternatief een URL als de bron van de berichtinhoud:"
 
 #: views/campaigns/create-triggered.hbs:17 views/campaigns/create.hbs:17
 #: views/campaigns/edit-triggered.hbs:26 views/campaigns/edit.hbs:31
@@ -422,73 +429,83 @@ msgid ""
 "If a message is sent then this URL will be POSTed to using Merge Tags as "
 "POST body. Use this if you want to generate the HTML message yourself"
 msgstr ""
+"Als een bericht wordt verzonden, wordt deze URL gePOST voor het gebruik van "
+"Merge Tags als POST-body. Gebruik dit als u zelf het HTML-bericht wilt "
+"genereren"
 
 #: views/campaigns/create-triggered.hbs:22 views/campaigns/create.hbs:24
 #: views/campaigns/edit-triggered.hbs:20 views/campaigns/edit.hbs:23
 #: views/campaigns/view.hbs:15
 msgid "Email \"subject line\""
-msgstr ""
+msgstr "E-mail \"onderwerpregel\""
 
 #: views/campaigns/create-triggered.hbs:23 views/campaigns/create.hbs:25
 #: views/campaigns/edit-triggered.hbs:21 views/campaigns/edit.hbs:24
 #: views/settings.hbs:29
 msgid "Keep it relevant and non-spammy"
-msgstr ""
+msgstr "Hou het relevant en niet-spammig"
 
 #: views/campaigns/create.hbs:21 views/campaigns/edit.hbs:20
 msgid ""
 "This is the address people will send replies to unless reply-to address is "
 "set"
 msgstr ""
+"Dit is het adres waarnaar mensen zullen antwoorden tenzij het antwoordadres "
+"is ingevuld"
 
 #: views/campaigns/create.hbs:22 views/campaigns/edit.hbs:21
 #: views/campaigns/view.hbs:14
 msgid "Email \"reply-to\" address"
-msgstr ""
+msgstr "E-mail \"antwoord\" adres"
 
 #: views/campaigns/create.hbs:23 views/campaigns/edit.hbs:22
 msgid "If set, this is the address people will send replies to"
-msgstr ""
+msgstr "Indien ingevuld, is dit het adres waarnaar mensen zullen antwoorden"
 
 #: views/campaigns/create.hbs:26 views/campaigns/edit.hbs:25
 msgid "Custom unsubscribe (URL)"
-msgstr ""
+msgstr "Op maat gemaakte afmelding (URL)"
 
 #: views/campaigns/create.hbs:27 views/campaigns/edit.hbs:26
 msgid "Set a custom unsubscribe url"
-msgstr ""
+msgstr "Stel een aangepaste afmeldings-URL in"
 
 #: views/campaigns/delivered.hbs:3 views/campaigns/delivered.hbs:4
 msgid "Delivered info"
-msgstr ""
+msgstr "Geleverde info"
 
 #: views/campaigns/delivered.hbs:6
 msgid "Subscribers who received the message and did not bounce/unsubscribe:"
 msgstr ""
+"Abonnees die het bericht hebben ontvangen en niet hebben gebounced / "
+"afgemeld:"
 
 #: views/campaigns/delivered.hbs:11
 msgid "Delivery time"
-msgstr ""
+msgstr "Bezorgtijd"
 
 #: views/campaigns/edit-rss.hbs:3 views/campaigns/edit-rss.hbs:4
 msgid "Edit RSS Campaign"
-msgstr ""
+msgstr "RSS-campagne bewerken"
 
 #: views/campaigns/edit-rss.hbs:7 views/campaigns/edit-triggered.hbs:8
 #: views/campaigns/edit.hbs:9 views/settings.hbs:4 views/users/account.hbs:6
 msgid "General Settings"
-msgstr ""
+msgstr "Algemene instellingen"
 
 #: views/campaigns/edit-rss.hbs:17
 msgid ""
 "Use special merge tag [RSS_ENTRY] to mark the position for the RSS post "
 "content. Additionally you can use any valid merge tag as well."
 msgstr ""
+"Gebruik een speciale samenvoegtag [RSS_ENTRY] om de positie voor de inhoud "
+"van het RSS-bericht te markeren. Bovendien kunt u ook elke geldige "
+"samenvoegtag gebruiken."
 
 #: views/campaigns/edit-rss.hbs:24 views/campaigns/edit-triggered.hbs:27
 #: views/campaigns/edit.hbs:38
 msgid "Delete Campaign"
-msgstr ""
+msgstr "Verwijder campagne"
 
 #: views/campaigns/edit-rss.hbs:25 views/campaigns/edit-triggered.hbs:28
 #: views/campaigns/edit.hbs:39 views/lists/edit.hbs:22
@@ -498,322 +515,342 @@ msgstr ""
 #: views/reports/edit.hbs:6 views/settings.hbs:102 views/templates/edit.hbs:13
 #: views/triggers/edit.hbs:30 views/users/account.hbs:18
 msgid "Update"
-msgstr ""
+msgstr "Update"
 
 #: views/campaigns/edit-triggered.hbs:3 views/campaigns/edit-triggered.hbs:4
 msgid "Edit Triggered Campaign"
-msgstr ""
+msgstr "Getriggerde campagne bewerken"
 
 #: views/campaigns/edit-triggered.hbs:6 views/campaigns/edit.hbs:6
 #: routes/forms.js:143
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 #: views/campaigns/edit-triggered.hbs:24 views/campaigns/edit.hbs:29
 msgid "Template Settings"
-msgstr ""
+msgstr "Sjabloon instellingen"
 
 #: views/campaigns/edit-triggered.hbs:25 views/campaigns/edit.hbs:30
 msgid "Template URL"
-msgstr ""
+msgstr "Sjabloon URL"
 
 #: views/campaigns/edit.hbs:3 views/campaigns/edit.hbs:4
 #: views/campaigns/upload-attachment.hbs:3
 #: views/campaigns/upload-attachment.hbs:5 views/campaigns/view.hbs:3
 msgid "Edit Campaign"
-msgstr ""
+msgstr "Campagne aanpassen"
 
 #: views/campaigns/edit.hbs:8 views/campaigns/edit.hbs:32
 msgid "Attachments"
-msgstr ""
+msgstr "Bijlagen"
 
 #: views/campaigns/edit.hbs:33
 msgid "File"
-msgstr ""
+msgstr "Bestand"
 
 #: views/campaigns/edit.hbs:34
 msgid "Size"
-msgstr ""
+msgstr "Grootte"
 
 #: views/campaigns/edit.hbs:35 views/campaigns/view.hbs:68
 #: views/lists/fields/fields.hbs:12 views/lists/forms/forms.hbs:9
 #: views/lists/view.hbs:33
 msgid "No data available in table"
-msgstr ""
+msgstr "Geen gegevens beschikbaar in de tabel"
 
 #: views/campaigns/edit.hbs:36 views/campaigns/upload-attachment.hbs:4
 msgid "Add Attachment"
-msgstr ""
+msgstr "Bijlage toevoegen"
 
 #: views/campaigns/edit.hbs:37 views/templates/edit.hbs:11
 msgid "Duplicate"
-msgstr ""
+msgstr "Multipliceren"
 
 #: views/campaigns/opened.hbs:3 views/campaigns/opened.hbs:4
 msgid "Opened info"
-msgstr ""
+msgstr "Geopende info"
 
 #: views/campaigns/opened.hbs:6
 msgid "Subscribers who opened this message:"
-msgstr ""
+msgstr "Abonnees die dit bericht hebben geopend:"
 
 #: views/campaigns/opened.hbs:12
 msgid "First open"
-msgstr ""
+msgstr "Eerst geopend"
 
 #: views/campaigns/opened.hbs:13
 msgid "Opened count"
-msgstr ""
+msgstr "Aantal keer geopend"
 
 #: views/campaigns/unsubscribed.hbs:3 views/campaigns/unsubscribed.hbs:4
 msgid "Unsubscribed info"
-msgstr ""
+msgstr "Uitgeschreven info"
 
 #: views/campaigns/unsubscribed.hbs:6
 msgid "Subscribers who unsubscribed:"
-msgstr ""
+msgstr "Abonnees die zich hebben uitgeschreven:"
 
 #: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:28
 #: views/lists/subscription/import.hbs:13 routes/lists.js:206
 msgid "Unsubscribed"
-msgstr ""
+msgstr "Uitgeschreven"
 
 #: views/campaigns/upload-attachment.hbs:7
 msgid "Upload"
-msgstr ""
+msgstr "Upload"
 
 #: views/campaigns/view.hbs:4
 msgid "Overview"
-msgstr ""
+msgstr "Overzicht"
 
 #: views/campaigns/view.hbs:5
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 #: views/campaigns/view.hbs:7
 msgid "Feed URL"
-msgstr ""
+msgstr "Feed URL"
 
 #: views/campaigns/view.hbs:8
 msgid "Last check"
-msgstr ""
+msgstr "Laatste controle"
 
 #: views/campaigns/view.hbs:9
 msgid "Not yet checked"
-msgstr ""
+msgstr "Nog niet gecontroleerd"
 
 #: views/campaigns/view.hbs:10
 msgid "activate campaign to start checking feed for new messages"
-msgstr ""
+msgstr "activeer campagne om feed te controleren op nieuwe berichten"
 
 #: views/campaigns/view.hbs:11
 msgid "RSS status"
-msgstr ""
+msgstr "RSS status"
 
 #: views/campaigns/view.hbs:16
 msgid "Preview campaign as"
-msgstr ""
+msgstr "Voorbeeld van campagne bekijken als"
 
 #: views/campaigns/view.hbs:17
 msgid "Add new test user"
-msgstr ""
+msgstr "Nieuwe testgebruiker toevoegen"
 
 #: views/campaigns/view.hbs:18
 msgid "No test users yet, create one here"
-msgstr ""
+msgstr "Nog geen testgebruikers, maak er hier een aan"
 
 #: views/campaigns/view.hbs:19
 msgid "Go"
-msgstr ""
+msgstr "Go"
 
 #: views/campaigns/view.hbs:20 lib/models/triggers.js:28
 msgid "Delivered"
-msgstr ""
+msgstr "Geleverd"
 
 #: views/campaigns/view.hbs:21
 msgid "List subscribers who received this message"
-msgstr ""
+msgstr "Lijst van abonnees die dit bericht hebben ontvangen"
 
 #: views/campaigns/view.hbs:22
 msgid "Blacklisted"
-msgstr ""
+msgstr "Blacklisted"
 
 #: views/campaigns/view.hbs:23
 msgid "List subscribers who blacklisted by global blacklist"
-msgstr ""
+msgstr "Lijst van abonnees die op de algemene zwarte lijst staan"
 
 #: views/campaigns/view.hbs:24 routes/lists.js:206
 msgid "Bounced"
-msgstr ""
+msgstr "Gebounced"
 
 #: views/campaigns/view.hbs:25
 msgid "List subscribers who bounced"
-msgstr ""
+msgstr "Lijst van abonnees die gebounced zijn"
 
 #: views/campaigns/view.hbs:26
 msgid "Complaints"
-msgstr ""
+msgstr "Klachten"
 
 #: views/campaigns/view.hbs:27
 msgid "List subscribers who complained for this message"
-msgstr ""
+msgstr "Lijst van abonnees die geklaagd hebben over dit bericht"
 
 #: views/campaigns/view.hbs:29
 msgid "List subscribers who unsubscribed after this message"
-msgstr ""
+msgstr "Lijst van abonnees die zich na dit bericht hebben uitgeschreven"
 
 #: views/campaigns/view.hbs:30
 msgid "Opened"
-msgstr ""
+msgstr "Geopend"
 
 #: views/campaigns/view.hbs:31
 msgid "List subscribers who opened this message"
-msgstr ""
+msgstr "Lijst van abonnees die dit bericht hebben geopend"
 
 #: views/campaigns/view.hbs:32
 msgid "Clicked"
-msgstr ""
+msgstr "Geklikt"
 
 #: views/campaigns/view.hbs:33 views/campaigns/view.hbs:70
 msgid "List subscribers who clicked on a link"
-msgstr ""
+msgstr "Lijst van abonnees die op een link hebben geklikt"
 
 #: views/campaigns/view.hbs:34
 msgid ""
 "Are you sure? This action would start sending messages to the selected list"
 msgstr ""
+"Bent u zeker? Met deze actie worden berichten naar de geselecteerde lijst "
+"verzonden"
 
 #: views/campaigns/view.hbs:35
 msgid "Delay sending"
-msgstr ""
+msgstr "Vertraag verzending"
 
 #: views/campaigns/view.hbs:36
 msgid "hours"
-msgstr ""
+msgstr "uren"
 
 #: views/campaigns/view.hbs:37
 msgid "minutes"
-msgstr ""
+msgstr "minuten"
 
 #: views/campaigns/view.hbs:38
 msgid "Send to subscribers:"
-msgstr ""
+msgstr "Verzenden naar abonnees:"
 
 #: views/campaigns/view.hbs:39
 msgid "Are you sure? This action would reset scheduling"
-msgstr ""
+msgstr "Bent u zeker? Deze actie zou de planning opnieuw instellen"
 
 #: views/campaigns/view.hbs:40
 msgid "Cancel"
-msgstr ""
+msgstr "Annuleer"
 
 #: views/campaigns/view.hbs:41
 msgid "Sending scheduled"
-msgstr ""
+msgstr "Zending ingepland"
 
 #: views/campaigns/view.hbs:42 views/campaigns/view.hbs:54
 msgid "Pause"
-msgstr ""
+msgstr "Pauzeer"
 
 #: views/campaigns/view.hbs:43 routes/campaigns.js:267
 msgid "Sending"
-msgstr ""
+msgstr "Aan het versturen"
 
 #: views/campaigns/view.hbs:44 views/campaigns/view.hbs:48
 msgid ""
 "Are you sure? This action would resume sending messages to the selected list"
 msgstr ""
+"Bent u zeker? Met deze actie wordt het verzenden van berichten naar de "
+"geselecteerde lijst hervat"
 
 #: views/campaigns/view.hbs:45 views/campaigns/view.hbs:49
 msgid "Are you sure? This action would reset all stats about current progress"
 msgstr ""
+"Bent u zeker? Met deze actie worden alle statistieken over de huidige "
+"voortgang gereset"
 
 #: views/campaigns/view.hbs:46
 msgid "Resume"
-msgstr ""
+msgstr "Hervat"
 
 #: views/campaigns/view.hbs:47 views/campaigns/view.hbs:51
 msgid "Reset"
-msgstr ""
+msgstr "Reset"
 
 #: views/campaigns/view.hbs:50
 msgid "Continue"
-msgstr ""
+msgstr "Doorgaan"
 
 #: views/campaigns/view.hbs:52
 msgid ""
 "All messages sent! Hit \"Continue\" if you you want to send this campaign to "
 "new subscribers"
 msgstr ""
+"Alle berichten verzonden! Druk op \"Doorgaan\" als u deze campagne naar "
+"nieuwe abonnees wilt verzenden"
 
 #: views/campaigns/view.hbs:53
 msgid ""
 "Are you sure? This action would pause sending new entries in RSS feed as "
 "email messages to the selected list"
 msgstr ""
+"Bent u zeker? Deze actie zou het verzenden van nieuwe items in RSS-feed als "
+"e-mailberichten naar de geselecteerde lijst onderbreken"
 
 #: views/campaigns/view.hbs:55 views/campaigns/view.hbs:59
 msgid "Campaign status:"
-msgstr ""
+msgstr "Campagnestatus:"
 
 #: views/campaigns/view.hbs:56
 msgid "ACTIVE"
-msgstr ""
+msgstr "ACTIEF"
 
 #: views/campaigns/view.hbs:57
 msgid ""
 "Are you sure? This action would start sending new entries in RSS feed as "
 "email messages to the selected list"
 msgstr ""
+"Bent u zeker? Met deze actie worden nieuwe berichten in RSS-feed als e-"
+"mailberichten naar de geselecteerde lijst verzonden"
 
 #: views/campaigns/view.hbs:58
 msgid "Activate"
-msgstr ""
+msgstr "Activeer"
 
 #: views/campaigns/view.hbs:60
 msgid "INACTIVE"
-msgstr ""
+msgstr "INATIEF"
 
 #: views/campaigns/view.hbs:61
 msgid ""
 "This is a triggered campaign. Messages are only sent to subscribers that hit "
 "some trigger that invokes this campaign"
 msgstr ""
+"Dit is een getriggerde campagne. Berichten worden alleen verzonden naar "
+"abonnees die een trigger activeren die deze campagne oproept"
 
 #: views/campaigns/view.hbs:62
 msgid "see more"
-msgstr ""
+msgstr "bekijk meer"
 
 #: views/campaigns/view.hbs:67
 msgid "List subscribers who clicked this link"
-msgstr ""
+msgstr "Lijst van abonnees die op deze link hebben geklikt"
 
 #: views/campaigns/view.hbs:71
 msgid ""
 "Clicks are counted as unique subscribers that clicked on a specific link or "
 "on any link (in aggregated view)"
 msgstr ""
+"Klikken worden geteld als unieke abonnees die op een specifieke link of op "
+"een link hebben geklikt (in geaggregeerde weergave)"
 
 #: views/campaigns/view.hbs:72
 msgid ""
 "If a new entry is found from campaign feed a new subcampaign is created of "
 "that entry and it will be listed here"
 msgstr ""
+"Als er een nieuw item wordt gevonden in de campagnefeed, wordt van dat item "
+"een nieuwe subcampagne gemaakt die hier wordt vermeld"
 
 #: views/emails/password-reset-html.hbs:1
 #: views/emails/password-reset-text.hbs:1
 msgid "Change your password"
-msgstr ""
+msgstr "Wijzig uw wachtwoord"
 
 #: views/emails/password-reset-html.hbs:2
 #: views/emails/password-reset-text.hbs:2
 msgid "We have received a password change request for your Mailtrain account:"
 msgstr ""
+"We hebben een verzoek ontvangen om uw wachtwoord te wijzigen voor uw "
+"Mailtrain-account:"
 
 #: views/emails/password-reset-html.hbs:3
 #: views/emails/password-reset-text.hbs:3
 msgid "Reset password"
-msgstr ""
+msgstr "Reset wachtwoord"
 
 #: views/emails/password-reset-html.hbs:4
 #: views/emails/password-reset-text.hbs:4
@@ -821,11 +858,13 @@ msgid ""
 "If you did not ask to change your password, then you can ignore this email "
 "and your password will not be changed."
 msgstr ""
+"Als u niet gevraagd heeft om uw wachtwoord te wijzigen, kunt u deze e-mail "
+"negeren en wordt uw wachtwoord niet gewijzigd."
 
 #: views/emails/rss-html.hbs:1 views/emails/stationery-html.hbs:3
 #: views/emails/stationery-text.hbs:3
 msgid "Preferences"
-msgstr ""
+msgstr "Voorkeuren"
 
 #: views/emails/rss-html.hbs:2 views/emails/stationery-html.hbs:4
 #: views/emails/stationery-text.hbs:4 views/lists/forms/edit.hbs:20
@@ -836,24 +875,24 @@ msgstr ""
 #: views/subscription/web-unsubscribe.mjml.hbs:2 routes/forms.js:223
 #: routes/lists.js:288
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Afmelden"
 
 #: views/emails/rss-html.hbs:3 views/emails/stationery-html.hbs:5
 #: views/emails/stationery-text.hbs:5
 msgid "View this email in your browser"
-msgstr ""
+msgstr "Bekijk deze email in je browser"
 
 #: views/emails/stationery-html.hbs:1 views/emails/stationery-text.hbs:1
 msgid "Hey [FIRST_NAME/Customer],"
-msgstr ""
+msgstr "Hallo [FIRST_NAME/Customer],"
 
 #: views/emails/stationery-html.hbs:2 views/emails/stationery-text.hbs:2
 msgid "Cheers,"
-msgstr ""
+msgstr "Groeten,"
 
 #: views/index.hbs:1
 msgid "List Management"
-msgstr ""
+msgstr "Lijstbeheer"
 
 #: views/index.hbs:2
 msgid ""
@@ -862,18 +901,22 @@ msgid ""
 "API or import from a CSV file. All lists come with support for custom fields "
 "and merge tags as well."
 msgstr ""
+"Met Mailtrain kunt u zelfs zeer grote lijsten eenvoudig beheren. Miljoenen "
+"abonnees? Geen probleem. U kunt abonnees handmatig toevoegen, via de API of "
+"importeren vanuit een CSV-bestand. Alle lijsten worden ondersteund met "
+"aangepaste velden en ook tags samenvoegen."
 
 #: views/index.hbs:3 views/index.hbs:7 views/index.hbs:10 views/index.hbs:13
 #: views/index.hbs:16 views/index.hbs:19 views/index.hbs:22 views/index.hbs:25
 #: views/index.hbs:28
 msgid "Show more"
-msgstr ""
+msgstr "Meer weergeven"
 
 #: views/index.hbs:4 views/lists/fields/create.hbs:3
 #: views/lists/fields/edit.hbs:3 views/lists/fields/fields.hbs:3
 #: views/lists/fields/fields.hbs:5 views/lists/view.hbs:6
 msgid "Custom Fields"
-msgstr ""
+msgstr "Aangepaste velden"
 
 #: views/index.hbs:5
 msgid ""
@@ -881,24 +924,30 @@ msgid ""
 "Every custom field can be included in the generated newsletters through "
 "merge tags."
 msgstr ""
+"Tekstvelden, cijfers, vervolgkeuzelijsten of selectievakjes, Mailtrain heeft "
+"ze allemaal. Elk aangepast veld kan via samenvoegtags in de gegenereerde "
+"nieuwsbrieven worden opgenomen."
 
 #: views/index.hbs:6
 msgid "Mailtrain also supports custom forms."
-msgstr ""
+msgstr "Mailtrain ondersteunt ook aangepaste formulieren."
 
 #: views/index.hbs:8
 msgid "List Segmentation"
-msgstr ""
+msgstr "Lijstsegmentatie"
 
 #: views/index.hbs:9
 msgid ""
 "Send messages only to list subscribers that match predefined segmentation "
 "rules. No need to create separate lists with small differences."
 msgstr ""
+"Verzend alleen berichten naar lijstabonnees die overeenkomen met vooraf "
+"gedefinieerde segmentatieregels. Het is niet nodig om afzonderlijke lijsten "
+"met kleine verschillen te maken."
 
 #: views/index.hbs:11
 msgid "RSS Campaigns"
-msgstr ""
+msgstr "RSS-campagnes"
 
 #: views/index.hbs:12
 msgid ""
@@ -906,30 +955,39 @@ msgid ""
 "then Mailtrain auto-generates a new campaign using entry data as message "
 "contents and sends it to selected subscribers."
 msgstr ""
+"Mailtrain instellen om RSS-feeds bij te houden. Wanneer een nieuw item in "
+"een feed wordt gedetecteerd, genereert Mailtrain automatisch een nieuwe "
+"campagne met behulp van invoergegevens als berichtinhoud en verzendt deze "
+"naar geselecteerde abonnees."
 
 #: views/index.hbs:14
 msgid "GPG Encryption"
-msgstr ""
+msgstr "GPG-codering"
 
 #: views/index.hbs:15
 msgid ""
 "If a list has a custom field for a GPG Public Key set then subscribers can "
 "upload their GPG public key to receive encrypted messages from the list."
 msgstr ""
+"Als een lijst een aangepast veld heeft voor een GPG Public Key-set, kunnen "
+"abonnees hun GPG Public Key uploaden om gecodeerde berichten van de lijst te "
+"ontvangen."
 
 #: views/index.hbs:17
 msgid "Click Stats"
-msgstr ""
+msgstr "Klik statistieken"
 
 #: views/index.hbs:18
 msgid ""
 "After a campaign is sent, check individual click statistics for every link "
 "included in the message."
 msgstr ""
+"Nadat een campagne is verzonden, controleert u individuele klikstatistieken "
+"voor elke link in het bericht."
 
 #: views/index.hbs:20
 msgid "Template Editors"
-msgstr ""
+msgstr "Sjabloon-editors"
 
 #: views/index.hbs:21
 msgid ""
@@ -937,10 +995,13 @@ msgid ""
 "editors. Mailtrain also offers a code editor if you prefer to handcraft the "
 "HTML yourself."
 msgstr ""
+"Mailtrain wordt geleverd met ingebouwde GrapeJS en Mosaico, twee "
+"geavanceerde sjablooneditors. Mailtrain biedt ook een code-editor als u "
+"liever zelf de HTML maakt."
 
 #: views/index.hbs:23
 msgid "Send via Any Provider"
-msgstr ""
+msgstr "Verzenden via elke provider"
 
 #: views/index.hbs:24
 msgid ""
@@ -948,61 +1009,67 @@ msgid ""
 "newsletters. Bounce and complaints handling via webhooks is supported for "
 "SES, SparkPost, SendGrid and Mailgun, also for Postfix and ZoneMTA."
 msgstr ""
+"U kunt elke provider die het SMTP-protocol ondersteunt gebruiken om uw "
+"nieuwsbrieven te verzenden. Bounce en klachtenbehandeling via webhooks wordt "
+"ondersteund voor SES, SparkPost, SendGrid en Mailgun, ook voor Postfix en "
+"ZoneMTA."
 
 #: views/index.hbs:26 lib/tools.js:137
 msgid "Automation"
-msgstr ""
+msgstr "Automatisering"
 
 #: views/index.hbs:27
 msgid ""
 "Define automation triggers to send specific messages when a user activates "
 "the trigger."
 msgstr ""
+"Definieer automatiseringstriggers om specifieke berichten te verzenden "
+"wanneer een gebruiker de trigger activeert."
 
 #: views/layout.hbs:2
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Schakel navigatie in"
 
 #: views/layout.hbs:3
 msgid "Wiki"
-msgstr ""
+msgstr "Wiki"
 
 #: views/layout.hbs:4
 msgid "Blog"
-msgstr ""
+msgstr "Blog"
 
 #: views/layout.hbs:5 views/users/account.hbs:2 views/users/account.hbs:3
 msgid "Account"
-msgstr ""
+msgstr "Account"
 
 #: views/layout.hbs:6 views/settings.hbs:2 views/settings.hbs:3
 msgid "Settings"
-msgstr ""
+msgstr "Instellingen"
 
 #: views/layout.hbs:8 views/users/api.hbs:2 views/users/api.hbs:3
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: views/layout.hbs:9
 msgid "Log out"
-msgstr ""
+msgstr "Log uit"
 
 #: views/layout.hbs:10 views/users/forgot.hbs:2 views/users/login.hbs:2
 #: views/users/login.hbs:3 views/users/login.hbs:9 views/users/reset.hbs:2
 msgid "Sign in"
-msgstr ""
+msgstr "Log in"
 
 #: views/layout.hbs:11
 msgid "Self Hosted Newsletter App Built on Top of Nodemailer"
-msgstr ""
+msgstr "Zelf gehoste nieuwsbrief-app gebouwd bovenop Nodemailer"
 
 #: views/layout.hbs:12 views/layout.hbs:14
 msgid "Source on GitHub"
-msgstr ""
+msgstr "Bron op GitHub"
 
 #: views/layout.hbs:13
 msgid "Subscribe to Our Newsletter"
-msgstr ""
+msgstr "Abonneer op onze nieuwsbrief"
 
 #: views/lists/create.hbs:2 views/lists/edit.hbs:2
 #: views/lists/fields/create.hbs:2 views/lists/fields/edit.hbs:2
@@ -1019,188 +1086,191 @@ msgstr ""
 #: views/lists/subscription/import.hbs:2 views/lists/view.hbs:2
 #: lib/tools.js:125 routes/lists.js:59
 msgid "Lists"
-msgstr ""
+msgstr "Lijsten"
 
 #: views/lists/create.hbs:3 views/lists/create.hbs:4 views/lists/create.hbs:13
 #: views/lists/lists.hbs:3
 msgid "Create List"
-msgstr ""
+msgstr "Lijst maken"
 
 #: views/lists/create.hbs:6 views/lists/edit.hbs:7
 msgid "List Name"
-msgstr ""
+msgstr "Lijst naam"
 
 #: views/lists/create.hbs:9 views/lists/edit.hbs:15
 #: views/triggers/create.hbs:15 views/triggers/edit.hbs:17
 msgid "Subscription"
-msgstr ""
+msgstr "Abonnement"
 
 #: views/lists/create.hbs:10 views/lists/edit.hbs:16
 msgid "Allow public users to subscribe themselves"
-msgstr ""
+msgstr "Sta openbare gebruikers toe zichzelf te abonneren"
 
 #: views/lists/create.hbs:11 views/lists/edit.hbs:17
 msgid "Unsubscription"
-msgstr ""
+msgstr "Uitschrijving"
 
 #: views/lists/create.hbs:12 views/lists/edit.hbs:18
 msgid "Select how an unsuscription request by subscriber is handled."
 msgstr ""
+"Selecteer hoe een uitschrijvingsverzoek van de abonnee wordt afgehandeld."
 
 #: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:8
 msgid "Edit List"
-msgstr ""
+msgstr "Lijst bewerken"
 
 #: views/lists/edit.hbs:5
 msgid "View List"
-msgstr ""
+msgstr "Lijst bekijken"
 
 #: views/lists/edit.hbs:8
 msgid "List ID"
-msgstr ""
+msgstr "Lijst ID"
 
 #: views/lists/edit.hbs:9
 msgid "This is the list ID displayed to the subscribers"
-msgstr ""
+msgstr "Dit is de lijst-ID die aan de abonnees wordt getoond"
 
 #: views/lists/edit.hbs:12
 msgid "Custom Form"
-msgstr ""
+msgstr "Aangepast formulier"
 
 #: views/lists/edit.hbs:13 views/lists/forms/forms.hbs:11
 msgid "Default Mailtrain Form"
-msgstr ""
+msgstr "Standaard Mailtrain-formulier"
 
 #: views/lists/edit.hbs:14
 msgid ""
 "The custom form used for this list. You can create a form <a href=\"/forms/"
 "{{id}}/create\">here</a>."
 msgstr ""
+"Het aangepaste formulier dat voor deze lijst wordt gebruikt. U kunt <a href="
+"\"/forms/{{id}}/create\"> hier </a> een formulier maken."
 
 #: views/lists/edit.hbs:19
 msgid "Unsubscribe Header"
-msgstr ""
+msgstr "Unsubscribe Header"
 
 #: views/lists/edit.hbs:20
 msgid "Do not send List-Unsubscribe headers"
-msgstr ""
+msgstr "Stuur geen List-Unsubscribe headers"
 
 #: views/lists/edit.hbs:21
 msgid "Delete List"
-msgstr ""
+msgstr "Lijst verwijderen"
 
 #: views/lists/fields/create.hbs:4
 msgid "Create Field"
-msgstr ""
+msgstr "Maak veld"
 
 #: views/lists/fields/create.hbs:5 views/lists/fields/fields.hbs:4
 msgid "Create Custom Field"
-msgstr ""
+msgstr "Maak een aangepast veld"
 
 #: views/lists/fields/create.hbs:6 views/lists/fields/create.hbs:7
 #: views/lists/fields/edit.hbs:7 views/lists/fields/edit.hbs:8
 msgid "Field Name"
-msgstr ""
+msgstr "Veldnaam"
 
 #: views/lists/fields/create.hbs:8 views/lists/fields/edit.hbs:9
 msgid "Field Description"
-msgstr ""
+msgstr "Veldbeschrijving"
 
 #: views/lists/fields/create.hbs:9 views/lists/fields/edit.hbs:10
 msgid "Field Type"
-msgstr ""
+msgstr "Veld soort"
 
 #: views/lists/fields/create.hbs:10 views/lists/fields/edit.hbs:11
 #: lib/models/fields.js:17
 msgid "Text"
-msgstr ""
+msgstr "Tekst"
 
 #: views/lists/fields/create.hbs:11 views/lists/fields/edit.hbs:12
 #: lib/models/fields.js:21
 msgid "Number"
-msgstr ""
+msgstr "Nummer"
 
 #: views/lists/fields/create.hbs:12 views/lists/fields/edit.hbs:13
 #: lib/models/fields.js:18
 msgid "Website"
-msgstr ""
+msgstr "Website"
 
 #: views/lists/fields/create.hbs:13 views/lists/fields/edit.hbs:14
 #: lib/models/fields.js:20
 msgid "GPG Public Key"
-msgstr ""
+msgstr "GPG Public Key"
 
 #: views/lists/fields/create.hbs:14 views/lists/fields/edit.hbs:15
 #: lib/models/fields.js:19
 msgid "Multi-line text"
-msgstr ""
+msgstr "Tekst met meerdere regels"
 
 #: views/lists/fields/create.hbs:15 views/lists/fields/edit.hbs:16
 msgid "JSON"
-msgstr ""
+msgstr "JSON"
 
 #: views/lists/fields/create.hbs:16 views/lists/fields/edit.hbs:17
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: views/lists/fields/create.hbs:17 views/lists/fields/edit.hbs:18
 msgid "Date (MM/DD/YYYY)"
-msgstr ""
+msgstr "Datum (MM/DD/YYYY)"
 
 #: views/lists/fields/create.hbs:18 views/lists/fields/edit.hbs:19
 #: lib/models/fields.js:26
 msgid "Date (DD/MM/YYYY)"
-msgstr ""
+msgstr "Datum (DD/MM/YYYY)"
 
 #: views/lists/fields/create.hbs:19 views/lists/fields/edit.hbs:20
 msgid "Birthday"
-msgstr ""
+msgstr "Verjaardag"
 
 #: views/lists/fields/create.hbs:20 views/lists/fields/edit.hbs:21
 #: lib/models/fields.js:27
 msgid "Birthday (MM/DD)"
-msgstr ""
+msgstr "Verjaardag (MM/DD)"
 
 #: views/lists/fields/create.hbs:21 views/lists/fields/edit.hbs:22
 #: lib/models/fields.js:28
 msgid "Birthday (DD/MM)"
-msgstr ""
+msgstr "Verjaardag (DD/MM)"
 
 #: views/lists/fields/create.hbs:22 views/lists/fields/edit.hbs:23
 msgid "Grouped"
-msgstr ""
+msgstr "Gegroepeerd"
 
 #: views/lists/fields/create.hbs:23 views/lists/fields/edit.hbs:24
 msgid "Drop Downs"
-msgstr ""
+msgstr "Drop Downs"
 
 #: views/lists/fields/create.hbs:24 views/lists/fields/edit.hbs:25
 #: lib/models/fields.js:22
 msgid "Radio Buttons"
-msgstr ""
+msgstr "Radio Buttons"
 
 #: views/lists/fields/create.hbs:25 views/lists/fields/edit.hbs:26
 #: lib/models/fields.js:23
 msgid "Checkboxes"
-msgstr ""
+msgstr "Checkboxes"
 
 #: views/lists/fields/create.hbs:26 views/lists/fields/edit.hbs:27
 msgid "Option for a group value"
-msgstr ""
+msgstr "Optie voor een groepswaarde"
 
 #: views/lists/fields/create.hbs:27 views/lists/fields/edit.hbs:28
 msgid "Group"
-msgstr ""
+msgstr "Groep"
 
 #: views/lists/fields/create.hbs:29 views/lists/fields/edit.hbs:30
 msgid "Required for group options"
-msgstr ""
+msgstr "Vereist voor groepsopties"
 
 #: views/lists/fields/create.hbs:30 views/lists/fields/create.hbs:31
 #: views/lists/fields/edit.hbs:36 views/lists/fields/edit.hbs:37
 #: views/lists/fields/fields.hbs:9
 msgid "Default merge tag value"
-msgstr ""
+msgstr "Standaardwaarde voor samenvoegtag"
 
 #: views/lists/fields/create.hbs:33 views/lists/fields/edit.hbs:35
 msgid ""
@@ -1212,48 +1282,57 @@ msgid ""
 "to render JSON values (if the JSON is an array then the array is exposed as "
 "<code>values</code>, otherwise you can access the JSON keys directly)."
 msgstr ""
+"Voor groepselementen zoals selectievakjes kunt u het uiterlijk van de "
+"samenvoegtag regelen met een optionele sjabloon. Het sjabloon maakt gebruik "
+"van stuursyntaxis en u kunt alle waarden vinden uit de <code> {{values}} </"
+"code> array, bijvoorbeeld <code> {{#each values}} {{this}} {{/ each}} < / "
+"code>. Als het sjabloon niet is gedefinieerd, worden meerdere waarden "
+"samengevoegd met komma's. U kunt dit sjabloon ook gebruiken om JSON-waarden "
+"weer te geven (als de JSON een array is, wordt de array weergegeven als "
+"<code> waarden </code>, anders hebt u rechtstreeks toegang tot de JSON-"
+"sleutels)."
 
 #: views/lists/fields/create.hbs:34 views/lists/fields/edit.hbs:38
 msgid "Visible"
-msgstr ""
+msgstr "Zichtbaar"
 
 #: views/lists/fields/create.hbs:35
 msgid "Add Field"
-msgstr ""
+msgstr "Voeg veld toe"
 
 #: views/lists/fields/edit.hbs:4
 msgid "Edit Field"
-msgstr ""
+msgstr "Veld bewerken"
 
 #: views/lists/fields/edit.hbs:5
 msgid "Edit Custom Field"
-msgstr ""
+msgstr "Aangepast veld bewerken"
 
 #: views/lists/fields/edit.hbs:6
 msgid "Back to fields"
-msgstr ""
+msgstr "Terug naar velden"
 
 #: views/lists/fields/edit.hbs:31 views/lists/fields/fields.hbs:8
 #: views/mosaico/editor.hbs:2 views/partials/merge-tag-reference.hbs:3
 msgid "Merge tag"
-msgstr ""
+msgstr "Samenvoegtag"
 
 #: views/lists/fields/edit.hbs:32
 msgid "Merge Tag"
-msgstr ""
+msgstr "Samenvoegtag"
 
 #: views/lists/fields/edit.hbs:33
 msgid "Put this tag in your content:"
-msgstr ""
+msgstr "Zet deze tag in uw inhoud:"
 
 #: views/lists/fields/edit.hbs:39
 msgid "Delete Field"
-msgstr ""
+msgstr "Verwijder veld"
 
 #: views/lists/fields/fields.hbs:7 views/lists/view.hbs:26
 #: views/report-templates/partials/report-template-fields.hbs:5
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: views/lists/fields/fields.hbs:10 views/lists/fields/fields.hbs:11
 #: views/lists/forms/edit.hbs:26 views/lists/forms/forms.hbs:8
@@ -1263,99 +1342,102 @@ msgstr ""
 #: routes/lists.js:170 routes/lists.js:257 routes/report-templates.js:51
 #: routes/templates.js:183 routes/triggers.js:345
 msgid "Edit"
-msgstr ""
+msgstr "Bewerk"
 
 #: views/lists/forms/create.hbs:3 views/lists/forms/edit.hbs:3
 #: views/lists/forms/forms.hbs:3 views/lists/forms/forms.hbs:5
 #: views/lists/view.hbs:5
 msgid "Custom Forms"
-msgstr ""
+msgstr "Aangepaste formulieren"
 
 #: views/lists/forms/create.hbs:4
 msgid "Create Form"
-msgstr ""
+msgstr "Formulier maken"
 
 #: views/lists/forms/create.hbs:5 views/lists/forms/forms.hbs:4
 msgid "Create Custom Form"
-msgstr ""
+msgstr "Maak een aangepast formulier"
 
 #: views/lists/forms/create.hbs:6 views/lists/forms/create.hbs:7
 #: views/lists/forms/edit.hbs:7 views/lists/forms/edit.hbs:8
 msgid "Form Name"
-msgstr ""
+msgstr "Formulier naam"
 
 #: views/lists/forms/create.hbs:8
 msgid "Add Form"
-msgstr ""
+msgstr "Formulier toevoegen"
 
 #: views/lists/forms/edit.hbs:4
 msgid "Edit Form"
-msgstr ""
+msgstr "Formulier bewerken"
 
 #: views/lists/forms/edit.hbs:5
 msgid "Edit Custom Form"
-msgstr ""
+msgstr "Aangepast formulier bewerken"
 
 #: views/lists/forms/edit.hbs:6
 msgid "Back to forms"
-msgstr ""
+msgstr "Terug naar formulieren"
 
 #: views/lists/forms/edit.hbs:10
 msgid "Optional comments about this form"
-msgstr ""
+msgstr "Optionele opmerkingen over dit formulier"
 
 #: views/lists/forms/edit.hbs:11
 msgid "Form Preview"
-msgstr ""
+msgstr "Voorbeeld van formulier"
 
 #: views/lists/forms/edit.hbs:12
 msgid ""
 "Note: These links are solely for a quick preview. If you submit a preview "
 "form you'll get redirected to the list's default form."
 msgstr ""
+"Opmerking: deze links zijn uitsluitend bedoeld als snel voorbeeld. Als u een "
+"voorbeeldformulier indient, wordt u doorgestuurd naar het standaardformulier "
+"van de lijst."
 
 #: views/lists/forms/edit.hbs:13 views/lists/subscription/add.hbs:16
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:4
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:4
 #: routes/forms.js:157 routes/lists.js:288
 msgid "Subscribe"
-msgstr ""
+msgstr "Abonneer"
 
 #: views/lists/forms/edit.hbs:14
 msgid "Confirm Subscription Notice"
-msgstr ""
+msgstr "Bevestig Abonnementskennisgeving"
 
 #: views/lists/forms/edit.hbs:15
 msgid "Confirm Unsubscription Notice"
-msgstr ""
+msgstr "Bevestig afmeldingskennisgeving"
 
 #: views/lists/forms/edit.hbs:16
 msgid "Subscribed Notice"
-msgstr ""
+msgstr "Abbonnementskennisgeving"
 
 #: views/lists/forms/edit.hbs:17
 msgid "Updated Notice"
-msgstr ""
+msgstr "Bijwerkingskennisgeving"
 
 #: views/lists/forms/edit.hbs:18
 msgid "Unsubscribed Notice"
-msgstr ""
+msgstr "Afmeldingskennisgeving"
 
 #: views/lists/forms/edit.hbs:19
 msgid "Manual Unsubscribe Notice"
-msgstr ""
+msgstr "Handmatige afmeldingskennisgeving"
 
 #: views/lists/forms/edit.hbs:21 routes/forms.js:205
 msgid "Manage"
-msgstr ""
+msgstr "Beheer"
 
 #: views/lists/forms/edit.hbs:22
 msgid "Manage Address"
-msgstr ""
+msgstr "Beheer adres"
 
 #: views/lists/forms/edit.hbs:23
 msgid "Create a test user for additional options"
-msgstr ""
+msgstr "Maak een testgebruiker voor extra opties"
 
 #: views/lists/forms/edit.hbs:24 views/report-templates/create.hbs:3
 #: views/report-templates/edit.hbs:3
@@ -1363,47 +1445,47 @@ msgstr ""
 #: views/templates/edit.hbs:2 views/templates/templates.hbs:2
 #: views/templates/templates.hbs:4 lib/tools.js:129 routes/templates.js:27
 msgid "Templates"
-msgstr ""
+msgstr "Sjablonen"
 
 #: views/lists/forms/edit.hbs:25
 msgid "Fields"
-msgstr ""
+msgstr "Velden"
 
 #: views/lists/forms/edit.hbs:27
 msgid "Form Fields"
-msgstr ""
+msgstr "Formuliervelden"
 
 #: views/lists/forms/edit.hbs:28
 msgid "Fields hidden on subscription page:"
-msgstr ""
+msgstr "Velden verborgen op abonnementpagina:"
 
 #: views/lists/forms/edit.hbs:29
 msgid "Fields shown on subscription page:"
-msgstr ""
+msgstr "Velden getoond op abonnementpagina:"
 
 #: views/lists/forms/edit.hbs:30
 msgid "Fields hidden on preferences page:"
-msgstr ""
+msgstr "Velden verborgen op voorkeurenpagina:"
 
 #: views/lists/forms/edit.hbs:31
 msgid "Fields shown on preferences page:"
-msgstr ""
+msgstr "Velden getoond op voorkeurenpagina:"
 
 #: views/lists/forms/edit.hbs:32
 msgid "Delete Form"
-msgstr ""
+msgstr "Formulier verwijderen"
 
 #: views/lists/forms/forms.hbs:10
 msgid "The default form for this list is:"
-msgstr ""
+msgstr "Het standaardformulier voor deze lijst is:"
 
 #: views/lists/lists.hbs:6
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: views/lists/lists.hbs:7 views/reports/partials/report-fields.hbs:10
 msgid "Subscribers"
-msgstr ""
+msgstr "Abonnees"
 
 #: views/lists/segments/create.hbs:3 views/lists/segments/edit.hbs:3
 #: views/lists/segments/rule-configure.hbs:3
@@ -1412,74 +1494,74 @@ msgstr ""
 #: views/lists/segments/view.hbs:3 views/lists/view.hbs:7
 #: views/lists/view.hbs:14
 msgid "Segments"
-msgstr ""
+msgstr "Segmenten"
 
 #: views/lists/segments/create.hbs:4 views/lists/segments/create.hbs:5
 #: views/lists/segments/rule-configure.hbs:4
 #: views/lists/segments/rule-create.hbs:4 views/lists/segments/rule-edit.hbs:4
 #: views/lists/segments/segments.hbs:4
 msgid "Create Segment"
-msgstr ""
+msgstr "Segment maken"
 
 #: views/lists/segments/create.hbs:6 views/lists/segments/create.hbs:7
 #: views/lists/segments/edit.hbs:7 views/lists/segments/edit.hbs:8
 msgid "Segment Name"
-msgstr ""
+msgstr "Segmentnaam"
 
 #: views/lists/segments/create.hbs:8 views/lists/segments/edit.hbs:9
 msgid "Rule match"
-msgstr ""
+msgstr "Rule match"
 
 #: views/lists/segments/create.hbs:10 views/lists/segments/edit.hbs:11
 msgid "All rules must match"
-msgstr ""
+msgstr "Alle regels moeten overeenkomen"
 
 #: views/lists/segments/create.hbs:11 views/lists/segments/edit.hbs:12
 msgid "Any rule can match"
-msgstr ""
+msgstr "Elke regel kan overeenkomen"
 
 #: views/lists/segments/create.hbs:12
 msgid "Add Segment"
-msgstr ""
+msgstr "Segment toevoegen"
 
 #: views/lists/segments/edit.hbs:4 views/lists/segments/edit.hbs:5
 #: views/lists/segments/view.hbs:6 views/lists/view.hbs:12
 msgid "Edit Segment"
-msgstr ""
+msgstr "Segment bewerken"
 
 #: views/lists/segments/edit.hbs:6
 msgid "Back to segments"
-msgstr ""
+msgstr "Terug naar segmenten"
 
 #: views/lists/segments/edit.hbs:13
 msgid "Delete Segment"
-msgstr ""
+msgstr "Segment verwijderen"
 
 #: views/lists/segments/rule-configure.hbs:5
 #: views/lists/segments/rule-create.hbs:5 views/lists/segments/rule-edit.hbs:5
 #: views/lists/segments/view.hbs:4
 msgid "Create Rule"
-msgstr ""
+msgstr "Creëer regel"
 
 #: views/lists/segments/rule-configure.hbs:6
 #: views/lists/segments/rule-create.hbs:6 views/lists/segments/rule-edit.hbs:6
 #: views/lists/segments/view.hbs:10
 msgid "Rule"
-msgstr ""
+msgstr "Regel"
 
 #: views/lists/segments/rule-configure.hbs:7
 #: views/lists/segments/rule-edit.hbs:7
 msgid "Condition"
-msgstr ""
+msgstr "Voorwaarde"
 
 #: views/lists/segments/rule-configure.hbs:8
 #: views/lists/segments/rule-edit.hbs:8
 msgid "Equals"
-msgstr ""
+msgstr "Gelijk aan"
 
 #: views/lists/segments/rule-configure.hbs:9
 msgid "Not squals"
-msgstr ""
+msgstr "Niet gelijk aan"
 
 #: views/lists/segments/rule-configure.hbs:10
 #: views/lists/segments/rule-configure.hbs:11
@@ -1492,7 +1574,7 @@ msgstr ""
 #: views/lists/segments/rule-edit.hbs:32 views/lists/segments/rule-edit.hbs:37
 #: views/lists/segments/view.hbs:11
 msgid "Value"
-msgstr ""
+msgstr "Waarde"
 
 #: views/lists/segments/rule-configure.hbs:12
 #: views/lists/segments/rule-edit.hbs:12
@@ -1500,6 +1582,8 @@ msgid ""
 "Use % for wildcard character, e.g. \"%test\" to match all values that end "
 "with \"test\""
 msgstr ""
+"Gebruik% voor jokertekens, b.v. \"%test\" om alle waarden te matchen die "
+"eindigen met \"test\""
 
 #: views/lists/segments/rule-configure.hbs:14
 #: views/lists/segments/rule-configure.hbs:17
@@ -1507,7 +1591,7 @@ msgstr ""
 #: views/lists/segments/rule-edit.hbs:14 views/lists/segments/rule-edit.hbs:19
 #: views/lists/segments/rule-edit.hbs:33
 msgid "Use exact match"
-msgstr ""
+msgstr "Gebruik exacte match"
 
 #: views/lists/segments/rule-configure.hbs:15
 #: views/lists/segments/rule-configure.hbs:18
@@ -1515,166 +1599,172 @@ msgstr ""
 #: views/lists/segments/rule-edit.hbs:15 views/lists/segments/rule-edit.hbs:20
 #: views/lists/segments/rule-edit.hbs:34
 msgid "Use range match"
-msgstr ""
+msgstr "Gebruik bereikovereenkomst"
 
 #: views/lists/segments/rule-configure.hbs:19
 #: views/lists/segments/rule-edit.hbs:23
 msgid "Use relative range match"
-msgstr ""
+msgstr "Gebruik relatieve bereikovereenkomst"
 
 #: views/lists/segments/rule-configure.hbs:20
 #: views/lists/segments/rule-configure.hbs:31
 #: views/lists/segments/rule-edit.hbs:16 views/lists/segments/rule-edit.hbs:21
 #: views/lists/segments/rule-edit.hbs:24 views/lists/segments/rule-edit.hbs:35
 msgid "From"
-msgstr ""
+msgstr "Van"
 
 #: views/lists/segments/rule-configure.hbs:21
 #: views/lists/segments/rule-configure.hbs:25
 #: views/lists/segments/rule-edit.hbs:25 views/lists/segments/rule-edit.hbs:29
 msgid "days"
-msgstr ""
+msgstr "dagen"
 
 #: views/lists/segments/rule-configure.hbs:22
 #: views/lists/segments/rule-configure.hbs:26
 #: views/lists/segments/rule-edit.hbs:26 views/lists/segments/rule-edit.hbs:30
 msgid "before today"
-msgstr ""
+msgstr "voor vandaag"
 
 #: views/lists/segments/rule-configure.hbs:23
 #: views/lists/segments/rule-configure.hbs:27
 #: views/lists/segments/rule-edit.hbs:27 views/lists/segments/rule-edit.hbs:31
 msgid "after today"
-msgstr ""
+msgstr "na vandaag"
 
 #: views/lists/segments/rule-configure.hbs:24
 #: views/lists/segments/rule-configure.hbs:32
 #: views/lists/segments/rule-edit.hbs:17 views/lists/segments/rule-edit.hbs:22
 #: views/lists/segments/rule-edit.hbs:28 views/lists/segments/rule-edit.hbs:36
 msgid "to"
-msgstr ""
+msgstr "tot"
 
 #: views/lists/segments/rule-configure.hbs:34
 #: views/lists/segments/rule-edit.hbs:38 lib/models/segments.js:156
 #: lib/models/segments.js:419
 msgid "Selected"
-msgstr ""
+msgstr "Geselecteerd"
 
 #: views/lists/segments/rule-configure.hbs:35
 #: views/lists/segments/rule-edit.hbs:39 lib/models/segments.js:156
 #: lib/models/segments.js:419
 msgid "Not selected"
-msgstr ""
+msgstr "Niet geselecteerd"
 
 #: views/lists/segments/rule-configure.hbs:36
 msgid "Add Rule"
-msgstr ""
+msgstr "Regel toevoegen"
 
 #: views/lists/segments/rule-create.hbs:8
 #: views/lists/subscription/import.hbs:18
 #: views/reports/create-select-template.hbs:5
 #: views/triggers/create-select.hbs:9
 msgid "Next"
-msgstr ""
+msgstr "Volgende"
 
 #: views/lists/segments/rule-edit.hbs:9
 msgid "Not equals"
-msgstr ""
+msgstr "Niet gelijk aan"
 
 #: views/lists/segments/rule-edit.hbs:40
 msgid "Delete Rule"
-msgstr ""
+msgstr "Regel verwijderen"
 
 #: views/lists/segments/segments.hbs:7
 msgid "Match"
-msgstr ""
+msgstr "Overeenkomst"
 
 #: views/lists/segments/view.hbs:5 views/lists/view.hbs:13
 msgid "Segment"
-msgstr ""
+msgstr "Segment"
 
 #: views/lists/segments/view.hbs:7
 msgid "Match rules"
-msgstr ""
+msgstr "Passende regels"
 
 #: views/lists/segments/view.hbs:8
 msgid "Matching subscribers"
-msgstr ""
+msgstr "Overeenkomende abonnees"
 
 #: views/lists/segments/view.hbs:9
 msgid "show"
-msgstr ""
+msgstr "toon"
 
 #: views/lists/subscription/add.hbs:3 views/lists/subscription/add.hbs:4
 msgid "Add subscriber"
-msgstr ""
+msgstr "Abonnee toevoegen"
 
 #: views/lists/subscription/add.hbs:5
 #: views/subscription/partials/subscription-custom-fields.hbs:1
 #: views/users/account.hbs:7
 msgid "Email Address"
-msgstr ""
+msgstr "E-mailadres"
 
 #: views/lists/subscription/add.hbs:8 views/lists/subscription/edit.hbs:9
 #: views/settings.hbs:85 views/settings.hbs:100
 #: views/subscription/partials/subscription-custom-fields.hbs:6
 msgid "Begins with"
-msgstr ""
+msgstr "Begint met"
 
 #: views/lists/subscription/add.hbs:9 views/lists/subscription/edit.hbs:10
 msgid ""
 "Insert a GPG public key that will be used to encrypt messages sent this "
 "subscriber"
 msgstr ""
+"Voer een openbare GPG-sleutel in die zal gebruikt worden voor het coderen "
+"van berichten die voor deze abonnee bestemd zijn"
 
 #: views/lists/subscription/add.hbs:11 views/lists/subscription/edit.hbs:12
 #: views/lists/subscription/import-preview.hbs:9
 msgid "Timezone"
-msgstr ""
+msgstr "Tijdzone"
 
 #: views/lists/subscription/add.hbs:13 views/lists/subscription/edit.hbs:13
 msgid "Test user?"
-msgstr ""
+msgstr "Test gebruiker?"
 
 #: views/lists/subscription/add.hbs:14 views/lists/subscription/edit.hbs:14
 msgid ""
 "If checked then this subscription can be used for previewing campaign "
 "messages"
 msgstr ""
+"Indien aangevinkt kan dit abonnement worden gebruikt om een voorbeeld van de "
+"campagne te bekijken"
 
 #: views/lists/subscription/add.hbs:15
 msgid ""
 "This person will not receive a confirmation email so make sure that you have "
 "permission to email them."
 msgstr ""
+"Deze persoon ontvangt geen bevestigingsmail, dus zorg ervoor dat je "
+"toestemming hebt om ze te e-mailen."
 
 #: views/lists/subscription/edit.hbs:3 views/lists/subscription/edit.hbs:4
 msgid "Edit subscriber"
-msgstr ""
+msgstr "Abonnee bewerken"
 
 #: views/lists/subscription/edit.hbs:5
 #: views/lists/subscription/import-failed.hbs:5
 msgid "Back to list"
-msgstr ""
+msgstr "Terug naar lijst"
 
 #: views/lists/subscription/edit.hbs:6
 #: views/lists/subscription/import-preview.hbs:6
 #: views/subscription/partials/subscription-unsubscribe-form.hbs:1
 #: lib/helpers.js:42 lib/models/segments.js:11
 msgid "Email address"
-msgstr ""
+msgstr "E-mailadres"
 
 #: views/lists/subscription/edit.hbs:17
 msgid "Delete Subscription"
-msgstr ""
+msgstr "Abonnement verwijderen"
 
 #: views/lists/subscription/import-failed.hbs:3
 msgid "Import status"
-msgstr ""
+msgstr "Import status"
 
 #: views/lists/subscription/import-failed.hbs:4
 msgid "Failed addresses"
-msgstr ""
+msgstr "Mislukte adressen"
 
 #: views/lists/subscription/import-failed.hbs:6
 msgid ""
@@ -1682,20 +1772,23 @@ msgid ""
 "Subscribers with role-based email addresses can join your list using the "
 "subscription form"
 msgstr ""
+"Op rollen gebaseerde adressen zoals postmaster@example.com worden bij het "
+"importeren geblokkeerd. Abonnees met op rollen gebaseerde e-mailadressen "
+"kunnen zich bij uw lijst voegen via het inschrijfformulier"
 
 #: views/lists/subscription/import-failed.hbs:7
 msgid "see here"
-msgstr ""
+msgstr "zie hier"
 
 #: views/lists/subscription/import-failed.hbs:9
 msgid "Fail reason"
-msgstr ""
+msgstr "Reden voor mislukken"
 
 #: views/lists/subscription/import-preview.hbs:3
 #: views/lists/subscription/import-preview.hbs:4
 #: views/lists/subscription/import.hbs:3 views/lists/subscription/import.hbs:4
 msgid "Import subscribers"
-msgstr ""
+msgstr "Abonnees importeren"
 
 #: views/lists/subscription/import-preview.hbs:10 views/users/api.hbs:21
 #: views/users/api.hbs:36 views/users/api.hbs:44 views/users/api.hbs:52
@@ -1703,178 +1796,183 @@ msgstr ""
 #: views/users/api.hbs:92 views/users/api.hbs:97 views/users/api.hbs:102
 #: views/users/api.hbs:107 views/users/api.hbs:117
 msgid "Example"
-msgstr ""
+msgstr "Voorbeeld"
 
 #: views/lists/subscription/import-preview.hbs:11
 msgid "Start import"
-msgstr ""
+msgstr "Begin met importeren"
 
 #: views/lists/subscription/import.hbs:5
 msgid "CSV File"
-msgstr ""
+msgstr "CSV bestand"
 
 #: views/lists/subscription/import.hbs:6
 msgid "The first line must contain column headings"
-msgstr ""
+msgstr "De eerste regel moet kolomkoppen bevatten"
 
 #: views/lists/subscription/import.hbs:7
 msgid "CSV delimiter"
-msgstr ""
+msgstr "CSV-scheidingsteken"
 
 #: views/lists/subscription/import.hbs:8
 msgid "Categorize the imported subscribers as"
-msgstr ""
+msgstr "Categoriseer de geïmporteerde abonnees als"
 
 #: views/lists/subscription/import.hbs:9 routes/lists.js:206
 msgid "Subscribed"
-msgstr ""
+msgstr "Ingeschreven"
 
 #: views/lists/subscription/import.hbs:10
 msgid "Regular subscriber addresses"
-msgstr ""
+msgstr "Reguliere abonnee-adressen"
 
 #: views/lists/subscription/import.hbs:11
 msgid "Subscribed (Force)"
-msgstr ""
+msgstr "Ingeschreven (Force)"
 
 #: views/lists/subscription/import.hbs:12
 msgid "Regular subscriber addresses, resubscribe users that have unsubscribed"
 msgstr ""
+"Reguliere abonnee-adressen, her-abonneer gebruikers die zich hebben afgemeld"
 
 #: views/lists/subscription/import.hbs:14
 msgid "Suppressed emails that will be unsubscribed from your list"
-msgstr ""
+msgstr "Onderdrukte e-mails die worden afgemeld van uw lijst"
 
 #: views/lists/subscription/import.hbs:15
 msgid "Check imported emails"
-msgstr ""
+msgstr "Controleer geïmporteerde e-mails"
 
 #: views/lists/subscription/import.hbs:16 views/triggers/triggers.hbs:12
 msgid "Enabled"
-msgstr ""
+msgstr "Ingeschakeld"
 
 #: views/lists/subscription/import.hbs:17 views/triggers/triggers.hbs:13
 msgid "Disabled"
-msgstr ""
+msgstr "Uitgeschakeld"
 
 #: views/lists/view.hbs:3
 msgid "Subscription Form"
-msgstr ""
+msgstr "Inschrijfformulier"
 
 #: views/lists/view.hbs:4
 msgid "List Actions"
-msgstr ""
+msgstr "Lijst acties"
 
 #: views/lists/view.hbs:9 views/triggers/create-select.hbs:3
 #: views/triggers/create-select.hbs:4 views/triggers/create.hbs:3
 #: views/triggers/create.hbs:4 views/triggers/create.hbs:27
 #: views/triggers/triggers.hbs:3
 msgid "Create Trigger"
-msgstr ""
+msgstr "Maak een trigger"
 
 #: views/lists/view.hbs:10
 msgid "Add Subscriber"
-msgstr ""
+msgstr "Abonnee toevoegen"
 
 #: views/lists/view.hbs:11
 msgid "Import Subscribers"
-msgstr ""
+msgstr "Abonnees importeren"
 
 #: views/lists/view.hbs:15
 msgid "Create New Segment"
-msgstr ""
+msgstr "Nieuw segment maken"
 
 #: views/lists/view.hbs:16
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: views/lists/view.hbs:17
 msgid "Subscriptions"
-msgstr ""
+msgstr "Abonnementen"
 
 #: views/lists/view.hbs:18
 msgid "Imports"
-msgstr ""
+msgstr "Imports"
 
 #: views/lists/view.hbs:25 routes/campaigns.js:269 routes/lists.js:300
 msgid "Finished"
-msgstr ""
+msgstr "Afgewerkt"
 
 #: views/lists/view.hbs:27
 msgid "Added"
-msgstr ""
+msgstr "Toegevoegd"
 
 #: views/lists/view.hbs:28
 msgid "Updated"
-msgstr ""
+msgstr "Bijgewerkt"
 
 #: views/lists/view.hbs:29
 msgid "Failed"
-msgstr ""
+msgstr "Mislukt"
 
 #: views/lists/view.hbs:31
 msgid ""
 "Are you sure? This action should only be called to resolve stalled imports"
 msgstr ""
+"Bent u zeker? Deze actie moet alleen worden gebruikt om vastgelopen import "
+"op te lossen"
 
 #: views/lists/view.hbs:32
 msgid "Restart"
-msgstr ""
+msgstr "Herstart"
 
 #: views/mosaico/editor.hbs:1 views/partials/merge-tag-reference.hbs:1
 msgid "Merge tag reference"
-msgstr ""
+msgstr "Tagreferentie samenvoegen"
 
 #: views/mosaico/editor.hbs:4
 msgid "MOSAICO Responsive Email Designer"
-msgstr ""
+msgstr "MOSAICO Responsive Email Designer"
 
 #: views/mosaico/editor.hbs:5
 msgid "Sucessfully saved"
-msgstr ""
+msgstr "Succesvol opgeslagen"
 
 #: views/mosaico/editor.hbs:6
 msgid "An error occured while saving the document"
-msgstr ""
+msgstr "Er is een fout opgetreden tijdens het opslaan van het document"
 
 #: views/mosaico/editor.hbs:7
 msgid "Unsaved changes will be lost. Close now?"
-msgstr ""
+msgstr "Niet-opgeslagen wijzigingen gaan verloren. Nu sluiten?"
 
 #: views/mosaico/editor.hbs:8 views/mosaico/editor.hbs:9
 msgid "Tags"
-msgstr ""
+msgstr "Tags"
 
 #: views/partials/codeeditor.hbs:1 views/partials/grapejs.hbs:1
 #: views/partials/mosaico.hbs:1 views/partials/summernote.hbs:1
 msgid "Template content (HTML)"
-msgstr ""
+msgstr "Sjablooninhoud (HTML)"
 
 #: views/partials/editor-navbar.hbs:1
 msgid "SAVE"
-msgstr ""
+msgstr "OPSLAAN"
 
 #: views/partials/editor-navbar.hbs:2
 msgid "SAVING"
-msgstr ""
+msgstr "AAN HET OPSLAAN"
 
 #: views/partials/editor-navbar.hbs:3
 msgid "CLOSE"
-msgstr ""
+msgstr "SLUIT"
 
 #: views/partials/grapejs.hbs:2
 msgid "Open GrapeJS"
-msgstr ""
+msgstr "Open GrapeJS"
 
 #: views/partials/html-preview.hbs:1
 msgid "Toggle HTML preview"
-msgstr ""
+msgstr "Schakel HTML-voorbeeld in"
 
 #: views/partials/html-to-text.hbs:1
 msgid ""
 "To extract the text from HTML click <a id=\"html-to-plaintext-btn\" role="
 "\"button\">here</a>."
 msgstr ""
+"Klik <a id=\"html-to-plaintext-btn\" role=\"button\">hier</a> om de tekst "
+"uit HTML te extraheren."
 
 #: views/partials/html-to-text.hbs:2
 msgid ""
@@ -1883,10 +1981,15 @@ msgid ""
 "\" target=\"_blank\" rel=\"noreferrer\">Premailer API</a>, a third party "
 "service. Their Terms of Service and Privacy Policy apply."
 msgstr ""
+"Hou er rekening mee dat uw bestaande platte tekst in het bovenstaande veld "
+"wordt overschreven. Deze functie maakt gebruik van de <a href=\"http://"
+"premailer.dialect.ca/api\" target=\"_blank\" rel=\"noreferrer\"> Premailer "
+"API </a>, een service van derden. Hun Servicevoorwaarden en Privacybeleid "
+"zijn van toepassing."
 
 #: views/partials/html-to-text.hbs:3
 msgid "An error occurred while talking to the server"
-msgstr ""
+msgstr "Er is een fout opgetreden tijdens het praten met de server"
 
 #: views/partials/merge-tag-reference.hbs:2
 msgid ""
@@ -1895,18 +1998,23 @@ msgid ""
 "<code>[TAG_NAME/fallback]</code> where <code>fallback</code> is an optional "
 "text value used when <code>TAG_NAME</code> is empty."
 msgstr ""
+"Samenvoegtags zijn tags die worden vervangen voordat het bericht wordt "
+"verzonden. De indeling van de samenvoegtag is als volgt: <code> [TAG_NAME] </"
+"code> of <code> [TAG_NAME / fallback]</code> waarbij <code>fallback</code> "
+"een optionele tekstwaarde is die wordt gebruikt wanneer < code>TAG_NAME</"
+"code> leeg is."
 
 #: views/partials/modal-carousel.hbs:1
 msgid "{{title}}"
-msgstr ""
+msgstr "{{title}}"
 
 #: views/partials/mosaico.hbs:2
 msgid "Open Mosaico"
-msgstr ""
+msgstr "Open Mosaico"
 
 #: views/partials/plaintext.hbs:1
 msgid "Template content (plaintext)"
-msgstr ""
+msgstr "Sjablooninhoud (platte tekst)"
 
 #: views/report-templates/create.hbs:2 views/report-templates/edit.hbs:2
 #: views/report-templates/report-templates.hbs:2
@@ -1915,95 +2023,95 @@ msgstr ""
 #: views/reports/reports.hbs:2 views/reports/reports.hbs:5
 #: views/reports/view.hbs:2 lib/tools.js:144 routes/reports.js:31
 msgid "Reports"
-msgstr ""
+msgstr "Rapporten"
 
 #: views/report-templates/create.hbs:4 views/report-templates/create.hbs:6
 #: views/report-templates/report-templates.hbs:4 views/templates/create.hbs:3
 #: views/templates/create.hbs:4 views/templates/create.hbs:12
 #: views/templates/templates.hbs:3
 msgid "Create Template"
-msgstr ""
+msgstr "Maak een sjabloon"
 
 #: views/report-templates/create.hbs:5 routes/report-templates.js:231
 msgid "Create Report Template"
-msgstr ""
+msgstr "Creëer rapportsjabloon"
 
 #: views/report-templates/edit.hbs:4 views/templates/edit.hbs:3
 #: views/templates/edit.hbs:4
 msgid "Edit Template"
-msgstr ""
+msgstr "Sjabloon bewerken"
 
 #: views/report-templates/edit.hbs:5 routes/report-templates.js:262
 msgid "Edit Report Template"
-msgstr ""
+msgstr "Rapportsjabloon bewerken"
 
 #: views/report-templates/edit.hbs:6 views/templates/edit.hbs:12
 msgid "Delete Template"
-msgstr ""
+msgstr "Sjabloon verwijderen"
 
 #: views/report-templates/edit.hbs:7
 msgid "Update and Stay"
-msgstr ""
+msgstr "Update en blijf"
 
 #: views/report-templates/edit.hbs:8
 msgid "Update and Leave"
-msgstr ""
+msgstr "Update en verlaat"
 
 #: views/report-templates/partials/report-template-fields.hbs:2
 msgid "Template Name"
-msgstr ""
+msgstr "Sjabloonnaam"
 
 #: views/report-templates/partials/report-template-fields.hbs:6
 msgid "User selectable fields"
-msgstr ""
+msgstr "Door de gebruiker selecteerbare velden"
 
 #: views/report-templates/partials/report-template-fields.hbs:7
 msgid "Data processing code"
-msgstr ""
+msgstr "Gegevensverwerkingscode"
 
 #: views/report-templates/partials/report-template-fields.hbs:8
 msgid "Rendering template"
-msgstr ""
+msgstr "Rendering sjabloon"
 
 #: views/report-templates/report-templates.hbs:5
 msgid "Blank"
-msgstr ""
+msgstr "Leeg"
 
 #: views/report-templates/report-templates.hbs:6
 msgid "All Subscribers"
-msgstr ""
+msgstr "Alle abonnees"
 
 #: views/report-templates/report-templates.hbs:7
 msgid "Grouped Subscribers"
-msgstr ""
+msgstr "Gegroepeerde abonnees"
 
 #: views/report-templates/report-templates.hbs:8
 msgid "Export List as CSV"
-msgstr ""
+msgstr "Lijst exporteren als CSV"
 
 #: views/report-templates/report-templates.hbs:9 views/reports/reports.hbs:4
 #: routes/report-templates.js:29
 msgid "Report Templates"
-msgstr ""
+msgstr "Rapportsjablonen"
 
 #: views/reports/create-select-template.hbs:3
 #: views/reports/create-select-template.hbs:4 views/reports/create.hbs:3
 #: views/reports/create.hbs:4 views/reports/create.hbs:5
 #: views/reports/reports.hbs:3 routes/reports.js:81
 msgid "Create Report"
-msgstr ""
+msgstr "Creëer rapport"
 
 #: views/reports/edit.hbs:3 views/reports/edit.hbs:4 routes/reports.js:151
 msgid "Edit Report"
-msgstr ""
+msgstr "Bewerk rapport"
 
 #: views/reports/edit.hbs:5
 msgid "Delete Report"
-msgstr ""
+msgstr "Rapport verwijderen"
 
 #: views/reports/partials/report-fields.hbs:2
 msgid "Report Name"
-msgstr ""
+msgstr "Rapportnaam"
 
 #: views/reports/partials/report-fields.hbs:8
 #: views/reports/partials/report-fields.hbs:11
@@ -2011,39 +2119,44 @@ msgid ""
 "Select a campaign in the table above by clicking on the respective row "
 "number."
 msgstr ""
+"Selecteer een campagne in de bovenstaande tabel door op het betreffende "
+"rijnummer te klikken."
 
 #: views/reports/partials/report-select-template.hbs:1
 msgid "Report Template"
-msgstr ""
+msgstr "Rapportsjabloon"
 
 #: views/settings.hbs:5
 msgid "Service Address (URL)"
-msgstr ""
+msgstr "Service Addres (URL)"
 
 #: views/settings.hbs:6
 msgid "Enter the URL this service can be reached from"
-msgstr ""
+msgstr "Voer de URL in vanwaar deze service kan worden bereikt"
 
 #: views/settings.hbs:7
 msgid "Admin Email"
-msgstr ""
+msgstr "E-mailadres beheerder"
 
 #: views/settings.hbs:8
 msgid ""
 "Enter the email address that will be used as \"from\" for system messages"
 msgstr ""
+"Voer het e-mailadres in dat zal worden gebruikt als \"van\" voor "
+"systeemberichten"
 
 #: views/settings.hbs:9
 msgid "Disable WYSIWYG editor"
-msgstr ""
+msgstr "Schakel de WYSIWYG-editor uit"
 
 #: views/settings.hbs:10
 msgid "If checked then message editor displays HTML code without the preview"
 msgstr ""
+"Indien ingeschakeld, toont de berichteditor HTML-code zonder het voorbeeld"
 
 #: views/settings.hbs:11
 msgid "Disable subscription confirmation messages"
-msgstr ""
+msgstr "Abonnementbevestigingsberichten uitschakelen"
 
 #: views/settings.hbs:12
 msgid ""
@@ -2051,217 +2164,228 @@ msgid ""
 "subscriber is now subscribed or unsubscribed. This does not disable double "
 "opt-in messages."
 msgstr ""
+"Indien aangevinkt, stuur dan geen bevestigingsbericht waarin staat dat de "
+"abonnee nu is geabonneerd of uitgeschreven. Hiermee worden dubbele opt-in-"
+"berichten niet uitgeschakeld."
 
 #: views/settings.hbs:13
 msgid "Tracking ID"
-msgstr ""
+msgstr "Tracking ID"
 
 #: views/settings.hbs:14
 msgid "Enter Google Analytics tracking code"
-msgstr ""
+msgstr "Voer de Google Analytics-trackingcode in"
 
 #: views/settings.hbs:15
 msgid "Frontpage shout out"
-msgstr ""
+msgstr "Voorpagina shout out"
 
 #: views/settings.hbs:16
 msgid "HTML code shown in the front page header section"
-msgstr ""
+msgstr "HTML-code weergegeven in de koptekst van de voorpagina"
 
 #: views/settings.hbs:17
 msgid "X-Mailer header"
-msgstr ""
+msgstr "X-Mailer header"
 
 #: views/settings.hbs:18
 msgid "Set a custom X-Mailer header value or leave empty to disable it"
 msgstr ""
+"Stel een aangepaste X-Mailer header in of laat leeg om deze uit te schakelen"
 
 #: views/settings.hbs:19
 msgid "Campaign defaults"
-msgstr ""
+msgstr "Standaardwaarden campagne"
 
 #: views/settings.hbs:20
 msgid "Sender name"
-msgstr ""
+msgstr "Naam afzender"
 
 #: views/settings.hbs:21
 msgid "Sender name, eg. My Awesome Company Ltd."
-msgstr ""
+msgstr "Naam afzender, bijv. My Awesome Company Ltd."
 
 #: views/settings.hbs:22
 msgid "Default address"
-msgstr ""
+msgstr "Standaard adres"
 
 #: views/settings.hbs:23
 msgid ""
 "Contact address to provide, eg. 1234 Main Street, Anywhere, MA 01234, USA"
-msgstr ""
+msgstr "Contactadres. Bijvoorbeeld: 1234 Main Street, Anywhere, MA 01234, VS"
 
 #: views/settings.hbs:24
 msgid "Default \"from name\""
-msgstr ""
+msgstr "Standaard \"van naam\""
 
 #: views/settings.hbs:26
 msgid "Default \"from\" email"
-msgstr ""
+msgstr "Standaard \"van\" email"
 
 #: views/settings.hbs:28
 msgid "Default \"subject line\""
-msgstr ""
+msgstr "Standaard \"onderwerpregel\""
 
 #: views/settings.hbs:30
 msgid "Default homepage (URL)"
-msgstr ""
+msgstr "Standaard homepage (URL)"
 
 #: views/settings.hbs:31
 msgid "URL to redirect the subscribed users to, eg. http://example.com/"
 msgstr ""
+"URL om de ingeschreven gebruikers om te leiden, bijvoorbeeld. http://example."
+"com/"
 
 #: views/settings.hbs:32
 msgid "Default custom unsubscribe (URL))"
-msgstr ""
+msgstr "Standaard aangepaste afmelding (URL)"
 
 #: views/settings.hbs:33
 msgid "Custom unsubscribe URL, eg. http://example.com/unsubscribe/[EMAIL]"
 msgstr ""
+"Aangepaste afmeldings-URL, bijv. http://example.com/unsubscribe/[EMAIL]"
 
 #: views/settings.hbs:34
 msgid "Set a custom unsubscribe url."
-msgstr ""
+msgstr "Stel een aangepaste afmeldings-URL in."
 
 #: views/settings.hbs:35
 msgid "Mailer Settings"
-msgstr ""
+msgstr "Mailer instellingen"
 
 #: views/settings.hbs:36
 msgid "These settings are required to send out e-mail messages"
-msgstr ""
+msgstr "Deze instellingen zijn vereist om e-mailberichten te verzenden"
 
 #: views/settings.hbs:37
 msgid "SMTP"
-msgstr ""
+msgstr "SMTP"
 
 #: views/settings.hbs:38
 msgid "AWS SES"
-msgstr ""
+msgstr "AWS SES"
 
 #: views/settings.hbs:39
 msgid "Use SMTP for sending mail"
-msgstr ""
+msgstr "Gebruik SMTP voor het verzenden van e-mail"
 
 #: views/settings.hbs:40
 msgid "Hostname"
-msgstr ""
+msgstr "Hostname"
 
 #: views/settings.hbs:41
 msgid "Port"
-msgstr ""
+msgstr "Poort"
 
 #: views/settings.hbs:42
 msgid "Port, eg. 465. Autodetected if left blank"
-msgstr ""
+msgstr "Poort, bijv. 465. Autodetected indien leeg gelaten"
 
 #: views/settings.hbs:43
 msgid "Encryption"
-msgstr ""
+msgstr "Encryptie"
 
 #: views/settings.hbs:44
 msgid "Disable SMTP authentication"
-msgstr ""
+msgstr "Schakel SMTP-authenticatie uit"
 
 #: views/settings.hbs:45 views/users/forgot.hbs:9 views/users/login.hbs:4
 #: views/users/login.hbs:5
 msgid "Username"
-msgstr ""
+msgstr "Gebruikersnaam"
 
 #: views/settings.hbs:46
 msgid "Username, eg. myaccount@example.com"
-msgstr ""
+msgstr "Gebruikersnaam, bijv. mijnaccount@voorbeeld.com"
 
 #: views/settings.hbs:47 views/settings.hbs:48 views/users/login.hbs:6
 #: views/users/login.hbs:7
 msgid "Password"
-msgstr ""
+msgstr "Wachtwoord"
 
 #: views/settings.hbs:49
 msgid "Use SES API for sending mail"
-msgstr ""
+msgstr "Gebruik SES API voor het verzenden van e-mail"
 
 #: views/settings.hbs:50
 msgid "Access Key"
-msgstr ""
+msgstr "Toegangssleutel"
 
 #: views/settings.hbs:51
 msgid "AWS Access Key Id"
-msgstr ""
+msgstr "AWS toegangssleutel-ID"
 
 #: views/settings.hbs:52
 msgid "Secret Key"
-msgstr ""
+msgstr "Geheime sleutel"
 
 #: views/settings.hbs:53
 msgid "AWS Secret Access Key"
-msgstr ""
+msgstr "AWS geheime toegangssleutel"
 
 #: views/settings.hbs:54
 msgid "Region"
-msgstr ""
+msgstr "Regio"
 
 #: views/settings.hbs:55
 msgid "Checking"
-msgstr ""
+msgstr "Controleren"
 
 #: views/settings.hbs:56
 msgid "Check Mailer config"
-msgstr ""
+msgstr "Controleer Mailer config"
 
 #: views/settings.hbs:57
 msgid "Advanced Mailer settings"
-msgstr ""
+msgstr "Geavanceerde Mailer-instellingen"
 
 #: views/settings.hbs:58
 msgid "Log SMTP transactions"
-msgstr ""
+msgstr "Log SMTP-transacties"
 
 #: views/settings.hbs:59
 msgid "Allow self-signed certificates"
-msgstr ""
+msgstr "Sta zelfondertekende certificaten toe"
 
 #: views/settings.hbs:60
 msgid "Max connections"
-msgstr ""
+msgstr "Max verbindingen"
 
 #: views/settings.hbs:61
 msgid "The count of max connections, eg. 10"
-msgstr ""
+msgstr "Het maximum aantal verbindingen, bijv. 10"
 
 #: views/settings.hbs:62
 msgid ""
 "The count of maximum simultaneous connections to make against the SMTP "
 "server (defaults to 5). This limit is per sending process."
 msgstr ""
+"Het maximale aantal gelijktijdige verbindingen dat moet worden gemaakt met "
+"de SMTP-server (standaard 5). Deze limiet is per verzendproces."
 
 #: views/settings.hbs:63
 msgid "Max messages"
-msgstr ""
+msgstr "Max berichten"
 
 #: views/settings.hbs:64
 msgid "The count of max messages, eg. 100"
-msgstr ""
+msgstr "Het maximum aantal berichten, bijv. 100"
 
 #: views/settings.hbs:65
 msgid ""
 "The number of messages to send through a single connection before the "
 "connection is closed and reopened (defaults to 100)"
 msgstr ""
+"Het aantal berichten dat via een enkele verbinding moet worden verzonden "
+"voordat de verbinding wordt gesloten en opnieuw wordt geopend (standaard 100)"
 
 #: views/settings.hbs:66
 msgid "Throttling"
-msgstr ""
+msgstr "Throttling"
 
 #: views/settings.hbs:67
 msgid "Messages per hour eg. 1000"
-msgstr ""
+msgstr "Berichten per uur bijv. 1000"
 
 #: views/settings.hbs:68
 msgid ""
@@ -2270,10 +2394,14 @@ msgid ""
 "or messages/second) then convert this limit into messages/hour (1m/s => "
 "3600m/h). This limit is per sending process."
 msgstr ""
+"Maximaal aantal berichten om binnen een uur te verzenden. Laat leeg of nul "
+"om niet te throttlen. Als uw provider een andere snelheidslimiet (berichten/"
+"minuut of berichten/seconde) gebruikt, zet deze limiet dan om in berichten/"
+"uur (1m/s => 3600m/u). Deze limiet is per verzendproces."
 
 #: views/settings.hbs:69
 msgid "VERP bounce handling"
-msgstr ""
+msgstr "VERP bounce handling"
 
 #: views/settings.hbs:70
 msgid ""
@@ -2282,6 +2410,11 @@ msgid ""
 "return path of the message. If the message is not accepted a bounce email is "
 "sent to this special VERP address and thus a bounce is detected."
 msgstr ""
+"Mailtrain kan VERP gebaseerde routing gebruiken om bounces te detecteren. In "
+"dit geval wordt het bericht naar de ontvanger verzonden met een aangepast "
+"VERP-adres als retourpad. Als het bericht niet wordt geaccepteerd, wordt een "
+"bounce-e-mail naar dit speciale VERP-adres verzonden en wordt een bounce "
+"gedetecteerd."
 
 #: views/settings.hbs:71
 msgid ""
@@ -2291,6 +2424,11 @@ msgid ""
 "privileges). This way if anyone tries to send email to someuser@verp-"
 "hostname then the email should end up to this server."
 msgstr ""
+"Om VERP te laten werken, moet u een DNS MX-record instellen dat naar uw "
+"Mailtrain-hostnaam verwijst. U moet er ook voor zorgen dat de Mailtrain VERP-"
+"interface beschikbaar is via poort 25 van uw server (poort 25 vereist "
+"meestal rootgebruikersrechten). Als iemand een e-mail probeert te verzenden "
+"naar someuser@verp-hostname, moet de e-mail op deze server toekomen."
 
 #: views/settings.hbs:72
 msgid ""
@@ -2298,34 +2436,42 @@ msgid ""
 "services (SES, SparkPost, Gmail etc.) tend to remove the VERP address from "
 "the message."
 msgstr ""
+"VERP werkt meestal alleen als u uw eigen SMTP-server gebruikt. Gewone "
+"relayservices (SES, SparkPost, Gmail enz.) Neigen ertoe het VERP-adres uit "
+"het bericht te verwijderen."
 
 #: views/settings.hbs:73
 msgid "Use VERP to catch bounces"
-msgstr ""
+msgstr "Gebruik VERP om bounces te vangen"
 
 #: views/settings.hbs:74
 msgid "Server hostname"
-msgstr ""
+msgstr "Server hostnaam"
 
 #: views/settings.hbs:75
 msgid "The VERP server hostname, eg. bounces.example.com"
-msgstr ""
+msgstr "De VERP-serverhostnaam, bijv. bounces.example.com"
 
 #: views/settings.hbs:76
 msgid ""
 "VERP bounce handling server hostname. This hostname is used in the SMTP "
 "envelope FROM address and the MX DNS records should point to this server"
 msgstr ""
+"VERP bounce handling server hostnaam. Deze hostnaam wordt gebruikt in het "
+"SMTP-envelop FROM-adres en de MX DNS-records moeten naar deze server "
+"verwijzen"
 
 #: views/settings.hbs:77
 msgid ""
 "VERP bounce handling server is not enabled. Modify your server configuration "
 "file and restart server to enable it"
 msgstr ""
+"VERP bounce handling server is niet ingeschakeld. Wijzig uw "
+"serverconfiguratiebestand en herstart de server om deze in te schakelen"
 
 #: views/settings.hbs:78
 msgid "GPG Signing"
-msgstr ""
+msgstr "GPG-ondertekening"
 
 #: views/settings.hbs:79
 msgid ""
@@ -2334,38 +2480,48 @@ msgid ""
 "with GPG key set receive encrypted messages and if you have signing key also "
 "set, the messages are signed with this key."
 msgstr ""
+"Alleen gecodeerde berichten kunnen worden ondertekend. Abonnees die geen "
+"openbare GPG-sleutel in hun profiel hebben ingesteld, ontvangen normale e-"
+"mailberichten. Gebruikers met GPG-sleutelset ontvangen gecodeerde berichten "
+"en als u ook een tekensleutel hebt ingesteld, worden de berichten met deze "
+"sleutel ondertekend."
 
 #: views/settings.hbs:80
 msgid ""
 "Do not use sensitive keys here. The private key and passphrase are not "
 "encrypted in the database."
 msgstr ""
+"Gebruik hier geen gevoelige sleutels. De privésleutel en wachtwoordzin zijn "
+"niet gecodeerd in de database."
 
 #: views/settings.hbs:81
 msgid "Private Key Passphrase"
-msgstr ""
+msgstr "Private Key Passphrase"
 
 #: views/settings.hbs:82
 msgid "Passphrase for the key if set"
-msgstr ""
+msgstr "Wachtwoordzin voor de sleutel indien ingevuld"
 
 #: views/settings.hbs:83
 msgid "Only fill this if your private key is encrypted with a passphrase"
 msgstr ""
+"Vul dit alleen in als uw privésleutel gecodeerd is met een wachtwoordzin"
 
 #: views/settings.hbs:84
 msgid "GPG Private Key"
-msgstr ""
+msgstr "GPG Private Key"
 
 #: views/settings.hbs:86
 msgid ""
 "This value is optional. If you do not provide a private key GPG encrypted "
 "messages are sent without signing."
 msgstr ""
+"Deze waarde is optioneel. Als u geen privésleutel verstrekt, worden GPG-"
+"gecodeerde berichten zonder ondertekening verzonden."
 
 #: views/settings.hbs:87
 msgid "DKIM Signing by ZoneMTA"
-msgstr ""
+msgstr "DKIM Signing door ZoneMTA"
 
 #: views/settings.hbs:88
 msgid ""
@@ -2373,20 +2529,25 @@ msgid ""
 "all outgoing messages. Other services usually provide their own means to "
 "DKIM sign your messages"
 msgstr ""
+"Als u ZoneMTA gebruikt, kan Mailtrain een DKIM-sleutel leveren voor het "
+"ondertekenen van alle uitgaande berichten. Andere services bieden meestal "
+"hun eigen middelen om DKIM uw berichten te ondertekenen"
 
 #: views/settings.hbs:89
 msgid ""
 "Do not use sensitive keys here. The private key is not encrypted in the "
 "database."
 msgstr ""
+"Gebruik hier geen gevoelige sleutels. De privésleutel is niet gecodeerd in "
+"de database."
 
 #: views/settings.hbs:90
 msgid "ZoneMTA DKIM API Key"
-msgstr ""
+msgstr "ZoneMTA DKIM API Key"
 
 #: views/settings.hbs:91
 msgid "Some secret value"
-msgstr ""
+msgstr "Een geheime waarde"
 
 #: views/settings.hbs:92
 msgid ""
@@ -2394,42 +2555,47 @@ msgid ""
 "value was generated by the Mailtrain installation script then you can keep "
 "it as it is"
 msgstr ""
+"Geheime waarde bekend bij ZoneMTA voor het opvragen van DKIM-"
+"sleutelinformatie. Als deze waarde is gegenereerd door het Mailtrain-"
+"installatiescript, kunt u deze behouden zoals deze is"
 
 #: views/settings.hbs:93
 msgid "DKIM domain"
-msgstr ""
+msgstr "DKIM domein"
 
 #: views/settings.hbs:94
 msgid "Domain name for the DKIM key"
-msgstr ""
+msgstr "Domeinnaam voor de DKIM-sleutel"
 
 #: views/settings.hbs:95
 msgid "Leave blank to use the sender email address domain"
-msgstr ""
+msgstr "Laat leeg om het e-mailadres van de afzender te gebruiken"
 
 #: views/settings.hbs:96 views/settings.hbs:97
 msgid "DKIM key selector"
-msgstr ""
+msgstr "DKIM key selector"
 
 #: views/settings.hbs:98
 msgid "Signing is disabled without a valid selector value"
-msgstr ""
+msgstr "Ondertekening is uitgeschakeld zonder een geldige selectorwaarde"
 
 #: views/settings.hbs:99
 msgid "DKIM Private Key"
-msgstr ""
+msgstr "DKIM Private Key"
 
 #: views/settings.hbs:101
 msgid ""
 "This value is optional. If you do not provide a private key then messages "
 "are not signed."
 msgstr ""
+"Deze waarde is optioneel. Als u geen persoonlijke sleutel opgeeft, worden "
+"berichten niet ondertekend."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:1
 #: views/subscription/mail-already-subscribed-text.hbs:1
 #: lib/models/subscriptions.js:174 lib/models/subscriptions.js:895
 msgid "Email address already registered"
-msgstr ""
+msgstr "E-mailadres is al geregistreerd"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:2
 #: views/subscription/mail-already-subscribed-text.hbs:2
@@ -2437,6 +2603,8 @@ msgid ""
 "We have received a subscription request. Your email address is however "
 "already registered."
 msgstr ""
+"We hebben een abonnementsaanvraag ontvangen. Uw e-mailadres is echter al "
+"geregistreerd."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:3
 #: views/subscription/mail-already-subscribed-text.hbs:3
@@ -2444,18 +2612,20 @@ msgid ""
 "If you received this email by mistake, simply delete it. Your existing "
 "subscription won't be affected."
 msgstr ""
+"Als u deze e-mail per ongeluk heeft ontvangen, verwijdert u deze eenvoudig. "
+"Uw bestaande abonnement wordt niet beïnvloed."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:4
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:3
 msgid "If you want to modify your subscription then you can "
-msgstr ""
+msgstr "Als u uw abonnement wilt wijzigen, dan kan dat "
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:5
 #: views/subscription/mail-already-subscribed-text.hbs:5
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:4
 #: views/subscription/mail-subscription-confirmed-text.hbs:4
 msgid "manage your preferences"
-msgstr ""
+msgstr "beheer uw voorkeuren"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:6
 #: views/subscription/mail-already-subscribed-text.hbs:6
@@ -2463,14 +2633,14 @@ msgstr ""
 #: views/subscription/mail-subscription-confirmed-text.hbs:5
 #: views/users/login.hbs:10
 msgid "or"
-msgstr ""
+msgstr "of"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:7
 #: views/subscription/mail-already-subscribed-text.hbs:7
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:6
 #: views/subscription/mail-subscription-confirmed-text.hbs:6
 msgid "unsubscribe here"
-msgstr ""
+msgstr "hier uitschrijven"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:8
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:7
@@ -2481,7 +2651,7 @@ msgstr ""
 #: views/subscription/web-unsubscribed-notice.mjml.hbs:3
 #: views/subscription/web-updated-notice.mjml.hbs:3
 msgid "Return to our website"
-msgstr ""
+msgstr "Ga terug naar onze website"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:9
 #: views/subscription/mail-already-subscribed-text.hbs:8
@@ -2496,22 +2666,22 @@ msgstr ""
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:5
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:5
 msgid "For questions about this list, please contact:"
-msgstr ""
+msgstr "Voor vragen over deze lijst kunt u contact opnemen met:"
 
 #: views/subscription/mail-already-subscribed-text.hbs:4
 #: views/subscription/mail-subscription-confirmed-text.hbs:3
 msgid "If you want to modify your subscription then you can:"
-msgstr ""
+msgstr "Als u uw abonnement wilt wijzigen, kunt u:"
 
 #: views/subscription/mail-confirm-address-change-html.mjml.hbs:1
 #: views/subscription/mail-confirm-address-change-text.hbs:1
 msgid "Please Confirm Subscription Address Change"
-msgstr ""
+msgstr "Bevestig de wijziging van het abonnementadres"
 
 #: views/subscription/mail-confirm-address-change-html.mjml.hbs:2
 #: views/subscription/mail-confirm-address-change-text.hbs:2
 msgid "Yes, subscribe this email address to the list"
-msgstr ""
+msgstr "Ja, abonneer dit e-mailadres op de lijst"
 
 #: views/subscription/mail-confirm-address-change-html.mjml.hbs:3
 #: views/subscription/mail-confirm-subscription-html.mjml.hbs:3
@@ -2519,6 +2689,9 @@ msgid ""
 "If you received this email by mistake, simply delete it. You won't be "
 "subscribed if you don't click the confirmation link above."
 msgstr ""
+"Als u deze e-mail per ongeluk heeft ontvangen, verwijdert u deze eenvoudig. "
+"U wordt niet geabonneerd als u niet op de bovenstaande bevestigingslink "
+"klikt."
 
 #: views/subscription/mail-confirm-address-change-text.hbs:3
 #: views/subscription/mail-confirm-subscription-text.hbs:3
@@ -2526,142 +2699,155 @@ msgid ""
 "If you received this email by mistake, simply delete it. You won't be "
 "subscribed unless you click the confirmation link above."
 msgstr ""
+"Als u deze e-mail per ongeluk heeft ontvangen, verwijdert u deze eenvoudig. "
+"U wordt niet ingeschreven tenzij u op de bevestigingslink hierboven klikt."
 
 #: views/subscription/mail-confirm-subscription-html.mjml.hbs:1
 #: views/subscription/mail-confirm-subscription-text.hbs:1
 #: views/subscription/mail-confirm-unsubscription-text.hbs:1
 #: routes/subscription.js:432
 msgid "Please Confirm Subscription"
-msgstr ""
+msgstr "Bevestig je abonnement alsjeblieft"
 
 #: views/subscription/mail-confirm-subscription-html.mjml.hbs:2
 #: views/subscription/mail-confirm-subscription-text.hbs:2
 msgid "Yes, subscribe me to this list"
-msgstr ""
+msgstr "Ja, abonneer me op deze lijst"
 
 #: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:1
 msgid "Please Confirm Unsubscription"
-msgstr ""
+msgstr "Bevestig de afmelding"
 
 #: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:2
 #: views/subscription/mail-confirm-unsubscription-text.hbs:2
 msgid "Yes, unsubscribe me from this list"
-msgstr ""
+msgstr "Ja, schrijf me uit voor deze lijst"
 
 #: views/subscription/mail-confirm-unsubscription-html.mjml.hbs:3
 msgid ""
 "If you received this email by mistake, simply delete it. You won't be "
 "unsubscribed if you don't click the confirmation link above."
 msgstr ""
+"Als u deze e-mail per ongeluk heeft ontvangen, verwijdert u deze eenvoudig. "
+"U wordt niet uitgeschreven als u niet op de bovenstaande bevestigingslink "
+"klikt."
 
 #: views/subscription/mail-confirm-unsubscription-text.hbs:3
 msgid ""
 "If you received this email by mistake, simply delete it. You won't be "
 "unsubscribed unless you click the confirmation link above."
 msgstr ""
+"Als u deze e-mail per ongeluk heeft ontvangen, verwijdert u deze eenvoudig. "
+"U wordt niet uitgeschreven tenzij u op de bevestigingslink hierboven klikt."
 
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:1
 #: views/subscription/mail-subscription-confirmed-text.hbs:1
 #: views/subscription/web-subscribed-notice.mjml.hbs:1
 msgid "Subscription Confirmed"
-msgstr ""
+msgstr "Abonnement bevestigd"
 
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:2
 msgid "Your subscription to our list has been confirmed"
-msgstr ""
+msgstr "Uw abonnement op onze lijst is bevestigd"
 
 #: views/subscription/mail-subscription-confirmed-text.hbs:2
 #: views/subscription/web-subscribed-notice.mjml.hbs:2
 msgid "Your subscription to our list has been confirmed."
-msgstr ""
+msgstr "Uw abonnement op onze lijst is bevestigd."
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:1
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:1
 msgid "You Are Now Unsubscribed"
-msgstr ""
+msgstr "U bent nu afgemeld"
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:2
 msgid "We have removed your email address from our list"
-msgstr ""
+msgstr "We hebben uw e-mailadres van onze lijst verwijderd"
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:3
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:3
 msgid "If you unsubscribed by mistake, you can re-subscribe at:"
 msgstr ""
+"Als u zich per ongeluk heeft afgemeld, kunt u zich opnieuw aanmelden op:"
 
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:2
 msgid "We have removed your email address from our list."
-msgstr ""
+msgstr "We hebben uw e-mailadres van onze lijst verwijderd."
 
 #: views/subscription/partials/subscription-custom-fields.hbs:2
 msgid "want to change it?"
-msgstr ""
+msgstr "wenst u het veranderen?"
 
 #: views/subscription/partials/subscription-custom-fields.hbs:5
 msgid "Download signature verification key"
-msgstr ""
+msgstr "Download handtekening verificatiesleutel"
 
 #: views/subscription/partials/subscription-custom-fields.hbs:7
 msgid ""
 "Insert your GPG public key here to encrypt messages sent to your address"
 msgstr ""
+"Voer hier uw openbare GPG-sleutel in om berichten te versleutelen die naar "
+"uw adres worden verzonden"
 
 #: views/subscription/partials/subscription-custom-fields.hbs:8
 msgid "optional"
-msgstr ""
+msgstr "optioneel"
 
 #: views/subscription/partials/subscription-flash-messages.hbs:1
 #: views/subscription/partials/subscription-flash-messages.hbs:3
 msgid "Warning!"
-msgstr ""
+msgstr "Waarschuwing!"
 
 #: views/subscription/partials/subscription-flash-messages.hbs:2
 msgid "If JavaScript was not enabled then no confirmation message was sent"
 msgstr ""
+"Als JavaScript niet is ingeschakeld, is er geen bevestigingsbericht verzonden"
 
 #: views/subscription/partials/subscription-flash-messages.hbs:4
 msgid "JavaScript must be enabled in order for this form to work"
-msgstr ""
+msgstr "JavaScript moet zijn ingeschakeld om dit formulier te laten werken"
 
 #: views/subscription/partials/subscription-manage-address-form.hbs:1
 msgid "Existing Email Address"
-msgstr ""
+msgstr "Bestaand e-mailadres"
 
 #: views/subscription/partials/subscription-manage-address-form.hbs:2
 msgid "New Email Address"
-msgstr ""
+msgstr "Nieuw email adres"
 
 #: views/subscription/partials/subscription-manage-address-form.hbs:3
 msgid "Your new email address"
-msgstr ""
+msgstr "Uw nieuwe e-mailadres"
 
 #: views/subscription/partials/subscription-manage-address-form.hbs:4
 msgid ""
 "You will receive a confirmation request to your new email address that you "
 "need to accept before your email is actually changed"
 msgstr ""
+"U ontvangt een bevestigingsverzoek op uw nieuwe e-mailadres dat u moet "
+"accepteren voordat uw e-mail daadwerkelijk wordt gewijzigd"
 
 #: views/subscription/partials/subscription-manage-address-form.hbs:5
 #: views/subscription/web-manage-address.mjml.hbs:2
 msgid "Update Email Address"
-msgstr ""
+msgstr "Update emailadres"
 
 #: views/subscription/partials/subscription-manage-form.hbs:1
 #: views/subscription/web-manage.mjml.hbs:2
 msgid "Update Profile"
-msgstr ""
+msgstr "Profiel bijwerken"
 
 #: views/subscription/partials/subscription-subscribe-form.hbs:1
 #: views/subscription/web-subscribe.mjml.hbs:2
 #: views/subscription/widget-subscribe.hbs:1
 msgid "Subscribe to list"
-msgstr ""
+msgstr "Abonneren op lijst"
 
 #: views/subscription/web-confirm-subscription-notice.mjml.hbs:1
 #: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:1
 #: views/subscription/widget-subscribe.hbs:4
 msgid "Almost Finished"
-msgstr ""
+msgstr "Bijna klaar"
 
 #: views/subscription/web-confirm-subscription-notice.mjml.hbs:2
 #: views/subscription/widget-subscribe.hbs:5
@@ -2669,253 +2855,261 @@ msgid ""
 "We need to confirm your email address. To complete the subscription process, "
 "please click the link in the email we just sent you."
 msgstr ""
+"We moeten uw e-mailadres bevestigen. Klik op de link in de e-mail die we u "
+"zojuist hebben gestuurd om uw inschrijving te voltooien."
 
 #: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:2
 msgid ""
 "We need to confirm your email address. To complete the unsubscription "
 "process, please click the link in the email we just sent you."
 msgstr ""
+"We moeten uw e-mailadres bevestigen. Klik op de link in de e-mail die we u "
+"zojuist hebben gestuurd om het afmeldingsproces te voltooien."
 
 #: views/subscription/web-manage-address.mjml.hbs:1
 msgid "Update Your Email Address"
-msgstr ""
+msgstr "Update uw e-mailadres"
 
 #: views/subscription/web-manage.mjml.hbs:1
 msgid "Update Your Preferences"
-msgstr ""
+msgstr "Update uw voorkeuren"
 
 #: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:1
 msgid "Online Unsubscription Is Not Possible"
-msgstr ""
+msgstr "Online afmelding is niet mogelijk"
 
 #: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:2
 msgid "Please contact us at"
-msgstr ""
+msgstr "Neem contact met ons op via"
 
 #: views/subscription/web-manual-unsubscribe-notice.mjml.hbs:3
 msgid "to get removed from the list"
-msgstr ""
+msgstr "om uit de lijst te worden verwijderd"
 
 #: views/subscription/web-subscribe.mjml.hbs:1
 msgid "Subscribe to List"
-msgstr ""
+msgstr "Abonneren op lijst"
 
 #: views/subscription/web-subscribed-notice.mjml.hbs:3
 msgid "Thank you for subscribing!"
-msgstr ""
+msgstr "Bedankt voor het inschrijven!"
 
 #: views/subscription/web-unsubscribed-notice.mjml.hbs:1
 msgid "Unsubscribe Successful"
-msgstr ""
+msgstr "Afmelden Succesvol"
 
 #: views/subscription/web-unsubscribed-notice.mjml.hbs:2
 msgid "You have been removed from:"
-msgstr ""
+msgstr "U bent verwijderd uit:"
 
 #: views/subscription/web-updated-notice.mjml.hbs:1
 msgid "Profile Updated"
-msgstr ""
+msgstr "Profiel geüpdatet"
 
 #: views/subscription/web-updated-notice.mjml.hbs:2
 msgid "Your profile information has been updated."
-msgstr ""
+msgstr "Uw profielinformatie werd bijgewerkt."
 
 #: views/subscription/widget-subscribe.hbs:2
 msgid "Sending ..."
-msgstr ""
+msgstr "Bezig met verzenden ..."
 
 #: views/subscription/widget-subscribe.hbs:3
 msgid "It looks like you are already subscribed to this list."
-msgstr ""
+msgstr "Het lijkt erop dat u al op deze lijst bent geabonneerd."
 
 #: views/templates/create.hbs:5 views/templates/edit.hbs:6
 msgid "Template name"
-msgstr ""
+msgstr "Sjabloonnaam"
 
 #: views/templates/create.hbs:6 views/templates/edit.hbs:7
 msgid "Name for this template, eg. Newsletter"
-msgstr ""
+msgstr "Naam voor dit sjabloon, bijvoorbeeld. Nieuwsbrief"
 
 #: views/templates/create.hbs:7
 msgid "HTML Editor"
-msgstr ""
+msgstr "HTML Editor"
 
 #: views/templates/create.hbs:10 views/templates/edit.hbs:9
 msgid "Optional comments about this template"
-msgstr ""
+msgstr "Optionele opmerkingen over dit sjabloon"
 
 #: views/templates/edit.hbs:5
 msgid "Back to templates"
-msgstr ""
+msgstr "Terug naar sjablonen"
 
 #: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2
 #: views/triggers/edit.hbs:2 views/triggers/triggered.hbs:2
 #: views/triggers/triggers.hbs:2 views/triggers/triggers.hbs:4
 msgid "Automation Triggers"
-msgstr ""
+msgstr "Automatiseringstriggers"
 
 #: views/triggers/create-select.hbs:5
 msgid "Select a list for the trigger"
-msgstr ""
+msgstr "Selecteer een lijst voor de trigger"
 
 #: views/triggers/create.hbs:5 views/triggers/edit.hbs:6
 msgid "Trigger name"
-msgstr ""
+msgstr "Trigger naam"
 
 #: views/triggers/create.hbs:6 views/triggers/edit.hbs:7
 msgid "Name for this trigger, eg. Inactive subscribers"
-msgstr ""
+msgstr "Naam voor deze trigger, bijvoorbeeld. Inactieve abonnees"
 
 #: views/triggers/create.hbs:8 views/triggers/edit.hbs:9
 msgid "Optional comments about this trigger"
-msgstr ""
+msgstr "Optionele opmerkingen over deze trigger"
 
 #: views/triggers/create.hbs:12 views/triggers/edit.hbs:14
 msgid "Trigger rule"
-msgstr ""
+msgstr "Trigger regel"
 
 #: views/triggers/create.hbs:13 views/triggers/edit.hbs:15
 msgid "Trigger fires"
-msgstr ""
+msgstr "Trigger lanceert"
 
 #: views/triggers/create.hbs:14 views/triggers/edit.hbs:16
 msgid "days after:"
-msgstr ""
+msgstr "dagen na:"
 
 #: views/triggers/create.hbs:16 views/triggers/create.hbs:21
 #: views/triggers/edit.hbs:18 views/triggers/edit.hbs:23
 msgid "Event"
-msgstr ""
+msgstr "Evenement"
 
 #: views/triggers/create.hbs:18 views/triggers/create.hbs:19
 #: views/triggers/create.hbs:25 views/triggers/edit.hbs:20
 #: views/triggers/edit.hbs:21 views/triggers/edit.hbs:27
 msgid "Campaign"
-msgstr ""
+msgstr "Campagne"
 
 #: views/triggers/create.hbs:23 views/triggers/edit.hbs:25
 msgid "Trigger action"
-msgstr ""
+msgstr "Trigger actie"
 
 #: views/triggers/create.hbs:24 views/triggers/edit.hbs:26
 msgid "Send campaign"
-msgstr ""
+msgstr "Verzend campagne"
 
 #: views/triggers/edit.hbs:3 views/triggers/edit.hbs:4
 msgid "Edit Trigger"
-msgstr ""
+msgstr "Bewerk trigger"
 
 #: views/triggers/edit.hbs:5
 msgid "Back to triggers"
-msgstr ""
+msgstr "Terug naar triggers"
 
 #: views/triggers/edit.hbs:11
 msgid "Trigger is enabled"
-msgstr ""
+msgstr "Trigger is actief"
 
 #: views/triggers/edit.hbs:29
 msgid "Delete Trigger"
-msgstr ""
+msgstr "Verwijder trigger"
 
 #: views/triggers/triggered.hbs:3
 msgid "Triggered"
-msgstr ""
+msgstr "Geactiveerd"
 
 #: views/triggers/triggered.hbs:4
 msgid "Triggered subscribers"
-msgstr ""
+msgstr "Triggered subscribers"
 
 #: views/triggers/triggered.hbs:5
 msgid "Subscribers who caused this trigger to fire"
-msgstr ""
+msgstr "Abonnees die deze trigger hebben geactiveerd"
 
 #: views/triggers/triggered.hbs:9
 msgid "Triggered time"
-msgstr ""
+msgstr "Tijd geactiveerd"
 
 #: views/triggers/triggers.hbs:9
 msgid "Trigger"
-msgstr ""
+msgstr "Trigger"
 
 #: views/triggers/triggers.hbs:10
 msgid "Target Campaign"
-msgstr ""
+msgstr "Doelcampagne"
 
 #: views/triggers/triggers.hbs:11
 msgid "Triggered count"
-msgstr ""
+msgstr "Triggered count"
 
 #: views/users/account.hbs:4
 msgid "This account is managed through LDAP."
-msgstr ""
+msgstr "Dit account wordt beheerd via LDAP."
 
 #: views/users/account.hbs:5
 msgid "Associated Email Address"
-msgstr ""
+msgstr "Bijbehorend e-mailadres"
 
 #: views/users/account.hbs:8
 msgid "Your e-mail address"
-msgstr ""
+msgstr "Uw e-mailadres"
 
 #: views/users/account.hbs:9
 msgid ""
 "This address is used for account recovery in case you lose your password"
 msgstr ""
+"Dit adres wordt gebruikt voor accountherstel in geval u uw wachtwoord "
+"verliest"
 
 #: views/users/account.hbs:10
 msgid "Password change"
-msgstr ""
+msgstr "Wachtwoord verandering"
 
 #: views/users/account.hbs:11
 msgid ""
 "You only need to fill out this form if you want to change your current "
 "password"
 msgstr ""
+"U hoeft dit formulier alleen in te vullen als u uw huidige wachtwoord wilt "
+"wijzigen"
 
 #: views/users/account.hbs:12 views/users/account.hbs:13
 msgid "Current Password"
-msgstr ""
+msgstr "Huidig wachtwoord"
 
 #: views/users/account.hbs:14 views/users/account.hbs:15
 #: views/users/reset.hbs:6 views/users/reset.hbs:7
 msgid "New Password"
-msgstr ""
+msgstr "Nieuw wachtwoord"
 
 #: views/users/account.hbs:16 views/users/reset.hbs:8
 msgid "Confirm Password"
-msgstr ""
+msgstr "Bevestig wachtwoord"
 
 #: views/users/account.hbs:17 views/users/reset.hbs:9
 msgid "Confirm New Password"
-msgstr ""
+msgstr "Bevestig nieuw wachtwoord"
 
 #: views/users/api.hbs:4
 msgid "Are you sure? Resetting would invalidate the currently existing token."
-msgstr ""
+msgstr "Bent u zeker? Resetten zou het huidige token ongeldig maken."
 
 #: views/users/api.hbs:5
 msgid "Are you sure?"
-msgstr ""
+msgstr "Bent u zeker?"
 
 #: views/users/api.hbs:6
 msgid "Reset Access Token"
-msgstr ""
+msgstr "Toegangstoken opnieuw instellen"
 
 #: views/users/api.hbs:7
 msgid "Generate Access Token"
-msgstr ""
+msgstr "Toegangstoken genereren"
 
 #: views/users/api.hbs:8
 msgid "Personal access token:"
-msgstr ""
+msgstr "Persoonlijk toegangstoken:"
 
 #: views/users/api.hbs:9
 msgid "Access token not yet generated"
-msgstr ""
+msgstr "Toegangstoken nog niet gegenereerd"
 
 #: views/users/api.hbs:10
 msgid "Notes about the API"
-msgstr ""
+msgstr "Opmerkingen over de API"
 
 #: views/users/api.hbs:11
 msgid ""
@@ -2923,6 +3117,9 @@ msgid ""
 "code> properties. If the response <code>error</code> has a value set then "
 "the request failed."
 msgstr ""
+"API-reactie is een JSON-structuur met de eigenschappen <code>error</code> en "
+"<code>data</code>. Als het antwoord <code>error</code> een waarde heeft, is "
+"het verzoek mislukt."
 
 #: views/users/api.hbs:12
 msgid ""
@@ -2931,10 +3128,15 @@ msgid ""
 "form data or <code>application/json</code> for a JSON payload. Using "
 "<code>multipart/form-data</code> is not supported."
 msgstr ""
+"U moet het juiste <code>Content-Type</code> definiëren wanneer u een verzoek "
+"indient. U kunt ofwel <code>application/x-www-form-urlencoded</code> "
+"gebruiken voor normale formuliergegevens of <code>application/json</code> "
+"voor een JSON-payload. Het gebruik van <code>multipart/form-data</code> "
+"wordt niet ondersteund."
 
 #: views/users/api.hbs:13
 msgid "Get list of subscriptions"
-msgstr ""
+msgstr "Ontvang een lijst met abonnementen"
 
 #: views/users/api.hbs:14
 msgid ""
@@ -2942,6 +3144,9 @@ msgid ""
 "fields of the subscribers will be returned. Note that custom fields will "
 "have generated names."
 msgstr ""
+"Haal een lijst van abonnementen op waarnaar wordt verwezen door de lijst :"
+"listId. Alle velden van de abonnees worden geretourneerd. Merk op dat "
+"aangepaste velden gegenereerde namen zullen hebben."
 
 #: views/users/api.hbs:15 views/users/api.hbs:24 views/users/api.hbs:26
 #: views/users/api.hbs:39 views/users/api.hbs:41 views/users/api.hbs:47
@@ -2951,34 +3156,34 @@ msgstr ""
 #: views/users/api.hbs:100 views/users/api.hbs:105 views/users/api.hbs:110
 #: views/users/api.hbs:112
 msgid "arguments"
-msgstr ""
+msgstr "argumenten"
 
 #: views/users/api.hbs:16 views/users/api.hbs:25 views/users/api.hbs:40
 #: views/users/api.hbs:48 views/users/api.hbs:56 views/users/api.hbs:69
 #: views/users/api.hbs:80 views/users/api.hbs:88 views/users/api.hbs:96
 #: views/users/api.hbs:101 views/users/api.hbs:106 views/users/api.hbs:111
 msgid "your personal access token"
-msgstr ""
+msgstr "uw persoonlijke toegangstoken"
 
 #: views/users/api.hbs:17 views/users/api.hbs:70
 msgid "Start position"
-msgstr ""
+msgstr "Begin positie"
 
 #: views/users/api.hbs:18 views/users/api.hbs:71
 msgid "optional, default 0"
-msgstr ""
+msgstr "optioneel, standaard 0"
 
 #: views/users/api.hbs:19
 msgid "limit subscription count in response"
-msgstr ""
+msgstr "beperk het aantal abonnementen in het antwoord"
 
 #: views/users/api.hbs:20 views/users/api.hbs:73
 msgid "optional, default 10000"
-msgstr ""
+msgstr "optioneel, standaard 10000"
 
 #: views/users/api.hbs:22
 msgid "Add subscription"
-msgstr ""
+msgstr "Abonnement toevoegen"
 
 #: views/users/api.hbs:23
 msgid ""
@@ -2986,40 +3191,48 @@ msgid ""
 "not included are left as is, so if you update only LAST_NAME value, then "
 "FIRST_NAME is kept untouched for an existing subscription."
 msgstr ""
+"Deze API-aanroep voegt een nieuw abonnement toe of update een bestaand. "
+"Velden die niet zijn opgenomen, blijven ongewijzigd, dus als u alleen de "
+"LAST_NAME-waarde bijwerkt, blijft FIRST_NAME onaangeroerd voor een bestaand "
+"abonnement."
 
 #: views/users/api.hbs:27 views/users/api.hbs:42 views/users/api.hbs:50
 msgid "subscriber's email address"
-msgstr ""
+msgstr "e-mailadres van de abonnee"
 
 #: views/users/api.hbs:28 views/users/api.hbs:43 views/users/api.hbs:51
 #: views/users/api.hbs:59 views/users/api.hbs:83 views/users/api.hbs:91
 #: views/users/api.hbs:114 views/users/api.hbs:116
 msgid "required"
-msgstr ""
+msgstr "verplicht"
 
 #: views/users/api.hbs:29
 msgid "subscriber's first name"
-msgstr ""
+msgstr "voornaam van de abonnee"
 
 #: views/users/api.hbs:30
 msgid "subscriber's last name"
-msgstr ""
+msgstr "achternaam van de abonnee"
 
 #: views/users/api.hbs:31
 msgid ""
 "subscriber's timezone (eg. \"Europe/Tallinn\", \"PST\" or \"UTC\"). If not "
 "set defaults to \"UTC\""
 msgstr ""
+"tijdzone van de abonnee (bijv. \"Europe/Tallinn\", \"PST\" of \"UTC\"). "
+"Indien niet ingevuld standaard op \"UTC\""
 
 #: views/users/api.hbs:32
 msgid ""
 "custom field value. Use yes/no for option group values (checkboxes, radios, "
 "drop downs)"
 msgstr ""
+"aangepaste veldwaarde. Gebruik ja/nee voor optiegroepwaarden "
+"(selectievakjes, radio's, vervolgkeuzelijsten)"
 
 #: views/users/api.hbs:33
 msgid "Additional POST arguments"
-msgstr ""
+msgstr "Aanvullende POST-argumenten"
 
 #: views/users/api.hbs:34
 msgid ""
@@ -3027,328 +3240,347 @@ msgid ""
 "even if it was previously marked as unsubscribed. If the email was already "
 "unsubscribed/blocked then subscription status is not changed"
 msgstr ""
+"stel in op \"ja\" als u zeker wilt weten dat de e-mail is gemarkeerd als "
+"geabonneerd, zelfs als deze eerder was gemarkeerd als niet-geabonneerd. Als "
+"de e-mail al is afgemeld/geblokkeerd, wordt de abonnementsstatus niet "
+"gewijzigd"
 
 #: views/users/api.hbs:35
 msgid ""
 "set to \"yes\" if you want to send confirmation email to the subscriber "
 "before actually marking as subscribed"
 msgstr ""
+"stel in op \"ja\" als u een bevestigingsmail naar de abonnee wilt sturen "
+"voordat u hem daadwerkelijk markeert als geabonneerd"
 
 #: views/users/api.hbs:37
 msgid "Remove subscription"
-msgstr ""
+msgstr "Afmelden"
 
 #: views/users/api.hbs:38
 msgid "This API call marks a subscription as unsubscribed"
-msgstr ""
+msgstr "Deze API-oproep markeert een abonnement als afgemeld"
 
 #: views/users/api.hbs:45
 msgid "Delete subscription"
-msgstr ""
+msgstr "Abonnement verwijderen"
 
 #: views/users/api.hbs:46
 msgid "This API call deletes a subscription"
-msgstr ""
+msgstr "Met deze API-oproep wordt een abonnement verwijderd"
 
 #: views/users/api.hbs:53
 msgid "Add new custom field"
-msgstr ""
+msgstr "Nieuw aangepast veld toevoegen"
 
 #: views/users/api.hbs:54
 msgid "This API call creates a new custom field for a list."
 msgstr ""
+"Met deze API-aanroep wordt een nieuw aangepast veld voor een lijst gemaakt."
 
 #: views/users/api.hbs:58
 msgid "field name"
-msgstr ""
+msgstr "veld naam"
 
 #: views/users/api.hbs:60
 msgid "field description"
-msgstr ""
+msgstr "veld beschrijving"
 
 #: views/users/api.hbs:61
 msgid "one of the following types:"
-msgstr ""
+msgstr "één van de volgende types:"
 
 #: views/users/api.hbs:62
 msgid ""
 "If the type is 'option' then you also need to specify the parent element ID"
 msgstr ""
+"Als het type 'optie' is, moet u ook de ID van het bovenliggende element "
+"opgeven"
 
 #: views/users/api.hbs:63
 msgid ""
 "Template for the group element. If not set, then values of the elements are "
 "joined with commas"
 msgstr ""
+"Sjabloon voor het groepselement. Indien niet ingevuld, worden waarden van de "
+"elementen samengevoegd met komma's"
 
 #: views/users/api.hbs:64
 msgid ""
 "if not visible then the subscriber can not view or modify this value at the "
 "profile page"
 msgstr ""
+"indien niet zichtbaar dan kan de abonnee deze waarde niet bekijken of "
+"wijzigen op de profielpagina"
 
 #: views/users/api.hbs:66
 msgid "Get list of blacklisted emails"
-msgstr ""
+msgstr "Krijg een lijst met e-mails op de zwarte lijst"
 
 #: views/users/api.hbs:67
 msgid "This API call get list of blacklisted emails."
-msgstr ""
+msgstr "Met deze API-oproep krijgt u een lijst met e-mails op de zwarte lijst."
 
 #: views/users/api.hbs:72
 msgid "limit emails count in response"
-msgstr ""
+msgstr "beperk aantal e-mails in het antwoord"
 
 #: views/users/api.hbs:74
 msgid "filter by part of email"
-msgstr ""
+msgstr "filter op deel van e-mail"
 
 #: views/users/api.hbs:75
 msgid "optional, default ''"
-msgstr ""
+msgstr "optioneel, standaard ''"
 
 #: views/users/api.hbs:78
 msgid "This API call either add emails to blacklist"
-msgstr ""
+msgstr "Deze API-oproep voegt e-mails toe aan de zwarte lijst"
 
 #: views/users/api.hbs:82 views/users/api.hbs:90
 msgid "email address"
-msgstr ""
+msgstr "e-mailadres"
 
 #: views/users/api.hbs:85
 msgid "Delete email from blacklist"
-msgstr ""
+msgstr "Verwijder e-mail van zwarte lijst"
 
 #: views/users/api.hbs:86
 msgid "This API call either delete emails from blacklist"
-msgstr ""
+msgstr "Deze API-oproep verwijdert e-mails van de zwarte lijst"
 
 #: views/users/api.hbs:93
 msgid "Get the lists a user has subscribed to"
-msgstr ""
+msgstr "Zoek de lijsten waarop een gebruiker zich heeft geabonneerd"
 
 #: views/users/api.hbs:94
 msgid "Retrieve the lists that the user with :email has subscribed to. "
 msgstr ""
+"Zoek de lijsten waarop de gebruiker met :e-mail zich heeft geabonneerd. "
 
 #: views/users/api.hbs:98
 msgid "Get all lists"
-msgstr ""
+msgstr "Krijg alle lijsten"
 
 #: views/users/api.hbs:99
 msgid "Retrieve every list. "
-msgstr ""
+msgstr "Haal elke lijst op. "
 
 #: views/users/api.hbs:103
 msgid "Get list by id"
-msgstr ""
+msgstr "Lijst ophalen op ID"
 
 #: views/users/api.hbs:104
 msgid "Retrieve the list with :id "
-msgstr ""
+msgstr "Haal de lijst op met :id "
 
 #: views/users/api.hbs:108
 msgid "Change email of existing list subscriber"
-msgstr ""
+msgstr "E-mailadres van bestaande lijstabonnees wijzigen"
 
 #: views/users/api.hbs:109
 msgid "This API call changes the email address of an existing list subscriber."
 msgstr ""
+"Deze API-oproep wijzigt het e-mailadres van een bestaande abonnee van de "
+"lijst."
 
 #: views/users/api.hbs:113
 msgid "subscriber's old email address"
-msgstr ""
+msgstr "het oude e-mailadres van de abonnee"
 
 #: views/users/api.hbs:115
 msgid "subscriber's new email address"
-msgstr ""
+msgstr "nieuw e-mailadres van de abonnee"
 
 #: views/users/forgot.hbs:3 views/users/reset.hbs:3
 msgid "Password Reset"
-msgstr ""
+msgstr "Wachtwoord reset"
 
 #: views/users/forgot.hbs:4
 msgid "Reset your password?"
-msgstr ""
+msgstr "Wachtwoord opnieuw instellen?"
 
 #: views/users/forgot.hbs:5
 msgid "Accounts are managed through LDAP."
-msgstr ""
+msgstr "Accounts worden beheerd via LDAP."
 
 #: views/users/forgot.hbs:6 views/users/reset.hbs:10
 msgid "Reset Password"
-msgstr ""
+msgstr "Reset wachtwoord"
 
 #: views/users/forgot.hbs:7
 msgid ""
 "Please provide the username or email address that you used when you signed "
 "up for your Mailtrain account."
 msgstr ""
+"Geef de gebruikersnaam of het e-mailadres op dat u hebt gebruikt toen u zich "
+"aanmeldde voor uw Mailtrain-account."
 
 #: views/users/forgot.hbs:8
 msgid "We will send you an email that will allow you to reset your password."
-msgstr ""
+msgstr "We sturen u een e-mail waarmee u uw wachtwoord opnieuw kunt instellen."
 
 #: views/users/forgot.hbs:10
 msgid "Username or email address"
-msgstr ""
+msgstr "Gebruikersnaam of e-mailadres"
 
 #: views/users/forgot.hbs:11
 msgid "Send verification email"
-msgstr ""
+msgstr "Stuur verificatie email"
 
 #: views/users/login.hbs:8
 msgid "Remember me"
-msgstr ""
+msgstr "Onthoud me"
 
 #: views/users/login.hbs:11 views/users/login.hbs:12
 msgid "Forgot password?"
-msgstr ""
+msgstr "Wachtwoord vergeten?"
 
 #: views/users/reset.hbs:4
 msgid "Choose your new password"
-msgstr ""
+msgstr "Kies uw nieuwe wachtwoord"
 
 #: views/users/reset.hbs:5
 msgid "Please enter a new password."
-msgstr ""
+msgstr "Voer een nieuw wachtwoord in."
 
 #: lib/editor-helpers.js:17 routes/templates.js:95
 msgid "Could not find template with specified ID"
-msgstr ""
+msgstr "Kan sjabloon met opgegeven ID niet vinden"
 
 #: lib/editor-helpers.js:33 routes/archive.js:145 routes/campaigns.js:145
 #: routes/campaigns.js:298 routes/campaigns.js:393 routes/campaigns.js:441
 #: routes/campaigns.js:481 routes/campaigns.js:858 routes/campaigns.js:881
 #: routes/campaigns.js:900 routes/campaigns.js:922 routes/triggers.js:172
 msgid "Could not find campaign with specified ID"
-msgstr ""
+msgstr "Kan campagne met opgegeven ID niet vinden"
 
 #: lib/editor-helpers.js:47 routes/editorapi.js:320
 msgid "Invalid resource type"
-msgstr ""
+msgstr "Invalid resource type"
 
 #: lib/feed.js:31
 msgid "Bad status code %s"
-msgstr ""
+msgstr "Onjuiste statuscode %s"
 
 #: lib/helpers.js:33
 msgid "URL that points to the unsubscribe page"
-msgstr ""
+msgstr "URL die verwijst naar de afmeldpagina"
 
 #: lib/helpers.js:36
 msgid "URL that points to the preferences page of the subscriber"
-msgstr ""
+msgstr "URL die verwijst naar de voorkeurenpagina van de abonnee"
 
 #: lib/helpers.js:39
 msgid "URL to preview the message in a browser"
-msgstr ""
+msgstr "URL om het bericht in een browser te bekijken"
 
 #: lib/helpers.js:45 lib/models/segments.js:31
 msgid "First name"
-msgstr ""
+msgstr "Voornaam"
 
 #: lib/helpers.js:48 lib/models/segments.js:35
 msgid "Last name"
-msgstr ""
+msgstr "Familienaam"
 
 #: lib/helpers.js:51
 msgid "Full name (first and last name combined)"
-msgstr ""
+msgstr "Volledige naam (voor- en achternaam gecombineerd)"
 
 #: lib/helpers.js:54
 msgid "Unique ID that identifies the recipient"
-msgstr ""
+msgstr "Uniek ID dat de ontvanger identificeert"
 
 #: lib/helpers.js:57
 msgid "Unique ID that identifies the list used for this campaign"
 msgstr ""
+"Uniek ID dat de lijst identificeert die voor deze campagne wordt gebruikt"
 
 #: lib/helpers.js:60
 msgid "Unique ID that identifies current campaign"
-msgstr ""
+msgstr "Uniek ID dat de huidige campagne identificeert"
 
 #: lib/helpers.js:68 lib/helpers.js:80
 msgid "content from an RSS entry"
-msgstr ""
+msgstr "inhoud van een RSS-item"
 
 #: lib/helpers.js:71
 msgid "RSS entry title"
-msgstr ""
+msgstr "Titel van een RSS-item"
 
 #: lib/helpers.js:74
 msgid "RSS entry date"
-msgstr ""
+msgstr "Datum van een RSS-item"
 
 #: lib/helpers.js:77
 msgid "RSS entry link"
-msgstr ""
+msgstr "Link van een RSS-item"
 
 #: lib/helpers.js:83
 msgid "RSS entry summary"
-msgstr ""
+msgstr "Samenvatting van een RSS-item"
 
 #: lib/helpers.js:86
 msgid "RSS entry image URL"
-msgstr ""
+msgstr "Afbeelding URL van een RSS-item"
 
 #: lib/mailer.js:245
 msgid "Invalid mail transport"
-msgstr ""
+msgstr "Ongeldig mail transport"
 
 #: lib/models/campaigns.js:105 lib/models/campaigns.js:132
 #: lib/models/campaigns.js:205 lib/models/campaigns.js:328
 #: lib/models/campaigns.js:601 lib/models/campaigns.js:734
 msgid "Missing Campaign ID"
-msgstr ""
+msgstr "Ontbrekende campagne-ID"
 
 #: lib/models/campaigns.js:241
 msgid "Emtpy or too large attahcment"
-msgstr ""
+msgstr "Lege of te grote bijlage"
 
 #: lib/models/campaigns.js:373
 msgid "Campaign does not exist"
-msgstr ""
+msgstr "Campagne bestaat niet"
 
 #: lib/models/campaigns.js:419 lib/models/campaigns.js:611
 msgid "Campaign Name must be set"
-msgstr ""
+msgstr "Campagnenaam moet ingevuld zijn"
 
 #: lib/models/campaigns.js:423
 msgid "RSS URL must be set and needs to be a valid URL"
-msgstr ""
+msgstr "RSS-URL moet zijn ingevuld en moet een geldige URL zijn"
 
 #: lib/models/campaigns.js:579
 msgid "Selected template not found"
-msgstr ""
+msgstr "Geselecteerde sjabloon niet gevonden"
 
 #: lib/models/campaigns.js:935
 msgid "Invalid or missing message ID"
-msgstr ""
+msgstr "Ongeldige of ontbrekende bericht-ID"
 
 #: lib/models/campaigns.js:1076
 msgid "Unrecognized message status"
-msgstr ""
+msgstr "Onbekende berichtstatus"
 
 #: lib/models/confirmations.js:27
 msgid "Could not store confirmation data"
-msgstr ""
+msgstr "Kan bevestigingsgegevens niet opslaan"
 
 #: lib/models/fields.js:24
 msgid "Drop Down"
-msgstr ""
+msgstr "Drop Down"
 
 #: lib/models/fields.js:25
 msgid "Date (MM/DD/YYY)"
-msgstr ""
+msgstr "Datum (DD/MM/YYYY)"
 
 #: lib/models/fields.js:29
 msgid "JSON value for custom rendering"
-msgstr ""
+msgstr "JSON-waarde voor aangepaste rendering"
 
 #: lib/models/fields.js:30
 msgid "Option"
-msgstr ""
+msgstr "Optie"
 
 #: lib/models/fields.js:53 lib/models/fields.js:98 lib/models/fields.js:123
 #: lib/models/forms.js:46 lib/models/lists.js:115 lib/models/lists.js:150
@@ -3358,381 +3590,383 @@ msgstr ""
 #: lib/models/subscriptions.js:710 lib/models/subscriptions.js:773
 #: lib/models/subscriptions.js:816
 msgid "Missing List ID"
-msgstr ""
+msgstr "Ontbrekende lijst-ID"
 
 #: lib/models/fields.js:129
 msgid "Option field requires a group to be selected"
-msgstr ""
+msgstr "Optieveld vereist dat er een groep geselecteerd is"
 
 #: lib/models/fields.js:150 lib/models/fields.js:201
 msgid "Missing Field ID"
-msgstr ""
+msgstr "Ontbrekend veld-ID"
 
 #: lib/models/fields.js:154 lib/models/segments.js:185
 #: lib/models/segments.js:225
 msgid "Field Name must be set"
-msgstr ""
+msgstr "Veldnaam moet ingevuld zijn"
 
 #: lib/models/fields.js:218
 msgid "Custom field not found"
-msgstr ""
+msgstr "Aangepast veld niet gevonden"
 
 #: lib/models/fields.js:291
 msgid "Unknown column type %s"
-msgstr ""
+msgstr "Onbekend kolomtype %s"
 
 #: lib/models/fields.js:295
 msgid "Missing column name"
-msgstr ""
+msgstr "Naam van kolom ontbreekt"
 
 #: lib/models/fields.js:299
 msgid "Missing list ID"
-msgstr ""
+msgstr "Ontbrekende lijst-ID"
 
 #: lib/models/fields.js:307
 msgid "Provided List ID not found"
-msgstr ""
+msgstr "Opgegeven lijst-ID niet gevonden"
 
 #: lib/models/forms.js:70 lib/models/forms.js:113 lib/models/forms.js:201
 #: lib/models/forms.js:291
 msgid "Missing Form ID"
-msgstr ""
+msgstr "Ontbrekende formulier-ID"
 
 #: lib/models/forms.js:121 lib/models/forms.js:205
 msgid "Form Name must be set"
-msgstr ""
+msgstr "Formuliernaam moet ingevuld zijn"
 
 #: lib/models/forms.js:307
 msgid "Custom form not found"
-msgstr ""
+msgstr "Aangepast formulier niet gevonden"
 
 #: lib/models/links.js:337 routes/campaigns.js:547 routes/campaigns.js:595
 #: routes/campaigns.js:635 routes/campaigns.js:685 services/sender.js:305
 msgid "Campaign not found"
-msgstr ""
+msgstr "Campagne niet gevonden"
 
 #: lib/models/links.js:345 routes/lists.js:181 services/sender.js:312
 msgid "List not found"
-msgstr ""
+msgstr "Lijst niet gevonden"
 
 #: lib/models/links.js:353
 msgid "Subscription not found"
-msgstr ""
+msgstr "Abonnement niet gevonden"
 
 #: lib/models/lists.js:167 lib/models/lists.js:211
 msgid "List Name must be set"
-msgstr ""
+msgstr "Lijstnaam moet ingevuld zijn"
 
 #: lib/models/lists.js:294
 msgid "Missing List CID"
-msgstr ""
+msgstr "Ontbrekende lijst CID"
 
 #: lib/models/report-templates.js:26 lib/models/report-templates.js:70
 #: lib/models/report-templates.js:142
 msgid "Missing report template ID"
-msgstr ""
+msgstr "Ontbrekende rapportsjabloon-ID"
 
 #: lib/models/report-templates.js:77
 msgid "Report template name must be set"
-msgstr ""
+msgstr "Naam van rapportsjabloon moet ingevuld zijn"
 
 #: lib/models/reports.js:40 lib/models/reports.js:110 lib/models/reports.js:188
 msgid "Missing report ID"
-msgstr ""
+msgstr "Ontbrekend rapport-ID"
 
 #: lib/models/reports.js:116
 msgid "Report name must be set"
-msgstr ""
+msgstr "Rapportnaam moet ingevuld zijn"
 
 #: lib/models/segments.js:15
 msgid "Signup country"
-msgstr ""
+msgstr "Aanmeld land"
 
 #: lib/models/segments.js:19 lib/models/triggers.js:14
 msgid "Sign up date"
-msgstr ""
+msgstr "Aanmelddatum"
 
 #: lib/models/segments.js:23 lib/models/triggers.js:18
 msgid "Latest open"
-msgstr ""
+msgstr "Laatste open"
 
 #: lib/models/segments.js:27 lib/models/triggers.js:22
 msgid "Latest click"
-msgstr ""
+msgstr "Laatste klik"
 
 #: lib/models/segments.js:69 lib/models/segments.js:216
 #: lib/models/segments.js:256 lib/models/segments.js:278
 msgid "Missing Segment ID"
-msgstr ""
+msgstr "Ontbrekende segment-ID"
 
 #: lib/models/segments.js:85 lib/models/segments.js:551
 #: lib/models/segments.js:662
 msgid "Segment not found"
-msgstr ""
+msgstr "Segment niet gevonden"
 
 #: lib/models/segments.js:146 lib/models/segments.js:147
 #: lib/models/segments.js:409 lib/models/segments.js:410
 msgid "%s days after today"
-msgstr ""
+msgstr "%s dagen na vandaag"
 
 #: lib/models/segments.js:146 lib/models/segments.js:147
 #: lib/models/segments.js:409 lib/models/segments.js:410
 msgid "%s days before today"
-msgstr ""
+msgstr "%s dagen voor vandaag"
 
 #: lib/models/segments.js:148 lib/models/segments.js:411
 msgid "today"
-msgstr ""
+msgstr "vandaag"
 
 #: lib/models/segments.js:189 lib/models/segments.js:229
 msgid "Invalid segment rule type"
-msgstr ""
+msgstr "Ongeldig segmentregeltype"
 
 #: lib/models/segments.js:289 lib/models/segments.js:455 routes/segments.js:266
 #: routes/segments.js:300 routes/segments.js:370 routes/segments.js:381
 msgid "Selected segment not found"
-msgstr ""
+msgstr "Geselecteerd segment niet gevonden"
 
 #: lib/models/segments.js:294 lib/models/segments.js:460 routes/segments.js:272
 #: routes/segments.js:306 routes/segments.js:387
 msgid "Invalid rule type"
-msgstr ""
+msgstr "Ongeldig regeltype"
 
 #: lib/models/segments.js:359 lib/models/segments.js:435
 #: lib/models/segments.js:526
 msgid "Missing Rule ID"
-msgstr ""
+msgstr "Ontbrekende regel-ID"
 
 #: lib/models/segments.js:375
 msgid "Specified rule not found"
-msgstr ""
+msgstr "Opgegeven regel niet gevonden"
 
 #: lib/models/segments.js:386
 msgid "Specified segment not found"
-msgstr ""
+msgstr "Opgegeven segment niet gevonden"
 
 #: lib/models/segments.js:446
 msgid "Selected rule not found"
-msgstr ""
+msgstr "Geselecteerde regel niet gevonden"
 
 #: lib/models/subscriptions.js:257 lib/models/subscriptions.js:287
 #: lib/models/subscriptions.js:394
 msgid "Missing Subscription ID"
-msgstr ""
+msgstr "Abonnement-ID ontbreekt"
 
 #: lib/models/subscriptions.js:315
 msgid "Missing Subscription email address"
-msgstr ""
+msgstr "E-mailadres voor abonnement ontbreekt"
 
 #: lib/models/subscriptions.js:570 lib/models/subscriptions.js:820
 msgid "Missing subscription ID"
-msgstr ""
+msgstr "Abonnement-ID ontbreekt"
 
 #: lib/models/subscriptions.js:661 lib/models/subscriptions.js:714
 #: lib/models/subscriptions.js:750
 msgid "Missing Import ID"
-msgstr ""
+msgstr "Ontbrekende import-ID"
 
 #: lib/models/subscriptions.js:842
 msgid "Unknown subscription ID"
-msgstr ""
+msgstr "Onbekende abonnements-ID"
 
 #: lib/models/subscriptions.js:847 routes/subscription.js:639
 msgid "Nothing seems to be changed"
-msgstr ""
+msgstr "Niets lijkt te zijn veranderd"
 
 #: lib/models/subscriptions.js:913 routes/subscription.js:473
 #: routes/subscription.js:545 routes/subscription.js:581
 #: routes/subscription.js:697 routes/subscription.js:772
 msgid "Subscription not found in this list"
-msgstr ""
+msgstr "Abonnement niet gevonden in deze lijst"
 
 #: lib/models/templates.js:26 lib/models/templates.js:102
 #: lib/models/templates.js:157
 msgid "Missing Template ID"
-msgstr ""
+msgstr "Ontbrekende sjabloon-ID"
 
 #: lib/models/templates.js:55 lib/models/templates.js:106
 msgid "Template Name must be set"
-msgstr ""
+msgstr "Sjabloonnaam moet ingevuld zijn"
 
 #: lib/models/templates.js:147
 msgid "Template does not exist"
-msgstr ""
+msgstr "Sjabloon bestaat niet"
 
 #: lib/models/triggers.js:31
 msgid "Has Opened"
-msgstr ""
+msgstr "Heeft geopend"
 
 #: lib/models/triggers.js:34
 msgid "Has Clicked"
-msgstr ""
+msgstr "Heeft geklikt"
 
 #: lib/models/triggers.js:37
 msgid "Not Opened"
-msgstr ""
+msgstr "Heeft niet geopend"
 
 #: lib/models/triggers.js:40
 msgid "Not Clicked"
-msgstr ""
+msgstr "Heeft niet geklikt"
 
 #: lib/models/triggers.js:221 lib/models/triggers.js:258
 msgid "Missing or invalid list ID"
-msgstr ""
+msgstr "Ontbrekende of ongeldige lijst-ID"
 
 #: lib/models/triggers.js:225 lib/models/triggers.js:310
 msgid "Days in the past are not allowed"
-msgstr ""
+msgstr "Dagen in het verleden zijn niet toegestaan"
 
 #: lib/models/triggers.js:229 lib/models/triggers.js:250
 #: lib/models/triggers.js:314 lib/models/triggers.js:335
 msgid "Missing or invalid trigger rule"
-msgstr ""
+msgstr "Ontbrekende of ongeldige triggerregel"
 
 #: lib/models/triggers.js:236 lib/models/triggers.js:321
 msgid "Invalid subscription configuration"
-msgstr ""
+msgstr "Ongeldige abonnementconfiguratie"
 
 #: lib/models/triggers.js:243 lib/models/triggers.js:328
 msgid "Invalid campaign configuration"
-msgstr ""
+msgstr "Ongeldige campagneconfiguratie"
 
 #: lib/models/triggers.js:246 lib/models/triggers.js:331
 msgid "A campaing can not be a target for itself"
-msgstr ""
+msgstr "Een campagne kan geen doelwit voor zichzelf zijn"
 
 #: lib/models/triggers.js:279
 msgid "Could not store trigger row"
-msgstr ""
+msgstr "Kon triggerrij niet opslaan"
 
 #: lib/models/triggers.js:296
 msgid "Missing or invalid Trigger ID"
-msgstr ""
+msgstr "Ontbrekende of ongeldige trigger-ID"
 
 #: lib/models/triggers.js:363
 msgid "Missing Trigger ID"
-msgstr ""
+msgstr "Trigger-ID ontbreekt"
 
 #: lib/models/users.js:103
 msgid "Could not store user row"
-msgstr ""
+msgstr "Kon gebruikersrij niet opslaan"
 
 #: lib/models/users.js:173
 msgid "Email Address must be set"
-msgstr ""
+msgstr "E-mailadres moet ingevuld zijn"
 
 #: lib/models/users.js:184
 msgid "Failed to check user data"
-msgstr ""
+msgstr "Kon gebruikersgegevens niet controleren"
 
 #: lib/models/users.js:195
 msgid ""
 "Can't change email as another user with the same email address already exists"
 msgstr ""
+"Kan e-mail niet wijzigen omdat er al een andere gebruiker met hetzelfde e-"
+"mailadres bestaat"
 
 #: lib/models/users.js:212
 msgid "Incorrect current password"
-msgstr ""
+msgstr "Onjuist huidig wachtwoord"
 
 #: lib/models/users.js:216
 msgid "New password not set"
-msgstr ""
+msgstr "Nieuw wachtwoord niet ingevuld"
 
 #: lib/models/users.js:220
 msgid "Passwords do not match"
-msgstr ""
+msgstr "Wachtwoorden komen niet overeen"
 
 #: lib/models/users.js:258
 msgid "User ID not set"
-msgstr ""
+msgstr "Gebruikers-ID niet ingevuld"
 
 #: lib/models/users.js:286
 msgid "Username must be set"
-msgstr ""
+msgstr "Gebruikersnaam moet ingevuld zijn"
 
 #: lib/models/users.js:323
 msgid "Mailer password change request"
-msgstr ""
+msgstr "Verzoek van Mailer wachtwoordwijziging"
 
 #: lib/models/users.js:347 lib/models/users.js:367
 msgid "Missing username or reset token"
-msgstr ""
+msgstr "Gebruikersnaam of reset token ontbreekt"
 
 #: lib/models/users.js:371
 msgid "Invalid new password"
-msgstr ""
+msgstr "Ongeldig nieuw wachtwoord"
 
 #: lib/passport.js:50
 msgid "%s  logged out"
-msgstr ""
+msgstr "%s uitgelogd"
 
 #: lib/passport.js:65
 msgid "Failed to authenticate user"
-msgstr ""
+msgstr "Kan de gebruiker niet verifiëren"
 
 #: lib/passport.js:81
 msgid "Logged in as %s"
-msgstr ""
+msgstr "Ingelogd als %s"
 
 #: lib/passport.js:191
 msgid "Incorrect username or password"
-msgstr ""
+msgstr "Foute gebruikersnaam of wachtwoord"
 
 #: lib/subscription-mail-helpers.js:28
 msgid "%s: Subscription Confirmed"
-msgstr ""
+msgstr "%s: abonnement bevestigd"
 
 #: lib/subscription-mail-helpers.js:39
 msgid "%s: Email Address Already Registered"
-msgstr ""
+msgstr "%s: e-mailadres al geregistreerd"
 
 #: lib/subscription-mail-helpers.js:49
 msgid "%s: Please Confirm Email Change in Subscription"
-msgstr ""
+msgstr "%s: bevestig e-mailwijziging in abonnement"
 
 #: lib/subscription-mail-helpers.js:59
 msgid "%s: Please Confirm Subscription"
-msgstr ""
+msgstr "%s: bevestig uw abonnement"
 
 #: lib/subscription-mail-helpers.js:69
 msgid "%s: Please Confirm Unsubscription"
-msgstr ""
+msgstr "%s: bevestig afmelding"
 
 #: lib/subscription-mail-helpers.js:76
 msgid "%s: Unsubscription Confirmed"
-msgstr ""
+msgstr "%s: uitschrijving bevestigd"
 
 #: lib/tools.js:154
 msgid "Blocked email address \"%s\""
-msgstr ""
+msgstr "Geblokkeerd e-mailadres \"%s\""
 
 #: lib/tools.js:163
 msgid "Invalid email address \"%s\"."
-msgstr ""
+msgstr "Ongeldig e-mailadres \"%s\"."
 
 #: lib/tools.js:166
 msgid "MX record not found for domain"
-msgstr ""
+msgstr "MX-record niet gevonden voor domein"
 
 #: lib/tools.js:169
 msgid "Address domain not found"
-msgstr ""
+msgstr "Adresdomein niet gevonden"
 
 #: lib/tools.js:172
 msgid "Address domain name is required"
-msgstr ""
+msgstr "Adres domeinnaam is verplicht"
 
 #: routes/archive.js:31 routes/archive.js:43 routes/archive.js:55 app.js:230
 msgid "Not Found"
-msgstr ""
+msgstr "Niet gevonden"
 
 #: routes/archive.js:121 services/sender.js:454
 msgid "Received status code %s from %s"
-msgstr ""
+msgstr "Statuscode %s ontvangen van %s"
 
 #: routes/archive.js:153 routes/campaigns.js:908
 msgid "Attachment not found"
-msgstr ""
+msgstr "Bijlage niet gevonden"
 
 #: routes/blacklist.js:13 routes/campaigns.js:26 routes/editorapi.js:32
 #: routes/fields.js:13 routes/forms.js:16 routes/grapejs.js:15
@@ -3741,135 +3975,135 @@ msgstr ""
 #: routes/templates.js:18 routes/triggers.js:19 routes/users.js:75
 #: routes/users.js:120
 msgid "Need to be logged in to access restricted content"
-msgstr ""
+msgstr "Moet aangemeld zijn om toegang te krijgen tot beperkte inhoud"
 
 #: routes/campaigns.js:118
 msgid "Could not create campaign"
-msgstr ""
+msgstr "Kan campagne niet maken"
 
 #: routes/campaigns.js:121
 msgid "Campaign “%s” created"
-msgstr ""
+msgstr "Campagne '%s' gemaakt"
 
 #: routes/campaigns.js:134
 msgid "Campaign duplicated"
-msgstr ""
+msgstr "Campagne gedupliceerd"
 
 #: routes/campaigns.js:136
 msgid "Could not duplicate specified campaign"
-msgstr ""
+msgstr "Kan opgegeven campagne niet dupliceren"
 
 #: routes/campaigns.js:223
 msgid "Campaign settings updated"
-msgstr ""
+msgstr "Campagne-instellingen bijgewerkt"
 
 #: routes/campaigns.js:225
 msgid "Campaign settings not updated"
-msgstr ""
+msgstr "Campagne-instellingen niet bijgewerkt"
 
 #: routes/campaigns.js:241 routes/campaigns.js:758
 msgid "Campaign deleted"
-msgstr ""
+msgstr "Campagne verwijderd"
 
 #: routes/campaigns.js:243 routes/campaigns.js:760
 msgid "Could not delete specified campaign"
-msgstr ""
+msgstr "Kan opgegeven campagne niet verwijderen"
 
 #: routes/campaigns.js:262
 msgid "Idling"
-msgstr ""
+msgstr "Niet actief"
 
 #: routes/campaigns.js:265
 msgid "Scheduled"
-msgstr ""
+msgstr "Gepland"
 
 #: routes/campaigns.js:271
 msgid "Paused"
-msgstr ""
+msgstr "Gepauzeerd"
 
 #: routes/campaigns.js:273
 msgid "Inactive"
-msgstr ""
+msgstr "Inactief"
 
 #: routes/campaigns.js:275
 msgid "Active"
-msgstr ""
+msgstr "Actief"
 
 #: routes/campaigns.js:277
 msgid "Other"
-msgstr ""
+msgstr "Anders"
 
 #: routes/campaigns.js:435
 msgid "Unknown status selector"
-msgstr ""
+msgstr "Onbekende statuskiezer"
 
 #: routes/campaigns.js:776
 msgid "Scheduled sending"
-msgstr ""
+msgstr "Verzending ingepland"
 
 #: routes/campaigns.js:778
 msgid "Could not schedule sending"
-msgstr ""
+msgstr "Kan verzending niet inplannen"
 
 #: routes/campaigns.js:790
 msgid "Sending resumed"
-msgstr ""
+msgstr "Verzenden hervat"
 
 #: routes/campaigns.js:792
 msgid "Could not resume sending"
-msgstr ""
+msgstr "Kan verzending niet hervatten"
 
 #: routes/campaigns.js:804
 msgid "Sending reset"
-msgstr ""
+msgstr "Verzenden reset"
 
 #: routes/campaigns.js:806
 msgid "Could not reset sending"
-msgstr ""
+msgstr "Kon verzending niet resetten"
 
 #: routes/campaigns.js:818 routes/campaigns.js:846
 msgid "Sending paused"
-msgstr ""
+msgstr "Verzenden gepauzeerd"
 
 #: routes/campaigns.js:820 routes/campaigns.js:848
 msgid "Could not pause sending"
-msgstr ""
+msgstr "Kon verzending niet onderbreken"
 
 #: routes/campaigns.js:832
 msgid "Sending activated"
-msgstr ""
+msgstr "Verzenden geactiveerd"
 
 #: routes/campaigns.js:834
 msgid "Could not activate sending"
-msgstr ""
+msgstr "Kon verzenden niet activeren"
 
 #: routes/campaigns.js:869
 msgid "Attachment uploaded"
-msgstr ""
+msgstr "Bijlage geüpload"
 
 #: routes/campaigns.js:871
 msgid "Could not store attachment"
-msgstr ""
+msgstr "Kon bijlage niet opslaan"
 
 #: routes/campaigns.js:888
 msgid "Attachment deleted"
-msgstr ""
+msgstr "Bijlage verwijderd"
 
 #: routes/campaigns.js:890
 msgid "Could not delete attachment"
-msgstr ""
+msgstr "Kon bijlage niet verwijderen"
 
 #: routes/editorapi.js:38
 msgid "Invalid editor name"
-msgstr ""
+msgstr "Ongeldige editornaam"
 
 #: routes/editorapi.js:146
 msgid "Method not supported"
-msgstr ""
+msgstr "Methode niet ondersteund"
 
 #: routes/editorapi.js:381
 msgid "Invalid resource type or ID"
-msgstr ""
+msgstr "Ongeldig brontype of ID"
 
 #: routes/fields.js:28 routes/fields.js:64 routes/fields.js:118
 #: routes/forms.js:31 routes/forms.js:63 routes/forms.js:94
@@ -3877,541 +4111,555 @@ msgstr ""
 #: routes/segments.js:151 routes/segments.js:223 routes/segments.js:255
 #: routes/segments.js:289 routes/segments.js:336 routes/segments.js:359
 msgid "Selected list ID not found"
-msgstr ""
+msgstr "Geselecteerde lijst-ID niet gevonden"
 
 #: routes/fields.js:102
 msgid "Could not create custom field"
-msgstr ""
+msgstr "Kon aangepast veld niet aanmaken"
 
 #: routes/fields.js:129
 msgid "Selected field not found"
-msgstr ""
+msgstr "Geselecteerd veld niet gevonden"
 
 #: routes/fields.js:165
 msgid "Field settings updated"
-msgstr ""
+msgstr "Veldinstellingen bijgewerkt"
 
 #: routes/fields.js:167
 msgid "Field settings not updated"
-msgstr ""
+msgstr "Veldinstellingen niet bijgewerkt"
 
 #: routes/fields.js:183
 msgid "Custom field deleted"
-msgstr ""
+msgstr "Aangepast veld verwijderd"
 
 #: routes/fields.js:185
 msgid "Could not delete specified field"
-msgstr ""
+msgstr "Kon opgegeven veld niet verwijderen"
 
 #: routes/forms.js:78
 msgid "Could not create custom form"
-msgstr ""
+msgstr "Kon aangepast formulier niet aanmaken"
 
 #: routes/forms.js:105
 msgid "Selected form not found"
-msgstr ""
+msgstr "Geselecteerd formulier niet gevonden"
 
 #: routes/forms.js:136
 msgid "The plaintext version for this email"
-msgstr ""
+msgstr "De platte tekstversie voor deze e-mail"
 
 #: routes/forms.js:137
 msgid "Custom forms use MJML for formatting"
-msgstr ""
+msgstr "Aangepaste formulieren gebruiken MJML voor opmaak"
 
 #: routes/forms.js:138
 msgid "See the MJML documentation <a class=\"mjml-documentation\">here</a>"
-msgstr ""
+msgstr "Bekijk de MJML-documentatie <a class=\"mjml-documentation\">hier</a>"
 
 #: routes/forms.js:146
 msgid "Layout"
-msgstr ""
+msgstr "Opmaak"
 
 #: routes/forms.js:152
 msgid "Form Input Style"
-msgstr ""
+msgstr "Formulierinvoerstijl"
 
 #: routes/forms.js:154
 msgid ""
 "This CSS stylesheet defines the appearance of form input elements and alerts"
 msgstr ""
+"Dit CSS-stylesheet definieert het uiterlijk van formulierinvoerelementen en "
+"waarschuwingen"
 
 #: routes/forms.js:160
 msgid "Web - Subscribe"
-msgstr ""
+msgstr "Web - Abonneren"
 
 #: routes/forms.js:165
 msgid "Web - Confirm Subscription Notice"
-msgstr ""
+msgstr "Web - Bevestig aanmelding voor abonnement"
 
 #: routes/forms.js:170
 msgid "Mail - Confirm Subscription (MJML)"
-msgstr ""
+msgstr "Mail - Abonnement bevestigen (MJML)"
 
 #: routes/forms.js:175
 msgid "Mail - Confirm Subscription (Text)"
-msgstr ""
+msgstr "Mail - Abonnement bevestigen (tekst)"
 
 #: routes/forms.js:180
 msgid "Mail - Already Subscribed (MJML)"
-msgstr ""
+msgstr "Mail - Al ingeschreven (MJML)"
 
 #: routes/forms.js:185
 msgid "Mail - Already Subscribed (Text)"
-msgstr ""
+msgstr "Mail - Al ingeschreven (tekst)"
 
 #: routes/forms.js:190
 msgid "Web - Subscribed Notice"
-msgstr ""
+msgstr "Web - Ingeschreven kennisgeving"
 
 #: routes/forms.js:195
 msgid "Mail - Subscription Confirmed (MJML)"
-msgstr ""
+msgstr "Mail - Abonnement bevestigd (MJML)"
 
 #: routes/forms.js:200
 msgid "Mail - Subscription Confirmed (Text)"
-msgstr ""
+msgstr "Mail - Abonnement bevestigd (tekst)"
 
 #: routes/forms.js:208
 msgid "Web - Manage Preferences"
-msgstr ""
+msgstr "Web - Beheer voorkeuren"
 
 #: routes/forms.js:213
 msgid "Web - Manage Address"
-msgstr ""
+msgstr "Web - Beheer adres"
 
 #: routes/forms.js:218
 msgid "Web - Updated Notice"
-msgstr ""
+msgstr "Web - Bijgewerkt kennisgeving"
 
 #: routes/forms.js:226
 msgid "Web - Unsubscribe"
-msgstr ""
+msgstr "Web - Abonnement opzeggen"
 
 #: routes/forms.js:231
 msgid "Web - Confirm Unsubscription Notice"
-msgstr ""
+msgstr "Web - Bevestig de afmelding"
 
 #: routes/forms.js:236
 msgid "Mail - Confirm Unsubscription (MJML)"
-msgstr ""
+msgstr "Mail - Bevestig afmelding (MJML)"
 
 #: routes/forms.js:241
 msgid "Mail - Confirm Unsubscription (Text)"
-msgstr ""
+msgstr "Mail - Bevestig afmelding (tekst)"
 
 #: routes/forms.js:246
 msgid "Mail - Confirm Address Change (MJML)"
-msgstr ""
+msgstr "Mail - Bevestig adreswijziging (MJML)"
 
 #: routes/forms.js:251
 msgid "Mail - Confirm Address Change (Text)"
-msgstr ""
+msgstr "Mail - Bevestig adreswijziging (tekst)"
 
 #: routes/forms.js:256
 msgid "Web - Unsubscribed Notice"
-msgstr ""
+msgstr "Web - Afgemeld kennisgeving"
 
 #: routes/forms.js:261
 msgid "Mail - Unsubscription Confirmed (MJML)"
-msgstr ""
+msgstr "Mail - Uitschrijving bevestigd (MJML)"
 
 #: routes/forms.js:266
 msgid "Mail - Unsubscription Confirmed (Text)"
-msgstr ""
+msgstr "Mail - Afmelding bevestigd (tekst)"
 
 #: routes/forms.js:271
+#, fuzzy
 msgid "Web - Manual Unsubscribe Notice"
-msgstr ""
+msgstr "Web - Handmatige afmelding kennisgeving"
 
 #: routes/forms.js:309
 msgid "Form settings updated"
-msgstr ""
+msgstr "Formulierinstellingen bijgewerkt"
 
 #: routes/forms.js:311
 msgid "Form settings not updated"
-msgstr ""
+msgstr "Formulierinstellingen niet bijgewerkt"
 
 #: routes/forms.js:327
 msgid "Custom form deleted"
-msgstr ""
+msgstr "Aangepast formulier verwijderd"
 
 #: routes/forms.js:329
 msgid "Could not delete specified form"
-msgstr ""
+msgstr "Kon opgegeven formulier niet verwijderen"
 
 #: routes/index.js:11
 msgid "Self Hosted Newsletter App"
-msgstr ""
+msgstr "Zelf gehoste nieuwsbrief-app"
 
 #: routes/links.js:39
 msgid "Oops, we couldn't find a link for the URL you clicked"
 msgstr ""
+"Oeps, we hebben geen link kunnen vinden voor de URL waarop u hebt geklikt"
 
 #: routes/lists.js:82
 msgid "Could not create list"
-msgstr ""
+msgstr "Kon lijst niet maken"
 
 #: routes/lists.js:85
 msgid "List created"
-msgstr ""
+msgstr "Lijst gemaakt"
 
 #: routes/lists.js:93 routes/lists.js:271 routes/lists.js:336
 #: routes/lists.js:375 routes/lists.js:444 routes/lists.js:469
 #: routes/lists.js:514 routes/lists.js:536 routes/lists.js:565
 #: routes/lists.js:657 routes/lists.js:714 routes/lists.js:741
 msgid "Could not find list with specified ID"
-msgstr ""
+msgstr "Kan lijst met opgegeven ID niet vinden"
 
 #: routes/lists.js:122
 msgid "List settings updated"
-msgstr ""
+msgstr "Lijstinstellingen bijgewerkt"
 
 #: routes/lists.js:124
 msgid "List settings not updated"
-msgstr ""
+msgstr "Lijstinstellingen niet bijgewerkt"
 
 #: routes/lists.js:142
 msgid "List deleted"
-msgstr ""
+msgstr "Lijst verwijderd"
 
 #: routes/lists.js:144
 msgid "Could not delete specified list"
-msgstr ""
+msgstr "Kan opgegeven lijst niet verwijderen"
 
 #: routes/lists.js:206
 msgid "Unknown"
-msgstr ""
+msgstr "Onbekend"
 
 #: routes/lists.js:206
 msgid "Complained"
-msgstr ""
+msgstr "Geklaagd"
 
 #: routes/lists.js:237
 msgid "Invalid key"
-msgstr ""
+msgstr "Ongeldige sleutel"
 
 #: routes/lists.js:239
 msgid "Expired key"
-msgstr ""
+msgstr "Verlopen sleutel"
 
 #: routes/lists.js:241
 msgid "Revoked key"
-msgstr ""
+msgstr "Ingetrokken sleutel"
 
 #: routes/lists.js:288
 msgid "Force Subscribe"
-msgstr ""
+msgstr "Abonneren afdwingen"
 
 #: routes/lists.js:291
 msgid "Initializing"
-msgstr ""
+msgstr "Bezig met initialiseren"
 
 #: routes/lists.js:294
 msgid "Initialized"
-msgstr ""
+msgstr "Geïnitialiseerd"
 
 #: routes/lists.js:297
 msgid "Importing"
-msgstr ""
+msgstr "Aan het importeren"
 
 #: routes/lists.js:303
 msgid "Errored"
-msgstr ""
+msgstr "Fout"
 
 #: routes/lists.js:381 routes/lists.js:450 routes/lists.js:475
 msgid "Could not find subscriber with specified ID"
-msgstr ""
+msgstr "Kon abonnee met opgegeven ID niet vinden"
 
 #: routes/lists.js:427
 msgid "Could not add subscription"
-msgstr ""
+msgstr "Kon abonnement niet toevoegen"
 
 #: routes/lists.js:432
 msgid "%s was successfully added to your list"
-msgstr ""
+msgstr "%s is succesvol toegevoegd aan uw lijst"
 
 #: routes/lists.js:434
 msgid "%s was not added to your list"
-msgstr ""
+msgstr "%s is niet aan uw lijst toegevoegd"
 
 #: routes/lists.js:456
 msgid "Could not unsubscribe user"
-msgstr ""
+msgstr "Kon gebruiker niet afmelden"
 
 #: routes/lists.js:459
 msgid "%s was successfully unsubscribed from your list"
-msgstr ""
+msgstr "%s is succesvol uitgeschreven uit uw lijst"
 
 #: routes/lists.js:479
 msgid "%s was successfully removed from your list"
-msgstr ""
+msgstr "%s is succesvol verwijderd uit uw lijst"
 
 #: routes/lists.js:491
 msgid "Another subscriber with email address %s already exists"
-msgstr ""
+msgstr "Er bestaat al een andere abonnee met het e-mailadres %s"
 
 #: routes/lists.js:498
 msgid "Subscription settings updated"
-msgstr ""
+msgstr "Abonnementsinstellingen bijgewerkt"
 
 #: routes/lists.js:500
 msgid "Subscription settings not updated"
-msgstr ""
+msgstr "Abonnementsinstellingen niet bijgewerkt"
 
 #: routes/lists.js:542 routes/lists.js:663 routes/lists.js:699
 #: routes/lists.js:727 routes/lists.js:747
 msgid "Could not find import data with specified ID"
-msgstr ""
+msgstr "Kan importgegevens niet vinden met opgegeven ID"
 
 #: routes/lists.js:573
 msgid "Could not process CSV"
-msgstr ""
+msgstr "CSV kon niet worden verwerkt"
 
 #: routes/lists.js:589
 msgid "Could not create importer"
-msgstr ""
+msgstr "Kon geen importeur maken"
 
 #: routes/lists.js:643
 msgid "Empty file"
-msgstr ""
+msgstr "Leeg bestand"
 
 #: routes/lists.js:646
 msgid "Too few rows"
-msgstr ""
+msgstr "Te weinig rijen"
 
 #: routes/lists.js:703
 msgid "Import started"
-msgstr ""
+msgstr "Import gestart"
 
 #: routes/lists.js:731
 msgid "Import restarted"
-msgstr ""
+msgstr "Import herstart"
 
 #: routes/lists.js:797
 msgid "One-step (i.e. no email with confirmation link)"
-msgstr ""
+msgstr "One-step (d.w.z. geen e-mail met bevestigingslink)"
 
 #: routes/lists.js:803
 msgid ""
 "One-step with unsubscription form (i.e. no email with confirmation link)"
 msgstr ""
+"One-step met uitschrijfformulier (d.w.z. geen e-mail met bevestigingslink)"
 
 #: routes/lists.js:809
 msgid "Two-step (i.e. an email with confirmation link will be sent)"
 msgstr ""
+"Twee stappen (d.w.z. er wordt een e-mail met bevestigingslink verzonden)"
 
 #: routes/lists.js:815
 msgid ""
 "Two-step with unsubscription form (i.e. an email with confirmation link will "
 "be sent)"
 msgstr ""
+"Tweestaps met uitschrijfformulier (d.w.z. er wordt een e-mail met "
+"bevestigingslink verzonden)"
 
 #: routes/lists.js:821
 msgid ""
 "Manual (i.e. unsubscription has to be performed by the list administrator)"
 msgstr ""
+"Handmatig (d.w.z. afmelden moet worden uitgevoerd door de lijstbeheerder)"
 
 #: routes/report-templates.js:246
 msgid "Could not create report template"
-msgstr ""
+msgstr "Kon geen rapportsjabloon maken"
 
 #: routes/report-templates.js:249
 msgid "Report template “%s” created"
-msgstr ""
+msgstr "Rapportsjabloon \"%s\" gemaakt"
 
 #: routes/report-templates.js:257
 msgid "Could not find report template with specified ID"
-msgstr ""
+msgstr "Kon rapportsjabloon met opgegeven ID niet vinden"
 
 #: routes/report-templates.js:280
 msgid "Report template updated"
-msgstr ""
+msgstr "Rapportsjabloon bijgewerkt"
 
 #: routes/report-templates.js:282
 msgid "Report template not updated"
-msgstr ""
+msgstr "Rapportsjabloon niet bijgewerkt"
 
 #: routes/report-templates.js:298
 msgid "Report template deleted"
-msgstr ""
+msgstr "Rapportsjabloon verwijderd"
 
 #: routes/report-templates.js:300
 msgid "Could not delete specified report template"
-msgstr ""
+msgstr "Kon opgegeven rapportsjabloon niet verwijderen"
 
 #: routes/reports.js:124 routes/reports.js:130
 msgid "Could not create report"
-msgstr ""
+msgstr "Kon geen rapport maken"
 
 #: routes/reports.js:135
 msgid "Report “%s” created"
-msgstr ""
+msgstr "Rapport \"%s\" gemaakt"
 
 #: routes/reports.js:146 routes/reports.js:224 routes/reports.js:239
 #: routes/reports.js:265 routes/reports.js:275
 msgid "Could not find report with specified ID"
-msgstr ""
+msgstr "Kon rapport met opgegeven ID niet vinden"
 
 #: routes/reports.js:188 routes/reports.js:194
 msgid "Could not update report"
-msgstr ""
+msgstr "Kon rapport niet updaten"
 
 #: routes/reports.js:197
 msgid "Report updated"
-msgstr ""
+msgstr "Rapport bijgewerkt"
 
 #: routes/reports.js:199
 msgid "Report not updated"
-msgstr ""
+msgstr "Rapport niet bijgewerkt"
 
 #: routes/reports.js:212
 msgid "Report deleted"
-msgstr ""
+msgstr "Rapport verwijderd"
 
 #: routes/reports.js:214
 msgid "Could not delete specified report"
-msgstr ""
+msgstr "Kon opgegeven rapport niet verwijderen"
 
 #: routes/reports.js:230
 msgid "Could not find report template"
-msgstr ""
+msgstr "Kon rapportsjabloon niet vinden"
 
 #: routes/reports.js:260
 msgid "Unknown type of template"
-msgstr ""
+msgstr "Onbekend type sjabloon"
 
 #: routes/segments.js:86
 msgid "Could not create segment"
-msgstr ""
+msgstr "Kon segment niet maken"
 
 #: routes/segments.js:89
 msgid "Segment created"
-msgstr ""
+msgstr "Segment gemaakt"
 
 #: routes/segments.js:113
 msgid "Selected segment ID not found"
-msgstr ""
+msgstr "Geselecteerde segment-ID niet gevonden"
 
 #: routes/segments.js:188
 msgid "Segment settings updated"
-msgstr ""
+msgstr "Segmentinstellingen bijgewerkt"
 
 #: routes/segments.js:190
 msgid "Segment settings not updated"
-msgstr ""
+msgstr "Segmentinstellingen niet bijgewerkt"
 
 #: routes/segments.js:206
 msgid "Segment deleted"
-msgstr ""
+msgstr "Segment verwijderd"
 
 #: routes/segments.js:208
 msgid "Could not delete specified segment"
-msgstr ""
+msgstr "Kon het opgegeven segment niet verwijderen"
 
 #: routes/segments.js:342
 msgid "Could not create rule"
-msgstr ""
+msgstr "Kon regel niet maken"
 
 #: routes/segments.js:345
 msgid "Rule created"
-msgstr ""
+msgstr "Regel gemaakt"
 
 #: routes/segments.js:410
 msgid "Rule settings updated"
-msgstr ""
+msgstr "Regelinstellingen bijgewerkt"
 
 #: routes/segments.js:412
 msgid "Rule settings not updated"
-msgstr ""
+msgstr "Regelinstellingen niet bijgewerkt"
 
 #: routes/segments.js:428
 msgid "Rule deleted"
-msgstr ""
+msgstr "Regel verwijderd"
 
 #: routes/segments.js:430
 msgid "Could not delete specified rule"
-msgstr ""
+msgstr "Kon opgegeven regel niet verwijderen"
 
 #: routes/settings.js:39
 msgid "Use TLS"
-msgstr ""
+msgstr "Gebruik TLS"
 
 #: routes/settings.js:40
 msgid "usually selected for port 465"
-msgstr ""
+msgstr "meestal geselecteerd voor poort 465"
 
 #: routes/settings.js:44
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Gebruik STARTTLS"
 
 #: routes/settings.js:45
 msgid "usually selected for port 587 and 25"
-msgstr ""
+msgstr "meestal geselecteerd voor poort 587 en 25"
 
 #: routes/settings.js:49
 msgid "Do not use encryption"
-msgstr ""
+msgstr "Gebruik geen encryptie"
 
 #: routes/settings.js:115
 msgid "Settings updated"
-msgstr ""
+msgstr "Instellingen bijgewerkt"
 
 #: routes/settings.js:173
 msgid "Invalid mail transport type"
-msgstr ""
+msgstr "Ongeldig e-mailtransporttype"
 
 #: routes/settings.js:184
 msgid "Invalid Access Key"
-msgstr ""
+msgstr "Ongeldige toegangssleutel"
 
 #: routes/settings.js:187
 msgid "Invalid AWS credentials"
-msgstr ""
+msgstr "Ongeldige inloggegevens voor AWS"
 
 #: routes/settings.js:190
 msgid "Connection refused, check hostname and port."
-msgstr ""
+msgstr "Verbinding geweigerd, controleer hostnaam en poort."
 
 #: routes/settings.js:195
 msgid ""
 "Did not receive greeting message from server. This might happen when "
 "connecting to a TLS port without using TLS."
 msgstr ""
+"Geen begroetingsbericht ontvangen van de server. Dit kan gebeuren wanneer u "
+"verbinding maakt met een TLS-poort zonder TLS te gebruiken."
 
 #: routes/settings.js:197
 msgid "Did not receive greeting message from server."
-msgstr ""
+msgstr "Geen begroetingsbericht ontvangen van de server."
 
 #: routes/settings.js:200
 msgid ""
 "Connection timed out. Check your firewall settings, destination port is "
 "probably blocked."
 msgstr ""
+"Connectie time-out. Controleer uw firewallinstellingen, de bestemmingspoort "
+"is waarschijnlijk geblokkeerd."
 
 #: routes/settings.js:205
 msgid "Authentication not accepted, server expects STARTTLS to be used."
 msgstr ""
+"Verificatie niet geaccepteerd, server verwacht dat STARTTLS wordt gebruikt."
 
 #: routes/settings.js:207
 msgid "Authentication failed, check username and password."
-msgstr ""
+msgstr "Verificatie mislukt, controleer gebruikersnaam en wachtwoord."
 
 #: routes/settings.js:217
 msgid "Failed Mailer verification."
-msgstr ""
+msgstr "Mailer-verificatie mislukt."
 
 #: routes/settings.js:217
 msgid "Server responded with: \"%s\""
-msgstr ""
+msgstr "Server reageerde met: \"%s\""
 
 #: routes/settings.js:221
 msgid "Mailer settings verified, ready to send some mail!"
-msgstr ""
+msgstr "Mailerinstellingen geverifieerd, klaar om wat e-mail te verzenden!"
 
 #: routes/subscription.js:33
 msgid "Not allowed by CORS"
-msgstr ""
+msgstr "Niet toegestaan door CORS"
 
 #: routes/subscription.js:61 routes/subscription.js:176
 #: routes/subscription.js:286 routes/subscription.js:382
@@ -4420,167 +4668,170 @@ msgstr ""
 #: routes/subscription.js:682 routes/subscription.js:760
 #: routes/subscription.js:897
 msgid "Selected list not found"
-msgstr ""
+msgstr "Geselecteerde lijst niet gevonden"
 
 #: routes/subscription.js:93
 msgid "Could not save subscription"
-msgstr ""
+msgstr "Kon abonnement niet opslaan"
 
 #: routes/subscription.js:118
 msgid "Subscriber info corrupted or missing"
-msgstr ""
+msgstr "Abonneegegevens zijn beschadigd of ontbreken"
 
 #: routes/subscription.js:136
 msgid "Email address changed"
-msgstr ""
+msgstr "E-mailadres gewijzigd"
 
 #: routes/subscription.js:179 routes/subscription.js:385
 msgid "The list does not allow public subscriptions."
-msgstr ""
+msgstr "De lijst staat geen openbare abonnementen toe."
 
 #: routes/subscription.js:355 routes/subscription.js:357
 msgid "Email address not set"
-msgstr ""
+msgstr "E-mailadres niet ingevuld"
 
 #: routes/subscription.js:653
 msgid ""
 "An email with further instructions has been sent to the provided address"
 msgstr ""
+"Er is een e-mail met verdere instructies naar het opgegeven adres gestuurd"
 
 #: routes/subscription.js:861 routes/subscription.js:877
 msgid "Public key is not set"
-msgstr ""
+msgstr "Openbare sleutel is niet ingevuld"
 
 #: routes/templates.js:84
 msgid "Could not create template"
-msgstr ""
+msgstr "Kon sjabloon niet maken"
 
 #: routes/templates.js:87
 msgid "Template created"
-msgstr ""
+msgstr "Sjabloon gemaakt"
 
 #: routes/templates.js:126
 msgid "Template settings updated"
-msgstr ""
+msgstr "Sjablooninstellingen bijgewerkt"
 
 #: routes/templates.js:128
 msgid "Template settings not updated"
-msgstr ""
+msgstr "Sjablooninstellingen niet bijgewerkt"
 
 #: routes/templates.js:144
 msgid "Template duplicated"
-msgstr ""
+msgstr "Sjabloon gedupliceerd"
 
 #: routes/templates.js:146
 msgid "Could not duplicate specified template"
-msgstr ""
+msgstr "Kon opgegeven sjabloon niet dupliceren"
 
 #: routes/templates.js:157
 msgid "Template deleted"
-msgstr ""
+msgstr "Sjabloon verwijderd"
 
 #: routes/templates.js:159
 msgid "Could not delete specified template"
-msgstr ""
+msgstr "Kon opgegeven sjabloon niet verwijderen"
 
 #: routes/triggers.js:64 routes/triggers.js:88 routes/triggers.js:180
 msgid "Could not find selected list"
-msgstr ""
+msgstr "Kon geselecteerde lijst niet vinden"
 
 #: routes/triggers.js:94 routes/triggers.js:100 routes/triggers.js:186
 msgid "Error while finding selected segment"
-msgstr ""
+msgstr "Fout bij het vinden van het geselecteerde segment"
 
 #: routes/triggers.js:157
 msgid "Could not create trigger"
-msgstr ""
+msgstr "Kon trigger niet aanmaken"
 
 #: routes/triggers.js:164
 msgid "Trigger “%s” created"
-msgstr ""
+msgstr "Activeer \"%s\" gemaakt"
 
 #: routes/triggers.js:197
 msgid "Error while finding selected segment subscribers"
-msgstr ""
+msgstr "Fout bij het vinden van geselecteerde segmentabonnees"
 
 #: routes/triggers.js:262
 msgid "Trigger settings updated"
-msgstr ""
+msgstr "Triggerinstellingen bijgewerkt"
 
 #: routes/triggers.js:264
 msgid "Trigger settings not updated"
-msgstr ""
+msgstr "Triggerinstellingen niet bijgewerkt"
 
 #: routes/triggers.js:276
 msgid "Trigger deleted"
-msgstr ""
+msgstr "Trigger verwijderd"
 
 #: routes/triggers.js:278
 msgid "Could not delete specified trigger"
-msgstr ""
+msgstr "Kon opgegeven trigger niet verwijderen"
 
 #: routes/triggers.js:290
 msgid "Could not find trigger with specified ID"
-msgstr ""
+msgstr "Kon trigger met opgegeven ID niet vinden"
 
 #: routes/triggers.js:303
 msgid "Trigger not found"
-msgstr ""
+msgstr "Trigger niet gevonden"
 
 #: routes/users.js:32
 msgid ""
 "An email with password reset instructions has been sent to your email "
 "address, if it exists on our system."
 msgstr ""
+"Een e-mail met instructies voor het opnieuw instellen van het wachtwoord is "
+"naar uw e-mailadres gestuurd, als deze op ons systeem bestaat."
 
 #: routes/users.js:46 routes/users.js:64
 msgid "Unknown or expired reset token"
-msgstr ""
+msgstr "Onbekende of verlopen reset-token"
 
 #: routes/users.js:66
 msgid "Your password has been changed successfully"
-msgstr ""
+msgstr "Je wachtwoord is met succes veranderd"
 
 #: routes/users.js:87
 msgid "User data not found"
-msgstr ""
+msgstr "Gebruikersgegevens niet gevonden"
 
 #: routes/users.js:110
 msgid "Access token updated"
-msgstr ""
+msgstr "Toegangstoken bijgewerkt"
 
 #: routes/users.js:112
 msgid "Access token not updated"
-msgstr ""
+msgstr "Toegangstoken niet bijgewerkt"
 
 #: routes/users.js:139
 msgid "Account information updated"
-msgstr ""
+msgstr "Accountgegevens bijgewerkt"
 
 #: routes/users.js:141
 msgid "Account information not updated"
-msgstr ""
+msgstr "Accountgegevens niet bijgewerkt"
 
 #: services/feedcheck.js:51
 msgid "Feed error: %s"
-msgstr ""
+msgstr "Feedfout: %s"
 
 #: services/feedcheck.js:54
 msgid "Found %s new campaign messages from feed"
-msgstr ""
+msgstr "%s nieuwe campagneberichten gevonden vanuit feed"
 
 #: services/feedcheck.js:56
 msgid "Found nothing new from the feed"
-msgstr ""
+msgstr "Niets nieuws gevonden uit de feed"
 
 #: services/feedcheck.js:146
 msgid "RSS entry %s"
-msgstr ""
+msgstr "RSS bericht %s"
 
 #: services/importer.js:249
 msgid "Could not access import file"
-msgstr ""
+msgstr "Geen toegang tot importbestand"
 
 #: services/triggers.js:51
 msgid "Unknown trigger type %s"
-msgstr ""
+msgstr "Onbekend triggertype %s"
