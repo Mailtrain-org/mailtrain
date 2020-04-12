@@ -12,6 +12,17 @@ case "$hostType" in
         fi
         ;;
 
+    centos8)
+        hostTypeLabel="CentOS 8"
+        redisService=redis
+        apacheConf="/etc/httpd/conf.d/mailtrain.conf"
+        apacheLogsPath="logs"
+
+        if hash firewall-cmd 2>/dev/null; then
+            firewallCmdExists=true
+        fi
+        ;;
+
     ubuntu1804)
         hostTypeLabel="Ubuntu 18.04 LTS"
         redisService=redis-server
@@ -121,6 +132,26 @@ EOT
 
             yum -y install mariadb-server nodejs ImageMagick redis pwgen gcc-c++ make mongodb-org bzip2
             ;;
+
+
+        centos8)
+            dnf -y install epel-release
+
+            cat > /etc/yum.repos.d/mongodb-org.repo <<EOT
+[mongodb-org-4.2]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/4.2/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-4.2.asc
+EOT
+
+            dnf -y module install nodejs/development
+            dnf -y module install mariadb/server
+            dnf -y module install redis
+            dnf -y install ImageMagick pwgen gcc-c++ make mongodb-org bzip2
+            ;;
+
 
         ubuntu1804)
             curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
@@ -258,6 +289,24 @@ function installHttpd {
             fi
             ;;
 
+        centos8)
+            dnf -y install httpd mod_ssl
+            systemctl start httpd
+            systemctl enable httpd
+
+            setsebool -P httpd_can_network_connect 1
+
+            if [ -n "$firewallCmdExists" ]; then
+                # Enable SSL ports on the firewall
+                for port in "80/tcp" "${portTrusted}/tcp" "${portSandbox}/tcp" "${portPublic}/tcp"; do
+                    firewall-cmd --add-port=$port --permanent
+                done
+
+                # Activate the firefall settings
+                firewall-cmd --reload
+            fi
+            ;;
+
         ubuntu1804)
             apt-get install -y apache2
 
@@ -377,7 +426,7 @@ EOT
 
 
     case "$hostType" in
-        centos7)
+        centos7|centos8)
             systemctl restart httpd
             ;;
 
@@ -405,6 +454,10 @@ function createCertificates {
     case "$hostType" in
         centos7)
             yum install -y certbot python2-certbot-apache
+            ;;
+
+        centos8)
+            dnf install -y certbot
             ;;
 
         ubuntu1804)

@@ -280,6 +280,10 @@ defaultRoles:
       description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
       permissions: [setupAutomation]
       ownNamespaceRole: campaignsAdmin
+    campaignsAdminWithoutNamespace:
+      name: Campaigns Admin (multiple namespaces)
+      description: Has basic set of rights to setup campaigns, edit lists and templates. The particular namespaces to which it has access have to be shared individually
+      permissions: [setupAutomation]
     nobody:
       name: None
       description: No permissions

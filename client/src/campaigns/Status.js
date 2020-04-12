@@ -419,7 +419,9 @@ class SendControls extends Component {
 
                 content = (
                     <Form stateOwner={this}>
-                        <CheckBox id="sendLater" label={t('sendLater')} text={t('scheduleDeliveryAtAParticularDatetime')}/>
+                        {entity.status !== CampaignStatus.SCHEDULED &&
+                            <CheckBox id="sendLater" label={t('sendLater')} text={t('scheduleDeliveryAtAParticularDatetime')}/>
+                        }
                         {this.getFormValue('sendLater') &&
                         <div>
                             <DatePicker id="date" label={t('date')} />
@@ -440,7 +442,7 @@ class SendControls extends Component {
                             :
                             <Button className="btn-primary" icon="play" label={t('send')} onClickAsync={::this.confirmStart}/>
                         }
-                        {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>}
+                        {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('Cancel scheduling')} onClickAsync={::this.stopAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
                     </>
