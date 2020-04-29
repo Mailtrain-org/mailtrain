@@ -33,6 +33,17 @@ case "$hostType" in
             firewallCmdExists=yes
         fi
         ;;
+
+    debian10)
+        hostTypeLabel="Debian 10"
+        redisService=redis-server
+        apacheConf="/etc/apache2/conf-available/mailtrain.conf"
+        apacheLogsPath="/var/log/apache2"
+
+        if hash ufw 2>/dev/null; then
+            firewallCmdExists=yes
+        fi
+        ;;
 esac
 
 
@@ -162,6 +173,15 @@ EOT
 
             apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2
             ;;
+
+        debian10)
+	    apt-get install -y gnupg
+	    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
+	    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+            apt-get update
+            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 npm
+            ;;
+
     esac
 
 
@@ -307,7 +327,7 @@ function installHttpd {
             fi
             ;;
 
-        ubuntu1804)
+        ubuntu1804|debian10)
             apt-get install -y apache2
 
             if [ -n "$firewallCmdExists" ]; then
@@ -317,6 +337,7 @@ function installHttpd {
                 done
             fi
             ;;
+	    
     esac
 }
 
@@ -430,7 +451,7 @@ EOT
             systemctl restart httpd
             ;;
 
-        ubuntu1804)
+        ubuntu1804|debian10)
             a2enmod ssl
             a2enmod rewrite
             a2enmod proxy
@@ -460,7 +481,7 @@ function createCertificates {
             dnf install -y certbot
             ;;
 
-        ubuntu1804)
+        ubuntu1804|debian10)
             apt-get install -y certbot python3-certbot-apache
             ;;
     esac
