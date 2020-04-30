@@ -13,6 +13,7 @@ enabledLanguages:
 - en-US
 - es-ES
 - de-DE
+- fr-FR
 - fk-FK
 
 mysql:
