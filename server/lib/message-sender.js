@@ -24,6 +24,7 @@ const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
 const { enforce, hashEmail } = require('./helpers');
 const senders = require('./senders');
+const shortid = require('shortid');
 
 const MessageType = {
     REGULAR: 0,
