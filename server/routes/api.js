@@ -140,6 +140,7 @@ router.postAsync('/delete/:listCid', passport.loggedIn, async (req, res) => {
 });
 
 
+// TODO: document endpoint
 router.getAsync('/subscriptions/:listCid', passport.loggedIn, async (req, res) => {
     const list = await lists.getByCid(req.context, req.params.listCid);
     const start = parseInt(req.query.start || 0, 10);
@@ -167,6 +168,57 @@ router.getAsync('/lists/:email', passport.loggedIn, async (req, res) => {
     });
 });
 
+// get lists by namespace
+router.getAsync(
+    "/lists-by-namespace/:namespaceId",
+    passport.loggedIn,
+    async (req, res) => {
+        const _lists = await lists.getByNamespaceId(
+            req.context,
+            castToInteger(req.params.namespaceId),
+        );
+
+        res.status(200);
+        res.json({
+            data: _lists.map(l => ({id: l.id, cid: l.cid, name: l.name}))
+        });
+    }
+);
+
+// create list
+router.postAsync('/list', passport.loggedIn, async (req, res) => {
+    const input = {};
+    Object.keys(req.body).forEach(key => {
+      input[(key || '').toString().trim().toLowerCase()] = (req.body[key] || '').toString().trim();
+    });
+
+    if (input.fieldwizard) {
+      input.fieldWizard = input.fieldwizard
+      delete input.fieldwizard
+    }
+
+    if (!input.namespace) {
+        throw new APIError('Missing namespace', 400);
+    }
+
+    var id = await lists.create(req.context, input);
+
+    var list = await lists.getById(req.context, id)
+
+    res.status(200);
+    res.json({
+        data: {id: list.cid}
+    });
+});
+
+// delete list
+router.deleteAsync('/list/:listCid', passport.loggedIn, async (req, res) => {
+  const list = await lists.getByCid(req.context, req.params.listCid);
+  await lists.remove(req.context, list.id);
+
+  res.status(200);
+  res.json({});
+});
 
 router.postAsync('/field/:listCid', passport.loggedIn, async (req, res) => {
     const list = await lists.getByCid(req.context, req.params.listCid);

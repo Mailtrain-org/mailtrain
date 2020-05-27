@@ -342,6 +342,109 @@ export default class API extends Component {
                 <pre>curl -XGET '{getUrl(`api/lists/test@example.com?access_token=${accessToken}`)}'</pre>
 
 
+                <h4>GET /api/lists-by-namespace/:namespaceId – {t('getListsInNamespace')}</h4>
+
+                <p>
+                  {t('retrieveTheListsThatTheNamespaceHas')}
+                </p>
+
+                <p>
+                  {t('Query params')}
+                </p>
+                <ul>
+                  <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
+                </ul>
+
+                <p>
+                  <strong>{t('example')}</strong>
+                </p>
+
+                <pre>curl -XGET '{getUrl(`api/lists-by-namespace/1?access_token=${accessToken}`)}'</pre>
+
+
+                <h4>POST /api/lists – {t('createList')}</h4>
+
+                <p>
+                  {t('createListDescription')}
+                </p>
+
+                <p>
+                  {t('Query params')}
+                </p>
+                <ul>
+                  <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
+                </ul>
+
+                <p>
+                  <strong>POST</strong> {t('arguments')}
+                </p>
+                <ul>
+                  <li><strong>NAMESPACE</strong> – {t('namespace')} (<em>{t('required')}</em>)</li>
+                  <li><strong>UNSUBSCRIPTION_MODE</strong> – {t('unsubscription')} (<em>{t('required')}</em>):
+                    <ul>
+                      <li><strong>0</strong> - {t('onestepIeNoEmailWithConfirmationLink')}</li>
+                      <li><strong>1</strong> - {t('onestepWithUnsubscriptionFormIeNoEmail')}</li>
+                      <li><strong>2</strong> - {t('twostepIeAnEmailWithConfirmationLinkWill')}</li>
+                      <li><strong>3</strong> - {t('twostepWithUnsubscriptionFormIeAnEmail')}</li>
+                      <li><strong>4</strong> - {t('manualIeUnsubscriptionHasToBePerformedBy')}</li>
+                    </ul>
+                  </li>
+                  <li><strong>NAME</strong> – {t('name')}</li>
+                  <li><strong>DESCRIPTION</strong> – {t('description')}</li>
+                  <li><strong>HOMEPAGE</strong> – {t('homepage')}</li>
+                  <li><strong>CONTACT_EMAIL</strong> – {t('contactEmail')}</li>
+                  <li><strong>DEFAULT_FORM</strong> – {t('webAndEmailFormsAndTemplatesUsedIn')}</li>
+                  <li><strong>FIELDWIZARD</strong> – {t('representationOfSubscribersName')}:
+                    <ul>
+                      <li><strong>none</strong> - {t('emptyCustomNoFields')}</li>
+                      <li><strong>full_name</strong> - {t('nameOneField')}</li>
+                      <li><strong>first_last_name</strong> - {t('firstNameAndLastNameTwoFields')}</li>
+                    </ul>
+                  </li>
+                  <li><strong>TO_NAME</strong> – {t('recipientsNameTemplate')}</li>
+                  <li><strong>LISTUNSUBSCRIBE_DISABLED</strong> – {t('doNotSendListUnsubscribeHeaders')}</li>
+                  <li><strong>PUBLIC_SUBSCRIBE</strong> – {t('allowPublicUsersToSubscribeThemselves')}</li>
+                  <li><strong>SEND_CONFIGURATION</strong> – {t('sendConfiguration-1')}</li>
+                </ul>
+
+                <p>
+                  <strong>{t('example')}</strong>
+                </p>
+
+                <pre>curl -XPOST '{getUrl(`api/list?access_token=${accessToken}`)}' \<br/>
+                  -d 'NAMESPACE=1' \<br/>
+                  -d 'UNSUBSCRIPTION_MODE=0' \<br/>
+                  -d 'NAME=list1' \<br/>
+                  -d 'DESCRIPTION=a very nice list' \<br/>
+                  -d 'CONTACT_EMAIL=test@example.com' \<br/>
+                  -d 'HOMEPAGE=example.com' \<br/>
+                  -d 'FIELDWIZARD=first_last_name' \<br/>
+                  -d 'SEND_CONFIGURATION=1' \<br/>
+                  -d 'PUBLIC_SUBSCRIBE=1' \<br/>
+                  -d 'LISTUNSUBSCRIBE_DISABLED=0'
+                </pre>
+
+
+                <h4>DELETE /api/lists/:listId – {t('deleteList')}</h4>
+
+                <p>
+                  {t('deleteListDescription')}
+                </p>
+
+                <p>
+                  {t('Query params')}
+                </p>
+                <ul>
+                  <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
+                </ul>
+
+                <p>
+                  <strong>{t('example')}</strong>
+                </p>
+
+                <pre>curl -XDELETE '{getUrl(`api/list/B16uVTdW?access_token=${accessToken}`)}'</pre>
+
+
                 <h4>GET /api/rss/fetch/:campaignCid – {t('triggerFetchOfACampaign')}</h4>
 
                 <p>
