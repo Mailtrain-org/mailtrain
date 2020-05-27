@@ -47,7 +47,7 @@ async function _getByTx(tx, context, key, value, extraColumns = []) {
 
     // Note that getRestrictedAccessToken relies to this check to see whether a user may impersonate another. If "manageUsers" here were to be changed to something like "viewUsers", then
     // a corresponding check has to be added to getRestrictedAccessToken
-    await shares.enforceEntityPermission(context, 'namespace', user.namespace, 'manageUsers');
+    await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
 
     return user;
 }
