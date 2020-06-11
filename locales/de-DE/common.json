@@ -967,7 +967,7 @@
   "invalidMjml-1": "MJML ungültig.",
   "templateContent": "Vorlage Inhalt",
   "validate": "Validieren",
-  "blockThumbnails": "Thumbnails blockieren",
+  "blockThumbnails": "Thumbnails der Blöcke",
   "versafixOne": "Versafix One",
   "mjmlSample": "MJML Beispiel",
   "mosaicoTemplateName": "Mosaico Vorlage \"{{name}}\"",
