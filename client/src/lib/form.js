@@ -248,7 +248,7 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
 
     if (format === 'inline') {
         return (
-            <div className={className} >
+            <div className={className}>
                 {labelBlock}{input}
                 {helpBlock}
                 {validationBlock}
@@ -256,7 +256,7 @@ function wrapInput(id, htmlId, owner, format, rightContainerClass, label, help, 
         );
     } else {
         return (
-            <div className={className} >
+            <div className={className}>
                 {labelBlock}
                 <div className={`${colRight} ${rightContainerClass}`}>
                     {input}
@@ -304,6 +304,7 @@ class StaticField extends Component {
 }
 
 @withComponentMixins([
+    withTranslation,
     withFormStateOwner
 ])
 class InputField extends Component {
@@ -313,18 +314,38 @@ class InputField extends Component {
         placeholder: PropTypes.string,
         type: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        format: PropTypes.string
+        format: PropTypes.string,
+        // TODO FOR MAILTRAIN added dropdown with hints under input
+        withHints: PropTypes.array,
+        disabled: PropTypes.bool
     }
 
     static defaultProps = {
         type: 'text'
     }
 
+    constructor() {
+        super();
+        this.state = {showHints: false};
+        this.textInput = React.createRef();
+    }
+
+    onFocus() {
+        this.setState({showHints: true});
+    }
+
+    onBlur() {
+        this.setState({showHints: false});
+    }
+
     render() {
         const props = this.props;
+        const t = props.t;
         const owner = this.getFormStateOwner();
-        const id = this.props.id;
+        const id = props.id;
         const htmlId = 'form_' + id;
+        const enableHints = !!(props.withHints && !props.disabled);
+
 
         let type = 'text';
         if (props.type === 'password') {
@@ -342,9 +363,78 @@ class InputField extends Component {
         const value = owner.getFormValue(id);
         if (value === null || value === undefined) console.log(`Warning: InputField ${id} is ${value}`);
 
-        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <input type={type} value={owner.getFormValue(id)} placeholder={props.placeholder} id={htmlId} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+        let hintsFuns = {};
+        if (enableHints) {
+            hintsFuns['onFocus'] = ::this.onFocus;
+            hintsFuns['onBlur'] = ::this.onBlur;
+        }
+
+        let inputContent = (
+            <input ref={this.textInput}
+                   type={type}
+                   value={owner.getFormValue(id)}
+                   placeholder={props.placeholder}
+                   id={htmlId}
+                   className={className}
+                   aria-describedby={htmlId + '_help'}
+                   onChange={evt => owner.updateFormValue(id, evt.target.value)}
+                   disabled={props.disabled}
+                   {...hintsFuns}
+            />
         );
+
+        if (enableHints) {
+            inputContent = (
+                <div className="input-group">
+                    {inputContent}
+                    <div className="input-group-append" onMouseDown={evt => evt.preventDefault()}>
+                        <Button label={t('Hints')} className="btn-secondary"
+                                onClickAsync={evt => {
+                                    if (!this.state.showHints) {
+                                        this.textInput.current.focus();
+                                    } else {
+                                        this.textInput.current.blur();
+                                    }
+                                }}/>
+                    </div>
+                </div>
+            );
+
+            let hintsDropdown = null;
+            if (this.state.showHints) {
+                const hints = [];
+                for (const hint of props.withHints) {
+                    hints.push(
+                        <li
+                            key={hint}
+                            className={`list-group-item list-group-item-action list-group-item-light ${styles.inputHint}`}
+                            onClick={evt => {
+                                this.textInput.current.blur();
+                                owner.updateFormValue(id, hint);
+                            }}
+                            onMouseDown={evt => evt.preventDefault()}
+                        >
+                            {hint}
+                        </li>
+                    )
+                }
+
+                hintsDropdown = (
+                    <div className={`list-group ${styles.inputHints}`}>
+                        {hints}
+                    </div>
+                )
+            }
+
+            inputContent = (
+                <div className={styles.inputContainer}>
+                    {inputContent}
+                    {hintsDropdown}
+                </div>
+            );
+        }
+
+        return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help, inputContent);
     }
 }
 
@@ -371,7 +461,11 @@ class CheckBox extends Component {
 
                         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                             <div className={`form-group form-check my-2 ${this.props.className}`}>
-                                <input className={inputClassName} type="checkbox" checked={owner.getFormValue(id)} id={htmlId} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
+                                <input className={inputClassName} type="checkbox"
+                                       checked={owner.getFormValue(id)}
+                                       id={htmlId}
+                                       aria-describedby={htmlId + '_help'}
+                                       onChange={evt => owner.updateFormValue(id, !owner.getFormValue(id))}/>
                                 <label className={styles.checkboxText} htmlFor={htmlId}>{props.text}</label>
                             </div>
                         );
@@ -427,7 +521,11 @@ class CheckBoxGroup extends Component {
 
             let number = options.push(
                 <div key={option.key} className="form-group form-check my-2">
-                    <input id={optId} type="checkbox" className={optClassName} checked={selection.includes(option.key)} onChange={evt => this.onChange(option.key)}/>
+                    <input id={optId}
+                           type="checkbox"
+                           className={optClassName}
+                           checked={selection.includes(option.key)}
+                           onChange={evt => this.onChange(option.key)}/>
                     <label className="form-check-label" htmlFor={optId}>{option.label}</label>
                 </div>
             );
@@ -475,7 +573,12 @@ class RadioGroup extends Component {
 
             let number = options.push(
                 <div key={option.key} className="form-group form-check my-2">
-                    <input id={optId} type="radio" className={optClassName} name={htmlId} checked={value === option.key} onChange={evt => owner.updateFormValue(id, option.key)}/>
+                    <input id={optId}
+                           type="radio"
+                           className={optClassName}
+                           name={htmlId}
+                           checked={value === option.key}
+                           onChange={evt => owner.updateFormValue(id, option.key)}/>
                     <label className="form-check-label" htmlFor={optId}>{option.label}</label>
                 </div>
             );
@@ -521,10 +624,15 @@ class TextArea extends Component {
         const owner = this.getFormStateOwner();
         const id = props.id;
         const htmlId = 'form_' + id;
-        const className = owner.addFormValidationClass('form-control ' + (props.className || '') , id);
+        const className = owner.addFormValidationClass('form-control ' + (props.className || ''), id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <textarea id={htmlId} placeholder={props.placeholder} value={owner.getFormValue(id) || ''} className={className} aria-describedby={htmlId + '_help'} onChange={this.onChange}></textarea>
+            <textarea id={htmlId}
+                      placeholder={props.placeholder}
+                      value={owner.getFormValue(id) || ''}
+                      className={className}
+                      aria-describedby={htmlId + '_help'}
+                      onChange={this.onChange}></textarea>
         );
     }
 }
@@ -577,12 +685,13 @@ class ColorPicker extends Component {
             <div>
                 <div className="input-group">
                     <div className={styles.colorPickerSwatchWrapper} onClick={::this.toggle}>
-                        <div className={styles.colorPickerSwatchColor} style={{background: `rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`}}/>
+                        <div className={styles.colorPickerSwatchColor}
+                             style={{background: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`}}/>
                     </div>
                 </div>
                 {this.state.opened &&
                 <div className={styles.colorPickerWrapper}>
-                    <SketchPicker color={color} onChange={::this.selected} />
+                    <SketchPicker color={color} onChange={::this.selected}/>
                 </div>
                 }
             </div>
@@ -611,7 +720,8 @@ class DatePicker extends Component {
         birthday: PropTypes.bool,
         dateFormat: PropTypes.string,
         formatDate: PropTypes.func,
-        parseDate: PropTypes.func
+        parseDate: PropTypes.func,
+        disabled: PropTypes.bool
     }
 
     static defaultProps = {
@@ -647,7 +757,7 @@ class DatePicker extends Component {
         const htmlId = 'form_' + id;
         const t = props.t;
 
-        function BirthdayPickerCaption({ date, localeUtils, onChange }) {
+        function BirthdayPickerCaption({date, localeUtils, onChange}) {
             const months = localeUtils.getMonths();
             return (
                 <div className="DayPicker-Caption">
@@ -695,11 +805,17 @@ class DatePicker extends Component {
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <>
-                <div className="input-group">
-                    <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId} className={className} aria-describedby={htmlId + '_help'} onChange={evt => owner.updateFormValue(id, evt.target.value)}/>
+                <div className={props.disabled ? '' : "input-group"}>
+                    <input type="text" value={selectedDateStr} placeholder={placeholder} id={htmlId}
+                           className={className} aria-describedby={htmlId + '_help'}
+                           onChange={evt => owner.updateFormValue(id, evt.target.value)}
+                           disabled={props.disabled}/>
+                    {!props.disabled &&
                     <div className="input-group-append">
-                        <Button iconTitle={t('openCalendar')} className="btn-secondary" icon="calendar-alt" onClickAsync={::this.toggleDayPicker}/>
+                        <Button iconTitle={t('openCalendar')} className="btn-secondary" icon="calendar-alt"
+                                onClickAsync={::this.toggleDayPicker}/>
                     </div>
+                    }
                 </div>
                 {this.state.opened &&
                 <div className={styles.dayPickerWrapper}>
@@ -755,10 +871,15 @@ class Dropdown extends Component {
             }
         }
 
-        const className = owner.addFormValidationClass('form-control ' + (props.className || '') , id);
+        const className = owner.addFormValidationClass('form-control ' + (props.className || ''), id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <select id={htmlId} className={className} aria-describedby={htmlId + '_help'} value={owner.getFormValue(id)} onChange={evt => owner.updateFormValue(id, evt.target.value)} disabled={props.disabled}>
+            <select id={htmlId}
+                    className={className}
+                    aria-describedby={htmlId + '_help'}
+                    value={owner.getFormValue(id)}
+                    onChange={evt => owner.updateFormValue(id, evt.target.value)}
+                    disabled={props.disabled}>
                 {options}
             </select>
         );
@@ -832,10 +953,15 @@ class TreeTableSelect extends Component {
         const id = this.props.id;
         const htmlId = 'form_' + id;
 
-        const className = owner.addFormValidationClass('' , id);
+        const className = owner.addFormValidationClass('', id);
 
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
-            <TreeTable className={className} data={props.data} dataUrl={props.dataUrl} selectMode={TreeSelectMode.SINGLE} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync} />
+            <TreeTable className={className}
+                       data={props.data}
+                       dataUrl={props.dataUrl}
+                       selectMode={TreeSelectMode.SINGLE}
+                       selection={owner.getFormValue(id)}
+                       onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
         );
     }
 }
@@ -927,20 +1053,36 @@ class TableSelect extends Component {
         const t = props.t;
 
         if (props.dropdown) {
-            const className = owner.addFormValidationClass('form-control' , id);
+            const className = owner.addFormValidationClass('form-control', id);
 
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div className={(props.disabled ? '' : 'input-group ') + styles.tableSelectDropdown}>
-                        <input type="text" className={className} value={this.state.selectedLabel} onClick={::this.toggleOpen} readOnly={!props.disabled} disabled={props.disabled}/>
+                        <input type="text"
+                               className={className}
+                               value={this.state.selectedLabel}
+                               onClick={::this.toggleOpen}
+                               readOnly={!props.disabled}
+                               disabled={props.disabled}/>
                         {!props.disabled &&
                         <div className="input-group-append">
                             <Button label={t('select')} className="btn-secondary" onClickAsync={::this.toggleOpen}/>
                         </div>
                         }
                     </div>
-                    <div className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
-                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionDataAsync={::this.onSelectionDataAsync} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                    <div
+                        className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>
+                        <Table ref={node => this.table = node}
+                               data={props.data}
+                               dataUrl={props.dataUrl}
+                               columns={props.columns}
+                               selectMode={props.selectMode}
+                               selectionAsArray={this.props.selectionAsArray}
+                               withHeader={props.withHeader}
+                               selectionKeyIndex={props.selectionKeyIndex}
+                               selection={owner.getFormValue(id)}
+                               onSelectionDataAsync={::this.onSelectionDataAsync}
+                               onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );
@@ -948,7 +1090,17 @@ class TableSelect extends Component {
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
                     <div>
-                        <Table ref={node => this.table = node} data={props.data} dataUrl={props.dataUrl} columns={props.columns} pageLength={props.pageLength} selectMode={props.selectMode} selectionAsArray={this.props.selectionAsArray} withHeader={props.withHeader} selectionKeyIndex={props.selectionKeyIndex} selection={owner.getFormValue(id)} onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
+                        <Table ref={node => this.table = node}
+                               data={props.data}
+                               dataUrl={props.dataUrl}
+                               columns={props.columns}
+                               pageLength={props.pageLength}
+                               selectMode={props.selectMode}
+                               selectionAsArray={this.props.selectionAsArray}
+                               withHeader={props.withHeader}
+                               selectionKeyIndex={props.selectionKeyIndex}
+                               selection={owner.getFormValue(id)}
+                               onSelectionChangedAsync={::this.onSelectionChangedAsync}/>
                     </div>
                 </div>
             );

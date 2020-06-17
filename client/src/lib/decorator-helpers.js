@@ -11,7 +11,7 @@ export function createComponentMixin(opts) {
     };
 }
 
-export function withComponentMixins(mixins, delegateFuns) {
+export function withComponentMixins(mixins, delegateFuns, delegateStaticFuns) {
     const mixinsClosure = new Set();
     for (const mixin of mixins) {
         console.assert(mixin);
@@ -53,12 +53,27 @@ export function withComponentMixins(mixins, delegateFuns) {
 
             return self;
         }
+
         TargetClassWithCtors.displayName = TargetClass.name;
 
         TargetClassWithCtors.prototype = TargetClass.prototype;
 
         for (const attr in TargetClass) {
             TargetClassWithCtors[attr] = TargetClass[attr];
+        }
+
+        function addStaticMethodsToClass(clazz) {
+            if (delegateStaticFuns) {
+                for (const staticFuncName of delegateStaticFuns) {
+                    if (!clazz[staticFuncName]) {
+                        Object.defineProperty(
+                            clazz,
+                            staticFuncName,
+                            Object.getOwnPropertyDescriptor(TargetClass, staticFuncName)
+                        );
+                    }
+                }
+            }
         }
 
         function incorporateMixins(DecoratedInner) {
@@ -102,6 +117,7 @@ export function withComponentMixins(mixins, delegateFuns) {
 
                     this._decoratorInnerInstanceRefFn = node => this._decoratorInnerInstance = node
                 }
+
                 render() {
                     let innerFn = parentProps => {
                         const props = {
@@ -136,6 +152,7 @@ export function withComponentMixins(mixins, delegateFuns) {
                 }
             }
 
+            addStaticMethodsToClass(ComponentMixinsOuter);
             return ComponentMixinsOuter;
 
         } else {
@@ -163,6 +180,7 @@ export function withComponentMixins(mixins, delegateFuns) {
                 return innerFn(props);
             }
 
+            addStaticMethodsToClass(ComponentContextProvider);
             return ComponentContextProvider;
         }
 
