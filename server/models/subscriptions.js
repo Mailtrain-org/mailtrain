@@ -735,6 +735,8 @@ async function _removeAndGetTx(tx, context, listId, existing) {
     if (existing.status === SubscriptionStatus.SUBSCRIBED) {
         await tx('lists').where('id', listId).decrement('subscribers', 1);
     }
+
+    return existing;
 }
 
 async function remove(context, listId, id) {

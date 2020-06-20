@@ -40,6 +40,7 @@ const usersRest = require('./routes/rest/users');
 const accountRest = require('./routes/rest/account');
 const reportTemplatesRest = require('./routes/rest/report-templates');
 const reportsRest = require('./routes/rest/reports');
+const channelsRest = require('./routes/rest/channels');
 const campaignsRest = require('./routes/rest/campaigns');
 const triggersRest = require('./routes/rest/triggers');
 const listsRest = require('./routes/rest/lists');
@@ -300,6 +301,7 @@ async function createApp(appType) {
         app.use('/rest', sendConfigurationsRest);
         app.use('/rest', usersRest);
         app.use('/rest', accountRest);
+        app.use('/rest', channelsRest);
         app.use('/rest', campaignsRest);
         app.use('/rest', triggersRest);
         app.use('/rest', listsRest);

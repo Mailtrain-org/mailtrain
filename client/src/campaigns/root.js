@@ -18,11 +18,18 @@ import StatisticsOpened from "./StatisticsOpened";
 import StatisticsLinkClicks from "./StatisticsLinkClicks";
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 import {namespaceCheckPermissions} from "../lib/namespace";
+import Clone from "./Clone";
 
 function getMenus(t) {
     const aggLabels = {
         'countries': t('countries'),
         'devices': t('devices')
+    };
+
+    const createLabels = {
+        [CampaignType.REGULAR]: t('createRegularCampaign'),
+        [CampaignType.RSS]: t('createRssCampaign'),
+        [CampaignType.TRIGGERED]: t('createTriggeredCampaign')
     };
 
     return {
@@ -160,16 +167,30 @@ function getMenus(t) {
                     }
                 },
                 'create-regular': {
-                    title: t('createRegularCampaign'),
+                    title: createLabels[CampaignType.REGULAR],
                     panelRender: props => <CampaignsCUD action="create" type={CampaignType.REGULAR} permissions={props.permissions} />
                 },
                 'create-rss': {
-                    title: t('createRssCampaign'),
+                    title: createLabels[CampaignType.RSS],
                     panelRender: props => <CampaignsCUD action="create" type={CampaignType.RSS} permissions={props.permissions} />
                 },
                 'create-triggered': {
-                    title: t('createTriggeredCampaign'),
+                    title: createLabels[CampaignType.TRIGGERED],
                     panelRender: props => <CampaignsCUD action="create" type={CampaignType.TRIGGERED} permissions={props.permissions} />
+                },
+                'clone': {
+                    title: t('Create Campaign'),
+                    link: params => `/campaigns/clone`,
+                    panelRender: props => <Clone />,
+                    children: {
+                        ':existingCampaignId([0-9]+)': {
+                            title: resolved => createLabels[resolved.existingCampaign.type],
+                            resolve: {
+                                existingCampaign: params => `rest/campaigns-settings/${params.existingCampaignId}`
+                            },
+                            panelRender: props => <CampaignsCUD action="create" createFromCampaign={props.resolved.existingCampaign} permissions={props.permissions} />
+                        }
+                    }
                 }
             }
         }

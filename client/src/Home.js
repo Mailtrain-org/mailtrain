@@ -1,6 +1,7 @@
 'use strict';
 
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {withTranslation} from './lib/i18n';
 import {requiresAuthenticatedUser} from './lib/page';
 import {withComponentMixins} from "./lib/decorator-helpers";
@@ -14,6 +15,10 @@ export default class List extends Component {
         super(props);
     }
 
+    static propTypes = {
+        configItems: PropTypes.object
+    }
+
     render() {
         const t = this.props.t;
 
@@ -21,6 +26,7 @@ export default class List extends Component {
             <div>
                 <h2>{t('Mailtrain 2 beta')}</h2>
                 <div>{t('Build') + ' 2020-05-28-0102'}</div>
+                <p>{this.props.configItems.shoutout}</p>
             </div>
         );
     }

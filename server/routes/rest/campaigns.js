@@ -11,6 +11,10 @@ router.postAsync('/campaigns-table', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listDTAjax(req.context, req.body));
 });
 
+router.postAsync('/campaigns-by-channel-table/:channelId', passport.loggedIn, async (req, res) => {
+    return res.json(await campaigns.listByChannelDTAjax(req.context, castToInteger(req.params.channelId), req.body));
+});
+
 router.postAsync('/campaigns-with-content-table', passport.loggedIn, async (req, res) => {
     return res.json(await campaigns.listWithContentDTAjax(req.context, req.body));
 });

@@ -12,6 +12,7 @@ import lists from './lists/root';
 import namespaces from './namespaces/root';
 import reports from './reports/root';
 import campaigns from './campaigns/root';
+import channels from './channels/root';
 import templates from './templates/root';
 import users from './users/root';
 import sendConfigurations from './send-configurations/root';
@@ -25,8 +26,9 @@ import {DropdownActionLink, Icon} from "./lib/bootstrap-components";
 import axios from './lib/axios';
 import {getUrl} from "./lib/urls";
 import {withComponentMixins} from "./lib/decorator-helpers";
+import Update from "./settings/Update";
 
-const topLevelMenuKeys = ['lists', 'templates', 'campaigns'];
+const topLevelMenuKeys = ['lists', 'channels', 'templates', 'campaigns'];
 
 if (mailtrainConfig.reportsEnabled) {
     topLevelMenuKeys.push('reports');
@@ -114,7 +116,10 @@ class Root extends Component {
         structure = {
             title: t('home'),
             link: '/',
-            panelComponent: Home,
+            localResolve: {
+                configItems: params => `rest/settings`
+            },
+            panelRender: props => <Home configItems={props.resolved.configItems} />,
             primaryMenuComponent: MainMenu,
             children: {
                 ...login.getMenus(t),
@@ -127,7 +132,8 @@ class Root extends Component {
                 ...account.getMenus(t),
                 ...settings.getMenus(t),
                 ...sendConfigurations.getMenus(t),
-                ...campaigns.getMenus(t)
+                ...campaigns.getMenus(t),
+                ...channels.getMenus(t)
             }
         };
 

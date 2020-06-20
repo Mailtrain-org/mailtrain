@@ -34,6 +34,8 @@ import styles from "./styles.scss";
 import moment from "moment";
 import {getUrl} from "./urls";
 import {createComponentMixin, withComponentMixins} from "./decorator-helpers";
+import cudStyles from "../../../mvis/ivis-core/client/src/settings/jobs/CUD.scss";
+import {campaignOverridables, CampaignSource, CampaignType} from "../../../shared/campaigns";
 
 
 const FormState = {
@@ -930,6 +932,207 @@ class ButtonRow extends Component {
 
 
 @withComponentMixins([
+    withTranslation,
+    withFormStateOwner
+], null, ['submitFormValuesMutator', 'getFormValueIdForPicker'])
+class ListCreator extends Component {
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        className: PropTypes.string,
+        withOrder: PropTypes.bool,
+
+    };
+
+    constructor(props) {
+        super(props);
+
+        this._nextEntryId = 0;
+    }
+
+    componentDidMount() {
+        const values = this.props.initValues;
+        if (values && values.length > 0) {
+            this.getFormStateOwner().updateForm(mutState => {
+                let entryIds = mutState.getIn([this.props.id, 'value']);
+
+                if (!entryIds) {
+                    entryIds = [];
+                }
+
+                for (const entryValue of values) {
+                    const entryId = this.getNextEntryId();
+                    mutState.setIn([this.getFormValueId(entryId), 'value'], entryValue);
+                    entryIds.push(entryId);
+                }
+
+                mutState.setIn([this.props.id, 'value'], entryIds);
+            });
+        }
+    }
+
+    static getFormValuesMutator(pickerId, data) {
+        const elems = [];
+        for (const elem of data[pickerId]) {
+            const uid = this.getNextEntryId();
+
+            const prefix = this.getFormValueId(uid);
+
+            data[prefix + 'list'] = elem.list;
+            data[prefix + 'segment'] = elem.segment;
+            data[prefix + 'useSegmentation'] = !!elem.segment;
+
+            elems.push(uid);
+        }
+        data[pickerId] = elems;
+    }
+
+
+    static submitFormValuesMutator(pickerId, data) {
+        const entryValues = [];
+        const entryIds = data[pickerId];
+
+        if (!entryIds) {
+            return entryValues;
+        }
+
+        for (const entryId of entryIds) {
+            const entryFormId = ListCreator.getFormValueIdForPicker(pickerId, entryId);
+            const value = data[entryFormId];
+            entryValues.push(value);
+            delete data[entryFormId]
+        }
+
+        data[pickerId] = entryValues;
+    }
+
+    static getFormValueIdForPicker(pickerId, entryId) {
+        return `${pickerId}_${entryId}`;
+    }
+
+    getFormValueId(entryId) {
+        return ListCreator.getFormValueIdForPicker(this.props.id, entryId);
+    }
+
+    getNextEntryId() {
+        return this._nextEntryId++;
+    }
+
+    onAddListEntry(positionBefore) {
+        this.getFormStateOwner().updateForm(mutState => {
+            let entryIds = mutState.getIn([this.props.id, 'value']);
+
+            if (!entryIds) {
+                entryIds = [];
+            }
+
+            if (positionBefore == null) {
+                positionBefore = entryIds.length;
+            }
+
+            const entryId = this.getNextEntryId();
+
+            mutState.setIn([this.getFormValueId(entryId), 'value'], null);
+            mutState.setIn([this.props.id, 'value'], [...entryIds.slice(0, positionBefore), entryId, ...entryIds.slice(positionBefore)]);
+        });
+    }
+
+    onRemoveSetEntry(entryId) {
+        this.getFormStateOwner().updateForm(mutState => {
+            const entryIds = mutState.getIn([this.props.id, 'value']);
+
+            mutState.delete(this.getFormValueId(entryId));
+
+            mutState.setIn([this.props.id, 'value'], entryIds.filter(id => id !== entryId));
+        });
+    }
+
+    onListEntryMoveUp(position) {
+        const owner = this.getFormStateOwner();
+        const entryIds = owner.getFormValue(this.props.id);
+        owner.updateFormValue(this.props.id, [...entryIds.slice(0, position - 1), entryIds[position], entryIds[position - 1], ...entryIds.slice(position + 1)]);
+    }
+
+    onListEntryMoveDown(position) {
+        const owner = this.getFormStateOwner();
+        const entryIds = owner.getFormValue(this.props.id);
+        owner.updateFormValue(this.props.id, [...entryIds.slice(0, position), entryIds[position + 1], entryIds[position], ...entryIds.slice(position + 2)]);
+    }
+
+    render() {
+        const props = this.props;
+        const owner = this.getFormStateOwner();
+        const id = props.id;
+        const t = props.t;
+        const withOrder = props.withOrder;
+        const entries = [];
+        const entryIds = owner.getFormValue(id) || [];
+
+        const entryButtonsStyles = withOrder ? cudStyles.entryButtonsWithOrder : cudStyles.entryButtons;
+        for (let pos = 0; pos < entryIds.length; pos++) {
+            const entryId = entryIds[pos];
+            const elementId = this.getFormValueId(entryId);
+            entries.push(
+                <div key={entryId}
+                     className={cudStyles.entry + (withOrder ? ' ' + cudStyles.withOrder : '') + ' ' + cudStyles.entryWithButtons}>
+                    <div className={entryButtonsStyles}>
+                        <Button
+                            className="btn-secondary"
+                            icon={`trash-alt ${withOrder ? "" : "fa-2x"}`}
+                            title={t('remove')}
+                            onClickAsync={() => this.onRemoveSetEntry(entryId)}
+                        />
+                        {withOrder &&
+                        <Button
+                            className="btn-secondary"
+                            icon="plus"
+                            title={t('Insert new entry before this one')}
+                            onClickAsync={() => this.onAddListEntry(pos)}
+                        />
+                        }
+                        {withOrder && pos > 0 &&
+                        <Button
+                            className="btn-secondary"
+                            icon="chevron-up"
+                            title={t('Move up')}
+                            onClickAsync={() => this.onListEntryMoveUp(pos)}
+                        />
+                        }
+                        {withOrder && pos < entryIds.length - 1 &&
+                        <Button
+                            className="btn-secondary"
+                            icon="chevron-down"
+                            title={t('Move down')}
+                            onClickAsync={() => this.onListEntryMoveDown(pos)}
+                        />
+                        }
+                    </div>
+                    <div className={cudStyles.entryContent}>
+                        {React.cloneElement(this.props.entryElement, {id: elementId})}
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <Fieldset id={id} className={props.classname} help={props.help} flat={props.flat} label={props.label}>
+                {entries}
+                <div key="newEntry" className={cudStyles.newEntry}>
+                    <Button
+                        className="btn-secondary"
+                        icon="plus"
+                        label={t('Add entry')}
+                        onClickAsync={() => this.onAddListEntry(entryIds.length)}
+                    />
+                </div>
+            </Fieldset>
+        );
+    }
+}
+
+
+@withComponentMixins([
     withFormStateOwner
 ])
 class TreeTableSelect extends Component {
@@ -984,6 +1187,7 @@ class TableSelect extends Component {
         dataUrl: PropTypes.string,
         data: PropTypes.array,
         columns: PropTypes.array,
+        order: PropTypes.array,
         selectionKeyIndex: PropTypes.number,
         selectionLabelIndex: PropTypes.number,
         selectionAsArray: PropTypes.bool,
@@ -1076,6 +1280,7 @@ class TableSelect extends Component {
                                data={props.data}
                                dataUrl={props.dataUrl}
                                columns={props.columns}
+                               order={props.order}
                                selectMode={props.selectMode}
                                selectionAsArray={this.props.selectionAsArray}
                                withHeader={props.withHeader}
@@ -1094,6 +1299,7 @@ class TableSelect extends Component {
                                data={props.data}
                                dataUrl={props.dataUrl}
                                columns={props.columns}
+                               order={props.order}
                                pageLength={props.pageLength}
                                selectMode={props.selectMode}
                                selectionAsArray={this.props.selectionAsArray}

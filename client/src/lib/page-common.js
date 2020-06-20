@@ -163,6 +163,13 @@ export function getRoutes(structure, parentRoute) {
                 entryResolve = resolve;
             }
 
+            let entryResolveWithLocal;
+            if (entry.localResolve) {
+                entryResolveWithLocal = Object.assign({}, entryResolve, entry.localResolve);
+            } else {
+                entryResolveWithLocal = entryResolve;
+            }
+
             let entryCheckPermissions;
             if (entry.checkPermissions) {
                 entryCheckPermissions = Object.assign({}, checkPermissions, entry.checkPermissions);
@@ -199,7 +206,7 @@ export function getRoutes(structure, parentRoute) {
                 link: entry.link,
                 panelInFullScreen: entry.panelInFullScreen,
                 insideIframe: entry.insideIframe,
-                resolve: entryResolve,
+                resolve: entryResolveWithLocal,
                 checkPermissions: entryCheckPermissions,
                 parents,
                 navs: [...navs, ...entryNavs],

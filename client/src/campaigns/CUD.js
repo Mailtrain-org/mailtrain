@@ -79,9 +79,20 @@ export default class CUD extends Component {
             [CampaignSource.URL]: t('url')
         };
 
-        const sourceLabelsOrder = [
-            CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN , CampaignSource.TEMPLATE, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.URL
-        ];
+        let sourceLabelsOrder;
+
+        if (props.createFromChannel) {
+            // If a campaign is created within a channel, we allow only for those source types that makes sense
+            sourceLabelsOrder = [
+                CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN, CampaignSource.CUSTOM_FROM_TEMPLATE
+            ];
+
+        } else {
+            // Regular creation or createFromCampaign
+            sourceLabelsOrder = [
+                CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN , CampaignSource.TEMPLATE, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.URL
+            ];
+        }
 
         this.sourceOptions = [];
         for (const key of sourceLabelsOrder) {
@@ -116,6 +127,8 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object,
+        createFromChannel: PropTypes.object,
+        createFromCampaign: PropTypes.object,
         permissions: PropTypes.object,
         type: PropTypes.number
     }
@@ -298,61 +311,209 @@ export default class CUD extends Component {
             }
 
         } else {
+
             const data = {};
-            for (const overridable of campaignOverridables) {
-                data[overridable + '_override'] = '';
-                data[overridable + '_overriden'] = false;
-            }
 
-            const lstUid = this.getNextListEntryId();
-            const lstPrefix = 'lists_' + lstUid + '_';
 
-            this.populateFormValues({
-                ...data,
+            if (this.props.createFromChannel) {
+                const channel = this.props.createFromChannel;
 
-                type: this.props.type,
+                for (const overridable of campaignOverridables) {
+                    if (channel[overridable + '_override'] === null) {
+                        data[overridable + '_override'] = '';
+                        data[overridable + '_overriden'] = false;
+                    } else {
+                        data[overridable + '_override'] = channel[overridable + '_override'];
+                        data[overridable + '_overriden'] = true;
+                    }
+                }
 
-                name: '',
-                description: '',
+                const lsts = [];
+                for (const lst of channel.lists) {
+                    const lstUid = this.getNextListEntryId();
 
-                [lstPrefix + 'list']: null,
-                [lstPrefix + 'segment']: null,
-                [lstPrefix + 'useSegmentation']: false,
-                lists: [lstUid],
+                    const prefix = 'lists_' + lstUid + '_';
 
-                send_configuration: null,
-                namespace: getDefaultNamespace(this.props.permissions),
+                    data[prefix + 'list'] = lst.list;
+                    data[prefix + 'segment'] = lst.segment;
+                    data[prefix + 'useSegmentation'] = !!lst.segment;
 
-                subject: '',
+                    lsts.push(lstUid);
+                }
+                data.lists = lsts;
 
-                click_tracking_disabled: false,
-                open_tracking_disabled: false,
+                data.type = CampaignType.REGULAR;
 
-                unsubscribe_url: '',
+                data.name = channel.cpg_name;
+                data.description = channel.cpg_description;
 
-                source: CampaignSource.CUSTOM,
+                data.send_configuration = channel.send_configuration;
+                if (channel.send_configuration) {
+                    // noinspection JSIgnoredPromiseFromCall
+                    this.fetchSendConfiguration(channel.send_configuration);
+                }
+
+                data.namespace = channel.namespace;
+
+                data.subject = channel.subject;
+
+                data.click_tracking_disabled = channel.click_tracking_disabled;
+                data.open_tracking_disabled = channel.open_tracking_disabled;
+
+                data.unsubscribe_url = channel.unsubscribe_url;
+
+                data.source = channel.source;
+
+                if (channel.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
+                    data.data_sourceTemplate = channel.sourceTemplate;
+                }
+
+                if (channel.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+                    channel.data_sourceCampaign = channel.data.sourceCampaign;
+                }
+
+                if (channel.source === CampaignSource.CUSTOM) {
+                    data.data_sourceCustom_type = channel.data.sourceCustom.type;
+                    data.data_sourceCustom_tag_language = channel.data.sourceCustom.tag_language;
+                    data.data_sourceCustom_data = channel.data.sourceCustom.data;
+
+                    this.templateTypes[channel.data.sourceCustom.type].afterLoad(data);
+                }
+
+            } else if (this.props.createFromCampaign) {
+                const sourceCampaign = this.props.createFromCampaign;
+
+                for (const overridable of campaignOverridables) {
+                    if (sourceCampaign[overridable + '_override'] === null) {
+                        data[overridable + '_override'] = '';
+                        data[overridable + '_overriden'] = false;
+                    } else {
+                        data[overridable + '_override'] = sourceCampaign[overridable + '_override'];
+                        data[overridable + '_overriden'] = true;
+                    }
+                }
+
+                const lsts = [];
+                for (const lst of sourceCampaign.lists) {
+                    const lstUid = this.getNextListEntryId();
+
+                    const prefix = 'lists_' + lstUid + '_';
+
+                    data[prefix + 'list'] = lst.list;
+                    data[prefix + 'segment'] = lst.segment;
+                    data[prefix + 'useSegmentation'] = !!lst.segment;
+
+                    lsts.push(lstUid);
+                }
+                data.lists = lsts;
+
+                data.type = sourceCampaign.type;
+
+                data.name = sourceCampaign.name;
+                data.description = sourceCampaign.description;
+
+                data.send_configuration = sourceCampaign.send_configuration;
+                // noinspection JSIgnoredPromiseFromCall
+                this.fetchSendConfiguration(sourceCampaign.send_configuration);
+
+                data.namespace = sourceCampaign.namespace;
+
+                data.subject = sourceCampaign.subject;
+
+                data.click_tracking_disabled = sourceCampaign.click_tracking_disabled;
+                data.open_tracking_disabled = sourceCampaign.open_tracking_disabled;
+
+                data.unsubscribe_url = sourceCampaign.unsubscribe_url;
+
 
                 // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
-                data_sourceTemplate: null,
+                data.data_sourceTemplate = null;
 
                 // This is for CampaignSource.CUSTOM_FROM_CAMPAIGN
-                data_sourceCampaign: null,
+                data.data_sourceCampaign = null;
 
                 // This is for CampaignSource.CUSTOM
-                data_sourceCustom_type: mailtrainConfig.editors[0],
-                data_sourceCustom_tag_language: mailtrainConfig.tagLanguages[0],
-                data_sourceCustom_data: {},
-                data_sourceCustom_html: '',
-                data_sourceCustom_text: '',
+                data.data_sourceCustom_type = mailtrainConfig.editors[0];
+                data.data_sourceCustom_tag_language = mailtrainConfig.tagLanguages[0];
+                data.data_sourceCustom_data = {};
+                data.data_sourceCustom_html = '';
+                data.data_sourceCustom_text = '';
 
-                ...this.templateTypes[mailtrainConfig.editors[0]].initData(),
+                Object.assign(data, this.templateTypes[mailtrainConfig.editors[0]].initData());
 
                 // This is for CampaignSource.URL
-                data_sourceUrl: '',
+                data.data_sourceUrl = '';
 
                 // This is for CampaignType.RSS
-                data_feedUrl: ''
-            });
+                data.data_feedUrl = '';
+
+                if (sourceCampaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceCampaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN || sourceCampaign.source === CampaignSource.CUSTOM) {
+                    data.source = CampaignSource.CUSTOM_FROM_CAMPAIGN;
+                    data.data_sourceCampaign = sourceCampaign.id;
+
+                } else if (sourceCampaign.source === CampaignSource.TEMPLATE) {
+                    data.source = CampaignSource.TEMPLATE;
+                    data.data_sourceTemplate = sourceCampaign.data.sourceTemplate;
+
+                } else if (sourceCampaign.source === CampaignSource.URL) {
+                    data.source = CampaignSource.URL;
+                    data.data_sourceUrl = sourceCampaign.data.sourceUrl;
+                }
+
+            } else {
+                for (const overridable of campaignOverridables) {
+                    data[overridable + '_override'] = '';
+                    data[overridable + '_overriden'] = false;
+                }
+
+                data.type = this.props.type;
+
+                data.name = '';
+                data.description = '';
+
+                const lstUid = this.getNextListEntryId();
+                const lstPrefix = 'lists_' + lstUid + '_';
+
+                data[lstPrefix + 'list'] = null;
+                data[lstPrefix + 'segment'] = null;
+                data[lstPrefix + 'useSegmentation'] = false;
+                data.lists = [lstUid];
+
+                data.send_configuration = null;
+                data.namespace = getDefaultNamespace(this.props.permissions);
+
+                data.subject = '';
+
+                data.click_tracking_disabled = false;
+                data.open_tracking_disabled = false;
+
+                data.unsubscribe_url = '';
+
+                data.source = CampaignSource.CUSTOM;
+
+                // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
+                data.data_sourceTemplate = null;
+
+                // This is for CampaignSource.CUSTOM_FROM_CAMPAIGN
+                data.data_sourceCampaign = null;
+
+                // This is for CampaignSource.CUSTOM
+                data.data_sourceCustom_type = mailtrainConfig.editors[0];
+                data.data_sourceCustom_tag_language = mailtrainConfig.tagLanguages[0];
+                data.data_sourceCustom_data = {};
+                data.data_sourceCustom_html = '';
+                data.data_sourceCustom_text = '';
+
+                Object.assign(data, this.templateTypes[mailtrainConfig.editors[0]].initData());
+
+                // This is for CampaignSource.URL
+                data.data_sourceUrl = '';
+
+                // This is for CampaignType.RSS
+                data.data_feedUrl = '';
+            }
+
+            this.populateFormValues(data);
         }
     }
 

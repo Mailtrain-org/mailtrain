@@ -28,7 +28,7 @@ const lists = require('./lists');
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
 
-const allowedKeysCommon = ['name', 'description', 'segment', 'namespace',
+const allowedKeysCommon = ['name', 'description', 'namespace', 'channel',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
@@ -67,7 +67,7 @@ function hash(entity, content) {
     return hasher.hash(filteredEntity);
 }
 
-async function _listDTAjax(context, namespaceId, params) {
+async function _listDTAjax(context, namespaceId, channelId, params) {
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -75,22 +75,30 @@ async function _listDTAjax(context, namespaceId, params) {
         builder => {
             builder = builder.from('campaigns')
                 .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
+                .leftJoin('channels', 'channels.id', 'campaigns.channel')
                 .whereNull('campaigns.parent');
             if (namespaceId) {
                 builder = builder.where('namespaces.id', namespaceId);
             }
+            if (channelId) {
+                builder = builder.where('channels.id', channelId);
+            }
             return builder;
         },
-        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'channels.name', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
 }
 
 async function listDTAjax(context, params) {
-    return await _listDTAjax(context, undefined, params);
+    return await _listDTAjax(context, undefined, undefined, params);
 }
 
 async function listByNamespaceDTAjax(context, namespaceId, params) {
-    return await _listDTAjax(context, namespaceId, params);
+    return await _listDTAjax(context, namespaceId, undefined, params);
+}
+
+async function listByChannelDTAjax(context, channelId, params) {
+    return await _listDTAjax(context, undefined, channelId, params);
 }
 
 async function listChildrenDTAjax(context, campaignId, params) {
@@ -1102,6 +1110,7 @@ module.exports.Content = Content;
 module.exports.hash = hash;
 
 module.exports.listDTAjax = listDTAjax;
+module.exports.listByChannelDTAjax = listByChannelDTAjax;
 module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.listChildrenDTAjax = listChildrenDTAjax;
 module.exports.listWithContentDTAjax = listWithContentDTAjax;

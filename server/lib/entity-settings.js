@@ -54,6 +54,12 @@ const entityTypes = {
         },
         clientLink: id => `/campaigns/${id}`
     },
+    channel: {
+        entitiesTable: 'channels',
+        sharesTable: 'shares_channel',
+        permissionsTable: 'permissions_channel',
+        clientLink: id => `/channels/${id}`
+    },
     template: {
         entitiesTable: 'templates',
         sharesTable: 'shares_template',
