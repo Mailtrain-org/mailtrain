@@ -7,6 +7,3 @@ npm-debug.log
 .DS_Store
 dump.rdb
 
-mvis/client/package-lock.json
-mvis/server/package-lock.json
-mvis/test-embed/package-lock.json
