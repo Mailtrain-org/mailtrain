@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  mysql:
+    image: mariadb:10.4
+    environment:
+    - MYSQL_ROOT_PASSWORD=mailtrain
+    - MYSQL_DATABASE=mailtrain
+    - MYSQL_USER=mailtrain
+    - MYSQL_PASSWORD=mailtrain
+    volumes:
+    - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:5
+    volumes:
+    - redis-data:/data
+
+  mongo:
+    image: mongo:4-xenial
+    volumes:
+    - mongo-data:/data/db
+
+  mailtrain:
+    build:
+      context: .
+      dockerfile: Dockerfile-Develop
+    ports:
+    - "3000:3000"
+    - "3003:3003"
+    - "3004:3004"
+    volumes:
+    - ./:/app
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongo-data:
