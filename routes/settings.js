@@ -49,20 +49,18 @@ router.get('/', passport.csrfProtection, (req, res, next) => {
             value: _('Do not use encryption')
         }];
 
-        configItems.sesRegion = [{
-            checked: configItems.sesRegion === 'us-east-1' || !configItems.sesRegion,
-            key: 'us-east-1',
-            value: 'US-EAST-1'
-        }, {
-            checked: configItems.sesRegion === 'us-west-2',
-            key: 'us-west-2',
-            value: 'US-WEST-2'
-        }, {
-            checked: configItems.sesRegion === 'eu-west-1',
-            key: 'eu-west-1',
-            value: 'EU-WEST-1'
-        }];
-
+        // default SES region
+        configItems.sesRegion = configItems.sesRegion || 'us-east-1';
+        // available regions: https://docs.aws.amazon.com/general/latest/gr/ses.html
+        configItems.sesRegion = ['us-east-1', 'us-east-2', 'us-west-2', 'ap-south-1', 'ap-northeast-1', 
+                                 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ca-central-1', 
+                                 'eu-central-1', 'eu-west-1', 'eu-west-2', 'sa-east-1', 'us-gov-west-1'
+                                ].map(region => ({
+                                    checked: configItems.sesRegion === region,
+                                    key: region,
+                                    value: region.toUpperCase()
+                                }));
+        
         configItems.useSMTP = configItems.mailTransport === 'smtp' || !configItems.mailTransport;
         configItems.useSES = configItems.mailTransport === 'ses';
 
