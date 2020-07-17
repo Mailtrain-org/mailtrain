@@ -199,6 +199,32 @@ These are the steps to start Mailtrain via docker-compose:
 
 The instructions above use an automatically built Docker image on DockerHub (https://hub.docker.com/r/mailtrain/mailtrain). If you want to build the Docker image yourself (e.g. when doing development), use the `docker-compose-local.yml` located in the project's root directory.
 
+
+### Deployment with Docker and Docker compose (for development)
+This setup starts a stack like above, but is tweaked to be used for local development using docker containers.
+
+1. Clone this repository
+
+2. Bring up the development stack
+    ```
+    docker-compose -f docker-compose-develop.yml up -d
+    ```
+3. Connect to a shell inside the container
+    ```
+    docker-compose exec mailtrain bash
+    ```
+4. Run these commands once to install all the node modules and build the client webapp
+    ```
+    cd /app
+    bash setup/reinstall-modules.sh
+    cd /app/client && npm run build && cd /app
+
+5. Start the server for the first time with this command, to generate the `server/config/production.yaml`
+    ```
+    bash docker-entrypoint.sh
+    ```
+
+
 ### Docker Environment Variables
 When using Docker, you can override the default Mailtrain settings via the following environment variables. These variables have to be defined in the docker-compose config
 file. You can give them a value directly in the `docker-compose.yml` config file. 
