@@ -171,7 +171,12 @@ export default class CustomContent extends Component {
             if (afterSubmitAction === CustomContent.AfterSubmitAction.STATUS) {
                 this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('campaignUpdated'));
             } else if (afterSubmitAction === CustomContent.AfterSubmitAction.LEAVE) {
-                this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignUpdated'));
+                const channelId = this.props.entity.channel;
+                if (channelId) {
+                    this.navigateToWithFlashMessage(`/channels/${channelId}/campaigns`, 'success', t('campaignUpdated'));
+                } else {
+                    this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignUpdated'));
+                }
             } else {
                 await this.getFormValuesFromURL(`rest/campaigns-content/${this.props.entity.id}`);
                 this.enableForm();

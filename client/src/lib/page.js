@@ -211,7 +211,7 @@ function renderFrameWithContent(t, panelInFullScreen, showSidebar, primaryMenu, 
                 </div>
 
                 <footer key="appFooter" className="app-footer">
-                    <div className="text-muted">&copy; 2018 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
+                    <div className="text-muted">&copy; 2020 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
                 </footer>
             </div>
         );

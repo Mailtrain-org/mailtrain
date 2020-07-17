@@ -30,10 +30,10 @@ import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import campaignsStyles from "./styles.scss";
 import {getUrl} from "../lib/urls";
-import {campaignOverridables, CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import {campaignOverridables, CampaignSource, CampaignStatus} from "../../../shared/campaigns";
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
-import {getCampaignLabels, ListsSelectorHelper} from "./helpers";
+import {getCampaignLabels, ListsSelectorHelper} from "../campaigns/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import interoperableErrors from "../../../shared/interoperable-errors";
 import {Trans} from "react-i18next";
@@ -51,27 +51,15 @@ export default class CUD extends Component {
 
         const t = props.t;
 
-        this.listsSelectorHelper = new ListsSelectorHelper(this, t, 'lists');
+        this.listsSelectorHelper = new ListsSelectorHelper(this, t, 'lists', true);
 
-        this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN);
+        this.templateTypes = getTemplateTypes(props.t, 'data_sourceCustom_', ResourceType.CAMPAIGN, true);
         this.tagLanguages = getTagLanguages(props.t);
 
         this.mailerTypes = getMailerTypes(props.t);
 
         const { campaignTypeLabels } = getCampaignLabels(t);
         this.campaignTypeLabels = campaignTypeLabels;
-
-        this.createTitles = {
-            [CampaignType.REGULAR]: t('createRegularCampaign'),
-            [CampaignType.RSS]: t('createRssCampaign'),
-            [CampaignType.TRIGGERED]: t('createTriggeredCampaign'),
-        };
-
-        this.editTitles = {
-            [CampaignType.REGULAR]: t('editRegularCampaign'),
-            [CampaignType.RSS]: t('editRssCampaign'),
-            [CampaignType.TRIGGERED]: t('editTriggeredCampaign'),
-        };
 
         this.sourceLabels = {
             [CampaignSource.CUSTOM]: t('customContent'),
@@ -105,7 +93,6 @@ export default class CUD extends Component {
         };
 
         this.initForm({
-            leaveConfirmation: !props.entity || props.entity.permissions.includes('edit'),
             onChange: {
                 send_configuration: ::this.onSendConfigurationChanged
             },
@@ -116,8 +103,6 @@ export default class CUD extends Component {
     static propTypes = {
         action: PropTypes.string.isRequired,
         entity: PropTypes.object,
-        createFromChannel: PropTypes.object,
-        crateFromCampaign: PropTypes.object,
         permissions: PropTypes.object,
         type: PropTypes.number
     }
@@ -173,18 +158,42 @@ export default class CUD extends Component {
         }
     }
 
+    populateTemplateDefaults(data) {
+        // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
+        data.data_sourceTemplate = null;
+
+        // This is for CampaignSource.CUSTOM_FROM_CAMPAIGN
+        data.data_sourceCampaign = null;
+
+        // This is for CampaignSource.CUSTOM
+        data.data_sourceCustom_type = mailtrainConfig.editors[0];
+        data.data_sourceCustom_tag_language = mailtrainConfig.tagLanguages[0];
+        data.data_sourceCustom_data = {};
+
+        Object.assign(data, this.templateTypes[mailtrainConfig.editors[0]].initData());
+
+        // This is for CampaignSource.URL
+        data.data_sourceUrl = '';
+    }
+
     getFormValuesMutator(data) {
-        // The source cannot be changed once campaign is created. Thus we don't have to initialize fields for all other sources
-        if (data.source === CampaignSource.TEMPLATE) {
+        this.populateTemplateDefaults(data);
+
+        if (data.source === CampaignSource.TEMPLATE || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
             data.data_sourceTemplate = data.data.sourceTemplate;
-        }
 
-        if (data.source === CampaignSource.URL) {
-            data.data_sourceUrl = data.data.sourceUrl;
-        }
+        } else if (data.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+            data.data_sourceCampaign = data.data.sourceCampaign;
 
-        if (data.type === CampaignType.RSS) {
-            data.data_feedUrl = data.data.feedUrl;
+        } else if (data.source === CampaignSource.CUSTOM) {
+            data.data_sourceCustom_type = data.data.sourceCustom.type;
+            data.data_sourceCustom_tag_language = data.data.sourceCustom.tag_language;
+            data.data_sourceCustom_data = data.data.sourceCustom.data;
+
+            this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
+
+        } else if (data.source === CampaignSource.URL) {
+            data.data_sourceUrl = data.data.sourceUrl
         }
 
         for (const overridable of campaignOverridables) {
@@ -210,30 +219,21 @@ export default class CUD extends Component {
         data.data = {};
         if (data.source === CampaignSource.TEMPLATE || data.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
             data.data.sourceTemplate = data.data_sourceTemplate;
-        }
 
-        if (data.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+        } else if (data.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             data.data.sourceCampaign = data.data_sourceCampaign;
-        }
 
-        if (!isEdit && data.source === CampaignSource.CUSTOM) {
+        } else if (data.source === CampaignSource.CUSTOM) {
             this.templateTypes[data.data_sourceCustom_type].beforeSave(data);
 
             data.data.sourceCustom = {
                 type: data.data_sourceCustom_type,
                 tag_language: data.data_sourceCustom_tag_language,
                 data: data.data_sourceCustom_data,
-                html: data.data_sourceCustom_html,
-                text: data.data_sourceCustom_text
             }
-        }
 
-        if (data.source === CampaignSource.URL) {
+        } else if (data.source === CampaignSource.URL) {
             data.data.sourceUrl = data.data_sourceUrl;
-        }
-
-        if (data.type === CampaignType.RSS) {
-            data.data.feedUrl = data.data_feedUrl;
         }
 
         for (const overridable of campaignOverridables) {
@@ -246,10 +246,10 @@ export default class CUD extends Component {
         this.listsSelectorHelper.submitFormValuesMutator(data);
 
         return filterData(data, [
-            'name', 'description', 'channel', 'namespace', 'send_configuration',
+            'name', 'description', 'namespace', 'cpg_name', 'cpg_description', 'send_configuration',
             'subject', 'from_name_override', 'from_email_override', 'reply_to_override',
             'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url',
-            'type', 'source', 'parent', 'lists'
+            'source', 'lists'
         ]);
     }
 
@@ -257,168 +257,38 @@ export default class CUD extends Component {
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
 
-            if (this.props.entity.status === CampaignStatus.SENDING) {
-                this.disableForm();
-            }
-
         } else {
 
             const data = {};
 
-            // This is for CampaignSource.TEMPLATE and CampaignSource.CUSTOM_FROM_TEMPLATE
-            data.data_sourceTemplate = null;
-
-            // This is for CampaignSource.CUSTOM_FROM_CAMPAIGN
-            data.data_sourceCampaign = null;
-
-            // This is for CampaignSource.CUSTOM
-            data.data_sourceCustom_type = mailtrainConfig.editors[0];
-            data.data_sourceCustom_tag_language = mailtrainConfig.tagLanguages[0];
-            data.data_sourceCustom_data = {};
-            data.data_sourceCustom_html = '';
-            data.data_sourceCustom_text = '';
-
-            Object.assign(data, this.templateTypes[mailtrainConfig.editors[0]].initData());
-
-            // This is for CampaignSource.URL
-            data.data_sourceUrl = '';
-
-            // This is for CampaignType.RSS
-            data.data_feedUrl = '';
-
-
-            if (this.props.createFromChannel) {
-                const channel = this.props.createFromChannel;
-
-                data.channel = channel.id;
-
-                for (const overridable of campaignOverridables) {
-                    if (channel[overridable + '_override'] === null) {
-                        data[overridable + '_override'] = '';
-                        data[overridable + '_overriden'] = false;
-                    } else {
-                        data[overridable + '_override'] = channel[overridable + '_override'];
-                        data[overridable + '_overriden'] = true;
-                    }
-                }
-
-                this.listsSelectorHelper.populateFrom(data, channel.lists);
-
-                data.type = CampaignType.REGULAR;
-
-                data.name = channel.cpg_name;
-                data.description = channel.cpg_description;
-
-                data.send_configuration = channel.send_configuration;
-                if (channel.send_configuration) {
-                    // noinspection JSIgnoredPromiseFromCall
-                    this.fetchSendConfiguration(channel.send_configuration);
-                }
-
-                data.namespace = channel.namespace;
-
-                data.subject = channel.subject;
-
-                data.click_tracking_disabled = channel.click_tracking_disabled;
-                data.open_tracking_disabled = channel.open_tracking_disabled;
-
-                data.unsubscribe_url = channel.unsubscribe_url;
-
-                data.source = channel.source;
-
-                if (channel.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                    data.data_sourceTemplate = channel.sourceTemplate;
-
-                } else if (channel.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-                    data.data_sourceCampaign = channel.data.sourceCampaign;
-
-                } else if (channel.source === CampaignSource.CUSTOM) {
-                    data.data_sourceCustom_type = channel.data.sourceCustom.type;
-                    data.data_sourceCustom_tag_language = channel.data.sourceCustom.tag_language;
-                    data.data_sourceCustom_data = channel.data.sourceCustom.data;
-
-                    this.templateTypes[channel.data.sourceCustom.type].afterLoad(data);
-
-                } else if (channel.source === CampaignSource.URL) {
-                    data.data_sourceUrl = channel.data.sourceUrl
-                }
-
-
-            } else if (this.props.createFromCampaign) {
-                const sourceCampaign = this.props.createFromCampaign;
-
-                data.channel = sourceCampaign.channel;
-
-                for (const overridable of campaignOverridables) {
-                    if (sourceCampaign[overridable + '_override'] === null) {
-                        data[overridable + '_override'] = '';
-                        data[overridable + '_overriden'] = false;
-                    } else {
-                        data[overridable + '_override'] = sourceCampaign[overridable + '_override'];
-                        data[overridable + '_overriden'] = true;
-                    }
-                }
-
-                this.listsSelectorHelper.populateFrom(data, sourceCampaign.lists);
-
-                data.type = sourceCampaign.type;
-
-                data.name = sourceCampaign.name;
-                data.description = sourceCampaign.description;
-
-                data.send_configuration = sourceCampaign.send_configuration;
-                // noinspection JSIgnoredPromiseFromCall
-                this.fetchSendConfiguration(sourceCampaign.send_configuration);
-
-                data.namespace = sourceCampaign.namespace;
-
-                data.subject = sourceCampaign.subject;
-
-                data.click_tracking_disabled = sourceCampaign.click_tracking_disabled;
-                data.open_tracking_disabled = sourceCampaign.open_tracking_disabled;
-
-                data.unsubscribe_url = sourceCampaign.unsubscribe_url;
-
-                if (sourceCampaign.source === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceCampaign.source === CampaignSource.CUSTOM_FROM_CAMPAIGN || sourceCampaign.source === CampaignSource.CUSTOM) {
-                    data.source = CampaignSource.CUSTOM_FROM_CAMPAIGN;
-                    data.data_sourceCampaign = sourceCampaign.id;
-
-                } else if (sourceCampaign.source === CampaignSource.TEMPLATE) {
-                    data.source = CampaignSource.TEMPLATE;
-                    data.data_sourceTemplate = sourceCampaign.data.sourceTemplate;
-
-                } else if (sourceCampaign.source === CampaignSource.URL) {
-                    data.source = CampaignSource.URL;
-                    data.data_sourceUrl = sourceCampaign.data.sourceUrl;
-                }
-
-            } else {
-                for (const overridable of campaignOverridables) {
-                    data[overridable + '_override'] = '';
-                    data[overridable + '_overriden'] = false;
-                }
-
-                data.channel = null;
-
-                data.type = this.props.type;
-
-                data.name = '';
-                data.description = '';
-
-                this.listsSelectorHelper.populateFrom(data, [{list: null, segment: null}]);
-
-                data.send_configuration = null;
-                data.namespace = getDefaultNamespace(this.props.permissions);
-
-                data.subject = '';
-
-                data.click_tracking_disabled = false;
-                data.open_tracking_disabled = false;
-
-                data.unsubscribe_url = '';
-
-                data.source = CampaignSource.CUSTOM;
+            for (const overridable of campaignOverridables) {
+                data[overridable + '_override'] = '';
+                data[overridable + '_overriden'] = false;
             }
+
+            data.type = this.props.type;
+
+            data.name = '';
+            data.description = '';
+
+            data.cpg_name = '';
+            data.cpg_description = '';
+
+            this.listsSelectorHelper.populateFrom(data, []);
+
+            data.send_configuration = null;
+            data.namespace = getDefaultNamespace(this.props.permissions);
+
+            data.subject = '';
+
+            data.click_tracking_disabled = false;
+            data.open_tracking_disabled = false;
+
+            data.unsubscribe_url = '';
+
+            data.source = CampaignSource.CUSTOM;
+
+            this.populateTemplateDefaults(data);
 
             this.populateFormValues(data);
         }
@@ -436,35 +306,19 @@ export default class CUD extends Component {
             state.setIn(['name', 'error'], t('nameMustNotBeEmpty'));
         }
 
-        if (!state.getIn(['subject', 'value'])) {
-            state.setIn(['subject', 'error'], t('"Subject" line must not be empty"'));
-        }
-
-        if (!state.getIn(['send_configuration', 'value'])) {
-            state.setIn(['send_configuration', 'error'], t('sendConfigurationMustBeSelected'));
-        }
-
-        if (state.getIn(['from_email_overriden', 'value']) && !state.getIn(['from_email_override', 'value'])) {
-            state.setIn(['from_email_override', 'error'], t('fromEmailMustNotBeEmpty'));
-        }
-
-
-        const campaignTypeKey = state.getIn(['type', 'value']);
-
         const sourceTypeKey = Number.parseInt(state.getIn(['source', 'value']));
 
-        if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
+        if (sourceTypeKey === CampaignSource.TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE) {
             if (!state.getIn(['data_sourceTemplate', 'value'])) {
                 state.setIn(['data_sourceTemplate', 'error'], t('templateMustBeSelected'));
             }
 
-        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+        } else if (sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             if (!state.getIn(['data_sourceCampaign', 'value'])) {
                 state.setIn(['data_sourceCampaign', 'error'], t('campaignMustBeSelected'));
             }
 
-        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
-            // The type is used only in create form. In case of CUSTOM_FROM_TEMPLATE or CUSTOM_FROM_CAMPAIGN, it is determined by the source template, so no need to check it here
+        } else if (sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);
             if (!customTemplateTypeKey) {
                 state.setIn(['data_sourceCustom_type', 'error'], t('typeMustBeSelected'));
@@ -484,34 +338,26 @@ export default class CUD extends Component {
             }
         }
 
-        if (campaignTypeKey === CampaignType.RSS) {
-            if (!state.getIn(['data_feedUrl', 'value'])) {
-                state.setIn(['data_feedUrl', 'error'], t('rssFeedUrlMustBeGiven'));
-            }
-        }
-
         this.listsSelectorHelper.localValidateFormValues(state)
 
         validateNamespace(t, state);
     }
 
-    static AfterSubmitAction = {
-        STAY: 0,
-        LEAVE: 1,
-        STATUS: 2
+    async save() {
+        await this.submitHandler();
     }
 
     @withFormErrorHandlers
-    async submitHandler(afterSubmitAction) {
+    async submitHandler(submitAndLeave) {
         const t = this.props.t;
 
         let sendMethod, url;
         if (this.props.entity) {
             sendMethod = FormSendMethod.PUT;
-            url = `rest/campaigns-settings/${this.props.entity.id}`;
+            url = `rest/channels/${this.props.entity.id}`;
         } else {
             sendMethod = FormSendMethod.POST;
-            url = 'rest/campaigns'
+            url = 'rest/channels'
         }
 
         this.disableForm();
@@ -521,38 +367,18 @@ export default class CUD extends Component {
 
         if (submitResult) {
             if (this.props.entity) {
-                if (afterSubmitAction === CUD.AfterSubmitAction.STATUS) {
-                    this.navigateToWithFlashMessage(`/campaigns/${this.props.entity.id}/status`, 'success', t('campaignUpdated'));
-                } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
-                    const channelId = this.getFormValue('channel');
-                    if (channelId) {
-                        this.navigateToWithFlashMessage(`/channels/${channelId}/campaigns`, 'success', t('campaignUpdated'));
-                    } else {
-                        this.navigateToWithFlashMessage('/campaigns', 'success', t('campaignUpdated'));
-                    }
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/channels', 'success', t('Channel updated'));
                 } else {
-                    await this.getFormValuesFromURL(`rest/campaigns-settings/${this.props.entity.id}`);
+                    await this.getFormValuesFromURL(`rest/channels/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('campaignUpdated'));
+                    this.setFormStatusMessage('success', t('Channel updated'));
                 }
             } else {
-                const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
-
-                if (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
-                    this.navigateToWithFlashMessage(`/campaigns/${submitResult}/content`, 'success', t('campaignCreated'));
+                if (submitAndLeave) {
+                    this.navigateToWithFlashMessage('/channels', 'success', t('Channel created'));
                 } else {
-                    if (afterSubmitAction === CUD.AfterSubmitAction.STATUS) {
-                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/status`, 'success', t('campaignCreated'));
-                    } else if (afterSubmitAction === CUD.AfterSubmitAction.LEAVE) {
-                        const channelId = this.getFormValue('channel');
-                        if (channelId) {
-                            this.navigateToWithFlashMessage(`/channels/${channelId}/campaigns`, 'success', t('campaignCreated'));
-                        } else {
-                            this.navigateToWithFlashMessage(`/campaigns`, 'success', t('campaignCreated'));
-                        }
-                    } else {
-                        this.navigateToWithFlashMessage(`/campaigns/${submitResult}/edit`, 'success', t('campaignCreated'));
-                    }
+                    this.navigateToWithFlashMessage(`/channels/${submitResult}/edit`, 'success', t('Channel created'));
                 }
             }
         } else {
@@ -561,28 +387,14 @@ export default class CUD extends Component {
         }
     }
 
-
     render() {
         const t = this.props.t;
         const isEdit = !!this.props.entity;
         const canModify = !isEdit || this.props.entity.permissions.includes('edit');
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
-        let extraSettings = null;
-
         const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
         const campaignTypeKey = this.getFormValue('type');
-
-        if (campaignTypeKey === CampaignType.RSS) {
-            extraSettings = <InputField id="data_feedUrl" label={t('rssFeedUrl')}/>
-        }
-
-        const channelsColumns = [
-            { data: 1, title: t('name') },
-            { data: 2, title: t('id'), render: data => <code>{data}</code> },
-            { data: 3, title: t('description') },
-            { data: 4, title: t('namespace') }
-        ];
 
         const sendConfigurationsColumns = [
             { data: 1, title: t('name') },
@@ -629,16 +441,6 @@ export default class CUD extends Component {
             sendSettings = null;
         }
 
-
-        let sourceEdit = null;
-        if (isEdit) {
-            if (!(sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN)) {
-                sourceEdit = <StaticField id="source" className={styles.formDisabled} label={t('contentSource')}>{this.sourceLabels[sourceTypeKey]}</StaticField>;
-            }
-        } else {
-            sourceEdit = <Dropdown id="source" label={t('contentSource')} options={this.sourceOptions}/>
-        }
-
         let templateEdit = null;
         if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
             const templatesColumns = [
@@ -658,7 +460,7 @@ export default class CUD extends Component {
             // only one instance, which fails because Table does not handle updates in "columns" property
             templateEdit = <TableSelect key="templateSelect" id="data_sourceTemplate" label={t('template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} help={help}/>;
 
-        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+        } else if (sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
             const campaignsColumns = [
                 { data: 1, title: t('name') },
                 { data: 2, title: t('id'), render: data => <code>{data}</code> },
@@ -670,18 +472,18 @@ export default class CUD extends Component {
 
             templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
 
-        } else if (!isEdit && sourceTypeKey === CampaignSource.CUSTOM) {
+        } else if (sourceTypeKey === CampaignSource.CUSTOM) {
             const customTemplateTypeKey = this.getFormValue('data_sourceCustom_type');
 
             let customTemplateTypeForm = null;
 
             if (customTemplateTypeKey) {
-                customTemplateTypeForm = getTypeForm(this, customTemplateTypeKey, isEdit);
+                customTemplateTypeForm = getTypeForm(this, customTemplateTypeKey, false);
             }
 
             templateEdit = <div>
                 <Dropdown id="data_sourceCustom_type" label={t('type')} options={this.customTemplateTypeOptions}/>
-                <Dropdown id="data_sourceCustom_tag_language" label={t('tagLanguage')} options={this.customTemplateTagLanguageOptions} disabled={isEdit}/>
+                <Dropdown id="data_sourceCustom_tag_language" label={t('tagLanguage')} options={this.customTemplateTagLanguageOptions}/>
 
                 {customTemplateTypeForm}
             </div>;
@@ -696,18 +498,18 @@ export default class CUD extends Component {
                     <DeleteModalDialog
                         stateOwner={this}
                         visible={this.props.action === 'delete'}
-                        deleteUrl={`rest/campaigns/${this.props.entity.id}`}
-                        backUrl={`/campaigns/${this.props.entity.id}/edit`}
-                        successUrl="/campaigns"
-                        deletingMsg={t('deletingCampaign')}
-                        deletedMsg={t('campaignDeleted')}/>
+                        deleteUrl={`rest/channels/${this.props.entity.id}`}
+                        backUrl={`/channels/${this.props.entity.id}/edit`}
+                        successUrl="/channels"
+                        deletingMsg={t('Deleting channel ...')}
+                        deletedMsg={t('Channel deleted')}/>
                 }
 
-                <Title>{isEdit ? this.editTitles[this.getFormValue('type')] : this.createTitles[this.getFormValue('type')]}</Title>
+                <Title>{isEdit ? t('Edit Channel') : t('Create Channel')}</Title>
 
                 {!canModify &&
                 <div className="alert alert-warning" role="alert">
-                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this campaign. Any changes that you perform here will be lost.</Trans>
+                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this channel. Any changes that you perform here will be lost.</Trans>
                 </div>
                 }
 
@@ -721,18 +523,20 @@ export default class CUD extends Component {
                     <InputField id="name" label={t('name')}/>
 
                     {isEdit &&
-                    <StaticField id="cid" className={styles.formDisabled} label={t('id')} help={t('thisIsTheCampaignIdDisplayedToThe')}>
+                    <StaticField id="cid" className={styles.formDisabled} label={t('id')}>
                         {this.getFormValue('cid')}
                     </StaticField>
                     }
 
                     <TextArea id="description" label={t('description')}/>
 
-                    <TableSelect id="channel" label={t('Channel')} withHeader withClear dropdown dataUrl='rest/channels-with-create-campaign-permission-table' columns={channelsColumns} selectionLabelIndex={1} />
-
-                    {extraSettings}
-
                     <NamespaceSelect/>
+
+                    <hr/>
+                    <Fieldset label={t('Campaign defaults')}>
+                        <InputField id="cpg_name" label={t('Campaign name')}/>
+                        <TextArea id="cpg_description" label={t('Campaign description')}/>
+                    </Fieldset>
 
                     <hr/>
 
@@ -742,7 +546,7 @@ export default class CUD extends Component {
 
                     <Fieldset label={t('sendSettings')}>
 
-                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader withClear dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
                         {sendSettings}
 
@@ -758,32 +562,21 @@ export default class CUD extends Component {
                         <CheckBox id="click_tracking_disabled" text={t('disableClickedTracking')}/>
                     </Fieldset>
 
-                    {sourceEdit &&
-                    <>
-                        <hr/>
-                        <Fieldset label={t('template')}>
-                            {sourceEdit}
-                        </Fieldset>
-                    </>
-                    }
+                    <hr/>
+                    <Fieldset label={t('template')}>
+                        <Dropdown id="source" label={t('contentSource')} options={this.sourceOptions}/>
+                    </Fieldset>
 
                     {templateEdit}
 
                     <ButtonRow>
                         {canModify &&
                             <>
-                                {!isEdit && (sourceTypeKey === CampaignSource.CUSTOM || sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE || sourceTypeKey === CampaignSource.CUSTOM_FROM_CAMPAIGN) ?
-                                    <Button type="submit" className="btn-primary" icon="check" label={t('saveAndEditContent')}/>
-                                :
-                                    <>
-                                        <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.LEAVE)}/>
-                                        <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CUD.AfterSubmitAction.STATUS)}/>
-                                    </>
-                                }
+                                <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
+                                {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>}
                             </>
                         }
-                        {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/campaigns/${this.props.entity.id}/delete`}/> }
+                        {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/channels/${this.props.entity.id}/delete`}/> }
                     </ButtonRow>
                 </Form>
             </div>

@@ -155,7 +155,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        await namespaceHelpers.validateMove(context, entity, existing, 'sendConfiguration', 'createSendConfiguration', 'delete');
+        await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'sendConfiguration', 'createSendConfiguration', 'delete');
 
         await tx('send_configurations').where('id', entity.id).update(filterObject(entity, allowedKeys));
 

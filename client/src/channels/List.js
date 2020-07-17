@@ -42,7 +42,7 @@ export default class List extends Component {
                 data: 1,
                 title: t('name'),
                 actions: data => {
-                    const perms = data[10];
+                    const perms = data[5];
                     if (perms.includes('view')) {
                         return [{label: data[1], link: `/channels/${data[0]}/campaigns`}];
                     } else {

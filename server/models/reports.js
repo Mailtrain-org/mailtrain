@@ -102,7 +102,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         await namespaceHelpers.validateEntity(tx, entity);
-        await namespaceHelpers.validateMove(context, entity, existing, 'report', 'createReport', 'delete');
+        await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'report', 'createReport', 'delete');
 
         entity.params = JSON.stringify(entity.params);
 

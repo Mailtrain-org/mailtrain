@@ -263,7 +263,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        await namespaceHelpers.validateMove(context, entity, existing, 'list', 'createList', 'delete');
+        await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'list', 'createList', 'delete');
 
         await tx('lists').where('id', entity.id).update(filterObject(entity, allowedKeys));
 

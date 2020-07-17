@@ -11,14 +11,14 @@ async function validateEntity(tx, entity) {
     }
 }
 
-async function validateMove(context, entity, existing, entityTypeId, createOperation, deleteOperation) {
+async function validateMoveTx(tx, context, entity, existing, entityTypeId, createOperation, deleteOperation) {
     if (existing.namespace !== entity.namespace) {
-        await shares.enforceEntityPermission(context, 'namespace', entity.namespace, createOperation);
-        await shares.enforceEntityPermission(context, entityTypeId, entity.id, deleteOperation);
+        await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, createOperation);
+        await shares.enforceEntityPermissionTx(tx, context, entityTypeId, entity.id, deleteOperation);
     }
 }
 
 module.exports = {
     validateEntity,
-    validateMove
+    validateMoveTx
 };

@@ -89,7 +89,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
         await _validateAndPreprocess(tx, entity);
 
-        await namespaceHelpers.validateMove(context, entity, existing, 'mosaicoTemplate', 'createMosaicoTemplate', 'delete');
+        await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'mosaicoTemplate', 'createMosaicoTemplate', 'delete');
 
         await tx('mosaico_templates').where('id', entity.id).update(filterObject(entity, allowedKeys));
 

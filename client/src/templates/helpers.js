@@ -39,7 +39,7 @@ export function getTagLanguages(t) {
     };
 }
 
-export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEMPLATE) {
+export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEMPLATE, allowEmpty = false) {
     // The prefix is used to to enable use within other forms (i.e. campaign form)
     const templateTypes = {};
 
@@ -97,7 +97,9 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                     dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}`}
                     columns={mosaicoTemplatesColumns}
                     selectionLabelIndex={1}
-                    disabled={isEdit}/>
+                    disabled={isEdit}
+                    withClear={allowEmpty}
+                />
             } else {
                 return null;
             }
@@ -169,7 +171,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         validate: state => {
             const mosaicoTemplate = state.getIn([prefix + 'mosaicoTemplate', 'value']);
-            if (!mosaicoTemplate) {
+            if (!allowEmpty && !mosaicoTemplate) {
                 state.setIn([prefix + 'mosaicoTemplate', 'error'], t('mosaicoTemplateMustBeSelected'));
             }
         }

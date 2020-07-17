@@ -298,7 +298,7 @@ defaultRoles:
         sendConfiguration: [viewPublic, viewPrivate, edit, delete, share, sendWithoutOverrides, sendWithAllowedOverrides, sendWithAnyOverrides]
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
-        channel: [view, edit, delete, share]
+        channel: [view, edit, delete, createCampaign, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
@@ -308,13 +308,13 @@ defaultRoles:
 
     campaignsAdmin:
       name: Campaigns Admin
-      description: In the respective namespace, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
+      description: In the respective namespace, the user has all permissions for managing lists, channels, templates and campaigns and the permission to send to send configurations.
       permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
       children:
         sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
-        channel: [view, edit, delete, share]
+        channel: [view, edit, delete, createCampaign, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         report: [view, edit, delete, share, execute, viewContent, viewOutput]
@@ -325,7 +325,7 @@ defaultRoles:
     campaignsCreator:
       name: Campaigns Creator
       description: In the respective namespace, the user has all permissions to create and manage templates and campaigns. The user can also read public data about send configurations and use Mosaico templates in the namespace.
-      permissions: [view, createTemplate, createChannel, createCampaign]
+      permissions: [view, createTemplate, createCampaign]
       children:
         sendConfiguration: [viewPublic]
         channel: [view]

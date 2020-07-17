@@ -44,7 +44,7 @@ export default class List extends Component {
 
         const channel = this.props.channel;
         const permissions = this.props.permissions;
-        const createPermitted = permissions.createCampaign;
+        const createPermitted = permissions.createCampaign && (!channel || channel.permissions.includes('createCampaign'));
 
         const columns = [];
         columns.push({
@@ -184,7 +184,11 @@ export default class List extends Component {
 
                 <Title>{t('campaigns')}</Title>
 
-                <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} order={[6, 'desc']} />
+                {channel ?
+                    <Table ref={node => this.table = node} withHeader dataUrl={`rest/campaigns-by-channel-table/${channel.id}`} columns={columns} order={[5, 'desc']} />
+                :
+                    <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} order={[6, 'desc']} />
+                }
             </div>
         );
     }

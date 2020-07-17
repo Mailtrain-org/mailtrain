@@ -169,7 +169,7 @@ async function updateWithConsistencyCheck(context, entity) {
         }
 
         await namespaceHelpers.validateEntity(tx, entity);
-        await namespaceHelpers.validateMove(context, entity, existing, 'customForm', 'createCustomForm', 'delete');
+        await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'customForm', 'createCustomForm', 'delete');
 
         const form = filterObject(entity, allowedFormKeys);
         enforce(!Object.keys(checkForMjmlErrors(form)).length, 'Error(s) in form templates');

@@ -11,6 +11,10 @@ router.postAsync('/channels-table', passport.loggedIn, async (req, res) => {
     return res.json(await channels.listDTAjax(req.context, req.body));
 });
 
+router.postAsync('/channels-with-create-campaign-permission-table', passport.loggedIn, async (req, res) => {
+    return res.json(await channels.listWithCreateCampaignPermissionDTAjax(req.context, req.body));
+});
+
 router.getAsync('/channels/:channelId', passport.loggedIn, async (req, res) => {
     const channel = await channels.getById(req.context, castToInteger(req.params.channelId), true);
     channel.hash = channels.hash(channel);
@@ -25,7 +29,7 @@ router.putAsync('/channels/:channelId', passport.loggedIn, passport.csrfProtecti
     const entity = req.body;
     entity.id = castToInteger(req.params.channelId);
 
-    await channels.updateWithConsistencyCheck(req.context);
+    await channels.updateWithConsistencyCheck(req.context, entity);
     return res.json();
 });
 

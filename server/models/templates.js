@@ -132,7 +132,7 @@ async function updateWithConsistencyCheck(context, entity) {
         await _validateAndPreprocess(tx, entity);
         entity.data = JSON.stringify(entity.data);
 
-        await namespaceHelpers.validateMove(context, entity, existing, 'template', 'createTemplate', 'delete');
+        await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'template', 'createTemplate', 'delete');
 
         const filteredEntity = filterObject(entity, allowedKeys);
 

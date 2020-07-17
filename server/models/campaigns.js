@@ -357,7 +357,7 @@ async function rawGetByTx(tx, key, id) {
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
         .select([
-            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
+            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.channel', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
             'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject',
             'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
             'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks',
@@ -412,6 +412,7 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
     } else if (content === Content.ONLY_SOURCE_CUSTOM) {
         entity = {
             id: entity.id,
+            channel: entity.channel,
             send_configuration: entity.send_configuration,
 
             data: {
@@ -454,6 +455,8 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
 
             if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
                 await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
+            } else if (entity.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+                await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.data.sourceCampaign, 'view');
             }
 
             enforce(Number.isInteger(entity.source));
@@ -480,6 +483,10 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
 async function _createTx(tx, context, entity, content) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCampaign');
+
+        if (entity.channel) {
+            await shares.enforceEntityPermissionTx(tx, context, 'channel', entity.channel, 'createCampaign');
+        }
 
         let copyFilesFrom = null;
         if (entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
@@ -570,6 +577,13 @@ async function createRssTx(tx, context, entity) {
     return await _createTx(tx, context, entity, Content.RSS_ENTRY);
 }
 
+async function _validateChannelMoveTx(tx, context, entity, existing) {
+    if (existing.channel !== entity.channel) {
+        await shares.enforceEntityPermission(context, 'channel', entity.channel, 'createCampaign');
+        await shares.enforceEntityPermission(context, 'campaign', entity.id, 'delete');
+    }
+}
+
 async function updateWithConsistencyCheck(context, entity, content) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'edit');
@@ -585,11 +599,13 @@ async function updateWithConsistencyCheck(context, entity, content) {
 
         let filteredEntity = filterObject(entity, allowedKeysUpdate);
         if (content === Content.ALL) {
-            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete');
+            await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'campaign', 'createCampaign', 'delete');
+            await _validateChannelMoveTx(tx, context, entity, existing);
 
         } else if (content === Content.WITHOUT_SOURCE_CUSTOM) {
             filteredEntity.data.sourceCustom = existing.data.sourceCustom;
-            await namespaceHelpers.validateMove(context, entity, existing, 'campaign', 'createCampaign', 'delete');
+            await namespaceHelpers.validateMoveTx(tx, context, entity, existing, 'campaign', 'createCampaign', 'delete');
+            await _validateChannelMoveTx(tx, context, entity, existing);
 
         } else if (content === Content.ONLY_SOURCE_CUSTOM) {
             const data = existing.data;
