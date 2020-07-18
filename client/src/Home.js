@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import {withTranslation} from './lib/i18n';
 import {requiresAuthenticatedUser} from './lib/page';
 import {withComponentMixins} from "./lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -16,7 +17,6 @@ export default class List extends Component {
     }
 
     static propTypes = {
-        configItems: PropTypes.object
     }
 
     render() {
@@ -26,7 +26,7 @@ export default class List extends Component {
             <div>
                 <h2>{t('Mailtrain 2 beta')}</h2>
                 <div>{t('Build') + ' 2020-07-18-0813'}</div>
-                <p>{this.props.configItems.shoutout}</p>
+                <p>{mailtrainConfig.shoutout}</p>
             </div>
         );
     }

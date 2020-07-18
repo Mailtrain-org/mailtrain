@@ -33,7 +33,7 @@ async function getAuthenticatedConfig(context) {
         globalPermissions[perm] = true;
     }
 
-    const setts = await settings.get(contextHelpers.getAdminContext(), ['mapsApiKey']);
+    const setts = await settings.get(contextHelpers.getAdminContext(), ['mapsApiKey', 'shoutout']);
 
     return {
         defaultCustomFormValues: await forms.getDefaultCustomFormValues(),
@@ -49,7 +49,8 @@ async function getAuthenticatedConfig(context) {
         verpEnabled: config.verp.enabled,
         reportsEnabled: config.reports.enabled,
         mapsApiKey: setts.mapsApiKey,
-        builtinZoneMTAEnabled: config.builtinZoneMTA.enabled
+        builtinZoneMTAEnabled: config.builtinZoneMTA.enabled,
+        shoutout: setts.shoutout
     }
 }
 

@@ -116,10 +116,7 @@ class Root extends Component {
         structure = {
             title: t('home'),
             link: '/',
-            localResolve: {
-                configItems: params => `rest/settings`
-            },
-            panelRender: props => <Home configItems={props.resolved.configItems} />,
+            panelRender: props => <Home />,
             primaryMenuComponent: MainMenu,
             children: {
                 ...login.getMenus(t),
