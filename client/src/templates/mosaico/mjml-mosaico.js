@@ -82,28 +82,30 @@ class MjMosaicoProperty extends HeadComponent {
     static allowedAttributes = {
         'property-id': 'string',
         label: 'string',
-        type: 'enum(image,link,visible)'
+        options: 'string',
+        values: 'string',
+        type: 'enum(image,link,visible,properties,select)'
     };
 
     handler() {
         const { add } = this.context;
 
-        let properties = null;
-        let extend = null;
+        let extra = '';
 
         const type = this.getAttribute('type');
         if (type === 'image') {
-            properties = 'src url alt';
+            extra = `${extra} properties: src url alt;`;
         } else if (type === 'link') {
-            properties = 'text url';
+            extra = `${extra} properties: text url;`;
         } else if (type === 'visible') {
-            extend = 'visible';
+            extra = `${extra} extend: visible;`;
+        } else if (type === 'properties') {
+            extra = `${extra} properties: ${this.getAttribute('values')};`;
+        } else if (type === 'select') {
+            extra = `${extra} widget: select; options: ${this.getAttribute('options')};`;
         }
 
-        const propertiesStr = properties ? ` properties: ${properties}` : '';
-        const extendStr = extend ? ` extend: ${extend}` : '';
-
-        add('style', ` @supports -ko-blockdefs { ${this.getAttribute('property-id')} { label: ${this.getAttribute('label')};${propertiesStr}${extendStr} } }`);
+        add('style', ` @supports -ko-blockdefs { ${this.getAttribute('property-id')} { label: ${this.getAttribute('label')};${extra} } }`);
     }
 }
 
