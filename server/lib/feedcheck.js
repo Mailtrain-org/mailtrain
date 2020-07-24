@@ -57,9 +57,14 @@ async function fetch(url) {
 
     const entries = [];
     for (const item of items) {
+        let date = item.date || item.pubdate || item.pubDate;
+        if (date) {
+            date = (new Date(date)).toISOString();
+        }
+
         const entry = {
             title: item.title,
-            date: item.date || item.pubdate || item.pubDate || new Date(),
+            date: date,
             guid: item.guid || item.link,
             link: item.link,
             content: item.description || item.summary,
@@ -84,7 +89,7 @@ async function getEntryForPreview(url) {
     if (entries.length === 0) {
         entry = {
             title: "Lorem Ipsum",
-            date: new Date(),
+            date: (new Date()).toISOString(),
             guid: "c21bc6c8-d351-4000-aa1f-e7ff928084cd",
             link: "http://www.example.com/sample-item.html",
             content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer gravida a purus in commodo. Sed risus eros, pharetra sit amet sagittis vel, porta nec magna. Sed sollicitudin blandit ornare. Pellentesque a lacinia dui. Etiam ullamcorper, nisl at pharetra fringilla, enim nunc blandit quam, nec vestibulum purus lorem in urna.",

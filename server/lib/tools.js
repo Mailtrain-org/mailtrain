@@ -166,6 +166,10 @@ function _formatTemplateSimple(source, mergeTags, isHTML) {
             }
         }
 
+        if (value === undefined) { // in RSS it may happen that the key is present, but the value is undefined
+            return '';
+        }
+
         const containsHTML = /<[a-z][\s\S]*>/.test(value);
         return isHTML ? he.encode((containsHTML ? value : value.replace(/(?:\r\n|\r|\n)/g, '<br/>')), {
             useNamedReferences: true,

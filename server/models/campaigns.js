@@ -530,6 +530,7 @@ async function _createTx(tx, context, entity, content) {
             filteredEntity.status = CampaignStatus.ACTIVE;
         } else if (filteredEntity.type === CampaignType.RSS_ENTRY) {
             filteredEntity.status = CampaignStatus.SCHEDULED;
+            filteredEntity.start_at = new Date();
         } else {
             filteredEntity.status = CampaignStatus.IDLE;
         }
@@ -635,7 +636,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
     });
 }
 
-async function _removeTx(tx, context, id, existing = null) {
+async function _removeTx(tx, context, id, existing = null, overrideTypeCheck = false) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
 
     if (!existing) {
@@ -646,11 +647,13 @@ async function _removeTx(tx, context, id, existing = null) {
         return new interoperableErrors.InvalidStateError;
     }
 
-    enforce(existing.type === CampaignType.REGULAR || existing.type === CampaignType.RSS || existing.type === CampaignType.TRIGGERED, 'This campaign cannot be removed by user.');
+    if (!overrideTypeCheck) {
+        enforce(existing.type === CampaignType.REGULAR || existing.type === CampaignType.RSS || existing.type === CampaignType.TRIGGERED, 'This campaign cannot be removed by user.');
+    }
 
     const childCampaigns = await tx('campaigns').where('parent', id).select(['id', 'status', 'type']);
     for (const childCampaign of childCampaigns) {
-        await _removeTx(tx, contect, childCampaign.id, childCampaign);
+        await _removeTx(tx, context, childCampaign.id, childCampaign, true);
     }
 
     await files.removeAllTx(tx, context, 'campaign', 'file', id);
@@ -1104,21 +1107,12 @@ async function getRssPreview(context, campaignCid, listCid, subscriptionCid) {
 
     enforce(campaign.type === CampaignType.RSS);
 
-    const list = await lists.getByCid(context, listCid);
-    await shares.enforceEntityPermission(context, 'list', list.id, 'viewTestSubscriptions');
-
-    const subscription = await subscriptions.getByCid(context, list.id, subscriptionCid);
-
-    if (!subscription.is_test) {
-        shares.throwPermissionDenied();
-    }
-
     const settings = {
         campaign, // this prevents message sender from fetching the campaign again
         rssEntry: await feedcheck.getEntryForPreview(campaign.data.feedUrl)
     };
 
-    return await messageSender.getMessage(campaignCid, listCid, subscriptionCid, settings);
+    return await messageSender.getMessage(campaignCid, listCid, subscriptionCid, settings, true);
 }
 
 

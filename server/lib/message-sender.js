@@ -741,14 +741,14 @@ async function queueSubscriptionMessage(sendConfigurationId, to, subject, encryp
     senders.scheduleCheck();
 }
 
-async function getMessage(campaignCid, listCid, subscriptionCid, settings) {
+async function getMessage(campaignCid, listCid, subscriptionCid, settings, isTest = false) {
     const cs = new MessageSender();
     await cs._init({type: MessageType.REGULAR, campaignCid, listCid, ...settings});
 
     const campaign = cs.campaign;
     const list = cs.listsByCid.get(listCid);
 
-    const subscriptionGrouped = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid);
+    const subscriptionGrouped = await subscriptions.getByCid(contextHelpers.getAdminContext(), list.id, subscriptionCid, true, isTest);
 
     let listOk = false;
 

@@ -74,7 +74,7 @@ class PreviewForTestUserModalDialog extends Component {
                 const accessToken = result.data;
                 window.open(getSandboxUrl(`cpgs/rss-preview/${campaignCid}/${listCid}/${subscriptionCid}`, accessToken, {withLocale: true}), '_blank');
 
-            } else if (entity.type === CampaignType.REGULAR) {
+            } else if (entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS_ENTRY) {
                 window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');
 
             } else {
@@ -322,6 +322,7 @@ class SendControls extends Component {
 
         const dialogs = (
             <>
+                PreviewForTestUserModalDialog
                 <TestSendModalDialog
                     mode={TestSendModalDialogMode.CAMPAIGN_STATUS}
                     visible={this.state.showTestSendModal}
@@ -627,7 +628,7 @@ export default class Status extends Component {
 
                     if (perms.includes('view')) {
                         actions.push({
-                            label: <Icon icon="send" title={t('status')}/>,
+                            label: <Icon icon="envelope" title={t('status')}/>,
                             link: `/campaigns/${data[0]}/status`
                         });
                     }
@@ -659,7 +660,7 @@ export default class Status extends Component {
                         <hr/>
                         <h3>RSS Entries</h3>
                         <p>{t('ifANewEntryIsFoundFromCampaignFeedANew')}</p>
-                        <Table withHeader dataUrl={`rest/campaigns-children/${this.props.entity.id}`} columns={campaignsChildrenColumns} />
+                        <Table withHeader dataUrl={`rest/campaigns-children/${this.props.entity.id}`} columns={campaignsChildrenColumns} order={[3, 'desc']}/>
                     </div>
                 }
             </div>
