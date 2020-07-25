@@ -573,7 +573,7 @@ export default class CUD extends Component {
                         {canModify &&
                             <>
                                 <Button type="submit" className="btn-primary" icon="check" label={t('save')}/>
-                                {isEdit && <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>}
+                                <Button type="submit" className="btn-primary" icon="check" label={t('saveAndLeave')} onClickAsync={async () => await this.submitHandler(true)}/>
                             </>
                         }
                         {canDelete && <LinkButton className="btn-danger" icon="trash-alt" label={t('delete')} to={`/channels/${this.props.entity.id}/delete`}/> }
