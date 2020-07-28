@@ -253,7 +253,7 @@ class MessageSender {
             html = tools.formatCampaignTemplate(html, this.tagLanguage, mergeTags, true, campaign, list, subscriptionGrouped);
         }
 
-        const generateText = !!(text || '').trim();
+        const generateText = !(text || '').trim();
         if (generateText) {
             text = htmlToText.fromString(html, {wordwrap: 130});
         } else {
