@@ -92,11 +92,11 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {createPermitted &&
-                        <LinkButton to="/channels/create" className="btn-primary" icon="plus" label={t('Create Channel')}/>
+                        <LinkButton to="/channels/create" className="btn-primary" icon="plus" label={t('createChannel')}/>
                     }
                 </Toolbar>
 
-                <Title>{t('Channels')}</Title>
+                <Title>{t('channels')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/channels-table" columns={columns} />
             </div>

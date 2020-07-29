@@ -102,12 +102,12 @@ class PreviewForTestUserModalDialog extends Component {
         ];
 
         return (
-            <ModalDialog hidden={!this.props.visible} title={t('Preview Campaign')} onCloseAsync={() => this.hideModal()} buttons={[
+            <ModalDialog hidden={!this.props.visible} title={t('previewCampaign')} onCloseAsync={() => this.hideModal()} buttons={[
                 { label: t('preview'), className: 'btn-primary', onClickAsync: ::this.previewAsync },
                 { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
             ]}>
                 <Form stateOwner={this}>
-                    <TableSelect id="testUser" label={t('Preview as')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
+                    <TableSelect id="testUser" label={t('previewAs')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
                 </Form>
             </ModalDialog>
         );
@@ -345,8 +345,8 @@ class SendControls extends Component {
 
         const testButtons = (
             <>
-                <Button className="btn-success" label={t('Preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
-                {testSendPermitted && <Button className="btn-success" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>}
+                <Button className="btn-success" label={t('preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
+                {testSendPermitted && <Button className="btn-success" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>}
             </>
         );
 
@@ -643,7 +643,7 @@ export default class Status extends Component {
                 <Title>{t('campaignStatus')}</Title>
 
                 <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('Sent')}>{entity.delivered}</AlignedRow>
+                <AlignedRow label={t('sent')}>{entity.delivered}</AlignedRow>
                 <AlignedRow label={t('status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
 
                 {sendSettings}

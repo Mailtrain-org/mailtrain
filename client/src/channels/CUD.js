@@ -533,9 +533,9 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     <hr/>
-                    <Fieldset label={t('Campaign defaults')}>
-                        <InputField id="cpg_name" label={t('Campaign name')}/>
-                        <TextArea id="cpg_description" label={t('Campaign description')}/>
+                    <Fieldset label={t('campaignDefaults')}>
+                        <InputField id="cpg_name" label={t('campaignName')}/>
+                        <TextArea id="cpg_description" label={t('campaignDescription')}/>
                     </Fieldset>
 
                     <hr/>

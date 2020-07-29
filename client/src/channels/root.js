@@ -12,7 +12,7 @@ import {namespaceCheckPermissions} from "../lib/namespace";
 function getMenus(t) {
     return {
         'channels': {
-            title: t('Channels'),
+            title: t('channels'),
             link: '/channels',
             checkPermissions: {
                 createChannel: {

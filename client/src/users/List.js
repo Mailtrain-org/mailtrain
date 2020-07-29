@@ -29,15 +29,15 @@ export default class List extends Component {
         const t = this.props.t;
 
         const columns = [
-            { data: 1, title: "Username" },
+            { data: 1, title: t('username') },
         ];
 
         if (mailtrainConfig.isAuthMethodLocal) {
-            columns.push({ data: 2, title: "Full Name" });
+            columns.push({ data: 2, title: t('fullName') });
         }
 
-        columns.push({ data: 3, title: "Namespace" });
-        columns.push({ data: 4, title: "Role" });
+        columns.push({ data: 3, title: t('namespace') });
+        columns.push({ data: 4, title: t('role') });
 
         columns.push({
             actions: data => {

@@ -207,14 +207,14 @@ export class TestSendModalDialog extends Component {
 
         if (mode === TestSendModalDialogMode.CAMPAIGN_CONTENT || mode === TestSendModalDialogMode.CAMPAIGN_STATUS) {
             const targetOpts = [
-                {key: Target.CAMPAIGN_ONE, label: t('Single test user of the campaign')},
-                {key: Target.CAMPAIGN_ALL, label: t('All test users of the campaign')},
-                {key: Target.LIST_ONE, label: t('Single test user from a list')},
-                {key: Target.LIST_ALL, label: t('All test users from a list/segment')}
+                {key: Target.CAMPAIGN_ONE, label: t('singleTestUserOfTheCampaign')},
+                {key: Target.CAMPAIGN_ALL, label: t('allTestUsersOfTheCampaign')},
+                {key: Target.LIST_ONE, label: t('singleTestUserFromAList')},
+                {key: Target.LIST_ALL, label: t('allTestUsersFromAList/Segment')}
             ];
 
             content.push(
-                <Dropdown key="target" id="target" format="wide" label={t('Select to where you want to send the test')} options={targetOpts}/>
+                <Dropdown key="target" id="target" format="wide" label={t('selectToWhereYouWantToSendTheTest')} options={targetOpts}/>
             );
         }
 
@@ -328,11 +328,11 @@ export class TestSendModalDialog extends Component {
 
         if (mode === TestSendModalDialogMode.CAMPAIGN_CONTENT || mode === TestSendModalDialogMode.CAMPAIGN_STATUS) {
             content.push(
-                <InputField key="subjectPrepend" id="subjectPrepend" format="wide" label={t('Prepend to subject')}/>
+                <InputField key="subjectPrepend" id="subjectPrepend" format="wide" label={t('rependToSubject')}/>
             );
 
             content.push(
-                <InputField key="subjectAppend" id="subjectAppend" format="wide" label={t('Append to subject')}/>
+                <InputField key="subjectAppend" id="subjectAppend" format="wide" label={t('appendToSubject')}/>
             );
         }
 

@@ -303,7 +303,7 @@ export default class CustomContent extends Component {
                                 <Button type="submit" className="btn-primary" icon="check" label={t('saveAndGoToStatus')} onClickAsync={async () => await this.submitHandler(CustomContent.AfterSubmitAction.STATUS)}/>
                             </>
                         }
-                        <Button className="btn-success" icon="at" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
+                        <Button className="btn-success" icon="at" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>
                     </ButtonRow>
                 </Form>
             </div>
