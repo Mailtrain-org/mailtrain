@@ -73,7 +73,7 @@ export default class List extends Component {
             title: t('status'),
             render: (data, display, rowData) => {
                 if (data === CampaignStatus.SCHEDULED) {
-                    const scheduled = rowData[6];
+                    const scheduled = rowData[7];
                     if (scheduled && new Date(scheduled) > new Date()) {
                         return t('sendingScheduled');
                     } else {

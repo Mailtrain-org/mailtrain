@@ -184,7 +184,7 @@ function restart(callback) {
             restartBackoffIdx += 1;
         }
 
-        setTimeout(restart, backoffTimeout);
+        setTimeout(restart, backoffTimeout, callback);
     });
 }
 
