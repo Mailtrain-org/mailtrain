@@ -1150,6 +1150,14 @@ msgid "Select how an unsuscription request by subscriber is handled."
 msgstr ""
 "Wählen Sie, welche Schritte zum Abmelden von der Liste notwendig sein sollen."
 
+#: views/lists/create.hbs:56 views/lists/edit.hbs:97
+msgid "Language"
+msgstr "Sprache"
+
+#: views/lists/create.hbs:63 views/lists/edit.hbs:104
+msgid "Select a language"
+msgstr "Wählen Sie eine Sprache aus"
+
 #: views/lists/edit.hbs:3 views/lists/edit.hbs:4 views/lists/view.hbs:8
 msgid "Edit List"
 msgstr "Liste bearbeiten"
@@ -4017,6 +4025,38 @@ msgstr "Die Liste konnte nicht erstellt werden"
 #: routes/lists.js:83
 msgid "List created"
 msgstr "Liste erstellt"
+
+#: routes/lists.js:835
+msgid "English"
+msgstr "englisch"
+
+#: routes/lists.js:836
+msgid "German"
+msgstr "deutsch"
+
+#: routes/lists.js:837
+msgid "Spanish"
+msgstr "spanisch"
+
+#: routes/lists.js:838
+msgid "Estonian"
+msgstr "estnisch"
+
+#: routes/lists.js:839
+msgid "French"
+msgstr "französisch"
+
+#: routes/lists.js:840
+msgid "Hungerian"
+msgstr "ungarisch"
+
+#: routes/lists.js:841
+msgid "Italian"
+msgstr "italienisch"
+
+#: routes/lists.js:842
+msgid "Polish"
+msgstr "polisch"
 
 #: routes/lists.js:91 routes/lists.js:267 routes/lists.js:332
 #: routes/lists.js:371 routes/lists.js:440 routes/lists.js:465
