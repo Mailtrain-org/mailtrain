@@ -73,6 +73,8 @@ router.get('/create', passport.csrfProtection, (req, res) => {
 
     data.unsubscriptionModeOptions = getUnsubscriptionModeOptions(data.unsubscriptionMode || lists.UnsubscriptionMode.ONE_STEP);
 
+    data.languages = getLanguages(config.language || 'en');
+
     res.render('lists/create', data);
 });
 
@@ -106,6 +108,8 @@ router.get('/edit/:id', passport.csrfProtection, (req, res) => {
             });
 
             list.unsubscriptionModeOptions = getUnsubscriptionModeOptions(list.unsubscriptionMode);
+
+            list.languages = getLanguages(list.language);
 
             list.csrfToken = req.csrfToken();
             res.render('lists/edit', list);
@@ -822,6 +826,19 @@ function getUnsubscriptionModeOptions(unsubscriptionMode) {
     };
 
     return options;
+}
+
+function getLanguages(language) {
+    return [
+        {value: 'en', selected: language === 'en', label: _('English')},
+        {value: 'de_DE', selected: language === 'de_DE', label: _('German')},
+        {value: 'es_ES', selected: language === 'es_ES', label: _('Spanish')},
+        {value: 'et', selected: language === 'et', label: _('Estonian')},
+        {value: 'fr_FR', selected: language === 'fr_FR', label: _('French')},
+        {value: 'hu_HU', selected: language === 'hu_HU', label: _('Hungerian')},
+        {value: 'it_IT', selected: language === 'it_IT', label: _('Italian')},
+        {value: 'pl_PL', selected: language === 'pl_PL', label: _('Polish')},
+    ]
 }
 
 module.exports = router;
