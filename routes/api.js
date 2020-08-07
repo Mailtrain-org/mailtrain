@@ -288,6 +288,59 @@ router.get('/lists/:email', (req, res) => {
     });
 });
 
+router.get('/subscription/:listId/:email', (req, res) => {
+    lists.getByCid(req.params.listId, (err, list) => {
+        if (err) {
+            log.error('API', err);
+            res.status(500);
+            return res.json({
+                error: err.message || err,
+                data: []
+            });
+        }
+        if (!list) {
+            res.status(404);
+            return res.json({
+                error: 'Selected listId not found',
+                data: []
+            });
+        }
+
+        subscriptions.getByEmail(list.id, req.params.email, (err, subscription) => {
+            if (err) {
+                res.status(500);
+                return res.json({
+                    error: err.message || err,
+                    data: []
+                });
+            } else if (!subscription) {
+                res.status(200);
+                return res.json({
+                    data: []
+                });
+            }
+
+            fields.list(list.id, (err, fieldList) => {
+                let customFields = fields.getRow(fieldList, subscription);
+                for (let key in subscription) {
+                    if (key.match(/^custom/)) {
+                        delete subscription[key];
+                    }
+                }
+
+                customFields.forEach(field => {
+                    subscription[field.mergeTag] = field.value !== "" && field.value !== null ? field.mergeValue : null;
+                });
+
+                res.status(200);
+                res.json({
+                    data: subscription
+                });
+            });
+        });
+    });
+});
+
 router.post('/field/:listId', (req, res) => {
     let input = {};
     Object.keys(req.body).forEach(key => {
