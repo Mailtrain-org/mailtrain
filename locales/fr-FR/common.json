@@ -1029,5 +1029,22 @@
   "thePasswordMustContainAtLeastOneSpecial": "Le mot de passe doit contenir au moins un caractère spécial",
   "tagLanguage": "Langue du tag",
   "tagLanguageMustBeSelected": "La langue du tag doit être sélectionnée",
-  "helpText": "Texte d'aide"
+  "helpText": "Texte d'aide",
+  "dTsEmptyTable": "Aucune donnée disponible dans le tableau",
+  "dTsInfo": "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+  "dTsInfoEmpty": "Affichage de l'élément 0 à 0 sur 0 élément",
+  "dTsInfoFiltered": "(filtré à partir de _MAX_ éléments au total)",
+  "dTsInfoPostFix": "",
+  "dTsInfoThousands": ",",
+  "dTsLengthMenu": "Afficher _MENU_ éléments",
+  "dTsLoadingRecords": "Chargement...",
+  "dTsProcessing": "Traitement...",
+  "dTsSearch": "Rechercher :",
+  "dTsZeroRecords": "Aucun élément correspondant trouvé",
+  "dTsFirst": "Premier",
+  "dTsLast": "Dernier",
+  "dTsNext": "Suivant",
+  "dTsPrevious": "Précédent",
+  "dTsSortAscending": ": activer pour trier la colonne par ordre croissant",
+  "dTsSortDescending": ": activer pour trier la colonne par ordre décroissant"
 }

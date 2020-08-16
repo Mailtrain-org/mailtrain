@@ -1107,5 +1107,22 @@
   "thePasswordMustContainAtLeastOne": "A senha deve conter pelo menos uma letra minúscula",
   "thePasswordMustContainAtLeastOne-1": "A senha deve conter pelo menos uma letra maiúscula",
   "thePasswordMustContainAtLeastOneNumber": "A senha deve conter pelo menos um número",
-  "thePasswordMustContainAtLeastOneSpecial": "A senha deve conter pelo menos um caractere especial"
+  "thePasswordMustContainAtLeastOneSpecial": "A senha deve conter pelo menos um caractere especial",
+  "dTsEmptyTable": "Não foi encontrado nenhum registo",
+  "dTsInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registos",
+  "dTsInfoEmpty": "Mostrando de 0 até 0 de 0 registos",
+  "dTsInfoFiltered": "(filtrado de _MAX_ registos no total)",
+  "dTsInfoPostFix": "",
+  "dTsInfoThousands": ".",
+  "dTsLengthMenu": "Mostrar _MENU_ registos",
+  "dTsLoadingRecords": "A carregar...",
+  "dTsProcessing": "A processar...",
+  "dTsSearch": "Procurar:",
+  "dTsZeroRecords": "Não foram encontrados resultados",
+  "dTsFirst": "Primeiro",
+  "dTsLast": "Último",
+  "dTsNext": "Seguinte",
+  "dTsPrevious": "Anterior",
+  "dTsSortAscending": ": Ordenar colunas de forma ascendente",
+  "dTsSortDescending": ": Ordenar colunas de forma descendente"
 }
