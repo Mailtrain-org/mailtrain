@@ -1045,5 +1045,20 @@
   "dTsNext": "Nächste",
   "dTsPrevious": "Letzte",
   "dTsSortAscending": ": aktivieren, um Spalte aufsteigend zu sortieren",
-  "dTsSortDescending": ": aktivieren, um Spalte absteigend zu sortieren"
+  "dTsSortDescending": ": aktivieren, um Spalte absteigend zu sortieren",
+  "saving": "Saving ...",
+  "channelUpdated": "Channel updated",
+  "channelCreated": "Channel created",
+  "deletingChannel": "Deleting channel ...",
+  "channelDeleted": "Channel deleted",
+  "editChannel": "Edit Channel",
+  "createChannel": "Create Channel",
+  "sendConfiguration": "Send configuration",
+  "sendConfiguration_plural": "Send configurations",
+  "disableOpenedTracking": "Disable opened tracking",
+  "disableClickedTracking": "Disable clicked tracking",
+  "save": "Save",
+  "saveAndLeave": "Save and leave",
+  "channels": "Channels",
+  "channelName": "Channel \"{{name}}\""
 }

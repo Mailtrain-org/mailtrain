@@ -368,17 +368,17 @@ export default class CUD extends Component {
         if (submitResult) {
             if (this.props.entity) {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/channels', 'success', t('Channel updated'));
+                    this.navigateToWithFlashMessage('/channels', 'success', t('channelUpdated'));
                 } else {
                     await this.getFormValuesFromURL(`rest/channels/${this.props.entity.id}`);
                     this.enableForm();
-                    this.setFormStatusMessage('success', t('Channel updated'));
+                    this.setFormStatusMessage('success', t('channelUpdated'));
                 }
             } else {
                 if (submitAndLeave) {
-                    this.navigateToWithFlashMessage('/channels', 'success', t('Channel created'));
+                    this.navigateToWithFlashMessage('/channels', 'success', t('channelCreated'));
                 } else {
-                    this.navigateToWithFlashMessage(`/channels/${submitResult}/edit`, 'success', t('Channel created'));
+                    this.navigateToWithFlashMessage(`/channels/${submitResult}/edit`, 'success', t('channelCreated'));
                 }
             }
         } else {
@@ -505,7 +505,7 @@ export default class CUD extends Component {
                         deletedMsg={t('Channel deleted')}/>
                 }
 
-                <Title>{isEdit ? t('Edit Channel') : t('Create Channel')}</Title>
+                <Title>{isEdit ? t('editChannel') : t('createChannel')}</Title>
 
                 {!canModify &&
                 <div className="alert alert-warning" role="alert">
