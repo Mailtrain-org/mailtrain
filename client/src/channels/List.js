@@ -96,7 +96,7 @@ export default class List extends Component {
                     }
                 </Toolbar>
 
-                <Title>{t('Channels')}</Title>
+                <Title>{t('channels')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/channels-table" columns={columns} />
             </div>

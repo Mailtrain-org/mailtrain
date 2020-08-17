@@ -501,8 +501,8 @@ export default class CUD extends Component {
                         deleteUrl={`rest/channels/${this.props.entity.id}`}
                         backUrl={`/channels/${this.props.entity.id}/edit`}
                         successUrl="/channels"
-                        deletingMsg={t('Deleting channel ...')}
-                        deletedMsg={t('Channel deleted')}/>
+                        deletingMsg={t('deletingChannel')}
+                        deletedMsg={t('channelDeleted')}/>
                 }
 
                 <Title>{isEdit ? t('editChannel') : t('createChannel')}</Title>
