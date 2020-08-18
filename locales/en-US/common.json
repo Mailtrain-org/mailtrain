@@ -1066,5 +1066,9 @@
   "save": "Save",
   "saveAndLeave": "Save and leave",
   "channels": "Channels",
-  "channelName": "Channel \"{{name}}\""
+  "channel": "Channel",
+  "channelName": "Channel \"{{name}}\"",
+  "cloneCampaign": "Clone Campaign",
+  "next": "Next",
+  "selectCampaignToBeCloned": "Select campaign to be cloned."
 }

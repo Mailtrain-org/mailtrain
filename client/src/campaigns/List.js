@@ -65,7 +65,7 @@ export default class List extends Component {
         columns.push({ data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] });
 
         if (!channel) {
-            columns.push({ data: 5, title: t('Channel') });
+            columns.push({ data: 5, title: t('channel') });
         }
 
         columns.push({
@@ -164,7 +164,7 @@ export default class List extends Component {
             } else {
                 createButton = (
                     <>
-                        <LinkButton to={`/campaigns/clone`} className="btn-primary" icon="clone" label={t('Clone Campaign')}/>
+                        <LinkButton to={`/campaigns/clone`} className="btn-primary" icon="clone" label={t('cloneCampaign')}/>
                         <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" icon="plus" label={t('createCampaign')}>
                             <DropdownLink to="/campaigns/create-regular">{t('regular')}</DropdownLink>
                             <DropdownLink to="/campaigns/create-rss">{t('rss')}</DropdownLink>
