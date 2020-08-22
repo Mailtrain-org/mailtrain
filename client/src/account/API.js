@@ -89,6 +89,37 @@ export default class API extends Component {
 <div class="accordion" id="apicalls">
     <div class="card">
         <div class="card-header">
+          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#moresubscribers"><h4>GET /api/subscriptions/:listCid – {t('Get subscribers')}</h4></button>
+        </div>
+        <div id="moresubscribers" class="collapse" data-parent="#apicalls">
+            <div class="card-body">
+               <p>
+                    {t('Get subscribers')}
+                </p>
+
+                <p>
+                    {t('Query params')}
+                </p>
+                <ul>
+                    <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}
+                        <ul>
+                        <li><strong>start</strong> – {t('startPosition')} (<em>{t('optionalDefault0')}</em>)</li>
+                        <li><strong>limit</strong> – {t('limitEmailsCountInResponse')} (<em>{t('optionalDefault10000')}</em>)</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <p>
+                    <strong>{t('example')}</strong>
+                </p>
+
+                <pre>curl -XGET '{getUrl(`api/subscriptions/P5wKkz-e7?access_token=${accessToken}&limit=10&start=10&search=gmail`)}' </pre>
+
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
           <h4><button type="button" class="btn btn-link" data-toggle="collapse" data-target="#moresubscribe"><h4>POST /api/subscribe/:listCid – {t('addSubscription')}</h4></button></h4>
         </div>
         <div id="moresubscribe" class="collapse" data-parent="#apicalls">
@@ -555,9 +586,9 @@ export default class API extends Component {
     </div>
     <div class="card">
         <div class="card-header">
-          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#morerss"><h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4></button>
+          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#moretemplate"><h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4></button>
         </div>
-        <div id="morerss" class="collapse" data-parent="#apicalls">
+        <div id="moretemplate" class="collapse" data-parent="#apicalls">
             <div class="card-body">
                 <p>
                     {t('sendSingleEmailByTemplateWithGiven')}
