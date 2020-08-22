@@ -86,7 +86,7 @@ export default class API extends Component {
                     </div>
                 </div>
 
-                <div className="card mb-3">
+                <!--<div className="card mb-3">
                     <div className="card-header">
                         <b>POST /api/subscribe/:listId – {t('addSubscription')}</b>
                     </div>
@@ -95,8 +95,8 @@ export default class API extends Component {
                             {t('thisApiCallEitherInsertsANewSubscription')}
                         </p>
                     </div>
-                </div>
-                <h4>POST /api/subscribe/:listId – {t('addSubscription')}</h4>
+                </div>-->
+                <h4>POST /api/subscribe/:listCid – {t('addSubscription')}</h4>
 
                 <p>
                     {t('thisApiCallEitherInsertsANewSubscription')}
@@ -141,7 +141,12 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/subscribe/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
-                <h4>POST /api/unsubscribe/:listId – {t('removeSubscription')}</h4>
+                <p>
+                    {t('Response example')}:
+                </p>
+                <pre>{"data":{"id":"TTrw41znK"}}</pre>
+
+                <h4>POST /api/unsubscribe/:listCId – {t('removeSubscription')}</h4>
 
                 <p>
                     {t('thisApiCallMarksASubscriptionAs')}
@@ -168,7 +173,13 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/unsubscribe/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com'</pre>
 
-                <h4>POST /api/delete/:listId – {t('deleteSubscription')}</h4>
+                <p>
+                    {t('Response example')}:
+                </p>
+                <pre>{"data":{"id":"TTrw41znK","unsubscribed":true}}</pre>
+
+
+                <h4>POST /api/delete/:listCId – {t('deleteSubscription')}</h4>
 
                 <p>
                     {t('thisApiCallDeletesASubscription')}
@@ -194,6 +205,12 @@ export default class API extends Component {
 
                 <pre>curl -XPOST '{getUrl(`api/delete/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com'</pre>
+                <p>
+                    {t('Response example')}:
+                </p>
+                <pre>{"data":{"id":"TTrw41znK","deleted":true}}</pre>
+
+
 
                 <h4>POST /api/field/:listId – {t('addNewCustomField')}</h4>
 
@@ -241,7 +258,11 @@ export default class API extends Component {
                 </p>
 
                 <pre>curl -XPOST '{getUrl(`api/field/B16uVTdW?access_token=${accessToken}`)}' \<br/>
---data 'NAME=Birthday&amp;TYPE=birthday-us&amp;VISIBLE=yes'</pre>
+--data 'NAME=Comment&TYPE=text'</pre>
+                <p>
+                    {t('Response example')}:
+                </p>
+                <pre>{"data":{"id":22,"tag":"MERGE_COMMENT"}}</pre>
 
                 <h4>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h4>
 
@@ -362,7 +383,7 @@ export default class API extends Component {
                 <pre>curl -XGET '{getUrl(`api/lists-by-namespace/1?access_token=${accessToken}`)}'</pre>
 
 
-                <h4>POST /api/lists – {t('createList')}</h4>
+                <h4>POST /api/list – {t('createList')}</h4>
 
                 <p>
                   {t('createListDescription')}
@@ -423,9 +444,12 @@ export default class API extends Component {
                   -d 'PUBLIC_SUBSCRIBE=1' \<br/>
                   -d 'LISTUNSUBSCRIBE_DISABLED=0'
                 </pre>
+                <p>
+                    {t('Response example')}:
+                </p>
+                <pre>{"data":{"id":"WSGjaP1fY"}}</pre>
 
-
-                <h4>DELETE /api/lists/:listId – {t('deleteList')}</h4>
+                <h4>DELETE /api/list/:listCId – {t('deleteList')}</h4>
 
                 <p>
                   {t('deleteListDescription')}
@@ -442,8 +466,11 @@ export default class API extends Component {
                   <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XDELETE '{getUrl(`api/list/B16uVTdW?access_token=${accessToken}`)}'</pre>
-
+                <pre>curl -XDELETE '{getUrl(`api/list/WSGjaP1fY?access_token=${accessToken}`)}'</pre>
+                <p>
+                    {t('Response example')}:
+                </p>
+                <pre>{}</pre>
 
                 <h4>GET /api/rss/fetch/:campaignCid – {t('triggerFetchOfACampaign')}</h4>
 
