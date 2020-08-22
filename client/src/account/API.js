@@ -134,7 +134,7 @@ export default class API extends Component {
                 <p>
                     {t('Response example')}:
                 </p>
-                <pre>{"data":{"id":"TTrw41znK"}}</pre>
+                <pre>"data": ("id":"TTrw41znK")</pre>
 
                 <h4>POST /api/unsubscribe/:listCId – {t('removeSubscription')}</h4>
 
@@ -166,7 +166,7 @@ export default class API extends Component {
                 <p>
                     {t('Response example')}:
                 </p>
-                <pre>{"data":{"id":"TTrw41znK","unsubscribed":true}}</pre>
+                <pre>"data": ("id":"TTrw41znK", "unsubscribed":true)</pre>
 
 
                 <h4>POST /api/delete/:listCId – {t('deleteSubscription')}</h4>
@@ -198,7 +198,7 @@ export default class API extends Component {
                 <p>
                     {t('Response example')}:
                 </p>
-                <pre>{"data":{"id":"TTrw41znK","deleted":true}}</pre>
+                <pre>"data": ("id":"TTrw41znK", "deleted":true)</pre>
 
 
 
@@ -252,7 +252,7 @@ export default class API extends Component {
                 <p>
                     {t('Response example')}:
                 </p>
-                <pre>{"data":{"id":22,"tag":"MERGE_COMMENT"}}</pre>
+                <pre>"data": ("id":22, "tag":"MERGE_COMMENT")</pre>
 
                 <h4>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h4>
 
@@ -437,7 +437,7 @@ export default class API extends Component {
                 <p>
                     {t('Response example')}:
                 </p>
-                <pre>{"data":{"id":"WSGjaP1fY"}}</pre>
+                <pre>"data": ("id":"WSGjaP1fY")</pre>
 
                 <h4>DELETE /api/list/:listCId – {t('deleteList')}</h4>
 
@@ -460,7 +460,7 @@ export default class API extends Component {
                 <p>
                     {t('Response example')}:
                 </p>
-                <pre>{}</pre>
+                <pre>t('Empty object')</pre>
 
                 <h4>GET /api/rss/fetch/:campaignCid – {t('triggerFetchOfACampaign')}</h4>
 
