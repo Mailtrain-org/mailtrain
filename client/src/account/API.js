@@ -86,16 +86,6 @@ export default class API extends Component {
                     </div>
                 </div>
 
-                <!--<div className="card mb-3">
-                    <div className="card-header">
-                        <b>POST /api/subscribe/:listId – {t('addSubscription')}</b>
-                    </div>
-                    <div className="card-body">
-                        <p className="card-text">
-                            {t('thisApiCallEitherInsertsANewSubscription')}
-                        </p>
-                    </div>
-                </div>-->
                 <h4>POST /api/subscribe/:listCid – {t('addSubscription')}</h4>
 
                 <p>
