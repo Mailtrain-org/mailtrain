@@ -425,7 +425,8 @@ export default class CUD extends Component {
                         <Dropdown id="dateFormat" label={t('dateFormat')}
                             options={[
                                 {key: DateFormat.US, label: t('mmddyyyy')},
-                                {key: DateFormat.EU, label: t('ddmmyyyy')}
+                                {key: DateFormat.EU, label: t('ddmmyyyy')},
+                                {key: DateFormat.INTL, label: t('YYYY-MM-DD')}
                             ]}
                         />
                         <InputField id="default_value" label={t('defaultValue')} help={<Trans i18nKey="defaultValueUsedWhenTheFieldIsEmpty">Default value used when the field is empty.</Trans>}/>
