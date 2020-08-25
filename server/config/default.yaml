@@ -55,6 +55,10 @@ enabledLanguages:
 # Inject custom scripts in subscription/layout.mjml.hbs
 # customSubscriptionScripts: [/custom/hello-world.js]
 
+# Customize the random string generation for cid
+cid:
+   alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+   length: 10
 
 # Enable to use Redis session cache or disable if Redis is not installed
 redis:
