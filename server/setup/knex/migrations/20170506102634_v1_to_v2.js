@@ -11,7 +11,7 @@ const { EntityVals: TriggerEntityVals, EventVals: TriggerEventVals } = require('
 const { SubscriptionSource } = require('../../../../shared/lists');
 const {DOMParser, XMLSerializer} = require('xmldom');
 const log = require('../../../lib/log');
-const shortid = require('shortid');
+const shortid = require('../../../lib/shortid');
 const slugify = require('slugify');
 
 const entityTypesAddNamespace = ['list', 'custom_form', 'template', 'campaign', 'report', 'report_template', 'user'];

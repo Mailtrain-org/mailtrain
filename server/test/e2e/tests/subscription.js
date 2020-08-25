@@ -4,7 +4,7 @@
 
 const config = require('../lib/config');
 const { useCase, step, precondition, driver } = require('../lib/mocha-e2e');
-const shortid = require('shortid');
+const shortid = require('../lib/shortid');
 const expect = require('chai').expect;
 const createPage = require('../page-objects/subscription');
 const faker = require('faker');

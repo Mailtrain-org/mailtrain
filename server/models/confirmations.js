@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('../lib/knex');
-const shortid = require('shortid');
+const shortid = require('../lib/shortid');
 
 async function addConfirmation(listId, action, ip, data) {
     const cid = shortid.generate();

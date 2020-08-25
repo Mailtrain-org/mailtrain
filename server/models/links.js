@@ -10,7 +10,7 @@ const uaParser = require('device');
 const he = require('he');
 const { getPublicUrl } = require('../lib/urls');
 const tools = require('../lib/tools');
-const shortid = require('shortid');
+const shortid = require('../lib/shortid');
 const {enforce} = require('../lib/helpers');
 
 const LinkId = {
