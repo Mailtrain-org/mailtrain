@@ -12,7 +12,7 @@ import {namespaceCheckPermissions} from "../lib/namespace";
 function getMenus(t) {
     return {
         'channels': {
-            title: t('Channels'),
+            title: t('channels'),
             link: '/channels',
             checkPermissions: {
                 createChannel: {
@@ -29,14 +29,14 @@ function getMenus(t) {
             panelRender: props => <ChannelsList permissions={props.permissions}/>,
             children: {
                 ':channelId([0-9]+)': {
-                    title: resolved => t('Channel "{{name}}"', {name: ellipsizeBreadcrumbLabel(resolved.channel.name)}),
+                    title: resolved => t('channelName', {name: ellipsizeBreadcrumbLabel(resolved.channel.name)}),
                     resolve: {
                         channel: params => `rest/channels/${params.channelId}`
                     },
                     link: params => `/channels/${params.channelId}/campaigns`,
                     navs: {
                         campaigns: {
-                            title: t('Campaigns'),
+                            title: t('campaigns'),
                             link: params => `/channels/${params.channelId}/campaigns`,
                             visible: resolved => resolved.channel.permissions.includes('view'),
                             panelRender: props => <CampaignsList channel={props.resolved.channel} permissions={props.permissions} />
@@ -64,7 +64,7 @@ function getMenus(t) {
                     }
                 },
                 'create': {
-                    title: t('Create Channel'),
+                    title: t('createChannel'),
                     panelRender: props => <ChannelsCUD action="create" permissions={props.permissions} />
                 }
             }

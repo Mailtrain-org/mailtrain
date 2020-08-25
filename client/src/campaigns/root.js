@@ -179,7 +179,7 @@ function getMenus(t) {
                     panelRender: props => <CampaignsCUD action="create" type={CampaignType.TRIGGERED} permissions={props.permissions} />
                 },
                 'clone': {
-                    title: t('Create Campaign'),
+                    title: t('createCampaign'),
                     link: params => `/campaigns/clone`,
                     panelRender: props => <Clone />,
                     children: {

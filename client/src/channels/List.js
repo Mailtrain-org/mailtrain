@@ -61,7 +61,7 @@ export default class List extends Component {
 
                     if (perms.includes('view')) {
                         actions.push({
-                            label: <Icon icon="inbox" title={t('Campaigns')}/>,
+                            label: <Icon icon="inbox" title={t('campaigns')}/>,
                             link: `/channels/${data[0]}/campaigns`
                         });
                     }
@@ -80,7 +80,7 @@ export default class List extends Component {
                         });
                     }
 
-                    tableAddDeleteButton(actions, this, perms, `rest/channels/${data[0]}`, data[1], t('Deleting channel ...'), t('Channel deleted'));
+                    tableAddDeleteButton(actions, this, perms, `rest/channels/${data[0]}`, data[1], t('deletingChannel'), t('channelDeleted'));
 
                     return actions;
                 }
@@ -92,11 +92,11 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
                     {createPermitted &&
-                        <LinkButton to="/channels/create" className="btn-primary" icon="plus" label={t('Create Channel')}/>
+                        <LinkButton to="/channels/create" className="btn-primary" icon="plus" label={t('createChannel')}/>
                     }
                 </Toolbar>
 
-                <Title>{t('Channels')}</Title>
+                <Title>{t('channels')}</Title>
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/channels-table" columns={columns} />
             </div>

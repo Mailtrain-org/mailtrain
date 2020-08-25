@@ -108,13 +108,13 @@ export default class Clone extends Component {
 
         return (
             <div>
-                <Title>{t('Create campaign')}</Title>
+                <Title>{t('createCampaign')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <TableSelect id="sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-table' columns={campaignsColumns} order={[4, 'desc']} selectionLabelIndex={1} help={t('Select campaign to be cloned.')}/>
+                    <TableSelect id="sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-table' columns={campaignsColumns} order={[4, 'desc']} selectionLabelIndex={1} help={t('selectCampaignToBeCloned')}/>
 
                     <ButtonRow>
-                        <Button type="submit" className="btn-primary" icon="chevron-right" label={t('Next')}/>
+                        <Button type="submit" className="btn-primary" icon="chevron-right" label={t('next')}/>
                     </ButtonRow>
                 </Form>
             </div>

@@ -225,8 +225,8 @@ export default class CUD extends Component {
         const canDelete = isEdit && userId !== 1 && mailtrainConfig.user.id !== userId;
 
         const rolesColumns = [
-            { data: 1, title: "Name" },
-            { data: 2, title: "Description" },
+            { data: 1, title: t("name") },
+            { data: 2, title: t("description") },
         ];
 
 
