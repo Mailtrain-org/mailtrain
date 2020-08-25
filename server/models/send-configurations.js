@@ -3,7 +3,7 @@
 const knex = require('../lib/knex');
 const hasher = require('node-object-hash')();
 const dtHelpers = require('../lib/dt-helpers');
-const shortid = require('shortid');
+const shortid = require('../lib/shortid');
 const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');

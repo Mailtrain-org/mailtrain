@@ -2,7 +2,7 @@
 
 const config = require('../config');
 const knex = require('../../../lib/knex');
-const shortid = require('shortid');
+const shortid = require('../../../lib/shortid');
 const slugify = require('slugify');
 
 async function run() {
