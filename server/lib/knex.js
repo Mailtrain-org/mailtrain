@@ -10,7 +10,7 @@ const knex = require('knex')({
     connection: {
         ...config.mysql,
 
-	charset: utf8mb4,
+	charset: 'utf8mb4',
 	multipleStatements: true,
 
 	// DATE and DATETIME types contain no timezone info. The MySQL driver tries to interpret them w.r.t. to local time, which
