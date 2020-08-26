@@ -233,8 +233,6 @@ www:
 
 mysql:
   password: "$mysqlPassword"
-  charset: utf8mb4
-  multipleStatements: true
 
 redis:
   enabled: true
