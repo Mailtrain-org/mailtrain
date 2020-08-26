@@ -866,13 +866,14 @@ async function getListsWithEmail(context, email) {
     // FIXME - this methods is rather suboptimal if there are many lists. It quite needs permission caching in shares.js
 
     return await knex.transaction(async tx => {
-        const lsts = await tx('lists').select(['id', 'cid', 'name']);
+        const lsts = await tx('lists').select(['id', 'cid', 'name', 'description']);
         const result = [];
 
         for (const list of lsts) {
             await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'viewSubscriptions');
             const entity = await tx(getSubscriptionTableName(list.id)).where('hash_email', hashEmail(email)).whereNotNull('email').first();
             if (entity) {
+               list.status=entity.status;
                 result.push(list);
             }
         }
