@@ -28,10 +28,10 @@ import {getUrl} from "./lib/urls";
 import {withComponentMixins} from "./lib/decorator-helpers";
 import Update from "./settings/Update";
 
-const topLevelMenuKeys = ['lists', 'channels', 'templates', 'campaigns'];
+const topLevelMenuKeys = ['Lists', 'Channels', 'Templates', 'Campaigns'];
 
 if (mailtrainConfig.reportsEnabled) {
-    topLevelMenuKeys.push('reports');
+    topLevelMenuKeys.push('Reports');
 }
 
 
@@ -67,29 +67,38 @@ class Root extends Component {
 
                 const topLevelMenu = [];
 
-                for (const entryKey of topLevelMenuKeys) {
-                    const entry = topLevelItems[entryKey];
-                    const link = entry.link || entry.externalLink;
-
-                    if (link && path.startsWith(link)) {
-                        topLevelMenu.push(<NavLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
-                    } else {
-                        topLevelMenu.push(<NavLink key={entryKey} to={link}>{entry.title}</NavLink>);
-                    }
-                }
-
                 if (mailtrainConfig.isAuthenticated) {
+
+		            for (const entryKey of topLevelMenuKeys) {
+		                const entry = topLevelItems[entryKey.toLowerCase()];
+		                const link = entry.link || entry.externalLink;
+
+		                if (mailtrainConfig.user.admin || mailtrainConfig.globalPermissions["manage"+entryKey]) {
+		                    if (link && path.startsWith(link)) {
+		                        topLevelMenu.push(<NavLink key={entryKey.toLowerCase()} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
+		                    } else {
+		                        topLevelMenu.push(<NavLink key={entryKey.toLowerCase()} to={link}>{entry.title}</NavLink>);
+		                    }
+		                }
+		            }
+
                     return (
                         <>
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
                                 <NavDropdown label={t('administration')}>
-                                    {mailtrainConfig.globalPermissions.displayManageUsers && <DropdownLink to="/users">{t('users')}</DropdownLink>}
-                                    <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>
-                                    {mailtrainConfig.globalPermissions.manageSettings && <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
-                                    <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>
-                                    {mailtrainConfig.globalPermissions.manageBlacklist && <DropdownLink to="/blacklist">{t('blacklist')}</DropdownLink>}
-                                    <DropdownLink to="/account/api">{t('api')}</DropdownLink>
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageUsers) &&
+                                        <DropdownLink to="/users">{t('users')}</DropdownLink>}
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageNamespaces) &&
+                                        <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>}
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageSettings) &&
+                                        <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageSendConfigurations) &&
+                                        <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>}
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageBlacklist) &&
+                                        <DropdownLink to="/blacklist">{t('blacklist')}</DropdownLink>}
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageApi) &&
+                                        <DropdownLink to="/account/api">{t('api')}</DropdownLink>}
                                 </NavDropdown>
                             </ul>
                             <ul className="navbar-nav mt-navbar-nav-right">
@@ -101,6 +110,7 @@ class Root extends Component {
                             </ul>
                         </>
                     );
+
                 } else {
                     return (
                         <>
