@@ -73,7 +73,7 @@ class Root extends Component {
 		                const entry = topLevelItems[entryKey.toLowerCase()];
 		                const link = entry.link || entry.externalLink;
 
-		                if (mailtrainConfig.user.admin || mailtrainConfig.globalPermissions["manage"+entryKey]) {
+		                if (mailtrainConfig.user.admin || mailtrainConfig.globalPermissions["displayManage"+entryKey]) {
 		                    if (link && path.startsWith(link)) {
 		                        topLevelMenu.push(<NavLink key={entryKey.toLowerCase()} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
 		                    } else {
@@ -87,17 +87,17 @@ class Root extends Component {
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
                                 <NavDropdown label={t('administration')}>
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageUsers) &&
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageUsers) &&
                                         <DropdownLink to="/users">{t('users')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageNamespaces) &&
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageNamespaces) &&
                                         <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>}
                                     {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageSettings) &&
                                         <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageSendConfigurations) &&
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageSendConfigurations) &&
                                         <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>}
                                     {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageBlacklist) &&
                                         <DropdownLink to="/blacklist">{t('blacklist')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageApi) &&
+                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageApi) &&
                                         <DropdownLink to="/account/api">{t('api')}</DropdownLink>}
                                 </NavDropdown>
                             </ul>
