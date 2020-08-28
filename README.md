@@ -263,6 +263,7 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
 | WITH_ZONE_MTA    | enables or disables builtin Zone-MTA (default: true)                  |
 | POOL_NAME        | sets builtin Zone-MTA pool name (default: os.hostname())              |
+| LOG_LEVEL        | sets log level among `silly|verbose|info|http|warn|error|silent` (default: `info`) |
 
 If you don't want to modify the original `docker-compose.yml`, you can put your overrides to another file (e.g. `docker-compose.override.yml`) -- like the one below.
 
