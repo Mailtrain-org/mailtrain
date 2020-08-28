@@ -69,11 +69,14 @@ class Root extends Component {
 
                 if (mailtrainConfig.isAuthenticated) {
 
+                    const gP = mailtrainConfig.globalPermissions;
+                    const superadmin = mailtrainConfig.user.admin;
+
 		            for (const entryKey of topLevelMenuKeys) {
 		                const entry = topLevelItems[entryKey.toLowerCase()];
 		                const link = entry.link || entry.externalLink;
 
-		                if (mailtrainConfig.user.admin || mailtrainConfig.globalPermissions["displayManage"+entryKey]) {
+		                if (superadmin || gP["displayManage"+entryKey]) {
 		                    if (link && path.startsWith(link)) {
 		                        topLevelMenu.push(<NavLink key={entryKey.toLowerCase()} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
 		                    } else {
@@ -86,20 +89,22 @@ class Root extends Component {
                         <>
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
-                                <NavDropdown label={t('administration')}>
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageUsers) &&
+                                {(superadmin || gP.displayManageUsers || gP.displayManageNamespaces || gP.manageSettings || 
+                                  gP.displayManageSendConfigurations || gP.manageBlacklist || gP.displayManageApi) &&
+                                  <NavDropdown label={t('administration')}>
+                                    {(superadmin || gP.displayManageUsers) &&
                                         <DropdownLink to="/users">{t('users')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageNamespaces) &&
+                                    {(superadmin || gP.displayManageNamespaces) &&
                                         <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageSettings) &&
+                                    {(superadmin || gP.manageSettings) &&
                                         <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageSendConfigurations) &&
+                                    {(superadmin || gP.displayManageSendConfigurations) &&
                                         <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageBlacklist) &&
+                                    {(superadmin || gP.manageBlacklist) &&
                                         <DropdownLink to="/blacklist">{t('blacklist')}</DropdownLink>}
-                                    {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.displayManageApi) &&
+                                    {(superadmin || gP.displayManageApi) &&
                                         <DropdownLink to="/account/api">{t('api')}</DropdownLink>}
-                                </NavDropdown>
+                                  </NavDropdown>}
                             </ul>
                             <ul className="navbar-nav mt-navbar-nav-right">
                                 {getLanguageChooser(t)}
