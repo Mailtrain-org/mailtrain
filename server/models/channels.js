@@ -30,6 +30,7 @@ function hash(entity) {
 }
 
 async function listDTAjax(context, params) {
+    shares.enforceGlobalPermission(context, 'manageChannels');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'channel', requiredOperations: ['view'] }],
@@ -44,6 +45,7 @@ async function listDTAjax(context, params) {
 }
 
 async function listWithCreateCampaignPermissionDTAjax(context, params) {
+    shares.enforceGlobalPermission(context, 'manageChannels');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'channel', requiredOperations: ['createCampaign'] }],
@@ -95,6 +97,7 @@ async function _getByTx(tx, context, key, id, withPermissions = true) {
 }
 
 async function getByIdTx(tx, context, id, withPermissions = true) {
+    shares.enforceGlobalPermission(context, 'manageChannels');
     await shares.enforceEntityPermissionTx(tx, context, 'channel', id, 'view');
 
     return await _getByTx(tx, context, 'id', id, withPermissions);
@@ -140,6 +143,7 @@ async function _validateAndPreprocess(tx, context, entity, isCreate) {
 }
 
 async function _createTx(tx, context, entity, content) {
+    shares.enforceGlobalPermission(context, 'manageChannels');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCampaign');
 
@@ -169,6 +173,7 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
+    shares.enforceGlobalPermission(context, 'manageChannels');
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'channel', entity.id, 'edit');
 
@@ -198,6 +203,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
 
 async function remove(context, id) {
+    shares.enforceGlobalPermission(context, 'manageChannels');
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'channel', id, 'delete');
 
