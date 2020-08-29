@@ -20,6 +20,7 @@ function hash(entity) {
 }
 
 async function getByIdTx(tx, context, id, withPermissions = true) {
+    shares.enforceGlobalPermission(context, 'manageTemplates');
     await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'view');
     const entity = await tx('templates').where('id', id).first();
     entity.data = JSON.parse(entity.data);
@@ -38,6 +39,7 @@ async function getById(context, id, withPermissions = true) {
 }
 
 async function _listDTAjax(context, namespaceId, params) {
+    shares.enforceGlobalPermission(context, 'manageTemplates');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'template', requiredOperations: ['view'] }],
@@ -70,6 +72,7 @@ async function _validateAndPreprocess(tx, entity) {
 }
 
 async function create(context, entity) {
+    shares.enforceGlobalPermission(context, 'manageTemplates');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createTemplate');
 
@@ -114,6 +117,7 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
+    shares.enforceGlobalPermission(context, 'manageTemplates');
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', entity.id, 'edit');
 
@@ -143,6 +147,7 @@ async function updateWithConsistencyCheck(context, entity) {
 }
 
 async function remove(context, id) {
+    shares.enforceGlobalPermission(context, 'manageTemplates');
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'delete');
 
