@@ -76,7 +76,7 @@ class Root extends Component {
 		                const entry = topLevelItems[entryKey.toLowerCase()];
 		                const link = entry.link || entry.externalLink;
 
-		                if (superadmin || gP["displayManage"+entryKey]) {
+		                if (superadmin || gP["manage"+entryKey]) {
 		                    if (link && path.startsWith(link)) {
 		                        topLevelMenu.push(<NavLink key={entryKey.toLowerCase()} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
 		                    } else {
@@ -89,20 +89,20 @@ class Root extends Component {
                         <>
                             <ul className="navbar-nav mt-navbar-nav-left">
                                 {topLevelMenu}
-                                {(superadmin || gP.displayManageUsers || gP.displayManageNamespaces || gP.manageSettings || 
-                                  gP.displayManageSendConfigurations || gP.manageBlacklist || gP.displayManageApi) &&
+                                {(superadmin || gP.manageUsers || gP.manageNamespaces || gP.manageSettings || 
+                                  gP.manageSendConfigurations || gP.manageBlacklist || gP.manageApi) &&
                                   <NavDropdown label={t('administration')}>
-                                    {(superadmin || gP.displayManageUsers) &&
+                                    {(superadmin || gP.manageUsers) &&
                                         <DropdownLink to="/users">{t('users')}</DropdownLink>}
-                                    {(superadmin || gP.displayManageNamespaces) &&
+                                    {(superadmin || gP.manageNamespaces) &&
                                         <DropdownLink to="/namespaces">{t('namespaces')}</DropdownLink>}
                                     {(superadmin || gP.manageSettings) &&
                                         <DropdownLink to="/settings">{t('globalSettings')}</DropdownLink>}
-                                    {(superadmin || gP.displayManageSendConfigurations) &&
+                                    {(superadmin || gP.manageSendConfigurations) &&
                                         <DropdownLink to="/send-configurations">{t('sendConfigurations')}</DropdownLink>}
                                     {(superadmin || gP.manageBlacklist) &&
                                         <DropdownLink to="/blacklist">{t('blacklist')}</DropdownLink>}
-                                    {(superadmin || gP.displayManageApi) &&
+                                    {(superadmin || gP.manageApi) &&
                                         <DropdownLink to="/account/api">{t('api')}</DropdownLink>}
                                   </NavDropdown>}
                             </ul>

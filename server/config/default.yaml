@@ -277,12 +277,12 @@ defaultRoles:
       name: Global Master
       admin: true
       description: All permissions
-      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings, setupAutomation]
+      permissions: [rebuildPermissions, createJavascriptWithROAccess, manageBlacklist, manageSettings,  manageUsers, manageLists, manageChannels, manageTemplates, manageCampaigns, manageReports, manageApi, manageSendConfigurations, manageNamespaces, setupAutomation]
       rootNamespaceRole: master
     campaignsAdmin:
       name: Campaigns Admin
       description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
-      permissions: [setupAutomation, displayManageLists, displayManageChannels, displayManageTemplates, displayManageCampaigns, displayManageReports, displayManageApi, displayManageSendConfigurations, displayManageNamespaces]
+      permissions: [setupAutomation, manageLists, manageChannels, manageTemplates, manageCampaigns, manageReports, manageApi, manageSendConfigurations, manageNamespaces]
       ownNamespaceRole: campaignsAdmin
     campaignsAdminWithoutNamespace:
       name: Campaigns Admin (multiple namespaces)
