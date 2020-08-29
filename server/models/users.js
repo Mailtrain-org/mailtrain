@@ -37,6 +37,7 @@ function hash(entity) {
 }
 
 async function _getByTx(tx, context, key, value, extraColumns = []) {
+    shares.enforceGlobalPermission(context, 'manageUsers');
     const columns = ['id', 'username', 'name', 'email', 'namespace', 'role', ...extraColumns];
 
     const user = await tx('users').select(columns).where(key, value).first();
@@ -109,6 +110,7 @@ async function serverValidate(context, data, isOwnAccount) {
 }
 
 async function listDTAjax(context, params) {
+    shares.enforceGlobalPermission(context, 'manageUsers');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'namespace', requiredOperations: ['manageUsers'] }],
@@ -165,6 +167,7 @@ async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
 }
 
 async function create(context, user) {
+    shares.enforceGlobalPermission(context, 'manageUsers');
     let id;
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
@@ -192,6 +195,7 @@ async function create(context, user) {
 }
 
 async function updateWithConsistencyCheck(context, user, isOwnAccount) {
+    shares.enforceGlobalPermission(context, 'manageUsers');
     await knex.transaction(async tx => {
         const existing = await tx('users').where('id', user.id).first();
         if (!existing) {
@@ -240,6 +244,7 @@ async function updateWithConsistencyCheck(context, user, isOwnAccount) {
 async function remove(context, userId) {
     enforce(userId !== 1, 'Admin cannot be deleted');
     enforce(context.user.id !== userId, 'User cannot delete himself/herself');
+    shares.enforceGlobalPermission(context, 'manageUsers');
 
     await knex.transaction(async tx => {
         const existing = await tx('users').where('id', userId).first();
