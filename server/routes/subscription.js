@@ -281,6 +281,9 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
 
     if (existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED) {
         await mailHelpers.sendAlreadySubscribed(req.locale, list, email, existingSubscription);
+        if (req.xhr) {
+            throw new Error(tUI('listEmailAddressAlreadyRegistered', req.locale, {list: list.name}));
+        }
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
     } else {
@@ -325,7 +328,7 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
         title: list.name,
         cid: list.cid,
         publicKeyUrl: getTrustedUrl('subscription/publickey'),
-        subscribeUrl: getTrustedUrl(`subscription/${list.cid}/subscribe`),
+        subscribeUrl: getPublicUrl(`subscription/${list.cid}/subscribe`),
         hasPubkey: !!configItems.pgpPrivateKey,
         customFields: await fields.forHbs(contextHelpers.getAdminContext(), list.id),
         template: {},
