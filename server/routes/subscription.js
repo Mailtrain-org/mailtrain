@@ -331,14 +331,15 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
         subscribeUrl: getPublicUrl(`subscription/${list.cid}/subscribe`),
         hasPubkey: !!configItems.pgpPrivateKey,
         customFields: await fields.forHbs(contextHelpers.getAdminContext(), list.id),
-        template: {},
+        template: 'subscription/widget-subscribe.hbs',
         layout: null,
     };
 
     await injectCustomFormData(req.query.fid || list.default_form, 'web_subscribe', data);
 
-    const renderAsync = bluebird.promisify(res.render.bind(res));
-    const html = await renderAsync('subscription/widget-subscribe', data);
+    const htmlRenderer = await tools.getTemplate(data.template, req.locale);
+
+    const html = htmlRenderer(data);
 
     const response = {
         data: {
