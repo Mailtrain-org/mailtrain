@@ -13,6 +13,7 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
 async function listTree(context) {
+    shares.enforceGlobalPermission(context, 'manageNamespaces');
     enforce(!context.user.admin, 'listTree is not supposed to be called by assumed admin');
 
     const entityType = entitySettings.getEntityType('namespace');
@@ -110,6 +111,7 @@ function hash(entity) {
 }
 
 async function getById(context, id) {
+    shares.enforceGlobalPermission(context, 'manageNamespaces');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
         const entity = await tx('namespaces').where('id', id).first();
@@ -119,6 +121,7 @@ async function getById(context, id) {
 }
 
 async function getChildrenTx(tx, context, id) {
+    shares.enforceGlobalPermission(context, 'manageNamespaces');
     await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
 
     const entityType = entitySettings.getEntityType('namespace');
@@ -162,6 +165,7 @@ async function getChildrenTx(tx, context, id) {
 }
 
 async function createTx(tx, context, entity) {
+    shares.enforceGlobalPermission(context, 'manageNamespaces');
     enforce(entity.namespace, 'Parent namespace must be set');
 
     await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createNamespace');
@@ -183,6 +187,7 @@ async function create(context, entity) {
 
 async function updateWithConsistencyCheck(context, entity) {
     enforce(entity.id !== 1 || entity.namespace === null, 'Cannot assign a parent to the root namespace.');
+    shares.enforceGlobalPermission(context, 'manageNamespaces');
 
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.id, 'edit');
@@ -221,6 +226,7 @@ async function updateWithConsistencyCheck(context, entity) {
 
 async function remove(context, id) {
     enforce(id !== 1, 'Cannot delete the root namespace.');
+    shares.enforceGlobalPermission(context, 'manageNamespaces');
 
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'delete');
