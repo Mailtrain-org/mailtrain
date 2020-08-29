@@ -1064,5 +1064,6 @@
   "channelName": "Channel \"{{name}}\"",
   "cloneCampaign": "Clone Campaign",
   "next": "Next",
-  "selectCampaignToBeCloned": "Select campaign to be cloned."
+  "selectCampaignToBeCloned": "Select campaign to be cloned.",
+  "permissionDenied": "Zugang verweigert"
 }

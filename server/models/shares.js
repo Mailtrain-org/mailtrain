@@ -9,6 +9,8 @@ const interoperableErrors = require('../../shared/interoperable-errors');
 const log = require('../lib/log');
 const {getGlobalNamespaceId} = require('../../shared/namespaces');
 const {getAdminId} = require('../../shared/users');
+const { tMark } = require('../lib/translate');
+
 
 // TODO: This would really benefit from some permission cache connected to rebuildPermissions
 // A bit of the problem is that the cache would have to expunged as the result of other processes modifying entites/permissions
@@ -449,7 +451,7 @@ async function regenerateRoleNamesTable() {
 
 
 function throwPermissionDenied() {
-    throw new interoperableErrors.PermissionDeniedError('Permission denied');
+    throw new interoperableErrors.PermissionDeniedError(tMark('permissionDenied'));
 }
 
 async function removeDefaultShares(tx, user) {
