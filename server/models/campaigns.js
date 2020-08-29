@@ -68,6 +68,7 @@ function hash(entity, content) {
 }
 
 async function _listDTAjax(context, namespaceId, channelId, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -102,6 +103,7 @@ async function listByChannelDTAjax(context, channelId, params) {
 }
 
 async function listChildrenDTAjax(context, campaignId, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -115,6 +117,7 @@ async function listChildrenDTAjax(context, campaignId, params) {
 
 
 async function listWithContentDTAjax(context, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -127,6 +130,7 @@ async function listWithContentDTAjax(context, params) {
 }
 
 async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listIds, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -140,6 +144,7 @@ async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listId
 }
 
 async function listTestUsersDTAjax(context, campaignId, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
 
@@ -225,6 +230,7 @@ async function listTestUsersDTAjax(context, campaignId, params) {
 }
 
 async function _listSubscriberResultsDTAjax(context, campaignId, getSubsQrys, columns, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
 
@@ -319,6 +325,7 @@ async function listOpensDTAjax(context, campaignId, params) {
 }
 
 async function listLinkClicksDTAjax(context, campaignId, params) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async (tx) => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'viewStats');
 
@@ -353,6 +360,7 @@ async function lockByIdTx(tx, id) {
 }
 
 async function rawGetByTx(tx, key, id) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     const entity = await tx('campaigns').where('campaigns.' + key, id)
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
@@ -386,6 +394,7 @@ async function rawGetByTx(tx, key, id) {
 }
 
 async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
 
     let entity = await rawGetByTx(tx, 'id', id);
@@ -445,6 +454,7 @@ async function getByCid(context, cid) {
 }
 
 async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM || content === Content.RSS_ENTRY) {
         await namespaceHelpers.validateEntity(tx, entity);
 
@@ -481,6 +491,7 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
 }
 
 async function _createTx(tx, context, entity, content) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createCampaign');
 
@@ -579,6 +590,7 @@ async function createRssTx(tx, context, entity) {
 }
 
 async function _validateChannelMoveTx(tx, context, entity, existing) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     if (existing.channel !== entity.channel) {
         await shares.enforceEntityPermission(context, 'channel', entity.channel, 'createCampaign');
         await shares.enforceEntityPermission(context, 'campaign', entity.id, 'delete');
@@ -637,6 +649,7 @@ async function updateWithConsistencyCheck(context, entity, content) {
 }
 
 async function _removeTx(tx, context, id, existing = null, overrideTypeCheck = false) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
 
     if (!existing) {
@@ -861,6 +874,7 @@ async function prepareCampaignMessages(campaignId) {
 }
 
 async function _changeStatus(context, campaignId, permittedCurrentStates, newState, invalidStateMessage, extraData) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     await knex.transaction(async tx => {
         // This is quite inefficient because it selects the same row 3 times. However as status is changed
         // rather infrequently, we keep it this way for simplicity
@@ -925,6 +939,7 @@ async function stop(context, campaignId) {
 }
 
 async function reset(context, campaignId) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     await knex.transaction(async tx => {
         // This is quite inefficient because it selects the same row 3 times. However as RESET is
         // going to be called rather infrequently, we keep it this way for simplicity
@@ -965,6 +980,7 @@ async function disable(context, campaignId) {
 
 
 async function getStatisticsOpened(context, id) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
@@ -979,6 +995,7 @@ async function getStatisticsOpened(context, id) {
 }
 
 async function fetchRssCampaign(context, cid) {
+    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
 
         const campaign = await tx('campaigns').where('cid', cid).select(['id', 'type']).first();
