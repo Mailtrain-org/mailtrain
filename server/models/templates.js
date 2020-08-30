@@ -20,7 +20,6 @@ function hash(entity) {
 }
 
 async function getByIdTx(tx, context, id, withPermissions = true) {
-    shares.enforceGlobalPermission(context, 'manageTemplates');
     await shares.enforceEntityPermissionTx(tx, context, 'template', id, 'view');
     const entity = await tx('templates').where('id', id).first();
     entity.data = JSON.parse(entity.data);
@@ -39,7 +38,6 @@ async function getById(context, id, withPermissions = true) {
 }
 
 async function _listDTAjax(context, namespaceId, params) {
-    shares.enforceGlobalPermission(context, 'manageTemplates');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'template', requiredOperations: ['view'] }],
