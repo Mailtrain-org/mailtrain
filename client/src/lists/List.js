@@ -10,6 +10,7 @@ import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRe
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {withForm} from "../lib/form";
 import PropTypes from 'prop-types';
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -117,6 +118,7 @@ export default class List extends Component {
         ];
 
         return (
+            {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageList) ?
             <div>
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
@@ -132,6 +134,8 @@ export default class List extends Component {
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />
             </div>
+            :
+            <div><h1>No tienes permisos para manejar listas</h1></div>}
         );
     }
 }

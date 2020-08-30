@@ -37,7 +37,6 @@ function hash(entity) {
 }
 
 async function _getByTx(tx, context, key, value, extraColumns = []) {
-    shares.enforceGlobalPermission(context, 'manageUsers');
     const columns = ['id', 'username', 'name', 'email', 'namespace', 'role', ...extraColumns];
 
     const user = await tx('users').select(columns).where(key, value).first();
@@ -110,7 +109,6 @@ async function serverValidate(context, data, isOwnAccount) {
 }
 
 async function listDTAjax(context, params) {
-    shares.enforceGlobalPermission(context, 'manageUsers');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'namespace', requiredOperations: ['manageUsers'] }],

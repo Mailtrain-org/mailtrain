@@ -230,7 +230,6 @@ async function listTestUsersDTAjax(context, campaignId, params) {
 }
 
 async function _listSubscriberResultsDTAjax(context, campaignId, getSubsQrys, columns, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
 
@@ -325,7 +324,6 @@ async function listOpensDTAjax(context, campaignId, params) {
 }
 
 async function listLinkClicksDTAjax(context, campaignId, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async (tx) => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'viewStats');
 
@@ -978,7 +976,6 @@ async function disable(context, campaignId) {
 
 
 async function getStatisticsOpened(context, id) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'viewStats');
 
@@ -993,7 +990,6 @@ async function getStatisticsOpened(context, id) {
 }
 
 async function fetchRssCampaign(context, cid) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
 
         const campaign = await tx('campaigns').where('cid', cid).select(['id', 'type']).first();

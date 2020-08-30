@@ -27,7 +27,6 @@ function hash(entity) {
 
 
 async function _listDTAjax(context, namespaceId, params) {
-    shares.enforceGlobalPermission(context, 'manageLists');
     const campaignEntityType = entitySettings.getEntityType('campaign');
 
     return await dtHelpers.ajaxListWithPermissions(

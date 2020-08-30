@@ -25,7 +25,6 @@ function hash(entity) {
 }
 
 async function getByIdWithTemplate(context, id, withPermissions = true) {
-    shares.enforceGlobalPermission(context, 'manageReports');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'report', id, 'view');
 
@@ -47,7 +46,6 @@ async function getByIdWithTemplate(context, id, withPermissions = true) {
 }
 
 async function listDTAjax(context, params) {
-    shares.enforceGlobalPermission(context, 'manageReports');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [
@@ -142,6 +140,7 @@ async function remove(context, id) {
 }
 
 async function updateFields(id, fields) {
+    shares.enforceGlobalPermission(context, 'manageReports');
     return await knex('reports').where('id', id).update(fields);
 }
 
@@ -150,6 +149,7 @@ async function listByState(state, limit) {
 }
 
 async function bulkChangeState(oldState, newState) {
+    shares.enforceGlobalPermission(context, 'manageReports');
     return await knex('reports').where('state', oldState).update('state', newState);
 }
 

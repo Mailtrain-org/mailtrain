@@ -30,7 +30,6 @@ function hash(entity) {
 }
 
 async function listDTAjax(context, params) {
-    shares.enforceGlobalPermission(context, 'manageChannels');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'channel', requiredOperations: ['view'] }],
@@ -96,7 +95,6 @@ async function _getByTx(tx, context, key, id, withPermissions = true) {
 }
 
 async function getByIdTx(tx, context, id, withPermissions = true) {
-    shares.enforceGlobalPermission(context, 'manageChannels');
     await shares.enforceEntityPermissionTx(tx, context, 'channel', id, 'view');
 
     return await _getByTx(tx, context, 'id', id, withPermissions);
