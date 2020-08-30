@@ -9,7 +9,6 @@ const interoperableErrors = require('../../shared/interoperable-errors');
 const log = require('../lib/log');
 const {getGlobalNamespaceId} = require('../../shared/namespaces');
 const {getAdminId} = require('../../shared/users');
-const { tUI } = require('../lib/translate');
 
 
 // TODO: This would really benefit from some permission cache connected to rebuildPermissions
@@ -451,7 +450,7 @@ async function regenerateRoleNamesTable() {
 
 
 function throwPermissionDenied() {
-    throw new interoperableErrors.PermissionDeniedError(tUI('permissionDenied', config.defaultLanguage));
+    throw new interoperableErrors.PermissionDeniedError('Permission denied');
 }
 
 async function removeDefaultShares(tx, user) {

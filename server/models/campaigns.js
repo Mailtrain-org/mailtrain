@@ -68,7 +68,6 @@ function hash(entity, content) {
 }
 
 async function _listDTAjax(context, namespaceId, channelId, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -103,7 +102,6 @@ async function listByChannelDTAjax(context, channelId, params) {
 }
 
 async function listChildrenDTAjax(context, campaignId, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -117,7 +115,6 @@ async function listChildrenDTAjax(context, campaignId, params) {
 
 
 async function listWithContentDTAjax(context, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -130,7 +127,6 @@ async function listWithContentDTAjax(context, params) {
 }
 
 async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listIds, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'campaign', requiredOperations: ['view'] }],
@@ -144,7 +140,6 @@ async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listId
 }
 
 async function listTestUsersDTAjax(context, campaignId, params) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'view');
 
