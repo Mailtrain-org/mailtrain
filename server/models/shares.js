@@ -515,7 +515,9 @@ function checkGlobalPermission(context, requiredOperations) {
 }
 
 function enforceGlobalPermission(context, requiredOperations) {
-    if (!checkGlobalPermission(context, requiredOperations)) {
+    const superadmin = ((context.user && context.user.role && config.roles.global[context.user.role]["admin"]) || false);
+
+    if (!superadmin && !checkGlobalPermission(context, requiredOperations)) {
         throwPermissionDenied();
     }
 }
