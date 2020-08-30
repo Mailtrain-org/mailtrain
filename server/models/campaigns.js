@@ -360,7 +360,6 @@ async function lockByIdTx(tx, id) {
 }
 
 async function rawGetByTx(tx, key, id) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     const entity = await tx('campaigns').where('campaigns.' + key, id)
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
@@ -394,7 +393,6 @@ async function rawGetByTx(tx, key, id) {
 }
 
 async function getByIdTx(tx, context, id, withPermissions = true, content = Content.ALL) {
-    shares.enforceGlobalPermission(context, 'manageCampaigns');
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'view');
 
     let entity = await rawGetByTx(tx, 'id', id);

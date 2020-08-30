@@ -86,7 +86,6 @@ async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {
 }
 
 async function getByIdTx(tx, context, id) {
-    shares.enforceGlobalPermission(context, 'manageLists');
     await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
     const entity = await tx('lists').where('id', id).first();
     return entity;
@@ -100,7 +99,6 @@ async function getById(context, id) {
 }
 
 async function getByIdWithListFields(context, id) {
-    shares.enforceGlobalPermission(context, 'manageLists');
     return await knex.transaction(async tx => {
         const entity = await getByIdTx(tx, context, id);
         entity.permissions = await shares.getPermissionsTx(tx, context, 'list', id);
@@ -110,7 +108,6 @@ async function getByIdWithListFields(context, id) {
 }
 
 async function getByCidTx(tx, context, cid) {
-    shares.enforceGlobalPermission(context, 'manageLists');
     const entity = await tx('lists').where('cid', cid).first();
     if (!entity) {
         shares.throwPermissionDenied();
@@ -127,7 +124,6 @@ async function getByCid(context, cid) {
 }
 
 async function getByNamespaceIdTx(tx, context, namespaceId) {
-    shares.enforceGlobalPermission(context, 'manageLists');
   // FIXME - this methods is rather suboptimal if there are many lists. It quite needs permission caching in shares.js
 
   const rows = await tx('lists').where('namespace', namespaceId);
