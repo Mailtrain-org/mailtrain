@@ -13,7 +13,6 @@ const dependencyHelpers = require('../lib/dependency-helpers');
 const allowedKeys = new Set(['name', 'description', 'namespace']);
 
 async function listTree(context) {
-    shares.enforceGlobalPermission(context, 'manageNamespaces');
     enforce(!context.user.admin, 'listTree is not supposed to be called by assumed admin');
 
     const entityType = entitySettings.getEntityType('namespace');
@@ -111,7 +110,6 @@ function hash(entity) {
 }
 
 async function getById(context, id) {
-    shares.enforceGlobalPermission(context, 'manageNamespaces');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
         const entity = await tx('namespaces').where('id', id).first();
@@ -121,7 +119,6 @@ async function getById(context, id) {
 }
 
 async function getChildrenTx(tx, context, id) {
-    shares.enforceGlobalPermission(context, 'manageNamespaces');
     await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
 
     const entityType = entitySettings.getEntityType('namespace');

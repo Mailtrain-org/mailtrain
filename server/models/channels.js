@@ -45,7 +45,6 @@ async function listDTAjax(context, params) {
 }
 
 async function listWithCreateCampaignPermissionDTAjax(context, params) {
-    shares.enforceGlobalPermission(context, 'manageChannels');
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'channel', requiredOperations: ['createCampaign'] }],
