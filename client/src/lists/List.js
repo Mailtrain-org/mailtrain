@@ -27,6 +27,13 @@ export default class List extends Component {
         tableRestActionDialogInit(this);
     }
 
+    componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
+    }
+
     static propTypes = {
         permissions: PropTypes.object
     }
@@ -118,7 +125,6 @@ export default class List extends Component {
         ];
 
         return (
-            {(mailtrainConfig.user.admin || mailtrainConfig.globalPermissions.manageList) ?
             <div>
                 {tableRestActionDialogRender(this)}
                 <Toolbar>
@@ -134,8 +140,7 @@ export default class List extends Component {
 
                 <Table ref={node => this.table = node} withHeader dataUrl="rest/lists-table" columns={columns} />
             </div>
-            :
-            <div><h1>No tienes permisos para manejar listas</h1></div>}
-        );
+        )
+
     }
 }

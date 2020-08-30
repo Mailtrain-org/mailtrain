@@ -37,6 +37,7 @@ import {getCampaignLabels, ListsSelectorHelper} from "../campaigns/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import interoperableErrors from "../../../shared/interoperable-errors";
 import {Trans} from "react-i18next";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -254,6 +255,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageChannels) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageChannels');
+        }
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
 

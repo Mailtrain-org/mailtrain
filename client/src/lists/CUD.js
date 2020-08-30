@@ -27,6 +27,7 @@ import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
 import styles from "../lib/styles.scss";
 import {getMailerTypes} from "../send-configurations/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -73,6 +74,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
 

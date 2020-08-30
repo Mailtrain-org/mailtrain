@@ -25,6 +25,7 @@ import {getFieldColumn, SubscriptionStatus} from '../../../../shared/lists';
 import {getFieldTypes, getSubscriptionStatusLabels} from './helpers';
 import moment from 'moment-timezone';
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -89,6 +90,11 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
+
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
 
