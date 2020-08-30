@@ -282,7 +282,9 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
     if (existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED) {
         await mailHelpers.sendAlreadySubscribed(req.locale, list, email, existingSubscription);
         if (req.xhr) {
-            throw new Error(tUI('listEmailAddressAlreadyRegistered', req.locale, {list: list.name}));
+            return res.status(200).json({
+                msg: tUI('pleaseConfirmSubscription', req.locale)
+            });
         }
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
