@@ -86,7 +86,6 @@ async function listWithSegmentByCampaignDTAjax(context, campaignId, params) {
 }
 
 async function getByIdTx(tx, context, id) {
-    await shares.enforceEntityPermissionTx(tx, context, 'list', id, 'view');
     const entity = await tx('lists').where('id', id).first();
     return entity;
 }
