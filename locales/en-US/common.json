@@ -38,6 +38,7 @@
   "yourPersonalAccessToken": "your personal access token",
   "subscribersEmailAddress": "subscriber's email address",
   "required": "required",
+  "requiredClientSideValidation": "Required (client-side validation only)",
   "subscribersFirstName": "subscriber's first name",
   "subscribersLastName": "subscriber's last name",
   "subscribersTimezoneEgEuropeTallinnPstOr": "subscriber's timezone (eg. \"Europe/Tallinn\", \"PST\" or \"UTC\"). If not set defaults to \"UTC\"",

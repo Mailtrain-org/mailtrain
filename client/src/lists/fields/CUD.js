@@ -514,7 +514,7 @@ export default class CUD extends Component {
 
                     <TextArea id="help" label={t('helpText')}/>
 
-                    <CheckBox id="required" label={'Required'}/>
+                    <CheckBox id="required" label={t('requiredClientSideValidation')}/>
 
                     {fieldSettings}
 

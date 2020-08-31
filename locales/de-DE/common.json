@@ -38,6 +38,7 @@
   "yourPersonalAccessToken": "Persönlicher Zugriffs-Token",
   "subscribersEmailAddress": "Abonnenten E-Mail-Adresse",
   "required": "benötigt",
+  "requiredClientSideValidation": "Erforderlich (nur clientseitige Validierung)",
   "subscribersFirstName": "Abonnenten Vorname",
   "subscribersLastName": "Abonnenten Familienname",
   "subscribersTimezoneEgEuropeTallinnPstOr": "Abonnenten Zeitzone (bsp. \"Europe/Tallinn\", \"PST\" oder \"UTC\"). Standardwert \"UTC\"",
