@@ -327,7 +327,7 @@ export default class CUD extends Component {
                 data.source = channel.source;
 
                 if (channel.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
-                    data.data_sourceTemplate = channel.sourceTemplate;
+                    data.data_sourceTemplate = channel.data.sourceTemplate;
 
                 } else if (channel.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
                     data.data_sourceCampaign = channel.data.sourceCampaign;
