@@ -956,7 +956,7 @@
   "contentOfAnRssEntry": "Contenu d'une entrée RSS",
   "rssEntrySummary": "Résumé de l'entrée RSS",
   "rssEntryImageUrl": "URL de l'image d'entrée RSS",
-  "toExtractTheTextFromHtmlClickHerePlease": "Pour extraire le texte de HTML, cliquez <1> ici </1>. Veuillez noter que votre texte en clair existant dans le champ ci-dessus sera écrasé. Cette fonctionnalité utilise l '<3> API Premailer </3>, un service tiers. Leurs conditions d'utilisation et leur politique de confidentialité s'appliquent. ",
+  "toExtractTheTextFromHtmlClickHerePlease": "Pour extraire le texte de HTML, cliquez <1> ici </1>. Veuillez noter que votre texte en clair existant dans le champ ci-dessus sera écrasé.",
   "mosaicoTemplateUpdated": "Modèle Mosaico mis à jour",
   "mosaicoTemplateCreated": "Modèle Mosaico créé",
   "deletingMosaicoTemplate": "Suppression du modèle Mosaico ...",
