@@ -955,7 +955,7 @@
   "contentOfAnRssEntry": "Inhalt eines RSS Eintrag",
   "rssEntrySummary": "RSS Eintrag Zusammenfassung",
   "rssEntryImageUrl": "RSS Eintrag Bild URL",
-  "toExtractTheTextFromHtmlClickHerePlease": "<1>Hier</1> klicken den Text aus dem HTML zu extrahieren. Hinweis: der bestehende Klartext wird überschrieben. Dieses Feature nutzt die <3>Premailer API</3>. Es gelten die Datenschutzbestimmungen des Anbieters.",
+  "toExtractTheTextFromHtmlClickHerePlease": "<1>Hier</1> klicken den Text aus dem HTML zu extrahieren. Hinweis: der bestehende Klartext wird überschrieben.",
   "mosaicoTemplateUpdated": "Mosaico Vorlage aktualisiert",
   "mosaicoTemplateCreated": "Mosaico Vorlage erstellt",
   "deletingMosaicoTemplate": "Mosaico Vorlage wird gelöscht ...",

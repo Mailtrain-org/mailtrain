@@ -985,7 +985,7 @@
   "contentOfAnRssEntry": "Contenido de la entrada RSS",
   "rssEntrySummary": "Resumen de la entrada RSS",
   "rssEntryImageUrl": "Enlace a la imágen RSS",
-  "toExtractTheTextFromHtmlClickHerePlease": "To extract the text from HTML click <1>here</1>. Please note that your existing plaintext in the field above will be overwritten. This feature uses the <3>Premailer     API</3>, a third party service. Their Terms of Service and Privacy Policy apply.",
+  "toExtractTheTextFromHtmlClickHerePlease": "To extract the text from HTML click <1>here</1>. Please note that your existing plaintext in the field above will be overwritten.",
   "mosaicoTemplateUpdated": "Plantilla Mosaico actualizada",
   "mosaicoTemplateCreated": "Plantilla Mosaico creada",
   "deletingMosaicoTemplate": "Borrando plantilla Mosaico ...",
