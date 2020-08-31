@@ -663,6 +663,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
             help: fld.help,
             field: fld,
             [type.getHbsType(fld)]: true,
+            required: fld.required,
             order_subscribe: fld.order_subscribe,
             order_manage: fld.order_manage
         };
@@ -689,6 +690,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
                     key: opt.key,
                     name: opt.name,
                     help: opt.help,
+                    required: opt.required,
                     value: isEnabled
                 });
             }
@@ -704,7 +706,8 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
                     key: opt.key,
                     name: opt.label,
                     help: opt.help,
-                    value: value === opt.key
+                    value: value === opt.key,
+                    required: fld.required
                 });
             }
 
