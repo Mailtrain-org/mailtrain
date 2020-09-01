@@ -29,7 +29,7 @@ export default class List extends Component {
 
     componentDidMount() {
         const t = this.props.t;
-        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageLists) {
+        if (!mailtrainConfig.globalPermissions.manageLists) {
             this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
         }
     }

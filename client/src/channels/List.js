@@ -34,7 +34,7 @@ export default class List extends Component {
 
     componentDidMount() {
         const t = this.props.t;
-        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageChannels) {
+        if (!mailtrainConfig.globalPermissions.manageChannels) {
             this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageChannels');
         }
     }

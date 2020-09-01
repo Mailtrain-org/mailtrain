@@ -255,7 +255,7 @@ export default class CUD extends Component {
 
     componentDidMount() {
         const t = this.props.t;
-        if (!mailtrainConfig.user.admin && !mailtrainConfig.globalPermissions.manageChannels) {
+        if (!mailtrainConfig.globalPermissions.manageChannels) {
             this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageChannels');
         }
         if (this.props.entity) {

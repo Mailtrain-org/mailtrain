@@ -40,8 +40,7 @@ async function getAuthenticatedConfig(context) {
         user: {
             id: context.user.id,
             username: context.user.username,
-            namespace: context.user.namespace,
-            admin: (config.roles.global[context.user.role]["admin"] || false)
+            namespace: context.user.namespace
         },
         globalPermissions,
         editors: config.editors,
