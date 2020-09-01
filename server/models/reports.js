@@ -140,7 +140,6 @@ async function remove(context, id) {
 }
 
 async function updateFields(id, fields) {
-    shares.enforceGlobalPermission(context, 'manageReports');
     return await knex('reports').where('id', id).update(fields);
 }
 
@@ -149,7 +148,6 @@ async function listByState(state, limit) {
 }
 
 async function bulkChangeState(oldState, newState) {
-    shares.enforceGlobalPermission(context, 'manageReports');
     return await knex('reports').where('state', oldState).update('state', newState);
 }
 

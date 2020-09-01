@@ -119,7 +119,7 @@ async function getById(context, id) {
 }
 
 async function getChildrenTx(tx, context, id) {
-
+    await shares.enforceEntityPermissionTx(tx, context, 'namespace', id, 'view');
     const entityType = entitySettings.getEntityType('namespace');
 
     const extraKeys = em.get('models.namespaces.extraKeys', []);
