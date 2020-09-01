@@ -29,7 +29,12 @@ export default class List extends Component {
     static propTypes = {
         permissions: PropTypes.object
     }
-
+    componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageNamespaces) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageNamespaces');
+        }
+    }
     render() {
         const t = this.props.t;
 

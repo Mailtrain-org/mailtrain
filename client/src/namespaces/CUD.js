@@ -93,6 +93,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageNamespaces) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageNamespaces');
+        }
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
         } else {
