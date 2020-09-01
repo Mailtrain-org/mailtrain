@@ -19,6 +19,7 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import {withComponentMixins} from "../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -45,6 +46,10 @@ export default class Update extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageSettings) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageSettings');
+        }
         this.getFormValuesFromEntity(this.props.entity);
     }
 

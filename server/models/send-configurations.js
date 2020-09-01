@@ -120,6 +120,7 @@ async function _validateAndPreprocess(tx, entity, isCreate) {
 
 
 async function create(context, entity) {
+    shares.enforceGlobalPermission(context, 'manageSendConfigurations');
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', entity.namespace, 'createSendConfiguration');
 
@@ -138,6 +139,7 @@ async function create(context, entity) {
 }
 
 async function updateWithConsistencyCheck(context, entity) {
+    shares.enforceGlobalPermission(context, 'manageSendConfigurations');
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', entity.id, 'edit');
 
@@ -167,6 +169,7 @@ async function updateWithConsistencyCheck(context, entity) {
 }
 
 async function remove(context, id) {
+    shares.enforceGlobalPermission(context, 'manageSendConfigurations');
     if (id === getSystemSendConfigurationId()) {
         shares.throwPermissionDenied();
     }

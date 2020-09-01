@@ -13,6 +13,7 @@ import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRe
 import {withComponentMixins} from "../lib/decorator-helpers";
 import styles from "./styles.scss";
 import PropTypes from 'prop-types';
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -32,6 +33,13 @@ export default class List extends Component {
 
         this.state = {};
         tableRestActionDialogInit(this);
+    }
+
+    componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageCampaigns) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageCampaigns');
+        }
     }
 
     static propTypes = {

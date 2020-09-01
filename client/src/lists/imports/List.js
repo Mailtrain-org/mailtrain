@@ -13,6 +13,7 @@ import moment from "moment";
 import {inProgress} from '../../../../shared/imports';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../../lib/modals";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -37,6 +38,10 @@ export default class List extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
     }
 
     render() {

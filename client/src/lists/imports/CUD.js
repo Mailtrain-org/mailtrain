@@ -30,6 +30,7 @@ import listStyles from "../styles.scss";
 import styles from "../../lib/styles.scss";
 import interoperableErrors from "../../../../shared/interoperable-errors";
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 
 function truncate(str, len, ending = '...') {
@@ -209,6 +210,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
         if (this.props.entity) {
             this.initFromEntity(this.props.entity);
         } else {

@@ -10,6 +10,7 @@ import {Button} from '../lib/bootstrap-components';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import styles from "./styles.scss"
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -35,6 +36,10 @@ export default class API extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageApi) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageApi');
+        }
         // noinspection JSIgnoredPromiseFromCall
         this.loadAccessToken();
     }

@@ -10,6 +10,7 @@ import {Button} from "../lib/bootstrap-components";
 import {HTTPMethod} from "../lib/axios";
 import {tableAddRestActionButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -87,6 +88,10 @@ export default class List extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageBlacklist) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageBlacklist');
+        }
         this.clearFields();
     }
 

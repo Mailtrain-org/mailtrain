@@ -91,6 +91,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageSendConfigurations) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageSendConfigurations');
+        }
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
         } else {

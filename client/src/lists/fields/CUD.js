@@ -32,6 +32,7 @@ import styles from "../../lib/styles.scss";
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-handlebars';
 import {withComponentMixins} from "../../lib/decorator-helpers";
+import mailtrainConfig from 'mailtrainConfig';
 
 @withComponentMixins([
     withTranslation,
@@ -178,6 +179,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
 

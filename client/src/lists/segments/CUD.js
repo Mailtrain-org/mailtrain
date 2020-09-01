@@ -28,6 +28,7 @@ import {getRuleHelpers} from "./helpers";
 import RuleSettingsPane from "./RuleSettingsPane";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 import clone from "clone";
+import mailtrainConfig from 'mailtrainConfig';
 
 // https://stackoverflow.com/a/4819886/1601953
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
@@ -123,6 +124,10 @@ export default class CUD extends Component {
     }
 
     componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageLists) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageLists');
+        }
         if (this.props.entity) {
             this.getFormValuesFromEntity(this.props.entity);
 

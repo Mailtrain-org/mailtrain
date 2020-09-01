@@ -11,6 +11,7 @@ import {getMailerTypes} from './helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+import mailtrainConfig from 'mailtrainConfig';
 
 
 @withComponentMixins([
@@ -31,6 +32,13 @@ export default class List extends Component {
 
     static propTypes = {
         permissions: PropTypes.object
+    }
+
+    componentDidMount() {
+        const t = this.props.t;
+        if (!mailtrainConfig.globalPermissions.manageSendConfigurations) {
+            this.navigateToWithFlashMessage('/', 'danger', t('permissionDenied')+': manageSendConfigurations');
+        }
     }
 
     render() {
