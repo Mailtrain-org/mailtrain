@@ -175,8 +175,65 @@ module.exports.restLogin = (req, res, next) => {
         });
     })(req, res, next);
 };
+let CasStrategy;
+let CasStrategyOpts;
+if (config.cas.enabled) {
+  try {
+    CasStrategy = require('passport-cas2').Strategy;
+    authMode = 'cas';
+    log.info('CAS', 'Found module "passport-cas2". It will be used for CAS auth.');
+    CasStrategyOpts = {
+      casURL: config.cas.urlsso,
+      propertyMap: { 
+        name: config.cas.nameTag,
+        email: config.cas.mailTag
+      }
+    };
+  } catch (exc) {
+    log.info('CAS', 'Module passport-cas2 not installed.');
+  }
+}
+if (CasStrategy) {
+    log.info('Using CAS auth (passport-cas2)');
+    module.exports.authMethod = 'cas';
+    module.exports.isAuthMethodLocal = false;
 
-if (LdapStrategy) {
+    passport.use(new CasStrategy(CasStrategyOpts, 
+    nodeifyFunction(async (username, profile) => { 
+      try {
+        const user = await users.getByUsername(username);
+
+        return {
+            id: user.id,
+            username: username,
+            name: profile[config.cas.nameTag],
+            email: profile[config.cas.mailTag],
+            role: user.role
+        };
+      } catch (err) {
+        if (err instanceof interoperableErrors.NotFoundError) {
+            const userId = await users.create(contextHelpers.getAdminContext(), {
+                username: username,
+                role: config.cas.newUserRole,
+                namespace: config.cas.newUserNamespaceId
+            });
+
+            return {
+                id: userId,
+                username: username,
+                name: profile[config.cas.nameTag],
+                email: profile[config.cas.mailTag],
+                role: config.cas.newUserRole
+            };
+        } else {
+            throw err;
+        }
+      }
+    }));
+    passport.serializeUser((user, done) => done(null, user));
+    passport.deserializeUser((user, done) => done(null, user));
+
+} else if (LdapStrategy) {
     log.info('Using LDAP auth (passport-' + authMode === 'ldap' ? 'ldapjs' : authMode + ')');
     module.exports.authMethod = 'ldap';
     module.exports.isAuthMethodLocal = false;
