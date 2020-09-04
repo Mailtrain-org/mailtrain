@@ -64,7 +64,7 @@
     "csurf": "^1.9.0",
     "csv-parse": "^1.2.3",
     "device": "^0.3.8",
-    "dompurify": "^1.0.2",
+    "dompurify": "^2.0.15",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.15.5",
