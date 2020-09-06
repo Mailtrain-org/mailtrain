@@ -148,9 +148,6 @@ module.exports.restLogout = (req, res) => {
     res.json();
 };
 
-
-module.exports.casLogin = passport.authenticate('cas', { failureRedirect: '/login' });
-
 module.exports.restLogin = (req, res, next) => {
     passport.authenticate(authMode, (err, user, info) => {
         if (err) {
