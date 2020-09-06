@@ -27,7 +27,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 
 const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace', 'role']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
-const allowedKeysExternal = new Set(['username', 'namespace', 'role']);
+const allowedKeysExternal = new Set(['username', 'namespace', 'role', 'name', 'email']);
 const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
 const shares = require('./shares');
 const contextHelpers = require('../lib/context-helpers');
