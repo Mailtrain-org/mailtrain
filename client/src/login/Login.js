@@ -110,8 +110,8 @@ export default class Login extends Component {
         } else if (mailtrainConfig.externalPasswordResetLink) {
             passwordResetLink = <a href={mailtrainConfig.externalPasswordResetLink}>{t('forgotYourPassword?')}</a>;
         }
-
-        return (
+        if (mailtrainConfig.authMethod != 'cas') {
+          return (
             <div>
                 <Title>{t('signIn')}</Title>
 
@@ -126,6 +126,25 @@ export default class Login extends Component {
                     </ButtonRow>
                 </Form>
             </div>
-        );
+          );
+        } else {
+          if (mailtrainConfig.isAuthenticated) {
+            return (
+              <div>
+                 <Title>{t('logOut')} CAS</Title>
+                 {<a href="/cas/logout" class="btn btn-primary">{t('logOut')}</a>}
+                 {passwordResetLink}
+              </div>
+            );
+          } else {
+            return (
+              <div>
+                <Title>{t('signIn')} CAS</Title>
+                {<a href="/cas/login" class="btn btn-primary">{t('signIn')}</a>}
+                {passwordResetLink}
+               </div>
+             );
+           }
+        }
     }
 }
