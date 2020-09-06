@@ -18,6 +18,8 @@ const slugify = require('slugify');
 const passport = require('../lib/passport');
 const templates = require('../models/templates');
 const campaigns = require('../models/campaigns');
+const urls = require('../lib/urls')
+const { getMergeTagsForBases } = require('../../shared/templates')
 const {castToInteger} = require('../lib/helpers');
 const {getSystemSendConfigurationId} = require('../../shared/send-configurations');
 
@@ -362,7 +364,9 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
     }
 
     const emails = input.EMAIL.split(',');
-    const mergeTags = input.TAGS || {};
+    const mergeTagsGlobal = getMergeTagsForBases(urls.getTrustedUrl(), urls.getSandboxUrl(), urls.getPublicUrl());
+    const mergeTagsLocal = input.TAGS || {};
+    const mergeTags = { ...mergeTagsGlobal, ...mergeTagsLocal}
     const subject = input.SUBJECT || '';
     const attachments = input.ATTACHMENTS || [];
 

@@ -269,6 +269,7 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | CAS_MAILTAG      | The field used to save the email (default: mail)                      |
 | CAS_NEWUSERROLE  | The role of new users (default: nobody)                               |
 | CAS_NEWUSERNAMESPACEID | The namespace id of new users (default: 1)                      |
+| LOG_LEVEL        | sets log level among `silly|verbose|info|http|warn|error|silent` (default: `info`) |
 
 If you don't want to modify the original `docker-compose.yml`, you can put your overrides to another file (e.g. `docker-compose.override.yml`) -- like the one below.
 

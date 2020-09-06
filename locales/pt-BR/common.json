@@ -1028,7 +1028,7 @@
   "contentOfAnRssEntry": "Conteúdo de uma entrada RSS",
   "rssEntrySummary": "Resumo da entrada do RSS",
   "rssEntryImageUrl": "URL da imagem de entrada RSS",
-  "toExtractTheTextFromHtmlClickHerePlease": "Para extrair o texto do HTML, clique <1> aqui </ 1>. Observe que o texto original existente no campo acima será sobrescrito. Esse recurso usa a <3> Premailer API </ 3>, uma serviço de terceiros. Os seus Termos de Serviço e Política de Privacidade são aplicáveis. ",
+  "toExtractTheTextFromHtmlClickHerePlease": "Para extrair o texto do HTML, clique <1> aqui </ 1>. Observe que o texto original existente no campo acima será sobrescrito.",
   "mosaicoTemplateUpdated": "Mosaico template updated",
   "mosaicoTemplateUpdated - TODO: update line above and then delete this line to mark that the translation has been fixed": "Mosaico template updated",
   "mosaicoTemplateCreated": "Mosaico template created",
