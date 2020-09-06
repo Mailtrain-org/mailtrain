@@ -148,6 +148,9 @@ module.exports.restLogout = (req, res) => {
     res.json();
 };
 
+
+module.exports.casLogin = passport.authenticate('cas', { failureRedirect: '/login' });
+
 module.exports.restLogin = (req, res, next) => {
     passport.authenticate(authMode, (err, user, info) => {
         if (err) {
@@ -176,19 +179,11 @@ module.exports.restLogin = (req, res, next) => {
     })(req, res, next);
 };
 let CasStrategy;
-let CasStrategyOpts;
-if (config.cas.enabled) {
+if (config.cas && config.cas.enabled === true) {
   try {
     CasStrategy = require('passport-cas2').Strategy;
     authMode = 'cas';
     log.info('CAS', 'Found module "passport-cas2". It will be used for CAS auth.');
-    CasStrategyOpts = {
-      casURL: config.cas.urlsso,
-      propertyMap: { 
-        name: config.cas.nameTag,
-        email: config.cas.mailTag
-      }
-    };
   } catch (exc) {
     log.info('CAS', 'Module passport-cas2 not installed.');
   }
@@ -198,16 +193,23 @@ if (CasStrategy) {
     module.exports.authMethod = 'cas';
     module.exports.isAuthMethodLocal = false;
 
-    passport.use(new CasStrategy(CasStrategyOpts, 
+    const cas = new CasStrategy({
+        casURL: config.cas.url,
+        propertyMap: {
+            displayName: config.cas.nameTag,
+            emails: config.cas.mailTag
+        }
+    }, 
     nodeifyFunction(async (username, profile) => { 
       try {
         const user = await users.getByUsername(username);
 
+        log.info('CAS', 'Old User: '+JSON.stringify(profile));
         return {
             id: user.id,
             username: username,
-            name: profile[config.cas.nameTag],
-            email: profile[config.cas.mailTag],
+            name: profile.displayName,
+            email: profile.emails[0].value,
             role: user.role
         };
       } catch (err) {
@@ -215,14 +217,17 @@ if (CasStrategy) {
             const userId = await users.create(contextHelpers.getAdminContext(), {
                 username: username,
                 role: config.cas.newUserRole,
-                namespace: config.cas.newUserNamespaceId
+                namespace: config.cas.newUserNamespaceId,
+                name: profile.displayName,
+                email: profile.emails[0].value
             });
+            log.info('CAS', 'New User: '+JSON.stringify(profile));
 
             return {
                 id: userId,
                 username: username,
-                name: profile[config.cas.nameTag],
-                email: profile[config.cas.mailTag],
+                name: profile.displayName,
+                email: profile.emails[0].value,
                 role: config.cas.newUserRole
             };
         } else {
@@ -230,8 +235,14 @@ if (CasStrategy) {
         }
       }
     }));
+    passport.use(cas);
     passport.serializeUser((user, done) => done(null, user));
     passport.deserializeUser((user, done) => done(null, user));
+
+    module.exports.authenticateCas = passport.authenticate('cas', { failureRedirect: '/login?cas-login-error' });
+    module.exports.logoutCas = function (req, res) {
+        cas.logout(req, res, config.www.trustedUrlBase+'/login?cas-logout-success');
+    };
 
 } else if (LdapStrategy) {
     log.info('Using LDAP auth (passport-' + authMode === 'ldap' ? 'ldapjs' : authMode + ')');

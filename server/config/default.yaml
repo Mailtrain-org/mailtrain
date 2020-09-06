@@ -174,7 +174,7 @@ postfixBounce:
 cas:
   # enable to use CAS user backend
   enabled: false
-  urlsso: https://example.cas-server.com
+  url: https://example.cas-server.com
   # nameTag identifies the attribute to be used for user's full name
   nameTag: username
   # mailTag identifies the attribute to be used for user's email address
