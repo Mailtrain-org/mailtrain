@@ -26,6 +26,12 @@ LDAP_UIDTAG=${LDAP_UIDTAG:-'username'}
 LDAP_MAILTAG=${LDAP_MAILTAG:-'mail'}
 LDAP_NAMETAG=${LDAP_NAMETAG:-'username'}
 LDAP_METHOD=${LDAP_METHOD:-'ldapjs'}
+WITH_CAS=${WITH_CAS:-'false'}
+CAS_URL=${CAS_URL:-'https://example.cas-server.com'}
+CAS_NAMETAG=${CAS_NAMETAG:-'username'}
+CAS_MAILTAG=${CAS_MAILTAG:-'mail'}
+CAS_NEWUSERROLE=${CAS_NEWUSERROLE:-'nobody'}
+CAS_NEWUSERNAMESPACEID=${CAS_NEWUSERNAMESPACEID:-'1'}
 MONGO_HOST=${MONGO_HOST:-'mongo'}
 WITH_REDIS=${WITH_REDIS:-'true'}
 REDIS_HOST=${REDIS_HOST:-'redis'}
@@ -106,6 +112,27 @@ EOT
         echo 'Info: LDAP not enabled'
     cat >> server/config/production.yaml <<EOT
 ldap:
+  enabled: false
+EOT
+    fi
+
+    # Manage CAS if enabled
+    if [ "$WITH_CAS" = "true" ]; then
+        echo 'Info: CAS enabled'
+    cat >> server/config/production.yaml <<EOT
+cas:
+  enabled: true
+  url: $CAS_URL
+  nameTag: $CAS_NAMETAG
+  mailTag: $CAS_MAILTAG
+  newUserRole: $CAS_NEWUSERROLE
+  newUserNamespaceId: $CAS_NEWUSERNAMESPACEID
+
+EOT
+    else
+        echo 'Info: CAS not enabled'
+    cat >> server/config/production.yaml <<EOT
+cas:
   enabled: false
 EOT
     fi
