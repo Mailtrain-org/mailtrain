@@ -170,4 +170,9 @@ if [ "$WITH_ZONE_MTA" = "true" ]; then
 fi
 
 cd server
+# Install passport-cas2 node package if CAS selected
+if [ "$WITH_CAS" = "true" ]; then
+  echo 'Info: Installing passport-cas2'
+  NODE_ENV=production npm install passport-cas2
+fi
 NODE_ENV=production node index.js
