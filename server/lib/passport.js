@@ -238,7 +238,7 @@ if (CasStrategy) {
 
     module.exports.authenticateCas = passport.authenticate('cas', { failureRedirect: '/login?cas-login-error' });
     module.exports.logoutCas = function (req, res) {
-        cas.logout(req, res, config.www.trustedUrlBase+'/login?cas-logout-success');
+        cas.logout(req, res, config.www.trustedUrlBase+'/?cas-logout-success');
     };
 
 } else if (LdapStrategy) {

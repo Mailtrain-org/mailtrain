@@ -128,23 +128,13 @@ export default class Login extends Component {
             </div>
           );
         } else {
-          if (mailtrainConfig.isAuthenticated) {
-            return (
-              <div>
-                 <Title>{t('logOut')} CAS</Title>
-                 {<a href="/cas/logout" class="btn btn-primary">{t('logOut')}</a>}
-                 {passwordResetLink}
-              </div>
-            );
-          } else {
-            return (
-              <div>
-                <Title>{t('signIn')} CAS</Title>
-                {<a href="/cas/login" class="btn btn-primary">{t('signIn')}</a>}
-                {passwordResetLink}
-               </div>
-             );
-           }
+          return (
+            <div>
+              <Title>{t('signIn')} CAS</Title>
+              {<a href="/cas/login" class="btn btn-primary">{t('signIn')}</a>}
+              {passwordResetLink}
+             </div>
+          );
         }
     }
 }
