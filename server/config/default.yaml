@@ -179,7 +179,7 @@ cas:
   nameTag: username
   # mailTag identifies the attribute to be used for user's email address
   mailTag: mail
-  newUserRole: campaignsAdmin
+  newUserRole: nobody
   # Global namespace id
   newUserNamespaceId: 1
 
