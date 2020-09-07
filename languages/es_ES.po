@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-08 10:55+0200\n"
-"PO-Revision-Date: 2020-09-07 17:25+0200\n"
+"PO-Revision-Date: 2020-09-07 18:56+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -1996,7 +1996,7 @@ msgstr "Código HTML es mostrado en la sección de encabezado de la portada"
 
 #: views/settings.hbs:17
 msgid "Campaign defaults"
-msgstr "Fallos en la campaña"
+msgstr "Campaña por defecto"
 
 #: views/settings.hbs:18
 msgid "Sender name"
@@ -2377,8 +2377,8 @@ msgstr "Dirección de correo ya registrada"
 #: views/subscription/mail-already-subscribed-text.hbs:2
 msgid "We have received a subscription request. Your email address is however already registered."
 msgstr ""
-"Hemos recibido una solicitud de suscripción. Su dirección de correo electrónico está sin "
-"embargo ya registrada."
+"Hemos recibido una solicitud de suscripción. Sin embargo, tu dirección de correo electrónico ya "
+"está registrada."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:3
 #: views/subscription/mail-already-subscribed-text.hbs:3
@@ -2386,13 +2386,13 @@ msgid ""
 "If you received this email by mistake, simply delete it. Your existing subscription won't be "
 "affected."
 msgstr ""
-"Si ha recibido este mensaje por error, simplemente elimínalo. Su subscripción no se verá "
+"Si has recibido este mensaje por error, simplemente elimínalo. Tu subscripción no se verá "
 "afectada."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:4
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:3
 msgid "If you want to modify your subscription then you can "
-msgstr "Si desea modificar su suscripción, puedes"
+msgstr "Si deseas modificar tu suscripción, puedes"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:5
 #: views/subscription/mail-already-subscribed-text.hbs:5
@@ -2424,7 +2424,7 @@ msgstr "darte de baja aquí"
 #: views/subscription/web-unsubscribed-notice.mjml.hbs:3
 #: views/subscription/web-updated-notice.mjml.hbs:3
 msgid "Return to our website"
-msgstr "Vuelve a nuestra web"
+msgstr "Volver nuestra web"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:9
 #: views/subscription/mail-already-subscribed-text.hbs:8
@@ -2439,12 +2439,12 @@ msgstr "Vuelve a nuestra web"
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:5
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:5
 msgid "For questions about this list, please contact:"
-msgstr "Para preguntas acerca de esta lista, por favor, póngase en contacto con nosotros en:"
+msgstr "Para preguntas acerca de esta lista, por favor, ponte en contacto con nosotros en:"
 
 #: views/subscription/mail-already-subscribed-text.hbs:4
 #: views/subscription/mail-subscription-confirmed-text.hbs:3
 msgid "If you want to modify your subscription then you can:"
-msgstr "Si desea modificar su suscripción a continuación, puedes:"
+msgstr "Si deseas modificar tu suscripción a continuación, puedes:"
 
 #: views/subscription/mail-confirm-address-change-html.mjml.hbs:1
 #: views/subscription/mail-confirm-address-change-text.hbs:1
@@ -2478,7 +2478,7 @@ msgstr ""
 #: views/subscription/mail-confirm-subscription-text.hbs:1
 #: views/subscription/mail-confirm-unsubscription-text.hbs:1 routes/subscription.js:431
 msgid "Please Confirm Subscription"
-msgstr "Por favor, confirme la suscripción"
+msgstr "Por favor, confirma la suscripción"
 
 #: views/subscription/mail-confirm-subscription-html.mjml.hbs:2
 #: views/subscription/mail-confirm-subscription-text.hbs:2
@@ -2518,21 +2518,21 @@ msgstr "Suscripción confirmada"
 
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:2
 msgid "Your subscription to our list has been confirmed"
-msgstr "Su suscripción a nuestra lista ha sido confirmada"
+msgstr "Tu suscripción a nuestra lista ha sido confirmada"
 
 #: views/subscription/mail-subscription-confirmed-text.hbs:2
 #: views/subscription/web-subscribed-notice.mjml.hbs:2
 msgid "Your subscription to our list has been confirmed."
-msgstr "Su suscripción a nuestra lista ha sido confirmada."
+msgstr "Tu suscripción a nuestra lista ha sido confirmada."
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:1
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:1
 msgid "You Are Now Unsubscribed"
-msgstr "Tu estás dado de baja ahora"
+msgstr "Acabas de cancelar tu suscripción"
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:2
 msgid "We have removed your email address from our list"
-msgstr "Hemos eliminado su correo electrónico de nuestra lista"
+msgstr "Hemos eliminado tu correo electrónico de nuestra lista"
 
 #: views/subscription/mail-unsubscription-confirmed-html.mjml.hbs:3
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:3
@@ -2541,7 +2541,7 @@ msgstr "Si te has dado de baja por error, puedes volverte a suscribir en:"
 
 #: views/subscription/mail-unsubscription-confirmed-text.hbs:2
 msgid "We have removed your email address from our list."
-msgstr "Hemos eliminado su correo electrónico de nuestra lista."
+msgstr "Hemos eliminado tu correo electrónico de nuestra lista."
 
 #: views/subscription/partials/subscription-custom-fields.hbs:2
 msgid "want to change it?"
@@ -2611,7 +2611,7 @@ msgstr "Suscribirse a la lista"
 #: views/subscription/web-confirm-unsubscription-notice.mjml.hbs:1
 #: views/subscription/widget-subscribe.hbs:4
 msgid "Almost Finished"
-msgstr "Casi terminado"
+msgstr "Casi hemos terminado"
 
 #: views/subscription/web-confirm-subscription-notice.mjml.hbs:2
 #: views/subscription/widget-subscribe.hbs:5
@@ -2632,7 +2632,7 @@ msgstr ""
 
 #: views/subscription/web-manage-address.mjml.hbs:1
 msgid "Update Your Email Address"
-msgstr "Actualizar su correo electrónico"
+msgstr "Actualiza tu correo electrónico"
 
 #: views/subscription/web-manage.mjml.hbs:1
 msgid "Update Your Preferences"
@@ -2668,7 +2668,7 @@ msgstr "Has sido eliminado de:"
 
 #: views/subscription/web-updated-notice.mjml.hbs:1
 msgid "Profile Updated"
-msgstr "Perfeil actualizado"
+msgstr "Perfil actualizado"
 
 #: views/subscription/web-updated-notice.mjml.hbs:2
 msgid "Your profile information has been updated."
