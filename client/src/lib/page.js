@@ -604,16 +604,23 @@ export class LinkButton extends Component {
 export class DropdownLink extends Component {
     static propTypes = {
         to: PropTypes.string,
-        className: PropTypes.string
+        className: PropTypes.string,
+        forceReload: PropTypes.bool
     }
 
     render() {
         const props = this.props;
 
         const clsName = "dropdown-item" + (props.className ? " " + props.className : "")
-        return (
+        if (props.forceReload) {
+          return (
             <Link to={props.to} className={clsName} onClick={() => window.location.href=props.to}>{props.children}</Link>
-        );
+          );
+         } else {
+          return (
+            <Link to={props.to} className={clsName}>{props.children}</Link>
+          );
+         }
     }
 }
 
