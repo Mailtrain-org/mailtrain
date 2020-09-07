@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-08 10:55+0200\n"
-"PO-Revision-Date: 2020-09-07 18:56+0200\n"
+"PO-Revision-Date: 2020-09-07 19:26+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -369,7 +369,7 @@ msgstr "Plantilla"
 
 #: views/campaigns/create-triggered.hbs:13 views/campaigns/create.hbs:13
 msgid "Select a template:"
-msgstr "Seleccionar plantilla"
+msgstr "Seleccionar plantilla:"
 
 #: views/campaigns/create-triggered.hbs:15 views/campaigns/create.hbs:15
 msgid "Selecting a template creates a campaign specific copy from it"
@@ -439,7 +439,7 @@ msgid ""
 "you can use any valid merge tag as well."
 msgstr ""
 "Usar especial tag [RSS_ENTRY] para marcar la posición del contenido del post RSS. Además puedes "
-"utilizas más tags"
+"utilizas más tags."
 
 #: views/campaigns/edit-rss.hbs:24 views/campaigns/edit-triggered.hbs:27
 #: views/campaigns/edit.hbs:35
@@ -519,7 +519,7 @@ msgstr "Información de bajas"
 
 #: views/campaigns/unsubscribed.hbs:6
 msgid "Subscribers who unsubscribed:"
-msgstr "Suscriptores que se han dado de baja"
+msgstr "Suscriptores que se han dado de baja:"
 
 #: views/campaigns/unsubscribed.hbs:11 views/campaigns/view.hbs:28
 #: views/lists/subscription/import.hbs:10 routes/lists.js:206
@@ -728,7 +728,7 @@ msgid ""
 "invokes this campaign"
 msgstr ""
 "Esta es una campaña encadenada (Trigger). Los boletines son enviados a suscriptores que han "
-"desencadenado alguna acción de esta campaña."
+"desencadenado alguna acción de esta campaña"
 
 #: views/campaigns/view.hbs:62
 msgid "see more"
@@ -944,9 +944,9 @@ msgid ""
 "appreciate a small donation to keep the Mailtrain development engines running. You can either "
 "use Bitcoin or PayPal for donations. My Bitcoin wallet is"
 msgstr ""
-"Si realmente te gusta Mailtrain o su negocio se beneficia de ella financieramente entonces yo "
-"realmente apreciaría una pequeña donación para mantener los motores de desarrollo Mailtrain. "
-"También se puede usar Bitcoin o PayPal para donaciones. Bitcoin es mi monedero."
+"Si realmente te gusta Mailtrain o tu negocio se beneficia de ella financieramente entonces "
+"realmente apreciaríamos una pequeña donación para mantener los motores de desarrollo de "
+"Mailtrain. También se puedes usar Bitcoin o PayPal para donaciones. Nuestro Bitcoin wallet es"
 
 #: views/index.hbs:32
 msgid "Or Donate Using Paypal"
@@ -963,7 +963,7 @@ msgstr ""
 
 #: views/index.hbs:35
 msgid "Free, open source mail server solution"
-msgstr "Gratis, solución de código abierto (open source) de servidor de correo "
+msgstr "Gratis, solución de código abierto (open source) de servidor de correo"
 
 #: views/layout.hbs:2
 msgid "Toggle navigation"
@@ -2386,7 +2386,7 @@ msgid ""
 "If you received this email by mistake, simply delete it. Your existing subscription won't be "
 "affected."
 msgstr ""
-"Si has recibido este mensaje por error, simplemente elimínalo. Tu subscripción no se verá "
+"Si has recibido este mensaje por error, simplemente elimínalo. Tu suscripción no se verá "
 "afectada."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:4
@@ -2471,8 +2471,8 @@ msgid ""
 "If you received this email by mistake, simply delete it. You won't be subscribed unless you "
 "click the confirmation link above."
 msgstr ""
-"Si ha recibido este mensaje por error, simplemente elimínalo. No va a estar suscrito a menos "
-"que haga clic en el enlace de confirmación anterior."
+"Si has recibido este mensaje por error, simplemente elimínalo. No vas a estar suscrito a menos "
+"que hagas clic en el enlace de confirmación anterior."
 
 #: views/subscription/mail-confirm-subscription-html.mjml.hbs:1
 #: views/subscription/mail-confirm-subscription-text.hbs:1
