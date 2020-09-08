@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-08 10:55+0200\n"
-"PO-Revision-Date: 2020-09-07 19:26+0200\n"
+"PO-Revision-Date: 2020-09-08 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -552,7 +552,7 @@ msgstr "No revisado aún"
 
 #: views/campaigns/view.hbs:10
 msgid "activate campaign to start checking feed for new messages"
-msgstr "Activar la campaña para empezar a comprobar si hay nuevos mensajes de Feed"
+msgstr "activar la campaña para empezar a comprobar si hay nuevos mensajes de Feed"
 
 #: views/campaigns/view.hbs:11
 msgid "RSS status"
@@ -771,8 +771,8 @@ msgid ""
 "If you did not ask to change your password, then you can ignore this email and your password "
 "will not be changed."
 msgstr ""
-"Si usted no pidió que cambie su contraseña, entonces puede ignorar este mensaje y no se "
-"cambiará la contraseña."
+"Si no has pedido un cambio de contraseña, entonces puedes ignorar este mensaje y no se cambiará "
+"la contraseña."
 
 #: views/emails/rss-html.hbs:1 views/emails/stationery-html.hbs:3
 #: views/emails/stationery-text.hbs:3
@@ -1000,7 +1000,7 @@ msgstr "Registrarse"
 
 #: views/layout.hbs:11
 msgid "Self Hosted Newsletter App Built on Top of Nodemailer"
-msgstr "Applicación de Newsletter \"autoalojada\" creada en base a Nodemailer?"
+msgstr "Applicación de Newsletter \"autoalojada\" creada sobre Nodemailer"
 
 #: views/layout.hbs:12 views/layout.hbs:14
 msgid "Source on GitHub"
@@ -1039,7 +1039,7 @@ msgstr "Suscripción"
 
 #: views/lists/create.hbs:10 views/lists/edit.hbs:16
 msgid "Allow public users to subscribe themselves"
-msgstr "Permitir que los usuarios públicos se suscriban a sí mismos "
+msgstr "Permitir que los usuarios públicos se suscriban a sí mismos"
 
 #: views/lists/create.hbs:11 views/lists/edit.hbs:17
 msgid "Unsubscription"
@@ -1160,7 +1160,7 @@ msgstr "Listas deplegables"
 
 #: views/lists/fields/create.hbs:23 views/lists/fields/edit.hbs:24 lib/models/fields.js:22
 msgid "Radio Buttons"
-msgstr "Botones Radio "
+msgstr "Botones Radio"
 
 #: views/lists/fields/create.hbs:24 views/lists/fields/edit.hbs:25 lib/models/fields.js:23
 msgid "Checkboxes"
@@ -1361,19 +1361,19 @@ msgstr "Campos de formulario"
 
 #: views/lists/forms/edit.hbs:28
 msgid "Fields hidden on subscription page:"
-msgstr "Campos ocultos de página de suscripción"
+msgstr "Campos ocultos en la página de suscripción:"
 
 #: views/lists/forms/edit.hbs:29
 msgid "Fields shown on subscription page:"
-msgstr "Campos no ocultos de página de suscripción"
+msgstr "Campos no ocultos en la página de suscripción:"
 
 #: views/lists/forms/edit.hbs:30
 msgid "Fields hidden on preferences page:"
-msgstr "Campos ocultos de página de preferencias"
+msgstr "Campos ocultos en la página de preferencias:"
 
 #: views/lists/forms/edit.hbs:31
 msgid "Fields shown on preferences page:"
-msgstr "Campos no ocultos de páginas de preferencias"
+msgstr "Campos no ocultos en la páginas de preferencias"
 
 #: views/lists/forms/edit.hbs:32
 msgid "Delete Form"
@@ -1624,7 +1624,7 @@ msgid ""
 msgstr ""
 "Direcciones basadas en roles como postmaster@example.com se bloquean cuando se importan. Los "
 "suscriptores con correos electrónicos basados en roles pueden unirse a la lista utilizando el "
-"formulario de suscripción."
+"formulario de suscripción"
 
 #: views/lists/subscription/import-failed.hbs:7
 msgid "see here"
@@ -1799,7 +1799,7 @@ msgstr "Vista previa de Toggle HTML"
 msgid ""
 "To extract the text from HTML click <a id=\"html-to-plaintext-btn\" role=\"button\">here</a>."
 msgstr ""
-"Para extraer el texto de HTML, haga clic <a id=\"html-to-plaintext-btn\" role=\"button\">aquí</"
+"Para extraer el texto de HTML, haz clic <a id=\"html-to-plaintext-btn\" role=\"button\">aquí</"
 "a>."
 
 #: views/partials/html-to-text.hbs:2
@@ -1936,7 +1936,7 @@ msgstr "Nombre de informe"
 #: views/reports/partials/report-fields.hbs:8 views/reports/partials/report-fields.hbs:11
 msgid "Select a campaign in the table above by clicking on the respective row number."
 msgstr ""
-"Seleccionar una campaña en la tabla superior haciendo clic en el respectivo número de columna"
+"Seleccionar una campaña en la tabla superior haciendo clic en el respectivo número de columna."
 
 #: views/reports/partials/report-select-template.hbs:1
 msgid "Report Template"
@@ -2173,7 +2173,7 @@ msgstr ""
 
 #: views/settings.hbs:63
 msgid "Throttling"
-msgstr "Regulador "
+msgstr "Regulador"
 
 #: views/settings.hbs:64
 msgid "Messages per hour eg. 1000"
@@ -2213,11 +2213,11 @@ msgid ""
 "(port 25 usually requires root user privileges). This way if anyone tries to send email to "
 "someuser@verp-hostname then the email should end up to this server."
 msgstr ""
-"ePara obtener el trabajo de VERP, necesitas crear un registro DNS MX que apunta a su nombre de "
-"host Mailtrain. También debe asegurarse de que la interfaz Mailtrain VERP está disponible desde "
-"el puerto 25 del servidor (puerto 25 por lo general requiere privilegios de usuario root). De "
-"esta manera si alguien trata de enviar un correo electrónico a someuser@verp-hostname, el "
-"correo electrónico debe terminar en este servidor."
+"Para que VERP funcione, necesitas crear un registro DNS MX que apunta a su nombre de host "
+"Mailtrain. También debe asegurarse de que la interfaz Mailtrain VERP está disponible desde el "
+"puerto 25 del servidor (puerto 25 por lo general requiere privilegios de usuario root). De esta "
+"manera si alguien trata de enviar un correo electrónico a someuser@verp-hostname, el correo "
+"electrónico debe terminar en este servidor."
 
 #: views/settings.hbs:69
 msgid ""
@@ -2254,7 +2254,7 @@ msgid ""
 "server to enable it"
 msgstr ""
 "Servidor Host VERP que maneja rebotes no esta activado. Modifica el archivo de configuración de "
-"tu servidor y reinicia el servidor para activarlo."
+"tu servidor y reinicia el servidor para activarlo"
 
 #: views/settings.hbs:75
 msgid "GPG Signing"
@@ -2300,7 +2300,7 @@ msgid ""
 "This value is optional. If you do not provide a private key GPG encrypted messages are sent "
 "without signing."
 msgstr ""
-"Este valor es opcional. Si usted no proporciona una clave privada GPG los mensajes cifrados se "
+"Este valor es opcional. Si no proporcionas una clave privada GPG los mensajes cifrados se "
 "envían sin firma."
 
 #: views/settings.hbs:84
@@ -2343,7 +2343,7 @@ msgstr "dominio DKIM"
 
 #: views/settings.hbs:91
 msgid "Domain name for the DKIM key"
-msgstr "nombre de dominio para la clave DKIM"
+msgstr "Nombre de dominio para la clave DKIM"
 
 #: views/settings.hbs:92
 msgid "Leave blank to use the sender email address domain"
@@ -2364,8 +2364,8 @@ msgstr "Clave privada DKIM"
 #: views/settings.hbs:98
 msgid "This value is optional. If you do not provide a private key then messages are not signed."
 msgstr ""
-"Este valor es opcional. Si usted no proporciona una clave privada a continuación, los mensajes "
-"no se firman."
+"Este valor es opcional. Si no proporcionas una clave privada a continuación, los mensajes no se "
+"firman."
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:1
 #: views/subscription/mail-already-subscribed-text.hbs:1 lib/models/subscriptions.js:171
@@ -2392,7 +2392,7 @@ msgstr ""
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:4
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:3
 msgid "If you want to modify your subscription then you can "
-msgstr "Si deseas modificar tu suscripción, puedes"
+msgstr "Si deseas modificar tu suscripción, puedes "
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:5
 #: views/subscription/mail-already-subscribed-text.hbs:5
@@ -2424,7 +2424,7 @@ msgstr "darte de baja aquí"
 #: views/subscription/web-unsubscribed-notice.mjml.hbs:3
 #: views/subscription/web-updated-notice.mjml.hbs:3
 msgid "Return to our website"
-msgstr "Volver nuestra web"
+msgstr "Volver a nuestra web"
 
 #: views/subscription/mail-already-subscribed-html.mjml.hbs:9
 #: views/subscription/mail-already-subscribed-text.hbs:8
@@ -2462,8 +2462,8 @@ msgid ""
 "If you received this email by mistake, simply delete it. You won't be subscribed if you don't "
 "click the confirmation link above."
 msgstr ""
-"Si ha recibido este mensaje por error, simplemente elimínalo. No será suscrito si no hace clic "
-"en el enlace de confirmación anterior."
+"Si has recibido este mensaje por error, simplemente elimínalo. No estarás suscrito si no haces "
+"clic en el enlace de confirmación anterior."
 
 #: views/subscription/mail-confirm-address-change-text.hbs:3
 #: views/subscription/mail-confirm-subscription-text.hbs:3
@@ -2471,8 +2471,8 @@ msgid ""
 "If you received this email by mistake, simply delete it. You won't be subscribed unless you "
 "click the confirmation link above."
 msgstr ""
-"Si has recibido este mensaje por error, simplemente elimínalo. No vas a estar suscrito a menos "
-"que hagas clic en el enlace de confirmación anterior."
+"Si has recibido este mensaje por error, simplemente elimínalo. No estarás suscrito a menos que "
+"hagas clic en el enlace de confirmación anterior."
 
 #: views/subscription/mail-confirm-subscription-html.mjml.hbs:1
 #: views/subscription/mail-confirm-subscription-text.hbs:1
@@ -2499,16 +2499,16 @@ msgid ""
 "If you received this email by mistake, simply delete it. You won't be unsubscribed if you don't "
 "click the confirmation link above."
 msgstr ""
-"Si ha recibido este mensaje por error, simplemente elimínalo. No será dado de baja si no hace "
-"clic en el enlace de confirmación anterior."
+"Si has recibido este mensaje por error, simplemente elimínalo. No estarás dado de baja si no "
+"haces clic en el enlace de confirmación anterior."
 
 #: views/subscription/mail-confirm-unsubscription-text.hbs:3
 msgid ""
 "If you received this email by mistake, simply delete it. You won't be unsubscribed unless you "
 "click the confirmation link above."
 msgstr ""
-"Si ha recibido este mensaje por error, simplemente elimínalo. No será dado de baja a menos de "
-"hacer clic en el enlace de confirmación anterior."
+"Si has recibido este mensaje por error, simplemente elimínalo. No estarás dado de baja a menos "
+"que hagas clic en el enlace de confirmación anterior."
 
 #: views/subscription/mail-subscription-confirmed-html.mjml.hbs:1
 #: views/subscription/mail-subscription-confirmed-text.hbs:1
@@ -2590,7 +2590,7 @@ msgid ""
 "before your email is actually changed"
 msgstr ""
 "Recibirás un email a tu nuevo correo electrónico con una solicitud de confirmación. Tras "
-"aceptarla el correo será cambiado definitivamente."
+"aceptarla el correo será cambiado definitivamente"
 
 #: views/subscription/partials/subscription-manage-address-form.hbs:5
 #: views/subscription/web-manage-address.mjml.hbs:2
@@ -2628,7 +2628,7 @@ msgid ""
 "link in the email we just sent you."
 msgstr ""
 "Necesitamos confirmar tu dirección de correo electrónico. Para completar el proceso de darse de "
-"baja, por favor haga clic en el enlace del correo electrónico que acabamos de enviarte."
+"baja, por favor haz clic en el enlace del correo electrónico que acabamos de enviarte."
 
 #: views/subscription/web-manage-address.mjml.hbs:1
 msgid "Update Your Email Address"
@@ -2672,15 +2672,15 @@ msgstr "Perfil actualizado"
 
 #: views/subscription/web-updated-notice.mjml.hbs:2
 msgid "Your profile information has been updated."
-msgstr "La información de tu perfil ha sido actualizada"
+msgstr "La información de tu perfil ha sido actualizada."
 
 #: views/subscription/widget-subscribe.hbs:2
 msgid "Sending ..."
-msgstr "Enviando"
+msgstr "Enviando ..."
 
 #: views/subscription/widget-subscribe.hbs:3
 msgid "It looks like you are already subscribed to this list."
-msgstr "Parece que tu ya estabas suscrito a esta lista"
+msgstr "Parece que ya estabas suscrito a esta lista."
 
 #: views/templates/create.hbs:5 views/templates/edit.hbs:6
 msgid "Template name"
@@ -2705,7 +2705,7 @@ msgstr "Volver a plantillas"
 #: views/triggers/create-select.hbs:2 views/triggers/create.hbs:2 views/triggers/edit.hbs:2
 #: views/triggers/triggered.hbs:2 views/triggers/triggers.hbs:2 views/triggers/triggers.hbs:4
 msgid "Automation Triggers"
-msgstr "Automatización Trigger "
+msgstr "Automatización Trigger"
 
 #: views/triggers/create-select.hbs:5
 msgid "Select a list for the trigger"
@@ -2912,20 +2912,20 @@ msgstr "tu token personal de acceso"
 
 #: views/users/api.hbs:18 views/users/api.hbs:33 views/users/api.hbs:41
 msgid "subscriber's email address"
-msgstr "Correo de Suscriptor"
+msgstr "correo de Suscriptor"
 
 #: views/users/api.hbs:19 views/users/api.hbs:34 views/users/api.hbs:42 views/users/api.hbs:61
 #: views/users/api.hbs:69
 msgid "required"
-msgstr "Obligatorio"
+msgstr "obligatorio"
 
 #: views/users/api.hbs:20
 msgid "subscriber's first name"
-msgstr "Nombre de suscriptor"
+msgstr "nombre de suscriptor"
 
 #: views/users/api.hbs:21
 msgid "subscriber's last name"
-msgstr "Apellidos  de suscriptor"
+msgstr "apellidos de suscriptor"
 
 #: views/users/api.hbs:22
 msgid ""
@@ -2938,7 +2938,7 @@ msgstr ""
 #: views/users/api.hbs:23
 msgid "custom field value. Use yes/no for option group values (checkboxes, radios, drop downs)"
 msgstr ""
-"Valor de campo personalizado. Utilice sí / no para la opción de los valores del grupo (casillas "
+"valor de campo personalizado. Utilice sí / no para la opción de los valores del grupo (casillas "
 "de verificación, radios, menús desplegables)"
 
 #: views/users/api.hbs:24
@@ -2951,7 +2951,7 @@ msgid ""
 "previously marked as unsubscribed. If the email was already unsubscribed/blocked then "
 "subscription status is not changed"
 msgstr ""
-"Marca \"Sí\" si desea asegurarse de que el correo electrónico se marca como suscrito incluso si "
+"marca \"Sí\" si desea asegurarse de que el correo electrónico se marca como suscrito incluso si "
 "fue previamente marcado como baja. Si el correo electrónico ya fue dado de baja o bloqueado, el "
 "estado de suscripción no se cambia"
 
@@ -2960,7 +2960,7 @@ msgid ""
 "set to \"yes\" if you want to send confirmation email to the subscriber before actually marking "
 "as subscribed"
 msgstr ""
-"Marca \"Sí\" si desea enviar un correo electrónico de confirmación al suscriptor antes de que "
+"marca \"Sí\" si desea enviar un correo electrónico de confirmación al suscriptor antes de que "
 "realmente se marque como suscrito"
 
 #: views/users/api.hbs:28
@@ -3017,7 +3017,7 @@ msgstr "Esta llamada a la API añade correos electrónicos a la lista negra"
 
 #: views/users/api.hbs:60 views/users/api.hbs:68
 msgid "email address"
-msgstr "Correo electrónico"
+msgstr "correo electrónico"
 
 #: views/users/api.hbs:63
 msgid "Delete email from blacklist"
@@ -3135,7 +3135,7 @@ msgstr "ID único que identifica la campaña actual"
 
 #: lib/helpers.js:68 lib/helpers.js:80
 msgid "content from an RSS entry"
-msgstr "Contenido de una entrada RSS"
+msgstr "contenido de una entrada RSS"
 
 #: lib/helpers.js:71
 msgid "RSS entry title"
@@ -3294,7 +3294,7 @@ msgstr "El nombre de la plantilla informe se debe ajustar"
 
 #: lib/models/reports.js:40 lib/models/reports.js:110 lib/models/reports.js:188
 msgid "Missing report ID"
-msgstr "Falta ID de informe "
+msgstr "Falta ID de informe"
 
 #: lib/models/reports.js:116
 msgid "Report name must be set"
@@ -3878,7 +3878,7 @@ msgstr "No se ha podido eliminar Formulario especificado"
 
 #: routes/index.js:11
 msgid "Self Hosted Newsletter App"
-msgstr "Auto alojamiento de Aplicación de Boletín "
+msgstr "Aplicación de Newsletter auto alojada"
 
 #: routes/links.js:39
 msgid "Oops, we couldn't find a link for the URL you clicked"
@@ -3916,7 +3916,7 @@ msgstr "No se ha eliminado la lista especificada"
 
 #: routes/lists.js:206
 msgid "Unknown"
-msgstr "desconocido"
+msgstr "Desconocido"
 
 #: routes/lists.js:206
 msgid "Complained"
@@ -4162,7 +4162,7 @@ msgstr "Usar TLS"
 
 #: routes/settings.js:40
 msgid "usually selected for port 465"
-msgstr "Normalmente seleccionado para el puerto 465"
+msgstr "normalmente seleccionado para el puerto 465"
 
 #: routes/settings.js:44
 msgid "Use STARTTLS"
@@ -4170,7 +4170,7 @@ msgstr "Usar STARTTLS"
 
 #: routes/settings.js:45
 msgid "usually selected for port 587 and 25"
-msgstr "Generalmente seleccionado por el puerto 587 y 25"
+msgstr "generalmente seleccionado por el puerto 587 y 25"
 
 #: routes/settings.js:49
 msgid "Do not use encryption"
@@ -4194,7 +4194,7 @@ msgstr "Credenciales AWS inválidas"
 
 #: routes/settings.js:190
 msgid "Connection refused, check hostname and port."
-msgstr "Conexión rechazada, verificar nombre de host y puerto "
+msgstr "Conexión rechazada, verificar nombre de host y puerto."
 
 #: routes/settings.js:195
 msgid ""
