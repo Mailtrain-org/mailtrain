@@ -62,7 +62,7 @@ fieldTypes.date = {
     afterJSON: (groupedField, entity) => {
         const key = getFieldColumn(groupedField);
         if (key in entity) {
-            entity[key] = entity[key] ? moment(entity[key]).toISOString() : null;
+            entity[key] = entity[key] ? moment(entity[key]).utc().format("YYYY-MM-DD HH:mm:ss") : null;
         }
     },
     listRender: (groupedField, value) => formatDate(groupedField.settings.dateFormat, value)
@@ -72,7 +72,7 @@ fieldTypes.birthday = {
     afterJSON: (groupedField, entity) => {
         const key = getFieldColumn(groupedField);
         if (key in entity) {
-            entity[key] = entity[key] ? moment(entity[key]).toISOString() : null;
+            entity[key] = entity[key] ? moment(entity[key]).utc().format("YYYY-MM-DD HH:mm:ss") : null;
         }
     },
     listRender: (groupedField, value) => formatBirthday(groupedField.settings.dateFormat, value)
