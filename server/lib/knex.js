@@ -17,11 +17,6 @@ const knex = require('knex')({
             'DATETIME'
         ]
     },
-    pool: {
-        min: 2,
-        max: 10
-	}
-    },
     migrations: {
         directory: path.join(__dirname, '..', 'setup', 'knex', 'migrations')
     }
