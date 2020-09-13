@@ -173,7 +173,7 @@ export default class CUD extends Component {
             data.orderManageBefore = Number.parseInt(data.orderManageBefore) || data.orderManageBefore;
         }
 
-        return filterData(data, ['name', 'help', 'key', 'default_value', 'type', 'group', 'settings',
+        return filterData(data, ['name', 'help', 'key', 'default_value', 'required', 'type', 'group', 'settings',
             'orderListBefore', 'orderSubscribeBefore', 'orderManageBefore']);
     }
 
@@ -187,6 +187,7 @@ export default class CUD extends Component {
                 type: 'text',
                 key: '',
                 default_value: '',
+                required: false,
                 help: '',
                 group: null,
                 isInGroup: false,
@@ -512,6 +513,8 @@ export default class CUD extends Component {
                     <InputField id="key" label={t('mergeTag-1')}/>
 
                     <TextArea id="help" label={t('helpText')}/>
+
+                    <CheckBox id="required" label={t('requiredClientSideValidation')}/>
 
                     {fieldSettings}
 

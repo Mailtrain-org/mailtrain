@@ -38,6 +38,7 @@
   "yourPersonalAccessToken": "seu token de acesso pessoal",
   "subscribersEmailAddress": "endereço de e-mail do assinante",
   "required": "obrigatório",
+  "requiredClientSideValidation": "Obrigatório (apenas validação do lado do cliente)",
   "subscribersFirstName": "primeiro nome do assinante",
   "subscribersLastName": "sobrenome do assinante",
   "subscribersTimezoneEgEuropeTallinnPstOr": "Fuso horário do assinante (por exemplo, \"Europe/Tallinn\", \"PST\"ou \"UTC\"). Se não for definido será considerado \"UTC\"",

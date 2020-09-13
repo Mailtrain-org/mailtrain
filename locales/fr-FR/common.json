@@ -38,6 +38,7 @@
   "yourPersonalAccessToken": "votre jeton d'accès personnel",
   "subscribersEmailAddress": "adresse e-mail de l'abonné",
   "required": "obligatoire",
+  "requiredClientSideValidation": "Obligatoire (validation côté client uniquement)",
   "subscribersFirstName": "prénom de l'abonné",
   "subscribersLastName": "nom de l'abonné",
   "subscribersTimezoneEgEuropeTallinnPstOr": "fuseau horaire de l'abonné (par exemple. \"Europe / Tallinn\", \"PST\" ou \"UTC\"). S'il n'est pas défini par défaut sur \"UTC\"",

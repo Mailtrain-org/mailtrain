@@ -18,7 +18,7 @@
     {{#if typeText}}
         <div class="form-group text {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="text" name="{{key}}" value="{{value}}">
+            <input type="text" name="{{key}}" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -26,7 +26,7 @@
     {{#if typeNumber}}
         <div class="form-group number {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="number" name="{{key}}" value="{{value}}">
+            <input type="number" name="{{key}}" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -34,7 +34,7 @@
     {{#if typeWebsite}}
         <div class="form-group url {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="url" name="{{key}}" value="{{value}}">
+            <input type="url" name="{{key}}" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -42,7 +42,7 @@
     {{#if typeLongtext}}
         <div class="form-group longtext {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <textarea rows="3" name="{{key}}">{{value}}</textarea>
+            <textarea rows="3" name="{{key}}" {{#if required}} required {{/if}}>{{value}}</textarea>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -50,7 +50,7 @@
     {{#if typeJson}}
         <div class="form-group json {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <textarea class="gpg-text" rows="3" name="{{key}}" placeholder="{&quot;data&quot;:&quot;value&quot;}">{{value}}</textarea>
+            <textarea class="gpg-text" rows="3" name="{{key}}" placeholder="{&quot;data&quot;:&quot;value&quot;}" {{#if required}} required {{/if}}>{{value}}</textarea>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -59,7 +59,7 @@
         <div class="form-group checkbox">
             <label>{{name}}</label>
             <label class="label-checkbox">
-                <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}}> {{field.settings.checkedLabel}}
+                <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}} {{#if required}} required {{/if}}> {{field.settings.checkedLabel}}
             </label>
             <input type="hidden" value="0" name="{{key}}">
             <small class="form-text text-muted">{{help}}</small>
@@ -72,7 +72,7 @@
             {{#if ../hasPubkey}}
                 <button class="btn-download-pubkey" type="submit" form="download-pubkey">{{#translate}}downloadSignatureVerificationKey{{/translate}}</button>
             {{/if}}
-            <textarea class="form-control gpg-text" rows="4" name="{{key}}" placeholder="{{#translate}}beginsWithAnd#39BeginPgpPublicKeyBloc{{/translate}}">{{value}}</textarea>
+            <textarea class="form-control gpg-text" rows="4" name="{{key}}" placeholder="{{#translate}}beginsWithAnd#39BeginPgpPublicKeyBloc{{/translate}}" {{#if required}} required {{/if}}>{{value}}</textarea>
             <small class="form-text text-muted">{{#translate}}insertYourGpgPublicKeyHereToEncrypt{{/translate}}</small>
             <small class="form-text text-muted">{{help}}</small>
         </div>
@@ -81,7 +81,7 @@
     {{#if typeDateUs}}
         <div class="form-group date fm-date-us {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="text" name="{{key}}" placeholder="MM/DD/YYYY" value="{{value}}">
+            <input type="text" name="{{key}}" placeholder="MM/DD/YYYY" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -89,7 +89,7 @@
     {{#if typeDateEur}}
         <div class="form-group date fm-date-eur {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="text" name="{{key}}" placeholder="DD/MM/YYYY" value="{{value}}">
+            <input type="text" name="{{key}}" placeholder="DD/MM/YYYY" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -97,7 +97,7 @@
     {{#if typeBirthdayUs}}
         <div class="form-group date fm-birthday-us {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="text" name="{{key}}" placeholder="MM/DD" value="{{value}}">
+            <input type="text" name="{{key}}" placeholder="MM/DD" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -105,7 +105,7 @@
     {{#if typeBirthdayEur}}
         <div class="form-group date fm-birthday-eur {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <input type="text" name="{{key}}" placeholder="DD/MM" value="{{value}}">
+            <input type="text" name="{{key}}" placeholder="DD/MM" value="{{value}}" {{#if required}} required {{/if}}>
             <small class="form-text text-muted">{{help}}</small>
         </div>
     {{/if}}
@@ -113,7 +113,7 @@
     {{#if typeDropdownGrouped }}
         <div class="form-group dropdown {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <select name="{{key}}" class="form-control">
+            <select name="{{key}}" class="form-control" {{#if required}} required {{/if}}>
                 <option value="">
                     {{#translate}}––Select ––{{/translate}}
                 </option>
@@ -130,7 +130,7 @@
             <label for="{{key}}">{{name}}</label>
             {{#each options}}
                 <label class="label-radio">
-                    <input type="radio" name="{{../key}}" value="{{key}}" {{#if value}} checked {{/if}}> {{name}}
+                    <input type="radio" name="{{../key}}" value="{{key}}" {{#if value}} checked {{/if}} {{#if required}} required {{/if}}> {{name}}
                 </label>
             {{/each}}
             <small class="form-text text-muted">{{help}}</small>
@@ -143,7 +143,7 @@
             <label>{{name}}</label>
             {{#each options}}
                 <label class="label-checkbox">
-                    <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}}> {{name}}
+                    <input type="checkbox" name="{{key}}" value="1" {{#if value}} checked {{/if}} {{#if required}} required {{/if}}> {{name}}
                 </label>
                 <small class="option-help-block form-text text-muted">{{help}}</small>
             {{/each}}
@@ -153,7 +153,7 @@
     {{#if typeDropdownEnum }}
         <div class="form-group dropdown {{key}}">
             <label for="{{key}}">{{name}}</label>
-            <select name="{{key}}" class="form-control">
+            <select name="{{key}}" class="form-control" {{#if required}} required {{/if}}>
                 <option value="">
                     –– Select ––
                 </option>
@@ -170,7 +170,7 @@
             <label for="{{key}}">{{name}}</label>
             {{#each options}}
                 <label class="label-radio">
-                    <input type="radio" name="{{../key}}" value="{{key}}" {{#if value}} checked {{/if}}> {{name}}
+                    <input type="radio" name="{{../key}}" value="{{key}}" {{#if value}} checked {{/if}} {{#if required}} required {{/if}}> {{name}}
                 </label>
             {{/each}}
             <small class="form-text text-muted">{{help}}</small>
