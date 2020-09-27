@@ -123,6 +123,10 @@ hbs.registerHelper('flash_messages', function () { // eslint-disable-line prefer
 
 async function createApp(appType) {
     const app = express();
+    // add healthcheck endpoint
+    app.all('/_health', (req, res, next) => {
+        res.send('');
+    });
 
     function install404Fallback(url) {
         app.use(url, (req, res, next) => {

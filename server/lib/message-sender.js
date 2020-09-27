@@ -363,6 +363,8 @@ class MessageSender {
 
             if (this.tagLanguage) {
                 subject = tools.formatCampaignTemplate(this.subject, this.tagLanguage, mergeTags, false, campaign, list, subscriptionGrouped);
+            } else if (campaign.source === CampaignSource.URL) {
+                subject = tools.formatCampaignTemplate(this.subject, 'simple', mergeTags, false, campaign, list, subscriptionGrouped);
             }
 
             headers = {
