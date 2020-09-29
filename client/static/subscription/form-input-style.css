@@ -44,6 +44,16 @@ label {
     margin-left: .3em;
 }
 
+form button {
+    background: #2D3E4F;
+    color: white;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
 
 /* --- Inputs ------------- */
 

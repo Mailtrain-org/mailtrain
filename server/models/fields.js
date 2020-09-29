@@ -19,9 +19,8 @@ const { getMergeTagsForBases } = require('../../shared/templates');
 const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
 
-
-const allowedKeysCreate = new Set(['name', 'help', 'key', 'default_value', 'type', 'group', 'settings']);
-const allowedKeysUpdate = new Set(['name', 'help', 'key', 'default_value', 'group', 'settings']);
+const allowedKeysCreate = new Set(['name', 'help', 'key', 'default_value', 'required', 'type', 'group', 'settings']);
+const allowedKeysUpdate = new Set(['name', 'help', 'key', 'default_value', 'required', 'group', 'settings']);
 const hashKeys = allowedKeysCreate;
 
 const fieldTypes = {};
@@ -188,8 +187,8 @@ fieldTypes['radio-enum'] = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeRadioEnum',
     render: (field, value) => {
-        const fld = field.settings.options[value];
-        return fld ? fld.name : '';
+        const fld = field.settings.options.find(x => x.key === value);
+        return fld ? fld.label : '';
     }
 };
 
@@ -205,8 +204,8 @@ fieldTypes['dropdown-enum'] = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeDropdownEnum',
     render: (field, value) => {
-        const fld = field.settings.options[value];
-        return fld ? fld.name : '';
+        const fld = field.settings.options.find(x => x.key === value);
+        return fld ? fld.label : '';
     }
 };
 
@@ -304,7 +303,7 @@ async function getById(context, listId, id) {
 }
 
 async function listTx(tx, listId) {
-    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'help', 'key', 'column', 'settings', 'group', 'default_value', 'order_list', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
+    return await tx('custom_fields').where({list: listId}).select(['id', 'name', 'type', 'help', 'key', 'column', 'settings', 'group', 'default_value', 'required', 'order_list', 'order_subscribe', 'order_manage']).orderBy(knex.raw('-order_list'), 'desc').orderBy('id', 'asc');
 }
 
 async function list(context, listId) {
@@ -664,6 +663,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
             help: fld.help,
             field: fld,
             [type.getHbsType(fld)]: true,
+            required: fld.required,
             order_subscribe: fld.order_subscribe,
             order_manage: fld.order_manage
         };
@@ -690,6 +690,7 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
                     key: opt.key,
                     name: opt.name,
                     help: opt.help,
+                    required: opt.required,
                     value: isEnabled
                 });
             }
@@ -705,7 +706,8 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
                     key: opt.key,
                     name: opt.label,
                     help: opt.help,
-                    value: value === opt.key
+                    value: value === opt.key,
+                    required: fld.required
                 });
             }
 

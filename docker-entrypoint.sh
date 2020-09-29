@@ -35,6 +35,7 @@ MYSQL_USER=${MYSQL_USER:-'mailtrain'}
 MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
 WITH_ZONE_MTA=${WITH_ZONE_MTA:-'true'}
 POOL_NAME=${POOL_NAME:-$(hostname)}
+LOG_LEVEL=${LOG_LEVEL:-'info'}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
@@ -82,6 +83,9 @@ builtinZoneMTA:
 
 queue:
   processes: 5
+
+log:
+  level: $LOG_LEVEL
 EOT
 
     # Manage LDAP if enabled

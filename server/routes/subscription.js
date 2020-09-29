@@ -281,6 +281,11 @@ router.postAsync('/:cid/subscribe', passport.parseForm, corsOrCsrfProtection, as
 
     if (existingSubscription && existingSubscription.status === SubscriptionStatus.SUBSCRIBED) {
         await mailHelpers.sendAlreadySubscribed(req.locale, list, email, existingSubscription);
+        if (req.xhr) {
+            return res.status(200).json({
+                msg: tUI('pleaseConfirmSubscription', req.locale)
+            });
+        }
         res.redirect('/subscription/' + encodeURIComponent(req.params.cid) + '/confirm-subscription-notice');
 
     } else {
@@ -325,17 +330,18 @@ router.getAsync('/:cid/widget', cors(corsOptions), async (req, res) => {
         title: list.name,
         cid: list.cid,
         publicKeyUrl: getTrustedUrl('subscription/publickey'),
-        subscribeUrl: getTrustedUrl(`subscription/${list.cid}/subscribe`),
+        subscribeUrl: getPublicUrl(`subscription/${list.cid}/subscribe`),
         hasPubkey: !!configItems.pgpPrivateKey,
         customFields: await fields.forHbs(contextHelpers.getAdminContext(), list.id),
-        template: {},
+        template: 'subscription/widget-subscribe.hbs',
         layout: null,
     };
 
     await injectCustomFormData(req.query.fid || list.default_form, 'web_subscribe', data);
 
-    const renderAsync = bluebird.promisify(res.render.bind(res));
-    const html = await renderAsync('subscription/widget-subscribe', data);
+    const htmlRenderer = await tools.getTemplate(data.template, req.locale);
+
+    const html = htmlRenderer(data);
 
     const response = {
         data: {
