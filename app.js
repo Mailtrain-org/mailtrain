@@ -261,5 +261,7 @@ app.use((err, req, res, next) => {
         error: {}
     });
 });
-
+app.listen(process.env.PORT || port, function(response) {
+  console.log("server is running on port " + port);
+};
 module.exports = app;
