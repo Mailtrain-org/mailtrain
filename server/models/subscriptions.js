@@ -661,6 +661,8 @@ async function createTxWithGroupedFieldsMap(tx, context, listId, groupedFieldsMa
 
     const allowedKeys = getAllowedKeys(groupedFieldsMap);
 
+    groupSubscription(groupedFieldsMap, entity);
+
     await _validateAndPreprocess(tx, listId, groupedFieldsMap, entity, meta, true);
 
     const filteredEntity = filterObject(entity, allowedKeys);
