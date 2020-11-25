@@ -648,7 +648,6 @@ function forHbsWithFieldsGrouped(fieldsGrouped, subscription) { // assumes group
         column: 'email',
         key: 'EMAIL',
         typeSubscriptionEmail: true,
-        value: subscription ? subscription.email : '',
         order_subscribe: -1,
         order_manage: -1
     }];
