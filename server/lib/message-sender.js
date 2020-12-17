@@ -231,6 +231,7 @@ class MessageSender {
         }
 
         const attachments = this.attachments.slice();
+           try{
         if (replaceDataImgs) {
             // replace data: images with embedded attachments
             html = html.replace(/(<img\b[^>]* src\s*=[\s"']*)(data:[^"'>\s]+)/gi, (match, prefix, dataUri) => {
@@ -242,6 +243,10 @@ class MessageSender {
                 return prefix + 'cid:' + cid;
             });
         }
+    }catch(exc)
+    {
+        log.error("Error replacing image");
+    }
 
 
         if (renderTags) {
