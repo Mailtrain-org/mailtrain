@@ -69,7 +69,7 @@ function getSchemaVersion(callback) {
             return callback(err);
         }
 
-        connection.query('SHOW TABLES LIKE "knex_migrations"', (err, rows) => {
+        connection.query("SHOW TABLES LIKE 'knex_migrations'", (err, rows) => {
             if (err) {
                 return callback(err);
             }
