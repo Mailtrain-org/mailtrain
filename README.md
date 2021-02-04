@@ -248,7 +248,9 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | MONGO_HOST       | sets mongo host (default: mongo)                                      |
 | WITH_REDIS       | enables or disables redis (default: true)                             |
 | REDIS_HOST       | sets redis host (default: redis)                                      |
+| REDIS_PORT       | sets redis host (default: 6379)                                       |
 | MYSQL_HOST       | sets mysql host (default: mysql)                                      |
+| MYSQL_PORT       | sets mysql port (default: 3306)                                       |
 | MYSQL_DATABASE   | sets mysql database (default: mailtrain)                              |
 | MYSQL_USER       | sets mysql user (default: mailtrain)                                  |
 | MYSQL_PASSWORD   | sets mysql password (default: mailtrain)                              |
