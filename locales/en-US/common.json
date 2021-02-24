@@ -387,6 +387,8 @@
   "thisIsTheListIdDisplayedToTheSubscribers": "This is the list ID displayed to the subscribers",
   "contactEmail": "Contact email",
   "contactEmailUsedInSubscriptionFormsAnd": "Contact email used in subscription forms and emails that are sent out. If not filled in, the admin email from the global settings will be used.",
+  "contactMailingAddress": "Mailing Address",
+  "contactMailingAddressUsedInSubscriptionFormsAnd": "Mailing Address used in subscription forms and emails that are sent out.",
   "homepage": "Homepage",
   "homepageUrlUsedInSubscriptionFormsAnd": "Homepage URL used in subscription forms and emails that are sent out. If not filled in, the default homepage from global settings will be used.",
   "sendConfigurationThatWillBeUsedFor": "Send configuration that will be used for sending out subscription-related emails.",

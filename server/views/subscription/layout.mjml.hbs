@@ -39,11 +39,13 @@
         </mj-raw>
 
         {{{body}}}
-
+        {{contactMailingAddress}}
         <mj-section padding-top="0">
             <mj-column>
                 <mj-text mj-class="small" font-style="italic">
                     <!-- POST ADDRESS -->
+                    <!-- fixes https://github.com/Mailtrain-org/mailtrain/issues/1011 -->
+                    {{> subscription_footer_address }}
                 </mj-text>
             </mj-column>
         </mj-section>

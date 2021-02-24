@@ -19,7 +19,7 @@ const activityLog = require('../lib/activity-log');
 
 const {UnsubscriptionMode, FieldWizard} = require('../../shared/lists');
 
-const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
+const allowedKeys = new Set(['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode', 'contact_email', 'contact_mailing_address', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration']);
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, allowedKeys));

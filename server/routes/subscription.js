@@ -674,6 +674,7 @@ async function webNotice(type, req, res) {
         title: list.name,
         homepage: list.homepage || configItems.defaultHomepage || getTrustedUrl(),
         contactAddress: list.contact_email || configItems.adminEmail,
+        contactMailingAddress: list.contact_mailing_address || '',
         template: {
             template: 'subscription/web-' + type + '-notice.mjml.hbs',
             layout: 'subscription/layout.mjml.hbs',

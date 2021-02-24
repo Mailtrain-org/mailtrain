@@ -67,7 +67,7 @@ export default class CUD extends Component {
         }
 
         return filterData(data, ['name', 'description', 'default_form', 'public_subscribe', 'unsubscription_mode',
-            'contact_email', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration',
+            'contact_email', 'contact_mailing_address', 'homepage', 'namespace', 'to_name', 'listunsubscribe_disabled', 'send_configuration',
             'fieldWizard'
         ]);
     }
@@ -84,6 +84,7 @@ export default class CUD extends Component {
                 default_form: 'default',
                 public_subscribe: true,
                 contact_email: '',
+                contact_mailing_address: '',
                 homepage: '',
                 unsubscription_mode: UnsubscriptionMode.ONE_STEP,
                 namespace: getDefaultNamespace(this.props.permissions),
@@ -266,6 +267,7 @@ export default class CUD extends Component {
                     <TextArea id="description" label={t('description')}/>
 
                     <InputField id="contact_email" label={t('contactEmail')} help={t('contactEmailUsedInSubscriptionFormsAnd')}/>
+                    <InputField id="contact_mailing_address" label={t('contactMailingAddress')} help={t('contactMailingAddressUsedInSubscriptionFormsAnd')}/>
                     <InputField id="homepage" label={t('homepage')} help={t('homepageUrlUsedInSubscriptionFormsAnd')}/>
                     {toNameFields}
                     <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} help={t('sendConfigurationThatWillBeUsedFor')}/>
