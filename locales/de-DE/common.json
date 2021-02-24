@@ -381,6 +381,8 @@
   "thisIsTheListIdDisplayedToTheSubscribers": "Diese Listen ID wird den Abonnenten angezeigt.",
   "contactEmail": "Kontakt E-Mail",
   "contactEmailUsedInSubscriptionFormsAnd": "In Formularen und E-Mails benutzte Kontakt E-Mail-Adresse. Wenn leer, wird die globale Administrator E-Mail benutzt.",
+  "contactMailingAddress": "Postanschrift",
+  "contactMailingAddressUsedInSubscriptionFormsAnd": "In der E-Mail-Fußzeile verwendete Postanschrift",
   "homepage": "Homepage",
   "homepageUrlUsedInSubscriptionFormsAnd": "In Formularen und E-Mails benutzte Homepage URL. Wenn leer, wird die globale Standard Homepage benutzt.",
   "sendConfigurationThatWillBeUsedFor": "Versand Konfiguration für den Versand von E-Mails.",

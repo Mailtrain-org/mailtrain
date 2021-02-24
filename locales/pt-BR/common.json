@@ -409,6 +409,8 @@
   "thisIsTheListIdDisplayedToTheSubscribers": "Este é o ID da lista exibido para os assinantes",
   "contactEmail": "Email de remetente",
   "contactEmailUsedInSubscriptionFormsAnd": "E-mail de contato usado em formulários de inscrição e e-mails enviados. Se não for preenchido, o e-mail admin das configurações globais será usado.",
+  "contactMailingAddress": "Endereço para correspondência",
+  "contactMailingAddressUsedInSubscriptionFormsAnd": "Endereço postal usado no rodapé do e-mail",
   "homepage": "Página inicial",
   "homepageUrlUsedInSubscriptionFormsAnd": "URL da página inicial usada nos formulários de inscrição e nos e-mails enviados. Se não forem preenchidos, a página inicial padrão das configurações globais será usada.",
   "sendConfigurationThatWillBeUsedFor": "Configuração de envio que será usada para enviar e-mails relacionados à assinatura.",

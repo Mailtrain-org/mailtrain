@@ -86,7 +86,9 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
         title: list.name,
         homepage: configItems.defaultHomepage || getTrustedUrl(),
         contactAddress: list.contact_email || configItems.adminEmail,
+        contactMailingAddress: list.contact_mailing_address || ''
     };
+    log.info('LIST DATA:', JSON.stringify(data));
 
     for (let relativeUrlKey in relativeUrls) {
         data[relativeUrlKey] = getPublicUrl(relativeUrls[relativeUrlKey], {locale});

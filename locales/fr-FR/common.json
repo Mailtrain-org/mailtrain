@@ -382,6 +382,8 @@
   "thisIsTheListIdDisplayedToTheSubscribers": "Il s'agit de l'ID de liste affiché pour les abonnés",
   "contactEmail": "Email du contact",
   "contactEmailUsedInSubscriptionFormsAnd": "E-mail de contact utilisé dans les formulaires d'abonnement et les e-mails envoyés. S'il n'est pas renseigné, l'e-mail d'administration des paramètres globaux sera utilisé.",
+  "contactMailingAddress": "Adresse postale",
+  "contactMailingAddressUsedInSubscriptionFormsAnd": "Adresse postale utilisée dans le pied de page de l'e-mail",
   "homepage": "Page d'accueil",
   "homepageUrlUsedInSubscriptionFormsAnd": "URL de page d'accueil utilisée dans les formulaires d'abonnement et les e-mails envoyés. Si elle n'est pas renseignée, la page d'accueil par défaut des paramètres globaux sera utilisée.",
   "sendConfigurationThatWillBeUsedFor": "Envoyer la configuration qui sera utilisée pour envoyer les e-mails liés à l'abonnement.",
