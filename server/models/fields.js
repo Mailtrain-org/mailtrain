@@ -233,7 +233,7 @@ fieldTypes.option = {
 
 fieldTypes['date'] = {
     validate: field => {
-        enforce(['eur', 'us'].includes(field.settings.dateFormat), 'Date format incorrect');
+        enforce(['eur', 'us', 'intl'].includes(field.settings.dateFormat), 'Date format incorrect');
     },
     addColumn: (table, name) => table.dateTime(name),
     indexed: true,

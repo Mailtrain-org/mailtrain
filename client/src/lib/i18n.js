@@ -6,6 +6,7 @@ import {I18nextProvider} from 'react-i18next';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import mailtrainConfig from 'mailtrainConfig';
+import moment from 'moment';
 
 import {convertToFake, getLang} from '../../../shared/langs';
 import {createComponentMixin} from "./decorator-helpers";
@@ -63,6 +64,8 @@ i18n
         debug: false
     });
 
+// Show moment text in selected language
+moment.locale(i18n.language);
 
 export default i18n;
 
