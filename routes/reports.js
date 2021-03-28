@@ -100,7 +100,7 @@ router.get('/create', passport.csrfProtection, (req, res) => {
         reqData.reportTemplates = items;
 
         if (!reportTemplateId) {
-            res.render('reports/create-select-template', reqData);
+            res.render('reports/create-select-template');
         } else {
             addUserFields(reportTemplateId, reqData, null, (err, data) => {
                 if (err) {
