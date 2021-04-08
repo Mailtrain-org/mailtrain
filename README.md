@@ -1,4 +1,4 @@
-## Mailtrain v2 beta is available. Check it out here https://github.com/Mailtrain-org/mailtrain/tree/development
+## Mailtrain v1 has been deprecated. It contains security flaws which won't likely be fixed. We advise you to use Mailtrain v2 instead. Check it out here https://github.com/Mailtrain-org/mailtrain/tree/v2
 
 # Mailtrain
 
