@@ -110,6 +110,6 @@
     "tmp-promise": "^1.1.0",
     "toml": "^2.3.3",
     "try-require": "^1.2.1",
-    "xmldom": "^0.1.31"
+    "xmldom": "^0.5.0"
   }
 }
