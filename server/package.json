@@ -81,7 +81,7 @@
     "jsdom": "^13.1.0",
     "juice": "^6.0.0",
     "klaw-sync": "^6.0.0",
-    "knex": "^0.16.5",
+    "knex": "^0.19.5",
     "libmime": "^4.2.1",
     "mailparser": "^2.7.7",
     "memory-cache": "^0.2.0",
