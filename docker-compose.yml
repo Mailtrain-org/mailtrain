@@ -2,6 +2,7 @@ version: '2'
 services:
   mysql:
     image: mysql:5.7
+    command: --max_allowed_packet=32505856
     environment:
       - MYSQL_ROOT_PASSWORD=mailtrain
       - MYSQL_DATABASE=mailtrain
