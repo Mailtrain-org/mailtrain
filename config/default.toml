@@ -214,3 +214,8 @@ logger=false
 
 [seleniumwebdriver]
 browser="phantomjs"
+
+[accesstokens]
+# Access tokens for clients that want to access the REST API. These are like the
+# user access token, but are not linked to a user and can not change at runtime.
+#my-client="a-secret-token"
