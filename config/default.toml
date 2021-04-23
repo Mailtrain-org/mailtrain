@@ -175,7 +175,7 @@ processes=1
 
 [mosaico]
 # Installed templates
-templates=[["versafix-1", "Versafix One"]]
+templates=[["versafix-1", "Versafix One"], ["versafix-2", "Versafix One (1.1.19)"]]
 # Inject custom scripts
 # customscripts=["/mosaico/custom/my-mosaico-plugin.js"]
 

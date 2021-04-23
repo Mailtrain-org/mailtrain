@@ -22,6 +22,7 @@ public/mosaico/custom/*
 !public/mosaico/custom/README.md
 public/mosaico/templates/*
 !public/mosaico/templates/versafix-1
+!public/mosaico/templates/versafix-2
 
 public/grapejs/uploads/*
 !public/grapejs/uploads/README.md

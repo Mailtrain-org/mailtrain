@@ -119,7 +119,7 @@
                             metadata: viewModel.exportMetadata(),
                         }),
                     }, null, 'html')
-                        .success(function() {
+                        .done(function() {
                             setTimeout(function() {
                                 window.bridge.lastSavedHtml = html;
                                 viewModel.notifier.success('{{#translate}}Sucessfully saved{{/translate}}');
