@@ -71,6 +71,7 @@ router.get('/', passport.csrfProtection, (req, res, next) => {
 
         configItems.verpEnabled = config.verp.enabled;
         configItems.csrfToken = req.csrfToken();
+        configItems.smtpPass = '';
         res.render('settings', configItems);
     });
 });
@@ -89,7 +90,7 @@ router.post('/update', passport.parseForm, passport.csrfProtection, (req, res) =
         if (key === 'service_url' && value && !/\/$/.test(value)) {
             value = value + '/';
         }
-        if (allowedKeys.indexOf(key) >= 0) {
+        if (allowedKeys.indexOf(key) >= 0 && !(key == 'smtp_pass' && value == '')) {
             keys.push(key);
             values.push(value);
         }
