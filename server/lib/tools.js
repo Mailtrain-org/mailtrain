@@ -166,7 +166,7 @@ function _formatTemplateSimple(source, mergeTags, isHTML) {
             }
         }
 
-        if (value === undefined) { // in RSS it may happen that the key is present, but the value is undefined
+        if (typeof value === "undefined" || !value) { // in RSS it may happen that the key is present, but the value is undefined
             return '';
         }
 
