@@ -91,7 +91,7 @@ export default class CUD extends Component {
         data.isInGroup = data.group !== null;
 
         data.enumOptions = '';
-        data.dateFormat = DateFormat.EUR;
+        data.dateFormat = DateFormat.EU;
         data.renderTemplate = '';
 
         switch (data.type) {
