@@ -210,7 +210,7 @@ function installMailtrain {
     mysql -u root -e "GRANT ALL PRIVILEGES ON mailtrain.* TO 'mailtrain'@'localhost';"
     mysql -u root -e "CREATE USER 'mailtrain_ro'@'localhost' IDENTIFIED BY '$mysqlRoPassword';"
     mysql -u root -e "GRANT SELECT ON mailtrain.* TO 'mailtrain_ro'@'localhost';"
-    mysql -u mailtrain --password="$mysqlPassword" -e "CREATE database mailtrain;"
+    mysql -u mailtrain --password="$mysqlPassword" -e "CREATE DATABASE mailtrain CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
     
     # Add new user for the mailtrain daemon to run as
     useradd mailtrain || true

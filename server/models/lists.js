@@ -207,13 +207,13 @@ async function create(context, entity) {
 
         await knex.schema.raw('CREATE TABLE `subscription__' + id + '` (\n' +
             '  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n' +
-            '  `cid` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
-            '  `email` varchar(255) CHARACTER SET utf8 DEFAULT NULL,\n' +
-            '  `hash_email` varchar(255) CHARACTER SET ascii NOT NULL,\n' +
+            '  `cid` varchar(255) NOT NULL,\n' +
+            '  `email` varchar(255) DEFAULT NULL,\n' +
+            '  `hash_email` varchar(255) NOT NULL,\n' +
             '  `source_email` int(11) DEFAULT NULL,\n' +  // Altough this is a reference to an import, it is represented as signed int(11). This is because we use negative values for constant from SubscriptionSource
             '  `opt_in_ip` varchar(100) DEFAULT NULL,\n' +
             '  `opt_in_country` varchar(2) DEFAULT NULL,\n' +
-            '  `tz` varchar(100) CHARACTER SET ascii DEFAULT NULL,\n' +
+            '  `tz` varchar(100) DEFAULT NULL,\n' +
             '  `status` tinyint(4) unsigned NOT NULL DEFAULT \'1\',\n' +
             '  `is_test` tinyint(4) unsigned NOT NULL DEFAULT \'0\',\n' +
             '  `status_change` timestamp NULL DEFAULT NULL,\n' +
@@ -233,7 +233,7 @@ async function create(context, entity) {
             '  KEY `latest_click` (`latest_click`),\n' +
             '  KEY `created` (`created`),\n' +
             '  KEY `updated` (`updated`)\n' +
-            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n');
+            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;\n');
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'list', entityId: id });
 
