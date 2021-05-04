@@ -147,4 +147,16 @@ if [ "$WITH_ZONE_MTA" = "true" ]; then
 fi
 
 cd server
+
+if [ "$WITH_LDAP" = "true" ]; then
+  if [ "$LDAP_METHOD" = "ldapjs" ]; then
+    echo 'Info: Install passport-ldapjs'
+    npm install passport-ldapjs
+  fi
+  if [ "$LDAP_METHOD" = "ldapauth" ]; then
+    echo 'Info: Install passport-ldapauth'
+    npm install passport-ldapauth
+  fi
+fi
+
 NODE_ENV=production node index.js
