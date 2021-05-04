@@ -22,7 +22,7 @@ RUN cd /app/shared && npm install --production
 RUN cd /app/server && npm install --production
 RUN cd /app/zone-mta && npm install --production
 
-# Later, copy the app files. That improves development speed as buiding the Docker image will not have
+# Later, copy the app files. That improves development speed as building the Docker image will not have
 # to download and install all the NPM dependencies every time there's a change in the source code
 COPY . /app
 
