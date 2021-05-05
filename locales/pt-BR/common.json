@@ -464,11 +464,11 @@
   "createField": "Criar campo",
   "mergeTag-1": "Merge tag",
   "fieldOrder": "Ordem de campo",
-  "listingsBefore": "Listings (before)",
+  "listingsBefore": "Listings",
   "selectTheFieldBeforeWhichThisFieldShould": "Selecione o campo antes do qual este campo deve aparecer nas listagens. Para excluir o campo das listagens, selecione \"Não visível\".",
-  "subscriptionFormBefore": "Formulário de assinatura (antes)",
+  "subscriptionFormBefore": "Formulário de assinatura",
   "selectTheFieldBeforeWhichThisFieldShould-1": "Selecione o campo antes do qual este campo deve aparecer no novo formulário de inscrição. Para excluir o campo do novo formulário de inscrição, selecione \"Não visível\".",
-  "managementFormBefore": "Forma de gerenciamento (antes)",
+  "managementFormBefore": "Forma de gerenciamento",
   "selectTheFieldBeforeWhichThisFieldShould-2": "Selecione o campo antes do qual este campo deve aparecer no gerenciamento de subscrição. Para excluir o campo do formulário de gerenciamento de subscrição, selecione \"Não visível\".",
   "youCanControlTheAppearanceOfTheMergeTag": "Você pode controlar a aparência da tag de mesclagem com este modelo. O template \n usa a sintaxe de handlebars e você pode encontrar todos os valores da matriz <1>{'{{values}}'}</1>, por \n exemplo <3> {'{{#each values}} {{this}} {{/each}}'}</3>. Se template não for definido, \n vários valores serão unidos por vírgulas.",
   "specifyTheOptionsToSelectFromInThe": "<0> Especifique as opções para selecionar no seguinte formato: <1>key|label</1>. Por exemplo: </0>\n<2><0>au|Australia</0></2><3><0>em|Áustria</0></3>",
@@ -1138,5 +1138,5 @@
   "cloneCampaign": "Clone Campaign",
   "next": "Next",
   "selectCampaignToBeCloned": "Select campaign to be cloned.",
-  "beforeFieldType": "before {{name}} ({{type}})"
+  "beforeFieldType": "antes {{name}} ({{type}})"
 }
