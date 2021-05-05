@@ -401,8 +401,8 @@
   "errorOnLineLine": "Error on line {{ line }}",
   "fieldUpdated": "Field updated",
   "fieldCreated": "Field created",
-  "notVisible": "Not visible",
-  "endOfList": "End of list",
+  "notVisible": "not visible",
+  "endOfList": "at end of list",
   "fieldSettings": "Field settings",
   "defaultValue": "Default value",
   "defaultValueUsedWhenTheFieldIsEmpty": "Default value used when the field is empty.",
@@ -427,11 +427,11 @@
   "createField": "Create Field",
   "mergeTag-1": "Merge tag",
   "fieldOrder": "Field order",
-  "listingsBefore": "Listings (before)",
+  "listingsBefore": "Listings",
   "selectTheFieldBeforeWhichThisFieldShould": "Select the field before which this field should appear in listings. To exclude the field from listings, select \"Not visible\".",
-  "subscriptionFormBefore": "Subscription form (before)",
+  "subscriptionFormBefore": "Subscription form",
   "selectTheFieldBeforeWhichThisFieldShould-1": "Select the field before which this field should appear in new subscription form. To exclude the field from the new subscription form, select \"Not visible\".",
-  "managementFormBefore": "Management form (before)",
+  "managementFormBefore": "Management form",
   "selectTheFieldBeforeWhichThisFieldShould-2": "Select the field before which this field should appear in subscription management. To exclude the field from the subscription management form, select \"Not visible\".",
   "youCanControlTheAppearanceOfTheMergeTag": "You can control the appearance of the merge tag with this template. The template\n                                uses handlebars syntax and you can find all values from <1>{'{{values}}'}</1> array, for\n                                example <3>{'{{#each values}} {{this}} {{/each}}'}</3>. If template is not defined then\n                                multiple values are joined with commas.",
   "specifyTheOptionsToSelectFromInThe": "<0>Specify the options to select from in the following format:<1>key|label</1>. For example:</0>\n                                <2><0>au|Australia</0></2><3><0>at|Austria</0></3>",
@@ -1025,5 +1025,6 @@
   "thePasswordMustContainAtLeastOne": "The password must contain at least one lowercase letter",
   "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
-  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character"
+  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
+  "beforeFieldType": "before {{name}} ({{type}})"
 }

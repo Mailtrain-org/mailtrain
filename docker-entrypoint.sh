@@ -35,7 +35,9 @@ CAS_NEWUSERNAMESPACEID=${CAS_NEWUSERNAMESPACEID:-'1'}
 MONGO_HOST=${MONGO_HOST:-'mongo'}
 WITH_REDIS=${WITH_REDIS:-'true'}
 REDIS_HOST=${REDIS_HOST:-'redis'}
+REDIS_PORT=${REDIS_PORT:-'6379'}
 MYSQL_HOST=${MYSQL_HOST:-'mysql'}
+MYSQL_PORT=${MYSQL_PORT:-'3306'}
 MYSQL_DATABASE=${MYSQL_DATABASE:-'mailtrain'}
 MYSQL_USER=${MYSQL_USER:-'mailtrain'}
 MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
@@ -74,10 +76,12 @@ mysql:
   database: $MYSQL_DATABASE
   user: $MYSQL_USER
   password: $MYSQL_PASSWORD
+  port: $MYSQL_PORT
 
 redis:
   enabled: $WITH_REDIS
   host: $REDIS_HOST
+  port: $REDIS_PORT
 
 builtinZoneMTA:
   enabled: $WITH_ZONE_MTA
@@ -157,11 +161,11 @@ fi
 
 # Wait for the other services to start
 echo 'Info: Waiting for MySQL Server'
-while ! nc -z $MYSQL_HOST 3306; do sleep 1; done
+while ! nc -z $MYSQL_HOST $MYSQL_PORT; do sleep 1; done
 
 if [ "$WITH_REDIS" = "true" ]; then
   echo 'Info: Waiting for Redis Server'
-  while ! nc -z $REDIS_HOST 6379; do sleep 1; done
+  while ! nc -z $REDIS_HOST $REDIS_PORT; do sleep 1; done
 fi
 
 if [ "$WITH_ZONE_MTA" = "true" ]; then
@@ -175,4 +179,16 @@ if [ "$WITH_CAS" = "true" ]; then
   echo 'Info: Installing passport-cas2'
   NODE_ENV=production npm install passport-cas2
 fi
+
+if [ "$WITH_LDAP" = "true" ]; then
+  if [ "$LDAP_METHOD" = "ldapjs" ]; then
+    echo 'Info: Install passport-ldapjs'
+    npm install passport-ldapjs
+  fi
+  if [ "$LDAP_METHOD" = "ldapauth" ]; then
+    echo 'Info: Install passport-ldapauth'
+    npm install passport-ldapauth
+  fi
+fi
+
 NODE_ENV=production node index.js

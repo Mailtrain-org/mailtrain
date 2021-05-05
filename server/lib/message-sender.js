@@ -218,9 +218,9 @@ class MessageSender {
             if (response.statusCode !== 200) {
                 const statusError = new Error(`Received status code ${response.statusCode} from ${sourceUrl}`);
                 if (response.statusCode >= 500) {
-                  statusError.campaignMessageErrorType = CampaignMessageErrorType.TRANSIENT;
+                    statusError.campaignMessageErrorType = CampaignMessageErrorType.PERMANENT;
                 } else {
-                  statusError.campaignMessageErrorType = CampaignMessageErrorType.PERMANENT;
+                    statusError.campaignMessageErrorType = CampaignMessageErrorType.TRANSIENT;
                 }
                 throw statusError;
             }
@@ -449,7 +449,17 @@ class MessageSender {
         let response;
         let responseId = null;
 
-        const info = this.isMassMail ? await mailer.sendMassMail(mail) : await mailer.sendTransactionalMail(mail);
+        let info;
+        try {
+            info = this.isMassMail ? await mailer.sendMassMail(mail) : await mailer.sendTransactionalMail(mail);
+        } catch (err) {
+            if (err.responseCode >= 500) {
+                err.campaignMessageErrorType = CampaignMessageErrorType.PERMANENT;
+            } else {
+                err.campaignMessageErrorType = CampaignMessageErrorType.TRANSIENT;
+            }
+            throw err;
+        }
 
         log.verbose('MessageSender', `response: ${info.response}   messageId: ${info.messageId}`);
 

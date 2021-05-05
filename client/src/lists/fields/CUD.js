@@ -91,7 +91,7 @@ export default class CUD extends Component {
         data.isInGroup = data.group !== null;
 
         data.enumOptions = '';
-        data.dateFormat = DateFormat.EUR;
+        data.dateFormat = DateFormat.EU;
         data.renderTemplate = '';
 
         switch (data.type) {
@@ -173,7 +173,7 @@ export default class CUD extends Component {
             data.orderManageBefore = Number.parseInt(data.orderManageBefore) || data.orderManageBefore;
         }
 
-        return filterData(data, ['name', 'help', 'key', 'default_value', 'type', 'group', 'settings',
+        return filterData(data, ['name', 'help', 'key', 'default_value', 'required', 'type', 'group', 'settings',
             'orderListBefore', 'orderSubscribeBefore', 'orderManageBefore']);
     }
 
@@ -187,6 +187,7 @@ export default class CUD extends Component {
                 type: 'text',
                 key: '',
                 default_value: '',
+                required: false,
                 help: '',
                 group: null,
                 isInGroup: false,
@@ -350,7 +351,7 @@ export default class CUD extends Component {
         const getOrderOptions = fld => {
             return [
                 {key: 'none', label: t('notVisible')},
-                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.group === null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
+                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.group === null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: t('beforeFieldType', {name: x.name, type: this.fieldTypes[x.type].label})})),
                 {key: 'end', label: t('endOfList')}
             ];
         };
@@ -425,7 +426,8 @@ export default class CUD extends Component {
                         <Dropdown id="dateFormat" label={t('dateFormat')}
                             options={[
                                 {key: DateFormat.US, label: t('mmddyyyy')},
-                                {key: DateFormat.EU, label: t('ddmmyyyy')}
+                                {key: DateFormat.EU, label: t('ddmmyyyy')},
+                                {key: DateFormat.INTL, label: t('YYYY-MM-DD')}
                             ]}
                         />
                         <InputField id="default_value" label={t('defaultValue')} help={<Trans i18nKey="defaultValueUsedWhenTheFieldIsEmpty">Default value used when the field is empty.</Trans>}/>
@@ -512,6 +514,8 @@ export default class CUD extends Component {
                     <InputField id="key" label={t('mergeTag-1')}/>
 
                     <TextArea id="help" label={t('helpText')}/>
+
+                    <CheckBox id="required" label={t('requiredClientSideValidation')}/>
 
                     {fieldSettings}
 

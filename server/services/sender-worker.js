@@ -41,9 +41,12 @@ async function processCampaignMessages(campaignId, messages) {
                 log.error('Senders', `Sending message to ${campaignMessage.list}:${campaignMessage.subscription} failed with error: ${err.message}. Will retry the message if within retention interval.`);
                 withErrors = true;
                 break;
-
             } else {
                 log.error('Senders', `Sending message to ${campaignMessage.list}:${campaignMessage.subscription} failed with error: ${err.message}.`);
+
+                log.verbose(err.code);
+                log.verbose(err.response);
+                log.verbose(err.responseCode);
                 log.verbose(err.stack);
             }
         }

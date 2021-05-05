@@ -1,6 +1,10 @@
-# Mailtrain v2 (beta)
+# Mailtrain v2
 
 Mailtrain is a self hosted newsletter application built on Node.js (v10+) and MySQL (v8+) or MariaDB (v10+).
+
+This is version 2 of Mailtrain. It mostly implements all features of v1 and add some more. It is a complete rewrite, so you will have to install it from scratch.
+
+If you are upgrading from Mailtrain v1, backup the DB and use it for Mailtrain v2. Mailtrain v2 should be able to upgrade the DB to the new schema.
 
 ![](https://mailtrain.org/mailtrain.png)
 
@@ -248,7 +252,9 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | MONGO_HOST       | sets mongo host (default: mongo)                                      |
 | WITH_REDIS       | enables or disables redis (default: true)                             |
 | REDIS_HOST       | sets redis host (default: redis)                                      |
+| REDIS_PORT       | sets redis host (default: 6379)                                       |
 | MYSQL_HOST       | sets mysql host (default: mysql)                                      |
+| MYSQL_PORT       | sets mysql port (default: 3306)                                       |
 | MYSQL_DATABASE   | sets mysql database (default: mailtrain)                              |
 | MYSQL_USER       | sets mysql user (default: mailtrain)                                  |
 | MYSQL_PASSWORD   | sets mysql password (default: mailtrain)                              |
