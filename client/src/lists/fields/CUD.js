@@ -351,7 +351,7 @@ export default class CUD extends Component {
         const getOrderOptions = fld => {
             return [
                 {key: 'none', label: t('notVisible')},
-                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.group === null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: `${x.name} (${this.fieldTypes[x.type].label})`})),
+                ...this.props.fields.filter(x => (!this.props.entity || x.id !== this.props.entity.id) && x[fld] !== null && x.group === null).sort((x, y) => x[fld] - y[fld]).map(x => ({ key: x.id.toString(), label: t('beforeFieldType', {name: x.name, type: this.fieldTypes[x.type].label})})),
                 {key: 'end', label: t('endOfList')}
             ];
         };

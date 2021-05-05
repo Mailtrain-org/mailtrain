@@ -429,11 +429,11 @@
   "createField": "Créer un champ",
   "mergeTag-1": "Etiquette à fusionner",
   "fieldOrder": "Ordre sur le terrain",
-  "listingsBefore": "Inscriptions (avant)",
+  "listingsBefore": "Inscriptions",
   "selectTheFieldBeforeWhichThisFieldShould": "Sélectionnez le champ avant lequel ce champ doit apparaître dans les listes. Pour exclure le champ des listes, sélectionnez \" Non visible \".",
-  "subscriptionFormBefore": "Formulaire d'abonnement (avant)",
+  "subscriptionFormBefore": "Formulaire d'abonnement",
   "selectTheFieldBeforeWhichThisFieldShould-1": "Sélectionnez le champ devant lequel ce champ doit apparaître dans le nouveau formulaire d'abonnement. Pour exclure le champ du nouveau formulaire d'abonnement, sélectionnez \" Non visible \".",
-  "managementFormBefore": "Formulaire de gestion (avant)",
+  "managementFormBefore": "Formulaire de gestion",
   "selectTheFieldBeforeWhichThisFieldShould-2": "Sélectionnez le champ devant lequel ce champ doit apparaître dans la gestion des abonnements. Pour exclure le champ du formulaire de gestion des abonnements, sélectionnez \" Non visible \".",
   "youCanControlTheAppearanceOfTheMergeTag": "Vous pouvez contrôler l'apparence de la balise de fusion avec ce modèle. Le modèle \n utilise la syntaxe du guidon et vous pouvez trouver toutes les valeurs du tableau <1> {'{{values}}'} </1>, par exemple \n <3> {'{{#each values}} {{this}} {{/ each}}'} </3>. Si le modèle n'est pas défini, \n plusieurs valeurs sont jointes par des virgules. ",
   "specifyTheOptionsToSelectFromInThe": "",
@@ -1059,5 +1059,6 @@
   "channelName": "Channel \"{{name}}\"",
   "cloneCampaign": "Clone Campaign",
   "next": "Next",
-  "selectCampaignToBeCloned": "Select campaign to be cloned."
+  "selectCampaignToBeCloned": "Select campaign to be cloned.",
+  "beforeFieldType": "avant {{name}} ({{type}})"
 }
