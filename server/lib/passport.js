@@ -175,8 +175,73 @@ module.exports.restLogin = (req, res, next) => {
         });
     })(req, res, next);
 };
+let CasStrategy;
+if (config.cas && config.cas.enabled === true) {
+  try {
+    CasStrategy = require('passport-cas2').Strategy;
+    authMode = 'cas';
+    log.info('CAS', 'Found module "passport-cas2". It will be used for CAS auth.');
+  } catch (exc) {
+    log.info('CAS', 'Module passport-cas2 not installed.');
+  }
+}
+if (CasStrategy) {
+    log.info('Using CAS auth (passport-cas2)');
+    module.exports.authMethod = 'cas';
+    module.exports.isAuthMethodLocal = false;
 
-if (LdapStrategy) {
+    const cas = new CasStrategy({
+        casURL: config.cas.url,
+        propertyMap: {
+            displayName: config.cas.nameTag,
+            emails: config.cas.mailTag
+        }
+    }, 
+    nodeifyFunction(async (username, profile) => { 
+      try {
+        const user = await users.getByUsername(username);
+
+        log.info('CAS', 'Old User: '+JSON.stringify(profile));
+        return {
+            id: user.id,
+            username: username,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            role: user.role
+        };
+      } catch (err) {
+        if (err instanceof interoperableErrors.NotFoundError) {
+            const userId = await users.create(contextHelpers.getAdminContext(), {
+                username: username,
+                role: config.cas.newUserRole,
+                namespace: config.cas.newUserNamespaceId,
+                name: profile.displayName,
+                email: profile.emails[0].value
+            });
+            log.info('CAS', 'New User: '+JSON.stringify(profile));
+
+            return {
+                id: userId,
+                username: username,
+                name: profile.displayName,
+                email: profile.emails[0].value,
+                role: config.cas.newUserRole
+            };
+        } else {
+            throw err;
+        }
+      }
+    }));
+    passport.use(cas);
+    passport.serializeUser((user, done) => done(null, user));
+    passport.deserializeUser((user, done) => done(null, user));
+
+    module.exports.authenticateCas = passport.authenticate('cas', { failureRedirect: '/login?cas-login-error' });
+    module.exports.logoutCas = function (req, res) {
+        cas.logout(req, res, config.www.trustedUrlBase+'/?cas-logout-success');
+    };
+
+} else if (LdapStrategy) {
     log.info('Using LDAP auth (passport-' + authMode === 'ldap' ? 'ldapjs' : authMode + ')');
     module.exports.authMethod = 'ldap';
     module.exports.isAuthMethodLocal = false;

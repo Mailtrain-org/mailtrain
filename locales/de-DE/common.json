@@ -1059,5 +1059,8 @@
   "cloneCampaign": "Kampagne klonen",
   "next": "Nächste",
   "selectCampaignToBeCloned": "Wähle zu klonende Kampagne",
-  "beforeFieldType": "vor {{name}} ({{type}})"
+  "beforeFieldType": "vor {{name}} ({{type}})",
+  "authenticationSuccessful": "Authentication successful",
+  "logoutSuccessful": "Logout successful",
+  "authenticationFailed": "Authentication failed"
 }

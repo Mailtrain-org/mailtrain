@@ -1138,5 +1138,8 @@
   "cloneCampaign": "Clone Campaign",
   "next": "Next",
   "selectCampaignToBeCloned": "Select campaign to be cloned.",
+  "authenticationSuccessful": "Authentication successful",
+  "logoutSuccessful": "Logout successful",
+  "authenticationFailed": "Authentication failed",
   "beforeFieldType": "antes {{name}} ({{type}})"
 }

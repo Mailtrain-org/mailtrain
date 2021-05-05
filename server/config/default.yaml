@@ -170,6 +170,18 @@ postfixBounce:
   # allow connections from localhost only
   host: 127.0.0.1
 
+cas:
+  # enable to use CAS user backend
+  enabled: false
+  url: https://example.cas-server.com
+  # nameTag identifies the attribute to be used for user's full name
+  nameTag: username
+  # mailTag identifies the attribute to be used for user's email address
+  mailTag: mail
+  newUserRole: nobody
+  # Global namespace id
+  newUserNamespaceId: 1
+
 # extra options for nodemailer
 nodemailer:
   #textEncoding: base64

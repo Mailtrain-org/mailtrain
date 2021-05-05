@@ -1089,5 +1089,8 @@
   "tagLanguage": "Lenguaje de marcado",
   "tagLanguageMustBeSelected": "Debes seleccionar un lenguaje de marcado",
   "helpText": "Texto de ayuda",
+  "authenticationSuccessful": "Autentificación completada con éxito",
+  "logoutSuccessful": "Logout completado con éxito",
+  "authenticationFailed": "Autentificación fallida",
   "beforeFieldType": "ante {{name}} ({{type}})"
 }

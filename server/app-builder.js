@@ -324,6 +324,14 @@ async function createApp(appType) {
             app.use('/rest', reportsRest);
         }
         install404Fallback('/rest');
+        if (config.cas && config.cas.enabled === true) {
+          app.get('/cas/login',
+            passport.authenticateCas,
+            function(req, res) {
+                res.redirect('/?cas-login-success');
+          });
+          app.get('/cas/logout', passport.logoutCas);
+        }
     }
 
     app.use('/', await index.getRouter(appType));

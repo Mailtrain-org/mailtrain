@@ -269,6 +269,12 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | LDAP_UIDTAG      | LDAP UID tag (e.g. uid/cn/username)                                   |
 | WITH_ZONE_MTA    | enables or disables builtin Zone-MTA (default: true)                  |
 | POOL_NAME        | sets builtin Zone-MTA pool name (default: os.hostname())              |
+| WITH_CAS         | use if you want to use CAS                                            |
+| CAS_URL          | CAS base URL                                                          |
+| CAS_NAMETAG      | The field used to save the name (default: username)                   |
+| CAS_MAILTAG      | The field used to save the email (default: mail)                      |
+| CAS_NEWUSERROLE  | The role of new users (default: nobody)                               |
+| CAS_NEWUSERNAMESPACEID | The namespace id of new users (default: 1)                      |
 | LOG_LEVEL        | sets log level among `silly|verbose|info|http|warn|error|silent` (default: `info`) |
 
 If you don't want to modify the original `docker-compose.yml`, you can put your overrides to another file (e.g. `docker-compose.override.yml`) -- like the one below.
