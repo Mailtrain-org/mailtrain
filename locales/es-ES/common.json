@@ -1088,5 +1088,6 @@
   "selectCampaignToBeCloned": "Elige la campaña que será clonada.",
   "tagLanguage": "Lenguaje de marcado",
   "tagLanguageMustBeSelected": "Debes seleccionar un lenguaje de marcado",
-  "helpText": "Texto de ayuda"
+  "helpText": "Texto de ayuda",
+  "beforeFieldType": "ante {{name}} ({{type}})"
 }

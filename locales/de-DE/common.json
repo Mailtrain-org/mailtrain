@@ -428,11 +428,11 @@
   "createField": "Feld erstellen",
   "mergeTag-1": "Variablenname",
   "fieldOrder": "Reihenfolge der Felder",
-  "listingsBefore": "In Listen vor ...",
+  "listingsBefore": "In Listen",
   "selectTheFieldBeforeWhichThisFieldShould": "Wähle, an welcher Position bzw. vor welchem anderen Feld dieses Feld in Listen erscheinen soll. Mit \"Nicht sichtbar\" wird es ausgeblendet.",
-  "subscriptionFormBefore": "Im Anmeldeformular vor ...",
+  "subscriptionFormBefore": "Im Anmeldeformular",
   "selectTheFieldBeforeWhichThisFieldShould-1": "Wähle, an welcher Position bzw. vor welchem anderen Feld dieses Feld im Anmeldeformular erscheinen soll. Mit \"Nicht sichtbar\" wird es ausgeblendet.",
-  "managementFormBefore": "Im Managementformular vor ...",
+  "managementFormBefore": "Im Managementformular",
   "selectTheFieldBeforeWhichThisFieldShould-2": "Wähle, an welcher Position bzw. vor welchem anderen Feld dieses Feld im Managementformular erscheinen soll. Mit \"Nicht sichtbar\" wird es ausgeblendet.",
   "youCanControlTheAppearanceOfTheMergeTag": "Diese Vorlage in Handlebars-Syntax definiert das Erscheinungsbild von Handlebars-Variablen.\nWerte des <code>{'{{values}}'}</code>-Arrays können mit <code>{'{{#each values}} {{this}} {{/each}}'}</code> ausgelesen werden. Ohne Vorlage werden mehrere Werte mit Kommas getrennt.",
   "specifyTheOptionsToSelectFromInThe": "<0>Die möglichen Optionen werden in folgendem Format erwartet:<1>Wert|Beschreibung</1>. Beispiel:</0>\n<2><0>au|Australien</0></2><3><0>at|Österreich</0></3>",
@@ -1058,5 +1058,6 @@
   "channelName": "Kanal \"{{name}}\"",
   "cloneCampaign": "Kampagne klonen",
   "next": "Nächste",
-  "selectCampaignToBeCloned": "Wähle zu klonende Kampagne"
+  "selectCampaignToBeCloned": "Wähle zu klonende Kampagne",
+  "beforeFieldType": "vor {{name}} ({{type}})"
 }
