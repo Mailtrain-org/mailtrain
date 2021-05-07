@@ -1,0 +1,34 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'run', 'build' ]
+2 info using npm@6.14.12
+3 info using node@v14.16.1
+4 verbose run-script [ 'prebuild', 'build', 'postbuild' ]
+5 info lifecycle mailtrain-client@2.0.0~prebuild: mailtrain-client@2.0.0
+6 info lifecycle mailtrain-client@2.0.0~build: mailtrain-client@2.0.0
+7 verbose lifecycle mailtrain-client@2.0.0~build: unsafe-perm in lifecycle true
+8 verbose lifecycle mailtrain-client@2.0.0~build: PATH: /usr/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/opt/mailtrain/client/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+9 verbose lifecycle mailtrain-client@2.0.0~build: CWD: /opt/mailtrain/client
+10 silly lifecycle mailtrain-client@2.0.0~build: Args: [ '-c', 'npm-run-all --parallel css js' ]
+11 silly lifecycle mailtrain-client@2.0.0~build: Returned: code: 1  signal: null
+12 info lifecycle mailtrain-client@2.0.0~build: Failed to exec build script
+13 verbose stack Error: mailtrain-client@2.0.0 build: `npm-run-all --parallel css js`
+13 verbose stack Exit status 1
+13 verbose stack     at EventEmitter.<anonymous> (/usr/lib/node_modules/npm/node_modules/npm-lifecycle/index.js:332:16)
+13 verbose stack     at EventEmitter.emit (events.js:315:20)
+13 verbose stack     at ChildProcess.<anonymous> (/usr/lib/node_modules/npm/node_modules/npm-lifecycle/lib/spawn.js:55:14)
+13 verbose stack     at ChildProcess.emit (events.js:315:20)
+13 verbose stack     at maybeClose (internal/child_process.js:1048:16)
+13 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:288:5)
+14 verbose pkgid mailtrain-client@2.0.0
+15 verbose cwd /opt/mailtrain/client
+16 verbose Linux 5.5.0-0.bpo.2-amd64
+17 verbose argv "/usr/bin/node" "/usr/bin/npm" "run" "build"
+18 verbose node v14.16.1
+19 verbose npm  v6.14.12
+20 error code ELIFECYCLE
+21 error errno 1
+22 error mailtrain-client@2.0.0 build: `npm-run-all --parallel css js`
+22 error Exit status 1
+23 error Failed at the mailtrain-client@2.0.0 build script.
+23 error This is probably not a problem with npm. There is likely additional logging output above.
+24 verbose exit [ 1, true ]
