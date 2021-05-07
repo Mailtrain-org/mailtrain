@@ -131,7 +131,7 @@ function installPrerequisities {
         centos7)
             yum -y install epel-release
 
-            curl --silent --location https://rpm.nodesource.com/setup_10.x | bash -
+            curl --silent --location https://rpm.nodesource.com/setup_14.x | bash -
             cat > /etc/yum.repos.d/mongodb-org.repo <<EOT
 [mongodb-org-4.0]
 name=MongoDB Repository
@@ -165,21 +165,23 @@ EOT
 
 
         ubuntu1804)
-            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 
             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
             echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
             apt-get update
 
-            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 wget curl
+            apt-get install -y mariadb-server build-essential nodejs imagemagick redis pwgen mongodb-org bzip2 wget curl
             ;;
 
         debian10)
-	    apt-get install -y gnupg
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
+            apt-get update
+	    apt-get install -y gnupg wget curl build-essential
 	    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
 	    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
             apt-get update
-            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 npm wget curl
+            apt-get install -y mariadb-server nodejs imagemagick redis pwgen mongodb-org bzip2
             ;;
 
     esac
