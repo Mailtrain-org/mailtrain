@@ -171,7 +171,7 @@ EOT
             echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
             apt-get update
 
-            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2
+            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 wget curl
             ;;
 
         debian10)
@@ -179,7 +179,7 @@ EOT
 	    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
 	    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
             apt-get update
-            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 npm
+            apt-get install -y mariadb-server nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 npm wget curl
             ;;
 
     esac
