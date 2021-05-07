@@ -37,7 +37,7 @@ to guarantee security and avoid XSS attacks in the multi-user settings. The func
 The recommended deployment of Mailtrain would use 3 DNS entries that all points to the **same** IP address. For example as follows:
 - *lists.example.com* - public endpoint (A record `lists` under `example.com` domain)
 - *mailtrain.example.com* - trusted endpoint (CNAME record `mailtrain` under `example.com` domain that points to `lists`)
-- *sbox.mailtrain.example.com* - sandbox endpoint (CNAME record `sbox.mailtrain` under `example.com` domain that points to `lists`)
+- *sbox-mailtrain.example.com* - sandbox endpoint (CNAME record `sbox.mailtrain` under `example.com` domain that points to `lists`)
 
 
 ### Installation on fresh CentOS 7 or Ubuntu 18.04 LTS (public website secured by SSL)
@@ -76,7 +76,7 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
     cd /opt
     git clone https://github.com/Mailtrain-org/mailtrain.git
     cd mailtrain
-    git checkout development
+    git checkout v2
     ```
 
 4. Run the installation script. Replace the urls and your email address with the correct values. **NOTE** that running this script you agree
@@ -139,7 +139,7 @@ All endpoints (trusted, sandbox, public) will provide only HTTP as follows:
     cd /opt
     git clone https://github.com/Mailtrain-org/mailtrain.git
     cd mailtrain
-    git checkout development
+    git checkout v2
     ```
 
 4. Run the installation script. Replace the urls and your email address with the correct values. **NOTE** that running this script you agree
@@ -177,7 +177,7 @@ This setup starts a stack composed of Mailtrain, MongoDB, Redis, and MariaDB. It
 To make this publicly accessible, you should add reverse proxy that makes these endpoints publicly available over HTTPS. If using the proxy, you also need to set the URL bases and `--withProxy` parameter via `MAILTRAIN_SETTING` as shown below.
 An example of such proxy would be:
 - http://localhost:3000 -> https://mailtrain.example.com
-- http://localhost:3003 -> https://sbox.mailtrain.example.com
+- http://localhost:3003 -> https://sbox-mailtrain.example.com
 - http://localhost:3004 -> https://lists.example.com
 
 To deploy Mailtrain with Docker, you need the following two dependencies installed:
