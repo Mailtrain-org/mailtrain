@@ -37,7 +37,7 @@ to guarantee security and avoid XSS attacks in the multi-user settings. The func
 The recommended deployment of Mailtrain would use 3 DNS entries that all points to the **same** IP address. For example as follows:
 - *lists.example.com* - public endpoint (A record `lists` under `example.com` domain)
 - *mailtrain.example.com* - trusted endpoint (CNAME record `mailtrain` under `example.com` domain that points to `lists`)
-- *sbox-mailtrain.example.com* - sandbox endpoint (CNAME record `sbox.mailtrain` under `example.com` domain that points to `lists`)
+- *sbox-mailtrain.example.com* - sandbox endpoint (CNAME record `sbox-mailtrain` under `example.com` domain that points to `lists`)
 
 
 ### Installation on fresh CentOS 7 or Ubuntu 18.04 LTS (public website secured by SSL)
@@ -84,12 +84,12 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
 
    For Centos 7 type:
     ```
-    bash setup/install-centos7-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+    bash setup/install-centos7-https.sh mailtrain.example.com sbox-mailtrain.example.com lists.example.com admin@example.com
     ```
 
    For Ubuntu 18.04 LTS type:
     ```
-    bash setup/install-ubuntu1804-https.sh mailtrain.example.com sbox.mailtrain.example.com lists.example.com admin@example.com
+    bash setup/install-ubuntu1804-https.sh mailtrain.example.com sbox-mailtrain.example.com lists.example.com admin@example.com
     ```
 
 5. Start Mailtrain and enable to be started by default when your server starts.
@@ -189,7 +189,7 @@ These are the steps to start Mailtrain via docker-compose:
 
 1. Download Mailtrain's docker-compose build file
     ```
-    curl -O https://raw.githubusercontent.com/Mailtrain-org/mailtrain/development/docker-compose.yml
+    curl -O https://raw.githubusercontent.com/Mailtrain-org/mailtrain/v2/docker-compose.yml
     ```
 
 2. Deploy Mailtrain via docker-compose (in the directory to which you downloaded the `docker-compose.yml` file). This will take quite some time when run for the first time. Subsequent executions will be fast.
