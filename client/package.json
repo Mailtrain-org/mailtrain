@@ -60,7 +60,7 @@
     "shallowequal": "^1.1.0",
     "shortid": "^2.2.15",
     "slugify": "^1.3.6",
-    "url-parse": "^1.4.7"
+    "url-parse": "^1.5.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.0",
