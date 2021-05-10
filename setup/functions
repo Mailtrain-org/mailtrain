@@ -5,6 +5,7 @@ case "$hostType" in
         hostTypeLabel="CentOS 7"
         redisService=redis
         apacheConf="/etc/httpd/conf.d/mailtrain.conf"
+	apacheSite=$apacheConf
         apacheLogsPath="logs"
 
         if hash firewall-cmd 2>/dev/null; then
@@ -16,6 +17,7 @@ case "$hostType" in
         hostTypeLabel="CentOS 8"
         redisService=redis
         apacheConf="/etc/httpd/conf.d/mailtrain.conf"
+	apacheSite=$apacheConf
         apacheLogsPath="logs"
 
         if hash firewall-cmd 2>/dev/null; then
@@ -27,6 +29,7 @@ case "$hostType" in
         hostTypeLabel="Ubuntu 18.04 LTS"
         redisService=redis-server
         apacheConf="/etc/apache2/conf-available/mailtrain.conf"
+        apacheSite="/etc/apache2/sites-available/mailtrain.conf"
         apacheLogsPath="/var/log/apache2"
 
         if hash ufw 2>/dev/null; then
@@ -38,6 +41,7 @@ case "$hostType" in
         hostTypeLabel="Debian 10"
         redisService=redis-server
         apacheConf="/etc/apache2/conf-available/mailtrain.conf"
+        apacheSite="/etc/apache2/sites-available/mailtrain.conf"
         apacheLogsPath="/var/log/apache2"
 
         if hash ufw 2>/dev/null; then
@@ -76,6 +80,44 @@ EOF
     echo "Success!"
 }
 
+
+function performInstallHttp-NoSSL {
+    local paramCount="$1"
+    hostTrusted="$2"
+    hostSandbox="$3"
+    hostPublic="$4"
+
+
+    if [ $paramCount -ne 3 ]; then
+            echo "Error: incorrect number of parameters."
+
+    cat <<EOF
+
+Basic usage: install-${hostType}-http.sh <trusted host> <sandbox host> <public host> 
+
+Installs Mailtrain 2 on ${hostTypeLabel}. This performs installation for external use. It installs Mailtrain, sets up
+a reverse HTTP proxy using Apache HTTPD, sets up firewall rules.
+
+You have to allocate three endpoints for Mailtrain - trusted (admin UI), sandbox (editors for templates), public (subscription forms and archive).
+These endpoints have to differ in hostname. It's fine to host them all from one IP address. 
+
+Note, that this will automatically accept the Let's Encrypt's Terms of Service.
+Thus, by running this script below, you agree with the Let's Encrypt's Terms of Service (https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf).
+
+Example: install-${hostType}-https.sh mailtrain.example.com sbox-mailtrain.example.com lists.example.com
+EOF
+
+      exit 1
+    fi
+
+    installPrerequisities
+    installHttpProxy "${hostTrusted}" "${hostSandbox}" "${hostPublic}" 
+    installMailtrain "http://${hostTrusted}" "http://${hostSandbox}" "http://${hostPublic}" 127.0.0.1 true
+    installService
+
+    echo
+    echo "Success!"
+}
 
 function performInstallHttps {
     local paramCount="$1"
@@ -171,7 +213,7 @@ EOT
             echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
             apt-get update
 
-            apt-get install -y mariadb-server build-essential nodejs imagemagick redis pwgen mongodb-org bzip2 wget curl
+            apt-get install -y mariadb-server build-essential nodejs imagemagick redis pwgen g++ make mongodb-org bzip2 wget curl
             ;;
 
         debian10)
@@ -181,7 +223,7 @@ EOT
 	    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
 	    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
             apt-get update
-            apt-get install -y mariadb-server nodejs imagemagick redis pwgen mongodb-org bzip2
+            apt-get install -y mariadb-server nodejs imagemagick redis pwgen mongodb-org bzip2 
             ;;
 
     esac
@@ -343,6 +385,79 @@ function installHttpd {
     esac
 }
 
+function installHttpProxy {
+    local hostTrusted="$1"
+    local hostSandbox="$2"
+    local hostPublic="$3"
+
+
+    > $apacheSite
+
+    cat >> $apacheSite <<EOT
+<VirtualHost *:80>
+    ServerName ${hostTrusted}
+
+    ServerSignature Off
+
+
+    ErrorLog ${apacheLogsPath}/${hostTrusted}_error.log
+    TransferLog ${apacheLogsPath}/${hostTrusted}_access.log
+    LogLevel warn
+
+    ProxyPreserveHost On
+    ProxyPass "/" "http://127.0.0.1:3000/"
+    ProxyPassReverse "/" "http://127.0.0.1:3000/"
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName ${hostSandbox}
+
+    ServerSignature Off
+
+
+    ErrorLog ${apacheLogsPath}/${hostSandbox}_error.log
+    TransferLog ${apacheLogsPath}/${hostSandbox}_access.log
+    LogLevel warn
+
+    ProxyPreserveHost On
+    ProxyPass "/" "http://127.0.0.1:3003/"
+    ProxyPassReverse "/" "http://127.0.0.1:3003/"
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName ${hostPublic}
+
+    ServerSignature Off
+
+
+    ErrorLog ${apacheLogsPath}/${hostPublic}_error.log
+    TransferLog ${apacheLogsPath}/${hostPublic}_access.log
+    LogLevel warn
+
+    ProxyPreserveHost On
+    ProxyPass "/" "http://127.0.0.1:3004/"
+    ProxyPassReverse "/" "http://127.0.0.1:3004/"
+</VirtualHost>
+
+
+EOT
+
+
+    case "$hostType" in
+        centos7|centos8)
+            systemctl restart httpd
+            ;;
+
+        ubuntu1804|debian10)
+            a2enmod rewrite
+            a2enmod proxy
+            a2enmod proxy_http
+            a2ensite mailtrain
+            systemctl restart apache2
+            ;;
+    esac
+
+}
 
 function installHttpsProxy {
     local hostTrusted="$1"
