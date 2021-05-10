@@ -19,5 +19,8 @@
     "fast-deep-equal": "^2.0.1",
     "klaw-sync": "^6.0.0",
     "slugify": "^1.3.3"
+  },
+  "devDependencies": {
+    "npm": "^6.14.13"
   }
 }

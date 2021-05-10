@@ -18,5 +18,8 @@
         "zonemta-delivery-counters": "^1.0.1",
         "zonemta-limiter": "^1.0.0",
         "zonemta-loop-breaker": "^1.0.2"
+    },
+    "devDependencies": {
+        "npm": "^6.14.13"
     }
 }
