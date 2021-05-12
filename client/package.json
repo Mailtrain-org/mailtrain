@@ -36,7 +36,7 @@
     "i18next-browser-languagedetector": "^4.0.1",
     "immutable": "^4.0.0-rc.12",
     "juice": "^6.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "mjml4-in-browser": "^1.1.2",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
