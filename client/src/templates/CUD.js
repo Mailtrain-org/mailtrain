@@ -361,7 +361,7 @@ export default class CUD extends Component {
 
                 {!canModify &&
                     <div className="alert alert-warning" role="alert">
-                        <Trans><b>Warning!</b> You do not have necessary permissions to edit this template. Any changes that you perform here will be lost.</Trans>
+                        <Trans i18nKey="warning!YouDoNotHaveNecessaryPermissions-2"><b>Warning!</b> You do not have necessary permissions to edit this template. Any changes that you perform here will be lost.</Trans>
                     </div>
                 }
 
@@ -374,7 +374,7 @@ export default class CUD extends Component {
                     }
 
                     {this.getFormValue('fromExistingEntity') ?
-                        <TableSelect id="existingEntity" label={t('Source template')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
+                        <TableSelect id="existingEntity" label={t('sourceTemplate')} withHeader dropdown dataUrl='rest/templates-table' columns={templatesColumns} selectionLabelIndex={1} />
                     :
                         <>
                             {isEdit ?

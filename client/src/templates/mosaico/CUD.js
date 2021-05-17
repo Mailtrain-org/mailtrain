@@ -213,7 +213,7 @@ export default class CUD extends Component {
 
                 {!canModify &&
                 <div className="alert alert-warning" role="alert">
-                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this Mosaico template. Any changes that you perform here will be lost.</Trans>
+                    <Trans i18nKey="warning!YouDoNotHaveNecessaryPermissions-3"><b>Warning!</b> You do not have necessary permissions to edit this Mosaico template. Any changes that you perform here will be lost.</Trans>
                 </div>
                 }
 

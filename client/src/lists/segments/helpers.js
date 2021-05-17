@@ -456,13 +456,13 @@ export function getRuleHelpers(t, fields) {
         },
         {
             column: 'status',
-            name: t('Status'),
+            name: t('status'),
             type: 'dropdown-static',
             options: {
-                subscribed: t('Subscribed'),
-                unsubscribed: t('Unsubscribed'),
-                bounced: t('Bounced'),
-                complained: t('Complained')
+                subscribed: t('subscribed'),
+                unsubscribed: t('unsubscribed'),
+                bounced: t('bounced'),
+                complained: t('complained')
             },
             default: 'subscribed'
         }
@@ -513,7 +513,7 @@ export function getRuleHelpers(t, fields) {
 
     ruleHelpers.extraFieldTypes = {
         'dropdown-static': {
-            label: t('Dropdown')
+            label: t('dropdown')
         }
     };
 

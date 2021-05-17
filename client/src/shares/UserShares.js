@@ -97,7 +97,7 @@ export default class UserShares extends Component {
                 {renderSharesTable('customForm', t('customForms-1', t('customForms-2')))}
                 {renderSharesTable('report', t('reports'), t('report-1'))}
                 {renderSharesTable('reportTemplate', t('reportTemplates'), t('reportTemplate-2'))}
-                {renderSharesTable('sendConfiguration', t('sendConfigurations-1'), t('sendConfiguration-1'))}
+                {renderSharesTable('sendConfiguration', t('sendConfigurations-1'), t('sendConfiguration'))}
             </div>
         );
     }

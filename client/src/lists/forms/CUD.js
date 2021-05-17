@@ -509,11 +509,11 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     {!isEdit &&
-                        <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromAnExistingCustomForms')}/>
+                        <CheckBox id="fromExistingEntity" label={t('customForms')} text={t('cloneFromExistingCustomForms')}/>
                     }
 
                     {this.getFormValue('fromExistingEntity') ?
-                        <TableSelect id="existingEntity" label={t('Source custom forms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="existingEntity" label={t('sourceCustomForms')} withHeader dropdown dataUrl='rest/forms-table' columns={customFormsColumns} selectionLabelIndex={1} />
                     :
                         <>
                             <Fieldset label={t('formsPreview')}>

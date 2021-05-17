@@ -31,10 +31,10 @@ export const ResourceType = {
 export function getTagLanguages(t) {
     return {
         [TagLanguages.SIMPLE]: {
-            name: t('Simple')
+            name: t('simple')
         },
         [TagLanguages.HBS]: {
-            name: t('Handlebars')
+            name: t('handlebars')
         }
     };
 }
@@ -523,13 +523,13 @@ export function getEditForm(owner, typeKey, prefix = '') {
     } else if (tagLanguage === TagLanguages.HBS) {
         instructions = (
             <>
-                <Trans>
+                <Trans i18nKey="mergeTagsAreTagsThatAreReplacedBefore-1">
                     <p>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <code>{tg('TAG_NAME')}</code>. </p>
                 </Trans>
                 <Trans i18nKey="youCanUseAnyOfTheStandardMergeTagsBelow">
                     <p>You can use any of the standard merge tags below. In addition to that every custom field has its own merge tag. Check the fields of the list you are going to send to.</p>
                 </Trans>
-                <Trans>
+                <Trans i18nKey="theWholeMessageIsInterpretedAsHandlebars">
                     <p>The whole message is interpreted as Handlebars template (see <a href="http://handlebarsjs.com/">http://handlebarsjs.com/</a>). You can use any Handlebars blocks and expressions
                         in the template. The merge tags form the root context of the Handlebars template.</p>
                 </Trans>
@@ -685,7 +685,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                                 {tg('RSS_ENTRY_CUSTOM_TAGS')}
                             </th>
                             <td>
-                                <Trans>Mailtrain custom tags. The custom tags can be passed in via <code>mt:entries-json</code> element in RSS entry. The text contents of the elements is interpreted as JSON-formatted object..</Trans>
+                                <Trans i18nKey="mailtrainCustomTagsTheCustomTagsCanBe">Mailtrain custom tags. The custom tags can be passed in via <code>mt:entries-json</code> element in RSS entry. The text contents of the elements is interpreted as JSON-formatted object..</Trans>
                             </td>
                         </tr>
                         </tbody>

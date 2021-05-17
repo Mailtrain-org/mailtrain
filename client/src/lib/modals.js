@@ -105,11 +105,11 @@ const entityTypeLabels = {
     'customForm': t => t('customForms'),
     'campaign': t => t('campaign'),
     'template': t => t('template'),
-    'sendConfiguration': t => t('sendConfiguration'),
+    'sendConfiguration': t => t('sendConfiguration-1'),
     'report': t => t('report'),
     'reportTemplate': t => t('reportTemplate'),
     'mosaicoTemplate': t => t('mosaicoTemplate'),
-    'user': t => t('User')
+    'user': t => t('user')
 };
 
 function _getDependencyErrorMessage(err, t, name) {
@@ -130,7 +130,7 @@ function _getDependencyErrorMessage(err, t, name) {
                     </ul>
                 </>
             :
-                <p>{t('Cannot delete {{name}} due to hidden dependencies', {name})}</p>
+                <p>{t('cannotDeleteNameDueToHiddenDependencies', {name})}</p>
             }
         </div>
     );

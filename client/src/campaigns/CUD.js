@@ -437,7 +437,7 @@ export default class CUD extends Component {
         }
 
         if (!state.getIn(['subject', 'value'])) {
-            state.setIn(['subject', 'error'], t('"Subject" line must not be empty"'));
+            state.setIn(['subject', 'error'], t('subjectLineMustNotBeEmpty'));
         }
 
         if (!state.getIn(['send_configuration', 'value'])) {
@@ -707,7 +707,7 @@ export default class CUD extends Component {
 
                 {!canModify &&
                 <div className="alert alert-warning" role="alert">
-                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this campaign. Any changes that you perform here will be lost.</Trans>
+                    <Trans i18nKey="warning!YouDoNotHaveNecessaryPermissions"><b>Warning!</b> You do not have necessary permissions to edit this campaign. Any changes that you perform here will be lost.</Trans>
                 </div>
                 }
 
@@ -728,7 +728,7 @@ export default class CUD extends Component {
 
                     <TextArea id="description" label={t('description')}/>
 
-                    <TableSelect id="channel" label={t('Channel')} withHeader withClear dropdown dataUrl='rest/channels-with-create-campaign-permission-table' columns={channelsColumns} selectionLabelIndex={1} />
+                    <TableSelect id="channel" label={t('channel')} withHeader withClear dropdown dataUrl='rest/channels-with-create-campaign-permission-table' columns={channelsColumns} selectionLabelIndex={1} />
 
                     {extraSettings}
 
@@ -742,7 +742,7 @@ export default class CUD extends Component {
 
                     <Fieldset label={t('sendSettings')}>
 
-                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="send_configuration" label={t('sendConfiguration-1')} withHeader dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
                         {sendSettings}
 

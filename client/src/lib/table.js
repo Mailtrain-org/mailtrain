@@ -322,26 +322,26 @@ class Table extends Component {
 
         const t = this.props.t;
         dtOptions.language = {
-          "sEmptyTable":     t("dTsEmptyTable"),
-          "sInfo":           t("dTsInfo"),
-          "sInfoEmpty":      t("dTsInfoEmpty"),
-          "sInfoFiltered":   t("dTsInfoFiltered"),
-          "sInfoPostFix":    t("dTsInfoPostFix"),
-          "sInfoThousands":  t("dTsInfoThousands"),
-          "sLengthMenu":     t("dTsLengthMenu"),
-          "sLoadingRecords": t("dTsLoadingRecords"),
-          "sProcessing":     t("dTsProcessing"),
-          "sSearch":         t("dTsSearch"),
-          "sZeroRecords":    t("dTsZeroRecords"),
+          "sEmptyTable":     t("noDataAvailableInTable"),
+          "sInfo":           t("showingStartToEndOfTotalEntries"),
+          "sInfoEmpty":      t("showing0To0Of0Entries"),
+          "sInfoFiltered":   t("filteredFromMaxTotalEntries"),
+          "sInfoPostFix":    t(""),
+          "sInfoThousands":  t("-1"),
+          "sLengthMenu":     t("showMenuEntries"),
+          "sLoadingRecords": t("loading-1"),
+          "sProcessing":     t("processing"),
+          "sSearch":         t("search"),
+          "sZeroRecords":    t("noMatchingRecordsFound"),
           "oPaginate": {
-            "sFirst":    t("dTsFirst"),
-            "sLast":     t("dTsLast"),
-            "sNext":     t("dTsNext"),
-            "sPrevious": t("dTsPrevious")
+            "sFirst":    t("firs"),
+            "sLast":     t("last"),
+            "sNext":     t("next"),
+            "sPrevious": t("previous")
           },
           "oAria": {
-           "sSortAscending":  t("dTsSortAscending"),
-           "sSortDescending": t("dTsSortDescending")
+           "sSortAscending":  t("activateToSortColumnAscending"),
+           "sSortDescending": t("activateToSortColumnDescending")
           }
        }
 

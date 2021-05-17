@@ -388,7 +388,7 @@ class InputField extends Component {
                 <div className="input-group">
                     {inputContent}
                     <div className="input-group-append" onMouseDown={evt => evt.preventDefault()}>
-                        <Button label={t('Hints')} className="btn-secondary"
+                        <Button label={t('hints')} className="btn-secondary"
                                 onClickAsync={evt => {
                                     if (!this.state.showHints) {
                                         this.textInput.current.focus();
@@ -1080,7 +1080,7 @@ class TableSelect extends Component {
                         {!props.disabled &&
                         <div className="input-group-append">
                             <Button label={t('select')} className="btn-secondary" onClickAsync={::this.toggleOpen}/>
-                            {props.withClear && selection && <Button icon="times" title={t('Clear')} className="btn-secondary" onClickAsync={::this.clear}/>}
+                            {props.withClear && selection && <Button icon="times" title={t('clear')} className="btn-secondary" onClickAsync={::this.clear}/>}
                         </div>
                         }
                     </div>
