@@ -109,6 +109,69 @@ class MosaicoSandbox extends Component {
         // which does not complain about mismatch of domains between TRUSTED and PUBLIC
         plugins.push(viewModel => {
             ko.bindingHandlers.wysiwygSrc.convertedUrl = (src, method, width, height) => getTrustedUrl(`mosaico/img?src=${encodeURIComponent(src)}&method=${encodeURIComponent(method)}&params=${width},${height}`);
+
+            ko.bindingHandlers.wysiwyg.standardOptions = {
+                toolbar1: 'bold italic underline subscript superscript forecolor backcolor removeformat',
+                toolbar2: 'link unlink | nonbreaking charmap emoticons | code',
+                plugins: ["link textcolor code nonbreaking emoticons charmap"]
+            };
+
+            // Adapted form https://github.com/voidlabs/mosaico/blob/7b7406b16d209389af88ab8b94e0b0afde0dcbab/src/js/bindings/wysiwygs.js#L242
+            ko.bindingHandlers.wysiwyg.fullOptions = {
+                toolbar1: 'bold italic underline subscript superscript styleselect forecolor backcolor removeformat | alignleft alignright aligncenter alignjustify alignnone | link unlink',
+                toolbar2: 'copy cut paste pastetext undo redo searchreplace | bullist numlist outdent indent | hr nonbreaking charmap emoticons | visualblocks code',
+                plugins: ["link hr paste lists textcolor code nonbreaking visualblocks emoticons searchreplace charmap"],
+                style_formats: [
+                    {
+                        title: 'Headings', items: [
+                            { title: 'Heading 1', format: 'h1' },
+                            { title: 'Heading 2', format: 'h2' },
+                            { title: 'Heading 3', format: 'h3' },
+                            { title: 'Heading 4', format: 'h4' },
+                            { title: 'Heading 5', format: 'h5' },
+                            { title: 'Heading 6', format: 'h6' }
+                        ]
+                    },
+                    {
+                        title: 'Inline', items: [
+                            { title: 'Bold', format: 'bold' },
+                            { title: 'Italic', format: 'italic' },
+                            { title: 'Underline', format: 'underline' },
+                            { title: 'Strikethrough', format: 'strikethrough' },
+                            { title: 'Superscript', format: 'superscript' },
+                            { title: 'Subscript', format: 'subscript' },
+                            { title: 'Code', format: 'code' }
+                        ]
+                    },
+                    {
+                        title: 'Blocks', items: [
+                            { title: 'Paragraph', format: 'p' },
+                            { title: 'Blockquote', format: 'blockquote' },
+                            { title: 'Div', format: 'div' },
+                            { title: 'Pre', format: 'pre' }
+                        ]
+                    },
+                    {
+                        title: 'Align', items: [
+                            { title: 'Left', format: 'alignleft' },
+                            { title: 'Center', format: 'aligncenter' },
+                            { title: 'Right', format: 'alignright' },
+                            { title: 'Justify', format: 'alignjustify' }
+                        ]
+                    },
+                    /* Here an example of custom styling:
+                    {
+                        title: 'Line Height',
+                        items: [
+                            { title: 'Normal Line Height', inline: 'span', styles: { "line-height": '100%' } },
+                            { title: 'Line Height + 10%', inline: 'span', styles: { "line-height": '110%' } },
+                            { title: 'Line Height + 50%', inline: 'span', styles: { "line-height": '150%' } },
+                            { title: 'Line Height + 100%', inline: 'span', styles: { "line-height": '200%' } }
+                        ]
+                    }
+                    */
+                ]
+            };
         });
 
         plugins.unshift(vm => {

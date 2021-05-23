@@ -315,7 +315,6 @@ class InputField extends Component {
         type: PropTypes.string,
         help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         format: PropTypes.string,
-        // TODO FOR MAILTRAIN added dropdown with hints under input
         withHints: PropTypes.array,
         disabled: PropTypes.bool
     }
@@ -690,10 +689,186 @@ class ColorPicker extends Component {
                     </div>
                 </div>
                 {this.state.opened &&
-                <div className={styles.colorPickerWrapper}>
-                    <SketchPicker color={color} onChange={::this.selected}/>
-                </div>
+                <>
+                    <div className={styles.overlay} onClick={::this.toggle} />
+                    <div className={styles.colorPickerWrapper}>
+                        <SketchPicker color={color} onChangeComplete={::this.selected} className={styles.dialog} />
+                    </div>
+                </>
                 }
+            </div>
+        );
+    }
+}
+
+@withComponentMixins([
+    withTranslation
+])
+class ColumnSelect extends Component {
+
+    constructor(props) {
+        super(props);
+    }
+
+    static propTypes = {
+        selectedValue: PropTypes.any,
+        onSelect: PropTypes.func,
+        header: PropTypes.string,
+        options: PropTypes.array
+    }
+
+    onKeyUp(event) {
+        const key = event.key;
+        if (key == 'Enter') {
+            event.target.click();
+        }
+    }
+
+    onKeyDown(event) {
+        const key = event.key;
+        if ((key == 'ArrowUp' || key == 'ArrowDown') && event.target === event.currentTarget) {
+            event.currentTarget.querySelector(`.${styles.columnSelectItem}`).focus();
+        } else {
+            if (key == 'ArrowUp') {
+                const previous = event.target.previousSibling;
+                if (previous) {
+                    previous.focus();
+                }
+            } else if (key == 'ArrowDown') {
+                const next = event.target.nextSibling;
+                if (next) {
+                    next.focus();
+                }
+            }
+        }
+    }
+
+    scrollColumnBy(e, y) {
+        e.target.parentNode.getElementsByClassName(styles.columnSelect)[0].scrollBy(0, y);
+    }
+
+    scrollColumnDown(e) {
+        this.scrollColumnBy(e, 50);
+    }
+
+    scrollColumnUp(e) {
+        this.scrollColumnBy(e, -50);
+    }
+
+    render() {
+        const {
+            t,
+            onSelect,
+            options,
+            selectedValue,
+            header
+        } = this.props;
+
+        const optionsElements = options.map(
+            option => {
+                let cls = styles.columnSelectItem;
+                if (option == selectedValue) {
+                    cls += ` ${styles.columnSelectItemSelected}`;
+                }
+                return (
+                    <li key={option} className={cls} tabIndex='-1' onClick={() => onSelect(option)}>
+                        {option}
+                    </li>
+                );
+            }
+        );
+
+        return (
+            <div className={styles.columnSelectWrapper}>
+                {header &&
+                <div className={styles.columnSelectHeader}>{header}</div>
+                }
+                <div className={styles.columnScroller} onClick={::this.scrollColumnUp}>&uarr;</div>
+                <ul className={styles.columnSelect} tabIndex='0' onKeyUp={this.onKeyUp} onKeyDown={this.onKeyDown}>
+                    {optionsElements}
+                </ul>
+                <div className={styles.columnScroller} onClick={::this.scrollColumnDown}>&darr;</div>
+            </div>
+        )
+    }
+}
+
+@withComponentMixins([
+    withTranslation,
+    withFormStateOwner
+])
+class TimePicker extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    static propTypes = {
+        selectedTime: PropTypes.object,
+        time: PropTypes.object,
+        onChange: PropTypes.func
+    };
+
+    onChange({hour, minute, second}) {
+        const {
+            time
+        } = this.props;
+
+        this.props.onChange(
+            {
+                hour: hour || time.hour,
+                minute: minute || time.minute,
+                second: second || time.second
+            }
+        )
+    }
+
+    onHourChange(hour) {
+        this.onChange({hour: hour})
+    }
+
+    onMinuteChange(minute) {
+        this.onChange({minute: minute})
+    }
+
+    onSecondsChange(second) {
+        this.onChange({second: second})
+    }
+
+    _generateTimeOptions(start, end, step = 1) {
+        const arr = [];
+        for (let i = start; i <= end; i += step) {
+            arr.push(String(i).padStart(2, '0'));
+        }
+        return arr;
+    }
+
+    render() {
+        const {
+            t,
+            time
+        } = this.props;
+
+        const hourOpts = this._generateTimeOptions(0, 23);
+        const minOpts = this._generateTimeOptions(0, 59);
+        const secOpts = minOpts;
+
+        return (
+            <div className={styles.TimePicker}>
+                <ColumnSelect
+                    header={t('h')}
+                    selectedValue={time.hour || hourOpts[0]}
+                    options={hourOpts}
+                    onSelect={::this.onHourChange}/>
+                <ColumnSelect
+                    header={t('min')}
+                    selectedValue={time.minute || minOpts[0]}
+                    options={minOpts}
+                    onSelect={::this.onMinuteChange}/>
+                <ColumnSelect
+                    header={t('sec')}
+                    selectedValue={time.second || secOpts[0]}
+                    options={secOpts}
+                    onSelect={::this.onSecondsChange}/>
             </div>
         );
     }
@@ -703,12 +878,12 @@ class ColorPicker extends Component {
     withTranslation,
     withFormStateOwner
 ])
-class DatePicker extends Component {
+class DateTimePicker extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            opened: false
+            dateOpened: false,
         };
     }
 
@@ -721,6 +896,7 @@ class DatePicker extends Component {
         dateFormat: PropTypes.string,
         formatDate: PropTypes.func,
         parseDate: PropTypes.func,
+        showTime: PropTypes.bool,
         disabled: PropTypes.bool
     }
 
@@ -730,32 +906,42 @@ class DatePicker extends Component {
 
     async toggleDayPicker() {
         this.setState({
-            opened: !this.state.opened
+            dateOpened: !this.state.dateOpened
         });
     }
 
-    daySelected(date) {
-        const owner = this.getFormStateOwner();
-        const id = this.props.id;
+    dateTimeChange(date, time) {
         const props = this.props;
+        const {id, showTime} = props;
+
+        const owner = this.getFormStateOwner();
+
+        time = {
+            hour: 0,
+            minute: 0,
+            second: 0,
+            ...time
+        };
 
         if (props.formatDate) {
-            owner.updateFormValue(id, props.formatDate(date));
+            owner.updateFormValue(id, props.formatDate(date, time));
         } else {
             owner.updateFormValue(id, props.birthday ? formatBirthday(props.dateFormat, date) : formatDate(props.dateFormat, date));
         }
 
-        this.setState({
-            opened: false
-        });
+        if (!showTime) {
+            this.setState({
+                dateOpened: false
+            });
+        }
     }
 
     render() {
+        const {t, showTime, id} = this.props;
+
         const props = this.props;
         const owner = this.getFormStateOwner();
-        const id = this.props.id;
         const htmlId = 'form_' + id;
-        const t = props.t;
 
         function BirthdayPickerCaption({date, localeUtils, onChange}) {
             const months = localeUtils.getMonths();
@@ -803,6 +989,12 @@ class DatePicker extends Component {
 
         const className = owner.addFormValidationClass('form-control', id);
 
+        const time = {
+            hour: selectedDate.getHours(),
+            minute: selectedDate.getMinutes(),
+            second: selectedDate.getSeconds()
+        };
+
         return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
             <>
                 <div className={props.disabled ? '' : "input-group"}>
@@ -817,16 +1009,22 @@ class DatePicker extends Component {
                     </div>
                     }
                 </div>
-                {this.state.opened &&
+                {this.state.dateOpened &&
                 <div className={styles.dayPickerWrapper}>
                     <DayPicker
-                        onDayClick={date => this.daySelected(date)}
+                        onDayClick={date => this.dateTimeChange(date, time)}
                         selectedDays={selectedDate}
                         initialMonth={selectedDate}
                         fromMonth={fromMonth}
                         toMonth={toMonth}
                         captionElement={captionElement}
                     />
+                    {showTime &&
+                    <TimePicker
+                        time={time}
+                        onChange={time => this.dateTimeChange(selectedDate, time)}
+                    />
+                    }
                 </div>
                 }
             </>
@@ -983,6 +1181,8 @@ class TableSelect extends Component {
     static propTypes = {
         dataUrl: PropTypes.string,
         data: PropTypes.array,
+        search: PropTypes.func, // initial value of the search field
+        searchCols: PropTypes.arrayOf(PropTypes.string), // should have same length as `columns`, set items to `null` to prevent search
         columns: PropTypes.array,
         order: PropTypes.array,
         selectionKeyIndex: PropTypes.number,
@@ -1089,6 +1289,8 @@ class TableSelect extends Component {
                         <Table ref={node => this.table = node}
                                data={props.data}
                                dataUrl={props.dataUrl}
+                               search={props.search}
+                               searchCols={props.searchCols}
                                columns={props.columns}
                                order={props.order}
                                selectMode={props.selectMode}
@@ -1108,6 +1310,8 @@ class TableSelect extends Component {
                         <Table ref={node => this.table = node}
                                data={props.data}
                                dataUrl={props.dataUrl}
+                               search={props.search}
+                               searchCols={props.searchCols}
                                columns={props.columns}
                                order={props.order}
                                pageLength={props.pageLength}
@@ -1769,7 +1973,7 @@ export {
     RadioGroup,
     TextArea,
     ColorPicker,
-    DatePicker,
+    DateTimePicker,
     Dropdown,
     AlignedRow,
     ButtonRow,

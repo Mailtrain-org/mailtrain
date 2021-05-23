@@ -4,7 +4,16 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
 import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
-import {AlignedRow, ButtonRow, CheckBox, DatePicker, Form, InputField, TableSelect, withForm} from '../lib/form';
+import {
+    AlignedRow,
+    ButtonRow,
+    CheckBox,
+    DateTimePicker,
+    Form,
+    InputField,
+    TableSelect,
+    withForm
+} from '../lib/form';
 import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {getCampaignLabels} from './helpers';
 import {Table} from "../lib/table";
@@ -425,7 +434,7 @@ class SendControls extends Component {
                         }
                         {this.getFormValue('sendLater') &&
                         <div>
-                            <DatePicker id="date" label={t('date')} />
+                            <DateTimePicker id="date" label={t('date')} />
                             <InputField id="time" label={t('time')} help={t('enter24HourTimeInFormatHhmmEg1348')}/>
                             <TableSelect id="timezone" label={t('Timezone')} dropdown columns={timezoneColumns} selectionKeyIndex={0} selectionLabelIndex={0} data={this.timezoneOptions}
                                          help={dateTimeHelp}

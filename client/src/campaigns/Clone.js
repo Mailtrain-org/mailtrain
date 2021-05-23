@@ -66,6 +66,7 @@ export default class Clone extends Component {
     }
 
     static propTypes = {
+        cloneFromChannel: PropTypes.object
     }
 
     componentDidMount() {
@@ -106,12 +107,19 @@ export default class Clone extends Component {
             { data: 10, title: t('namespace') }
         ];
 
+        let campaignSelect;
+        if (this.props.cloneFromChannel) {
+            campaignSelect = <TableSelect id="sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl={`rest/campaigns-by-channel-table/${this.props.cloneFromChannel.id}`} columns={campaignsColumns} order={[4, 'desc']} selectionLabelIndex={1} help={t('selectCampaignToBeCloned')}/>
+        } else {
+            campaignSelect = <TableSelect id="sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-table' columns={campaignsColumns} order={[4, 'desc']} selectionLabelIndex={1} help={t('selectCampaignToBeCloned')}/>
+        }
+
         return (
             <div>
                 <Title>{t('createCampaign')}</Title>
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
-                    <TableSelect id="sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-table' columns={campaignsColumns} order={[4, 'desc']} selectionLabelIndex={1} help={t('selectCampaignToBeCloned')}/>
+                    {campaignSelect}
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="chevron-right" label={t('next')}/>

@@ -160,7 +160,12 @@ export default class List extends Component {
 
         if (createPermitted) {
             if (channel) {
-                createButton = <LinkButton to={`/channels/${channel.id}/create`} className="btn-primary" icon="plus" label={t('createCampaign')}/>;
+                createButton = (
+                    <>
+                        <LinkButton to={`/channels/${channel.id}/clone`} className="btn-primary" icon="clone" label={t('cloneCampaign')}/>
+                        <LinkButton to={`/channels/${channel.id}/create`} className="btn-primary" icon="plus" label={t('createCampaign')}/>
+                    </>
+                );
             } else {
                 createButton = (
                     <>
