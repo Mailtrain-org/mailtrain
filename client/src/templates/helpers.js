@@ -159,13 +159,13 @@ class MosaicoTemplateChangeModalDialog extends Component {
 
         if (tagLanguageKey) {
             return (
-                <ModalDialog hidden={!this.props.visible} title={t('Change Mosaico Template')} onCloseAsync={this.hideModalHandler} buttons={[
-                    { label: t('Cancel'), className: 'btn-primary', onClickAsync: this.hideModalHandler },
-                    { label: t('Apply'), className: 'btn-danger', onClickAsync: this.performActionHandler }
+                <ModalDialog hidden={!this.props.visible} title={t('changeMosaicoTemplate')} onCloseAsync={this.hideModalHandler} buttons={[
+                    { label: t('cancel'), className: 'btn-primary', onClickAsync: this.hideModalHandler },
+                    { label: t('apply'), className: 'btn-danger', onClickAsync: this.performActionHandler }
                 ]}>
                     <Form stateOwner={this} format="wide">
                         <div className="alert alert-warning" role="alert">
-                            <Trans><b>Warning!</b> Switching the Mosaico template works only if the original and the new templates use the same fields. If they do not, your data will be lost. Please make sure you save your work before performing this operation.</Trans>
+                            <Trans i18nKey="warning!SwitchingTheMosaicoTemplateWorks"><b>Warning!</b> Switching the Mosaico template works only if the original and the new templates use the same fields. If they do not, your data will be lost. Please make sure you save your work before performing this operation.</Trans>
                         </div>
                         <TableSelect
                             id={'mosaicoTemplate'}
@@ -225,7 +225,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 let extraButtons;
                 if (isEdit) {
                     extraButtons=[
-                        <Button key='change' label={t('Change')} className="btn-secondary" onClickAsync={async () => owner.updateFormValue(prefix + 'mosaicoTemplateChangeModalVisible', true)}/>
+                        <Button key='change' label={t('change')} className="btn-secondary" onClickAsync={async () => owner.updateFormValue(prefix + 'mosaicoTemplateChangeModalVisible', true)}/>
                     ];
                 } else {
                     extraButtons = null;
