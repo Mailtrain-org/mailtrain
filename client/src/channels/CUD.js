@@ -512,7 +512,7 @@ export default class CUD extends Component {
 
                 {!canModify &&
                 <div className="alert alert-warning" role="alert">
-                    <Trans><b>Warning!</b> You do not have necessary permissions to edit this channel. Any changes that you perform here will be lost.</Trans>
+                    <Trans i18nKey="warning!YouDoNotHaveNecessaryPermissions-1"><b>Warning!</b> You do not have necessary permissions to edit this channel. Any changes that you perform here will be lost.</Trans>
                 </div>
                 }
 
@@ -536,9 +536,9 @@ export default class CUD extends Component {
                     <NamespaceSelect/>
 
                     <hr/>
-                    <Fieldset label={t('Campaign defaults')}>
-                        <InputField id="cpg_name" label={t('Campaign name')}/>
-                        <TextArea id="cpg_description" label={t('Campaign description')}/>
+                    <Fieldset label={t('campaignDefaults')}>
+                        <InputField id="cpg_name" label={t('campaignName-1')}/>
+                        <TextArea id="cpg_description" label={t('campaignDescription')}/>
                     </Fieldset>
 
                     <hr/>
@@ -549,7 +549,7 @@ export default class CUD extends Component {
 
                     <Fieldset label={t('sendSettings')}>
 
-                        <TableSelect id="send_configuration" label={t('sendConfiguration')} withHeader withClear dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
+                        <TableSelect id="send_configuration" label={t('sendConfiguration-1')} withHeader withClear dropdown dataUrl='rest/send-configurations-table' columns={sendConfigurationsColumns} selectionLabelIndex={1} />
 
                         {sendSettings}
 

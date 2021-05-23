@@ -111,12 +111,12 @@ class PreviewForTestUserModalDialog extends Component {
         ];
 
         return (
-            <ModalDialog hidden={!this.props.visible} title={t('Preview Campaign')} onCloseAsync={() => this.hideModal()} buttons={[
+            <ModalDialog hidden={!this.props.visible} title={t('previewCampaign')} onCloseAsync={() => this.hideModal()} buttons={[
                 { label: t('preview'), className: 'btn-primary', onClickAsync: ::this.previewAsync },
                 { label: t('close'), className: 'btn-danger', onClickAsync: ::this.hideModal }
             ]}>
                 <Form stateOwner={this}>
-                    <TableSelect id="testUser" label={t('Preview as')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
+                    <TableSelect id="testUser" label={t('previewAs')} withHeader dropdown dataUrl={`rest/campaigns-test-users-table/${this.props.entity.id}`} columns={testUsersColumns} selectionLabelIndex={1} />
                 </Form>
             </ModalDialog>
         );
@@ -175,7 +175,7 @@ class SendControls extends Component {
 
             const timezone = state.getIn(['timezone', 'value']);
             if (!timezone) {
-                state.setIn(['timezone', 'error'], t('Timezone must be selected'));
+                state.setIn(['timezone', 'error'], t('timezoneMustBeSelected'));
             }
         }
     }
@@ -271,7 +271,7 @@ class SendControls extends Component {
         const t = this.props.t;
         this.actionDialog(
             t('confirmLaunch'),
-            t('Do you want to schedule the campaign for launch?'),
+            t('doYouWantToScheduleTheCampaignForLaunch?'),
             async () => {
                 await this.scheduleAsync();
             }
@@ -354,8 +354,8 @@ class SendControls extends Component {
 
         const testButtons = (
             <>
-                <Button className="btn-success" label={t('Preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
-                {testSendPermitted && <Button className="btn-success" label={t('Test send')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>}
+                <Button className="btn-success" label={t('preview')} onClickAsync={async () => this.setState({previewForTestUserVisible: true})}/>
+                {testSendPermitted && <Button className="btn-success" label={t('testSend')} onClickAsync={async () => this.setState({showTestSendModal: true})}/>}
             </>
         );
 
@@ -370,7 +370,7 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.PAUSING) {
             sendStatus = (
                 <AlignedRow label={t('sendStatus')}>
-                    {t('Campaign is being paused. Please wait.')}
+                    {t('campaignIsBeingPausedPleaseWait')}
                 </AlignedRow>
             );
 
@@ -384,14 +384,14 @@ class SendControls extends Component {
         } else if (entity.status === CampaignStatus.FINISHED) {
             sendStatus = (
                 <AlignedRow label={t('sendStatus')}>
-                    {sendPermitted ? t('allMessagesSent!HitContinueIfYouYouWant') : t('All messages sent!')}
+                    {sendPermitted ? t('allMessagesSent!HitContinueIfYouWantTo') : t('allMessagesSent!')}
                 </AlignedRow>
             );
 
         } else if (entity.status === CampaignStatus.INACTIVE) {
             sendStatus = (
                 <AlignedRow label={t('sendStatus')}>
-                    {sendPermitted ? t('yourCampaignIsCurrentlyDisabledClick') : t('Your campaign is currently disabled.')}
+                    {sendPermitted ? t('yourCampaignIsCurrentlyDisabledClick') : t('yourCampaignIsCurrentlyDisabled')}
                 </AlignedRow>
             );
 
@@ -409,21 +409,21 @@ class SendControls extends Component {
             if (entity.status === CampaignStatus.IDLE || entity.status === CampaignStatus.PAUSED || (entity.status === CampaignStatus.SCHEDULED && entity.scheduled)) {
 
                 const timezoneColumns = [
-                    { data: 0, title: t('Timezone') }
+                    { data: 0, title: t('timezone') }
                 ];
 
                 const dateValue = (this.getFormValue('date') || '').trim();
                 const timeValue = (this.getFormValue('time') || '').trim();
                 const timezone = this.getFormValue('timezone');
 
-                let dateTimeHelp = t('Select date, time and a timezone to display the date and time with offset');
+                let dateTimeHelp = t('selectDateTimeAndATimezoneToDisplayThe');
                 let dateTimeAlert = null;
                 if (moment(dateValue, 'YYYY-MM-DD', true).isValid() && moment(timeValue, 'HH:mm', true).isValid() && timezone) {
                     const dateTime = moment.tz(dateValue + ' ' + timeValue, 'YYYY-MM-DD HH:mm', timezone);
 
                     dateTimeHelp = dateTime.toString();
                     if (!moment().isBefore(dateTime)) {
-                        dateTimeAlert = <div className="alert alert-danger" role="alert">{t('Scheduled date/time seems to be in the past. If you schedule the send, campaign will be sent immediately.')}</div>;
+                        dateTimeAlert = <div className="alert alert-danger" role="alert">{t('scheduledDatetimeSeemsToBeInThePastIfYou')}</div>;
                     }
                 }
 
@@ -436,7 +436,7 @@ class SendControls extends Component {
                         <div>
                             <DateTimePicker id="date" label={t('date')} />
                             <InputField id="time" label={t('time')} help={t('enter24HourTimeInFormatHhmmEg1348')}/>
-                            <TableSelect id="timezone" label={t('Timezone')} dropdown columns={timezoneColumns} selectionKeyIndex={0} selectionLabelIndex={0} data={this.timezoneOptions}
+                            <TableSelect id="timezone" label={t('timezone')} dropdown columns={timezoneColumns} selectionKeyIndex={0} selectionLabelIndex={0} data={this.timezoneOptions}
                                          help={dateTimeHelp}
                             />
                             {dateTimeAlert && <AlignedRow>{dateTimeAlert}</AlignedRow>}
@@ -452,7 +452,7 @@ class SendControls extends Component {
                             :
                             <Button className="btn-primary" icon="play" label={t('send')} onClickAsync={::this.confirmStart}/>
                         }
-                        {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('Cancel scheduling')} onClickAsync={::this.stopAsync}/>}
+                        {entity.status === CampaignStatus.SCHEDULED && <Button className="btn-primary" icon="pause" label={t('cancelScheduling')} onClickAsync={::this.stopAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <Button className="btn-primary" icon="redo" label={t('reset')} onClickAsync={::this.resetAsync}/>}
                         {entity.status === CampaignStatus.PAUSED && <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>}
                     </>
@@ -461,7 +461,7 @@ class SendControls extends Component {
             } else if (entity.status === CampaignStatus.PAUSING) {
                 sendButtons = (
                     <>
-                        <Button className="btn-primary" icon="pause" label={t('Pausing')} disabled={true}/>
+                        <Button className="btn-primary" icon="pause" label={t('pausing')} disabled={true}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                     </>
                 );
@@ -469,7 +469,7 @@ class SendControls extends Component {
             } else if (entity.status === CampaignStatus.SENDING || (entity.status === CampaignStatus.SCHEDULED && !entity.scheduled)) {
                 sendButtons = (
                     <>
-                        <Button className="btn-primary" icon="pause" label={t('Pause')} onClickAsync={::this.stopAsync}/>
+                        <Button className="btn-primary" icon="pause" label={t('pause')} onClickAsync={::this.stopAsync}/>
                         <LinkButton className="btn-secondary" icon="signal" label={t('viewStatistics')} to={`/campaigns/${entity.id}/statistics`}/>
                     </>
                 );
@@ -652,7 +652,7 @@ export default class Status extends Component {
                 <Title>{t('campaignStatus')}</Title>
 
                 <AlignedRow label={t('name')}>{entity.name}</AlignedRow>
-                <AlignedRow label={t('Sent')}>{entity.delivered}</AlignedRow>
+                <AlignedRow label={t('sent')}>{entity.delivered}</AlignedRow>
                 <AlignedRow label={t('status')}>{this.campaignStatusLabels[entity.status]}</AlignedRow>
 
                 {sendSettings}

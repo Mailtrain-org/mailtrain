@@ -40,7 +40,7 @@ function getMenus(t) {
             panelRender: props => <ReportsList permissions={props.permissions}/>,
             children: {
                 ':reportId([0-9]+)': {
-                    title: resolved => t('reportName', {name: ellipsizeBreadcrumbLabel(resolved.report.name)}),
+                    title: resolved => t('reportName-1', {name: ellipsizeBreadcrumbLabel(resolved.report.name)}),
                     resolve: {
                         report: params => `rest/reports/${params.reportId}`
                     },

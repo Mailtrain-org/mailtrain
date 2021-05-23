@@ -89,16 +89,16 @@ export default class API extends Component {
 <div class="accordion" id="apicalls">
     <div class="card">
         <div class="card-header">
-          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#moresubscribers"><h4>GET /api/subscriptions/:listCid – {t('Get subscribers')}</h4></button>
+          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#moresubscribers"><h4>GET /api/subscriptions/:listCid – {t('getSubscribers')}</h4></button>
         </div>
         <div id="moresubscribers" class="collapse" data-parent="#apicalls">
             <div class="card-body">
                <p>
-                    {t('Get subscribers')}
+                    {t('getSubscribers')}
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}
@@ -129,7 +129,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -168,7 +168,7 @@ export default class API extends Component {
 --data 'EMAIL=test@example.com&amp;MERGE_CHECKBOX=yes&amp;REQUIRE_CONFIRMATION=yes'</pre>
 
                 <p>
-                    {t('Response example')}:
+                    {t('responseExample')}:
                 </p>
                 <pre>"data": ("id":"TTrw41znK")</pre>
 
@@ -186,7 +186,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -207,7 +207,7 @@ export default class API extends Component {
 --data 'EMAIL=test@example.com'</pre>
 
                 <p>
-                    {t('Response example')}:
+                    {t('responseExample')}:
                 </p>
                 <pre>"data": ("id":"TTrw41znK", "unsubscribed":true)</pre>
 
@@ -225,7 +225,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -245,7 +245,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/delete/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'EMAIL=test@example.com'</pre>
                 <p>
-                    {t('Response example')}:
+                    {t('responseExample')}:
                 </p>
                 <pre>"data": ("id":"TTrw41znK", "deleted":true)</pre>
 
@@ -263,7 +263,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -304,7 +304,7 @@ export default class API extends Component {
                 <pre>curl -XPOST '{getUrl(`api/field/B16uVTdW?access_token=${accessToken}`)}' \<br/>
 --data 'NAME=Comment&TYPE=text'</pre>
                 <p>
-                    {t('Response example')}:
+                    {t('responseExample')}:
                 </p>
                 <pre>"data": ("id":22, "tag":"MERGE_COMMENT")</pre>
             </div>
@@ -321,7 +321,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}
@@ -353,7 +353,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -386,7 +386,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -419,7 +419,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -435,16 +435,16 @@ export default class API extends Component {
     </div>
     <div class="card">
         <div class="card-header">
-          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#morelistsnamespace"><h4>GET /api/lists-by-namespace/:namespaceId – {t('getListsInNamespace')}</h4></button>
+          <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#morelistsnamespace"><h4>GET /api/lists-by-namespace/:namespaceId – {t('getTheListsInANamespace')}</h4></button>
         </div>
         <div id="morelistsnamespace" class="collapse" data-parent="#apicalls">
             <div class="card-body">
                 <p>
-                  {t('retrieveTheListsThatTheNamespaceHas')}
+                  {t('retrieveTheListsThatTheNamespaceWith')}
                 </p>
 
                 <p>
-                  {t('Query params')}
+                  {t('queryParams')}
                 </p>
                 <ul>
                   <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -465,11 +465,11 @@ export default class API extends Component {
         <div id="morecreatelist" class="collapse" data-parent="#apicalls">
             <div class="card-body">
                 <p>
-                  {t('createListDescription')}
+                  {t('createsANewListOfSubscribers')}
                 </p>
 
                 <p>
-                  {t('Query params')}
+                  {t('queryParams')}
                 </p>
                 <ul>
                   <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -504,7 +504,7 @@ export default class API extends Component {
                   <li><strong>TO_NAME</strong> – {t('recipientsNameTemplate')}</li>
                   <li><strong>LISTUNSUBSCRIBE_DISABLED</strong> – {t('doNotSendListUnsubscribeHeaders')}</li>
                   <li><strong>PUBLIC_SUBSCRIBE</strong> – {t('allowPublicUsersToSubscribeThemselves')}</li>
-                  <li><strong>SEND_CONFIGURATION</strong> – {t('sendConfiguration-1')}</li>
+                  <li><strong>SEND_CONFIGURATION</strong> – {t('sendConfiguration')}</li>
                 </ul>
 
                 <p>
@@ -524,7 +524,7 @@ export default class API extends Component {
                   -d 'LISTUNSUBSCRIBE_DISABLED=0'
                 </pre>
                 <p>
-                    {t('Response example')}:
+                    {t('responseExample')}:
                 </p>
                 <pre>"data": ("id":"WSGjaP1fY")</pre>
             </div>
@@ -537,11 +537,11 @@ export default class API extends Component {
         <div id="moredeletelist" class="collapse" data-parent="#apicalls">
             <div class="card-body">
                 <p>
-                  {t('deleteListDescription')}
+                  {t('deletesAListOfSubscribers')}
                 </p>
 
                 <p>
-                  {t('Query params')}
+                  {t('queryParams')}
                 </p>
                 <ul>
                   <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -553,9 +553,9 @@ export default class API extends Component {
 
                 <pre>curl -XDELETE '{getUrl(`api/list/WSGjaP1fY?access_token=${accessToken}`)}'</pre>
                 <p>
-                    {t('Response example')}:
+                    {t('responseExample')}:
                 </p>
-                <pre>{t('Empty object')}</pre>
+                <pre>{t('emptyObject')}</pre>
             </div>
         </div>
     </div>
@@ -570,7 +570,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -595,7 +595,7 @@ export default class API extends Component {
                 </p>
 
                 <p>
-                    {t('Query params')}
+                    {t('queryParams')}
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
@@ -608,8 +608,8 @@ export default class API extends Component {
                     <li><strong>EMAIL</strong> – {t('emailAddress')} (<em>{t('required')}</em>)</li>
                     <li><strong>SEND_CONFIGURATION_ID</strong> – {t('idOfConfigurationUsedToCreateMailer')}</li>
                     <li><strong>SUBJECT</strong> – {t('subject')}</li>
-                    <li><strong>TAGS</strong> – {t('mapOfTemplatesubjectVariablesToReplace')}</li>
-                    <li><strong>ATTACHMENTS</strong> – {t('Attachments (format as consumed by nodemailer)')}</li>
+                    <li><strong>TAGS</strong> – {t('mapOfTemplateVariablesToReplace')}</li>
+                    <li><strong>ATTACHMENTS</strong> – {t('attachmentsFormatAsConsumedByNodemailer')}</li>
                 </ul>
 
                 <p>

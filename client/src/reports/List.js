@@ -71,7 +71,7 @@ export default class List extends Component {
 
                     if (state === ReportState.PROCESSING || state === ReportState.SCHEDULED) {
                         viewContent = {
-                            label: <Icon icon="hourglass" title={t('processing-1')}/>,
+                            label: <Icon icon="hourglass" title={t('processing-2')}/>,
                         };
 
                         startStop = {
