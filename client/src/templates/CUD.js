@@ -24,7 +24,7 @@ import {withErrorHandling} from '../lib/error-handling';
 import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {ContentModalDialog, DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
+import {getEditForm, getModals, getTagLanguages, getTemplateTypes, getTypeForm} from './helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
@@ -314,8 +314,10 @@ export default class CUD extends Component {
             editForm = getEditForm(this, typeKey);
         }
 
+        let modals = null;
         let typeForm = null;
         if (typeKey) {
+            modals = getModals(this, customTemplateTypeKey, isEdit);
             typeForm = getTypeForm(this, typeKey, isEdit);
         }
 
@@ -356,6 +358,7 @@ export default class CUD extends Component {
                         deletingMsg={t('deletingTemplate')}
                         deletedMsg={t('templateDeleted')}/>
                 }
+                {modals}
 
                 <Title>{isEdit ? t('editTemplate') : t('createTemplate')}</Title>
 

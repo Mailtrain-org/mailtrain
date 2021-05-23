@@ -25,7 +25,7 @@ import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
 import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {DeleteModalDialog} from "../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
-import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import {getModals, getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import campaignsStyles from "./styles.scss";
@@ -639,6 +639,7 @@ export default class CUD extends Component {
             sourceEdit = <Dropdown id="source" label={t('contentSource')} options={this.sourceOptions}/>
         }
 
+        let templateModals = null;
         let templateEdit = null;
         if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
             const templatesColumns = [
@@ -676,6 +677,7 @@ export default class CUD extends Component {
             let customTemplateTypeForm = null;
 
             if (customTemplateTypeKey) {
+                templateModals = getModals(this, customTemplateTypeKey, isEdit);
                 customTemplateTypeForm = getTypeForm(this, customTemplateTypeKey, isEdit);
             }
 
@@ -702,6 +704,7 @@ export default class CUD extends Component {
                         deletingMsg={t('deletingCampaign')}
                         deletedMsg={t('campaignDeleted')}/>
                 }
+                {templateModals}
 
                 <Title>{isEdit ? this.editTitles[this.getFormValue('type')] : this.createTitles[this.getFormValue('type')]}</Title>
 

@@ -1198,6 +1198,7 @@ class TableSelect extends Component {
         format: PropTypes.string,
         disabled: PropTypes.bool,
         withClear: PropTypes.bool,
+        extraButtons: PropTypes.array,
 
         pageLength: PropTypes.number
     }
@@ -1205,7 +1206,8 @@ class TableSelect extends Component {
     static defaultProps = {
         selectMode: TableSelectMode.SINGLE,
         selectionLabelIndex: 0,
-        pageLength: 10
+        pageLength: 10,
+        extraButtons: null
     }
 
     async onSelectionChangedAsync(sel, data) {
@@ -1268,21 +1270,33 @@ class TableSelect extends Component {
         if (props.dropdown) {
             const className = owner.addFormValidationClass('form-control', id);
 
+            let groupAppend = null;
+            if (!props.disabled) {
+                groupAppend = (
+                    <div className="input-group-append">
+                        <Button label={t('select')} className="btn-secondary" onClickAsync={::this.toggleOpen}/>
+                        {props.withClear && selection && <Button icon="times" title={t('Clear')} className="btn-secondary" onClickAsync={::this.clear}/>}
+                        {props.extraButtons}
+                    </div>
+                );
+            } else if (props.extraButtons) {
+                groupAppend = (
+                    <div className="input-group-append">
+                        {props.extraButtons}
+                    </div>
+                );
+            }
+
             return wrapInput(id, htmlId, owner, props.format, '', props.label, props.help,
                 <div>
-                    <div className={(props.disabled ? '' : 'input-group ') + styles.tableSelectDropdown}>
+                    <div className={(groupAppend ? 'input-group ' : '') + styles.tableSelectDropdown}>
                         <input type="text"
                                className={className}
                                value={this.state.selectedLabel}
                                onClick={::this.toggleOpen}
                                readOnly={!props.disabled}
                                disabled={props.disabled}/>
-                        {!props.disabled &&
-                        <div className="input-group-append">
-                            <Button label={t('select')} className="btn-secondary" onClickAsync={::this.toggleOpen}/>
-                            {props.withClear && selection && <Button icon="times" title={t('Clear')} className="btn-secondary" onClickAsync={::this.clear}/>}
-                        </div>
-                        }
+                        { groupAppend }
                     </div>
                     <div
                         className={styles.tableSelectTable + (this.state.open ? '' : ' ' + styles.tableSelectTableHidden)}>

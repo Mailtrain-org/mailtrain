@@ -17,7 +17,14 @@ import {
 } from '../lib/form';
 import {withErrorHandling} from '../lib/error-handling';
 import mailtrainConfig from 'mailtrainConfig';
-import {getEditForm, getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
+import {
+    getEditForm,
+    getModals,
+    getTagLanguages,
+    getTemplateTypes,
+    getTypeForm,
+    ResourceType
+} from '../templates/helpers';
 import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
@@ -275,6 +282,7 @@ export default class CustomContent extends Component {
                     onHide={() => this.setState({showExportModal: false})}
                     getContentAsync={this.exportModalGetContentHandler}
                 />
+                {customTemplateTypeKey && getModals(this, customTemplateTypeKey, true)}
 
                 <Title>{t('editCustomContent')}</Title>
 
