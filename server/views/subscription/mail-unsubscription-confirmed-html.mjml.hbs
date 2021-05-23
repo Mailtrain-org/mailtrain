@@ -1,16 +1,17 @@
 <mj-section>
     <mj-column>
         <mj-text mj-class="h3">
-            You Are Now Unsubscribed
+            {{#translate}}youAreNowUnsubscribed{{/translate}}
         </mj-text>
         <mj-text mj-class="p">
-            We have removed your email address from our list. If you unsubscribed by mistake, you can re-subscribe at:
+            ̣{{#translate}}weHaveRemovedYourEmailAddressFromOurList{{/translate}}
+            {{#translate}}ifYouUnsubscribedByMistakeYouCan{{/translate}}:
         </mj-text>
         <mj-button mj-class="button" href="{{subscribeUrl}}">
-            Subscribe
+            ̣{{#translate}}subscribe{{/translate}}
         </mj-button>
         <mj-text mj-class="p">
-            For questions about this list, please contact:
+            {{#translate}}forQuestionsAboutThisListPleaseContact{{/translate}}
             <br/><a href="mailto:{{contactAddress}}">{{contactAddress}}</a>
         </mj-text>
     </mj-column>

@@ -1,16 +1,16 @@
 <mj-section>
     <mj-column>
         <mj-text mj-class="h3">
-            Please Confirm Subscription
+            {{#translate}}pleaseConfirmSubscription{{/translate}}
         </mj-text>
         <mj-button mj-class="button" href="{{confirmUrl}}">
-            Yes, subscribe me to this list
+            {{#translate}}yesSubscribeMeToThisList{{/translate}}
         </mj-button>
         <mj-text mj-class="p">
-            If you received this email by mistake, simply delete it. You won't be subscribed if you don't click the confirmation link above.
+            {{#translate}}ifYouReceivedThisEmailByMistakeSimply-1{{/translate}}
         </mj-text>
         <mj-text mj-class="p">
-            For questions about this list, please contact:
+            {{#translate}}forQuestionsAboutThisListPleaseContact{{/translate}}
             <br/><a href="mailto:{{contactAddress}}">{{contactAddress}}</a>
         </mj-text>
     </mj-column>
