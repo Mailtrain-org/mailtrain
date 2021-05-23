@@ -1,7 +1,7 @@
 'use strict';
 
-import React from "react";
-import {ACEEditor, AlignedRow, Dropdown, StaticField, TableSelect} from "../lib/form";
+import React, {Component} from "react";
+import {ACEEditor, AlignedRow, Dropdown, Form, StaticField, TableSelect, withForm} from "../lib/form";
 import 'ace-builds/src-noconflict/mode-text';
 import 'ace-builds/src-noconflict/mode-html';
 
@@ -17,11 +17,17 @@ import {CodeEditorSourceType, getCodeEditorSourceTypeOptions} from "../lib/sandb
 import {getTemplateTypes as getMosaicoTemplateTypes} from './mosaico/helpers';
 import {getSandboxUrl} from "../lib/urls";
 import mailtrainConfig from 'mailtrainConfig';
-import {ActionLink, Button} from "../lib/bootstrap-components";
+import {ActionLink, Button, ModalDialog} from "../lib/bootstrap-components";
 import {Trans} from "react-i18next";
-import {TagLanguages, renderTag} from "../../../shared/templates";
+import {renderTag, TagLanguages} from "../../../shared/templates";
 
 import styles from "../lib/styles.scss";
+import PropTypes from "prop-types";
+import {withComponentMixins} from "../lib/decorator-helpers";
+import {withTranslation} from "../lib/i18n";
+import {withErrorHandling} from "../lib/error-handling";
+import {withPageHelpers} from "../lib/page-common";
+import {requiresAuthenticatedUser} from "../lib/page";
 
 export const ResourceType = {
     TEMPLATE: 'template',
@@ -37,6 +43,147 @@ export function getTagLanguages(t) {
             name: t('Handlebars')
         }
     };
+}
+
+function getMosaicoTemplatesColumns(t) {
+    const mosaicoTemplateTypes = getMosaicoTemplateTypes(t);
+    const mosaicoTemplatesColumns = [
+        {
+            data: 1,
+            title: t('name')
+        },
+        {
+            data: 2,
+            title: t('description')
+        },
+        {
+            data: 3,
+            title: t('type'),
+            render: data => mosaicoTemplateTypes[data].typeName
+        },
+        {
+            data: 6,
+            title: t('namespace')
+        },
+    ];
+
+    return mosaicoTemplatesColumns;
+}
+
+
+@withComponentMixins([
+    withTranslation,
+    withForm,
+    withErrorHandling,
+    withPageHelpers,
+    requiresAuthenticatedUser
+])
+class MosaicoTemplateChangeModalDialog extends Component {
+    constructor() {
+        super();
+
+        this.initForm({
+            leaveConfirmation: false
+        });
+
+        this.hideModalHandler = ::this.hideModal;
+        this.performActionHandler = ::this.performAction;
+    }
+
+    static propTypes = {
+        visible: PropTypes.bool.isRequired,
+        onHide: PropTypes.func.isRequired,
+        owner: PropTypes.object,
+        prefix: PropTypes.string,
+    }
+
+    componentDidMount() {
+        const owner = this.props.owner;
+        const prefix = this.props.prefix;
+
+        this.populateFormValues({
+            mosaicoTemplate: owner.getFormValue(prefix + 'mosaicoTemplate')
+        });
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const owner = this.props.owner;
+        const prefix = this.props.prefix;
+
+        if (!prevProps.visible && this.props.visible) {
+            this.updateFormValue('mosaicoTemplate', owner.getFormValue(prefix + 'mosaicoTemplate'))
+        }
+    }
+
+    localValidateFormValues(state) {
+        const t = this.props.t;
+
+        state.setIn(['mosaicoTemplate', 'error'], null);
+        if (!state.getIn(['mosaicoTemplate', 'value'])) {
+            state.setIn(['mosaicoTemplate', 'error'], t('mosaicoTemplateMustBeSelected'))
+        }
+    }
+
+    async hideModal() {
+        this.props.onHide();
+    }
+
+    async performAction() {
+        if (this.isFormWithoutErrors()) {
+            const owner = this.props.owner;
+            const prefix = this.props.prefix;
+            const state = await owner.editorNode.exportState();
+
+            this.props.owner.updateFormValue(prefix + 'mosaicoTemplate', this.getFormValue('mosaicoTemplate'));
+
+            // If the sandbox is still loading, the exportState returns null.
+            if (state) {
+                owner.updateFormValue(prefix + 'mosaicoData', {
+                    metadata: state.metadata,
+                    model: state.model
+                });
+            }
+
+            this.props.owner.updateFormValue(prefix + 'mosaicoEditorEpoch', owner.getFormValue(prefix + 'mosaicoEditorEpoch') + 1);
+            this.hideModal();
+        } else {
+            this.showFormValidation();
+        }
+    }
+
+    render() {
+        const t = this.props.t;
+        const owner = this.props.owner;
+        const prefix = this.props.prefix;
+        const tagLanguageKey = owner.getFormValue(prefix + 'tag_language');
+
+        if (tagLanguageKey) {
+            return (
+                <ModalDialog hidden={!this.props.visible} title={t('Change Mosaico Template')} onCloseAsync={this.hideModalHandler} buttons={[
+                    { label: t('Cancel'), className: 'btn-primary', onClickAsync: this.hideModalHandler },
+                    { label: t('Apply'), className: 'btn-danger', onClickAsync: this.performActionHandler }
+                ]}>
+                    <Form stateOwner={this} format="wide">
+                        <div className="alert alert-warning" role="alert">
+                            <Trans><b>Warning!</b> Switching the Mosaico template works only if the original and the new templates use the same fields. If they do not, your data will be lost. Please make sure you save your work before performing this operation.</Trans>
+                        </div>
+                        <TableSelect
+                            id={'mosaicoTemplate'}
+                            label={t('mosaicoTemplate')}
+                            withHeader
+                            dropdown
+                            dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}`}
+                            columns={getMosaicoTemplatesColumns(t)}
+                            selectionLabelIndex={1}
+                        />
+                    </Form>
+                </ModalDialog>
+            );
+
+        } else {
+            return null;
+        }
+    }
 }
 
 export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEMPLATE, allowEmpty = false) {
@@ -62,44 +209,42 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         }
     }
 
-
-    const mosaicoTemplateTypes = getMosaicoTemplateTypes(t);
-    const mosaicoTemplatesColumns = [
-        {
-            data: 1,
-            title: t('name')
-        },
-        {
-            data: 2,
-            title: t('description')
-        },
-        {
-            data: 3,
-            title: t('type'),
-            render: data => mosaicoTemplateTypes[data].typeName
-        },
-        {
-            data: 6,
-            title: t('namespace')
-        },
-    ];
-
     templateTypes.mosaico = {
         typeName: t('mosaico'),
+        getModals: (owner, isEdit) => (
+            <MosaicoTemplateChangeModalDialog
+                owner={owner}
+                prefix={prefix}
+                visible={owner.getFormValue(prefix + 'mosaicoTemplateChangeModalVisible')}
+                onHide={() => owner.updateFormValue(prefix + 'mosaicoTemplateChangeModalVisible', false)}
+            />
+        ),
         getTypeForm: (owner, isEdit) => {
             const tagLanguageKey = owner.getFormValue(prefix + 'tag_language');
             if (tagLanguageKey) {
-                return <TableSelect
-                    id={prefix + 'mosaicoTemplate'}
-                    label={t('mosaicoTemplate')}
-                    withHeader
-                    dropdown
-                    dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}`}
-                    columns={mosaicoTemplatesColumns}
-                    selectionLabelIndex={1}
-                    disabled={isEdit}
-                    withClear={allowEmpty}
-                />
+                let extraButtons;
+                if (isEdit) {
+                    extraButtons=[
+                        <Button key='change' label={t('Change')} className="btn-secondary" onClickAsync={async () => owner.updateFormValue(prefix + 'mosaicoTemplateChangeModalVisible', true)}/>
+                    ];
+                } else {
+                    extraButtons = null;
+                }
+
+                return (
+                    <TableSelect
+                        id={prefix + 'mosaicoTemplate'}
+                        label={t('mosaicoTemplate')}
+                        withHeader
+                        dropdown
+                        dataUrl={`rest/mosaico-templates-by-tag-language-table/${tagLanguageKey}`}
+                        columns={getMosaicoTemplatesColumns(t)}
+                        selectionLabelIndex={1}
+                        disabled={isEdit}
+                        withClear={allowEmpty}
+                        extraButtons={extraButtons}
+                    />
+                );
             } else {
                 return null;
             }
@@ -108,6 +253,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
             <AlignedRow
                 label={t('templateContentHtml')}>
                 <MosaicoHost
+                    key={`editor-${owner.getFormValue(prefix + 'mosaicoEditorEpoch')}`}
                     ref={owner.editorNodeRefHandler}
                     entity={owner.props.entity}
                     initialModel={owner.getFormValue(prefix + 'mosaicoData').model}
@@ -144,7 +290,9 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
         },
         initData: () => ({
             [prefix + 'mosaicoTemplate']: null,
-            [prefix + 'mosaicoData']: {}
+            [prefix + 'mosaicoData']: {},
+            [prefix + 'mosaicoTemplateChangeModalVisible']: false,
+            [prefix + 'mosaicoEditorEpoch']: 0
         }),
         afterLoad: data => {
             data[prefix + 'mosaicoTemplate'] = data[prefix + 'data'].mosaicoTemplate;
@@ -152,6 +300,8 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
                 metadata: data[prefix + 'data'].metadata,
                 model: data[prefix + 'data'].model
             };
+            data[prefix + 'mosaicoTemplateChangeModalVisible'] = false;
+            data[prefix + 'mosaicoEditorEpoch'] = 0;
         },
         beforeSave: data => {
             data[prefix + 'data'] = {
@@ -182,6 +332,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     templateTypes.mosaicoWithFsTemplate = {
         typeName: t('mosaicoWithPredefinedTemplates'),
+        getModals: (owner, isEdit) => null,
         getTypeForm: (owner, isEdit) => {
             if (isEdit) {
                 return <StaticField
@@ -270,6 +421,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     templateTypes.grapesjs = {
         typeName: t('grapesJs'),
+        getModals: (owner, isEdit) => null,
         getTypeForm: (owner, isEdit) => {
             if (isEdit) {
                 return <StaticField
@@ -352,6 +504,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     templateTypes.ckeditor4 = {
         typeName: t('ckEditor4'),
+        getModals: (owner, isEdit) => null,
         getTypeForm: (owner, isEdit) => null,
         getHTMLEditor: owner =>
             <AlignedRow
@@ -420,6 +573,7 @@ export function getTemplateTypes(t, prefix = '', entityTypeId = ResourceType.TEM
 
     templateTypes.codeeditor = {
         typeName: t('codeEditor'),
+        getModals: (owner, isEdit) => null,
         getTypeForm: (owner, isEdit) => {
             const sourceType = owner.getFormValue(prefix + 'codeEditorSourceType');
             if (isEdit) {
@@ -708,5 +862,9 @@ export function getEditForm(owner, typeKey, prefix = '') {
 
 export function getTypeForm(owner, typeKey, isEdit) {
     return owner.templateTypes[typeKey].getTypeForm(owner, isEdit);
+}
+
+export function getModals(owner, typeKey, isEdit) {
+    return owner.templateTypes[typeKey].getModals(owner, isEdit);
 }
 

@@ -3,41 +3,14 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {withTranslation} from '../lib/i18n';
-import {LinkButton, requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
-import {
-    AlignedRow,
-    Button,
-    ButtonRow,
-    CheckBox,
-    Dropdown,
-    Fieldset,
-    filterData,
-    Form,
-    FormSendMethod,
-    InputField,
-    StaticField,
-    TableSelect,
-    TextArea,
-    withForm,
-    withFormErrorHandlers
-} from '../lib/form';
-import {withAsyncErrorHandler, withErrorHandling} from '../lib/error-handling';
-import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
-import {DeleteModalDialog} from "../lib/modals";
-import mailtrainConfig from 'mailtrainConfig';
-import {getTagLanguages, getTemplateTypes, getTypeForm, ResourceType} from '../templates/helpers';
-import axios from '../lib/axios';
-import styles from "../lib/styles.scss";
-import campaignsStyles from "./styles.scss";
-import {getUrl} from "../lib/urls";
-import {campaignOverridables, CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page'
+import {Button, ButtonRow, Form, TableSelect, withForm, withFormErrorHandlers} from '../lib/form';
+import {withErrorHandling} from '../lib/error-handling';
+import {getTagLanguages, getTemplateTypes, ResourceType} from '../templates/helpers';
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels} from "./helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import interoperableErrors from "../../../shared/interoperable-errors";
-import {Trans} from "react-i18next";
-import {Table} from "../lib/table";
 
 @withComponentMixins([
     withTranslation,
