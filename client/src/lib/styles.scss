@@ -1,4 +1,6 @@
 @import "../scss/variables.scss";
+@import "../scss/mixins";
+@import "~react-day-picker/lib/style.css";
 
 .toolbar {
   float: right;
@@ -37,7 +39,9 @@
 }
 
 .dayPickerWrapper {
-  text-align: right;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
 }
 
 .buttonRow {
@@ -105,6 +109,92 @@
   }
 }
 
+.inputContainer {
+  position: relative;
+
+  .inputHints {
+    position: absolute;
+    border-top: 0;
+    width: 100%;
+    top: 100%;
+    z-index: 100;
+  }
+
+  .inputHint {
+    padding: 0.5rem;
+  }
+
+}
+
+.columnSelectWrapper {
+  display: flex;
+  flex-flow: column nowrap;
+  text-align: center;
+}
+
+.columnScroller{
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+
+  &:hover {
+    //border: 1px dashed var(--gray);
+    box-shadow:0 0 1px 1px var(--gray);
+  }
+}
+
+.columnSelectHeader {
+  color: var(--gray);
+  text-align: center;
+}
+
+.columnSelect {
+  list-style-type: none;
+  overflow: hidden;
+  padding:0;
+  height: 20em;
+  margin: 0;
+
+  @include hocus(){
+    overflow-y: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar { /* WebKit */
+      width: 0;
+      height: 0;
+    }
+  }
+}
+
+.columnSelectItem {
+  padding: 0 20px;
+  cursor: pointer;
+
+  &.columnSelectItemSelected {
+    background-color: #4A90E2;
+    color:white;
+    @include hocus() {
+      background-color:#51A0FA;
+    }
+  }
+
+  @include hocus(){
+    background-color: #F0F8FF;
+  }
+}
+
+.TimePicker {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  border: $input-border-width solid $input-border-color;
+  border-radius: $input-border-radius;
+  padding: $input-padding-y $input-padding-x;
+}
+
 .colorPickerSwatchWrapper {
   padding: 7px;
   background: #fff;
@@ -116,7 +206,7 @@
   .colorPickerSwatchColor {
     width: 60px;
     height: 18px;
-    borderRadius: 2px;
+    border-radius: 2px;
   }
 }
 
@@ -124,7 +214,22 @@
   text-align: right;
 }
 
-.checkboxText{
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.dialog {
+  z-index: 1001;
+  position: relative;
+}
+
+.checkboxText {
   padding-top: 3px;
 }
 
@@ -145,7 +250,7 @@
   }
 }
 
-.dropZoneActive{
+.dropZoneActive {
   border-color: #90EE90;
   color: #000;
   background-color: #DDFFDD;

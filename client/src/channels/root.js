@@ -8,8 +8,16 @@ import ChannelsCUD from './CUD';
 import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 import {namespaceCheckPermissions} from "../lib/namespace";
+import Clone from "../campaigns/Clone";
+import {CampaignType} from "../../../shared/campaigns";
 
 function getMenus(t) {
+    const createLabels = {
+        [CampaignType.REGULAR]: t('createRegularCampaign'),
+        [CampaignType.RSS]: t('createRssCampaign'),
+        [CampaignType.TRIGGERED]: t('createTriggeredCampaign')
+    };
+
     return {
         'channels': {
             title: t('channels'),
@@ -60,6 +68,20 @@ function getMenus(t) {
                             link: params => `/channels/${params.channelId}/create`,
                             visible: resolved => resolved.channel.permissions.includes('createCampaign'),
                             panelRender: props => <CampaignsCUD action="create" createFromChannel={props.resolved.channel} permissions={props.permissions} />,
+                        },
+                        'clone': {
+                            title: t('createCampaign'),
+                            link: params => `/channels/${params.channelId}/clone`,
+                            panelRender: props => <Clone cloneFromChannel={props.resolved.channel}/>,
+                            children: {
+                                ':existingCampaignId([0-9]+)': {
+                                    title: resolved => createLabels[resolved.existingCampaign.type],
+                                    resolve: {
+                                        existingCampaign: params => `rest/campaigns-settings/${params.existingCampaignId}`
+                                    },
+                                    panelRender: props => <CampaignsCUD action="create" createFromCampaign={props.resolved.existingCampaign} permissions={props.permissions} />
+                                }
+                            }
                         }
                     }
                 },

@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import {DatePicker, Dropdown, InputField} from "../../lib/form";
+import {DateTimePicker, Dropdown, InputField} from "../../lib/form";
 import {DateFormat, formatBirthday, formatDate, parseBirthday, parseDate} from '../../../../shared/date';
 import {tMark} from "../../lib/i18n";
 
@@ -260,7 +260,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const birthdayValueSettings = {
-        getForm: fldDef => <DatePicker id="birthday" label={t('date')} birthday />,
+        getForm: fldDef => <DateTimePicker id="birthday" label={t('date')} birthday />,
         getFormData: (rule, fldDef) => ({
             birthday: formatBirthday(DateFormat.INTL, rule.value)
         }),
@@ -281,7 +281,7 @@ export function getRuleHelpers(t, fields) {
     };
 
     const dateValueSettings = {
-        getForm: fldDef => <DatePicker id="date" label={t('date')} />,
+        getForm: fldDef => <DateTimePicker id="date" label={t('date')} />,
         getFormData: (rule, fldDef) => ({
             date: formatDate(DateFormat.INTL, rule.value)
         }),

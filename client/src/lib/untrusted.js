@@ -171,6 +171,27 @@ export class UntrustedContentHost extends Component {
     }
 }
 
+class ErrorBoundary extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {hasError: false};
+    }
+
+    static getDerivedStateFromError(error) {
+        return {
+            hasError: true,
+            error: error
+        };
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return <p>Embedding failed. There is probably error in panel parameters.</p>;
+        }
+
+        return this.props.children;
+    }
+}
 
 @withComponentMixins([
     withTranslation
@@ -243,7 +264,11 @@ export class UntrustedContentRoot extends Component {
         const t = this.props.t;
 
         if (this.state.initialized) {
-            return this.props.render(this.state.contentProps);
+            return (
+                <ErrorBoundary>
+                    {this.props.render(this.state.contentProps)}
+                </ErrorBoundary>
+            );
         } else {
             return (
                 <div className="sandbox-loading-message">

@@ -51,7 +51,7 @@ export class Icon extends Component {
         const props = this.props;
 
         if (props.family === 'fas' || props.family === 'far') {
-            return <i className={`${props.family} fa-${props.icon} ${props.className || ''}`} title={props.title}></i>;
+            return <i className={`${props.family} fa-${props.icon} ${props.className || ''}`} title={props.title}/>;
         } else {
             console.error(`Icon font family ${props.family} not supported. (icon: ${props.icon}, title: ${props.title})`)
             return null;
@@ -192,6 +192,53 @@ export class DropdownActionLink extends Component {
 
         return (
             <ActionLink className={clsName} onClickAsync={props.onClickAsync}>{props.children}</ActionLink>
+        );
+    }
+}
+
+
+/** The `DropdownActionLink` closes the dropdown when clicked (because `evt.stopPropagation()` does not work correctly
+ *  with React events). Use this component if you need the Dropdown to remain opened when action link is clicked. */
+@withComponentMixins([
+    withErrorHandling
+])
+export class DropdownActionLinkKeepOpen extends Component {
+    static propTypes = {
+        onClickAsync: PropTypes.func,
+        className: PropTypes.string,
+        disabled: PropTypes.bool
+    }
+
+    @withAsyncErrorHandler
+    onClick(evt) {
+        if (this.props.onClickAsync) {
+            evt.preventDefault();
+            evt.stopPropagation();
+
+            this.props.onClickAsync(evt);
+        }
+    }
+
+    componentDidMount() {
+        this.element.addEventListener('click', ::this.onClick);
+    }
+
+    componentWillUnmount() {
+        this.element.removeEventListener('click', ::this.onClick);
+    }
+
+    render() {
+        const props = this.props;
+
+        let clsName = "dropdown-item ";
+        if (props.disabled) {
+            clsName += "disabled ";
+        }
+
+        clsName += props.className;
+
+        return (
+            <a href={props.href || ''}  className={clsName} ref={node => this.element = node}>{props.children}</a>
         );
     }
 }

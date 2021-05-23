@@ -54,7 +54,9 @@ class Table extends Component {
         withHeader: PropTypes.bool,
         refreshInterval: PropTypes.number,
         pageLength: PropTypes.number,
-        order: PropTypes.array
+        order: PropTypes.array,
+        search: PropTypes.string, // initial value of the search field
+        searchCols: PropTypes.arrayOf(PropTypes.string), // should have same length as `columns`, set items to `null` to prevent search
     }
 
     static defaultProps = {
@@ -256,6 +258,7 @@ class Table extends Component {
 
                 column.type = 'html';
                 column.createdCell = createdCellFn;
+                column.render = () => '';
 
                 if (!('data' in column)) {
                     column.data = null;
@@ -287,6 +290,13 @@ class Table extends Component {
                 "<'row'<'col-sm-12'<'" + styles.dataTableTable + "'tr>>>" +
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
         };
+        if (this.props.search)
+            dtOptions.search = { search: this.props.search };
+        if (this.props.searchCols) {
+            dtOptions.searchCols = this.props.searchCols.map(value => value !== null ? ({
+                search: value,
+            }) : null)
+        }
 
         const self = this;
         dtOptions.createdRow = function(row, data) {

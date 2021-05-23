@@ -6,7 +6,7 @@ import {
     ACEEditor,
     CheckBox,
     CheckBoxGroup,
-    DatePicker,
+    DateTimePicker,
     Dropdown,
     InputField,
     RadioGroup,
@@ -69,7 +69,7 @@ export function getFieldTypes(t) {
     };
 
     const dateFieldType = {
-        form: groupedField => <DatePicker key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} />,
+        form: groupedField => <DateTimePicker key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} />,
         assignFormData: (groupedField, data) => {
             const value = data[getFieldColumn(groupedField)];
             data[getFieldColumn(groupedField)] = value ? formatDate(groupedField.settings.dateFormat, value) : '';
@@ -94,7 +94,7 @@ export function getFieldTypes(t) {
     };
 
     const birthdayFieldType = {
-        form: groupedField => <DatePicker key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} birthday />,
+        form: groupedField => <DateTimePicker key={getFieldColumn(groupedField)} id={getFieldColumn(groupedField)} label={groupedField.name} dateFormat={groupedField.settings.dateFormat} birthday />,
         assignFormData: (groupedField, data) => {
             const value = data[getFieldColumn(groupedField)];
             data[getFieldColumn(groupedField)] = value ? formatBirthday(groupedField.settings.dateFormat, value) : '';
