@@ -317,7 +317,7 @@ export default class CUD extends Component {
         let modals = null;
         let typeForm = null;
         if (typeKey) {
-            modals = getModals(this, customTemplateTypeKey, isEdit);
+            modals = getModals(this, typeKey, isEdit);
             typeForm = getTypeForm(this, typeKey, isEdit);
         }
 
