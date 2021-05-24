@@ -13,7 +13,7 @@ const seenIds = new Set();
 let remainder = '';
 let reading = false;
 
-async function readNextChunks() {
+async function readNextChunks(socket) {
     if (reading) {
         return false;
     }
@@ -91,7 +91,7 @@ function start(callback) {
     let started = false; // Not sure why all this magic around "started". But it was there this way in Mailtrain v1, so we kept it.
 
     const server = net.createServer(socket => {
-        socket.on('readable', readNextChunks);
+        socket.on('readable', () => readNextChunks(socket));
     });
 
     server.on('error', err => {

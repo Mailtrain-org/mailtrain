@@ -177,7 +177,7 @@ module.exports = list => ({
     webUnsubscribedNotice: web({
         baseUrl: config.basePublicUrl,
         url: `/subscription/${list.cid}/unsubscribed-notice`,
-        textsToWaitFor: ['Unsubscribe Successful']
+        textsToWaitFor: ['Unsubscription Confirmed']
     }),
 
     mailUnsubscriptionConfirmed: mail({

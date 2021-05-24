@@ -1,17 +1,17 @@
 <mj-section>
     <mj-column>
         <mj-text mj-class="h3">
-            Subscription Confirmed
+            {{#translate}}subscriptionConfirmed{{/translate}}
         </mj-text>
         <mj-text mj-class="p">
-            Your subscription to our list has been confirmed. If you want to modify your subscription then you can
-            <a href="{{preferencesUrl}}">manage your preferences</a> or <a href="{{unsubscribeUrl}}">unsubscribe here</a>.
+            {{#translate}}yourSubscriptionToOurListHasBeen{{/translate}} {{#translate}}ifYouWantToModifyYourSubscriptionThenYou{{/translate}}
+            <a href="{{preferencesUrl}}">{{#translate}}manageYourPreferences{{/translate}}</a> {{#translate}}or{{/translate}} <a href="{{unsubscribeUrl}}">{{#translate}}unsubscribeHere{{/translate}}</a>.
         </mj-text>
         <mj-button mj-class="button" href="{{homepage}}">
-            Return to our website
+            {{#translate}}returnToOurWebsite{{/translate}}
         </mj-button>
         <mj-text mj-class="p">
-            For questions about this list, please contact:
+            {{#translate}}forQuestionsAboutThisListPleaseContact{{/translate}}
             <br/><a href="mailto:{{contactAddress}}">{{contactAddress}}</a>
         </mj-text>
     </mj-column>
