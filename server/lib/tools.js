@@ -144,8 +144,8 @@ function validateEmailGetMessage(result, address, language) {
     }
 }
 
-function formatCampaignTemplate(source, tagLanguage, mergeTags, isHTML, campaign, list, subscription) {
-    const links = getMessageLinks(campaign, list, subscription);
+function formatCampaignTemplate(source, tagLanguage, mergeTags, isHTML, campaign, campaignListsById, list, subscription) {
+    const links = getMessageLinks(campaign, campaignListsById, list, subscription);
     mergeTags = {...mergeTags, ...links};
     return formatTemplate(source, tagLanguage, mergeTags, isHTML);
 }
@@ -227,13 +227,32 @@ async function prepareHtml(html) {
     return juice(preparedHtml);
 }
 
-function getMessageLinks(campaign, list, subscription) {
+function getMessageLinks(campaign, campaignListsById, list, subscription) {
     const result = {};
 
     if (list && subscription) {
         if (campaign) {
             result.LINK_UNSUBSCRIBE = getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscription.cid + '?c=' + campaign.cid);
             result.LINK_BROWSER = getPublicUrl('/archive/' + campaign.cid + '/' + list.cid + '/' + subscription.cid);
+
+            if (campaign.lists) {
+                let cpgListIdx = 0;
+                let cpgPublicListIdx = 0;
+                for (const cpgListSpec of campaign.lists) {
+                    const cpgList = campaignListsById.get(cpgListSpec.list);
+
+                    result[`LIST_ID_${cpgListIdx}`] = cpgList.cid;
+                    cpgListIdx += 1;
+
+                    if (cpgList.public_subscribe) {
+                        if (!result.LINK_PUBLIC_SUBSCRIBE) {
+                            result.LINK_PUBLIC_SUBSCRIBE = getPublicUrl('/subscription/' + cpgList.cid)
+                        }
+                        result[`PUBLIC_LIST_ID_${cpgPublicListIdx}`] = cpgList.cid;
+                        cpgPublicListIdx += 1;
+                    }
+                }
+            }
         } else {
             result.LINK_UNSUBSCRIBE = getPublicUrl('/subscription/' + list.cid + '/unsubscribe/' + subscription.cid);
         }

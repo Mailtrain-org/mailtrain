@@ -139,10 +139,12 @@ export default class CustomContent extends Component {
     localValidateFormValues(state) {
         const t = this.props.t;
 
+        for (const key of state.keys()) {
+            state.setIn([key, 'error'], null);
+        }
+
         if (!state.getIn(['data_sourceCustom_tag_language', 'value'])) {
             state.setIn(['data_sourceCustom_tag_language', 'error'], t('tagLanguageMustBeSelected'));
-        } else {
-            state.setIn(['data_sourceCustom_tag_language', 'error'], null);
         }
 
         const customTemplateTypeKey = state.getIn(['data_sourceCustom_type', 'value']);

@@ -140,7 +140,7 @@ async function addOrGet(campaignId, url) {
     }
 }
 
-async function updateLinks(source, tagLanguage, mergeTags, campaign, list, subscription) {
+async function updateLinks(source, tagLanguage, mergeTags, campaign, campaignListsById, list, subscription) {
     if ((campaign.open_tracking_disabled && campaign.click_tracking_disabled) || !source || !source.trim()) {
         // tracking is disabled, do not modify the message
         return source;
@@ -173,7 +173,7 @@ async function updateLinks(source, tagLanguage, mergeTags, campaign, list, subsc
         const urls = new Map(); // url -> {id, cid} (as returned by add)
         for (const url of urlsToBeReplaced) {
             // url might include variables, need to rewrite those just as we do with message content
-            const expanedUrl = encodeURI(tools.formatCampaignTemplate(url, tagLanguage, mergeTags, false, campaign, list, subscription));
+            const expanedUrl = encodeURI(tools.formatCampaignTemplate(url, tagLanguage, mergeTags, false, campaign, campaignListsById, list, subscription));
             const link = await addOrGet(campaign.id, expanedUrl);
             urls.set(url, link);
         }

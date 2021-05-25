@@ -35,6 +35,11 @@ class MosaicoSandbox extends Component {
     }
 
     async exportState(method, params) {
+        if (!this.viewModel) {
+            // If something fails (e.g. the mosaico template does not exists, the viewModel is not defined
+            return null;
+        }
+
         const trustedUrlBase = getTrustedUrl();
         const sandboxUrlBase = getSandboxUrl();
         const publicUrlBase = getPublicUrl();
