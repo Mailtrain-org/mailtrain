@@ -718,7 +718,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                                 {tg('LINK_PUBLIC_SUBSCRIBE')}
                             </th>
                             <td>
-                                <Trans>URL that points to the subscribe page of the first list in the campaign that allows public subscriptions</Trans>
+                                <Trans i18nKey="urlThatPointsToTheSubscribePageOfThe">URL that points to the subscribe page of the first list in the campaign that allows public subscriptions</Trans>
                             </td>
                         </tr>
                         <tr>
@@ -774,7 +774,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                                 {tg('LIST_ID_<index>')}
                             </th>
                             <td>
-                                <Trans>Unique ID that identifies the list. The <code>index</code> is 0-based index of the list in the campaign. <code>LIST_ID_0</code> thus means the first list in the campaign.</Trans>
+                                <Trans i18nKey="uniqueIdThatIdentifiesTheListTheIndexIs0">Unique ID that identifies the list. The <code>index</code> is 0-based index of the list in the campaign. <code>LIST_ID_0</code> thus means the first list in the campaign.</Trans>
                             </td>
                         </tr>
                         <tr>
@@ -782,7 +782,7 @@ export function getEditForm(owner, typeKey, prefix = '') {
                                 {tg('PUBLIC_LIST_ID_<index>')}
                             </th>
                             <td>
-                                <Trans>The same as above, but only taking into account the lists for which public subscribe is enabled. <code>PUBLIC_LIST_ID_0</code> thus means the first public list in the campaign.</Trans>
+                                <Trans i18nKey="theSameAsAboveButOnlyTakingIntoAccount">The same as above, but only taking into account the lists for which public subscribe is enabled. <code>PUBLIC_LIST_ID_0</code> thus means the first public list in the campaign.</Trans>
                             </td>
                         </tr>
                         <tr>

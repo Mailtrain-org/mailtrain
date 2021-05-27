@@ -140,9 +140,27 @@ export function getMailerTypes(t) {
     ];
 
     const sesRegionOptions = [
-        { key: 'us-east-1', label: t('useast1')},
-        { key: 'us-west-2', label: t('uswest2')},
-        { key: 'eu-west-1', label: t('euwest1')}
+        { key: 'us-east-2', label: t('usEastOhio')},
+        { key: 'us-east-1', label: t('usEastNVirginia')},
+        { key: 'us-west-1', label: t('usWestNCalifornia')},
+        { key: 'us-west-2', label: t('usWestOregon')},
+        { key: 'af-south-1', label: t('africaCapeTown')},
+        { key: 'ap-east-1', label: t('asiaPacificHongKong')},
+        { key: 'ap-south-1', label: t('asiaPacificMumbai')},
+        { key: 'ap-northeast-3', label: t('asiaPacificOsaka')},
+        { key: 'ap-northeast-2', label: t('asiaPacificSeoul')},
+        { key: 'ap-southeast-1', label: t('asiaPacificSingapore')},
+        { key: 'ap-southeast-2', label: t('asiaPacificSydney')},
+        { key: 'ap-northeast-1', label: t('asiaPacificTokyo')},
+        { key: 'ca-central-1', label: t('canadaCentral')},
+        { key: 'eu-central-1', label: t('europeFrankfurt')},
+        { key: 'eu-west-1', label: t('europeIreland')},
+        { key: 'eu-west-2', label: t('europeLondon')},
+        { key: 'eu-south-1', label: t('europeMilan')},
+        { key: 'eu-west-3', label: t('europeParis')},
+        { key: 'eu-north-1', label: t('europeStockholm')},
+        { key: 'me-south-1', label: t('middleEastBahrain')},
+        { key: 'sa-east-1', label: t('southAmericaSaoPaulo')}
     ];
 
     const zoneMtaTypeOptions = [];
