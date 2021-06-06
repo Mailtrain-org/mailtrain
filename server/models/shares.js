@@ -130,7 +130,7 @@ async function assign(context, entityTypeId, entityId, userId, role) {
         await tx(entityType.permissionsTable).where({user: userId, entity: entityId}).del();
         if (entityTypeId === 'namespace') {
             await rebuildPermissionsTx(tx, {userId});
-        } else if (role) {
+        } else {
             await rebuildPermissionsTx(tx, { entityTypeId, entityId, userId });
         }
     });
@@ -292,7 +292,6 @@ async function rebuildPermissionsTx(tx, restriction) {
             parentId = parent.namespace;
         }
     }
-
 
     // This reads direct shares from DB, joins each with the permissions from namespaces and stores the permissions into DB
     for (const entityTypeId in restrictedEntityTypes) {
