@@ -238,14 +238,18 @@ Alternatively, you can just declare them there leaving their value empty
 value can be provided via a file called `.env` or via environment 
 variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-vars..) docker-compose -f docker-compose.yml build (or up)`)  
 
+https://mailtrain.example.com
+https://sbox-mailtrain.example.com
+https://lists.example.com
+
 | Parameter        | Description |
 | ---------        | ----------- |
 | PORT_TRUSTED     | sets the trusted port of the instance (default: 3000)                 |
 | PORT_SANDBOX     | sets the sandbox port of the instance (default: 3003)                 |
 | PORT_PUBLIC      | sets the public port of the instance (default: 3004)                  |
-| URL_BASE_TRUSTED | sets the trusted url of the instance (default: http://localhost:3000) |
-| URL_BASE_SANDBOX | sets the sandbox url of the instance (default: http://localhost:3003) |
-| URL_BASE_PUBLIC  | sets the public url of the instance (default: http://localhost:3004)  |
+| URL_BASE_TRUSTED | sets the external trusted url of the instance (default: http://localhost:3000) eg https://mailtrain.example.com |
+| URL_BASE_SANDBOX | sets the external sandbox url of the instance (default: http://localhost:3003) eg https://sbox-mailtrain.example.com |
+| URL_BASE_PUBLIC  | sets the external public url of the instance (default: http://localhost:3004) eg https://lists.example.com |
 | WWW_HOST         | sets the address that the server binds to (default: 0.0.0.0)          |
 | WWW_PROXY        | use if Mailtrain is behind an http reverse proxy (default: false)     |
 | WWW_SECRET       | sets the secret for the express session (default: `$(pwgen -1)`)      |
