@@ -45,7 +45,7 @@ WITH_ZONE_MTA=${WITH_ZONE_MTA:-'true'}
 POOL_NAME=${POOL_NAME:-$(hostname)}
 LOG_LEVEL=${LOG_LEVEL:-'info'}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-'test'}
-ADMIN_ACCESS_TOKEN=${ADMIN_PASSWORD:-''}
+ADMIN_ACCESS_TOKEN=${ADMIN_ACCESS_TOKEN:-''}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
