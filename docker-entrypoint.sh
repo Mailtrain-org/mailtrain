@@ -44,6 +44,8 @@ MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
 WITH_ZONE_MTA=${WITH_ZONE_MTA:-'true'}
 POOL_NAME=${POOL_NAME:-$(hostname)}
 LOG_LEVEL=${LOG_LEVEL:-'info'}
+ADMIN_PASSWORD=${ADMIN_PASSWORD:-'test'}
+ADMIN_ACCESS_TOKEN=${ADMIN_ACCESS_TOKEN:-''}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
@@ -190,5 +192,7 @@ if [ "$WITH_LDAP" = "true" ]; then
     npm install passport-ldapauth
   fi
 fi
+
+NODE_ENV=production node setup/docker-entrypoint-db-setup.js "$ADMIN_PASSWORD" "$ADMIN_ACCESS_TOKEN"
 
 NODE_ENV=production node index.js
