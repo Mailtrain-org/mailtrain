@@ -152,7 +152,7 @@ async function _fileCache(typeId, cacheConfig, keyGen) {
                     if (fileStream) {
                         fileStream.destroy(err);
                         fs.unlink(tmpFilePath, () => {
-                            cachedFiles.delete(key);
+                            fileCaches.delete(key);
                             callback();
                         });
                     } else {
