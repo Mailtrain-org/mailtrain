@@ -31,6 +31,14 @@ services:
     - "3004:3004"
     volumes:
     - ./:/app
+    depends_on:
+    - mysql
+    - redis
+    - mongo
+    links:
+    - mysql
+    - redis
+    - mongo
 
 volumes:
   mysql-data:

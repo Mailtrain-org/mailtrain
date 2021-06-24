@@ -29,6 +29,14 @@ services:
     - "3004:3004"
     volumes:
     - mailtrain-files:/app/server/files
+    depends_on:
+    - mysql
+    - redis
+    - mongo
+    links:
+    - mysql
+    - redis
+    - mongo
 
 volumes:
   mysql-data:
