@@ -112,7 +112,7 @@ router.get('/:listId/:segmentId/create', passport.csrfProtection, (req, res, nex
                         selected: data.column === field.column
                     }));
 
-                    campaigns.list(0, 300, (err, campaignList) => {
+                    campaigns.list(0, 0, (err, campaignList) => {
                         if (err) {
                             return next(err);
                         }
@@ -203,7 +203,7 @@ router.get('/edit/:id', passport.csrfProtection, (req, res, next) => {
                             fieldList = [];
                         }
 
-                        campaigns.list(0, 300, (err, campaignList) => {
+                        campaigns.list(0, 0, (err, campaignList) => {
                             if (err) {
                                 return next(err);
                             }
