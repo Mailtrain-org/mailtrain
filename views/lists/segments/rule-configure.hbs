@@ -39,9 +39,32 @@
 
         <div class="form-group">
             <label for="value" class="col-sm-2 control-label">{{#translate}}Value{{/translate}}</label>
-            <div class="col-sm-10">
+            <div class="col-sm-10 radio">
+                <label>
+                    <input type="radio" name="multiple" value="" {{#unless value.multiple}} checked{{/unless}}> {{#translate}}Use single value{{/translate}}
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
                 <input type="text" class="form-control" name="value" id="value" value="{{value.value}}" placeholder="{{#translate}}Value{{/translate}}">
                 <span class="help-block">{{#translate}}Use % for wildcard character, e.g. "%test" to match all values that end with "test"{{/translate}}</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10 radio">
+                <label>
+                    <input type="radio" name="multiple" value="1" {{#if value.multiple}} checked{{/if}}> {{#translate}}Use multiple values{{/translate}}
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input type="text" class="form-control" name="list" id="list" value="{{value.list}}" placeholder="{{#translate}}List of comma separated values{{/translate}}">
+                <span class="help-block">{{#translate}}Use a list of comma separated values, e.g. "test,try,exam" to match either "test", "try" or "exam"{{/translate}}</span>
             </div>
         </div>
     {{/if}}
