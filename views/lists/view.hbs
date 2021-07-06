@@ -205,3 +205,81 @@
         {{/if}}
     </div>
 </div>
+<script>
+    (function(){
+{{#if statusColored }}
+        function updateSubscribersRows () {
+            $('.dataTable thead tr').removeClass('highlight');
+            if ($(document).scrollTop() > 400) {
+                $('html, body').stop().animate({ scrollTop: 0 }, 300, function () {
+                    $('.dataTable thead tr').addClass('highlight');
+                });
+            }
+
+            for (i = 0; i < 5; i++) {
+                $('.dataTable tr:has(span.subscriber-status-' + i + ')').addClass('subscriber-status-' + i);
+            }
+        }
+{{/if}}
+        function updateTableWidth () {
+            var container = $('.container');
+            var containerWidth = container.width();
+            var tableWidth = $('.dataTable').width();
+
+            if (tableWidth > containerWidth) {
+                container.css({ width: 'auto', 'max-width': tableWidth + 100 + 'px' });
+                $(window).off('resize', updateTableWidth);
+            }
+            $(window).trigger('resize');
+        }
+
+        function StatusSelector () {
+            var slt = document.createElement('select');
+            slt.name = 'status';
+            slt.classList = 'form-control input-sm';
+            ['', 'Subscribed', 'Unsubscribed', 'Bounced', 'Complained'].forEach(function(s) {
+                var opt = document.createElement('option');
+                opt.value = s.toLowerCase();
+                opt.textContent = s || '{{#translate}}All Status{{/translate}}';
+                slt.appendChild(opt);
+            });
+            return slt;
+        }
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var dataTable = $('.data-table-ajax').dataTable();
+            dataTable.on('init.dt', function() {
+                var statusSelect = new StatusSelector();
+                $('.dataTables_filter').append('&nbsp;').append(statusSelect);
+                $(statusSelect).on('change', function () {
+                    dataTable.api().search($(this).val()).draw();
+                });
+                $('input[type=search]', '.dataTables_filter').on('focus', function(){
+                    if ($(statusSelect).val().length) {
+                        $(this).val('');
+                        $(statusSelect).val('').change();
+                    }
+                });
+                updateTableWidth();
+            });
+
+{{#if statusColored }}
+            dataTable.on('draw.dt', updateSubscribersRows);
+            updateSubscribersRows();
+{{/if}}
+        });
+    })();
+</script>
+
+
+    {{!-- <form id="statusFilters" class="form-inline">
+        <div class="form-group">
+            <select name="status" class="form-control input-sm">
+                <option value="">{{#translate}}Status{{/translate}}</option>
+                <option value="subscribed">{{#translate}}Subscribed{{/translate}}</option>
+                <option value="unsubscribed">{{#translate}}Unsubscribed{{/translate}}</option>
+                <option value="bounced">{{#translate}}Bounced{{/translate}}</option>
+                <option value="complained">{{#translate}}Complained{{/translate}}</option>
+            </select>
+        </div>
+    </form> --}}

@@ -51,8 +51,9 @@
 
         var editorWindow;
 
-        var $editorFrame = $('<iframe id="editor-frame"/>')
+        var $editorFrame = $('<iframe id="editor-frame" />')
             .attr('src', '/{{editorName}}/editor?id={{id}}&type=' + type)
+            .attr('allowfullscreen', 'true')
             .on('load', function() {
                 editorWindow = $editorFrame[0].contentWindow;
                 editorWindow.bridge = editorWindow.bridge || {};

@@ -24,7 +24,7 @@ title="mailtrain"
 # Enabled HTML editors
 editors=[
   ["summernote", "Summernote"],
-  ["grapejs", "GrapeJS"],
+  ["grapejs", "GrapesJS"],
   ["mosaico", "Mosaico"],
   ["codeeditor", "Code Editor"]
 ]
@@ -185,6 +185,27 @@ templates=[
   ["demo", "HTML Template"],
   ["aves", "MJML Template"]
 ]
+
+[grapejs.mjml]
+# Editor main background color
+editorBackgroundColor = "#202835"
+# Editor canvas background (light, dark, bluish, custom css)
+canvasBackgroundStyle = "bluish"
+# Color for the head and attributes labels
+canvasLabelsColor = "#4b5666"
+
+[views.template]
+showeditor=false
+
+[views.lists]
+statuscolored=false
+
+[geoip]
+# Alternative directory containing the files geoip-country.dat and geoip-country6.dat
+datadirectory=false
+
+[search]
+inhiddenfields=true
 
 [reports]
 # The whole reporting functionality can be disabled below if the they are not needed and the DB cannot be

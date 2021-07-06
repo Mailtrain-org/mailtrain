@@ -31,6 +31,8 @@ if (config.title) {
     process.title = config.title;
 }
 
+process.execArgv = tools.cleanArgv();
+
 log.level = config.log.level;
 app.set('port', port);
 

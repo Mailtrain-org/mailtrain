@@ -16,7 +16,7 @@ let _ = require('../lib/translate')._;
 let util = require('util');
 let cors = require('cors');
 let cache = require('memory-cache');
-let geoip = require('geoip-ultralight');
+let geoip = require('geoip-country');
 let confirmations = require('../lib/models/confirmations');
 let mailHelpers = require('../lib/subscription-mail-helpers');
 
@@ -74,7 +74,8 @@ function checkAndExecuteConfirmation(req, action, errorMsg, next, exec) {
 router.get('/confirm/subscribe/:cid', (req, res, next) => {
     checkAndExecuteConfirmation(req, 'subscribe', 'Request invalid or already completed. If your subscription request is still pending, please subscribe again.', next, (confirmation, list) => {
         const data = confirmation.data;
-        let optInCountry = geoip.lookupCountry(confirmation.ip) || null;
+        let geodata = geoip.lookup(confirmation.ip);
+        let optInCountry = geodata && geodata.country || null;
 
         const meta = {
             cid: req.params.cid,
@@ -863,30 +864,43 @@ router.post('/publickey', passport.parseForm, (req, res, next) => {
             return next(err);
         }
 
-        let privKey;
-        try {
-            privKey = openpgp.key.readArmored(configItems.pgpPrivateKey).keys[0];
-            if (configItems.pgpPassphrase && !privKey.decrypt(configItems.pgpPassphrase)) {
-                privKey = false;
-            }
-        } catch (E) {
-            // just ignore if failed
-        }
-
-        if (!privKey) {
+        const sendError = () => {
             err = new Error(_('Public key is not set'));
             err.status = 404;
             return next(err);
         }
 
-        let pubkey = privKey.toPublic().armor();
+        const sendResult = (privKey) => {
+            let pubkey = privKey.toPublic().armor();
+            res.writeHead(200, {
+                'Content-Type': 'application/octet-stream',
+                'Content-Disposition': 'attachment; filename=public.asc'
+            });
+            res.end(pubkey);
+        }
 
-        res.writeHead(200, {
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename=public.asc'
-        });
-
-        res.end(pubkey);
+        openpgp.key.readArmored(configItems.pgpPrivateKey).
+            then((armored) => {
+                let privKey = armored.keys[0];
+                if (configItems.pgpPassphrase) {
+                    privKey.decrypt(configItems.pgpPassphrase).
+                        then((success) => {
+                            if (success) {
+                                sendResult(privKey);
+                            }
+                        }).
+                        catch((error) => {
+                            log.error('GPG', error);
+                            sendError();
+                        })
+                } else {
+                    sendResult(privKey);
+                }
+            }).
+            catch((error) => {
+                log.error('GPG', error);
+                sendError();
+            });
     });
 });
 
@@ -909,7 +923,9 @@ function webNotice(type, req, res, next) {
 
             let data = {
                 title: list.name,
+                lcid: req.params.cid,
                 homepage: configItems.defaultHomepage || configItems.serviceUrl,
+                serviceUrl: configItems.serviceUrl,
                 defaultAddress: configItems.defaultAddress,
                 defaultPostaddress: configItems.defaultPostaddress,
                 contactAddress: configItems.defaultAddress,

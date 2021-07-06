@@ -12,6 +12,7 @@ let forms = require('../lib/models/forms');
 let tools = require('../lib/tools');
 let striptags = require('striptags');
 let htmlescape = require('escape-html');
+let getName = require('country-list').getName;
 let multer = require('multer');
 let os = require('os');
 let humanize = require('humanize');
@@ -167,7 +168,7 @@ router.post('/ajax', (req, res) => {
                 '<code>' + row.cid + '</code>',
                 row.subscribers,
                 htmlescape(striptags(row.description) || ''),
-                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span><a href="/lists/edit/' + row.id + '">' + _('Edit') + '</a>' ]
+                '<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <a href="/lists/edit/' + row.id + '">' + _('Edit') + '</a>' ]
             )
         });
     });
@@ -189,8 +190,25 @@ router.post('/ajax/:id', (req, res) => {
             }
 
             let columns = ['#', 'email', 'first_name', 'last_name'].concat(fieldList.filter(field => field.visible).map(field => field.column)).concat(['status', 'created']);
+            let searchFields = ['email', 'first_name', 'last_name'];
 
-            subscriptions.filter(list.id, req.body, columns, req.query.segment, (err, data, total, filteredTotal) => {
+            if (('search' in req.body) && req.body.search.value) {
+                const search = req.body.search.value.toLowerCase();
+                const statusTypes = ['subscribed', 'unsubscribed', 'bounced', 'complained'];
+
+                if (statusTypes.includes(search)) {
+                    searchFields = ['status'];
+                    req.body.search.value = String(statusTypes.indexOf(search) + 1);
+                } else if (fieldList.length) {
+                    const searcheableTypes = ['text', 'longtext', 'website'].concat(/^[0-9]+$/.test(search) ? ['number'] : []);
+                    let additionalSearchFields = fieldList.filter(field => {
+                        return ((searcheableTypes.indexOf(field.type) > -1) && (config.search.inhiddenfields ? true : field.visible));
+                    }).map(field => field.column);
+                    searchFields = searchFields.concat(additionalSearchFields);
+                }
+            }
+
+            subscriptions.filter(list.id, req.body, columns, req.query.segment, searchFields, (err, data, total, filteredTotal) => {
                 if (err) {
                     return res.json({
                         error: err.message || err,
@@ -205,57 +223,85 @@ router.post('/ajax/:id', (req, res) => {
 
                 let statuses = [_('Unknown'), _('Subscribed'), _('Unsubscribed'), _('Bounced'), _('Complained')];
 
-                res.json({
-                    draw: req.body.draw,
-                    recordsTotal: total,
-                    recordsFiltered: filteredTotal,
-                    data: data.map((row, i) => [
+                let dataPromise = Promise.all(data.map((row, i) => Promise.all([
+                    Promise.resolve([
                         (Number(req.body.start) || 0) + 1 + i,
                         htmlescape(row.email || ''),
                         htmlescape(row.firstName || ''),
-                        htmlescape(row.lastName || '')
-                    ].concat(fields.getRow(fieldList, row).map(cRow => {
-                        if (cRow.type === 'number') {
-                            return htmlescape(cRow.value && humanize.numberFormat(cRow.value, 0) || '');
-                        } else if (cRow.type === 'longtext') {
-                            let value = (cRow.value || '');
-                            if (value.length > 50) {
-                                value = value.substr(0, 47).trim() + '…';
-                            }
-                            return htmlescape(value);
-                        } else if (cRow.type === 'gpg') {
-                            let value = (cRow.value || '').trim();
-                            try {
-                                value = openpgp.key.readArmored(value);
-                                if (value) {
-
-                                    let keys = value.keys;
-                                    for (let i = 0; i < keys.length; i++) {
-                                        let key = keys[i];
-                                        switch (key.verifyPrimaryKey()) {
-                                            case 0:
-                                                return _('Invalid key');
-                                            case 1:
-                                                return _('Expired key');
-                                            case 2:
-                                                return _('Revoked key');
+                        htmlescape(row.lastName || ''),
+                    ]),
+                    new Promise((resolve) => {
+                        let fieldsPromise = Promise.all(fields.getRow(fieldList, row).map( async (cRow) => {
+                            switch (cRow.type) {
+                                case 'number':
+                                    return Promise.resolve(htmlescape(cRow.value && humanize.numberFormat(cRow.value, 0) || ''));
+                                case 'longtext':
+                                    let value = (cRow.value || '');
+                                    if (value.length > 50) {
+                                        value = value.substr(0, 47).trim() + '…';
+                                    }
+                                    return Promise.resolve(htmlescape(value));
+                                case 'gpg':
+                                    return new Promise((resolve) => {
+                                        let value = (cRow.value || '').trim();
+                                        if (!value.length) {
+                                            resolve(''); // no key
                                         }
-                                    }
+                                        openpgp.key.readArmored(value).
+                                            then((value) => {
+                                                const noResultsError = new Error('No armored keys returned');
 
-                                    value = value.keys && value.keys[0] && value.keys[0].primaryKey.fingerprint;
-                                    if (value) {
-                                        value = '0x' + value.substr(-16).toUpperCase();
-                                    }
-                                }
-                            } catch (E) {
-                                value = 'parse error';
+                                                if (!(typeof value === 'object') || !('keys' in value)) { throw noResultsError }
+                                                if (value.err && value.err.length) { throw value.err[0] }
+                                                if (!value.keys.length) { throw noResultsError }
+
+                                                let keysVerification = Promise.race(value.keys.map((key) => key.verifyPrimaryKey()));
+
+                                                keysVerification.then((verifiedKey) => {
+                                                    switch (verifiedKey) {
+                                                        case 0:
+                                                            return resolve(_('Invalid key'));
+                                                        case 1:
+                                                            return resolve(_('Expired key'));
+                                                        case 2:
+                                                            return resolve(_('Revoked key'));
+                                                    }
+                                                    value = value.keys[0].primaryKey.fingerprint.join('');
+                                                    if (value) {
+                                                        value = '0x' + value.substr(-16).toUpperCase();
+                                                    }
+                                                    return resolve(htmlescape(value || ''));
+                                                });
+                                            }).
+                                            catch((error) => {
+                                                const message = error.message || error || _('Unexpected error');
+                                                resolve('<span title="' + message + '" class="subscriber-status-4">' + _('Parse error') + '  <a class="glyphicon glyphicon-info-sign" style="text-decoration:none" title="' + message + '"> </a></span>');
+                                            });
+                                    }).catch((error) => log.error('GPG', error));
+                                default:
+                                    return Promise.resolve(htmlescape(cRow.value || ''));
                             }
-                            return htmlescape(value || '');
-                        } else {
-                            return htmlescape(cRow.value || '');
-                        }
-                    })).concat(statuses[row.status]).concat(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A').concat('<a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>'))
-                });
+                        }));
+
+                        fieldsPromise.then(fieldsResults => {
+                            resolve(fieldsResults);
+                        }).catch((error) => log.error('Lists', error));
+                    }),
+                    Promise.resolve(config.views.lists.statuscolored ? '<span class="subscriber-status-' + row.status + '">' + statuses[row.status] + '</span>' : statuses[row.status] ),
+                    Promise.resolve(row.created && row.created.toISOString ? '<span class="datestring" data-date="' + row.created.toISOString() + '" title="' + row.created.toISOString() + '">' + row.created.toISOString() + '</span>' : 'N/A' ),
+                    Promise.resolve('<a href="/lists/subscription/' + list.id + '/edit/' + row.cid + '">' + _('Edit') + '</a>' )
+                ])));
+
+                dataPromise.then(data => {
+                    data = data.map(row => row.reduce((acc, val) => acc.concat(val), [])); // flatten results
+                    res.json({
+                        draw: req.body.draw,
+                        recordsTotal: total,
+                        recordsFiltered: filteredTotal,
+                        data: data
+                    })
+                }).catch((error) => res.json({ draw: req.body.draw, recordsTotal: 0, recordsFiltered: 0, data:[], error: error.message }));
+
             });
         });
     });
@@ -312,6 +358,7 @@ router.get('/view/:id', passport.csrfProtection, (req, res) => {
                 list.csrfToken = req.csrfToken();
                 list.customFields = fieldList.filter(field => field.visible);
                 list.customSort = list.customFields.length ? ',' + list.customFields.map(() => '0').join(',') : '';
+                list.statusColored = config.views.lists.statuscolored;
 
                 list.showSubscriptions = req.query.tab === 'subscriptions' || !req.query.tab;
                 list.showImports = req.query.tab === 'imports';
@@ -387,12 +434,26 @@ router.get('/subscription/:id/edit/:cid', passport.csrfProtection, (req, res) =>
                     fieldList = [];
                 }
 
+                let statuses = [_('Unknown'), _('Subscribed'), _('Unsubscribed'), _('Bounced'), _('Complained')];
+
                 subscription.list = list;
                 subscription.csrfToken = req.csrfToken();
 
                 subscription.customFields = fields.getRow(fieldList, subscription, false, true);
                 subscription.useEditor = true;
+                subscription.createdDate = moment(subscription.created).format('lll');
+                subscription.modifiedDate = moment(subscription.statusChange).format('lll');
+
+                subscription.statusTitle = statuses[subscription.status];
                 subscription.isSubscribed = subscription.status === 1;
+                subscription.isBounced = subscription.status === 3;
+
+                let country = {};
+                if (subscription.optInCountry) {
+                    country.name = getName(subscription.optInCountry);
+                    country.code = subscription.optInCountry.toLowerCase();
+                }
+                subscription.country = country;
 
                 let tzfound = false;
                 subscription.timezones = moment.tz.names().map(tz => {
@@ -457,6 +518,31 @@ router.post('/subscription/unsubscribe', passport.parseForm, passport.csrfProtec
                     return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
                 }
                 req.flash('success', util.format(_('%s was successfully unsubscribed from your list'), subscription.email));
+                res.redirect('/lists/view/' + list.id);
+            });
+        });
+    });
+});
+
+router.post('/subscription/reactivate', passport.parseForm, passport.csrfProtection, (req, res) => {
+    lists.get(req.body.list, (err, list) => {
+        if (err || !list) {
+            req.flash('danger', err && err.message || err || _('Could not find list with specified ID'));
+            return res.redirect('/lists');
+        }
+
+        subscriptions.get(list.id, req.body.cid, (err, subscription) => {
+            if (err || !subscription) {
+                req.flash('danger', err && err.message || err || _('Could not find subscriber with specified ID'));
+                return res.redirect('/lists/view/' + list.id);
+            }
+
+            subscriptions.changeStatus(list.id, subscription.id, false, subscriptions.Status.SUBSCRIBED, (err, found) => {
+                if (err) {
+                    req.flash('danger', err && err.message || err || _('Could not reactivate user'));
+                    return res.redirect('/lists/subscription/' + list.id + '/edit/' + subscription.cid);
+                }
+                req.flash('success', util.format(_('%s was successfully reactivated from your list'), subscription.email));
                 res.redirect('/lists/view/' + list.id);
             });
         });

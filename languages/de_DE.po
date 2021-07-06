@@ -988,11 +988,11 @@ msgstr "Vorlagen Editoren"
 
 #: views/index.hbs:21
 msgid ""
-"Mailtrain ships with GrapeJS and Mosaico built in, two advanced template "
+"Mailtrain ships with GrapesJS and Mosaico built in, two advanced template "
 "editors. Mailtrain also offers a code editor if you prefer to handcraft the "
 "HTML yourself."
 msgstr ""
-"Mailtrain beinhaltet GrapeJS und Mosaico, zwei Programme zum Bearbeiten der "
+"Mailtrain beinhaltet GrapesJS und Mosaico, zwei Programme zum Bearbeiten der "
 "E-Mail-Vorlagen. Natürlich bietet Mailtrain auch einen Code-Editor, sofern "
 "Sie den HTML Code selber erstellen möchten."
 
@@ -1943,8 +1943,8 @@ msgid "CLOSE"
 msgstr "SCHLIESSEN"
 
 #: views/partials/grapejs.hbs:2
-msgid "Open GrapeJS"
-msgstr "GrapeJS öffnen"
+msgid "Open GrapesJS"
+msgstr "GrapesJS öffnen"
 
 #: views/partials/html-preview.hbs:1
 msgid "Toggle HTML preview"

@@ -44,7 +44,7 @@ jqueryFileUpload.on('begin', fileInfo => {
     fileInfo.name = fileInfo.name
         .toLowerCase()
         .replace(/ /g, '-')
-        .replace(/[^a-z0-9+-.]+/g, '');
+        .replace(/[^a-z0-9@+-.]+/g, '');
 });
 
 const listImages = (dir, dirURL, callback) => {
@@ -107,6 +107,12 @@ const placeholderImage = (width, height, callback) => {
 const resizedImage = (src, method, width, height, callback) => {
     const pathname = path.join('/', url.parse(src).pathname);
     const filePath = path.join(__dirname, '..', 'public', pathname);
+    const ext = path.extname(filePath).toLowerCase();
+
+    if (!fs.existsSync(filePath) && !['.jpg', '.jpeg', '.gif', '.png', '.webp', '.bpm', '.tiff'].includes(ext)) {
+        return callback(new Error('No valid image to process'));
+    }
+
     const magick = gm(filePath);
 
     magick.format((err, format) => {
@@ -172,11 +178,15 @@ const getProcessedImage = (dynamicUrl, callback) => {
         return val;
     };
 
+
     if (method === 'placeholder') {
         width = sanitizeSize(width, 1, 2048, 600, false);
         height = sanitizeSize(height, 1, 2048, 300, false);
         placeholderImage(width, height, callback);
     } else {
+        if (src === '') {
+            return callback(new Error('Empty image source'));
+        }
         width = sanitizeSize(width, 1, 2048, 600, false);
         height = sanitizeSize(height, 1, 2048, 300, true);
         resizedImage(src, method, width, height, callback);
@@ -412,7 +422,7 @@ router.post('/upload', passport.csrfProtection, (req, res) => {
             try {
                 JSON.parse(mockres._getData()).files.forEach(file => {
                     data.push({
-                        src: file.url
+                        src: decodeURIComponent(file.url)
                     });
                 });
                 res.json({

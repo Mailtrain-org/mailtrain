@@ -1,124 +1,83 @@
+'use strict';
+/* global grapesjs, toastr, confirm */
+/* eslint no-var: "off", prefer-arrow-callback:"off", object-shorthand:"off" */
+
 grapesjs.plugins.add('gjs-preset-mjml', (editor, opts) => {
-  var opt = opts || {};
-  var config = editor.getConfig();
 
-  config.showDevices = 0;
+    var updateTooltip = function (coll, pos) {
+        coll.each(function (item) {
+            var attrs = item.get('attributes');
+            attrs['data-tooltip-pos'] = pos || 'bottom';
+            item.set('attributes', attrs);
+        });
+    };
 
-  var updateTooltip = function(coll, pos) {
-    coll.each(function(item) {
-      var attrs = item.get('attributes');
-      attrs['data-tooltip-pos'] = pos || 'bottom';
-      item.set('attributes', attrs);
+    /****************** BUTTONS *************************/
+
+    var pnm = editor.Panels;
+
+    pnm.addButton('options', {
+        id: 'clean-all',
+        className: 'fa fa-trash icon-blank',
+        command: {
+            run: function (editor, sender = {}) {
+                if (confirm('Are you sure you want to clean the canvas?')) {
+                    editor.setComponents('');
+                    editor.Commands.run('clean-mjml');
+                }
+                sender.set && sender.set('active', 0);
+            }
+        },
+        attributes: {
+            title: 'Empty canvas'
+        }
     });
-  }
+
+    updateTooltip(pnm.getPanel('options').get('buttons'));
+    updateTooltip(pnm.getPanel('views').get('buttons'));
 
 
-  /****************** COMMANDS *************************/
+    /****************** EVENTS *************************/
 
-  var cmdm = editor.Commands;
-  cmdm.add('undo', {
-    run: function(editor, sender) {
-      sender.set('active', 0);
-      editor.UndoManager.undo(1);
-    }
-  });
-  cmdm.add('redo', {
-    run: function(editor, sender) {
-      sender.set('active', 0);
-      editor.UndoManager.redo(1);
-    }
-  });
-  cmdm.add('set-device-desktop', {
-    run: function(editor) {
-      editor.setDevice('Desktop');
-    }
-  });
-  cmdm.add('set-device-mobile', {
-    run: function(editor) {
-      editor.setDevice('Mobile');
-    }
-  });
-  cmdm.add('clean-all', {
-    run: function(editor, sender) {
-      sender && sender.set('active',false);
-      if (confirm('Are you sure you want to clean the canvas?')) {
-        editor.setComponents('<mj-container><mj-section><mj-column>'+
-          '<mj-text>Start from here</mj-text></mj-column></mj-section></mj-container>');
-        localStorage.setItem('gjs-mjml-css', '');
-        localStorage.setItem('gjs-mjml-html', '');
-      }
-    }
-  });
+    // When removing assets
+    editor.on('asset:remove', function () {
+        editor.log('Removing assets is not implemented.', { title: 'GrapesJS Assets', level: 'info' });
+    });
 
-  /****************** BUTTONS *************************/
+    // When loggin
+    editor.on('log:info', (msg, opts) => toastr && toastr.info(msg, opts.title));
+    editor.on('log:error', (msg, opts) => toastr && toastr.error(msg, opts.title));
+    editor.on('log:warning', (msg, opts) => toastr && toastr.warning(msg, opts.title));
 
-  var pnm = editor.Panels;
-  pnm.addButton('options', [{
-    id: 'undo',
-    className: 'fa fa-undo icon-undo',
-    command: 'undo',
-    attributes: { title: 'Undo (CTRL/CMD + Z)'}
-  },{
-    id: 'redo',
-    className: 'fa fa-repeat icon-redo',
-    command: 'redo',
-    attributes: { title: 'Redo (CTRL/CMD + SHIFT + Z)' }
-  },{
-    id: 'clean-all',
-    className: 'fa fa-trash icon-blank',
-    command: 'clean-all',
-    attributes: { title: 'Empty canvas' }
-  }]);
+    // When cleaning mjml
+    editor.getModel().on('run:clean-mjml', function () {
 
-  // Add devices buttons
-  var panelDevices = pnm.addPanel({id: 'devices-c'});
-  var deviceBtns = panelDevices.get('buttons');
-  deviceBtns.add([{
-    id: 'deviceDesktop',
-    command: 'set-device-desktop',
-    className: 'fa fa-desktop',
-    attributes: {'title': 'Desktop'},
-    active: 1,
-  },{
-    id: 'deviceMobile',
-    command: 'set-device-mobile',
-    className: 'fa fa-mobile',
-    attributes: {'title': 'Mobile'},
-  }]);
+        // convert template images relative to absolute urls when command
+        // 'clean-mjml' is triggered (at loading and at import).
 
-  // Remove preview and code button
-  let prvBtn = pnm.addButton('options', 'preview');
-  let optPanel = pnm.getPanel('options');
-  let cmdBtns = optPanel.get('buttons');
-  prvBtn && cmdBtns.remove(prvBtn);
+        ['mj-wrapper', 'mj-section', 'mj-navbar', 'mj-hero', 'mj-image'].forEach(function (tagName) {
 
-  updateTooltip(deviceBtns);
-  updateTooltip(pnm.getPanel('options').get('buttons'));
-  updateTooltip(pnm.getPanel('options').get('buttons'));
-  updateTooltip(pnm.getPanel('views').get('buttons'));
+            var components = editor.getWrapper().findType(tagName);
+            components.forEach(function (cpnt) {
+                var attributes = cpnt.get('attributes');
+                var attrName = tagName === 'mj-image' ? 'src' : 'background-url';
+                var url = attributes[attrName];
 
+                if (url && url.substring(0, 2) === './') {
+                    var absoluteUrl = opts.mailtrain.serviceUrl + 'grapejs/templates/' + opts.mailtrain.template + '/' + url.substring(2);
 
-
-  /****************** EVENTS *************************/
-
-  // On component change show the Style Manager
-  editor.on('change:selectedComponent', function() {
-    var openLayersBtn = editor.Panels.getButton('views', 'open-layers');
-
-    // Don't switch when the Layer Manager is on or
-    // there is no selected component
-    if((!openLayersBtn || !openLayersBtn.get('active')) &&
-      editor.editor.get('selectedComponent')) {
-      var openSmBtn = editor.Panels.getButton('views', 'open-sm');
-      openSmBtn && openSmBtn.set('active', 1);
-    }
-  });
-
-  // Do stuff on load
-  editor.on('load', function() {
-    // Open block manager
-    var openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
-    openBlocksBtn && openBlocksBtn.set('active', 1);
-  });
+                    if (tagName === 'mj-image') {
+                        cpnt.set('src', absoluteUrl);
+                        editor.trigger(cpnt, 'change:src');
+                    } else {
+                        attributes[attrName] = absoluteUrl;
+                        cpnt.set('attributes', attributes);
+                        cpnt.view.rerender();
+                        // cpnt.trigger(cpnt, 'change:attributes'); ??
+                    }
+                }
+            });
+        });
+    });
 
 });
