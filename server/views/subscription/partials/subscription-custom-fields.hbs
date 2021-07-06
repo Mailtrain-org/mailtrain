@@ -2,14 +2,14 @@
 
     {{#if typeSubscriptionEmail}}
         <div class="form-group email">
-            <label for="EMAIL">{{#translate}}emailAddress-2{{/translate}}</label>
+            <label for="{{key}}">{{#translate}}emailAddress-2{{/translate}}</label>
             {{#if ../isManagePreferences}}
                 <div class="input-group">
-                    <input type="email" name="EMAIL" id="email" placeholder="" value="{{../email}}" readonly>
+                    <input type="email" name="{{key}}" id="email" placeholder="" value="{{../email}}" readonly>
                     <div class="input-group-addon"><a href="/subscription/{{../lcid}}/manage-address/{{../cid}}">{{#translate}}wantToChangeIt?{{/translate}}</a></div>
                 </div>
             {{else}}
-                <input type="email" name="EMAIL" id="email" placeholder="" value="{{../email}}" required>
+                <input type="email" name="{{key}}" id="email" placeholder="" value="{{../email2}}" required>
             {{/if}}
             <small class="form-text text-muted">{{help}}</small>
         </div>
