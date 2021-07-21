@@ -50,6 +50,7 @@ enabledLanguages:
 - es-ES
 - pt-BR
 - de-DE
+- fr-FR
 - fk-FK
 
 # Inject custom scripts in subscription/layout.mjml.hbs
