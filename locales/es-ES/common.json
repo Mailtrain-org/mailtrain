@@ -1258,6 +1258,7 @@
   "yesSubscribeThisEmailAddressToTheList": "Sí, suscribir este dirección de correo a la lista",
   "pleaseConfirmUnsubscription": "Por favor confirma tu desuscripción",
   "yesUnsubscribeMe": "Sí, desuscríbeme de esta lista",
+  "yesUnsubscribeMe - TODO: update line above and then delete this line to mark that the translation has been fixed": "Yes. Unsubscribe me.",
   "ifYouReceivedThisEmailByMistakeSimply-2": "Si has recibido este email por error, tan solo bórralo. Solo serás desuscrito si haces click en el enlace de confirmación de arriba.",
   "yourSubscriptionToOurListHasBeen": "Tu suscripción a nuestra lista ha sido confirmada.",
   "youAreNowUnsubscribed": "Ya estás desuscrito",
