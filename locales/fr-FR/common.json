@@ -1052,7 +1052,7 @@
   "warning!SwitchingTheMosaicoTemplateWorks": "<0>Attention !</0> Le changement de modèle Mosaico ne fonctionne que si le modèle original et le nouveau modèle utilisent les mêmes champs. Si ce n'est pas le cas, vos données seront perdues. Veillez à sauvegarder votre travail avant d'effectuer cette opération.",
   "mergeTagsAreTagsThatAreReplacedBefore": "",
   "youCanUseAnyOfTheStandardMergeTagsBelow": "\n <1> Vous pouvez utiliser n'importe laquelle des balises de fusion standard ci-dessous. En plus de cela, chaque champ personnalisé a sa propre balise de fusion. Vérifiez les champs de la liste à laquelle vous allez envoyer. </1> \n",
-  "mergeTagsAreTagsThatAreReplacedBefore-1": "\n                    <1>Merge tags are tags that are replaced before sending out the message. The format of the merge tag is the following: <1>{tg('TAG_NAME')}</1>. </1>\n                ",
+  "mergeTagsAreTagsThatAreReplacedBefore-1": "\n                    <1>Les balises de fusion sont des balises qui sont remplacées avant d'envoyer le message. Le format de balise de fusion est le suivant: <1>{tg('TAG_NAME')}</1>. </1>\n                ",
   "theWholeMessageIsInterpretedAsHandlebars": "\n                    <1>The whole message is interpreted as Handlebars template (see <1>http://handlebarsjs.com/</1>). You can use any Handlebars blocks and expressions\n                        in the template. The merge tags form the root context of the Handlebars template.</1>\n                ",
   "urlThatPointsToTheSubscribePageOfThe": "URL qui pointe vers la page des abonnements de la première liste de la campagne qui autorise les abonnements publiques.",
   "urlThatPointsToTheUnsubscribePage": "URL pointant vers la page de désabonnement",
