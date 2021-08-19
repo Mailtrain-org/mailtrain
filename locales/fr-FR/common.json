@@ -1050,7 +1050,7 @@
   "mergeTagReference": "Référence de la balise de fusion",
   "templateContentPlainText": "Contenu du modèle (texte brut)",
   "warning!SwitchingTheMosaicoTemplateWorks": "<0>Attention !</0> Le changement de modèle Mosaico ne fonctionne que si le modèle original et le nouveau modèle utilisent les mêmes champs. Si ce n'est pas le cas, vos données seront perdues. Veillez à sauvegarder votre travail avant d'effectuer cette opération.",
-  "mergeTagsAreTagsThatAreReplacedBefore": "",
+  "mergeTagsAreTagsThatAreReplacedBefore": "Les balises utilisées sont remplacés avant l'envoi du message.",
   "youCanUseAnyOfTheStandardMergeTagsBelow": "\n <1> Vous pouvez utiliser n'importe laquelle des balises de fusion standard ci-dessous. En plus de cela, chaque champ personnalisé a sa propre balise de fusion. Vérifiez les champs de la liste à laquelle vous allez envoyer. </1> \n",
   "mergeTagsAreTagsThatAreReplacedBefore-1": "\n                    <1>Les balises de fusion sont des balises qui sont remplacées avant d'envoyer le message. Le format de balise de fusion est le suivant: <1>{tg('TAG_NAME')}</1>. </1>\n                ",
   "theWholeMessageIsInterpretedAsHandlebars": "\n                    <1>L'ensemble du message est interprété comme un modèle de guidon (voir <1>http://handlebarsjs.com/</1>). Vous pouvez utiliser tous les blocs et expressions de guidon\n                        dans le modèle. Les balises de fusion forment le contexte racine du modèle guidons.</1>\n                ",
