@@ -402,13 +402,13 @@ async function list(context, listId, grouped, offset, limit, where = []) {
             entitiesQry.limit(limit);
         }
 
-	where.forEach(function(clause) {
-		if (clause.length >= 3) {
-			entitiesQry.where(clause[0], clause[1], clause[2]);
-		} else {
-			entitiesQry.where(clause[0], clause[1]);
-		}
-	});
+        where.forEach(function(clause) {
+            if (clause.length >= 3) {
+                entitiesQry.where(clause[0], clause[1], clause[2]);
+            } else {
+                entitiesQry.where(clause[0], clause[1]);
+            }
+        });
 
         const entities = await entitiesQry;
 
