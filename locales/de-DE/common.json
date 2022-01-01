@@ -776,7 +776,7 @@
   "subscribed": "Angemeldet",
   "dropdown": "Dropdown",
   "notSelected": "Nicht ausgewählt",
-  "anotherSubscriptionWithTheSameEmail": "Ein Abonnement mit derselben E-Mail-Adresse existiert bereits.",
+  "anotherSubscriptionWithTheSameEmail": "Ein anderes Abonnement mit derselben E-Mail-Adresse existiert bereits.",
   "subscriptionUpdated": "Abonnement aktualisiert",
   "subscriptionCreated": "Abonnement erstellt",
   "itSeemsThatAnotherSubscriptionWithThe": "In der Zwischenzeit wurde ein anderes Abonnement mit der gleichen E-Mail-Adresse erstellt. Seite neu laden und mit neuen Daten beginnen. Alle Änderungen gehen verloren.",
