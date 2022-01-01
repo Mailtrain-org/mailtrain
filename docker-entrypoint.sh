@@ -98,7 +98,6 @@ queue:
 
 log:
   level: $LOG_LEVEL
-
 EOT
 
     # Manage LDAP if enabled
