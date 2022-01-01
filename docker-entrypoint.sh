@@ -46,7 +46,6 @@ POOL_NAME=${POOL_NAME:-$(hostname)}
 LOG_LEVEL=${LOG_LEVEL:-'info'}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-'test'}
 ADMIN_ACCESS_TOKEN=${ADMIN_ACCESS_TOKEN:-''}
-DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE:-'en-US'}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
@@ -99,8 +98,6 @@ queue:
 
 log:
   level: $LOG_LEVEL
-
-defaultLanguage: $DEFAULT_LANGUAGE
 
 EOT
 
