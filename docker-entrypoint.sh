@@ -47,6 +47,9 @@ LOG_LEVEL=${LOG_LEVEL:-'info'}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-'test'}
 ADMIN_ACCESS_TOKEN=${ADMIN_ACCESS_TOKEN:-''}
 DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE:-'en-US'}
+WITH_POSTFIXBOUNCE=${WITH_POSTFIXBOUNCE:-'false'}
+POSTFIXBOUNCE_PORT=${POSTFIXBOUNCE_PORT:-'5699'}
+POSTFIXBOUNCE_HOST=${POSTFIXBOUNCE_HOST:-'127.0.0.1'}
 
 # Warning for users that already rely on the MAILTRAIN_SETTING variable
 # Can probably be removed in the future.
@@ -149,6 +152,24 @@ EOT
 cas:
   enabled: false
 EOT
+    fi
+    
+    # Manage POSTFIXBOUNCE if enabled
+    if [ "$WITH_POSTFIXBOUNCE" = "true" ]; then
+        echo 'Info: POSTFIXBOUNCE enabled'
+    cat >> server/config/production.yaml <<EOT
+
+postfixBounce:
+  # Enable to allow writing Postfix bounce log to Mailtrain listener
+  # If enabled, tail mail.log to Mailtrain with the following command:
+  #     tail -f -n +0 /var/log/mail.log | nc POSTFIXBOUNCE_HOST POSTFIXBOUNCE_PORT -
+  enabled: true
+  port: $POSTFIXBOUNCE_PORT
+  host: $POSTFIXBOUNCE_HOST
+
+EOT
+    else
+        echo 'Info: POSTFIXBOUNCE not enabled'
     fi
 
 fi
