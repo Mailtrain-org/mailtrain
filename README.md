@@ -242,8 +242,12 @@ https://mailtrain.example.com
 https://sbox-mailtrain.example.com
 https://lists.example.com
 
+#### !!!WARNING!!! Always set ADMIN_PASSWORD, as it will leave your instance otherwise vurnerable with the default password being `test`!
+
 | Parameter        | Description |
 | ---------        | ----------- |
+| ADMIN_PASSWORD | sets Admin Password, Admin users name can be changed, but password will always be overwritten by this, please set it always, as it otherwise defaults to `test` |
+| ADMIN_ACCESS_TOKEN | sets Access Token for API, this is optional |
 | PORT_TRUSTED     | sets the trusted port of the instance (default: 3000)                 |
 | PORT_SANDBOX     | sets the sandbox port of the instance (default: 3003)                 |
 | PORT_PUBLIC      | sets the public port of the instance (default: 3004)                  |

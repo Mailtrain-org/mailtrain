@@ -16,6 +16,7 @@ import lang_es_ES_common from "../../../locales/es-ES/common";
 import lang_pt_BR_common from "../../../locales/pt-BR/common";
 import lang_de_DE_common from "../../../locales/de-DE/common";
 import lang_fr_FR_common from "../../../locales/fr-FR/common";
+import lang_ru_RU_common from "../../../locales/ru-RU/common";
 
 const resourcesCommon = {
     'en-US': lang_en_US_common,
@@ -23,6 +24,7 @@ const resourcesCommon = {
     'pt-BR': lang_pt_BR_common,
     'de-DE': lang_de_DE_common,
     'fr-FR': lang_fr_FR_common,
+    'ru_RU': lang_ru_RU_common,
     'fk-FK': convertToFake(lang_en_US_common)
 };
 
