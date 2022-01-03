@@ -37,7 +37,7 @@ router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
 
     const input = {};
     Object.keys(req.body).forEach(key => {
-        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim();
+        input[(key || '').toString().trim().toUpperCase()] = (req.body[key] || '').toString().trim().toLowerCase();
     });
 
     if (!input.EMAIL) {
