@@ -281,6 +281,7 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | CAS_NEWUSERNAMESPACEID | The namespace id of new users (default: 1)                      |
 | LOG_LEVEL        | sets log level among `silly|verbose|info|http|warn|error|silent` (default: `info`) |
 | DEFAULT_LANGUAGE | sets default language (default: en-US) |
+| ENABLED_LANGUAGES | sets languages, that can be chosen for the UI (default: en-US, es-ES, pt-BR, de-DE, fr-FR, fk-FK) |
 | WITH_POSTFIXBOUNCE | enables PostfixBounce TCP listener (default: false) |
 | POSTFIXBOUNCE_PORT | sets PostfixBounce Listening TCP-Port (default: 5699) |
 | POSTFIXBOUNCE_HOST | sets PostfixBounce Listening Host (default: 127.0.0.1) |
