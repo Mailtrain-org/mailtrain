@@ -12,7 +12,7 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
-MYSQL_PASSWORD=`pwgen 12 -1`
+MYSQL_PASSWORD=`pwgen 16 -1 -s`
 
 # Setup MySQL user for Mailtrain Tests
 mysql -u root -e "CREATE USER 'mailtrain_test'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
