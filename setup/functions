@@ -217,8 +217,8 @@ function installMailtrain {
     local wwwHost="$4"
     local wwwProxy="$5"
 
-    mysqlPassword=`pwgen -1 -s 16`
-    mysqlRoPassword=`pwgen -1 -s 16`
+    mysqlPassword=`pwgen -1 -s 32`
+    mysqlRoPassword=`pwgen -1 -s 32`
     
     # Setup MySQL user for Mailtrain
     mysql -u root -e "CREATE USER 'mailtrain'@'localhost' IDENTIFIED BY '$mysqlPassword';"
@@ -240,7 +240,7 @@ roGroup: nobody
 www:
   host: $wwwHost
   proxy: $wwwProxy
-  secret: "`pwgen -1 -s 16`"
+  secret: "`pwgen -1 -s 32`"
   trustedUrlBase: $urlBaseTrusted
   sandboxUrlBase: $urlBaseSandbox
   publicUrlBase: $urlBasePublic
@@ -546,7 +546,7 @@ function deleteAllModules {
 
 
 function setupTest {
-    mysqlPassword=`pwgen -1 -s 16`
+    mysqlPassword=`pwgen -1 -s 32`
 
     # Setup MySQL user for Mailtrain
     mysql -u root -e "CREATE USER 'mailtrain_test'@'localhost' IDENTIFIED BY '$mysqlPassword';"
