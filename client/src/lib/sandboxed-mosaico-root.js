@@ -48,7 +48,7 @@ class MosaicoSandbox extends Component {
         /* juice is called to inline css styles of situations like this
             <style type="text/css" data-inline="true">
                 [data-ko-block=introBlock] .text p {
-                    font-family: merriweather,georgia,times new roman,serif; font-size: 14px; text-align: justify; line-height: 150%; color: #3A3A3A; margin-top: 8px;
+                    font-family: georgia,times new roman,serif; font-size: 14px; text-align: justify; line-height: 150%; color: #3A3A3A; margin-top: 8px;
                 }
             </style>
 
@@ -56,7 +56,7 @@ class MosaicoSandbox extends Component {
 
             <div style="Margin:0px auto;max-width:600px;" data-ko-block="introBlock">
                 ...
-                <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;" data-ko-editable="text" class="text">
+                <div style="font-family: Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;" data-ko-editable="text" class="text">
                     <p>XXX</p>
                 </div>
                 ...
