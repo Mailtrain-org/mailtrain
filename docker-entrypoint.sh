@@ -178,9 +178,13 @@ if [ -f server/services/workers/reports/config/production.yaml ]; then
     echo 'Info: server/production.yaml already provisioned'
 else
     echo 'Info: Generating server/production.yaml'
-    cat > server/services/workers/reports/config/production.yaml <<EOT
+    cat > server/services/workers/reports/config/production.yaml <<EOT  
 mysql:
   host: $MYSQL_HOST
+  user: $MYSQL_USER
+  password: $MYSQL_PASSWORD
+  database: $MYSQL_DATABASE
+  port: $MYSQL_PORT  
 log:
   level: warn
 EOT
