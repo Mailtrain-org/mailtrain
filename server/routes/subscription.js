@@ -672,7 +672,7 @@ async function webNotice(type, req, res) {
 
     const data = {
         title: list.name,
-        homepage: list.homepage || configItems.defaultHomepage || getTrustedUrl(),
+        homepage: configItems.defaultHomepage || getTrustedUrl() || list.homepage ,
         contactAddress: list.contact_email || configItems.adminEmail,
         template: {
             template: 'subscription/web-' + type + '-notice.mjml.hbs',
