@@ -140,8 +140,8 @@ export default class API extends Component {
                 </p>
                 <ul>
                     <li><strong>EMAIL</strong> – {t('subscribersEmailAddress')} (<em>{t('required')}</em>)</li>
-                    <li><strong>FIRST_NAME</strong> – {t('subscribersFirstName')}</li>
-                    <li><strong>LAST_NAME</strong> – {t('subscribersLastName')}</li>
+                    <li><strong>MERGE_FIRST_NAME</strong> – {t('subscribersFirstName')}</li>
+                    <li><strong>MERGE_LAST_NAME</strong> – {t('subscribersLastName')}</li>
                     <li><strong>TIMEZONE</strong> – {t('subscribersTimezoneEgEuropeTallinnPstOr')}</li>
                     <li><strong>MERGE_TAG_VALUE</strong> – {t('customFieldValueUseYesnoForOptionGroup')}</li>
                 </ul>
