@@ -1166,5 +1166,19 @@
   "thePasswordMustContainAtLeastOne": "The password must contain at least one lowercase letter",
   "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
-  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character"
+  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",  
+  "extraThrottlingMailerSettings":"Extra throttling settings",
+  "throttlingWarmUpDays":"Warm-up interval",
+  "throttlingWarmUpDaysEg10":"Warm-up interval in days, e.g. 10",
+  "senderWarmUpPeriodInDays":"Gradually increase the volume each day until reaching your throttling settings.",
+  "throttlingWarmUpFrom":"Warm-up starting date",
+  "throttlingWarmUpFromDateInUnixTimestampEg1648735303000":"e.g. 1648735303000",
+  "senderWarmUpPeriodStartingDayInUnixTimestamp":"Set the starting date and time in Unix Epoch Format",
+  "enableSenderOnDaySun":"Sending emails on Friday",
+  "enableSenderOnDayMon":"Sending emails on Monday",
+  "enableSenderOnDayTue":"Sending emails on Tuesday",
+  "enableSenderOnDayWed":"Sending emails on  Wednesday",
+  "enableSenderOnDayThu":"Sending emails on Thursday",
+  "enableSenderOnDayFri":"Sending emails on Friday",
+  "enableSenderOnDaySat":"Sending emails on Saturday"
 }
