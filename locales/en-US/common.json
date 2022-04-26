@@ -1174,7 +1174,7 @@
   "throttlingWarmUpFrom":"Warm-up starting date",
   "throttlingWarmUpFromDateInUnixTimestampEg1648735303000":"e.g. 1648735303000",
   "senderWarmUpPeriodStartingDayInUnixTimestamp":"Set the starting date and time in Unix Epoch Format",
-  "enableSenderOnDaySun":"Sending emails on Friday",
+  "enableSenderOnDaySun":"Sending emails on Sunday",
   "enableSenderOnDayMon":"Sending emails on Monday",
   "enableSenderOnDayTue":"Sending emails on Tuesday",
   "enableSenderOnDayWed":"Sending emails on  Wednesday",
