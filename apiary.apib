@@ -3,8 +3,34 @@ HOST: http://localhost:3003/api
 
 # Mailtrain REST API Documentation
 
-Mailtrain is a self-hosted Mail Automation Plattform. 
+Mailtrain is a self hosted newsletter application built on Node.js (v14+) and MySQL (v8+) or MariaDB (v10+). 
 This is the corresponding REST API documentation.
+
+# Features
+## Application
+
+    - Subscriber lists management
+    - List segmentation
+    - Custom fields
+    - Email templates (including MJML-based templates)
+    - Custom reports
+    - Automation (triggered and RSS campaigns)
+    - Multiple users with granular user permissions and flexible sharing
+    - Hierarchical namespaces for enterprise-level situations
+    - Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery
+
+## REST API 
+    - Get subscribers of list
+    - Subscribe to & unsubscribe from list
+    - Delete subscription
+    - Add custom fields
+    - Blacklist email and remove email from blacklist
+    - Get blacklisted email addresses
+    - Get users subscriptions
+    - Get lists in a namespace
+    - Create and delete lists
+    - Trigger fetch RSS campaigns
+    - Send transactional emails
 
 ## Get subscribers [/subscriptions/:listCid?access_token=21w9h12s981e918ps0k1283sj012&limit=1&start=10]
 ### List all Subscriptions [GET]
@@ -90,8 +116,8 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
             }
 
 
-## Remove subscription [/unsubscribe/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
-### Remove subscription [POST]
+## Unsubscribe from list [/unsubscribe/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+### Unsubscribe [POST]
 + Request (application/json)
 + Response 201 (application/json)
 ## Delete subscription [/delete/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
