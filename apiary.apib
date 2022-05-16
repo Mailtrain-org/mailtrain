@@ -54,7 +54,7 @@ You may further specify the wanted response with query params.
                         {
                             "id":11,
                             "cid":"mYuYPPxZyA",
-                            "email":"test-user@mail.com",
+                            "email":"john.doe@testmail.com",
                             "hash_email":"+oFuatBxbUPfwUL+KyahNF2YWWPxtMT5VYD7CDhNKG8kJ4B1stuttAP3Bf5gu4W3X91lu5cZgiWCKWrd+pp36w==",
                             "source_email":13,
                             "opt_in_ip":null,
@@ -87,40 +87,21 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
 + Request (application/json)
 
         {
-            "EMAIL": "test@mail.com",
+            "EMAIL": "john.doe@testmail.com",
             "MERGE_FIRST_NAME": "John",
-            "MERGE_FIRST_NAME": "Doe",
+            "MERGE_LAST_NAME": "Doe",
             "TIMEZONE": "Europe/Berlin",
             "MERGE_CHECKBOX": "yes",
             "REQUIRE_CONFIRMATION": "yes",
         }
 
 + Response 201 (application/json)
-
-    + Headers
-
-            Location: /questions/2
-
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+                "data": {
+                    "id":"ghLnvbRLbj"
+                }
             }
 
 
@@ -130,14 +111,35 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
     + access_token - Mailtrain API Access token
 ### Unsubscribe [POST]
 + Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
+        
 + Response 201 (application/json)
+    + Body
+
+            {
+                "data":  {
+                    "id":"DSwghGuCDI",
+                    "unsubscribed":true
+                }
+            }
+
 ## Delete subscription [/delete/{listCid}{?access_token}]
 + Parameters
     + listCid - Subscription list unique identifier
     + access_token - Mailtrain API Access token
 ### Delete subscription [POST]
 + Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
 + Response 201 (application/json)
+    + Body
+
+            {"data":{"id":"DSwghGuCDI","deleted":true}}
 
 ## Add new custom field [/field/{listCid}{?access_token}]
 + Parameters
