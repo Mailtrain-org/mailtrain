@@ -35,10 +35,10 @@ This is the corresponding REST API documentation.
 ## Get subscribers [/subscriptions/{listCid}{?access_token,limit,start}]
 + Parameters
     + listCid - Subscription list unique identifier
-    + access_token - Mailatrain API Access token
+    + access_token - Mailtrain API Access token
     + limit - Maximum number of subscribers returned
     + start - Start Index of subscribers
-    
+
 ### List all Subscriptions [GET]
 You may list all substribtions to a given list. 
 You may further specify the wanted response with query params.
@@ -77,7 +77,10 @@ You may further specify the wanted response with query params.
                 }
             }
         ]
-## Add subscription [/subscribe/{listCid}?access_token]
+## Add subscription [/subscribe/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
 ### Subscribe to List [POST]
 
 Users may subscribe email addresses to subscription lists with this POST Endpoint.
@@ -122,54 +125,89 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
             }
 
 
-## Unsubscribe from list [/unsubscribe/{listCid}?access_token]
+## Unsubscribe from list [/unsubscribe/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
 ### Unsubscribe [POST]
 + Request (application/json)
 + Response 201 (application/json)
-## Delete subscription [/delete/{listCid}?access_token]
+## Delete subscription [/delete/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
 ### Delete subscription [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Add new custom field [/field/{listCid}?access_token]
+## Add new custom field [/field/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
 ### Add field [POST] 
 + Request (application/json)
 + Response 201 (application/json)
 
-## Get list of blacklisted emails [/blacklist/get?access_token]
+## Get list of blacklisted emails [/blacklist/get{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
 ### Get list [GET]
 + Response 201 (application/json)
 
-## Add email to blacklist [/blacklist/add?access_token]
+## Add email to blacklist [/blacklist/add{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
 ### Add to blacklist [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Delete email from blacklist [/blacklist/delete?access_token]
+## Delete email from blacklist [/blacklist/delete{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
 ### Delete from blacklist [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Get users subscriptions [/lists/:email?access_token]
+## Get users subscriptions [/lists/{email}{?access_token}]
++ Parameters
+    + email - Subscription email
+    + access_token - Mailtrain API Access token
+## Get subscriptions [GET]
 + Response 201 (application/json)
 
-## Get lists in a namespaces [/lists-by-namespace/:namespaceId?access_token]
+## Get lists in a namespaces [/lists-by-namespace/{namespaceId}{?access_token}]
++ Parameters
+    + namespaceId - Namespace list unique identifier
+    + access_token - Mailtrain API Access token
+## Get lists [GET]
 + Response 201 (application/json)
 
-## Create new list [/list/?access_token]
+## Create new list [/list/{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
 ### Create new list [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Delete a list [/list/{listCid}?access_token]
+## Delete a list [/list/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
 ### Delete a list [DELETE]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Trigger fetch RSS campaign [/rss/fetch/:campaignId?access_token]
+## Trigger fetch RSS campaign [/rss/fetch/{campaignId}{?access_token}]
++ Parameters
+    + campaignId - Campaign unique identifier
+    + access_token - Mailtrain API Access token
+## Trigger campaign [GET]
 + Response 201 (application/json)
 
-## Send transactional email [/templates/:templateId/send/:campaignId?access_token]
+## Send transactional email [/templates/{templateId}/send{?access_token}]
++ Parameters
+    + templateId - Template unique identifier
+    + access_token - Mailtrain API Access token
 ### Create new list [POST]
 + Request (application/json)
 + Response 201 (application/json)
