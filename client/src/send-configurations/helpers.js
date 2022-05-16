@@ -51,9 +51,20 @@ export function getMailerTypes(t) {
         return {
             maxConnections: '5',
             throttling: '',
-            logTransactions: false
+            logTransactions: false,
+            // Add extra throttling params
+            throttlingWarmUpDays: '', // Set warm up period in days
+            throttlingWarmUpFrom: '', // Set warm up starting date - Unix time
+            enableSenderOnDaySun: true,
+            enableSenderOnDayMon: true,
+            enableSenderOnDayTue: true,
+            enableSenderOnDayWed: true,
+            enableSenderOnDayThu: true,
+            enableSenderOnDayFri: true,
+            enableSenderOnDaySat: true,
+        
         };
-    }
+    }  
 
     function getInitGenericSMTP() {
         return {
@@ -73,6 +84,16 @@ export function getMailerTypes(t) {
         data.maxConnections = data.mailer_settings.maxConnections;
         data.throttling = data.mailer_settings.throttling || '';
         data.logTransactions = data.mailer_settings.logTransactions;
+        // Add extra throttling params
+        data.throttlingWarmUpDays = data.mailer_settings.throttlingWarmUpDays
+        data.throttlingWarmUpFrom  = data.mailer_settings.throttlingWarmUpFrom
+        data.enableSenderOnDaySun = data.mailer_settings.enableSenderOnDaySun ?? true;
+        data.enableSenderOnDayMon = data.mailer_settings.enableSenderOnDayMon ?? true;
+        data.enableSenderOnDayTue = data.mailer_settings.enableSenderOnDayTue ?? true;
+        data.enableSenderOnDayWed = data.mailer_settings.enableSenderOnDayWed ?? true;
+        data.enableSenderOnDayThu = data.mailer_settings.enableSenderOnDayThu ?? true;
+        data.enableSenderOnDayFri = data.mailer_settings.enableSenderOnDayFri ?? true;
+        data.enableSenderOnDaySat = data.mailer_settings.enableSenderOnDaySat ?? true;
     }
 
     function afterLoadGenericSMTP(data) {
@@ -92,6 +113,16 @@ export function getMailerTypes(t) {
         data.mailer_settings.maxConnections = Number(data.maxConnections);
         data.mailer_settings.throttling = Number(data.throttling);
         data.mailer_settings.logTransactions = data.logTransactions;
+        // Add extra throttling params
+        data.mailer_settings.throttlingWarmUpDays = Number(data.throttlingWarmUpDays)
+        data.mailer_settings.throttlingWarmUpFrom  = Number(data.throttlingWarmUpFrom)
+        data.mailer_settings.enableSenderOnDaySun = data.enableSenderOnDaySun;
+        data.mailer_settings.enableSenderOnDayMon = data.enableSenderOnDayMon;
+        data.mailer_settings.enableSenderOnDayTue = data.enableSenderOnDayTue;
+        data.mailer_settings.enableSenderOnDayWed = data.enableSenderOnDayWed;
+        data.mailer_settings.enableSenderOnDayThu = data.enableSenderOnDayThu;
+        data.mailer_settings.enableSenderOnDayFri = data.enableSenderOnDayFri;
+        data.mailer_settings.enableSenderOnDaySat = data.enableSenderOnDaySat;
     }
 
     function beforeSaveGenericSMTP(data, builtin = false) {
@@ -113,6 +144,9 @@ export function getMailerTypes(t) {
     function validateCommon(state) {
         validateNumber(state, 'maxConnections', 'Max connections');
         validateNumber(state, 'throttling', 'Throttling', true);
+        // Validate extra throttling params 
+        validateNumber(state, 'throttlingWarmUpDays', 'Throttling Warm Up Days', true);
+        validateNumber(state, 'throttlingWarmUpFrom', 'Throttling Warm Up From', true); 
     }
 
     function validateGenericSMTP(state) {
@@ -195,6 +229,17 @@ export function getMailerTypes(t) {
                     <InputField id="maxConnections" label={t('maxConnections')} placeholder={t('theCountOfMaxConnectionsEg10')} help={t('theCountOfMaximumSimultaneousConnections')}/>
                     <InputField id="smtpMaxMessages" label={t('maxMessages')} placeholder={t('theCountOfMaxMessagesEg100')} help={t('theNumberOfMessagesToSendThroughASingle')}/>
                     <InputField id="throttling" label={t('throttling')} placeholder={t('messagesPerHourEg1000')} help={t('maximumNumberOfMessagesToSendInAnHour')}/>
+                </Fieldset>                    
+                <Fieldset label={t('extraThrottlingMailerSettings')}>    
+                    <InputField id="throttlingWarmUpDays" label={t('throttlingWarmUpDays')} placeholder={t('throttlingWarmUpDaysEg10')} help={t('senderWarmUpPeriodInDays')}/>
+                    <InputField id="throttlingWarmUpFrom" label={t('throttlingWarmUpFrom')} placeholder={t('throttlingWarmUpFromDateInUnixTimestampEg1648735303000')} help={t('senderWarmUpPeriodStartingDayInUnixTimestamp')}/>
+                    <CheckBox id="enableSenderOnDaySun" text={t('enableSenderOnDaySun')}/>
+                    <CheckBox id="enableSenderOnDayMon" text={t('enableSenderOnDayMon')}/>
+                    <CheckBox id="enableSenderOnDayTue" text={t('enableSenderOnDayTue')}/>
+                    <CheckBox id="enableSenderOnDayWed" text={t('enableSenderOnDayWed')}/>
+                    <CheckBox id="enableSenderOnDayThu" text={t('enableSenderOnDayThu')}/>
+                    <CheckBox id="enableSenderOnDayFri" text={t('enableSenderOnDayFri')}/>
+                    <CheckBox id="enableSenderOnDaySat" text={t('enableSenderOnDaySat')}/>
                 </Fieldset>
             </div>,
         initData: () => ({

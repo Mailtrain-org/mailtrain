@@ -102,6 +102,74 @@ async function _sendTransactionalMail(transport, mail) {
     return await _sendMail(transport, mail);
 }
 
+function _daysBetween(date1, date2) {
+    // The number of milliseconds in one day
+    const ONE_DAY = 1000 * 60 * 60 * 24;
+
+    // Calculate the difference in milliseconds
+    const differenceMs = Math.abs(date1 - date2);
+
+    // Convert back to days and return
+    return Math.round(differenceMs / ONE_DAY);    
+}
+
+function _senderIsEnabledForDay(enabledDaysInWeek, date) {
+    if (!Array.isArray(enabledDaysInWeek)) return null;
+    if (enabledDaysInWeek.length !== 7) return null;
+    // getDay();
+    // Sunday - Saturday : 0 - 6                
+    const dayInWeek = date.getUTCDay();
+    if (enabledDaysInWeek[dayInWeek] === 1) return true;
+    return false;
+  }
+
+// e.g. for enabling working days only
+// enabledDaysInWeek = [0, 1, 1, 1, 1, 1, 0] from Sunday to Saturday
+// returns value in milliseconds
+function _senderTimeToNextEnabledDay(enabledDaysInWeek) {
+
+    if (!Array.isArray(enabledDaysInWeek)) return 0;
+    if (enabledDaysInWeek.length !== 7) return 0;
+  
+    const dateNow = new Date(Date.now());
+    const dayInWeek = dateNow.getUTCDay(); // Sunday - Saturday : 0 - 6 
+    let _enabledDaysInWeek = enabledDaysInWeek.concat(enabledDaysInWeek);
+    let timeToNextEnabledDay = 0;
+  
+    for (let i = dayInWeek; i < 2 * 7; i++) {
+      if (_enabledDaysInWeek[i] === 1) {
+        const daysToNextEnabledDay = i - dayInWeek;
+        // Set exact utc time when next enabled day starts
+        let d = new Date(Date.UTC(dateNow.getUTCFullYear(), dateNow.getUTCMonth(), dateNow.getDate(), 0, 0, 0));
+  
+        d.setDate(dateNow.getDate() + daysToNextEnabledDay); // add days 
+        _senderIsEnabledForDay(enabledDaysInWeek, d)
+        timeToNextEnabledDay = d.getTime() - dateNow.getTime();
+        if (timeToNextEnabledDay < 0) timeToNextEnabledDay = 0;
+        return timeToNextEnabledDay;
+      }
+  
+    }
+    return 0;
+  }
+  
+  function _getWarmUpMultiplicator(throttlingWarmUpDays, throttlingWarmUpFrom) {
+    if (throttlingWarmUpDays && throttlingWarmUpFrom) {
+  
+      const timeNow = Date.now();
+      if (throttlingWarmUpFrom > timeNow) throttlingWarmUpFrom = timeNow;
+  
+      const warmingUpDays = _daysBetween(timeNow, throttlingWarmUpFrom);
+      if (warmingUpDays < throttlingWarmUpDays) {
+        let warmUpMultiplicator = warmingUpDays / throttlingWarmUpDays;
+        log.verbose('Mail', 'Warn up day %s/%s, warmUpMultiplicator %s)', warmingUpDays, throttlingWarmUpDays, warmUpMultiplicator);
+        return warmUpMultiplicator;
+      }
+    }
+    return 1;
+  }
+  
+
 async function _createTransport(sendConfiguration) {
     const mailerSettings = sendConfiguration.mailer_settings;
     const mailerType = sendConfiguration.mailer_type;
@@ -204,9 +272,42 @@ async function _createTransport(sendConfiguration) {
 
     if (mailerType === MailerType.GENERIC_SMTP || mailerType === MailerType.ZONE_MTA) {
         let throttling = mailerSettings.throttling;
+        let throttlingWarmUpDays = mailerSettings.throttlingWarmUpDays; // Set warm up period in days
+        let throttlingWarmUpFrom = mailerSettings.throttlingWarmUpFrom; // Set warm up starting date - Unix time
+
+        const enableSenderOnDaySun = mailerSettings.enableSenderOnDaySun === true ? 1 : 0;
+        const enableSenderOnDayMon = mailerSettings.enableSenderOnDayMon === true ? 1 : 0;
+        const enableSenderOnDayTue = mailerSettings.enableSenderOnDayTue === true ? 1 : 0;
+        const enableSenderOnDayWed = mailerSettings.enableSenderOnDayWed === true ? 1 : 0;
+        const enableSenderOnDayThu = mailerSettings.enableSenderOnDayThu === true ? 1 : 0;
+        const enableSenderOnDayFri = mailerSettings.enableSenderOnDayFri === true ? 1 : 0;
+        const enableSenderOnDaySat = mailerSettings.enableSenderOnDaySat === true ? 1 : 0;  
+
+        // From Sunday to Saturday e.g. enable sending in working days only [0,1,1,1,1,1,0]        
+        let enabledDaysInWeek  = [
+            enableSenderOnDaySun, 
+            enableSenderOnDayMon,
+            enableSenderOnDayTue,
+            enableSenderOnDayWed,
+            enableSenderOnDayThu,
+            enableSenderOnDayFri,
+            enableSenderOnDaySat
+        ];         
+
+        const warmUpMultiplicator = _getWarmUpMultiplicator(throttlingWarmUpDays, throttlingWarmUpFrom)
+        let throttlingOrig = mailerSettings.throttling;
+        let throttlingWarmUp = 0;
+
         if (throttling) {
-            throttling = 1 / (throttling / (3600 * 1000));
+            throttling = 1 / (throttling * warmUpMultiplicator / (3600 * 1000));
+            // For loging purposes only
+            throttlingWarmUp = throttling;
+            throttlingOrig = 1 / (throttlingOrig / (3600 * 1000)); 
         }
+        
+        let timeToNextEnabledDay = _senderTimeToNextEnabledDay(enabledDaysInWeek);    
+        throttling = Math.max(throttling,timeToNextEnabledDay);
+        log.verbose('Mail', 'Throttling changed from %s to %s (throttlingWarmUp in %s ms, timeToNextEnabledDay in %s ms)', throttlingOrig, throttling, throttlingWarmUp, timeToNextEnabledDay);
 
         let lastCheck = Date.now();
 
