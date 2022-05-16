@@ -6,35 +6,42 @@ HOST: http://localhost:3003/api
 Mailtrain is a self hosted newsletter application built on Node.js (v14+) and MySQL (v8+) or MariaDB (v10+). 
 This is the corresponding REST API documentation.
 
-*Application-Features*
+**Application-Features**
 
-    - Subscriber lists management
-    - List segmentation
-    - Custom fields
-    - Email templates (including MJML-based templates)
-    - Custom reports
-    - Automation (triggered and RSS campaigns)
-    - Multiple users with granular user permissions and flexible sharing
-    - Hierarchical namespaces for enterprise-level situations
-    - Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery
+- Subscriber lists management
+- List segmentation
+- Custom fields
+- Email templates (including MJML-based templates)
+- Custom reports
+- Automation (triggered and RSS campaigns)
+- Multiple users with granular user permissions and flexible sharing
+- Hierarchical namespaces for enterprise-level situations
+- Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery
 
-* REST API Features*
-    - Get subscribers of list
-    - Subscribe to & unsubscribe from list
-    - Delete subscription
-    - Add custom fields
-    - Blacklist email and remove email from blacklist
-    - Get blacklisted email addresses
-    - Get users subscriptions
-    - Get lists in a namespace
-    - Create and delete lists
-    - Trigger fetch RSS campaigns
-    - Send transactional emails
+**REST API Features**
 
-## Get subscribers [/subscriptions/:listCid?access_token=21w9h12s981e918ps0k1283sj012&limit=1&start=10]
+- Get subscribers of list
+- Subscribe to & unsubscribe from list
+- Delete subscription
+- Add custom fields
+- Blacklist email and remove email from blacklist
+- Get blacklisted email addresses
+- Get users subscriptions
+- Get lists in a namespace
+- Create and delete lists
+- Trigger fetch RSS campaigns
+- Send transactional emails
+
+## Get subscribers [/subscriptions/{listCid}{?access_token,limit,start}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailatrain API Access token
+    + limit - Maximum number of subscribers returned
+    + start - Start Index of subscribers
+    
 ### List all Subscriptions [GET]
-Users may list all substribtion to a given list. 
-They may further specify the wanted response with query params.
+You may list all substribtions to a given list. 
+You may further specify the wanted response with query params.
 
 + Response 200 (application/json)
 
@@ -70,7 +77,7 @@ They may further specify the wanted response with query params.
                 }
             }
         ]
-## Add subscription [/subscribe/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+## Add subscription [/subscribe/{listCid}?access_token]
 ### Subscribe to List [POST]
 
 Users may subscribe email addresses to subscription lists with this POST Endpoint.
@@ -115,54 +122,54 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
             }
 
 
-## Unsubscribe from list [/unsubscribe/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+## Unsubscribe from list [/unsubscribe/{listCid}?access_token]
 ### Unsubscribe [POST]
 + Request (application/json)
 + Response 201 (application/json)
-## Delete subscription [/delete/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+## Delete subscription [/delete/{listCid}?access_token]
 ### Delete subscription [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Add new custom field [/field/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+## Add new custom field [/field/{listCid}?access_token]
 ### Add field [POST] 
 + Request (application/json)
 + Response 201 (application/json)
 
-## Get list of blacklisted emails [/blacklist/get?access_token=21w9h12s981e918ps0k1283sj012]
+## Get list of blacklisted emails [/blacklist/get?access_token]
 ### Get list [GET]
 + Response 201 (application/json)
 
-## Add email to blacklist [/blacklist/add?access_token=21w9h12s981e918ps0k1283sj012]
+## Add email to blacklist [/blacklist/add?access_token]
 ### Add to blacklist [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Delete email from blacklist [/blacklist/delete?access_token=21w9h12s981e918ps0k1283sj012]
+## Delete email from blacklist [/blacklist/delete?access_token]
 ### Delete from blacklist [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Get users subscriptions [/lists/:email?access_token=21w9h12s981e918ps0k1283sj012]
+## Get users subscriptions [/lists/:email?access_token]
 + Response 201 (application/json)
 
-## Get lists in a namespaces [/lists-by-namespace/:namespaceId?access_token=21w9h12s981e918ps0k1283sj012]
+## Get lists in a namespaces [/lists-by-namespace/:namespaceId?access_token]
 + Response 201 (application/json)
 
-## Create new list [/list/?access_token=21w9h12s981e918ps0k1283sj012]
+## Create new list [/list/?access_token]
 ### Create new list [POST]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Delete a list [/list/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+## Delete a list [/list/{listCid}?access_token]
 ### Delete a list [DELETE]
 + Request (application/json)
 + Response 201 (application/json)
 
-## Trigger fetch RSS campaign [/rss/fetch/:campaignId?access_token=21w9h12s981e918ps0k1283sj012]
+## Trigger fetch RSS campaign [/rss/fetch/:campaignId?access_token]
 + Response 201 (application/json)
 
-## Send transactional email [/templates/:templateId/send/:campaignId?access_token=21w9h12s981e918ps0k1283sj012]
+## Send transactional email [/templates/:templateId/send/:campaignId?access_token]
 ### Create new list [POST]
 + Request (application/json)
 + Response 201 (application/json)
