@@ -147,8 +147,32 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
     + access_token - Mailtrain API Access token
 ### Add field [POST] 
 + Request (application/json)
+
+        {
+            "NAME": "fiel_name",
+            "TYPE": [
+                "text",
+                "website",
+                "longtext",
+                "gpg",
+                "number",
+                "radio",
+                "checkbox",
+                "date-us",
+                "date-eur",
+                "birthday-us",
+                "brithday-eur",
+                "json",
+                "option",
+            ]
+            "GROUP": "parent_element_id",
+            "GROUP_TEMPLATE": "group_template",
+            "VISIBLE": [ "yes", "no" ]
+        }
 + Response 201 (application/json)
 
+        {"data":{"id":37,"tag":"MERGE_COMMENT"}}
+        
 ## Get list of blacklisted emails [/blacklist/get{?access_token}]
 + Parameters
     + access_token - Mailtrain API Access token
