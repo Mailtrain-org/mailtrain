@@ -6,7 +6,7 @@ HOST: http://localhost:3003/api
 Mailtrain is a self-hosted Mail Automation Plattform. 
 This is the corresponding REST API documentation.
 
-## Subscription Collection [/subscriptions/:listCid]
+## Subscription Collection [/subscriptions/:listCid?&limit=1&start=10]
 
 ### List all Subscriptions [GET]
 Users may list all substribtion to a given list. 
@@ -16,23 +16,34 @@ They may further specify the wanted response with query params.
 
         [
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
+                "data": {
+                    "start":10,
+                    "limit":1,
+                    "subscriptions": [
+                        {
+                            "id":11,
+                            "cid":"mYuYPPxZyA",
+                            "email":"test-user@mail.com",
+                            "hash_email":"+oFuatBxbUPfwUL+KyahNF2YWWPxtMT5VYD7CDhNKG8kJ4B1stuttAP3Bf5gu4W3X91lu5cZgiWCKWrd+pp36w==",
+                            "source_email":13,
+                            "opt_in_ip":null,
+                            "opt_in_country":null,
+                            "tz":null,
+                            "status":1,
+                            "is_test":0,
+                            "status_change":"2022-03-25T13:11:03.000Z",
+                            "unsubscribed":null,
+                            "latest_open":null,
+                            "latest_click":null,
+                            "created":"2022-03-25T13:11:03.000Z",
+                            "updated":"2022-03-25T13:11:03.000Z",
+                            "custom_first_name_nkimafdbdm":"John",
+                            "source_custom_first_name_nkimafdbdm":13,
+                            "custom_last_name_qyripjydtq":"Doe",
+                            "source_custom_last_name_qyripjydtq":13
+                        }
+                    ]
+                }
             }
         ]
 
