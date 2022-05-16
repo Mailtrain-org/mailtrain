@@ -6,8 +6,7 @@ HOST: http://localhost:3003/api
 Mailtrain is a self-hosted Mail Automation Plattform. 
 This is the corresponding REST API documentation.
 
-## Subscription Collection [/subscriptions/:listCid?&limit=1&start=10]
-
+## Get subscribers [/subscriptions/:listCid?access_token=21w9h12s981e918ps0k1283sj012&limit=1&start=10]
 ### List all Subscriptions [GET]
 Users may list all substribtion to a given list. 
 They may further specify the wanted response with query params.
@@ -46,23 +45,20 @@ They may further specify the wanted response with query params.
                 }
             }
         ]
+## Add subscription [/subscribe/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+### Subscribe to List [POST]
 
-### Create a New Question [POST]
-
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+Users may subscribe email addresses to subscription lists with this POST Endpoint.
 
 + Request (application/json)
 
         {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
+            "EMAIL": "test@mail.com",
+            "MERGE_FIRST_NAME": "John",
+            "MERGE_FIRST_NAME": "Doe",
+            "TIMEZONE": "Europe/Berlin",
+            "MERGE_CHECKBOX": "yes",
+            "REQUIRE_CONFIRMATION": "yes",
         }
 
 + Response 201 (application/json)
@@ -92,3 +88,56 @@ form of choices.
                     }
                 ]
             }
+
+
+## Remove subscription [/unsubscribe/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+### Remove subscription [POST]
++ Request (application/json)
++ Response 201 (application/json)
+## Delete subscription [/delete/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+### Delete subscription [POST]
++ Request (application/json)
++ Response 201 (application/json)
+
+## Add new custom field [/field/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+### Add field [POST] 
++ Request (application/json)
++ Response 201 (application/json)
+
+## Get list of blacklisted emails [/blacklist/get?access_token=21w9h12s981e918ps0k1283sj012]
+### Get list [GET]
++ Response 201 (application/json)
+
+## Add email to blacklist [/blacklist/add?access_token=21w9h12s981e918ps0k1283sj012]
+### Add to blacklist [POST]
++ Request (application/json)
++ Response 201 (application/json)
+
+## Delete email from blacklist [/blacklist/delete?access_token=21w9h12s981e918ps0k1283sj012]
+### Delete from blacklist [POST]
++ Request (application/json)
++ Response 201 (application/json)
+
+## Get users subscriptions [/lists/:email?access_token=21w9h12s981e918ps0k1283sj012]
++ Response 201 (application/json)
+
+## Get lists in a namespaces [/lists-by-namespace/:namespaceId?access_token=21w9h12s981e918ps0k1283sj012]
++ Response 201 (application/json)
+
+## Create new list [/list/?access_token=21w9h12s981e918ps0k1283sj012]
+### Create new list [POST]
++ Request (application/json)
++ Response 201 (application/json)
+
+## Delete a list [/list/:listCid?access_token=21w9h12s981e918ps0k1283sj012]
+### Delete a list [DELETE]
++ Request (application/json)
++ Response 201 (application/json)
+
+## Trigger fetch RSS campaign [/rss/fetch/:campaignId?access_token=21w9h12s981e918ps0k1283sj012]
++ Response 201 (application/json)
+
+## Send transactional email [/templates/:templateId/send/:campaignId?access_token=21w9h12s981e918ps0k1283sj012]
+### Create new list [POST]
++ Request (application/json)
++ Response 201 (application/json)
