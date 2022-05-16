@@ -150,48 +150,52 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
 
         {
             "NAME": "fiel_name",
-            "TYPE": [
-                "text",
-                "website",
-                "longtext",
-                "gpg",
-                "number",
-                "radio",
-                "checkbox",
-                "date-us",
-                "date-eur",
-                "birthday-us",
-                "brithday-eur",
-                "json",
-                "option",
-            ]
+            "TYPE": "text",
             "GROUP": "parent_element_id",
             "GROUP_TEMPLATE": "group_template",
-            "VISIBLE": [ "yes", "no" ]
+            "VISIBLE": "yes"
         }
 + Response 201 (application/json)
 
         {"data":{"id":37,"tag":"MERGE_COMMENT"}}
-        
-## Get list of blacklisted emails [/blacklist/get{?access_token}]
+
+## Get list of blacklisted emails [/blacklist/get{?access_token,limit,start,search}]
 + Parameters
     + access_token - Mailtrain API Access token
+    + limit - Maximum number of results to be returned
+    + start - Start index of results to be returned
+    + search - Search mail domain
+
 ### Get list [GET]
 + Response 201 (application/json)
 
+        {"data":{"start":10,"limit":1,"emails":["john.doe@test-mail.com"]}}
 ## Add email to blacklist [/blacklist/add{?access_token}]
 + Parameters
     + access_token - Mailtrain API Access token
 ### Add to blacklist [POST]
 + Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
+
 + Response 201 (application/json)
+
+        {"data":[]}
 
 ## Delete email from blacklist [/blacklist/delete{?access_token}]
 + Parameters
     + access_token - Mailtrain API Access token
 ### Delete from blacklist [POST]
 + Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
 + Response 201 (application/json)
+
+        {"data":[]}
 
 ## Get users subscriptions [/lists/{email}{?access_token}]
 + Parameters
@@ -200,6 +204,8 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
 ## Get subscriptions [GET]
 + Response 201 (application/json)
 
+        {"data":[{"id":3,"cid":"Z3jMJgfTuT","name":"Newsletter","description":"Newsletter","status":1}]}
+
 ## Get lists in a namespaces [/lists-by-namespace/{namespaceId}{?access_token}]
 + Parameters
     + namespaceId - Namespace list unique identifier
@@ -207,12 +213,29 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
 ## Get lists [GET]
 + Response 201 (application/json)
 
+        {"data":[{"id":1,"cid":"Z3jMJgfTuT","name":"Newsletter"}]}
+
 ## Create new list [/list/{?access_token}]
 + Parameters
     + access_token - Mailtrain API Access token
 ### Create new list [POST]
 + Request (application/json)
+
+        {
+            "NAMESPACE": 1,
+            "NAMESPACE": 0,
+            "NAME": "MyNewList",
+            "DESCRIPTION": "My new list",
+            "CONTACT_EMAIL": "test@example.com",
+            "HOMEPAGE": "example.com",
+            "FIELDWIZARD": "first_last_name",
+            "SEND_CONFIGURATION": 1,
+            "PUBLIC_SUBSCRIBE": 1,
+            "LISTUNSUBSCRIBE_DISABLED": 0
+        }
 + Response 201 (application/json)
+
+        {"data":{"id":"HGVtqxlOJe"}}
 
 ## Delete a list [/list/{listCid}{?access_token}]
 + Parameters
@@ -220,7 +243,10 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
     + access_token - Mailtrain API Access token
 ### Delete a list [DELETE]
 + Request (application/json)
+
 + Response 201 (application/json)
+
+        {}
 
 ## Trigger fetch RSS campaign [/rss/fetch/{campaignId}{?access_token}]
 + Parameters
@@ -235,4 +261,13 @@ Users may subscribe email addresses to subscription lists with this POST Endpoin
     + access_token - Mailtrain API Access token
 ### Create new list [POST]
 + Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com",
+            "SUBJECT": "Test eMail",
+            "TAGS[FOO]": "bar",
+            "TAGS[TEST]": "example",
+        }
 + Response 201 (application/json)
+
+        {}
