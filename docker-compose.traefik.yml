@@ -1,0 +1,118 @@
+version: '3'
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+    driver: bridge
+  inbound:
+    external: true
+
+services:
+  mailtrain:
+#    image: mailtrain/mailtrain:latest
+    build: .
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+    links:
+      - mysql
+      - redis
+      - mongo
+    environment:
+#      - PORT_TRUSTED=80
+      # - WITH_LDAP=true
+      # - LDAP_HOST=ldap://ldap.domain
+      # - LDAP_BIND_USER=dn=admin,dc=domain,dc=tld
+      # - LDAP_BIND_PASS=${LDAP_PASS}
+      # - LDAP_UIDTAG=cn
+      # - LDAP_BASEDN=ou=people,dc=domain,dc=tld
+      # - LDAP_FILTER=(objectclass=AsteriskSIPUser)
+      - WWW_PROXY=true
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DEFAULT_LANGUAGE=${LOCALE}
+      - URL_BASE_TRUSTED=https://mailtrain.${DOMAIN}
+      - URL_BASE_SANDBOX=https://sbox.${DOMAIN}
+      - URL_BASE_PUBLIC=https://lists.${DOMAIN}
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    # ports:
+    #   - "3000:3000"
+    #   - "3003:3003"
+    #   - "3004:3004"
+    volumes:
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+      - mailtrain-files:/app/server/files
+    networks:
+      - internal
+      - web
+      - inbound
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailtrain.rule=Host(`mailtrain.${DOMAIN}`)"
+      - "traefik.http.routers.mailtrain.entrypoints=websecure"
+      - "traefik.http.routers.mailtrain.service=mailtrain"
+      - "traefik.http.routers.mailtrain.tls.certresolver=myresolver"
+      - "traefik.http.services.mailtrain.loadbalancer.server.port=3000"
+      - "traefik.http.routers.sbox.rule=Host(`sbox.${DOMAIN}`)"
+      - "traefik.http.routers.sbox.entrypoints=websecure"
+      - "traefik.http.routers.sbox.service=sbox"
+      - "traefik.http.routers.sbox.tls.certresolver=myresolver"
+      - "traefik.http.services.sbox.loadbalancer.server.port=3003"
+      - "traefik.http.routers.lists.rule=Host(`lists.${DOMAIN}`)"
+      - "traefik.http.routers.lists.entrypoints=websecure"
+      - "traefik.http.routers.lists.service=lists"
+      - "traefik.http.routers.lists.tls.certresolver=myresolver"
+      - "traefik.http.services.lists.loadbalancer.server.port=3004"
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  mysql:
+    image: mariadb:10.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  mongo:
+    image: mongo:4-xenial
+    volumes:
+      - mongo-data:/data/db
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  redis:
+    image: redis:5
+    volumes:
+      - redis-data:/data
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongo-data:
+  mailtrain-files:
