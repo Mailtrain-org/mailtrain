@@ -42,7 +42,7 @@ tagLanguages:
 - hbs     # e.g. {{#if FIRST_NAME}}Hello {{firstName}}!{{else}}Hello!{{/if}} - this syntax uses Handlebars templating language (http://handlebarsjs.com)
 
 # Default language to use
-defaultLanguage: en-US
+defaultLanguage: de-DE
 
 # Enabled languages
 enabledLanguages:
@@ -154,10 +154,10 @@ ldap:
   nameTag: username
   # mailTag identifies the attribute to be used for user's email address
   mailTag: mail
-  passwordresetlink:
-  newUserRole: master
+  passwordresetlink: https://sso.iem-experten.de
+  newUserRole: nobody
   # Global namespace id
-  newUserNamespaceId: 1
+  newUserNamespaceId: 3
   # Use a different user to bind LDAP (final bind DN will be: {{uidTag}}: {{bindUser}},{{baseDN}})
   bindUser: name@company.net
   bindPassword: mySecretPassword

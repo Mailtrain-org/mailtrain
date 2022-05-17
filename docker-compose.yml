@@ -1,38 +1,126 @@
 version: '3'
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+    driver: bridge
+  inbound:
+    external: true
 
 services:
+  mailtrain:
+#    image: mailtrain/mailtrain:latest
+    build: .
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+    links:
+      - mysql
+      - redis
+      - mongo
+    environment:
+#      - PORT_TRUSTED=80
+      ADMIN_PASSWORD: xQ7VAXeaDPjgejwVssTZLAVmMD7bh9ce5uWf2VPmtwX9qi9sJctUgDCKLkK3thnE
+      # WITH_LDAP: "false"
+      WITH_LDAP: "true"
+      LDAP_HOST: ldap://ldap.iem-experten
+      LDAP_PORT: 389
+      # LDAP_BIND_USER: null
+      # LDAP_BIND_PASS: null
+      LDAP_BIND_USER: cn=admin,dc=iem-experten,dc=de
+      LDAP_BIND_PASS: 5oXU9TDnFafLK7cMHqr9SLdjtSwQYpxrTNb3DpwzJvWAZzCoHWEf3cssLKkrx9q9
+      LDAP_UIDTAG: uid
+      LDAP_BASEDN: "ou=people,dc=iem-experten,dc=de"
+      LDAP_METHOD: ldapauth
+      #-: LDAP_BASEDN=ou=people,dc=iem-experten,dc=de
+      LDAP_SECURE: "false"
+      LDAP_FILTER: (&(objectclass=AsteriskSIPUser)(|(uid={{username}})(mail={{username}})))
+      # filter: (&(objectClass=AsteriskSIPUser)(mail=*))
+      WWW_PROXY: "true"
+      DEFAULT_LANGUAGE: de-DE
+      URL_BASE_TRUSTED: https://mailtrain.safebasket.de
+      URL_BASE_SANDBOX: https://sbox.safebasket.de
+      URL_BASE_PUBLIC: https://lists.safebasket.de
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: 2subxQaNibMKMdtbvzURfZDLCRtXxUCJ24ZNzqnsPyULdUiRjANZDvLYPzaJoQx4
+      MYSQL_DATABASE: mailtrain
+      MYSQL_USER: yoda
+      MYSQL_PASSWORD: WtY4hFq3Kc2TmrxNTiKxq9Lqj9RiR4jpMp9pApNoCZ7i4YFngCThn5JdzKJh4wvA
+    # ports:
+    #   - "3000:3000"
+    #   - "3003:3003"
+    #   - "3004:3004"
+    volumes:
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+      - mailtrain-files:/app/server/files
+    networks:
+      - internal
+      - web
+      - inbound
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailtrain.rule=Host(`mailtrain.safebasket.de`)"
+      - "traefik.http.routers.mailtrain.entrypoints=websecure"
+      - "traefik.http.routers.mailtrain.service=mailtrain"
+      - "traefik.http.routers.mailtrain.tls.certresolver=myresolver"
+      - "traefik.http.services.mailtrain.loadbalancer.server.port=3000"
+      - "traefik.http.routers.sbox.rule=Host(`sbox.safebasket.de`)"
+      - "traefik.http.routers.sbox.entrypoints=websecure"
+      - "traefik.http.routers.sbox.service=sbox"
+      - "traefik.http.routers.sbox.tls.certresolver=myresolver"
+      - "traefik.http.services.sbox.loadbalancer.server.port=3003"
+      - "traefik.http.routers.lists.rule=Host(`lists.safebasket.de`)"
+      - "traefik.http.routers.lists.entrypoints=websecure"
+      - "traefik.http.routers.lists.service=lists"
+      - "traefik.http.routers.lists.tls.certresolver=myresolver"
+      - "traefik.http.services.lists.loadbalancer.server.port=3004"
+      - "com.centurylinklabs.watchtower.enable=true"
+
   mysql:
     image: mariadb:10.4
     environment:
-    - MYSQL_ROOT_PASSWORD=mailtrain
-    - MYSQL_DATABASE=mailtrain
-    - MYSQL_USER=mailtrain
-    - MYSQL_PASSWORD=mailtrain
+      - MYSQL_ROOT_PASSWORD=2subxQaNibMKMdtbvzURfZDLCRtXxUCJ24ZNzqnsPyULdUiRjANZDvLYPzaJoQx4
+      - MYSQL_DATABASE=mailtrain
+      - MYSQL_USER=yoda
+      - MYSQL_PASSWORD=WtY4hFq3Kc2TmrxNTiKxq9Lqj9RiR4jpMp9pApNoCZ7i4YFngCThn5JdzKJh4wvA
     volumes:
-    - mysql-data:/var/lib/mysql
-
-  redis:
-    image: redis:5
-    volumes:
-    - redis-data:/data
+      - mysql-data:/var/lib/mysql
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   mongo:
     image: mongo:4-xenial
     volumes:
-    - mongo-data:/data/db
+      - mongo-data:/data/db
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
-  mailtrain:
-    image: mailtrain/mailtrain:latest
-    ports:
-    - "3000:3000"
-    - "3003:3003"
-    - "3004:3004"
+  redis:
+    image: redis:5
     volumes:
-    - mailtrain-files:/app/server/files
+      - redis-data:/data
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
 
 volumes:
   mysql-data:
   redis-data:
   mongo-data:
   mailtrain-files:
-
