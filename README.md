@@ -1,24 +1,38 @@
 # Mailtrain v2
 
-Mailtrain is a self hosted newsletter application built on Node.js (v14+) and MySQL (v8+) or MariaDB (v10+).
+Mailtrain ist eine freie selbst gehostete Newsletter-Anwendung für 
 
-This is version 2 of Mailtrain. It mostly implements all features of v1 and add some more. It is a complete rewrite, so you will have to install it from scratch.
-
-If you are upgrading from Mailtrain v1, backup the DB and use it for Mailtrain v2. Mailtrain v2 should be able to upgrade the DB to the new schema.
+Mailtrain basiert auf Node.js (v14+) und MySQL (v8+) oder MariaDB (v10+).
 
 ![](https://mailtrain.org/mailtrain.png)
 
 ## Features
 
-* Subscriber lists management
+* eMail and RSS Campaigns
+* Marketing Funnel & Automation
+    - Lists & segment-based campaigns
+    - Scheduled campaigns
+    - Event-based campaigns
+* Communication channel & mailbox management
+* Google Analytics integration
+* Subscriber list management
 * List segmentation
-* Custom fields
-* Email templates (including MJML-based templates)
-* Custom reports
-* Automation (triggered and RSS campaigns)
-* Multiple users with granular user permissions and flexible sharing
-* Hierarchical namespaces for enterprise-level situations
-* Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery
+* User-defined properties & fields
+* Email templates (incl. MJML-based templates)
+* Enterprise & multi-tenant support
+    - User accounts and roles
+    - Hierarchical namespaces
+    - Flexible sharing
+    - Granular user permissions
+    - Directory service integration (LDAP / Active Directiory)
+* Signed and encrypted emails (PGP Integration)
+* User defined reports
+* Website integration via forms or REST API interface
+* Mail Server Integration
+    - SMTP
+    - Zone-MTA
+    - Amazon SES
+* Open Source Licence (GPL-V3.0)
 
 ## Recommended minimal hardware Requirements
 * 2 vCPU
