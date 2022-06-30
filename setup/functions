@@ -172,6 +172,7 @@ EOT
             apt-get update
 
             apt-get install -y mariadb-server build-essential nodejs imagemagick redis pwgen mongodb-org bzip2 wget curl
+	    installMariaDBFixKeyLength
             ;;
 
         debian10)
@@ -182,6 +183,7 @@ EOT
 	    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
             apt-get update
             apt-get install -y mariadb-server nodejs imagemagick redis pwgen mongodb-org bzip2
+	    installMariaDBFixKeyLength
             ;;
 
     esac
@@ -195,6 +197,17 @@ EOT
 
     systemctl start mongod
     systemctl enable mongod
+}
+
+function installMariaDBFixKeyLength() {
+    cat > /etc/mysql/mariadb.conf.d/60-fix-key-length.cnf <<EOT
+[mysqld]
+innodb_file_format = Barracuda
+innodb_file_per_table = on
+innodb_default_row_format = dynamic
+innodb_large_prefix = 1
+innodb_file_format_max = Barracuda
+EOT
 }
 
 function installMailtrain {

@@ -81,7 +81,7 @@ async function run() {
                                     .where('campaign_links.list', cpgList.list)
                                     .where('campaign_links.link', links.LinkId.OPEN)
                                     .as('campaign_links');
-                            }, 'campaign_links', 'campaign_links.subscription', subsTable + '.id');
+                            }, 'campaign_links.subscription', subsTable + '.id');
 
                         column = 'campaign_links.created';
 
@@ -93,7 +93,7 @@ async function run() {
                                     .where('campaign_links.list', cpgList.list)
                                     .where('campaign_links.link', links.LinkId.GENERAL_CLICK)
                                     .as('campaign_links');
-                            }, 'campaign_links', 'campaign_links.subscription', subsTable + '.id');
+                            }, 'campaign_links.subscription', subsTable + '.id');
 
                         column = 'campaign_links.created';
 

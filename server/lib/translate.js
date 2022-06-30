@@ -15,6 +15,8 @@ function loadLanguage(longCode) {
 loadLanguage('en-US');
 loadLanguage('es-ES');
 loadLanguage('pt-BR');
+loadLanguage('de-DE');
+loadLanguage('fr-FR');
 resourcesCommon['fk-FK'] = convertToFake(resourcesCommon['en-US']);
 
 const resources = {};

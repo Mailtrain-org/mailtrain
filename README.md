@@ -238,14 +238,18 @@ Alternatively, you can just declare them there leaving their value empty
 value can be provided via a file called `.env` or via environment 
 variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-vars..) docker-compose -f docker-compose.yml build (or up)`)  
 
+#### !!!WARNING!!! Always set ADMIN_PASSWORD, as it will leave your instance otherwise vurnerable with the default password being `test`!
+
 | Parameter        | Description |
 | ---------        | ----------- |
+| ADMIN_PASSWORD | sets Admin Password, Admin users name can be changed, but password will always be overwritten by this, please set it always, as it otherwise defaults to `test` |
+| ADMIN_ACCESS_TOKEN | sets Access Token for API, this is optional |
 | PORT_TRUSTED     | sets the trusted port of the instance (default: 3000)                 |
 | PORT_SANDBOX     | sets the sandbox port of the instance (default: 3003)                 |
 | PORT_PUBLIC      | sets the public port of the instance (default: 3004)                  |
-| URL_BASE_TRUSTED | sets the trusted url of the instance (default: http://localhost:3000) |
-| URL_BASE_SANDBOX | sets the sandbox url of the instance (default: http://localhost:3003) |
-| URL_BASE_PUBLIC  | sets the public url of the instance (default: http://localhost:3004)  |
+| URL_BASE_TRUSTED | sets the external trusted url of the instance (default: http://localhost:3000), e.g. https://mailtrain.example.com |
+| URL_BASE_SANDBOX | sets the external sandbox url of the instance (default: http://localhost:3003), e.g. https://sbox-mailtrain.example.com |
+| URL_BASE_PUBLIC  | sets the external public url of the instance (default: http://localhost:3004), e.g. https://lists.example.com |
 | WWW_HOST         | sets the address that the server binds to (default: 0.0.0.0)          |
 | WWW_PROXY        | use if Mailtrain is behind an http reverse proxy (default: false)     |
 | WWW_SECRET       | sets the secret for the express session (default: `$(pwgen -1)`)      |
@@ -276,6 +280,10 @@ variables (e.g. `URL_BASE_TRUSTED=https://mailtrain.domain.com (and more env-var
 | CAS_NEWUSERROLE  | The role of new users (default: nobody)                               |
 | CAS_NEWUSERNAMESPACEID | The namespace id of new users (default: 1)                      |
 | LOG_LEVEL        | sets log level among `silly|verbose|info|http|warn|error|silent` (default: `info`) |
+| DEFAULT_LANGUAGE | sets default language (default: en-US) |
+| WITH_POSTFIXBOUNCE | enables PostfixBounce TCP listener (default: false) |
+| POSTFIXBOUNCE_PORT | sets PostfixBounce Listening TCP-Port (default: 5699) |
+| POSTFIXBOUNCE_HOST | sets PostfixBounce Listening Host (default: 127.0.0.1) |
 
 If you don't want to modify the original `docker-compose.yml`, you can put your overrides to another file (e.g. `docker-compose.override.yml`) -- like the one below.
 

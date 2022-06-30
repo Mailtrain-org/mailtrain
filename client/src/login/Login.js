@@ -75,7 +75,10 @@ export default class Login extends Component {
             const submitSuccessful = await this.validateAndSendFormValuesToURL(FormSendMethod.POST, 'rest/login');
 
             if (submitSuccessful) {
-                const nextUrl = qs.parse(this.props.location.search).next || getUrl();
+                const unsafeUrl = qs.parse(this.props.location.search).next
+                const safeUrl = unsafeUrl.replace(/[^a-zA-Z0-9/\-]/g, "");
+
+                const nextUrl = safeUrl || getUrl();
 
                 /* This ensures we get config for the authenticated user */
                 window.location = nextUrl;
