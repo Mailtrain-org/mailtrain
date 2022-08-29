@@ -86,7 +86,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
 
     data.template.template = form[viewKey] || data.template.template;
     data.template.layout = form.layout || data.template.layout;
-    data.formInputStyle = form.formInputStyle || `@import url(${getPublicUrl('static/subscription/form-input-style.css')});`;
+    data.formInputStyle = form.form_input_style || `@import url(${getPublicUrl('static/subscription/form-input-style.css')});`;
 
     const configItems = await settings.get(contextHelpers.getAdminContext(), ['uaCode']);
 
