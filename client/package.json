@@ -39,7 +39,7 @@
     "lodash": "^4.17.21",
     "mjml4-in-browser": "^1.1.2",
     "moment": "^2.29.1",
-    "moment-timezone": "^0.5.33",
+    "moment-timezone": "^0.5.35",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
     "querystringify": "^2.2.0",
