@@ -13,7 +13,7 @@ module.exports.init = (app, done) => {
             envelope.dkim.keys = [];
         }
 
-        const dkimHeaderValue = headers.getFirst('x-mailtrain-dkim');
+        const dkimHeaderValue = require('libmime').decodeWords(headers.getFirst('x-mailtrain-dkim'));
 
         if (dkimHeaderValue) {
             const dkimKey = JSON.parse(dkimHeaderValue);
