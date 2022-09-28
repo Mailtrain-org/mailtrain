@@ -84,7 +84,7 @@ async function _sendMail(list, email, template, locale, subjectKey, relativeUrls
 
     const data = {
         title: list.name,
-        homepage: configItems.defaultHomepage || getTrustedUrl(),
+        homepage: list.homepage || configItems.defaultHomepage || getTrustedUrl(),
         contactAddress: list.contact_email || configItems.adminEmail,
     };
 
