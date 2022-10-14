@@ -24,7 +24,7 @@ const resourcesCommon = {
     'pt-BR': lang_pt_BR_common,
     'de-DE': lang_de_DE_common,
     'fr-FR': lang_fr_FR_common,
-    'ru_RU': lang_ru_RU_common,
+    'ru-RU': lang_ru_RU_common,
     'fk-FK': convertToFake(lang_en_US_common)
 };
 
