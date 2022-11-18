@@ -152,7 +152,7 @@ async function _fileCache(typeId, cacheConfig, keyGen) {
                     if (fileStream) {
                         fileStream.destroy(err);
                         fs.unlink(tmpFilePath, () => {
-                            knex('file_cache').where('type', typeId).where('key', key).del().then(()=> callback());
+                            callback();
                         });
                     } else {
                         callback();
