@@ -100,7 +100,7 @@ async function _fileCache(typeId, cacheConfig, keyGen) {
                     tmpName().then(tmp => {
                         tmpFilePath = tmp;
                         fileStream = fs.createWriteStream(tmpFilePath);
-                        setTimeout(callback, 5000);
+                        setTimeout(callback, 0);
                     })
                 } else {
                     callback();
