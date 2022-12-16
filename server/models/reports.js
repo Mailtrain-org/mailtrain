@@ -692,6 +692,10 @@ async function getMultiCampaignMessagesStatistics(campaign, startBeforeDays, end
                     opened_percent: 0,
                     clicks:0,
                     clicks_percent:0,
+                    opened_total_from_beginning: e.opened,
+                    opened_total_from_beginning_percent: 0,
+                    clicks_total_from_beginning: e.clicks,
+                    clicks_total_from_beginning_percent:0,                    
                     unsubscribed_total_from_beginning: e.unsubscribed,
                     bounced_total_from_beginning: e.bounced,
                     complained_total_from_beginning: e.complained,
@@ -707,20 +711,23 @@ async function getMultiCampaignMessagesStatistics(campaign, startBeforeDays, end
 
         result.delivered = result.delivered + 1;
 
-        if(typeof e.campaign_links_count === 'number' ) {
+        if(typeof e.campaign_links_count === 'number' && e.campaign_links_count > 0) {
             result.opened = result.opened + 1;
-            result.opened_percent = Math.round(result.opened / result.delivered * 100 * 100)/100;
+            
         }
 
         if (typeof e.links_visits === 'number' && e.links_visits > 0) {
             result.links_visits = result.links_visits + e.links_visits;
             result.clicks = result.clicks + 1;
-            result.clicks_percent = Math.round(result.clicks / result.delivered * 100 * 100)/100;
         }
         if (typeof e.links_hits === 'number') {
             result.links_hits = result.links_hits + e.links_hits;
         }
         
+        result.opened_percent = Math.round(result.opened / result.delivered * 100 * 100)/100;
+        result.clicks_percent = Math.round(result.clicks / result.delivered * 100 * 100)/100;
+        result.opened_total_from_beginning_percent = Math.round(result.opened_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
+        result.clicks_total_from_beginning_percent = Math.round(result.clicks_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;        
         result.unsubscribed_total_from_beginning_percent =  Math.round(result.unsubscribed_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
         result.unsubscribed_total_from_beginning_percent =  Math.round(result.unsubscribed_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
         result.bounced_total_from_beginning_percent =  Math.round(result.bounced_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
