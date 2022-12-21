@@ -594,7 +594,7 @@ async function rawGetMessagesByTx(tx, key, id, startBeforeDays, endBeforeDays, d
     var ed = new Date();   
 
     sd.setDate(sd.getDate() - startBeforeDays);
-    ed.setDate(sd.getDate() - endBeforeDays);
+    ed.setDate(ed.getDate() - endBeforeDays);
 
     const entities = await tx('campaign_messages').where('campaign_messages.campaign', id).andWhere('campaign_messages.created', '>=', sd.toISOString()).andWhere('campaign_messages.created', '<=', ed.toISOString())
         .leftJoin('campaign_lists', 'campaign_messages.campaign', 'campaign_lists.campaign')
