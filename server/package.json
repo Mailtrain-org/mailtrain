@@ -49,7 +49,7 @@
     "bounce-handler": "7.3.2-fork.3",
     "capitalize": "^2.0.1",
     "compression": "^1.7.3",
-    "config": "^3.2.4",
+    "config": "^3.3.8",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.4.2",
     "cookie-parser": "^1.4.3",
