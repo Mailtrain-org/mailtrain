@@ -15,6 +15,12 @@ const {LinkId} = require('./links');
 const subscriptions = require('./subscriptions');
 const {Readable} = require('stream');
 
+//
+// TODO Modifies
+//
+//const campaigns = require('./campaigns');
+const {castToInteger} = require('../lib/helpers');
+
 const ReportState = require('../../shared/reports').ReportState;
 
 const allowedKeys = new Set(['name', 'description', 'report_template', 'params', 'namespace']);
@@ -189,6 +195,7 @@ async function getCampaignCommonListFields(campaign) {
 
     return listFields;
 }
+
 
 async function _getCampaignStatistics(campaign, select, joins, unionQryFn, listQryFn, asStream) {
     const subsQrys = [];
@@ -501,8 +508,235 @@ async function getCampaignLinkClickStatisticsStream(campaign, select, unionQryFn
     return await _getCampaignLinkClickStatistics(campaign, select, unionQryFn, listQryFn, true);
 }
 
+//
+// Used in Get quick statistics for multiple campaings
+// Source query comes from the endpoint 
+// rest/campaigns-stats/:id used in Campaing details / stats
+// 
+async function rawGetByTx(tx, key, id) {
+    const entity = await tx('campaigns').where('campaigns.' + key, id)//.andWhere('created', '>=', '2022-12-13T00:00:00Z')
+        .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
+        .groupBy('campaigns.id')
+        .select([
+            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.channel', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
+            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject',
+            'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
+            'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks', 'campaigns.created',
+            knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`)
+        ])
+        .first();
+
+    if (!entity) {
+        return undefined;
+        //throw new shares.throwPermissionDenied();
+    }
+
+    if (entity.lists) {
+        entity.lists = entity.lists.split(';').map(x => {
+            const entries = x.split(':');
+            const list = Number.parseInt(entries[0]);
+            const segment = entries[1] ? Number.parseInt(entries[1]) : null;
+            return {list, segment};
+        });
+    } else {
+        entity.lists = [];
+    }
+
+    entity.data = JSON.parse(entity.data);
+
+    return entity;
+}
 
 
+//
+// Get quick statistics for multiple campaings 
+//
+async function getMultiCampaignQuickStatistics(campaign) {
+    let entities = [];
+    for (const c of campaign) {
+    let entity =  await knex.transaction(async tx => {
+        return await rawGetByTx(tx, 'id', castToInteger(c.id));
+    });
+    
+    if(!entity) {
+        entity = {
+            delivered:0,
+            opened:0,
+            clicks:0,
+            unsubscribed:0,
+            bounced:0,
+            complained:0,
+            name:c.name,
+            id:c.id,
+            subject:c.subject,
+            send_configuration:c.send_configuration,
+        }
+    }
+    entity.opened_percent = Math.round(entity.opened / entity.delivered * 100 * 100)/100;
+    entity.clicks_percent =  Math.round(entity.clicks / entity.delivered * 100 * 100)/100;
+    entity.unsubscribed_percent =  Math.round(entity.unsubscribed / entity.delivered * 100 * 100)/100;
+    entity.bounced_percent =  Math.round(entity.bounced / entity.delivered * 100 * 100)/100;
+    entity.complained_percent =  Math.round(entity.complained / entity.delivered * 100 * 100)/100;
+    
+    entities.push(entity);
+    }
+    return entities;
+}
+
+//
+// Get data from the table campaign_messages
+// Source query comes from the endpoint 
+// rest/campaigns-stats/:id used in Campaing details / stats
+// 
+async function rawGetMessagesByTx(tx, key, id, startBeforeDays, endBeforeDays, debug) {
+
+    var sd = new Date();
+    var ed = new Date();   
+
+    sd.setDate(sd.getDate() - startBeforeDays);
+    ed.setDate(ed.getDate() - endBeforeDays);
+
+    const entities = await tx('campaign_messages').where('campaign_messages.campaign', id).andWhere('campaign_messages.created', '>=', sd.toISOString()).andWhere('campaign_messages.created', '<=', ed.toISOString())
+        .leftJoin('campaign_lists', 'campaign_messages.campaign', 'campaign_lists.campaign')
+        .leftJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
+        .leftJoin('campaign_links', 'campaign_messages.subscription', 'campaign_links.subscription')
+        .leftJoin('links', 'campaign_links.link', 'links.id')
+        .groupBy('campaign_messages.id')
+        .select([
+            'campaign_messages.id as messages_id', 'campaign_messages.campaign as messages_campaign',
+            'campaign_links.subscription as campaign_links_subscription', 'campaign_links.campaign as campaign_links_campaign', 'campaign_links.count as campaign_links_count',
+            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.channel', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
+            'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject',
+            'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
+            'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks', 'campaigns.created',
+            knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_lists.list, campaign_lists.segment) ORDER BY campaign_lists.id SEPARATOR \';\') as lists`),
+            knex.raw(`GROUP_CONCAT(CONCAT_WS(\':\', campaign_links.subscription, campaign_links.link, links.visits, links.hits) ORDER BY campaign_links.created SEPARATOR \';\') as links`)
+
+        ]);
+
+    if (!entities) {
+        return undefined;
+    }
+
+    for (const e of entities) {
+
+    if (e.lists) {
+        e.lists = e.lists.split(';').map(x => {
+            const entries = x.split(':');
+            const list = Number.parseInt(entries[0]);
+            const segment = entries[1] ? Number.parseInt(entries[1]) : null;
+            return {list, segment};
+        });
+    } else {
+        e.lists = [];
+    }
+
+    if (e.links) {
+        e.links_visits = 0;
+        e.links_hits = 0;    
+        e.links = e.links.split(';').map(x => {
+            const entries = x.split(':');
+            const subscription = Number.parseInt(entries[0]);
+            const link = entries[1] ? Number.parseInt(entries[1]) : null;
+            const visits = entries[2] ? Number.parseInt(entries[2]) : null;
+            const hits = entries[3] ? Number.parseInt(entries[3]) : null;
+
+            e.links_visits = visits > 0 ? e.links_visits + visits: e.links_visits;
+            e.links_hits = hits > 0 ? e.links_hits + hits: e.links_hits;
+
+            return {subscription, link, visits, hits};
+        });
+    } else {
+        e.links = [];
+    }
+
+    e.data = JSON.parse(e.data);
+    }
+
+    return entities;
+}
+
+//
+// Get quick statistics for multiple campaings 
+//
+async function getMultiCampaignMessagesStatistics(campaign, startBeforeDays, endBeforeDays, groupByCampaingIds = true, debug = false) {
+
+    let entities = [];
+    for (const c of campaign) {
+    
+    let entitiesMessages =  await knex.transaction(async tx => {
+        return await rawGetMessagesByTx(tx, 'id', castToInteger(c.id),typeof startBeforeDays === 'number' ? startBeforeDays : 30, typeof endBeforeDays === 'number' ? endBeforeDays : 0, debug);
+    });
+    
+    if(entitiesMessages)
+        for(const e of entitiesMessages) {
+            entities.push(e);
+        }
+    }
+    if (groupByCampaingIds !== true)
+        return entities;
+    
+    // Group by campaings
+    let cEntities = [];
+    for (const e of entities) {
+        // Find the value of the first element/object in the array, otherwise undefined is returned.
+        var result = cEntities.find(obj => {
+            return obj.id === e.id;
+          })
+        var addElement = false;
+          if (!result) {            
+            result = {
+                    delivered:0,
+                    delivered_total_from_beginning: e.delivered,
+                    opened: 0,
+                    opened_percent: 0,
+                    clicks:0,
+                    clicks_percent:0,
+                    opened_total_from_beginning: e.opened,
+                    opened_total_from_beginning_percent: 0,
+                    clicks_total_from_beginning: e.clicks,
+                    clicks_total_from_beginning_percent:0,                    
+                    unsubscribed_total_from_beginning: e.unsubscribed,
+                    bounced_total_from_beginning: e.bounced,
+                    complained_total_from_beginning: e.complained,
+                    name:e.name,
+                    id:e.id,
+                    subject:e.subject,
+                    send_configuration:e.send_configuration,
+                    links_visits: 0,
+                    links_hits: 0,
+                }
+                addElement = true;            
+        } 
+
+        result.delivered = result.delivered + 1;
+
+        if(typeof e.campaign_links_count === 'number' && e.campaign_links_count > 0) {
+            result.opened = result.opened + 1;
+            
+        }
+
+        if (typeof e.links_visits === 'number' && e.links_visits > 0) {
+            result.links_visits = result.links_visits + e.links_visits;
+            result.clicks = result.clicks + 1;
+        }
+        if (typeof e.links_hits === 'number') {
+            result.links_hits = result.links_hits + e.links_hits;
+        }
+        
+        result.opened_percent = Math.round(result.opened / result.delivered * 100 * 100)/100;
+        result.clicks_percent = Math.round(result.clicks / result.delivered * 100 * 100)/100;
+        result.opened_total_from_beginning_percent = Math.round(result.opened_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
+        result.clicks_total_from_beginning_percent = Math.round(result.clicks_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;        
+        result.unsubscribed_total_from_beginning_percent =  Math.round(result.unsubscribed_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
+        result.unsubscribed_total_from_beginning_percent =  Math.round(result.unsubscribed_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
+        result.bounced_total_from_beginning_percent =  Math.round(result.bounced_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
+        result.complained_total_from_beginning_percent =  Math.round(result.complained_total_from_beginning / result.delivered_total_from_beginning * 100 * 100)/100;
+        
+       if (addElement) cEntities.push(result);
+    }
+    return cEntities;
+}
 
 module.exports.ReportState = ReportState;
 module.exports.hash = hash;
@@ -523,3 +757,7 @@ module.exports.getCampaignLinkClickStatistics = getCampaignLinkClickStatistics;
 module.exports.getCampaignOpenStatisticsStream = getCampaignOpenStatisticsStream;
 module.exports.getCampaignClickStatisticsStream = getCampaignClickStatisticsStream;
 module.exports.getCampaignLinkClickStatisticsStream = getCampaignLinkClickStatisticsStream;
+// Get quick statistics for multiple campaings 
+module.exports.getMultiCampaignQuickStatistics = getMultiCampaignQuickStatistics;
+// Get detailed statistics based on delivered campaigns messages 
+module.exports.getMultiCampaignMessagesStatistics = getMultiCampaignMessagesStatistics;
