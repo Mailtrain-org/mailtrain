@@ -1,0 +1,273 @@
+FORMAT: 1A
+HOST: http://localhost:3003/api
+
+# Mailtrain REST API Documentation
+
+Mailtrain is a self hosted newsletter application built on Node.js (v14+) and MySQL (v8+) or MariaDB (v10+). 
+This is the corresponding REST API documentation.
+
+**Application-Features**
+
+- Subscriber lists management
+- List segmentation
+- Custom fields
+- Email templates (including MJML-based templates)
+- Custom reports
+- Automation (triggered and RSS campaigns)
+- Multiple users with granular user permissions and flexible sharing
+- Hierarchical namespaces for enterprise-level situations
+- Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery
+
+**REST API Features**
+
+- Get subscribers of list
+- Subscribe to & unsubscribe from list
+- Delete subscription
+- Add custom fields
+- Blacklist email and remove email from blacklist
+- Get blacklisted email addresses
+- Get users subscriptions
+- Get lists in a namespace
+- Create and delete lists
+- Trigger fetch RSS campaigns
+- Send transactional emails
+
+## Get subscribers [/subscriptions/{listCid}{?access_token,limit,start}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
+    + limit - Maximum number of subscribers returned
+    + start - Start Index of subscribers
+
+### List all Subscriptions [GET]
+You may list all substribtions to a given list. 
+You may further specify the wanted response with query params.
+
++ Response 200 (application/json)
+    + Body
+    
+            {
+                "data": {
+                    "start":10,
+                    "limit":1,
+                    "subscriptions": [
+                        {
+                            "id":11,
+                            "cid":"mYuYPPxZyA",
+                            "email":"john.doe@testmail.com",
+                            "hash_email":"+oFuatBxbUPfwUL+KyahNF2YWWPxtMT5VYD7CDhNKG8kJ4B1stuttAP3Bf5gu4W3X91lu5cZgiWCKWrd+pp36w==",
+                            "source_email":13,
+                            "opt_in_ip":null,
+                            "opt_in_country":null,
+                            "tz":null,
+                            "status":1,
+                            "is_test":0,
+                            "status_change":"2022-03-25T13:11:03.000Z",
+                            "unsubscribed":null,
+                            "latest_open":null,
+                            "latest_click":null,
+                            "created":"2022-03-25T13:11:03.000Z",
+                            "updated":"2022-03-25T13:11:03.000Z",
+                            "custom_first_name_nkimafdbdm":"John",
+                            "source_custom_first_name_nkimafdbdm":13,
+                            "custom_last_name_qyripjydtq":"Doe",
+                            "source_custom_last_name_qyripjydtq":13
+                        }
+                    ]
+                }
+            }
+## Add subscription [/subscribe/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
+### Subscribe to List [POST]
+
+Users may subscribe email addresses to subscription lists with this POST Endpoint.
+
++ Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com",
+            "MERGE_FIRST_NAME": "John",
+            "MERGE_LAST_NAME": "Doe",
+            "TIMEZONE": "Europe/Berlin",
+            "MERGE_CHECKBOX": "yes",
+            "REQUIRE_CONFIRMATION": "yes",
+        }
+
++ Response 201 (application/json)
+    + Body
+
+            {
+                "data": {
+                    "id":"ghLnvbRLbj"
+                }
+            }
+
+
+## Unsubscribe from list [/unsubscribe/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
+### Unsubscribe [POST]
++ Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
+        
++ Response 201 (application/json)
+    + Body
+
+            {
+                "data":  {
+                    "id":"DSwghGuCDI",
+                    "unsubscribed":true
+                }
+            }
+
+## Delete subscription [/delete/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
+### Delete subscription [POST]
++ Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
++ Response 201 (application/json)
+    + Body
+
+            {"data":{"id":"DSwghGuCDI","deleted":true}}
+
+## Add new custom field [/field/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
+### Add field [POST] 
++ Request (application/json)
+
+        {
+            "NAME": "fiel_name",
+            "TYPE": "text",
+            "GROUP": "parent_element_id",
+            "GROUP_TEMPLATE": "group_template",
+            "VISIBLE": "yes"
+        }
++ Response 201 (application/json)
+
+        {"data":{"id":37,"tag":"MERGE_COMMENT"}}
+
+## Get list of blacklisted emails [/blacklist/get{?access_token,limit,start,search}]
++ Parameters
+    + access_token - Mailtrain API Access token
+    + limit - Maximum number of results to be returned
+    + start - Start index of results to be returned
+    + search - Search mail domain
+
+### Get list [GET]
++ Response 201 (application/json)
+
+        {"data":{"start":10,"limit":1,"emails":["john.doe@test-mail.com"]}}
+## Add email to blacklist [/blacklist/add{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
+### Add to blacklist [POST]
++ Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
+
++ Response 201 (application/json)
+
+        {"data":[]}
+
+## Delete email from blacklist [/blacklist/delete{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
+### Delete from blacklist [POST]
++ Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com"
+        }
++ Response 201 (application/json)
+
+        {"data":[]}
+
+## Get users subscriptions [/lists/{email}{?access_token}]
++ Parameters
+    + email - Subscription email
+    + access_token - Mailtrain API Access token
+## Get subscriptions [GET]
++ Response 201 (application/json)
+
+        {"data":[{"id":3,"cid":"Z3jMJgfTuT","name":"Newsletter","description":"Newsletter","status":1}]}
+
+## Get lists in a namespaces [/lists-by-namespace/{namespaceId}{?access_token}]
++ Parameters
+    + namespaceId - Namespace list unique identifier
+    + access_token - Mailtrain API Access token
+## Get lists [GET]
++ Response 201 (application/json)
+
+        {"data":[{"id":1,"cid":"Z3jMJgfTuT","name":"Newsletter"}]}
+
+## Create new list [/list/{?access_token}]
++ Parameters
+    + access_token - Mailtrain API Access token
+### Create new list [POST]
++ Request (application/json)
+
+        {
+            "NAMESPACE": 1,
+            "NAMESPACE": 0,
+            "NAME": "MyNewList",
+            "DESCRIPTION": "My new list",
+            "CONTACT_EMAIL": "test@example.com",
+            "HOMEPAGE": "example.com",
+            "FIELDWIZARD": "first_last_name",
+            "SEND_CONFIGURATION": 1,
+            "PUBLIC_SUBSCRIBE": 1,
+            "LISTUNSUBSCRIBE_DISABLED": 0
+        }
++ Response 201 (application/json)
+
+        {"data":{"id":"HGVtqxlOJe"}}
+
+## Delete a list [/list/{listCid}{?access_token}]
++ Parameters
+    + listCid - Subscription list unique identifier
+    + access_token - Mailtrain API Access token
+### Delete a list [DELETE]
++ Request (application/json)
+
++ Response 201 (application/json)
+
+        {}
+
+## Trigger fetch RSS campaign [/rss/fetch/{campaignId}{?access_token}]
++ Parameters
+    + campaignId - Campaign unique identifier
+    + access_token - Mailtrain API Access token
+## Trigger campaign [GET]
++ Response 201 (application/json)
+
+## Send transactional email [/templates/{templateId}/send{?access_token}]
++ Parameters
+    + templateId - Template unique identifier
+    + access_token - Mailtrain API Access token
+### Create new list [POST]
++ Request (application/json)
+
+        {
+            "EMAIL": "john.doe@testmail.com",
+            "SUBJECT": "Test eMail",
+            "TAGS[FOO]": "bar",
+            "TAGS[TEST]": "example",
+        }
++ Response 201 (application/json)
+
+        {}

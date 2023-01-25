@@ -22,33 +22,25 @@ services:
       - mongo
     environment:
 #      - PORT_TRUSTED=80
-      ADMIN_PASSWORD: xQ7VAXeaDPjgejwVssTZLAVmMD7bh9ce5uWf2VPmtwX9qi9sJctUgDCKLkK3thnE
-      # WITH_LDAP: "false"
-      WITH_LDAP: "true"
-      LDAP_HOST: ldap://ldap.iem-experten
-      LDAP_PORT: 389
-      # LDAP_BIND_USER: null
-      # LDAP_BIND_PASS: null
-      LDAP_BIND_USER: cn=admin,dc=iem-experten,dc=de
-      LDAP_BIND_PASS: 5oXU9TDnFafLK7cMHqr9SLdjtSwQYpxrTNb3DpwzJvWAZzCoHWEf3cssLKkrx9q9
-      LDAP_UIDTAG: uid
-      LDAP_BASEDN: "ou=people,dc=iem-experten,dc=de"
-      LDAP_METHOD: ldapauth
-      #-: LDAP_BASEDN=ou=people,dc=iem-experten,dc=de
-      LDAP_SECURE: "false"
-      LDAP_FILTER: (&(objectclass=AsteriskSIPUser)(|(uid={{username}})(mail={{username}})))
-      # filter: (&(objectClass=AsteriskSIPUser)(mail=*))
-      WWW_PROXY: "true"
-      DEFAULT_LANGUAGE: de-DE
-      URL_BASE_TRUSTED: https://mailtrain.safebasket.de
-      URL_BASE_SANDBOX: https://sbox.safebasket.de
-      URL_BASE_PUBLIC: https://lists.safebasket.de
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_ROOT_PASSWORD: 2subxQaNibMKMdtbvzURfZDLCRtXxUCJ24ZNzqnsPyULdUiRjANZDvLYPzaJoQx4
-      MYSQL_DATABASE: mailtrain
-      MYSQL_USER: yoda
-      MYSQL_PASSWORD: WtY4hFq3Kc2TmrxNTiKxq9Lqj9RiR4jpMp9pApNoCZ7i4YFngCThn5JdzKJh4wvA
+      # - WITH_LDAP=true
+      # - LDAP_HOST=ldap://ldap.domain
+      # - LDAP_BIND_USER=dn=admin,dc=domain,dc=tld
+      # - LDAP_BIND_PASS=${LDAP_PASS}
+      # - LDAP_UIDTAG=cn
+      # - LDAP_BASEDN=ou=people,dc=domain,dc=tld
+      # - LDAP_FILTER=(objectclass=AsteriskSIPUser)
+      - WWW_PROXY=true
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DEFAULT_LANGUAGE=${LOCALE}
+      - URL_BASE_TRUSTED=https://mailtrain.${DOMAIN}
+      - URL_BASE_SANDBOX=https://sbox.${DOMAIN}
+      - URL_BASE_PUBLIC=https://lists.${DOMAIN}
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     # ports:
     #   - "3000:3000"
     #   - "3003:3003"
@@ -63,17 +55,17 @@ services:
       - inbound
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mailtrain.rule=Host(`mailtrain.safebasket.de`)"
+      - "traefik.http.routers.mailtrain.rule=Host(`mailtrain.${DOMAIN}`)"
       - "traefik.http.routers.mailtrain.entrypoints=websecure"
       - "traefik.http.routers.mailtrain.service=mailtrain"
       - "traefik.http.routers.mailtrain.tls.certresolver=myresolver"
       - "traefik.http.services.mailtrain.loadbalancer.server.port=3000"
-      - "traefik.http.routers.sbox.rule=Host(`sbox.safebasket.de`)"
+      - "traefik.http.routers.sbox.rule=Host(`sbox.${DOMAIN}`)"
       - "traefik.http.routers.sbox.entrypoints=websecure"
       - "traefik.http.routers.sbox.service=sbox"
       - "traefik.http.routers.sbox.tls.certresolver=myresolver"
       - "traefik.http.services.sbox.loadbalancer.server.port=3003"
-      - "traefik.http.routers.lists.rule=Host(`lists.safebasket.de`)"
+      - "traefik.http.routers.lists.rule=Host(`lists.${DOMAIN}`)"
       - "traefik.http.routers.lists.entrypoints=websecure"
       - "traefik.http.routers.lists.service=lists"
       - "traefik.http.routers.lists.tls.certresolver=myresolver"
@@ -83,10 +75,10 @@ services:
   mysql:
     image: mariadb:10.4
     environment:
-      - MYSQL_ROOT_PASSWORD=2subxQaNibMKMdtbvzURfZDLCRtXxUCJ24ZNzqnsPyULdUiRjANZDvLYPzaJoQx4
-      - MYSQL_DATABASE=mailtrain
-      - MYSQL_USER=yoda
-      - MYSQL_PASSWORD=WtY4hFq3Kc2TmrxNTiKxq9Lqj9RiR4jpMp9pApNoCZ7i4YFngCThn5JdzKJh4wvA
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
       # - /etc/timezone:/etc/timezone:ro
