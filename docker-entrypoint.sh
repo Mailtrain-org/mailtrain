@@ -47,6 +47,7 @@ LOG_LEVEL=${LOG_LEVEL:-'info'}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-'test'}
 ADMIN_ACCESS_TOKEN=${ADMIN_ACCESS_TOKEN:-''}
 DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE:-'en-US'}
+ENABLED_LANGUAGES=${ENABLED_LANGUAGES:-'en-US, es-ES, pt-BR, de-DE, fr-FR, fk-FK'}
 WITH_POSTFIXBOUNCE=${WITH_POSTFIXBOUNCE:-'false'}
 POSTFIXBOUNCE_PORT=${POSTFIXBOUNCE_PORT:-'5699'}
 POSTFIXBOUNCE_HOST=${POSTFIXBOUNCE_HOST:-'127.0.0.1'}
@@ -59,13 +60,15 @@ if [ ! -z "$MAILTRAIN_SETTING" ]; then
     exit 1
 fi
 
-if [ -f server/config/production.yaml ]; then
+PRODUCTION_CONFIG=server/config/production.yaml
+
+if [ -f $PRODUCTION_CONFIG ]; then
     echo 'Info: application/production.yaml already provisioned'
 else
     echo 'Info: Generating application/production.yaml'
 
     # Basic configuration
-    cat >> server/config/production.yaml <<EOT
+    cat >> $PRODUCTION_CONFIG <<EOT
 www:
   host: $WWW_HOST
   proxy: $WWW_PROXY
@@ -103,14 +106,25 @@ queue:
 log:
   level: $LOG_LEVEL
 
+EOT
+
+#manage languages chosen
+for language in $(echo $ENABLED_LANGUAGES | tr "," "\n")
+do
+    ENABLED_LANGUAGES_LIST+="- $language"$'\n'
+done
+cat >> $PRODUCTION_CONFIG <<EOT
 defaultLanguage: $DEFAULT_LANGUAGE
+
+enabledLanguages:
+$ENABLED_LANGUAGES_LIST
 
 EOT
 
     # Manage LDAP if enabled
     if [ "$WITH_LDAP" = "true" ]; then
         echo 'Info: LDAP enabled'
-    cat >> server/config/production.yaml <<EOT
+    cat >> $PRODUCTION_CONFIG <<EOT
 ldap:
   enabled: true
   host: $LDAP_HOST
@@ -127,7 +141,7 @@ ldap:
 EOT
     else
         echo 'Info: LDAP not enabled'
-    cat >> server/config/production.yaml <<EOT
+    cat >> $PRODUCTION_CONFIG <<EOT
 ldap:
   enabled: false
 EOT
@@ -136,7 +150,7 @@ EOT
     # Manage CAS if enabled
     if [ "$WITH_CAS" = "true" ]; then
         echo 'Info: CAS enabled'
-    cat >> server/config/production.yaml <<EOT
+    cat >> $PRODUCTION_CONFIG <<EOT
 cas:
   enabled: true
   url: $CAS_URL
@@ -148,7 +162,7 @@ cas:
 EOT
     else
         echo 'Info: CAS not enabled'
-    cat >> server/config/production.yaml <<EOT
+    cat >> $PRODUCTION_CONFIG <<EOT
 cas:
   enabled: false
 EOT
@@ -157,7 +171,7 @@ EOT
     # Manage POSTFIXBOUNCE if enabled
     if [ "$WITH_POSTFIXBOUNCE" = "true" ]; then
         echo 'Info: POSTFIXBOUNCE enabled'
-    cat >> server/config/production.yaml <<EOT
+    cat >> $PRODUCTION_CONFIG <<EOT
 
 postfixBounce:
   # Enable to allow writing Postfix bounce log to Mailtrain listener
