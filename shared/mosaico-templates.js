@@ -1644,7 +1644,7 @@ function getMJMLSample(tagLanguage) {
         '    \n' +
         '    <mj-style>\n' +
         '      p {\n' +
-        '        font-family: Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif;\n' +
+        '        font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif;\n' +
         '        font-size: 12px;\n' +
         '        color: #9da3a3;\n' +
         '        margin-top: 8px;\n' +
@@ -1793,7 +1793,7 @@ function getMJMLSample(tagLanguage) {
         '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>\n' +
         '              </div>\n' +
         '            </mj-text>\n' +
-        '            <mj-mosaico-button property-id="readMoreLink" font-family="Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif" padding-left="10px" padding-bottom="15px" padding-top="15px">Read more ...</mj-mosaico-button>\n' +
+        '            <mj-mosaico-button property-id="readMoreLink" font-family="Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif" padding-left="10px" padding-bottom="15px" padding-top="15px">Read more ...</mj-mosaico-button>\n' +
         '          </mj-column>\n' +
         '        </mj-section>\n' +
         '      </mj-mosaico-block>  \n' +
