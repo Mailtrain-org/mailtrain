@@ -230,16 +230,16 @@ export function getMailerTypes(t) {
                     <InputField id="smtpMaxMessages" label={t('maxMessages')} placeholder={t('theCountOfMaxMessagesEg100')} help={t('theNumberOfMessagesToSendThroughASingle')}/>
                     <InputField id="throttling" label={t('throttling')} placeholder={t('messagesPerHourEg1000')} help={t('maximumNumberOfMessagesToSendInAnHour')}/>
                 </Fieldset>                    
-                <Fieldset label={t('extraThrottlingMailerSettings')}>    
-                    <InputField id="throttlingWarmUpDays" label={t('throttlingWarmUpDays')} placeholder={t('throttlingWarmUpDaysEg10')} help={t('senderWarmUpPeriodInDays')}/>
-                    <InputField id="throttlingWarmUpFrom" label={t('throttlingWarmUpFrom')} placeholder={t('throttlingWarmUpFromDateInUnixTimestampEg1648735303000')} help={t('senderWarmUpPeriodStartingDayInUnixTimestamp')}/>
-                    <CheckBox id="enableSenderOnDaySun" text={t('enableSenderOnDaySun')}/>
-                    <CheckBox id="enableSenderOnDayMon" text={t('enableSenderOnDayMon')}/>
-                    <CheckBox id="enableSenderOnDayTue" text={t('enableSenderOnDayTue')}/>
-                    <CheckBox id="enableSenderOnDayWed" text={t('enableSenderOnDayWed')}/>
-                    <CheckBox id="enableSenderOnDayThu" text={t('enableSenderOnDayThu')}/>
-                    <CheckBox id="enableSenderOnDayFri" text={t('enableSenderOnDayFri')}/>
-                    <CheckBox id="enableSenderOnDaySat" text={t('enableSenderOnDaySat')}/>
+                <Fieldset label={t('extraThrottlingSettings')}>    
+                    <InputField id="throttlingWarmUpDays" label={t('warmupInterval')} placeholder={t('warmupIntervalInDaysEg10')} help={t('graduallyIncreaseTheVolumeEachDayUntil')}/>
+                    <InputField id="throttlingWarmUpFrom" label={t('warmupStartingDate')} placeholder={t('eg1648735303000')} help={t('setTheStartingDateAndTimeInUnixEpoch')}/>
+                    <CheckBox id="enableSenderOnDaySun" text={t('sendingEmailsOnSunday')}/>
+                    <CheckBox id="enableSenderOnDayMon" text={t('sendingEmailsOnMonday')}/>
+                    <CheckBox id="enableSenderOnDayTue" text={t('sendingEmailsOnTuesday')}/>
+                    <CheckBox id="enableSenderOnDayWed" text={t('sendingEmailsOnWednesday')}/>
+                    <CheckBox id="enableSenderOnDayThu" text={t('sendingEmailsOnThursday')}/>
+                    <CheckBox id="enableSenderOnDayFri" text={t('sendingEmailsOnFriday')}/>
+                    <CheckBox id="enableSenderOnDaySat" text={t('sendingEmailsOnSaturday')}/>
                 </Fieldset>
             </div>,
         initData: () => ({
