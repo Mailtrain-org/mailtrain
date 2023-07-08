@@ -25,7 +25,7 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.6.0",
     "clone": "^2.1.2",
-    "datatables.net": "^1.10.24",
+    "datatables.net": "^1.11.3",
     "datatables.net-bs4": "^1.10.24",
     "ellipsize": "^0.1.0",
     "grapesjs": "^0.14.62",
