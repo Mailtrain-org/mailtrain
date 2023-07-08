@@ -1287,5 +1287,6 @@
   "thePasswordMustContainAtLeastOne": "La contraseña debe tener al menos una letra minúscula",
   "thePasswordMustContainAtLeastOne-1": "La contraseña debe tener al menos una letra mayúscula",
   "thePasswordMustContainAtLeastOneNumber": "La contraseña debe tener al menos un número",
-  "thePasswordMustContainAtLeastOneSpecial": "La contraseña debe tener al menos un caracter especial"
+  "thePasswordMustContainAtLeastOneSpecial": "La contraseña debe tener al menos un caracter especial",
+  "filterByData": "Filtrar datos usando cláusulas where de la forma [[campo,operador,valor],[campo,operador,valor],...] "
 }

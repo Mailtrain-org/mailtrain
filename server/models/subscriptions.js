@@ -386,7 +386,7 @@ async function listTestUsersDTAjax(context, listCid, params) {
     });
 }
 
-async function list(context, listId, grouped, offset, limit) {
+async function list(context, listId, grouped, offset, limit, where = []) {
     return await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSubscriptions');
 
@@ -401,6 +401,14 @@ async function list(context, listId, grouped, offset, limit) {
         if (Number.isInteger(limit)) {
             entitiesQry.limit(limit);
         }
+
+        where.forEach(function(clause) {
+            if (clause.length >= 3) {
+                entitiesQry.where(clause[0], clause[1], clause[2]);
+            } else {
+                entitiesQry.where(clause[0], clause[1]);
+            }
+        });
 
         const entities = await entitiesQry;
 

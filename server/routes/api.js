@@ -147,8 +147,9 @@ router.getAsync('/subscriptions/:listCid', passport.loggedIn, async (req, res) =
     const list = await lists.getByCid(req.context, req.params.listCid);
     const start = parseInt(req.query.start || 0, 10);
     const limit = parseInt(req.query.limit || 10000, 10);
+    const where = req.query.where || [];
 
-    const result = await subscriptions.list(req.context, list.id, false, start, limit);
+    const result = await subscriptions.list(req.context, list.id, false, start, limit, where);
 
     res.status(200);
     res.json({
