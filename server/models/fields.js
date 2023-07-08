@@ -96,6 +96,7 @@ fieldTypes.json = {
     cardinality: Cardinality.SINGLE,
     getHbsType: field => 'typeJson',
     forHbs: (field, value) => value,
+    jsonData: (field, value) => JSON.parse(value),
     parsePostValue: (field, value) => value,
     render: (field, value) => {
         try {
@@ -136,6 +137,7 @@ fieldTypes['checkbox-grouped'] = {
     enumerated: false,
     cardinality: Cardinality.MULTIPLE,
     getHbsType: field => 'typeCheckboxGrouped',
+    jsonData: (field, value) => (value || []).map(col => field.groupedOptions[col].name),
     render: (field, value) => {
         const subItems = (value || []).map(col => field.groupedOptions[col].name);
 
@@ -226,6 +228,7 @@ fieldTypes.option = {
         return !(['false', 'no', '0', ''].indexOf((value || '').toString().trim().toLowerCase()) >= 0)
     },
     getHbsType: field => 'typeOption',
+    jsonData: (field, value) => value ? true : false,
     forHbs: (field, value) => value ? 1 : 0,
     render: (field, value) => value ? field.settings.checkedLabel : field.settings.uncheckedLabel
 
@@ -739,6 +742,9 @@ function getMergeTags(fieldsGrouped, subscription, extraTags = {}) { // assumes 
         const fldCol = getFieldColumn(fld);
 
         mergeTags[fld.key] = type.render(fld, subscription[fldCol]);
+        if (type.jsonData) {
+            mergeTags[fld.key + "_RAW"] = type.jsonData(fld, subscription[fldCol]);
+        }
     }
 
     return mergeTags;
