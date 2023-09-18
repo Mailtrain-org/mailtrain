@@ -78,7 +78,7 @@ const langCodes = {
     },
     'fk-FK': {
         getShortLabel: t => 'IT',
-        getLabel: t => 'Fake',
+        getLabel: t => 'Italiano',
         longCode: 'it-IT'
     }
 }
