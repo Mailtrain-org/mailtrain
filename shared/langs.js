@@ -71,11 +71,16 @@ const langCodes = {
         getLabel: t => 'Russian',
         longCode: 'ru-RU'
     },
+    'eu': {
+        getShortLabel: t => 'EU',
+        getLabel: t => 'Euskara',
+        longCode: 'eu'
+    },
     'fk-FK': {
         getShortLabel: t => 'FK',
         getLabel: t => 'Fake',
         longCode: 'fk-FK'
-    }
+    },
 }
 
 function getLang(lng) {
