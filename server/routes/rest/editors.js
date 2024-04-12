@@ -2,7 +2,6 @@
 
 const passport = require('../../lib/passport');
 
-const bluebird = require('bluebird');
 const htmlToText = require('html-to-text');
 
 const router = require('../../lib/router-async').create();

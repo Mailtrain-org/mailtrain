@@ -11,7 +11,8 @@ const gm = require('gm').subClass({
 });
 const users = require('../models/users');
 const capitalize = require('capitalize');
-
+const {promisify} = require("node:util");
+blebi
 const fs = require('fs-extra')
 
 const files = require('../models/files');
@@ -22,8 +23,6 @@ const mosaicoTemplates = require('../models/mosaico-templates');
 
 const contextHelpers = require('../lib/context-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
-
-const bluebird = require('bluebird');
 
 const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
 const { base } = require('../../shared/templates');
@@ -56,7 +55,7 @@ users.registerRestrictedAccessTokenMethod('mosaico', async ({entityTypeId, entit
 
 async function placeholderImage(width, height, labelText, labelColor) {
     const magick = gm(width, height, '#707070');
-    const streamAsync = bluebird.promisify(magick.stream.bind(magick));
+    const streamAsync = promisify(magick.stream.bind(magick));
 
     const size = 40;
     let x = 0;
@@ -94,8 +93,8 @@ async function placeholderImage(width, height, labelText, labelColor) {
 
 async function resizedImage(filePath, method, width, height) {
     const magick = gm(filePath);
-    const streamAsync = bluebird.promisify(magick.stream.bind(magick));
-    const formatAsync = bluebird.promisify(magick.format.bind(magick));
+    const streamAsync = promisify(magick.stream.bind(magick));
+    const formatAsync = promisify(magick.format.bind(magick));
 
     const format = (await formatAsync()).toLowerCase();
 

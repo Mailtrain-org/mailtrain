@@ -6,7 +6,7 @@ const path = require('path');
 const knex = require('./knex');
 const {CampaignStatus} = require('../../shared/campaigns');
 const builtinZoneMta = require('./builtin-zone-mta');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 let messageTid = 0;
 let senderProcess;
@@ -61,6 +61,6 @@ function reloadConfig(sendConfigurationId) {
     messageTid++;
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.spawn = promisify(spawn);
 module.exports.scheduleCheck = scheduleCheck;
 module.exports.reloadConfig = reloadConfig;

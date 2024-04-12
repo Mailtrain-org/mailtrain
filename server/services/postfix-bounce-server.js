@@ -6,7 +6,7 @@ const net = require('net');
 const campaigns = require('../models/campaigns');
 const contextHelpers = require('../lib/context-helpers');
 const { CampaignMessageStatus } = require('../../shared/campaigns');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 const seenIds = new Set();
 
@@ -125,5 +125,5 @@ function start(callback) {
     });
 }
 
-module.exports.start = bluebird.promisify(start);
+module.exports.start = promisify(start);
 

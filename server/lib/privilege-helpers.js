@@ -43,11 +43,6 @@ function getConfigUidGid() {
     return _getConfigUidGid('user', 'group', process.getuid(), process.getgid());
 }
 
-function getConfigROUidGid() {
-    const rwIds = getConfigUidGid();
-    return _getConfigUidGid('roUser', 'roGroup', rwIds.uid, rwIds.gid);
-}
-
 function ensureMailtrainOwner(file, callback) {
     const ids = getConfigUidGid();
 

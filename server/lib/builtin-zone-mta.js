@@ -6,8 +6,8 @@ const log = require('./log');
 const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
-const bluebird = require('bluebird');
 const os = require('os');
+const {promisify} = require("node:util");
 
 let zoneMtaProcess = null;
 
@@ -200,6 +200,6 @@ function spawn(callback) {
     }
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.spawn = promisify(spawn);
 module.exports.getUsername = getUsername;
 module.exports.getPassword = getPassword;

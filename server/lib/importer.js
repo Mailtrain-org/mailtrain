@@ -7,7 +7,7 @@ const path = require('path');
 const {ImportStatus, RunStatus} = require('../../shared/imports');
 const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('./activity-log');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 let messageTid = 0;
 let importerProcess;
@@ -61,5 +61,5 @@ function scheduleCheck() {
     messageTid++;
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.spawn = promisify(spawn);
 module.exports.scheduleCheck = scheduleCheck;

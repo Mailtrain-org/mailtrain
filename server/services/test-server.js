@@ -5,7 +5,7 @@ const config = require('../lib/config');
 const crypto = require('crypto');
 const humanize = require('humanize');
 const http = require('http');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 const SMTPServer = require('smtp-server').SMTPServer;
 const simpleParser = require('mailparser').simpleParser;
@@ -194,4 +194,4 @@ function start(callback) {
     }
 }
 
-module.exports.start = bluebird.promisify(start);
+module.exports.start = promisify(start);

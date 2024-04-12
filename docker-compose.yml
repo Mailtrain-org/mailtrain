@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mysql:
-    image: mariadb:10.4
+    image: mariadb:11.3
     environment:
     - MYSQL_ROOT_PASSWORD=mailtrain
     - MYSQL_DATABASE=mailtrain
@@ -12,12 +12,12 @@ services:
     - mysql-data:/var/lib/mysql
 
   redis:
-    image: redis:5
+    image: redis:7
     volumes:
     - redis-data:/data
 
   mongo:
-    image: mongo:4-xenial
+    image: mongo:5
     volumes:
     - mongo-data:/data/db
 

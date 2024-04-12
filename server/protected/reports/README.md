@@ -1,1 +1,0 @@
-This directory serves for generated reports.

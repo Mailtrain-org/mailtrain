@@ -9,10 +9,10 @@ const path = require('path');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const entitySettings = require('../lib/entity-settings');
 const {getPublicUrl} = require('../lib/urls');
+const {promisify} = require("node:util");
 
 const crypto = require('crypto');
-const bluebird = require('bluebird');
-const cryptoPseudoRandomBytes = bluebird.promisify(crypto.pseudoRandomBytes.bind(crypto));
+const cryptoPseudoRandomBytes = promisify(crypto.pseudoRandomBytes.bind(crypto));
 
 const entityTypes = entitySettings.getEntityTypes();
 

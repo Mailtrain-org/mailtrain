@@ -13,7 +13,7 @@ const { tUI } = require('../lib/translate');
 const contextHelpers = require('../lib/context-helpers');
 const forms = require('../models/forms');
 const {getTrustedUrl, getPublicUrl} = require('../lib/urls');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 const { SubscriptionStatus, SubscriptionSource } = require('../../shared/lists');
 
@@ -95,7 +95,7 @@ async function injectCustomFormData(customFormId, viewKey, data) {
 }
 
 async function captureFlashMessages(res) {
-    const renderAsync = bluebird.promisify(res.render.bind(res));
+    const renderAsync = promisify(res.render.bind(res));
     return await renderAsync('subscription/capture-flash-messages', { layout: null });
 }
 

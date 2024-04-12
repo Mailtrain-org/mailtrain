@@ -14,12 +14,11 @@ const {getTrustedUrl} = require('../lib/urls');
 const { tUI } = require('../lib/translate');
 const messageSender = require('../lib/message-sender');
 const {getSystemSendConfigurationId} = require('../../shared/send-configurations');
-
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 const bcrypt = require('bcrypt-nodejs');
-const bcryptHash = bluebird.promisify(bcrypt.hash.bind(bcrypt));
-const bcryptCompare = bluebird.promisify(bcrypt.compare.bind(bcrypt));
+const bcryptHash = promisify(bcrypt.hash.bind(bcrypt));
+const bcryptCompare = promisify(bcrypt.compare.bind(bcrypt));
 
 const passport = require('../lib/passport');
 

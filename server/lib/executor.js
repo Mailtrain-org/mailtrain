@@ -3,7 +3,7 @@
 const fork = require('./fork').fork;
 const log = require('./log');
 const path = require('path');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 const requestCallbacks = {};
 let messageTid = 0;
@@ -76,6 +76,6 @@ function stop(tid) {
     });
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.spawn = promisify(spawn);
 module.exports.start = start;
 module.exports.stop = stop;

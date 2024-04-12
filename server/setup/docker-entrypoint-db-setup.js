@@ -4,9 +4,10 @@ const log = require('../lib/log');
 const dbcheck = require('../lib/dbcheck');
 const knex = require('../lib/knex');
 const {getAdminId} = require("../../shared/users");
-const bluebird = require('bluebird');
 const bcrypt = require('bcrypt-nodejs');
-const bcryptHash = bluebird.promisify(bcrypt.hash.bind(bcrypt));
+const {promisify} = require("node:util");
+
+const bcryptHash = promisify(bcrypt.hash.bind(bcrypt));
 
 async function init() {
     const args = process.argv.slice(2);

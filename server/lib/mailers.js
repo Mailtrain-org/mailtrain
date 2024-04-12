@@ -9,11 +9,10 @@ const openpgpEncrypt = require('nodemailer-openpgp').openpgpEncrypt;
 const sendConfigurations = require('../models/send-configurations');
 const { ZoneMTAType, MailerType } = require('../../shared/send-configurations');
 const builtinZoneMta = require('./builtin-zone-mta');
+const {promisify} = require("node:util");
 
 const contextHelpers = require('./context-helpers');
 const settings = require('../models/settings');
-
-const bluebird = require('bluebird');
 
 const transports = new Map();
 
@@ -256,7 +255,7 @@ async function _createTransport(sendConfiguration) {
     }
 
     const transport = nodemailer.createTransport(transportOptions, config.nodemailer);
-    transport.sendMailAsync = bluebird.promisify(transport.sendMail.bind(transport));
+    transport.sendMailAsync = promisify(transport.sendMail.bind(transport));
 
     transport.use('stream', openpgpEncrypt({
         signingKey: configItems.pgpPrivateKey,
@@ -334,7 +333,7 @@ async function _createTransport(sendConfiguration) {
 
     transport.mailer = {
         sendConfiguration,
-        throttleWait: bluebird.promisify(throttleWait),
+        throttleWait: promisify(throttleWait),
         sendTransactionalMail: async (mail) => await _sendTransactionalMail(transport, mail),
         sendMassMail: async (mail, template) => await _sendMail(transport, mail)
     };

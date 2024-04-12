@@ -4,9 +4,9 @@ const fork = require('./fork').fork;
 const log = require('./log');
 const path = require('path');
 const senders = require('./senders');
-const bluebird = require('bluebird');
 const feedparser = require('feedparser-promised');
 const {getPublicUrl} = require('./urls');
+const {promisify} = require("node:util");
 
 let messageTid = 0;
 let feedcheckProcess;
@@ -121,7 +121,7 @@ async function getEntryForPreview(url) {
     return entry;
 }
 
-module.exports.spawn = bluebird.promisify(spawn);
+module.exports.spawn = promisify(spawn);
 module.exports.scheduleCheck = scheduleCheck;
 module.exports.fetch = fetch;
 module.exports.getEntryForPreview = getEntryForPreview;

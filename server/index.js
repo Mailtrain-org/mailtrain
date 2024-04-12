@@ -19,11 +19,11 @@ const reportProcessor = require('./lib/report-processor');
 const executor = require('./lib/executor');
 const privilegeHelpers = require('./lib/privilege-helpers');
 const knex = require('./lib/knex');
-const bluebird = require('bluebird');
 const shares = require('./models/shares');
 const { AppType } = require('../shared/app');
 const builtinZoneMta = require('./lib/builtin-zone-mta');
 const klawSync = require('klaw-sync');
+const {promisify} = require("node:util");
 
 const { uploadedFilesDir } = require('./lib/file-helpers');
 const { reportFilesDir } = require('./lib/report-helpers');
@@ -70,7 +70,7 @@ async function startHTTPServer(appType, appName, port) {
         log.info('Express', 'WWW server [%s] listening on %s', appName, bind);
     });
 
-    const serverListenAsync = bluebird.promisify(server.listen.bind(server));
+    const serverListenAsync = promisify(server.listen.bind(server));
     await serverListenAsync({port, host});
 }
 

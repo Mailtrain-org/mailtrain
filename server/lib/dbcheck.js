@@ -10,7 +10,7 @@ const log = require('./log');
 const fs = require('fs');
 const pathlib = require('path');
 const Handlebars = require('handlebars');
-const bluebird = require('bluebird');
+const {promisify} = require("node:util");
 
 const highestLegacySchemaVersion = 34;
 
@@ -219,8 +219,8 @@ function runUpdates(runCount, callback) {
     });
 }
 
-const runUpdatesAsync = bluebird.promisify(runUpdates);
-const dbEndAsync = bluebird.promisify(db.end.bind(db));
+const runUpdatesAsync = promisify(runUpdates);
+const dbEndAsync = promisify(db.end.bind(db));
 
 async function dbcheck() {
     await runUpdatesAsync(0);
