@@ -32,8 +32,6 @@ gdpr:
 editors:
 - mosaico
 - mosaicoWithFsTemplate
-- grapesjs
-- ckeditor4
 - codeeditor
 
 # Enabled tag languages
@@ -223,14 +221,6 @@ mosaico:
       pruneInterval: 60 # seconds
 
 
-grapesjs:
-# Installed templates
-  templates:
-    - key: demo
-      label: HTML Template
-    - key: aves
-      label: MJML Template
-
 testServer:
   # Starts a vanity server that redirects all mail to /dev/null
   # Mostly needed for local development
@@ -288,7 +278,7 @@ defaultRoles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createReportTemplate, createTemplate, createMosaicoTemplate, createSendConfiguration, createChannel, createCampaign, manageUsers]
+      permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createSendConfiguration, createChannel, createCampaign, manageUsers]
       children:
         sendConfiguration: [viewPublic, viewPrivate, edit, delete, share, sendWithoutOverrides, sendWithAllowedOverrides, sendWithAnyOverrides]
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
@@ -296,15 +286,13 @@ defaultRoles:
         channel: [view, edit, delete, createCampaign, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
-        report: [view, edit, delete, share, execute, viewContent, viewOutput]
-        reportTemplate: [view, edit, delete, share, execute]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
-        namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createReportTemplate, createTemplate, createMosaicoTemplate, createSendConfiguration, createChannel, createCampaign, manageUsers]
+        namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createSendConfiguration, createChannel, createCampaign, manageUsers]
 
     campaignsAdmin:
       name: Campaigns Admin
       description: In the respective namespace, the user has all permissions for managing lists, channels, templates and campaigns and the permission to send to send configurations.
-      permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
+      permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
       children:
         sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
@@ -312,10 +300,8 @@ defaultRoles:
         channel: [view, edit, delete, createCampaign, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
-        report: [view, edit, delete, share, execute, viewContent, viewOutput]
-        reportTemplate: [view, share, execute]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
-        namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createReport, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
+        namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
 
     campaignsCreator:
       name: Campaigns Creator
@@ -407,18 +393,6 @@ defaultRoles:
       name: Viewer
       description: The user can view the template but cannot edit it.
       permissions: [view, viewFiles]
-
-  report:
-    master:
-      name: Master
-      description: All permissions
-      permissions: [view, edit, delete, share, execute, viewContent, viewOutput]
-
-  reportTemplate:
-    master:
-      name: Master
-      description: All permissions
-      permissions: [view, edit, delete, share, execute]
 
   mosaicoTemplate:
     master:

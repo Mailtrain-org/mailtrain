@@ -13,12 +13,8 @@ const verpServer = require('./services/verp-server');
 const testServer = require('./services/test-server');
 const postfixBounceServer = require('./services/postfix-bounce-server');
 const tzupdate = require('./services/tzupdate');
-const dbcheck = require('./lib/dbcheck');
 const senders = require('./lib/senders');
-const reportProcessor = require('./lib/report-processor');
-const executor = require('./lib/executor');
 const privilegeHelpers = require('./lib/privilege-helpers');
-const knex = require('./lib/knex');
 const shares = require('./models/shares');
 const { AppType } = require('../shared/app');
 const builtinZoneMta = require('./lib/builtin-zone-mta');
@@ -26,8 +22,8 @@ const klawSync = require('klaw-sync');
 const {promisify} = require("node:util");
 
 const { uploadedFilesDir } = require('./lib/file-helpers');
-const { reportFilesDir } = require('./lib/report-helpers');
 const { filesDir } = require('./models/files');
+const {initDb} = require("./lib/dbupdate");
 
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
@@ -74,14 +70,12 @@ async function startHTTPServer(appType, appName, port) {
     await serverListenAsync({port, host});
 }
 
-
 // ---------------------------------------------------------------------------------------
 // Start the whole circus
 // ---------------------------------------------------------------------------------------
 async function init() {
-    await dbcheck();
 
-    await knex.migrate.latest(); // And now the current migration with Knex
+    await initDb();
 
     await shares.regenerateRoleNamesTable();
     await shares.rebuildPermissions();
@@ -95,9 +89,7 @@ async function init() {
     }
 
     await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
-    await privilegeHelpers.ensureMailtrainDir(reportFilesDir);
 
-    await executor.spawn();
     await testServer.start();
     await verpServer.start();
     await builtinZoneMta.spawn();
@@ -118,8 +110,6 @@ async function init() {
     gdprCleanup.start();
 
     await postfixBounceServer.start();
-
-    await reportProcessor.init();
 
     log.info('Service', 'All services started');
     appBuilder.setReady();

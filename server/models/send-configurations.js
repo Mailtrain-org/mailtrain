@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('../lib/knex');
-const hasher = require('node-object-hash')();
+const hasher = require('node-object-hash').hasher();
 const dtHelpers = require('../lib/dt-helpers');
 const shortid = require('../lib/shortid');
 const { enforce, filterObject } = require('../lib/helpers');

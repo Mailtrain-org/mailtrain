@@ -174,18 +174,6 @@ EOT
 
 fi
 
-if [ -f server/services/workers/reports/config/production.yaml ]; then
-    echo 'Info: server/production.yaml already provisioned'
-else
-    echo 'Info: Generating server/production.yaml'
-    cat > server/services/workers/reports/config/production.yaml <<EOT
-mysql:
-  host: $MYSQL_HOST
-log:
-  level: warn
-EOT
-fi
-
 # Wait for the other services to start
 echo 'Info: Waiting for MySQL Server'
 while ! nc -z $MYSQL_HOST $MYSQL_PORT; do sleep 1; done

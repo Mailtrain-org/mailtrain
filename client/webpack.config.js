@@ -9,8 +9,6 @@ module.exports = {
     entry: {
         "root": ['./src/root.js'],
         "mosaico-root": ['./src/lib/sandboxed-mosaico-root.js'],
-        "ckeditor-root": ['./src/lib/sandboxed-ckeditor-root.js'],
-        "grapesjs-root": ['./src/lib/sandboxed-grapesjs-root.js'],
         "codeeditor-root": ['./src/lib/sandboxed-codeeditor-root.js'],
     },
     output: {

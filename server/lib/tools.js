@@ -4,7 +4,7 @@ const isemail = require('isemail');
 const path = require('path');
 const {getPublicUrl} = require('./urls');
 const {enforce} = require('./helpers');
-const hasher = require('node-object-hash')();
+const hasher = require('node-object-hash').hasher();
 
 const mjml2html = require('mjml');
 

@@ -10,7 +10,6 @@ import login from './login/root';
 import blacklist from './blacklist/root';
 import lists from './lists/root';
 import namespaces from './namespaces/root';
-import reports from './reports/root';
 import campaigns from './campaigns/root';
 import channels from './channels/root';
 import templates from './templates/root';
@@ -29,11 +28,6 @@ import {withComponentMixins} from "./lib/decorator-helpers";
 import Update from "./settings/Update";
 
 const topLevelMenuKeys = ['lists', 'channels', 'templates', 'campaigns'];
-
-if (mailtrainConfig.reportsEnabled) {
-    topLevelMenuKeys.push('reports');
-}
-
 
 @withComponentMixins([
     withTranslation
@@ -122,7 +116,6 @@ class Root extends Component {
             children: {
                 ...login.getMenus(t),
                 ...lists.getMenus(t),
-                ...reports.getMenus(t),
                 ...templates.getMenus(t),
                 ...namespaces.getMenus(t),
                 ...users.getMenus(t),

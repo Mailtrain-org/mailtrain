@@ -40,8 +40,8 @@ async function getRouter(appType) {
         router.getAsync('/editor', passport.csrfProtection, async (req, res) => {
             const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
 
-            res.render('ckeditor/root', {
-                layout: 'ckeditor/layout',
+            res.render('codeeditor/root', {
+                layout: 'codeeditor/layout',
                 reactCsrfToken: req.csrfToken(),
                 mailtrainConfig: JSON.stringify(mailtrainConfig),
                 scriptFiles: [

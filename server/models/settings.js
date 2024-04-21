@@ -2,7 +2,7 @@
 
 const knex = require('../lib/knex');
 const { filterObject } = require('../lib/helpers');
-const hasher = require('node-object-hash')();
+const hasher = require('node-object-hash').hasher();
 const shares = require('./shares');
 
 const allowedKeys = new Set(['adminEmail', 'uaCode', 'mapsApiKey', 'shoutout', 'pgpPassphrase', 'pgpPrivateKey', 'defaultHomepage']);

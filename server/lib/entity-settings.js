@@ -82,18 +82,6 @@ const entityTypes = {
         permissionsTable: 'permissions_send_configuration',
         clientLink: id => `/send-configurations/${id}`
     },
-    report: {
-        entitiesTable: 'reports',
-        sharesTable: 'shares_report',
-        permissionsTable: 'permissions_report',
-        clientLink: id => `/reports/${id}`
-    },
-    reportTemplate: {
-        entitiesTable: 'report_templates',
-        sharesTable: 'shares_report_template',
-        permissionsTable: 'permissions_report_template',
-        clientLink: id => `/reports/templates/${id}`
-    },
     mosaicoTemplate: {
         entitiesTable: 'mosaico_templates',
         sharesTable: 'shares_mosaico_template',

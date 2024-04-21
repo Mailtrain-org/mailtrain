@@ -2,7 +2,7 @@
 
 const config = require('../lib/config');
 const knex = require('../lib/knex');
-const hasher = require('node-object-hash')();
+const hasher = require('node-object-hash').hasher();
 const { enforce, filterObject } = require('../lib/helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const passwordValidator = require('../../shared/password-validator')();

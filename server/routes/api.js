@@ -30,6 +30,9 @@ class APIError extends Error {
     }
 }
 
+// No API at the moment. It needs a rehaul. The API will be added once we know what the users need and use.
+
+/*
 
 router.postAsync('/subscribe/:listCid', passport.loggedIn, async (req, res) => {
     const list = await lists.getByCid(req.context, req.params.listCid);
@@ -376,4 +379,5 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
     res.json({ data: result });
 });
 
+ */
 module.exports = router;

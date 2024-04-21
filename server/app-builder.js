@@ -20,14 +20,11 @@ const contextHelpers = require('./lib/context-helpers');
 const api = require('./routes/api');
 
 // These are routes for the new React-based client
-const reports = require('./routes/reports');
 const quickReports = require('./routes/quick-reports');
 const subscriptions = require('./routes/subscriptions');
 const campaigns = require('./routes/campaigns');
 const subscription = require('./routes/subscription');
 const sandboxedMosaico = require('./routes/sandboxed-mosaico');
-const sandboxedCKEditor = require('./routes/sandboxed-ckeditor');
-const sandboxedGrapesJS = require('./routes/sandboxed-grapesjs');
 const sandboxedCodeEditor = require('./routes/sandboxed-codeeditor');
 const files = require('./routes/files');
 const links = require('./routes/links');
@@ -38,8 +35,6 @@ const namespacesRest = require('./routes/rest/namespaces');
 const sendConfigurationsRest = require('./routes/rest/send-configurations');
 const usersRest = require('./routes/rest/users');
 const accountRest = require('./routes/rest/account');
-const reportTemplatesRest = require('./routes/rest/report-templates');
-const reportsRest = require('./routes/rest/reports');
 const channelsRest = require('./routes/rest/channels');
 const campaignsRest = require('./routes/rest/campaigns');
 const triggersRest = require('./routes/rest/triggers');
@@ -279,17 +274,11 @@ async function createApp(appType) {
     useWith404Fallback('/cpgs', await campaigns.getRouter(appType)); // This needs to be different from "campaigns", which is already used by the UI
 
     useWith404Fallback('/mosaico', await sandboxedMosaico.getRouter(appType));
-    useWith404Fallback('/ckeditor', await sandboxedCKEditor.getRouter(appType));
-    useWith404Fallback('/grapesjs', await sandboxedGrapesJS.getRouter(appType));
     useWith404Fallback('/codeeditor', await sandboxedCodeEditor.getRouter(appType));
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
         useWith404Fallback('/subscriptions', subscriptions);
         useWith404Fallback('/webhooks', webhooks);
-
-        if (config.reports && config.reports.enabled === true) {
-            useWith404Fallback('/rpts', reports); // This needs to be different from "reports", which is already used by the UI
-        }
 
         useWith404Fallback('/quick-rpts', quickReports);
 
@@ -319,10 +308,6 @@ async function createApp(appType) {
         app.use('/rest', filesRest);
         app.use('/rest', settingsRest);
 
-        if (config.reports && config.reports.enabled === true) {
-            app.use('/rest', reportTemplatesRest);
-            app.use('/rest', reportsRest);
-        }
         install404Fallback('/rest');
         if (config.cas && config.cas.enabled === true) {
           app.get('/cas/login',

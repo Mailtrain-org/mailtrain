@@ -106,8 +106,6 @@ const entityTypeLabels = {
     'campaign': t => t('campaign'),
     'template': t => t('template'),
     'sendConfiguration': t => t('sendConfiguration-1'),
-    'report': t => t('report'),
-    'reportTemplate': t => t('reportTemplate'),
     'mosaicoTemplate': t => t('mosaicoTemplate'),
     'user': t => t('user')
 };

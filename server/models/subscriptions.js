@@ -2,7 +2,7 @@
 
 const config = require('../lib/config');
 const knex = require('../lib/knex');
-const hasher = require('node-object-hash')();
+const hasher = require('node-object-hash').hasher();
 const shortid = require('../lib/shortid');
 const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');

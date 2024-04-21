@@ -14,7 +14,7 @@ async function processQueue() {
 
     processQueueIsRunning = true;
 
-    // XXX submit data to IVIS if configured in config
+    // XXX submit data to activity logging service
 
     actitivyQueue.splice(0);
 
