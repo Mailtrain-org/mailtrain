@@ -29,7 +29,7 @@ exports.up = (knex, Promise) => (async() => {
 
     await knex.schema.table('campaigns', table => {
         table.dropColumn('parent');
-        table.dropColumn('lastCheck');
+        table.dropColumn('last_check');
         table.dropColumn('type');
     });
 

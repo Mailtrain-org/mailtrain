@@ -217,7 +217,7 @@ export default class CUD extends Component {
             'name', 'description', 'channel', 'namespace', 'send_configuration',
             'subject', 'from_name_override', 'from_email_override', 'reply_to_override',
             'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url',
-            'type', 'source', 'parent', 'lists'
+            'type', 'source', 'lists'
         ]);
     }
 

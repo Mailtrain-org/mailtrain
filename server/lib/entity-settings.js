@@ -29,10 +29,6 @@ const entityTypes = {
         entitiesTable: 'campaigns',
         sharesTable: 'shares_campaign',
         permissionsTable: 'permissions_campaign',
-        dependentPermissions: {
-            extraColumns: ['parent'],
-            getParent: entity => entity.parent
-        },
         files: {
             file: {
                 table: 'files_campaign_file',
