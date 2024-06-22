@@ -1,5 +1,20 @@
 Note that some of these may be already obsolete...
 
+
+### Fix deprecations
+- npm WARN deprecated crypto@1.0.1: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
+- npm WARN deprecated @types/form-data@2.5.0: This is a stub types definition. form-data provides its own type definitions, so you do not need this installed.
+- npm WARN deprecated natives@1.1.6: This module relies on Node.js's internals and will break at some point. Do not use it, and update to graceful-fs@4.x.
+- npm WARN deprecated har-validator@5.1.5: this library is no longer supported
+- npm WARN deprecated feedparser-promised@2.0.1: This library is now deprecated. Please use node-parser instead.
+- npm WARN deprecated graceful-fs@1.1.14: please upgrade to graceful-fs 4 for compatibility with current and future versions of Node.js
+- npm WARN deprecated bcrypt-nodejs@0.0.3: bcrypt-nodejs is no longer actively maintained. Please use bcrypt or bcryptjs. See https://github.com/kelektiv/node.bcrypt.js/wiki/bcrypt-vs-brypt.js to learn more about these two options
+- npm WARN deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+- npm WARN deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+- npm WARN deprecated request@2.88.0: request has been deprecated, see https://github.com/request/request/issues/3142
+- npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+
+
 ### Front page
 - Some dashboard
 

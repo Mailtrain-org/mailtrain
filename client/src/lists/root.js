@@ -17,7 +17,6 @@ import ImportsCUD from './imports/CUD';
 import ImportsStatus from './imports/Status';
 import ImportRunsStatus from './imports/RunStatus';
 import Share from '../shares/Share';
-import TriggersList from './TriggersList';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 import {namespaceCheckPermissions} from "../lib/namespace";
 
@@ -191,11 +190,6 @@ function getMenus(t) {
                                     panelRender: props => <ImportsCUD action="create" list={props.resolved.list} />
                                 }
                             }
-                        },
-                        triggers: {
-                            title: t('triggers'),
-                            link: params => `/lists/${params.listId}/triggers`,
-                            panelRender: props => <TriggersList list={props.resolved.list} />
                         },
                         share: {
                             title: t('share'),

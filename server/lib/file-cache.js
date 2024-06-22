@@ -4,7 +4,7 @@ const { filesDir } = require('../models/files');
 const path = require('path');
 const log = require('./log');
 const knex = require('./knex');
-const fs = require('fs-extra-promise');
+const fs = require('fs-extra');
 const stream = require('stream');
 const privilegeHelpers = require('./privilege-helpers');
 const synchronized = require('./synchronized');
@@ -48,7 +48,7 @@ async function _fileCache(typeId, cacheConfig, keyGen) {
                         for (const entry of entries) {
                             cumulativeSize += entry.size;
                             if (cumulativeSize > maxSize) {
-                                await fs.unlinkAsync(getLocalFileName(entry.id));
+                                await fs.unlink(getLocalFileName(entry.id));
                                 await knex('file_cache').where('id', entry.id).del();
                             }
 
@@ -131,14 +131,14 @@ async function _fileCache(typeId, cacheConfig, keyGen) {
 
                                     if (!existingFileEntry) {
                                         const ids = await tx('file_cache').insert({type: typeId, key, mimetype: res.getHeader('Content-Type'), size: fileSize});
-                                        await fs.moveAsync(tmpFilePath, getLocalFileName(ids[0]), {});
+                                        await fs.move(tmpFilePath, getLocalFileName(ids[0]), {});
                                         mayNeedPruning = true;
                                     } else {
-                                        await fs.unlinkAsync(tmpFilePath);
+                                        await fs.unlink(tmpFilePath);
                                     }
                                 });
                             } catch (err) {
-                                await fs.unlinkAsync(tmpFilePath);
+                                await fs.unlink(tmpFilePath);
                             }
 
                             callback();

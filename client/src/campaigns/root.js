@@ -9,9 +9,7 @@ import Content from './Content';
 import CampaignsList from './List';
 import Share from '../shares/Share';
 import Files from "../lib/files";
-import {CampaignSource, CampaignType} from "../../../shared/campaigns";
-import TriggersCUD from './triggers/CUD';
-import TriggersList from './triggers/List';
+import {CampaignSource} from "../../../shared/campaigns";
 import StatisticsSubsList from "./StatisticsSubsList";
 import {SubscriptionStatus} from "../../../shared/lists";
 import StatisticsOpened from "./StatisticsOpened";
@@ -24,12 +22,6 @@ function getMenus(t) {
     const aggLabels = {
         'countries': t('countries'),
         'devices': t('devices')
-    };
-
-    const createLabels = {
-        [CampaignType.REGULAR]: t('createRegularCampaign'),
-        [CampaignType.RSS]: t('createRssCampaign'),
-        [CampaignType.TRIGGERED]: t('createTriggeredCampaign')
     };
 
     return {
@@ -132,32 +124,6 @@ function getMenus(t) {
                             visible: resolved => resolved.campaign.permissions.includes('viewAttachments'),
                             panelRender: props => <Files title={t('attachments')} help={t('theseFilesWillBeAttachedToTheCampaign')} entity={props.resolved.campaign} entityTypeId="campaign" entitySubTypeId="attachment" managePermission="manageAttachments"/>
                         },
-                        triggers: {
-                            title: t('triggers'),
-                            link: params => `/campaigns/${params.campaignId}/triggers/`,
-                            visible: resolved => resolved.campaign.type === CampaignType.TRIGGERED && resolved.campaign.permissions.includes('viewTriggers'),
-                            panelRender: props => <TriggersList campaign={props.resolved.campaign} />,
-                            children: {
-                                ':triggerId([0-9]+)': {
-                                    title: resolved => t('triggerName', {name: ellipsizeBreadcrumbLabel(resolved.trigger.name)}),
-                                    resolve: {
-                                        trigger: params => `rest/triggers/${params.campaignId}/${params.triggerId}`,
-                                    },
-                                    link: params => `/campaigns/${params.campaignId}/triggers/${params.triggerId}/edit`,
-                                    navs: {
-                                        ':action(edit|delete)': {
-                                            title: t('edit'),
-                                            link: params => `/campaigns/${params.campaignId}/triggers/${params.triggerId}/edit`,
-                                            panelRender: props => <TriggersCUD action={props.match.params.action} entity={props.resolved.trigger} campaign={props.resolved.campaign} />
-                                        }
-                                    }
-                                },
-                                create: {
-                                    title: t('create'),
-                                    panelRender: props => <TriggersCUD action="create" campaign={props.resolved.campaign} />
-                                }
-                            }
-                        },
                         share: {
                             title: t('share'),
                             link: params => `/campaigns/${params.campaignId}/share`,
@@ -167,16 +133,8 @@ function getMenus(t) {
                     }
                 },
                 'create-regular': {
-                    title: createLabels[CampaignType.REGULAR],
-                    panelRender: props => <CampaignsCUD action="create" type={CampaignType.REGULAR} permissions={props.permissions} />
-                },
-                'create-rss': {
-                    title: createLabels[CampaignType.RSS],
-                    panelRender: props => <CampaignsCUD action="create" type={CampaignType.RSS} permissions={props.permissions} />
-                },
-                'create-triggered': {
-                    title: createLabels[CampaignType.TRIGGERED],
-                    panelRender: props => <CampaignsCUD action="create" type={CampaignType.TRIGGERED} permissions={props.permissions} />
+                    title: t('createCampaign'),
+                    panelRender: props => <CampaignsCUD action="create" permissions={props.permissions} />
                 },
                 'clone': {
                     title: t('createCampaign'),

@@ -11,7 +11,6 @@ import {getMailerTypes} from "../send-configurations/helpers";
 import axios from '../lib/axios';
 import {getUrl} from '../lib/urls';
 import {withComponentMixins} from "../lib/decorator-helpers";
-import {CampaignType} from "../../../shared/campaigns";
 
 const Target = {
     CAMPAIGN_ONE: 'campaign_one',

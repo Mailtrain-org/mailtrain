@@ -15,7 +15,6 @@ If you are upgrading from Mailtrain v1, backup the DB and use it for Mailtrain v
 * Custom fields
 * Email templates (including MJML-based templates)
 * Custom reports
-* Automation (triggered and RSS campaigns)
 * Multiple users with granular user permissions and flexible sharing
 * Hierarchical namespaces for enterprise-level situations
 * Builtin Zone-MTA (https://github.com/zone-eu/zone-mta) for close-to-zero setup of mail delivery

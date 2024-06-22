@@ -561,31 +561,6 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#morerss"><h4>GET /api/rss/fetch/:campaignCid – {t('triggerFetchOfACampaign')}</h4></button>
-        </div>
-        <div id="morerss" className="collapse" data-parent="#apicalls">
-            <div className="card-body">
-                <p>
-                    {t('forcesTheRssFeedCheckToImmediatelyCheck')}
-                </p>
-
-                <p>
-                    {t('queryParams')}
-                </p>
-                <ul>
-                    <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}</li>
-                </ul>
-
-                <p>
-                    <strong>{t('example')}</strong>
-                </p>
-
-                <pre>curl -XGET '{getUrl(`api/rss/fetch/5OOnZKrp0?access_token=${accessToken}`)}'</pre>
-            </div>
-        </div>
-    </div>
-    <div className="card">
-        <div className="card-header">
           <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moretemplate"><h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4></button>
         </div>
         <div id="moretemplate" className="collapse" data-parent="#apicalls">

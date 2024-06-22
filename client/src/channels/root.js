@@ -9,15 +9,8 @@ import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 import {namespaceCheckPermissions} from "../lib/namespace";
 import Clone from "../campaigns/Clone";
-import {CampaignType} from "../../../shared/campaigns";
 
 function getMenus(t) {
-    const createLabels = {
-        [CampaignType.REGULAR]: t('createRegularCampaign'),
-        [CampaignType.RSS]: t('createRssCampaign'),
-        [CampaignType.TRIGGERED]: t('createTriggeredCampaign')
-    };
-
     return {
         'channels': {
             title: t('channels'),

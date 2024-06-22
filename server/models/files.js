@@ -4,7 +4,7 @@ const knex = require('../lib/knex');
 const { enforce } = require('../lib/helpers');
 const dtHelpers = require('../lib/dt-helpers');
 const shares = require('./shares');
-const fs = require('fs-extra-promise');
+const fs = require('fs-extra');
 const path = require('path');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const entitySettings = require('../lib/entity-settings');
@@ -243,7 +243,7 @@ async function createFiles(context, type, subType, entityId, files, replacementB
             // The names should be unique, so overwrite is disabled
             // The directory is created if it does not exist
             // Empty options argument is passed, otherwise fails
-            await fs.moveAsync(file.path, filePath, {});
+            await fs.move(file.path, filePath, {});
         } else if (file.data) {
             await fs.outputFile(filePath, file.data);
         }
@@ -251,12 +251,12 @@ async function createFiles(context, type, subType, entityId, files, replacementB
     // Remove replaced files from files directory
     for (const file of removedFiles) {
         const filePath = getFilePath(type, subType, entityId, file.filename);
-        await fs.removeAsync(filePath);
+        await fs.remove(filePath);
     }
     // Remove ignored files from upload directory
     for (const file of ignoredFiles) {
         if (file.path) {
-            await fs.removeAsync(file.path);
+            await fs.remove(file.path);
         }
     }
 
@@ -294,7 +294,7 @@ async function unlockTx(tx, type, subType, id) {
         await tx(filesTableName).where('id', id).del();
 
         const filePath = getFilePath(type, subType, file.entity, file.filename);
-        await fs.removeAsync(filePath);
+        await fs.remove(filePath);
 
     } else {
         await tx(filesTableName).where('id', id).update({lock_count: file.lock_count - 1});
@@ -313,7 +313,7 @@ async function removeFile(context, type, subType, id) {
             await tx(filesTableName).where('id', file.id).del();
 
             const filePath = getFilePath(type, subType, file.entity, file.filename);
-            await fs.removeAsync(filePath);
+            await fs.remove(filePath);
         } else {
             await tx(filesTableName).where('id', file.id).update({delete_pending: true});
         }
@@ -331,7 +331,7 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
     for (const row of rows) {
         const fromFilePath = getFilePath(fromType, fromSubType, fromEntityId, row.filename);
         const toFilePath = getFilePath(toType, toSubType, toEntityId, row.filename);
-        await fs.copyAsync(fromFilePath, toFilePath, {});
+        await fs.copy(fromFilePath, toFilePath, {});
 
         delete row.id;
         row.entity = toEntityId;
@@ -349,7 +349,7 @@ async function removeAllTx(tx, context, type, subType, entityId) {
     const rows = await tx(getFilesTable(type, subType)).where({entity: entityId});
     for (const row of rows) {
         const filePath = getFilePath(type, subType, entityId, row.filename);
-        await fs.removeAsync(filePath);
+        await fs.remove(filePath);
     }
 
     await tx(getFilesTable(type, subType)).where('entity', entityId).del();

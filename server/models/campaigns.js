@@ -11,9 +11,8 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const files = require('./files');
 const templates = require('./templates');
 const { allTagLanguages } = require('../../shared/templates');
-const { CampaignMessageStatus, CampaignStatus, CampaignSource, CampaignType, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
+const { CampaignMessageStatus, CampaignStatus, CampaignSource, getSendConfigurationPermissionRequiredForSend } = require('../../shared/campaigns');
 const sendConfigurations = require('./send-configurations');
-const triggers = require('./triggers');
 const {SubscriptionStatus} = require('../../shared/lists');
 const subscriptions = require('./subscriptions');
 const segments = require('./segments');
@@ -85,7 +84,7 @@ async function _listDTAjax(context, namespaceId, channelId, params) {
             }
             return builder;
         },
-        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'channels.name', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'channels.name', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -109,7 +108,7 @@ async function listChildrenDTAjax(context, campaignId, params) {
         builder => builder.from('campaigns')
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
             .where('campaigns.parent', campaignId),
-        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.status', 'campaigns.scheduled', 'campaigns.source', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -122,7 +121,7 @@ async function listWithContentDTAjax(context, params) {
         builder => builder.from('campaigns')
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
             .whereIn('campaigns.source', [CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.CUSTOM_FROM_CAMPAIGN]),
-        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -135,7 +134,7 @@ async function listOthersWhoseListsAreIncludedDTAjax(context, campaignId, listId
             .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
             .whereNot('campaigns.id', campaignId)
             .whereNotExists(qry => qry.from('campaign_lists').whereRaw('campaign_lists.campaign = campaigns.id').whereNotIn('campaign_lists.list', listIds)),
-        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.type', 'campaigns.created', 'namespaces.name']
+        ['campaigns.id', 'campaigns.name', 'campaigns.cid', 'campaigns.description', 'campaigns.created', 'namespaces.name']
     );
 }
 
@@ -357,7 +356,7 @@ async function rawGetByTx(tx, key, id) {
         .leftJoin('campaign_lists', 'campaigns.id', 'campaign_lists.campaign')
         .groupBy('campaigns.id')
         .select([
-            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.channel', 'campaigns.namespace', 'campaigns.status', 'campaigns.type', 'campaigns.source',
+            'campaigns.id', 'campaigns.cid', 'campaigns.name', 'campaigns.description', 'campaigns.channel', 'campaigns.namespace', 'campaigns.status', 'campaigns.source',
             'campaigns.send_configuration', 'campaigns.from_name_override', 'campaigns.from_email_override', 'campaigns.reply_to_override', 'campaigns.subject',
             'campaigns.data', 'campaigns.click_tracking_disabled', 'campaigns.open_tracking_disabled', 'campaigns.unsubscribe_url', 'campaigns.scheduled',
             'campaigns.delivered', 'campaigns.unsubscribed', 'campaigns.bounced', 'campaigns.complained', 'campaigns.blacklisted', 'campaigns.opened', 'campaigns.clicks',
@@ -449,10 +448,6 @@ async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
         await namespaceHelpers.validateEntity(tx, entity);
 
         if (isCreate) {
-            enforce(entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS || entity.type === CampaignType.TRIGGERED ||
-                    (content === Content.RSS_ENTRY && entity.type === CampaignType.RSS_ENTRY),
-                'Unknown campaign type');
-
             if (entity.source === CampaignSource.TEMPLATE || entity.source === CampaignSource.CUSTOM_FROM_TEMPLATE) {
                 await shares.enforceEntityPermissionTx(tx, context, 'template', entity.data.sourceTemplate, 'view');
             } else if (entity.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
@@ -519,21 +514,13 @@ async function _createTx(tx, context, entity, content) {
 
         await _validateAndPreprocess(tx, context, entity, true, content);
 
-        const filteredEntity = filterObject(entity, entity.type === CampaignType.RSS_ENTRY ? allowedKeysCreateRssEntry : allowedKeysCreate);
+        const filteredEntity = filterObject(entity, allowedKeysCreate);
         filteredEntity.cid = shortid.generate();
 
         const data = filteredEntity.data;
 
         filteredEntity.data = JSON.stringify(filteredEntity.data);
-
-        if (filteredEntity.type === CampaignType.RSS || filteredEntity.type === CampaignType.TRIGGERED) {
-            filteredEntity.status = CampaignStatus.ACTIVE;
-        } else if (filteredEntity.type === CampaignType.RSS_ENTRY) {
-            filteredEntity.status = CampaignStatus.SCHEDULED;
-            filteredEntity.start_at = new Date();
-        } else {
-            filteredEntity.status = CampaignStatus.IDLE;
-        }
+        filteredEntity.status = CampaignStatus.IDLE;
 
         const ids = await tx('campaigns').insert(filteredEntity);
         const id = ids[0];
@@ -647,15 +634,6 @@ async function _removeTx(tx, context, id, existing = null, overrideTypeCheck = f
         return new interoperableErrors.InvalidStateError;
     }
 
-    if (!overrideTypeCheck) {
-        enforce(existing.type === CampaignType.REGULAR || existing.type === CampaignType.RSS || existing.type === CampaignType.TRIGGERED, 'This campaign cannot be removed by user.');
-    }
-
-    const childCampaigns = await tx('campaigns').where('parent', id).select(['id', 'status', 'type']);
-    for (const childCampaign of childCampaigns) {
-        await _removeTx(tx, context, childCampaign.id, childCampaign, true);
-    }
-
     await files.removeAllTx(tx, context, 'campaign', 'file', id);
     await files.removeAllTx(tx, context, 'campaign', 'attachment', id);
 
@@ -664,8 +642,6 @@ async function _removeTx(tx, context, id, existing = null, overrideTypeCheck = f
     await tx('campaign_links').where('campaign', id).del();
 
     await tx('links').where('campaign', id).del();
-
-    await triggers.removeAllByCampaignIdTx(tx, context, id);
 
     await tx('template_dep_campaigns')
         .where('campaign', id)
@@ -975,21 +951,6 @@ async function getStatisticsOpened(context, id) {
             devices,
             countries
         };
-    });
-}
-
-async function fetchRssCampaign(context, cid) {
-    return await knex.transaction(async tx => {
-
-        const campaign = await tx('campaigns').where('cid', cid).select(['id', 'type']).first();
-
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaign.id, 'fetchRss');
-
-        enforce(campaign.type === CampaignType.RSS, 'Invalid campaign type');
-
-        await tx('campaigns').where('id', campaign.id).update('last_check', null);
-
-        feedcheck.scheduleCheck();
     });
 }
 

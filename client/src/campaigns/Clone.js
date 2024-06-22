@@ -30,9 +30,6 @@ export default class Clone extends Component {
 
         this.mailerTypes = getMailerTypes(props.t);
 
-        const { campaignTypeLabels } = getCampaignLabels(t);
-        this.campaignTypeLabels = campaignTypeLabels;
-
         this.initForm({
             leaveConfirmation: false,
         });
@@ -75,9 +72,8 @@ export default class Clone extends Component {
             { data: 1, title: t('name') },
             { data: 2, title: t('id'), render: data => <code>{data}</code> },
             { data: 3, title: t('description') },
-            { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
-            { data: 9, title: t('created'), render: data => moment(data).fromNow() },
-            { data: 10, title: t('namespace') }
+            { data: 8, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 9, title: t('namespace') }
         ];
 
         let campaignSelect;

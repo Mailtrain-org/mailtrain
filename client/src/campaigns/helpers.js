@@ -1,6 +1,6 @@
 'use strict';
 
-import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import {CampaignStatus} from "../../../shared/campaigns";
 import campaignsStyles from "./styles.scss";
 import {Button} from "../lib/bootstrap-components";
 import {CheckBox, Fieldset, TableSelect} from "../lib/form";
@@ -8,28 +8,19 @@ import React from "react";
 
 export function getCampaignLabels(t) {
 
-    const campaignTypeLabels = {
-        [CampaignType.REGULAR]: t('regular'),
-        [CampaignType.TRIGGERED]: t('triggered'),
-        [CampaignType.RSS]: t('rss')
-    };
-
     const campaignStatusLabels = {
         [CampaignStatus.IDLE]: t('idle'),
         [CampaignStatus.SCHEDULED]: t('scheduled'),
         [CampaignStatus.PAUSED]: t('paused'),
         [CampaignStatus.FINISHED]: t('finished'),
         [CampaignStatus.PAUSED]: t('paused'),
-        [CampaignStatus.INACTIVE]: t('inactive'),
-        [CampaignStatus.ACTIVE]: t('active'),
         [CampaignStatus.SENDING]: t('sending'),
         [CampaignStatus.PAUSING]: t('pausing')
     };
 
 
     return {
-        campaignStatusLabels,
-        campaignTypeLabels
+        campaignStatusLabels
     };
 }
 

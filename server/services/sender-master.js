@@ -5,7 +5,7 @@ const fork = require('../lib/fork').fork;
 const log = require('../lib/log');
 const path = require('path');
 const knex = require('../lib/knex');
-const {CampaignStatus, CampaignType, CampaignMessageStatus} = require('../../shared/campaigns');
+const {CampaignStatus, CampaignMessageStatus} = require('../../shared/campaigns');
 const campaigns = require('../models/campaigns');
 const builtinZoneMta = require('../lib/builtin-zone-mta');
 const {CampaignActivityType} = require('../../shared/activity-log');
@@ -131,10 +131,6 @@ function getExpirationThresholds() {
     const now = Date.now();
 
     return {
-        [MessageType.TRIGGERED]: {
-            threshold: now - config.queue.retention.triggered * 1000,
-            title: 'triggered campaign'
-        },
         [MessageType.TEST]: {
             threshold: now - config.queue.retention.test * 1000,
             title: 'test campaign'
@@ -409,7 +405,6 @@ async function scheduleCampaigns() {
 
         const expirationThreshold = new Date(now - config.queue.retention.campaign * 1000);
         const expiredCampaigns = await knex('campaigns')
-            .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
             .whereIn('campaigns.status', [CampaignStatus.SCHEDULED, CampaignStatus.PAUSED])
             .where('campaigns.start_at', '<', expirationThreshold)
             .update({status: CampaignStatus.FINISHED});
@@ -417,7 +412,6 @@ async function scheduleCampaigns() {
         // Empty message queues for PAUSING campaigns. A pausing campaign typically waits for campaignMessageQueueEmpty before it can check for PAUSING
         // We speed this up by discarding messages in the message queue of the campaign.
         const pausingCampaigns = await knex('campaigns')
-            .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
             .where('campaigns.status', CampaignStatus.PAUSING)
             .select(['id'])
             .forUpdate();
@@ -436,7 +430,6 @@ async function scheduleCampaigns() {
 
             await knex.transaction(async tx => {
                 const scheduledCampaign = await tx('campaigns')
-                    .whereIn('campaigns.type', [CampaignType.REGULAR, CampaignType.RSS_ENTRY])
                     .whereNotIn('campaigns.send_configuration', postponedSendConfigurationIds)
                     .where('campaigns.status', CampaignStatus.SCHEDULED)
                     .where('campaigns.start_at', '<=', nowDate)
@@ -518,7 +511,7 @@ async function processQueuedBySendConfiguration(sendConfigurationId) {
             const messageIdsInProcessing = messagesInProcessing.map(x => x.id);
 
             const rows = await knex('queued')
-                .orderByRaw(`FIELD(type, ${MessageType.TRIGGERED}, ${MessageType.API_TRANSACTIONAL}, ${MessageType.TEST}, ${MessageType.SUBSCRIPTION}) DESC, id ASC`) // This orders messages in the following order MessageType.SUBSCRIPTION, MessageType.TEST, MessageType.API_TRANSACTIONAL and MessageType.TRIGGERED
+                .orderByRaw(`FIELD(type, ${MessageType.API_TRANSACTIONAL}, ${MessageType.TEST}, ${MessageType.SUBSCRIPTION}) DESC, id ASC`) // This orders messages in the following order MessageType.SUBSCRIPTION, MessageType.TEST, MessageType.API_TRANSACTIONAL
                 .where('send_configuration', sendConfigurationId)
                 .whereNotIn('id', messageIdsInProcessing)
                 .limit(retrieveBatchSize);

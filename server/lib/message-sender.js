@@ -12,7 +12,7 @@ const lists = require('../models/lists');
 const fields = require('../models/fields');
 const sendConfigurations = require('../models/send-configurations');
 const links = require('../models/links');
-const {CampaignSource, CampaignType} = require('../../shared/campaigns');
+const {CampaignSource} = require('../../shared/campaigns');
 const {toNameTagLangauge} = require('../../shared/lists');
 const {CampaignMessageStatus, CampaignMessageErrorType} = require('../../shared/campaigns');
 const tools = require('./tools');
@@ -28,11 +28,9 @@ const shortid = require('./shortid');
 
 const MessageType = {
     REGULAR: 0,
-    TRIGGERED: 1,
-    TEST: 2,
-    SUBSCRIPTION: 3,
-    API_TRANSACTIONAL: 4
-
+    TEST: 1,
+    SUBSCRIPTION: 2,
+    API_TRANSACTIONAL: 3
 };
 
 class MessageSender {
@@ -43,7 +41,7 @@ class MessageSender {
         Accepted combinations of settings:
 
         Option #1
-        - settings.type in [MessageType.REGULAR, MessageType.TRIGGERED, MessageType.TEST]
+        - settings.type in [MessageType.REGULAR, MessageType.TEST]
         - campaign / campaignCid / campaignId
         - listId / listCid [optional if campaign is provided]
         - sendConfigurationId [optional if campaign is provided]
@@ -66,7 +64,7 @@ class MessageSender {
         this.listsFieldsGrouped = new Map(); // listId -> fieldsGrouped
 
         await knex.transaction(async tx => {
-            if (this.type === MessageType.REGULAR || this.type === MessageType.TRIGGERED || this.type === MessageType.TEST) {
+            if (this.type === MessageType.REGULAR || this.type === MessageType.TEST) {
                 this.isMassMail = true;
 
                 if (settings.campaign) {
@@ -163,12 +161,6 @@ class MessageSender {
                 this.html = this.campaign.data.sourceCustom.html;
                 this.text = this.campaign.data.sourceCustom.text;
                 this.tagLanguage = this.campaign.data.sourceCustom.tag_language;
-            }
-
-            if (settings.rssEntry !== undefined) {
-                this.rssEntry = settings.rssEntry;
-            } else if (this.campaign && this.campaign.data.rssEntry) {
-                this.rssEntry = this.campaign.data.rssEntry;
             }
 
             enforce(this.renderedHtml || (this.campaign && this.campaign.source === CampaignSource.URL) || this.tagLanguage);
@@ -275,23 +267,6 @@ class MessageSender {
         };
     }
 
-    _getExtraTags() {
-        const tags = {};
-
-        if (this.rssEntry) {
-            const rssEntry = this.rssEntry;
-            tags['RSS_ENTRY_TITLE'] = rssEntry.title;
-            tags['RSS_ENTRY_DATE'] = rssEntry.date;
-            tags['RSS_ENTRY_LINK'] = rssEntry.link;
-            tags['RSS_ENTRY_CONTENT'] = rssEntry.content;
-            tags['RSS_ENTRY_SUMMARY'] = rssEntry.summary;
-            tags['RSS_ENTRY_IMAGE_URL'] = rssEntry.imageUrl;
-            tags['RSS_ENTRY_CUSTOM_TAGS'] = rssEntry.customTags;
-        }
-
-        return tags;
-    }
-
     async initByCampaignId(campaignId) {
         await this._init({type: MessageType.REGULAR, campaignId});
     }
@@ -341,7 +316,7 @@ class MessageSender {
             const flds = this.listsFieldsGrouped.get(list.id);
 
             if (!mergeTags) {
-                mergeTags = fields.getMergeTags(flds, subscriptionGrouped, this._getExtraTags());
+                mergeTags = fields.getMergeTags(flds, subscriptionGrouped);
             }
 
             for (const fld of flds) {
@@ -571,7 +546,7 @@ class MessageSender {
 async function sendQueuedMessage(queuedMessage) {
     const messageType = queuedMessage.type;
 
-    enforce(messageType === MessageType.TRIGGERED || messageType === MessageType.TEST || messageType === MessageType.SUBSCRIPTION || messageType === MessageType.API_TRANSACTIONAL);
+    enforce(messageType === MessageType.TEST || messageType === MessageType.SUBSCRIPTION || messageType === MessageType.API_TRANSACTIONAL);
 
     const msgData = queuedMessage.data;
 
@@ -588,7 +563,6 @@ async function sendQueuedMessage(queuedMessage) {
         tagLanguage: msgData.tagLanguage,
         renderedHtml: msgData.renderedHtml,
         renderedText: msgData.renderedText,
-        rssEntry: msgData.rssEntry
     });
 
     const campaign = cs.campaign;
@@ -615,22 +589,6 @@ async function sendQueuedMessage(queuedMessage) {
         });
 
         throw err;
-    }
-
-    if (messageType === MessageType.TRIGGERED) {
-        await knex('campaign_messages').insert({
-            hash_email: result.subscriptionGrouped.hash_email,
-            subscription: result.subscriptionGrouped.id,
-            campaign: campaign.id,
-            list: result.list.id,
-            send_configuration: queuedMessage.send_configuration,
-            status: CampaignMessageStatus.SENT,
-            response: result.response,
-            response_id: result.response_id,
-            updated: new Date()
-        });
-
-        await knex('campaigns').where('id', campaign.id).increment('delivered');
     }
 
     if (campaign && messageType === MessageType.TEST) {
@@ -680,7 +638,7 @@ async function dropQueuedMessage(queuedMessage) {
 
 
 async function queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, messageType, messageData) {
-    enforce(messageType === MessageType.TRIGGERED || messageType === MessageType.TEST);
+    enforce(messageType === MessageType.TEST);
 
     const msgData = {...messageData};
 
@@ -794,7 +752,7 @@ async function getMessage(campaignCid, listCid, subscriptionCid, settings, isTes
     }
 
     const flds = cs.listsFieldsGrouped.get(list.id);
-    const mergeTags = fields.getMergeTags(flds, subscriptionGrouped, cs._getExtraTags());
+    const mergeTags = fields.getMergeTags(flds, subscriptionGrouped);
 
     return await cs._getMessage(mergeTags, list, subscriptionGrouped, false);
 }

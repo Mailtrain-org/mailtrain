@@ -7,7 +7,7 @@ const util = require('util');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-const csrf = require('csurf');
+const csrf = require('@dr.pogodin/csurf');
 const bodyParser = require('body-parser');
 
 const users = require('../models/users');

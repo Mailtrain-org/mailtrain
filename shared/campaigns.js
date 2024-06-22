@@ -12,35 +12,20 @@ const CampaignSource = {
     MAX: 5
 };
 
-const CampaignType = {
-    MIN: 1,
-
-    REGULAR: 1,
-    RSS: 2,
-    RSS_ENTRY: 3,
-    TRIGGERED: 4,
-
-    MAX: 4
-};
-
 const CampaignStatus = {
     MIN: 1,
 
-    // For campaign types: NORMAL, RSS_ENTRY
+    // For campaign types: NORMAL
     IDLE: 1,
     SCHEDULED: 2,
     FINISHED: 3,
     PAUSED: 4,
 
-    // For campaign types: RSS, TRIGGERED
-    INACTIVE: 5,
-    ACTIVE: 6,
+    // For campaign types: NORMAL
+    SENDING: 5,
+    PAUSING: 6,
 
-    // For campaign types: NORMAL, RSS_ENTRY
-    SENDING: 7,
-    PAUSING: 8,
-
-    MAX: 9
+    MAX: 6
 };
 
 
@@ -93,7 +78,6 @@ function getSendConfigurationPermissionRequiredForSend(campaign, sendConfigurati
 
 module.exports = {
     CampaignSource,
-    CampaignType,
     CampaignStatus,
     campaignOverridables,
     CampaignMessageStatus,

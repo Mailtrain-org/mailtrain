@@ -88,7 +88,7 @@ async function processQueuedMessages(sendConfigurationId, messages) {
         try {
             await messageSender.sendQueuedMessage(queuedMessage);
 
-            if ((messageType === MessageType.TRIGGERED || messageType === MessageType.TEST) && msgData.campaignId && msgData.listId && msgData.subscriptionId) {
+            if (messageType === MessageType.TEST && msgData.campaignId && msgData.listId && msgData.subscriptionId) {
                 await activityLog.logCampaignTrackerActivity(CampaignTrackerActivityType.SENT, msgData.campaignId, msgData.listId, msgData.subscriptionId);
             }
 

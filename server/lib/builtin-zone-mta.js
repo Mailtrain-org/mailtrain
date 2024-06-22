@@ -8,11 +8,13 @@ const fs = require('fs-extra');
 const crypto = require('crypto');
 const os = require('os');
 const {promisify} = require("node:util");
+const privilegeHelpers = require("./privilege-helpers");
 
 let zoneMtaProcess = null;
 
 const zoneMtaDir = path.join(__dirname, '..', '..', 'zone-mta');
-const zoneMtaBuiltingConfig = path.join(zoneMtaDir, 'config', 'builtin-zonemta.json');
+const zoneMtaBuiltinConfigDir = path.join(zoneMtaDir, 'config');
+const zoneMtaBuiltinConfig = path.join(zoneMtaBuiltinConfigDir, 'builtin-zonemta.json');
 
 const password = process.env.BUILTIN_ZONE_MTA_PASSWORD || crypto.randomBytes(20).toString('hex').toLowerCase();
 
@@ -138,7 +140,8 @@ async function createConfig() {
         }
     };
 
-    await fs.writeFile(zoneMtaBuiltingConfig, JSON.stringify(cnf, null, 2));
+    await privilegeHelpers.ensureMailtrainDir(zoneMtaBuiltinConfigDir);
+    await fs.writeFile(zoneMtaBuiltinConfig, JSON.stringify(cnf, null, 2));
 }
 
 function restart(callback) {
@@ -152,7 +155,7 @@ function restart(callback) {
 
     zoneMtaProcess = fork(
         path.join(zoneMtaDir, 'index.js'),
-        ['--config=' + zoneMtaBuiltingConfig],
+        ['--config=' + zoneMtaBuiltinConfig],
         {
             cwd: zoneMtaDir,
             env: {NODE_ENV: process.env.NODE_ENV}

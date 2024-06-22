@@ -58,9 +58,6 @@ export default class CUD extends Component {
 
         this.mailerTypes = getMailerTypes(props.t);
 
-        const { campaignTypeLabels } = getCampaignLabels(t);
-        this.campaignTypeLabels = campaignTypeLabels;
-
         this.sourceLabels = {
             [CampaignSource.CUSTOM]: t('customContent'),
             [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
@@ -394,7 +391,6 @@ export default class CUD extends Component {
         const canDelete = isEdit && this.props.entity.permissions.includes('delete');
 
         const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
-        const campaignTypeKey = this.getFormValue('type');
 
         const sendConfigurationsColumns = [
             { data: 1, title: t('name') },
@@ -466,9 +462,8 @@ export default class CUD extends Component {
                 { data: 1, title: t('name') },
                 { data: 2, title: t('id'), render: data => <code>{data}</code> },
                 { data: 3, title: t('description') },
-                { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
-                { data: 5, title: t('created'), render: data => moment(data).fromNow() },
-                { data: 6, title: t('namespace') }
+                { data: 4, title: t('created'), render: data => moment(data).fromNow() },
+                { data: 5, title: t('namespace') }
             ];
 
             templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;

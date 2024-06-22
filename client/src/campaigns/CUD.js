@@ -30,7 +30,7 @@ import axios from '../lib/axios';
 import styles from "../lib/styles.scss";
 import campaignsStyles from "./styles.scss";
 import {getUrl} from "../lib/urls";
-import {campaignOverridables, CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import {campaignOverridables, CampaignSource, CampaignStatus} from "../../../shared/campaigns";
 import moment from 'moment';
 import {getMailerTypes} from "../send-configurations/helpers";
 import {getCampaignLabels, ListsSelectorHelper} from "./helpers";
@@ -58,27 +58,11 @@ export default class CUD extends Component {
 
         this.mailerTypes = getMailerTypes(props.t);
 
-        const { campaignTypeLabels } = getCampaignLabels(t);
-        this.campaignTypeLabels = campaignTypeLabels;
-
-        this.createTitles = {
-            [CampaignType.REGULAR]: t('createRegularCampaign'),
-            [CampaignType.RSS]: t('createRssCampaign'),
-            [CampaignType.TRIGGERED]: t('createTriggeredCampaign'),
-        };
-
-        this.editTitles = {
-            [CampaignType.REGULAR]: t('editRegularCampaign'),
-            [CampaignType.RSS]: t('editRssCampaign'),
-            [CampaignType.TRIGGERED]: t('editTriggeredCampaign'),
-        };
-
         this.sourceLabels = {
             [CampaignSource.CUSTOM]: t('customContent'),
             [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
             [CampaignSource.TEMPLATE]: t('template'),
-            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate'),
-            [CampaignSource.URL]: t('url')
+            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate')
         };
 
         const sourceLabelsOrder = [
@@ -183,10 +167,6 @@ export default class CUD extends Component {
             data.data_sourceUrl = data.data.sourceUrl;
         }
 
-        if (data.type === CampaignType.RSS) {
-            data.data_feedUrl = data.data.feedUrl;
-        }
-
         for (const overridable of campaignOverridables) {
             if (data[overridable + '_override'] === null) {
                 data[overridable + '_override'] = '';
@@ -230,10 +210,6 @@ export default class CUD extends Component {
 
         if (data.source === CampaignSource.URL) {
             data.data.sourceUrl = data.data_sourceUrl;
-        }
-
-        if (data.type === CampaignType.RSS) {
-            data.data.feedUrl = data.data_feedUrl;
         }
 
         for (const overridable of campaignOverridables) {
@@ -283,10 +259,6 @@ export default class CUD extends Component {
             // This is for CampaignSource.URL
             data.data_sourceUrl = '';
 
-            // This is for CampaignType.RSS
-            data.data_feedUrl = '';
-
-
             if (this.props.createFromChannel) {
                 const channel = this.props.createFromChannel;
 
@@ -303,8 +275,6 @@ export default class CUD extends Component {
                 }
 
                 this.listsSelectorHelper.populateFrom(data, channel.lists);
-
-                data.type = CampaignType.REGULAR;
 
                 data.name = channel.cpg_name;
                 data.description = channel.cpg_description;
@@ -449,8 +419,6 @@ export default class CUD extends Component {
         }
 
 
-        const campaignTypeKey = state.getIn(['type', 'value']);
-
         const sourceTypeKey = Number.parseInt(state.getIn(['source', 'value']));
 
         if (sourceTypeKey === CampaignSource.TEMPLATE || (!isEdit && sourceTypeKey === CampaignSource.CUSTOM_FROM_TEMPLATE)) {
@@ -481,12 +449,6 @@ export default class CUD extends Component {
         } else if (sourceTypeKey === CampaignSource.URL) {
             if (!state.getIn(['data_sourceUrl', 'value'])) {
                 state.setIn(['data_sourceUrl', 'error'], t('urlMustNotBeEmpty'));
-            }
-        }
-
-        if (campaignTypeKey === CampaignType.RSS) {
-            if (!state.getIn(['data_feedUrl', 'value'])) {
-                state.setIn(['data_feedUrl', 'error'], t('rssFeedUrlMustBeGiven'));
             }
         }
 
@@ -571,11 +533,6 @@ export default class CUD extends Component {
         let extraSettings = null;
 
         const sourceTypeKey = Number.parseInt(this.getFormValue('source'));
-        const campaignTypeKey = this.getFormValue('type');
-
-        if (campaignTypeKey === CampaignType.RSS) {
-            extraSettings = <InputField id="data_feedUrl" label={t('rssFeedUrl')}/>
-        }
 
         const channelsColumns = [
             { data: 1, title: t('name') },
@@ -664,9 +621,8 @@ export default class CUD extends Component {
                 { data: 1, title: t('name') },
                 { data: 2, title: t('id'), render: data => <code>{data}</code> },
                 { data: 3, title: t('description') },
-                { data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] },
-                { data: 5, title: t('created'), render: data => moment(data).fromNow() },
-                { data: 6, title: t('namespace') }
+                { data: 4, title: t('created'), render: data => moment(data).fromNow() },
+                { data: 5, title: t('namespace') }
             ];
 
             templateEdit = <TableSelect key="campaignSelect" id="data_sourceCampaign" label={t('campaign')} withHeader dropdown dataUrl='rest/campaigns-with-content-table' columns={campaignsColumns} selectionLabelIndex={1} help={t('contentOfTheSelectedCampaignWillBeCopied')}/>;
@@ -706,7 +662,7 @@ export default class CUD extends Component {
                 }
                 {templateModals}
 
-                <Title>{isEdit ? this.editTitles[this.getFormValue('type')] : this.createTitles[this.getFormValue('type')]}</Title>
+                <Title>{isEdit ? t('editCampaign') : t('createCampaign')}</Title>
 
                 {!canModify &&
                 <div className="alert alert-warning" role="alert">

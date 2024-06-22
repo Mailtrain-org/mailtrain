@@ -21,7 +21,7 @@ import {Button, Icon, ModalDialog} from "../lib/bootstrap-components";
 import axios from "../lib/axios";
 import {getPublicUrl, getSandboxUrl, getUrl} from "../lib/urls";
 import interoperableErrors from '../../../shared/interoperable-errors';
-import {CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import {CampaignStatus} from "../../../shared/campaigns";
 import moment from 'moment-timezone';
 import campaignsStyles from "./styles.scss";
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -71,24 +71,7 @@ class PreviewForTestUserModalDialog extends Component {
             const campaignCid = entity.cid;
             const [listCid, subscriptionCid] = this.getFormValue('testUser').split(':');
 
-            if (entity.type === CampaignType.RSS) {
-                const result = await axios.post(getUrl('rest/restricted-access-token'), {
-                    method: 'rssPreview',
-                    params: {
-                        campaignCid,
-                        listCid
-                    }
-                });
-
-                const accessToken = result.data;
-                window.open(getSandboxUrl(`cpgs/rss-preview/${campaignCid}/${listCid}/${subscriptionCid}`, accessToken, {withLocale: true}), '_blank');
-
-            } else if (entity.type === CampaignType.REGULAR || entity.type === CampaignType.RSS_ENTRY) {
-                window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');
-
-            } else {
-                throw new Error('Preview not supported');
-            }
+            window.open(getPublicUrl(`archive/${campaignCid}/${listCid}/${subscriptionCid}`, {withLocale: true}), '_blank');
 
         } else {
             this.showFormValidation();
@@ -531,8 +514,7 @@ export default class Status extends Component {
             sendConfigurationNotPermitted: false
         };
 
-        const { campaignTypeLabels, campaignStatusLabels } = getCampaignLabels(t);
-        this.campaignTypeLabels = campaignTypeLabels;
+        const { campaignStatusLabels } = getCampaignLabels(t);
         this.campaignStatusLabels = campaignStatusLabels;
 
         this.refreshTimeoutHandler = ::this.periodicRefreshTask;
@@ -626,14 +608,12 @@ export default class Status extends Component {
         const campaignsChildrenColumns = [
             { data: 1, title: t('name') },
             { data: 2, title: t('id'), render: data => <code>{data}</code> },
-            { data: 5, title: t('status'), render: (data, display, rowData) => this.campaignStatusLabels[data] },
-            { data: 8, title: t('created'), render: data => moment(data).fromNow() },
+            { data: 4, title: t('status'), render: (data, display, rowData) => this.campaignStatusLabels[data] },
+            { data: 7, title: t('created'), render: data => moment(data).fromNow() },
             {
                 actions: data => {
                     const actions = [];
-                    const perms = data[10];
-                    const campaignType = data[4];
-                    const campaignSource = data[7];
+                    const perms = data[9];
 
                     if (perms.includes('view')) {
                         actions.push({
@@ -663,15 +643,6 @@ export default class Status extends Component {
 
                 <hr/>
                 <SendControls entity={entity} refreshEntity={::this.refreshEntity}/>
-
-                {entity.type === CampaignType.RSS &&
-                    <div>
-                        <hr/>
-                        <h3>RSS Entries</h3>
-                        <p>{t('ifANewEntryIsFoundFromCampaignFeedANew')}</p>
-                        <Table withHeader dataUrl={`rest/campaigns-children/${this.props.entity.id}`} columns={campaignsChildrenColumns} order={[3, 'desc']}/>
-                    </div>
-                }
             </div>
         );
     }

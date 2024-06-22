@@ -188,11 +188,9 @@ queue:
   # Mailtrain will keep retrying until the email expires.
   # Due to Mailtrain's internal timeouts, the values should be at least 60 seconds.
   retention:
-    # Regular and RSS campaign. Once this expires, the campaign is considered finished. The remaining recipients
+    # Once this expires, the campaign is considered finished. The remaining recipients
     # are included in the set of those recipients to whom the message would be delivered if the campaign is again started.
     campaign: 86400    # 1 day
-    # Triggered campaign. Once this expires, the message gets discarded.
-    triggered: 86400   # 1 day
     # Test send (in campaign or template)
     test: 300          # 5 minutes
     # Subscription and password reset related emails
@@ -284,7 +282,7 @@ defaultRoles:
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
         channel: [view, edit, delete, createCampaign, share]
-        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, send, sendToTestUsers, viewStats]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
         namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createSendConfiguration, createChannel, createCampaign, manageUsers]
@@ -298,7 +296,7 @@ defaultRoles:
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
         channel: [view, edit, delete, createCampaign, share]
-        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, fetchRss]
+        campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, send, sendToTestUsers, viewStats]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
         namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
@@ -310,7 +308,7 @@ defaultRoles:
       children:
         sendConfiguration: [viewPublic]
         channel: [view]
-        campaign: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, sendToTestUsers, viewStats, fetchRss]
+        campaign: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, sendToTestUsers, viewStats]
         template: [view, edit, delete, viewFiles, manageFiles, sendToTestUsers]
         mosaicoTemplate: [view, viewFiles]
         namespace: [view, createTemplate, createChannel, createCampaign]
@@ -321,7 +319,7 @@ defaultRoles:
       permissions: [view, createTemplate, createCampaign]
       children:
         channel: [view]
-        campaign: [view, viewFiles, viewAttachments, viewTriggers]
+        campaign: [view, viewFiles, viewAttachments]
         template: [view, viewFiles]
         mosaicoTemplate: [view, viewFiles]
         namespace: [view]
@@ -370,19 +368,15 @@ defaultRoles:
     master:
       name: Master
       description: All permissions
-      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, send, sendToTestUsers, viewStats, manageMessages, fetchRss]
+      permissions: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, send, sendToTestUsers, viewStats, manageMessages]
     creator:
       name: Creator
       description: The user can setup the campaign but cannot send it.
-      permissions: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, viewTriggers, manageTriggers, sendToTestUsers, viewStats, fetchRss]
+      permissions: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, sendToTestUsers, viewStats]
     viewer:
       name: Viewer
       description: The user can view the campaign but cannot edit it or send it.
-      permissions: [view, viewFiles, viewAttachments, viewTriggers]
-    rssTrigger:
-      name: RSS Campaign Trigger
-      description: Allows triggering a fetch of an RSS campaign
-      permissions: [fetchRss]
+      permissions: [view, viewFiles, viewAttachments]
 
   template:
     master:

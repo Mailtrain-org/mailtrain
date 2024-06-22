@@ -3,7 +3,7 @@
 const log = require('./log');
 const config = require('./config');
 
-const fs = require('fs-extra-promise');
+const fs = require('fs-extra');
 
 const tryRequire = require('try-require');
 const posix = tryRequire('posix');
@@ -49,12 +49,12 @@ function ensureMailtrainOwner(file, callback) {
     if (callback) {
         fs.chown(file, ids.uid, ids.gid, callback);
     } else {
-        return fs.chownAsync(file, ids.uid, ids.gid);
+        return fs.chown(file, ids.uid, ids.gid);
     }
 }
 
 async function ensureMailtrainDir(dir) {
-    await fs.ensureDirAsync(dir);
+    await fs.ensureDir(dir);
     await ensureMailtrainOwner(dir);
 }
 
@@ -81,7 +81,5 @@ function dropRootPrivileges() {
 module.exports = {
     dropRootPrivileges,
     ensureMailtrainOwner,
-    ensureMailtrainDir,
-    getConfigUidGid,
-    getConfigROUidGid
+    ensureMailtrainDir
 };

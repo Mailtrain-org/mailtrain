@@ -37,7 +37,6 @@ const usersRest = require('./routes/rest/users');
 const accountRest = require('./routes/rest/account');
 const channelsRest = require('./routes/rest/channels');
 const campaignsRest = require('./routes/rest/campaigns');
-const triggersRest = require('./routes/rest/triggers');
 const listsRest = require('./routes/rest/lists');
 const formsRest = require('./routes/rest/forms');
 const fieldsRest = require('./routes/rest/fields');
@@ -163,10 +162,15 @@ async function createApp(appType) {
     app.use(cookieParser());
 
     if (config.redis.enabled) {
-        const RedisStore = require('connect-redis')(session);
+        const Redis = require("ioredis");
+        const RedisStore = require('connect-redis').default;
+
+        const redisClient = new Redis(config.redis);
 
         app.use(session({
-            store: new RedisStore(config.redis),
+            store: new RedisStore({
+                client: redisClient
+            }),
             secret: config.www.secret,
             saveUninitialized: false,
             resave: false
@@ -292,7 +296,6 @@ async function createApp(appType) {
         app.use('/rest', accountRest);
         app.use('/rest', channelsRest);
         app.use('/rest', campaignsRest);
-        app.use('/rest', triggersRest);
         app.use('/rest', listsRest);
         app.use('/rest', formsRest);
         app.use('/rest', fieldsRest);

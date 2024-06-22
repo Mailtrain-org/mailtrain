@@ -57,8 +57,7 @@ export default class List extends Component {
             {
                 actions: data => {
                     const actions = [];
-                    const triggersCount = data[6];
-                    const perms = data[7];
+                    const perms = data[6];
 
                     if (perms.includes('viewSubscriptions')) {
                         actions.push({
@@ -92,13 +91,6 @@ export default class List extends Component {
                         actions.push({
                             label: <Icon icon="file-import" title={t('imports')}/>,
                             link: `/lists/${data[0]}/imports`
-                        });
-                    }
-
-                    if (triggersCount > 0) {
-                        actions.push({
-                            label: <Icon icon="bell" title={t('triggers')}/>,
-                            link: `/lists/${data[0]}/triggers`
                         });
                     }
 

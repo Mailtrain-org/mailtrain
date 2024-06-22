@@ -7,7 +7,7 @@ import {DropdownLink, LinkButton, requiresAuthenticatedUser, Title, Toolbar, wit
 import {withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import moment from 'moment';
-import {CampaignSource, CampaignStatus, CampaignType} from "../../../shared/campaigns";
+import {CampaignSource, CampaignStatus} from "../../../shared/campaigns";
 import {getCampaignLabels} from "./helpers";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
@@ -26,8 +26,7 @@ export default class List extends Component {
 
         const t = props.t;
 
-        const { campaignTypeLabels, campaignStatusLabels } = getCampaignLabels(t);
-        this.campaignTypeLabels = campaignTypeLabels;
+        const { campaignStatusLabels } = getCampaignLabels(t);
         this.campaignStatusLabels = campaignStatusLabels;
 
         this.state = {};
@@ -62,18 +61,17 @@ export default class List extends Component {
 
         columns.push({ data: 2, title: t('id'), render: data => <code>{data}</code>, className: styles.tblCol_id });
         columns.push({ data: 3, title: t('description') });
-        columns.push({ data: 4, title: t('type'), render: data => this.campaignTypeLabels[data] });
 
         if (!channel) {
-            columns.push({ data: 5, title: t('channel') });
+            columns.push({ data: 4, title: t('channel') });
         }
 
         columns.push({
-            data: 6,
+            data: 5,
             title: t('status'),
             render: (data, display, rowData) => {
                 if (data === CampaignStatus.SCHEDULED) {
-                    const scheduled = rowData[7];
+                    const scheduled = rowData[6];
                     if (scheduled && new Date(scheduled) > new Date()) {
                         return t('sendingScheduled');
                     } else {
@@ -84,15 +82,14 @@ export default class List extends Component {
                 }
             }
         });
-        columns.push({ data: 9, title: t('created'), render: data => moment(data).fromNow() });
-        columns.push({ data: 10, title: t('namespace') });
+        columns.push({ data: 8, title: t('created'), render: data => moment(data).fromNow() });
+        columns.push({ data: 9, title: t('namespace') });
         columns.push({
             className: styles.tblCol_buttons,
             actions: data => {
                 const actions = [];
-                const perms = data[11];
-                const campaignType = data[4];
-                const campaignSource = data[8];
+                const perms = data[10];
+                const campaignSource = data[7];
 
                 if (perms.includes('view')) {
                     actions.push({
@@ -136,13 +133,6 @@ export default class List extends Component {
                     });
                 }
 
-                if (campaignType === CampaignType.TRIGGERED && perms.includes('viewTriggers')) {
-                    actions.push({
-                        label: <Icon icon="bell" title={t('triggers')}/>,
-                        link: `/campaigns/${data[0]}/triggers`
-                    });
-                }
-
                 if (perms.includes('share')) {
                     actions.push({
                         label: <Icon icon="share" title={t('share')}/>,
@@ -170,11 +160,7 @@ export default class List extends Component {
                 createButton = (
                     <>
                         <LinkButton to={`/campaigns/clone`} className="btn-primary" icon="clone" label={t('cloneCampaign')}/>
-                        <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" icon="plus" label={t('createCampaign')}>
-                            <DropdownLink to="/campaigns/create-regular">{t('regular')}</DropdownLink>
-                            <DropdownLink to="/campaigns/create-rss">{t('rss')}</DropdownLink>
-                            <DropdownLink to="/campaigns/create-triggered">{t('triggered')}</DropdownLink>
-                        </ButtonDropdown>
+                        <LinkButton to={`/campaigns/create-regular`} className="btn-primary" icon="plus" label={t('createCampaign')}/>
                     </>
                 );
             }

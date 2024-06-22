@@ -7,7 +7,7 @@ const dtHelpers = require('../lib/dt-helpers');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const shares = require('./shares');
 const {ImportSource, MappingType, ImportStatus, RunStatus, prepFinished, prepFinishedAndNotInProgress, runInProgress} = require('../../shared/imports');
-const fs = require('fs-extra-promise');
+const fs = require('fs-extra');
 const path = require('path');
 const importer = require('../lib/importer');
 const {ListActivityType} = require('../../shared/activity-log');
@@ -97,7 +97,7 @@ async function create(context, listId, entity, files) {
             enforce(files.csvFile, 'File must be included');
             const csvFile = files.csvFile[0];
             const filePath = path.join(filesDir, csvFile.filename);
-            await fs.moveAsync(csvFile.path, filePath, {});
+            await fs.move(csvFile.path, filePath, {});
 
             entity.settings.csv = {
                 originalname: csvFile.originalname,
@@ -168,7 +168,7 @@ async function removeTx(tx, context, listId, id) {
     existing.settings = JSON.parse(existing.settings);
 
     const filePath = path.join(filesDir, existing.settings.csv.filename);
-    await fs.removeAsync(filePath);
+    await fs.remove(filePath);
 
     const importTable = 'import_file__' + id;
     await knex.schema.dropTableIfExists(importTable);
