@@ -13,11 +13,6 @@ if (config.cid && config.cid.length) customlength=config.cid.length;
 
 const re = new RegExp('['+alphabet+']{'+customlength+'}');
 
-// Implements the public methods of shortid module with nanoid and export them
-module.exports.generate = function() {
-  return customnanoid();
-}
-
 module.exports.generate = function() {
   let res = '';
   for (let i = 0; i < customlength; i++) {

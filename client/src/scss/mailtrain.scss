@@ -7,10 +7,10 @@ $fa-font-path: "../static-npm/fontawesome";
 $enable-print-styles: false;
 
 @import "./variables.scss";
-@import "node_modules/@coreui/coreui/scss/coreui.scss";
-@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
-@import "node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
-@import "node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+@import "@coreui/coreui/scss/coreui.scss";
+@import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "@fortawesome/fontawesome-free/scss/regular.scss";
+@import "@fortawesome/fontawesome-free/scss/solid.scss";
 
 .custom-select {
   -webkit-appearance: none; // This is a fix for Chrome
@@ -38,9 +38,7 @@ body.mailtrain {
 
   .mt-breadcrumb-and-tertiary-navbar {
     display: flex;
-    border-radius: 0;
     @include border-radius($breadcrumb-border-radius);
-    @include borders($breadcrumb-borders);
     background-color: $breadcrumb-bg;
 
     .breadcrumb {
