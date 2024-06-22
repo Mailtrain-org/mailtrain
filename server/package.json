@@ -16,6 +16,9 @@
   "dependencies": {
     "@aws-sdk/client-ses": "^3.556.0",
     "@dr.pogodin/csurf": "^1.13.0",
+    "@xmldom/xmldom": "^0.8.10",
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "bounce-handler": "7.3.2-fork.3",
     "capitalize": "^2.0.4",
@@ -53,7 +56,7 @@
     "libmime": "^5.3.4",
     "mailparser": "^3.6.9",
     "memory-cache": "^0.2.0",
-    "mjml": "^4.15.3",
+    "mjml": "^4.7.1",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.45",
     "morgan": "^1.10.0",
@@ -74,7 +77,6 @@
     "slugify": "^1.6.6",
     "smtp-server": "^3.13.3",
     "tmp-promise": "^3.0.3",
-    "try-require": "^1.2.1",
-    "xmldom": "^0.6.0"
+    "try-require": "^1.2.1"
   }
 }

@@ -14,11 +14,8 @@ const {getTrustedUrl} = require('../lib/urls');
 const { tUI } = require('../lib/translate');
 const messageSender = require('../lib/message-sender');
 const {getSystemSendConfigurationId} = require('../../shared/send-configurations');
-const {promisify} = require("node:util");
 
-const bcrypt = require('bcrypt-nodejs');
-const bcryptHash = promisify(bcrypt.hash.bind(bcrypt));
-const bcryptCompare = promisify(bcrypt.compare.bind(bcrypt));
+const bcrypt = require('bcrypt');
 
 const passport = require('../lib/passport');
 
@@ -30,6 +27,8 @@ const allowedKeysExternal = new Set(['username', 'namespace', 'role', 'name', 'e
 const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
 const shares = require('./shares');
 const contextHelpers = require('../lib/context-helpers');
+
+const saltRounds = 10;
 
 function hash(entity) {
     return hasher.hash(filterObject(entity, hashKeys));
@@ -86,7 +85,7 @@ async function serverValidate(context, data, isOwnAccount) {
         const user = await knex('users').select(['id', 'password']).where('id', data.id).first();
 
         result.currentPassword = {};
-        result.currentPassword.incorrect = !await bcryptCompare(data.currentPassword, user.password);
+        result.currentPassword.incorrect = !await bcrypt.compare(data.currentPassword, user.password);
     }
 
     if (data.email) {
@@ -157,7 +156,7 @@ async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
             throw new Error('Invalid password');
         }
 
-        entity.password = await bcryptHash(entity.password, null, null);
+        entity.password = await bcrypt.hash(entity.password, saltRounds);
     } else {
         delete entity.password;
     }

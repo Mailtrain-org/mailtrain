@@ -22,7 +22,6 @@ const api = require('./routes/api');
 // These are routes for the new React-based client
 const quickReports = require('./routes/quick-reports');
 const subscriptions = require('./routes/subscriptions');
-const campaigns = require('./routes/campaigns');
 const subscription = require('./routes/subscription');
 const sandboxedMosaico = require('./routes/sandboxed-mosaico');
 const sandboxedCodeEditor = require('./routes/sandboxed-codeeditor');
@@ -274,8 +273,6 @@ async function createApp(appType) {
         useWith404Fallback('/archive', archive);
         useWith404Fallback('/files', files);
     }
-
-    useWith404Fallback('/cpgs', await campaigns.getRouter(appType)); // This needs to be different from "campaigns", which is already used by the UI
 
     useWith404Fallback('/mosaico', await sandboxedMosaico.getRouter(appType));
     useWith404Fallback('/codeeditor', await sandboxedCodeEditor.getRouter(appType));

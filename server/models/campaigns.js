@@ -18,7 +18,6 @@ const subscriptions = require('./subscriptions');
 const segments = require('./segments');
 const senders = require('../lib/senders');
 const links = require('./links');
-const feedcheck = require('../lib/feedcheck');
 const contextHelpers = require('../lib/context-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
 const messageSender = require('../lib/message-sender');
@@ -31,15 +30,13 @@ const allowedKeysCommon = ['name', 'description', 'namespace', 'channel',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
 
 const allowedKeysCreate = new Set(['type', 'source', ...allowedKeysCommon]);
-const allowedKeysCreateRssEntry = new Set(['type', 'source', 'parent', ...allowedKeysCommon]);
 const allowedKeysUpdate = new Set([...allowedKeysCommon]);
 
 const Content = {
     ALL: 0,
     WITHOUT_SOURCE_CUSTOM: 1,
     ONLY_SOURCE_CUSTOM: 2,
-    RSS_ENTRY: 3,
-    SETTINGS_WITH_STATS: 4
+    SETTINGS_WITH_STATS: 3
 };
 
 function hash(entity, content) {
@@ -389,7 +386,7 @@ async function getByIdTx(tx, context, id, withPermissions = true, content = Cont
 
     let entity = await rawGetByTx(tx, 'id', id);
 
-    if (content === Content.ALL || content === Content.RSS_ENTRY) {
+    if (content === Content.ALL) {
         // Return everything
 
     } else if (content === Content.SETTINGS_WITH_STATS) {
@@ -444,7 +441,7 @@ async function getByCid(context, cid) {
 }
 
 async function _validateAndPreprocess(tx, context, entity, isCreate, content) {
-    if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM || content === Content.RSS_ENTRY) {
+    if (content === Content.ALL || content === Content.WITHOUT_SOURCE_CUSTOM) {
         await namespaceHelpers.validateEntity(tx, entity);
 
         if (isCreate) {
@@ -559,10 +556,6 @@ async function create(context, entity) {
     return await knex.transaction(async tx => {
         return await _createTx(tx, context, entity, Content.ALL);
     });
-}
-
-async function createRssTx(tx, context, entity) {
-    return await _createTx(tx, context, entity, Content.RSS_ENTRY);
 }
 
 async function _validateChannelMoveTx(tx, context, entity, existing) {
@@ -987,10 +980,6 @@ async function testSend(context, data) {
                 attachments: []
             };
 
-            if (campaign.type === CampaignType.RSS) {
-                messageData.rssEntry = await feedcheck.getEntryForPreview(campaign.data.feedUrl);
-            }
-
             const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', campaignId);
             for (const attachment of attachments) {
                 messageData.attachments.push({
@@ -1062,21 +1051,6 @@ async function testSend(context, data) {
     senders.scheduleCheck();
 }
 
-async function getRssPreview(context, campaignCid, listCid, subscriptionCid) {
-    const campaign = await getByCid(context, campaignCid);
-    await shares.enforceEntityPermission(context, 'campaign', campaign.id, 'view');
-
-    enforce(campaign.type === CampaignType.RSS);
-
-    const settings = {
-        campaign, // this prevents message sender from fetching the campaign again
-        rssEntry: await feedcheck.getEntryForPreview(campaign.data.feedUrl)
-    };
-
-    return await messageSender.getMessage(campaignCid, listCid, subscriptionCid, settings, true);
-}
-
-
 module.exports.Content = Content;
 module.exports.hash = hash;
 
@@ -1096,7 +1070,6 @@ module.exports.getByIdTx = getByIdTx;
 module.exports.getById = getById;
 module.exports.getByCid = getByCid;
 module.exports.create = create;
-module.exports.createRssTx = createRssTx;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
 module.exports.enforceSendPermissionTx = enforceSendPermissionTx;
@@ -1121,7 +1094,4 @@ module.exports.rawGetByTx = rawGetByTx;
 module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
 module.exports.getStatisticsOpened = getStatisticsOpened;
 
-module.exports.fetchRssCampaign = fetchRssCampaign;
-
 module.exports.testSend = testSend;
-module.exports.getRssPreview = getRssPreview;

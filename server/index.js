@@ -7,7 +7,6 @@ const translate = require('./lib/translate');
 const http = require('http');
 const gdprCleanup = require('./services/gdpr-cleanup');
 const importer = require('./lib/importer');
-const feedcheck = require('./lib/feedcheck');
 const verpServer = require('./services/verp-server');
 const testServer = require('./services/test-server');
 const postfixBounceServer = require('./services/postfix-bounce-server');
@@ -22,7 +21,7 @@ const {promisify} = require("node:util");
 
 const { uploadedFilesDir } = require('./lib/file-helpers');
 const { filesDir } = require('./models/files');
-const {initDb} = require("./lib/dbupdate");
+const { initDb } = require("./lib/dbupdate");
 
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
@@ -102,7 +101,6 @@ async function init() {
     tzupdate.start();
 
     await importer.spawn();
-    await feedcheck.spawn();
     await senders.spawn();
 
     gdprCleanup.start();

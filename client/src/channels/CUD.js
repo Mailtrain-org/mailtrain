@@ -62,8 +62,7 @@ export default class CUD extends Component {
             [CampaignSource.CUSTOM]: t('customContent'),
             [CampaignSource.CUSTOM_FROM_CAMPAIGN]: t('customContentClonedFromAnotherCampaign'),
             [CampaignSource.TEMPLATE]: t('template'),
-            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate'),
-            [CampaignSource.URL]: t('url')
+            [CampaignSource.CUSTOM_FROM_TEMPLATE]: t('customContentClonedFromTemplate')
         };
 
         const sourceLabelsOrder = [
@@ -168,9 +167,6 @@ export default class CUD extends Component {
         data.data_sourceCustom_data = {};
 
         Object.assign(data, this.templateTypes[mailtrainConfig.editors[0]].initData());
-
-        // This is for CampaignSource.URL
-        data.data_sourceUrl = '';
     }
 
     getFormValuesMutator(data) {
@@ -188,9 +184,6 @@ export default class CUD extends Component {
             data.data_sourceCustom_data = data.data.sourceCustom.data;
 
             this.templateTypes[data.data.sourceCustom.type].afterLoad(data);
-
-        } else if (data.source === CampaignSource.URL) {
-            data.data_sourceUrl = data.data.sourceUrl
         }
 
         for (const overridable of campaignOverridables) {
@@ -228,9 +221,6 @@ export default class CUD extends Component {
                 tag_language: data.data_sourceCustom_tag_language,
                 data: data.data_sourceCustom_data,
             }
-
-        } else if (data.source === CampaignSource.URL) {
-            data.data.sourceUrl = data.data_sourceUrl;
         }
 
         for (const overridable of campaignOverridables) {
@@ -327,11 +317,6 @@ export default class CUD extends Component {
 
             if (customTemplateTypeKey) {
                 this.templateTypes[customTemplateTypeKey].validate(state);
-            }
-
-        } else if (sourceTypeKey === CampaignSource.URL) {
-            if (!state.getIn(['data_sourceUrl', 'value'])) {
-                state.setIn(['data_sourceUrl', 'error'], t('urlMustNotBeEmpty'));
             }
         }
 
@@ -484,9 +469,6 @@ export default class CUD extends Component {
 
                 {customTemplateTypeForm}
             </div>;
-
-        } else if (sourceTypeKey === CampaignSource.URL) {
-            templateEdit = <InputField id="data_sourceUrl" label={t('renderUrl')} help={t('ifAMessageIsSentThenThisUrlWillBePosTed')}/>
         }
 
         return (

@@ -66,7 +66,7 @@ export default class CUD extends Component {
         };
 
         const sourceLabelsOrder = [
-            CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN , CampaignSource.TEMPLATE, CampaignSource.CUSTOM_FROM_TEMPLATE, CampaignSource.URL
+            CampaignSource.CUSTOM, CampaignSource.CUSTOM_FROM_CAMPAIGN , CampaignSource.TEMPLATE, CampaignSource.CUSTOM_FROM_TEMPLATE
         ];
 
         this.sourceOptions = [];
@@ -163,10 +163,6 @@ export default class CUD extends Component {
             data.data_sourceTemplate = data.data.sourceTemplate;
         }
 
-        if (data.source === CampaignSource.URL) {
-            data.data_sourceUrl = data.data.sourceUrl;
-        }
-
         for (const overridable of campaignOverridables) {
             if (data[overridable + '_override'] === null) {
                 data[overridable + '_override'] = '';
@@ -206,10 +202,6 @@ export default class CUD extends Component {
                 html: data.data_sourceCustom_html,
                 text: data.data_sourceCustom_text
             }
-        }
-
-        if (data.source === CampaignSource.URL) {
-            data.data.sourceUrl = data.data_sourceUrl;
         }
 
         for (const overridable of campaignOverridables) {
@@ -255,9 +247,6 @@ export default class CUD extends Component {
             data.data_sourceCustom_text = '';
 
             Object.assign(data, this.templateTypes[mailtrainConfig.editors[0]].initData());
-
-            // This is for CampaignSource.URL
-            data.data_sourceUrl = '';
 
             if (this.props.createFromChannel) {
                 const channel = this.props.createFromChannel;
@@ -309,8 +298,6 @@ export default class CUD extends Component {
 
                     this.templateTypes[channel.data.sourceCustom.type].afterLoad(data);
 
-                } else if (channel.source === CampaignSource.URL) {
-                    data.data_sourceUrl = channel.data.sourceUrl
                 }
 
 
@@ -357,9 +344,6 @@ export default class CUD extends Component {
                     data.source = CampaignSource.TEMPLATE;
                     data.data_sourceTemplate = sourceCampaign.data.sourceTemplate;
 
-                } else if (sourceCampaign.source === CampaignSource.URL) {
-                    data.source = CampaignSource.URL;
-                    data.data_sourceUrl = sourceCampaign.data.sourceUrl;
                 }
 
             } else {
@@ -444,11 +428,6 @@ export default class CUD extends Component {
 
             if (customTemplateTypeKey) {
                 this.templateTypes[customTemplateTypeKey].validate(state);
-            }
-
-        } else if (sourceTypeKey === CampaignSource.URL) {
-            if (!state.getIn(['data_sourceUrl', 'value'])) {
-                state.setIn(['data_sourceUrl', 'error'], t('urlMustNotBeEmpty'));
             }
         }
 
@@ -643,9 +622,6 @@ export default class CUD extends Component {
 
                 {customTemplateTypeForm}
             </div>;
-
-        } else if (sourceTypeKey === CampaignSource.URL) {
-            templateEdit = <InputField id="data_sourceUrl" label={t('renderUrl')} help={t('ifAMessageIsSentThenThisUrlWillBePosTed')}/>
         }
 
         return (

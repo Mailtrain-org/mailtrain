@@ -4,10 +4,7 @@ const log = require('../lib/log');
 const dbcheck = require('../lib/dbcheck');
 const knex = require('../lib/knex');
 const {getAdminId} = require("../../shared/users");
-const bcrypt = require('bcrypt-nodejs');
-const {promisify} = require("node:util");
-
-const bcryptHash = promisify(bcrypt.hash.bind(bcrypt));
+const bcrypt = require('bcrypt');
 
 async function init() {
     const args = process.argv.slice(2);
@@ -24,7 +21,7 @@ async function init() {
     await knex.migrate.latest();
 
 
-    const hashedPasswd = await bcryptHash(passwd, null, null);
+    const hashedPasswd = await bcrypt.hash(passwd, 10);
     await knex('users').where({id: getAdminId()}).update({password: hashedPasswd});
 
     if (accessToken !== '') {

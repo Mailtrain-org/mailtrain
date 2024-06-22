@@ -7,9 +7,8 @@ const CampaignSource = {
     CUSTOM: 2,
     CUSTOM_FROM_TEMPLATE: 3,
     CUSTOM_FROM_CAMPAIGN: 4,
-    URL: 5,
 
-    MAX: 5
+    MAX: 4
 };
 
 const CampaignStatus = {

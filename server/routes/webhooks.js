@@ -1,7 +1,7 @@
 'use strict';
 
 const router = require('../lib/router-async').create();
-const request = require('request-promise');
+const axios = require('axios');
 const campaigns = require('../models/campaigns');
 const sendConfigurations = require('../models/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
@@ -21,7 +21,7 @@ router.postAsync('/aws', async (req, res) => {
 
         case 'SubscriptionConfirmation':
             if (req.body.SubscribeURL) {
-                await request(req.body.SubscribeURL);
+                await axios.get(req.body.SubscribeURL);
                 break;
             } else {
                 const err = new Error('SubscribeURL not set');
