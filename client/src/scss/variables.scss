@@ -1,8 +1,4 @@
-$table-cell-padding: .5rem;
-$input-border-color: #adb5bd;
+@import "./custom-variables.scss";
+@import "@coreui/coreui/scss/functions.scss";
+@import "@coreui/coreui/scss/variables.scss";
 
-$breadcrumb-bg: #f6f7f8;
-
-$navbar-dark-color: rgba(#fff, .75) !default;
-$navbar-dark-hover-color: #fff !default;
-$navbar-active-color: #fff;

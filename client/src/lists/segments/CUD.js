@@ -21,7 +21,7 @@ import styles from "./CUD.scss";
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
-import SortableTree from "react-sortable-tree";
+import SortableTree from "@nosferatu500/react-sortable-tree";
 import 'react-sortable-tree/style.css';
 import {ActionLink, Button, Icon} from "../../lib/bootstrap-components";
 import {getRuleHelpers} from "./helpers";

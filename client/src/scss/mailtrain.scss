@@ -6,7 +6,7 @@ $font-family-monospace: 'Ubuntu Mono', monospace;
 $fa-font-path: "../static-npm/fontawesome";
 $enable-print-styles: false;
 
-@import "./variables.scss";
+@import "./custom-variables.scss";
 @import "@coreui/coreui/scss/coreui.scss";
 @import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
 @import "@fortawesome/fontawesome-free/scss/regular.scss";
