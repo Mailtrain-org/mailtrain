@@ -17,8 +17,10 @@ import ACEEditorRaw from 'react-ace';
 import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/ext-searchbox';
 
-import DayPicker from 'react-day-picker';
-import 'react-day-picker/lib/style.css';
+import {DayPicker} from 'react-day-picker';
+// TODO: Uncomment if the day picker does not work, delete otherwise
+// import 'react-day-picker/dist/style.css';
+
 import {
     birthdayYear,
     DateFormat,

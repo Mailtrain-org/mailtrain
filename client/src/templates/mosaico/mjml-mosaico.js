@@ -1,12 +1,17 @@
 'use strict';
 
-import htmlparser from 'htmlparser2'
+import {Parser} from 'htmlparser2'
 import min from 'lodash/min';
 import {BodyComponent, HeadComponent, MJML} from "../../lib/mjml";
-import shortid from "shortid";
 
+let idAlphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 function getId() {
-    return shortid.generate();
+    let res = '';
+    for (let i = 0; i < 10; i++) {
+        res += idAlphabet[Math.floor(Math.random() * idAlphabet.length)];
+    }
+
+    return res;
 }
 
 const parents = [];
@@ -30,7 +35,7 @@ function handleMosaicoAttributes(block, src) {
     let newSrc = src;
     let offset = 0;
 
-    const parser = new htmlparser.Parser(
+    const parser = new Parser(
         {
             onopentag: (name, attrs) => {
                 const fragment = src.substring(parser.startIndex, parser.endIndex);

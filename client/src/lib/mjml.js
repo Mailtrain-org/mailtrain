@@ -2,7 +2,7 @@
 
 import {isArray, mergeWith} from 'lodash';
 import kebabCase from 'lodash/kebabCase';
-import mjml2html, {BodyComponent, components, defaultSkeleton, dependencies, HeadComponent} from "mjml4-in-browser";
+import mjml2html, {BodyComponent, components, defaultSkeleton, dependencies, HeadComponent} from "mjml-browser";
 
 export { BodyComponent, HeadComponent };
 
