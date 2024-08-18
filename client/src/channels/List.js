@@ -8,7 +8,8 @@ import {withErrorHandling} from '../lib/error-handling';
 import {Table} from '../lib/table';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
+import * as campaignsStyles from "../campaigns/styles.scss";
 import PropTypes from 'prop-types';
 
 @withComponentMixins([
@@ -54,7 +55,7 @@ export default class List extends Component {
             { data: 3, title: t('description') },
             { data: 4, title: t('namespace') },
             {
-                className: styles.tblCol_buttons,
+                className: campaignsStyles.tblCol_buttons,
                 actions: data => {
                     const actions = [];
                     const perms = data[5];

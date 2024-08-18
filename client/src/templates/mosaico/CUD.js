@@ -24,7 +24,7 @@ import mailtrainConfig from 'mailtrainConfig';
 import {getMJMLSample, getVersafix} from "../../../../shared/mosaico-templates";
 import {getTemplateTypes, getTemplateTypesOrder} from "./helpers";
 import {withComponentMixins} from "../../lib/decorator-helpers";
-import styles from "../../lib/styles.scss";
+import * as styles from "../../lib/styles.scss";
 import {getTagLanguages} from "../helpers";
 import {Trans} from "react-i18next";
 

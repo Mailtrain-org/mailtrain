@@ -19,7 +19,7 @@ import {
     tableRestActionDialogInit,
     tableRestActionDialogRender
 } from "../../lib/modals";
-import listStyles from "../styles.scss";
+import * as listStyles from "../styles.scss";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 @withComponentMixins([

@@ -28,8 +28,8 @@ import {DeleteModalDialog} from "../../lib/modals";
 import mailtrainConfig from 'mailtrainConfig';
 import {getTrustedUrl, getUrl} from "../../lib/urls";
 import {ActionLink, Icon} from "../../lib/bootstrap-components";
-import styles from "../../lib/styles.scss";
-import formsStyles from "./styles.scss";
+import * as styles from "../../lib/styles.scss";
+import * as formsStyles from "./styles.scss";
 import axios from "../../lib/axios";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 

@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from './i18n';
 import PropTypes from "prop-types";
-import styles from "./sandboxed-codeeditor.scss";
+import * as styles from "./sandboxed-codeeditor.scss";
 
 import {UntrustedContentHost} from './untrusted';
 import {Icon} from "./bootstrap-components";

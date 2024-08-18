@@ -1,3 +1,6 @@
 [submodule "mvis/ivis-core"]
 	path = mvis/ivis-core
 	url = https://github.com/smartarch/ivis-core.git
+[submodule "client/mjml"]
+	path = client/mjml
+	url = git@github.com:bures/mjml.git

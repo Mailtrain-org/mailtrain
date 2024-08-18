@@ -17,7 +17,7 @@ import {ActionLink, Button, ModalDialog} from "../lib/bootstrap-components";
 import {Trans} from "react-i18next";
 import {renderTag, TagLanguages} from "../../../shared/templates";
 
-import styles from "../lib/styles.scss";
+import * as styles from "../lib/styles.scss";
 import PropTypes from "prop-types";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {withTranslation} from "../lib/i18n";

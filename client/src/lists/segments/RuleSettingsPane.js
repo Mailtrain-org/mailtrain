@@ -9,7 +9,7 @@ import {withErrorHandling} from "../../lib/error-handling";
 import {getRuleHelpers} from "./helpers";
 import {getFieldTypes} from "../fields/helpers";
 
-import styles from "./CUD.scss";
+import * as styles from "./CUD.scss";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 
 @withComponentMixins([

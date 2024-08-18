@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import {TranslationRoot, withTranslation} from './i18n';
 import {parentRPC, UntrustedContentRoot} from './untrusted';
 import PropTypes from "prop-types";
-import styles from "./sandboxed-codeeditor.scss";
+import * as styles from "./sandboxed-codeeditor.scss";
 import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
 import {base, unbase} from "../../../shared/templates";
 import ACEEditorRaw from 'react-ace';
@@ -21,6 +21,7 @@ import mjml2html from "./mjml";
 import juice from "juice";
 
 import {withComponentMixins} from "./decorator-helpers";
+import {createRoot} from "react-dom/client";
 
 const refreshTimeout = 1000;
 
@@ -210,11 +211,12 @@ class CodeEditorSandbox extends Component {
 export default function() {
     parentRPC.init();
 
-    ReactDOM.render(
+    const container = document.getElementById('root');
+    const root = createRoot(container); // createRoot(container!) if you use TypeScript
+    root.render(
         <TranslationRoot>
             <UntrustedContentRoot render={props => <CodeEditorSandbox {...props} />} />
         </TranslationRoot>,
-        document.getElementById('root')
     );
 };
 

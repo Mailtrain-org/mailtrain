@@ -6,7 +6,7 @@ import 'ace-builds/src-noconflict/mode-html'
 import 'ace-builds/src-noconflict/mode-xml'
 import {ContentModalDialog} from "../../lib/modals";
 import mjml2html from "./mjml-mosaico";
-import styles from "../../lib/styles.scss";
+import * as styles from "../../lib/styles.scss";
 
 
 export function getTemplateTypesOrder() {

@@ -11,6 +11,7 @@ import {getPublicUrl, getSandboxUrl, getTrustedUrl} from "./urls";
 import {base, unbase} from "../../../shared/templates";
 import {withComponentMixins} from "./decorator-helpers";
 import juice from "juice";
+import {createRoot} from "react-dom/client";
 
 
 @withComponentMixins([
@@ -216,11 +217,12 @@ class MosaicoSandbox extends Component {
 export default function() {
     parentRPC.init();
 
-    ReactDOM.render(
+    const container = document.getElementById('root');
+    const root = createRoot(container); // createRoot(container!) if you use TypeScript
+    root.render(
         <TranslationRoot>
             <UntrustedContentRoot render={props => <MosaicoSandbox {...props} />} />
         </TranslationRoot>,
-        document.getElementById('root')
     );
 };
 

@@ -21,7 +21,10 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude: path.join(__dirname, 'node_modules'),
+                exclude: [
+                    path.join(__dirname, 'node_modules'),
+                    path.join(__dirname, 'mjml'),
+                ],
                 use: [
                     {
                         loader: 'babel-loader',
@@ -109,7 +112,6 @@ module.exports = {
             patterns: [
                 { from: './node_modules/jquery/dist/jquery.min.js', to: path.resolve(__dirname, 'dist')},
                 { from: './node_modules/bootstrap/dist/js/bootstrap.min.js', to: path.resolve(__dirname, 'dist')},
-                { from: './node_modules/@coreui/coreui/dist/js/coreui.min.js', to: path.resolve(__dirname, 'dist')},
                 { from: './node_modules/@fortawesome/fontawesome-free/webfonts/', to: path.resolve(__dirname, 'dist', 'webfonts'), toType: 'dir' },
             ],
         }),

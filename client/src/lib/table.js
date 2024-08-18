@@ -15,7 +15,7 @@ import axios from './axios';
 
 import {withPageHelpers} from './page'
 import {withAsyncErrorHandler, withErrorHandling} from './error-handling';
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import {getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 

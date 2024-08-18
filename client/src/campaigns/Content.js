@@ -26,7 +26,7 @@ import {
     ResourceType
 } from '../templates/helpers';
 import axios from '../lib/axios';
-import styles from "../lib/styles.scss";
+import * as styles from "../lib/styles.scss";
 import {getUrl} from "../lib/urls";
 import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
 import {withComponentMixins} from "../lib/decorator-helpers";

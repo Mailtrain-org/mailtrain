@@ -24,7 +24,7 @@ import {withErrorHandling} from '../lib/error-handling';
 import {DeleteModalDialog} from '../lib/modals';
 import {getDefaultNamespace, NamespaceSelect, validateNamespace} from '../lib/namespace';
 import {FieldWizard, UnsubscriptionMode} from '../../../shared/lists';
-import styles from "../lib/styles.scss";
+import * as styles from "../lib/styles.scss";
 import {getMailerTypes} from "../send-configurations/helpers";
 import {withComponentMixins} from "../lib/decorator-helpers";
 

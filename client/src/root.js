@@ -3,7 +3,8 @@
 import './lib/public-path';
 
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
 import {TranslationRoot, withTranslation} from './lib/i18n';
 import account from './account/root';
 import login from './login/root';
@@ -25,7 +26,6 @@ import {DropdownActionLink, Icon} from "./lib/bootstrap-components";
 import axios from './lib/axios';
 import {getUrl} from "./lib/urls";
 import {withComponentMixins} from "./lib/decorator-helpers";
-import Update from "./settings/Update";
 
 const topLevelMenuKeys = ['lists', 'channels', 'templates', 'campaigns'];
 
@@ -135,7 +135,12 @@ class Root extends Component {
 }
 
 export default function() {
-    ReactDOM.render(<TranslationRoot><Root/></TranslationRoot>,document.getElementById('root'));
+    const container = document.getElementById('root');
+    const root = createRoot(container); // createRoot(container!) if you use TypeScript
+    root.render(
+        <TranslationRoot>
+            <Root/>
+        </TranslationRoot>
+    );
 };
-
 

@@ -2,13 +2,12 @@
 
 import {isArray, mergeWith} from 'lodash';
 import kebabCase from 'lodash/kebabCase';
-import mjml2html, {BodyComponent, components, defaultSkeleton, dependencies, HeadComponent} from "mjml-browser";
+import mjml2html, {BodyComponent, HeadComponent, presetCore, components, dependencies, assignComponents, assignDependencies, defaultSkeleton} from "mjml-browser";
 
 export { BodyComponent, HeadComponent };
 
-const initComponents = {...components};
-const initDependencies = {...dependencies};
-
+const initComponents = {...presetCore.components};
+const initDependencies = {...presetCore.dependencies};
 
 // MJML uses global state. This class wraps MJML state and provides a custom mjml2html function which sets the right state before calling the original mjml2html
 export class MJML {
@@ -45,11 +44,8 @@ export class MJML {
             Object.assign(obj, src);
         }
 
-        const origComponents = {...components};
-        const origDependencies = {...dependencies};
-
-        setObj(components, this.components);
-        setObj(dependencies, this.dependencies);
+        assignComponents(components, this.components)
+        assignDependencies(dependencies, this.dependencies)
 
         const res = mjml2html(mjml, {
             skeleton: options => {
@@ -59,8 +55,8 @@ export class MJML {
             }
         });
 
-        setObj(components, origComponents);
-        setObj(dependencies, origDependencies);
+        assignComponents(components, presetCore.components)
+        assignDependencies(dependencies, presetCore.dependencies)
 
         return res;
     }
@@ -71,7 +67,6 @@ const mjmlInstance = new MJML();
 export default function defaultMjml2html(src) {
     return mjmlInstance.mjml2html(src);
 }
-
 
 
 

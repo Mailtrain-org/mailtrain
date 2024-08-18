@@ -9,7 +9,7 @@ import {withErrorHandling} from "./error-handling";
 import interoperableErrors from "../../../shared/interoperable-errors";
 import {ActionLink, Button, DismissibleAlert, DropdownActionLink, Icon} from "./bootstrap-components";
 import mailtrainConfig from "mailtrainConfig";
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import {getRoutes, renderRoute, Resolver, SectionContentContext, withPageHelpers} from "./page-common";
 import {getBaseDir, getUrl} from "./urls";
 import {createComponentMixin, withComponentMixins} from "./decorator-helpers";

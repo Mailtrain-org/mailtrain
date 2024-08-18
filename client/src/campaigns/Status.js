@@ -23,10 +23,10 @@ import {getPublicUrl, getSandboxUrl, getUrl} from "../lib/urls";
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {CampaignStatus} from "../../../shared/campaigns";
 import moment from 'moment-timezone';
-import campaignsStyles from "./styles.scss";
+import * as campaignsStyles from "./styles.scss";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {TestSendModalDialog, TestSendModalDialogMode} from "./TestSendModalDialog";
-import styles from "../lib/styles.scss";
+import * as styles from "../lib/styles.scss";
 
 @withComponentMixins([
     withTranslation,

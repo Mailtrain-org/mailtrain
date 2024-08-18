@@ -9,7 +9,7 @@ import axios from '../lib/axios';
 import {Button} from '../lib/bootstrap-components';
 import {getUrl} from "../lib/urls";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import styles from "./styles.scss"
+import * as styles from "./styles.scss"
 
 @withComponentMixins([
     withTranslation,

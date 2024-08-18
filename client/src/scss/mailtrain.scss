@@ -7,7 +7,7 @@ $fa-font-path: "../static-npm/fontawesome";
 $enable-print-styles: false;
 
 @import "./custom-variables.scss";
-@import "@coreui/coreui/scss/coreui.scss";
+@import "bootstrap/scss/bootstrap";
 @import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
 @import "@fortawesome/fontawesome-free/scss/regular.scss";
 @import "@fortawesome/fontawesome-free/scss/solid.scss";
@@ -38,7 +38,7 @@ body.mailtrain {
 
   .mt-breadcrumb-and-tertiary-navbar {
     display: flex;
-    @include border-radius($breadcrumb-border-radius);
+    border-radius: $breadcrumb-border-radius;
     background-color: $breadcrumb-bg;
 
     .breadcrumb {

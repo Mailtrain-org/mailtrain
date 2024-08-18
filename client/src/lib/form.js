@@ -32,7 +32,7 @@ import {
     parseDate
 } from '../../../shared/date';
 
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import moment from "moment";
 import {getUrl} from "./urls";
 import {createComponentMixin, withComponentMixins} from "./decorator-helpers";
@@ -59,14 +59,10 @@ const withFormStateOwner = createComponentMixin({
     }
 });
 
-export function withFormErrorHandlers(target, name, descriptor) {
-    const asyncFn = descriptor.value;
-
-    descriptor.value = async function(...args) {
+export function withFormErrorHandlers(asyncFn) {
+    return async function(...args) {
         await this.formHandleErrors(async () => await asyncFn.apply(this, args));
     };
-
-    return descriptor;
 }
 
 @withComponentMixins([

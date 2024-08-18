@@ -1,6 +1,9 @@
 @import "sandbox-common";
 
 .sandbox {
+  /* This comment ensures that the empty CSS rule is kept through the optimization.
+     It is a placeholder for some potential future settings.
+   */
 }
 
 .aceEditorWithPreview, .aceEditorWithoutPreview, .preview {

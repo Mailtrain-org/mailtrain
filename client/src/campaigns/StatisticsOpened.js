@@ -10,7 +10,7 @@ import {getUrl} from "../lib/urls";
 
 import Chart from 'react-google-charts';
 
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import {Table} from "../lib/table";
 import {Link} from "react-router-dom";
 
@@ -125,7 +125,7 @@ export default class StatisticsOpened extends Component {
             charts = (
                 <div className={styles.charts}>
                     {navPills}
-                    <h4 className={styles.chartTitle}>{t('distributionByDeviceType')}</h4>
+                    <h4 className={styles.sectionTitle}>{t('distributionByDeviceType')}</h4>
                     <Chart
                         width="100%"
                         height="380px"

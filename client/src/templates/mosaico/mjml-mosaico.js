@@ -2,6 +2,7 @@
 
 import {Parser} from 'htmlparser2'
 import min from 'lodash/min';
+
 import {BodyComponent, HeadComponent, MJML} from "../../lib/mjml";
 
 let idAlphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -715,7 +716,7 @@ mjmlInstance.registerDependencies({
 });
 
 mjmlInstance.addToHeader(`
-    <style type="text/css">
+    <style>
         @supports -ko-blockdefs {
             visible { label: Visible?; widget: boolean }
             color { label: Color; widget: color }

@@ -9,7 +9,7 @@ import {Table} from "./table";
 import Dropzone from "react-dropzone";
 import {Icon, ModalDialog} from "./bootstrap-components";
 import axios from './axios';
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import {getPublicUrl, getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 

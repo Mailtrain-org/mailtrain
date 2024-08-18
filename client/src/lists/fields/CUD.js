@@ -28,7 +28,7 @@ import {getFieldTypes} from './helpers';
 import validators from '../../../../shared/validators';
 import slugify from 'slugify';
 import {DateFormat, parseBirthday, parseDate} from '../../../../shared/date';
-import styles from "../../lib/styles.scss";
+import * as styles from "../../lib/styles.scss";
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-handlebars';
 import {withComponentMixins} from "../../lib/decorator-helpers";

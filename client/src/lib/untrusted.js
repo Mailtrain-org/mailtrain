@@ -6,7 +6,7 @@ import {withTranslation} from './i18n';
 import {requiresAuthenticatedUser, withPageHelpers} from "./page";
 import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
 import axios from "./axios";
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import {getSandboxUrl, getUrl, setRestrictedAccessToken} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 

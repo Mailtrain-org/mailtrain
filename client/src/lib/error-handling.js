@@ -53,18 +53,14 @@ export const withErrorHandling = createComponentMixin({
     }
 });
 
-export function withAsyncErrorHandler(target, name, descriptor) {
-    let fn = descriptor.value;
-
-    descriptor.value = async function () {
+export function withAsyncErrorHandler(fn) {
+    return async function (...args) {
         try {
-            await fn.apply(this, arguments)
+            await fn.apply(this, ...args)
         } catch (error) {
             handleError(this, error);
         }
     };
-
-    return descriptor;
 }
 
 export function wrapWithAsyncErrorHandler(self, fn) {

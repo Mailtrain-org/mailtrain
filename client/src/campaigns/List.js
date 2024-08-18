@@ -11,7 +11,7 @@ import {CampaignSource, CampaignStatus} from "../../../shared/campaigns";
 import {getCampaignLabels} from "./helpers";
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import PropTypes from 'prop-types';
 
 @withComponentMixins([

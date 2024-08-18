@@ -27,9 +27,9 @@ import {getMailerTypes} from "./helpers";
 
 import {getSystemSendConfigurationId, MailerType} from "../../../shared/send-configurations";
 
-import styles from "../lib/styles.scss";
+import * as styles from "../lib/styles.scss";
 
-import sendConfigurationsStyles from "./styles.scss";
+import * as sendConfigurationsStyles from "./styles.scss";
 
 import mailtrainConfig from 'mailtrainConfig';
 import {withComponentMixins} from "../lib/decorator-helpers";

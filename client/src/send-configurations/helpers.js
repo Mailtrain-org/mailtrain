@@ -5,7 +5,7 @@ import React from "react";
 import {MailerType, ZoneMTAType} from "../../../shared/send-configurations";
 import {CheckBox, Dropdown, Fieldset, InputField, TextArea} from "../lib/form";
 import {Trans} from "react-i18next";
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import mailtrainConfig from 'mailtrainConfig';
 
 export const mailerTypesOrder = [

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import {Icon, ModalDialog} from "./bootstrap-components";
 import {getUrl} from "./urls";
 import {withPageHelpers} from "./page";
-import styles from './styles.scss';
+import * as styles from './styles.scss';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {Link} from "react-router-dom";
 import {withComponentMixins} from "./decorator-helpers";

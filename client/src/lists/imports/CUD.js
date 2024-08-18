@@ -26,8 +26,8 @@ import {getImportLabels} from './helpers';
 import {ImportSource, inProgress, MappingType, prepInProgress, prepFinished} from '../../../../shared/imports';
 import axios from "../../lib/axios";
 import {getUrl} from "../../lib/urls";
-import listStyles from "../styles.scss";
-import styles from "../../lib/styles.scss";
+import * as listStyles from "../styles.scss";
+import * as styles from "../../lib/styles.scss";
 import interoperableErrors from "../../../../shared/interoperable-errors";
 import {withComponentMixins} from "../../lib/decorator-helpers";
 

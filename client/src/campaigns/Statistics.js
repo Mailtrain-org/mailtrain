@@ -11,7 +11,7 @@ import {getUrl} from "../lib/urls";
 import {AlignedRow} from "../lib/form";
 import {Icon} from "../lib/bootstrap-components";
 
-import styles from "./styles.scss";
+import * as styles from "./styles.scss";
 import {Link} from "react-router-dom";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
