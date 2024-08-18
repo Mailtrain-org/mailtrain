@@ -89,7 +89,7 @@ export default class API extends Component {
 <div className="accordion" id="apicalls">
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moresubscribers"><h4>GET /api/subscriptions/:listCid – {t('getSubscribers')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moresubscribers"><h4>GET /api/subscriptions/:listCid – {t('getSubscribers')}</h4></button>
         </div>
         <div id="moresubscribers" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -120,7 +120,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <h4><button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moresubscribe"><h4>POST /api/subscribe/:listCid – {t('addSubscription')}</h4></button></h4>
+          <h4><button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moresubscribe"><h4>POST /api/subscribe/:listCid – {t('addSubscription')}</h4></button></h4>
         </div>
         <div id="moresubscribe" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -177,7 +177,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moreunsubscribe"><h4>POST /api/unsubscribe/:listCId – {t('removeSubscription')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moreunsubscribe"><h4>POST /api/unsubscribe/:listCId – {t('removeSubscription')}</h4></button>
         </div>
         <div id="moreunsubscribe" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -216,7 +216,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moredelete"><h4>POST /api/delete/:listCId – {t('deleteSubscription')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moredelete"><h4>POST /api/delete/:listCId – {t('deleteSubscription')}</h4></button>
         </div>
         <div id="moredelete" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -254,7 +254,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#morefield"><h4>POST /api/field/:listId – {t('addNewCustomField')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#morefield"><h4>POST /api/field/:listId – {t('addNewCustomField')}</h4></button>
         </div>
         <div id="morefield" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -312,7 +312,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moreblacklistget"><h4>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moreblacklistget"><h4>GET /api/blacklist/get – {t('getListOfBlacklistedEmails')}</h4></button>
         </div>
         <div id="moreblacklistget" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -344,7 +344,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moreblacklistadd"><h4>POST /api/blacklist/add – {t('addEmailToBlacklist')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moreblacklistadd"><h4>POST /api/blacklist/add – {t('addEmailToBlacklist')}</h4></button>
         </div>
         <div id="moreblacklistadd" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -377,7 +377,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moreblacklistdelete"><h4>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moreblacklistdelete"><h4>POST /api/blacklist/delete – {t('deleteEmailFromBlacklist')}</h4></button>
         </div>
         <div id="moreblacklistdelete" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -410,7 +410,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#morelistsemail"><h4>GET /api/lists/:email – {t('getTheListsAUserHasSubscribedTo')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#morelistsemail"><h4>GET /api/lists/:email – {t('getTheListsAUserHasSubscribedTo')}</h4></button>
         </div>
         <div id="morelistsemail" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -435,7 +435,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#morelistsnamespace"><h4>GET /api/lists-by-namespace/:namespaceId – {t('getTheListsInANamespace')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#morelistsnamespace"><h4>GET /api/lists-by-namespace/:namespaceId – {t('getTheListsInANamespace')}</h4></button>
         </div>
         <div id="morelistsnamespace" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -460,7 +460,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#morecreatelist"><h4>POST /api/list – {t('createList')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#morecreatelist"><h4>POST /api/list – {t('createList')}</h4></button>
         </div>
         <div id="morecreatelist" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -532,7 +532,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moredeletelist"><h4>DELETE /api/list/:listCId – {t('deleteList')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moredeletelist"><h4>DELETE /api/list/:listCId – {t('deleteList')}</h4></button>
         </div>
         <div id="moredeletelist" className="collapse" data-parent="#apicalls">
             <div className="card-body">
@@ -561,7 +561,7 @@ export default class API extends Component {
     </div>
     <div className="card">
         <div className="card-header">
-          <button type="button" className="btn btn-link" data-toggle="collapse" data-target="#moretemplate"><h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4></button>
+          <button type="button" className="btn btn-link" data-bs-toggle="collapse" data-bs-target="#moretemplate"><h4>POST /api/templates/:templateId/send – {t('sendTransactionalEmail')}</h4></button>
         </div>
         <div id="moretemplate" className="collapse" data-parent="#apicalls">
             <div className="card-body">

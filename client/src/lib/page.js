@@ -164,7 +164,7 @@ function getLoadingMessage(t) {
     );
 }
 
-function renderFrameWithContent(t, panelInFullScreen, showSidebar, primaryMenu, secondaryMenu, content) {
+function renderFrameWithContent(t, panelInFullScreen, primaryMenu, content) {
     if (panelInFullScreen) {
         return (
             <div key="app" className="app panel-in-fullscreen">
@@ -178,18 +178,12 @@ function renderFrameWithContent(t, panelInFullScreen, showSidebar, primaryMenu, 
 
     } else {
         return (
-            <div key="app" className={"app " + (showSidebar ? 'sidebar-lg-show' : '')}>
+            <div key="app" className="app">
                 <header key="appHeader" className="app-header">
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                        {showSidebar &&
-                        <button className="navbar-toggler sidebar-toggler" data-toggle="sidebar-show" type="button">
-                            <span className="navbar-toggler-icon"/>
-                        </button>
-                        }
-
                         <Link className="navbar-brand" to="/"><div><Icon icon="envelope"/> Mailtrain</div></Link>
 
-                        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mtMainNavbar" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"/>
                         </button>
 
@@ -200,18 +194,13 @@ function renderFrameWithContent(t, panelInFullScreen, showSidebar, primaryMenu, 
                 </header>
 
                 <div key="appBody" className="app-body">
-                    {showSidebar &&
-                    <div key="sidebar" className="sidebar">
-                        {secondaryMenu}
-                    </div>
-                    }
                     <main key="main" className="main">
                         {content}
                     </main>
                 </div>
 
                 <footer key="appFooter" className="app-footer">
-                    <div className="text-muted">&copy; 2020 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
+                    <div className="text-muted">&copy; 2024 <a href="https://mailtrain.org">Mailtrain.org</a>, <a href="mailto:info@mailtrain.org">info@mailtrain.org</a>. <a href="https://github.com/Mailtrain-org/mailtrain">{t('sourceOnGitHub')}</a></div>
                 </footer>
             </div>
         );
@@ -229,12 +218,6 @@ class PanelRoute extends Component {
             panelInFullScreen: props.route.panelInFullScreen
         };
 
-        this.sidebarAnimationNodeListener = evt => {
-            if (evt.propertyName === 'left') {
-                this.forceUpdate();
-            }
-        };
-
         this.setPanelInFullScreen = panelInFullScreen => this.setState({ panelInFullScreen });
     }
 
@@ -245,32 +228,15 @@ class PanelRoute extends Component {
         flashMessage: PropTypes.object
     }
 
-    registerSidebarAnimationListener() {
-        if (this.sidebarAnimationNode) {
-            this.sidebarAnimationNode.addEventListener("transitionend", this.sidebarAnimationNodeListener);
-        }
-    }
-
-    componentDidMount() {
-        this.registerSidebarAnimationListener();
-    }
-
-    componentDidUpdate(prevProps) {
-        this.registerSidebarAnimationListener();
-    }
-
     render() {
         const t = this.props.t;
         const route = this.props.route;
         const params = this.props.match.params;
 
-        const showSidebar = !!route.secondaryMenuComponent;
-
         const panelInFullScreen = this.state.panelInFullScreen;
 
         const render = (resolved, permissions) => {
             let primaryMenu = null;
-            let secondaryMenu = null;
             let content = null;
 
             if (resolved && permissions) {
@@ -292,10 +258,6 @@ class PanelRoute extends Component {
 
                 if (route.primaryMenuComponent) {
                     primaryMenu = React.createElement(route.primaryMenuComponent, compProps);
-                }
-
-                if (route.secondaryMenuComponent) {
-                    secondaryMenu = React.createElement(route.secondaryMenuComponent, compProps);
                 }
 
                 const panelContent = (
@@ -323,7 +285,7 @@ class PanelRoute extends Component {
                 content = getLoadingMessage(t);
             }
 
-            return renderFrameWithContent(t, panelInFullScreen, showSidebar, primaryMenu, secondaryMenu, content);
+            return renderFrameWithContent(t, panelInFullScreen, primaryMenu, content);
         };
 
 
@@ -689,11 +651,11 @@ export class NavDropdown extends Component {
         return (
             <li className={className}>
                 {props.icon ?
-                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         <Icon icon={props.icon}/>{' '}{props.label}
                     </a>
                     :
-                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {props.label}
                     </a>
                 }
@@ -740,7 +702,7 @@ export function getLanguageChooser(t) {
     const currentLngCode = getLang(i18n.language).getShortLabel(t);
 
     const languageChooser = (
-        <NavDropdown menuClassName="dropdown-menu-right" label={currentLngCode}>
+        <NavDropdown menuClassName="dropdown-menu-end" label={currentLngCode}>
             {languageOptions}
         </NavDropdown>
     );

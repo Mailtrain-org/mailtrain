@@ -19,6 +19,12 @@ $enable-print-styles: false;
 body.mailtrain {
   background-color: white;
 
+  a {
+    color: #20a8d8;
+    text-decoration: none;
+    background-color: transparent;
+  }
+
   &.sandbox {
     overflow-x: hidden;
   }
@@ -34,21 +40,47 @@ body.mailtrain {
 
   .dropdown-item {
     border-bottom: none 0px;
+    color: #23282c;
   }
 
   .mt-breadcrumb-and-tertiary-navbar {
     display: flex;
     border-radius: $breadcrumb-border-radius;
     background-color: $breadcrumb-bg;
+    border-bottom: 1px solid #c8ced3;
+    margin-bottom: 1.5rem;
 
     .breadcrumb {
       border: 0px none;
       margin-bottom: 0px;
-      padding-top: 11px;
-      padding-bottom: 12px;
-    }
+      padding: 11px 1rem 12px;
 
-    margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      background-color: #f6f7f8;
+    }
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .app-body {
+    flex-grow: 1;
+  }
+
+  .app-footer {
+    flex: 0 0 50px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0 1rem;
+    color: #23282c;
+    background: #f0f3f5;
+    border-top: 1px solid #c8ced3;
   }
 
   @include media-breakpoint-down(md) {
@@ -62,15 +94,18 @@ body.mailtrain {
   }
 
   .app-header {
+    flex: 0 0 55px;
 
     .navbar {
       padding: 0 15px;
 
       .navbar-brand {
-        // width: $sidebar-width - 30px;
-        width: 130px; // We don't use sidebar yet, so no need to align with it.
-
+        width: 130px;
+        height: 55px;
+        align-items: center;
+        display: inline-flex;
         justify-content: left;
+        color: #fff;
 
         @include media-breakpoint-down(md) {
           // This is to keep the title and the menu buttons in order. Normally the brand is position: absolute which distorts the order
@@ -111,6 +146,7 @@ body.mailtrain {
       .nav-item {
         .nav-link {
           padding: 0px;
+          color: rgba(255, 255, 255, 0.75);
         }
 
         @include media-breakpoint-up(lg) {
@@ -164,3 +200,6 @@ body.mailtrain {
   font-family: monospace;
 }
 
+.form-group {
+  margin-bottom: 1rem;
+}

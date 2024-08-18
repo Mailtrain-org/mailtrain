@@ -56,7 +56,7 @@ export const withErrorHandling = createComponentMixin({
 export function withAsyncErrorHandler(fn) {
     return async function (...args) {
         try {
-            await fn.apply(this, ...args)
+            await fn.apply(this, args)
         } catch (error) {
             handleError(this, error);
         }

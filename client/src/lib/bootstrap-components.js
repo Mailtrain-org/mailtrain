@@ -136,7 +136,7 @@ export class ButtonDropdown extends Component {
 
         return (
             <div className={className}>
-                <button type="button" className={buttonClassName} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{icon}{iconSpacer}{props.label}</button>
+                <button type="button" className={buttonClassName} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{icon}{iconSpacer}{props.label}</button>
                 <ul className={menuClassName}>{props.children}</ul>
             </div>
         );
@@ -154,7 +154,7 @@ export class ActionLink extends Component {
     }
 
     @withAsyncErrorHandler
-    async onClick(evt) {
+    async onClick(evt, ...args) {
         if (this.props.onClickAsync) {
             evt.preventDefault();
             evt.stopPropagation();
@@ -183,12 +183,14 @@ export class DropdownActionLink extends Component {
     render() {
         const props = this.props;
 
-        let clsName = "dropdown-item ";
+        let clsName = "dropdown-item";
         if (props.disabled) {
-            clsName += "disabled ";
+            clsName += " disabled";
         }
 
-        clsName += props.className;
+        if (props.className) {
+            clsName += " " + props.className;
+        }
 
         return (
             <ActionLink className={clsName} onClickAsync={props.onClickAsync}>{props.children}</ActionLink>

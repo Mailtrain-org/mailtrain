@@ -238,6 +238,7 @@ async function createApp(appType) {
 
     useWith404Fallback('/static-npm/fontawesome', express.static(path.join(__dirname, '..', 'client', 'dist', 'webfonts')));
     useWith404Fallback('/static-npm/jquery.min.js', express.static(path.join(__dirname, '..', 'client', 'dist', 'jquery.min.js')));
+    useWith404Fallback('/static-npm/popper.min.js', express.static(path.join(__dirname, '..', 'client', 'dist', 'popper.min.js')));
     useWith404Fallback('/static-npm/bootstrap.min.js', express.static(path.join(__dirname, '..', 'client', 'dist', 'bootstrap.min.js')));
 
 

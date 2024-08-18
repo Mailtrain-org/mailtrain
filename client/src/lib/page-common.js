@@ -144,7 +144,7 @@ async function resolve(route, match, prevResolverState) {
 }
 
 export function getRoutes(structure, parentRoute) {
-    function _getRoutes(urlPrefix, resolve, checkPermissions, parents, structure, navs, primaryMenuComponent, secondaryMenuComponent) {
+    function _getRoutes(urlPrefix, resolve, checkPermissions, parents, structure, navs, primaryMenuComponent) {
         let routes = [];
         for (let routeKey in structure) {
             const entry = structure[routeKey];
@@ -201,7 +201,6 @@ export function getRoutes(structure, parentRoute) {
                 panelComponent: entry.panelComponent,
                 panelRender: entry.panelRender,
                 primaryMenuComponent: (entry.primaryMenuComponent || entry.primaryMenuComponent === null) ? entry.primaryMenuComponent : primaryMenuComponent,
-                secondaryMenuComponent: (entry.secondaryMenuComponent || entry.secondaryMenuComponent === null) ? entry.secondaryMenuComponent : secondaryMenuComponent,
                 title: entry.title,
                 link: entry.link,
                 panelInFullScreen: entry.panelInFullScreen,
@@ -230,12 +229,12 @@ export function getRoutes(structure, parentRoute) {
                     const childNavs = [...entryNavs];
                     childNavs[navKeyIdx] = Object.assign({}, childNavs[navKeyIdx], { active: true });
 
-                    routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, { [navKey]: nav }, childNavs, route.primaryMenuComponent, route.secondaryMenuComponent));
+                    routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, { [navKey]: nav }, childNavs, route.primaryMenuComponent));
                 }
             }
 
             if (entry.children) {
-                routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, entry.children, entryNavs, route.primaryMenuComponent, route.secondaryMenuComponent));
+                routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, entry.children, entryNavs, route.primaryMenuComponent));
             }
         }
 
@@ -255,7 +254,7 @@ export function getRoutes(structure, parentRoute) {
             children: { ...(routeSpec.children || {}), ...(structure.children || {}) }
         };
 
-        return _getRoutes(parentRoute.urlPrefix, parentRoute.resolve, parentRoute.checkPermissions, parentRoute.parents, { [parentRoute.routeKey]: extStructure }, parentRoute.siblingNavs, parentRoute.primaryMenuComponent, parentRoute.secondaryMenuComponent);
+        return _getRoutes(parentRoute.urlPrefix, parentRoute.resolve, parentRoute.checkPermissions, parentRoute.parents, { [parentRoute.routeKey]: extStructure }, parentRoute.siblingNavs, parentRoute.primaryMenuComponent);
 
     } else {
         return _getRoutes('', {}, {}, [], { "": structure }, [], null, null);
