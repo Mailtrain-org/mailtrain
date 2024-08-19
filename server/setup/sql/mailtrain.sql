@@ -719,7 +719,8 @@ INSERT INTO `settings` VALUES
 (53,'adminEmail','admin@example.com'),
 (54,'defaultHomepage','http://localhost:3000/'),
 (55,'pgpPassphrase',''),
-(56,'pgpPrivateKey','');
+(56,'pgpPrivateKey',''),
+(57,'mapsApiKey','');
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `shares_campaign` (

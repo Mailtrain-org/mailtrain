@@ -5,3 +5,12 @@ textarea.dkimPrivateKey {
 .overridableCheckbox {
   margin-top: -8px !important;
 }
+
+.extraThrottlingMailerSettings {
+  .enableByDay {
+    :global .form-group {
+      margin-bottom: 0px;
+    }
+    margin-bottom: 1rem;
+  }
+}

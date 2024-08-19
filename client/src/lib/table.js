@@ -344,7 +344,7 @@ class Table extends Component {
           "sSearch":         t("search"),
           "sZeroRecords":    t("noMatchingRecordsFound"),
           "oPaginate": {
-            "sFirst":    t("firs"),
+            "sFirst":    t("first"),
             "sLast":     t("last"),
             "sNext":     t("next"),
             "sPrevious": t("previous")

@@ -9,7 +9,6 @@ const passwordValidator = require('../../shared/password-validator')();
 const dtHelpers = require('../lib/dt-helpers');
 const tools = require('../lib/tools');
 const crypto = require('crypto');
-const settings = require('./settings');
 const {getTrustedUrl} = require('../lib/urls');
 const { tUI } = require('../lib/translate');
 const messageSender = require('../lib/message-sender');
@@ -210,7 +209,7 @@ async function updateWithConsistencyCheck(context, user, isOwnAccount) {
             await _validateAndPreprocess(tx, user, false, isOwnAccount);
 
             if (isOwnAccount && user.password) {
-                if (!await bcryptCompare(user.currentPassword, existing.password)) {
+                if (!await bcrypt.compare(user.currentPassword, existing.password)) {
                     throw new interoperableErrors.IncorrectPasswordError();
                 }
             }
@@ -267,7 +266,7 @@ async function getByUsernameIfPasswordMatch(context, username, password) {
     try {
         const user = await _getBy(context, 'username', username, ['password']);
 
-        if (!await bcryptCompare(password, user.password)) {
+        if (!await bcrypt.compare(password, user.password)) {
             throw new interoperableErrors.IncorrectPasswordError();
         }
 
@@ -360,7 +359,7 @@ async function resetPassword(username, resetToken, password) {
                 throw new Error('Invalid password');
             }
 
-            password = await bcryptHash(password, null, null);
+            password = await bcrypt.hash(password, null, null);
 
             await tx('users').where({username}).update({
                 password,

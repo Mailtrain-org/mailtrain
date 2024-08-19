@@ -88,7 +88,7 @@ class Root extends Component {
                             </ul>
                             <ul className="navbar-nav mt-navbar-nav-right">
                                 {getLanguageChooser(t)}
-                                <NavDropdown menuClassName="dropdown-menu-right" label={mailtrainConfig.user.username} icon="user">
+                                <NavDropdown menuClassName="dropdown-menu-end" label={mailtrainConfig.user.username} icon="user">
                                     <DropdownLink to="/account"><Icon icon='user'/> {t('account')}</DropdownLink>
                                     {mailtrainConfig.authMethod == 'cas' && <DropdownLink to="/cas/logout" forceReload><Icon icon="sign-out-alt"/> {t('logOut')}</DropdownLink>}
                                     {mailtrainConfig.authMethod != 'cas' && <DropdownActionLink onClickAsync={::this.logout}><Icon icon='sign-out-alt'/> {t('logOut')}</DropdownActionLink>}

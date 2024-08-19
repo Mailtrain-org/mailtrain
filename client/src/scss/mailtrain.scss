@@ -135,6 +135,10 @@ body.mailtrain {
     .navbar-nav {
       margin-top: 8px;
       margin-bottom: 8px;
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.75);
+      }
     }
 
     .mt-navbar-nav-right {
@@ -146,7 +150,6 @@ body.mailtrain {
       .nav-item {
         .nav-link {
           padding: 0px;
-          color: rgba(255, 255, 255, 0.75);
         }
 
         @include media-breakpoint-up(lg) {
@@ -196,10 +199,54 @@ body.mailtrain {
   }
 }
 
+.alert-dismissible {
+  .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+  }
+}
+
+.modal-header {
+  .close {
+    padding: 1rem 1rem;
+    margin: -1rem -1rem -1rem auto;
+  }
+}
+
+.close {
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  appearance: none;
+  float: right;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: .5;
+}
+
 .gpg-text {
   font-family: monospace;
 }
 
 .form-group {
   margin-bottom: 1rem;
+}
+
+div.dt-container div.dt-paging ul.pagination {
+  justify-content: flex-end;
+}
+
+.page-item.disabled .page-link {
+  background-color: #fff;
+}
+
+table.dataTable {
+  margin-top: 6px;
+  margin-bottom: 6px;
 }

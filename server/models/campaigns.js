@@ -71,8 +71,7 @@ async function _listDTAjax(context, namespaceId, channelId, params) {
         builder => {
             builder = builder.from('campaigns')
                 .innerJoin('namespaces', 'namespaces.id', 'campaigns.namespace')
-                .leftJoin('channels', 'channels.id', 'campaigns.channel')
-                .whereNull('campaigns.parent');
+                .leftJoin('channels', 'channels.id', 'campaigns.channel');
             if (namespaceId) {
                 builder = builder.where('namespaces.id', namespaceId);
             }
@@ -531,11 +530,7 @@ async function _createTx(tx, context, entity, content) {
             });
         }
 
-        if (filteredEntity.parent) {
-            await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id, parentId: filteredEntity.parent });
-        } else {
-            await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
-        }
+        await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: id });
 
         if (copyFilesFrom) {
             await files.copyAllTx(tx, context, copyFilesFrom.entityType, 'file', copyFilesFrom.entityId, 'campaign', 'file', id);

@@ -38,6 +38,7 @@ export function getMailerTypes(t) {
 
     function validateNumber(state, field, label, emptyAllowed = false) {
         const value = state.getIn([field, 'value']);
+        console.log(field, value, emptyAllowed);
         if (typeof value === 'string' && value.trim() === '' && !emptyAllowed) { // After load, the numerical values can be still numbers
             state.setIn([field, 'error'], t('labelMustNotBeEmpty', {label}));
         } else if (isNaN(value)) {
@@ -85,8 +86,8 @@ export function getMailerTypes(t) {
         data.throttling = data.mailer_settings.throttling || '';
         data.logTransactions = data.mailer_settings.logTransactions;
         // Add extra throttling params
-        data.throttlingWarmUpDays = data.mailer_settings.throttlingWarmUpDays
-        data.throttlingWarmUpFrom  = data.mailer_settings.throttlingWarmUpFrom
+        data.throttlingWarmUpDays = data.mailer_settings.throttlingWarmUpDays || '';
+        data.throttlingWarmUpFrom  = data.mailer_settings.throttlingWarmUpFrom || '';
         data.enableSenderOnDaySun = data.mailer_settings.enableSenderOnDaySun ?? true;
         data.enableSenderOnDayMon = data.mailer_settings.enableSenderOnDayMon ?? true;
         data.enableSenderOnDayTue = data.mailer_settings.enableSenderOnDayTue ?? true;
@@ -206,6 +207,22 @@ export function getMailerTypes(t) {
     zoneMtaTypeOptions.push({ key: ZoneMTAType.WITH_HTTP_CONF, label: t('dynamicConfigurationOfDkimKeysViaZoneMt-1')});
     zoneMtaTypeOptions.push({ key: ZoneMTAType.REGULAR, label: t('noDynamicConfigurationOfDkimKeys')});
 
+    const renderExtraThrottlingMailerSettings = () => (
+        <Fieldset className={styles.extraThrottlingMailerSettings} label={t('extraThrottlingMailerSettings')}>
+            <InputField id="throttlingWarmUpDays" label={t('throttlingWarmUpDays')} placeholder={t('throttlingWarmUpDaysEg10')} help={t('senderWarmUpPeriodInDays')}/>
+            <InputField id="throttlingWarmUpFrom" label={t('throttlingWarmUpFrom')} placeholder={t('throttlingWarmUpFromDateInUnixTimestampEg1648735303000')} help={t('senderWarmUpPeriodStartingDayInUnixTimestamp')}/>
+            <div className={styles.enableByDay}>
+                <CheckBox id="enableSenderOnDaySun" text={t('enableSenderOnDaySun')}/>
+                <CheckBox id="enableSenderOnDayMon" text={t('enableSenderOnDayMon')}/>
+                <CheckBox id="enableSenderOnDayTue" text={t('enableSenderOnDayTue')}/>
+                <CheckBox id="enableSenderOnDayWed" text={t('enableSenderOnDayWed')}/>
+                <CheckBox id="enableSenderOnDayThu" text={t('enableSenderOnDayThu')}/>
+                <CheckBox id="enableSenderOnDayFri" text={t('enableSenderOnDayFri')}/>
+                <CheckBox id="enableSenderOnDaySat" text={t('enableSenderOnDaySat')}/>
+            </div>
+        </Fieldset>
+    );
+
     mailerTypes[MailerType.GENERIC_SMTP] = {
         typeName: typeNames[MailerType.GENERIC_SMTP],
         getForm: owner =>
@@ -229,18 +246,8 @@ export function getMailerTypes(t) {
                     <InputField id="maxConnections" label={t('maxConnections')} placeholder={t('theCountOfMaxConnectionsEg10')} help={t('theCountOfMaximumSimultaneousConnections')}/>
                     <InputField id="smtpMaxMessages" label={t('maxMessages')} placeholder={t('theCountOfMaxMessagesEg100')} help={t('theNumberOfMessagesToSendThroughASingle')}/>
                     <InputField id="throttling" label={t('throttling')} placeholder={t('messagesPerHourEg1000')} help={t('maximumNumberOfMessagesToSendInAnHour')}/>
-                </Fieldset>                    
-                <Fieldset label={t('extraThrottlingMailerSettings')}>    
-                    <InputField id="throttlingWarmUpDays" label={t('throttlingWarmUpDays')} placeholder={t('throttlingWarmUpDaysEg10')} help={t('senderWarmUpPeriodInDays')}/>
-                    <InputField id="throttlingWarmUpFrom" label={t('throttlingWarmUpFrom')} placeholder={t('throttlingWarmUpFromDateInUnixTimestampEg1648735303000')} help={t('senderWarmUpPeriodStartingDayInUnixTimestamp')}/>
-                    <CheckBox id="enableSenderOnDaySun" text={t('enableSenderOnDaySun')}/>
-                    <CheckBox id="enableSenderOnDayMon" text={t('enableSenderOnDayMon')}/>
-                    <CheckBox id="enableSenderOnDayTue" text={t('enableSenderOnDayTue')}/>
-                    <CheckBox id="enableSenderOnDayWed" text={t('enableSenderOnDayWed')}/>
-                    <CheckBox id="enableSenderOnDayThu" text={t('enableSenderOnDayThu')}/>
-                    <CheckBox id="enableSenderOnDayFri" text={t('enableSenderOnDayFri')}/>
-                    <CheckBox id="enableSenderOnDaySat" text={t('enableSenderOnDaySat')}/>
                 </Fieldset>
+                {renderExtraThrottlingMailerSettings()}
             </div>,
         initData: () => ({
             ...getInitGenericSMTP()
@@ -303,6 +310,7 @@ export function getMailerTypes(t) {
                         <InputField id="smtpMaxMessages" label={t('maxMessages')} placeholder={t('theCountOfMaxMessagesEg100')} help={t('theNumberOfMessagesToSendThroughASingle')}/>
                         <InputField id="throttling" label={t('throttling')} placeholder={t('messagesPerHourEg1000')} help={t('maximumNumberOfMessagesToSendInAnHour')}/>
                     </Fieldset>
+                    {renderExtraThrottlingMailerSettings()}
                 </div>
             );
         },
@@ -317,10 +325,10 @@ export function getMailerTypes(t) {
         afterLoad: data => {
             afterLoadGenericSMTP(data);
             data.zoneMtaType = data.mailer_settings.zoneMtaType;
-            data.dkimApiKey = data.mailer_settings.dkimApiKey;
-            data.dkimDomain = data.mailer_settings.dkimDomain;
-            data.dkimSelector = data.mailer_settings.dkimSelector;
-            data.dkimPrivateKey = data.mailer_settings.dkimPrivateKey;
+            data.dkimApiKey = data.mailer_settings.dkimApiKey || '';
+            data.dkimDomain = data.mailer_settings.dkimDomain || '';
+            data.dkimSelector = data.mailer_settings.dkimSelector || '';
+            data.dkimPrivateKey = data.mailer_settings.dkimPrivateKey || '';
         },
         beforeSave: data => {
             const zoneMtaType = Number.parseInt(data.zoneMtaType);
@@ -362,6 +370,7 @@ export function getMailerTypes(t) {
                     <InputField id="maxConnections" label={t('maxConnections')} placeholder={t('theCountOfMaxConnectionsEg10')} help={t('theCountOfMaximumSimultaneousConnections')}/>
                     <InputField id="throttling" label={t('throttling')} placeholder={t('messagesPerHourEg1000')} help={t('maximumNumberOfMessagesToSendInAnHour')}/>
                 </Fieldset>
+                {renderExtraThrottlingMailerSettings()}
             </div>,
         initData: () => ({
             ...getInitCommon(),
@@ -371,9 +380,9 @@ export function getMailerTypes(t) {
         }),
         afterLoad: data => {
             afterLoadCommon(data);
-            data.sesKey = data.mailer_settings.key;
-            data.sesSecret = data.mailer_settings.secret;
-            data.sesRegion = data.mailer_settings.region;
+            data.sesKey = data.mailer_settings.key || '';
+            data.sesSecret = data.mailer_settings.secret || '';
+            data.sesRegion = data.mailer_settings.region || '';
         },
         beforeSave: data => {
             beforeSaveCommon(data);

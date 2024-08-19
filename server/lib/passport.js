@@ -144,7 +144,7 @@ module.exports.setupRegularAuth = app => {
 };
 
 module.exports.restLogout = (req, res) => {
-    req.logout();
+    req.logout(() => {});
     res.json();
 };
 

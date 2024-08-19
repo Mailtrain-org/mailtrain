@@ -93,7 +93,7 @@ export default class List extends Component {
                 {tableRestActionDialogRender(this)}
                 {createPermitted &&
                     <Toolbar>
-                        <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-right" label={t('createMosaicoTemplate')}>
+                        <ButtonDropdown buttonClassName="btn-primary" menuClassName="dropdown-menu-end" label={t('createMosaicoTemplate')}>
                             <DropdownLink to="/templates/mosaico/create">{t('blank')}</DropdownLink>
                             <DropdownLink to="/templates/mosaico/create/versafix">{t('versafixOne')}</DropdownLink>
                             <DropdownLink to="/templates/mosaico/create/mjml-sample">{t('mjmlSample')}</DropdownLink>
