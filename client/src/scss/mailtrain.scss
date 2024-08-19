@@ -250,3 +250,9 @@ table.dataTable {
   margin-top: 6px;
   margin-bottom: 6px;
 }
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #c8ced3;
+}
+

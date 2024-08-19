@@ -42,7 +42,7 @@ export default class List extends Component {
                 data: 1,
                 title: t('name'),
                 actions: data => {
-                    const perms = data[7];
+                    const perms = data[6];
                     if (perms.includes('viewSubscriptions')) {
                         return [{label: data[1], link: `/lists/${data[0]}/subscriptions`}];
                     } else {

@@ -19,9 +19,6 @@ import * as styles from "./styles.scss";
 import {getUrl} from "./urls";
 import {withComponentMixins} from "./decorator-helpers";
 
-//dtFactory();
-//dtSelectFactory();
-
 
 const TableSelectMode = {
     NONE: 0,
@@ -285,10 +282,6 @@ class Table extends Component {
             order: [...this.props.order],
             autoWidth: false,
             pageLength: this.props.pageLength,
-            dom: // This overrides Bootstrap 4 settings. It may need to be updated if there are updates in the DataTables Bootstrap 4 plugin.
-                "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                "<'row'<'col-sm-12'<'" + styles.dataTableTable + "'tr>>>" +
-                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
         };
         if (this.props.search)
             dtOptions.search = { search: this.props.search };

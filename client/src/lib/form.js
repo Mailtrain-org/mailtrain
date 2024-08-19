@@ -18,8 +18,7 @@ import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/ext-searchbox';
 
 import {DayPicker} from 'react-day-picker';
-// TODO: Uncomment if the day picker does not work, delete otherwise
-// import 'react-day-picker/dist/style.css';
+import 'react-day-picker/dist/style.css';
 
 import {
     birthdayYear,

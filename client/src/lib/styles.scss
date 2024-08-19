@@ -1,6 +1,5 @@
 @import "../scss/variables.scss";
 @import "../scss/mixins";
-@import "react-day-picker/style.css";
 
 .toolbar {
   float: right;
@@ -8,10 +7,11 @@
 }
 
 .form { // This is here to give the styles below higher priority than Bootstrap has
-  :global .DayPicker {
+  :global .rdp-root {
     border: $input-border-width solid $input-border-color;
     border-radius: $input-border-radius;
     padding: $input-padding-y $input-padding-x;
+    margin-top: 5px;
   }
 
   :global .form-horizontal .control-label {
