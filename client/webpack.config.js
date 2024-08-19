@@ -65,14 +65,7 @@ module.exports = {
             },
             {
                 test: /\.(png|jpg|gif)$/,
-                use: [ 
-                    {
-                        loader: 'url-loader',
-                        options: {
-                            limit: 8192 // inline base64 URLs for <=8k images, direct URLs for the rest
-                        }
-                    }
-                ] 
+                type: "asset"
             },
             {
                 test: /\.scss$/,
@@ -86,7 +79,7 @@ module.exports = {
                         options: {
                             modules: {
                                 localIdentName: '[path][name]__[local]--[hash:base64:5]'
-                            }
+                            },
                         }
                     },
                     {
@@ -96,9 +89,7 @@ module.exports = {
             },
             {
                 test: /\.(svg|otf|woff2|woff|ttf|eot)$/,
-                use: [
-                    'url-loader'
-                ]
+                type: "asset"
             }
         ]
     },
