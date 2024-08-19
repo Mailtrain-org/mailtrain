@@ -12,7 +12,6 @@ const subscriptions = require('./subscriptions');
 const dependencyHelpers = require('../lib/dependency-helpers');
 const {ListActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
-const {SubscriptionStatus} = require('../../shared/lists');
 
 const allowedKeys = new Set(['name', 'settings']);
 

@@ -1,6 +1,5 @@
 'use strict';
 
-const knex = require('./knex');
 const interoperableErrors = require('../../shared/interoperable-errors');
 const entitySettings = require('./entity-settings');
 const shares = require('../models/shares');

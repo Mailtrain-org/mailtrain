@@ -27,8 +27,6 @@ function hash(entity) {
 
 
 async function _listDTAjax(context, namespaceId, params) {
-    const campaignEntityType = entitySettings.getEntityType('campaign');
-
     return await dtHelpers.ajaxListWithPermissions(
         context,
         [{ entityTypeId: 'list', requiredOperations: ['view'] }],

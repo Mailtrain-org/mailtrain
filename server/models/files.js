@@ -137,7 +137,7 @@ async function getFileByUrl(context, url) {
 // Adds files to an entity. The source data can be either a file (then it's path is contained in file.path) or in-memory data (then it's content is in file.data).
 async function createFiles(context, type, subType, entityId, files, replacementBehavior, transformResponseFn) {
     enforceTypePermitted(type, subType);
-    if (files.length == 0) {
+    if (files.length === 0) {
         // No files uploaded
         return {uploaded: 0};
     }

@@ -12,7 +12,6 @@ const path = require('path');
 
 const mjml2html = require('mjml');
 
-const lists = require('./lists');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
 const formAllowedKeys = new Set([

@@ -7,9 +7,6 @@ const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
 
 
-const path = require('path');
-const files = require('../../models/files');
-
 const {uploadedFilesDir} = require('../../lib/file-helpers')
 
 const multer = require('multer')({

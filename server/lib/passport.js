@@ -2,7 +2,6 @@
 
 const config = require('./config');
 const log = require('./log');
-const util = require('util');
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;

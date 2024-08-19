@@ -17,12 +17,11 @@ const {toNameTagLangauge} = require('../../shared/lists');
 const {CampaignMessageStatus, CampaignMessageErrorType} = require('../../shared/campaigns');
 const tools = require('./tools');
 const htmlToText = require('html-to-text');
-const axios = require('axios');
 const files = require('../models/files');
 const {getPublicUrl} = require('./urls');
 const blacklist = require('../models/blacklist');
 const libmime = require('libmime');
-const { enforce, hashEmail } = require('./helpers');
+const { enforce } = require('./helpers');
 const senders = require('./senders');
 const shortid = require('./shortid');
 

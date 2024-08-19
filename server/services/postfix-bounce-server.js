@@ -63,10 +63,10 @@ async function readNextChunks(socket) {
                             if (queuedAs || status === 'sent') {
                                 log.verbose('POSTFIXBOUNCE', 'Message %s locally requeued as %s', queueId, queuedAs);
                                 // Update message's previous queueId (thanks @mfechner )
-                                campaigns.updateMessageResponse(contextHelpers.getAdminContext(), message, queued, queuedAs);
+                                await campaigns.updateMessageResponse(contextHelpers.getAdminContext(), message, queued, queuedAs);
                                 log.verbose('POSTFIXBOUNCE', 'Successfully changed message queueId to %s', queuedAs);
                             } else {
-                                campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
+                                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, true);
                                 log.verbose('POSTFIXBOUNCE', 'Marked message %s as bounced', queueId);
                             }
 

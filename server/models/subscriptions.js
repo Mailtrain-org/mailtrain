@@ -23,11 +23,6 @@ const TEST_USERS_LIST_LIMIT = 1000;
 
 const fieldTypes = {};
 
-const Cardinality = {
-    SINGLE: 0,
-    MULTIPLE: 1
-};
-
 function getOptionsMap(groupedField) {
     const result = {};
     for (const opt of groupedField.settings.options) {

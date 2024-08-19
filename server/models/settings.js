@@ -19,7 +19,7 @@ async function get(context, keyOrKeys) {
     if (!keyOrKeys) {
         keys = [...allowedKeys.values()];
     } else if (!Array.isArray(keyOrKeys)) {
-        keys = [ keys ];
+        keys = [ keyOrKeys ];
     } else {
         keys = keyOrKeys;
     }

@@ -13,7 +13,7 @@ const { CampaignSource, } = require('../../shared/campaigns');
 const segments = require('./segments');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
-const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
+const {EntityActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
 
 const allowedKeys = new Set(['name', 'description', 'namespace', 'cpg_name', 'cpg_description',

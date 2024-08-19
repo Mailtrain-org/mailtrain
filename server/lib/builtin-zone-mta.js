@@ -169,8 +169,6 @@ function restart(callback) {
 
                 if (callback) {
                     return callback();
-                } else {
-                    return;
                 }
             }
         }

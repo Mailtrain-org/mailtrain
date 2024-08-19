@@ -3,7 +3,6 @@
 const config = require('./lib/config');
 const log = require('./lib/log');
 const appBuilder = require('./app-builder');
-const translate = require('./lib/translate');
 const http = require('http');
 const gdprCleanup = require('./services/gdpr-cleanup');
 const importer = require('./lib/importer');

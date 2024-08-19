@@ -1,7 +1,5 @@
 'use strict';
 
-const knex = require('./knex');
-
 function getRequestContext(req) {
     const context = {
         user: req.user

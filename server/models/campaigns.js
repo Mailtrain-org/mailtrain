@@ -712,8 +712,6 @@ async function getMessageByCid(messageCid, withVerpHostname = false) { // withVe
         } else {
             return await baseQuery;
         }
-
-        return message;
     });
 }
 
@@ -840,7 +838,7 @@ async function _changeStatus(context, campaignId, permittedCurrentStates, newSta
 
         if (Array.isArray(newState)) {
             const newStateIdx = permittedCurrentStates.indexOf(entity.status);
-            enforce(newStateIdx != -1);
+            enforce(newStateIdx !== -1);
             newState = newState[newStateIdx];
         }
 

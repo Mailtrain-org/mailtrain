@@ -5,14 +5,11 @@ const passport = require('../lib/passport');
 const clientHelpers = require('../lib/client-helpers');
 const users = require('../models/users');
 
-const files = require('../models/files');
-const fileHelpers = require('../lib/file-helpers');
-
 const templates = require('../models/templates');
 
 const contextHelpers = require('../lib/context-helpers');
 
-const { getTrustedUrl, getSandboxUrl, getPublicUrl } = require('../lib/urls');
+const { getSandboxUrl } = require('../lib/urls');
 const { AppType } = require('../../shared/app');
 
 

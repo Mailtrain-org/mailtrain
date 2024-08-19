@@ -3,8 +3,6 @@
 const config = require('./config');
 const path = require('path');
 
-const knexConstructor = require('knex');
-
 const knex = require('knex')({
     client: 'mysql',
     connection: {

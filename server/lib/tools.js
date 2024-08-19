@@ -113,7 +113,7 @@ async function mergeTemplateIntoLayout(template, layout, locale) {
 
 async function validateEmail(address) {
     const result = await new Promise(resolve => {
-        const result = isemail.validate(address, {
+        isemail.validate(address, {
             checkDNS: true,
             errorLevel: 1
         }, resolve);
@@ -171,7 +171,7 @@ function _formatTemplateSimple(source, mergeTags, isHTML) {
         }
 
         const containsHTML = /<[a-z][\s\S]*>/.test(value);
-        return isHTML ? he.encode((containsHTML ? value : value.replace(/(?:\r\n|\r|\n)/g, '<br/>')), {
+        return isHTML ? he.encode((containsHTML ? value : value.replace(/\r\n|\r|\n/g, '<br/>')), {
             useNamedReferences: true,
             allowUnsafeSymbols: true
         }) : (containsHTML ? htmlToText.fromString(value) : value);
