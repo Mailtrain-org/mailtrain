@@ -25,7 +25,7 @@ Subscribe to our newsletter to get updates: https://mosaico.voxmail.it/user/regi
 
 ### Build/Run with the development backend [![Build Status](https://travis-ci.org/voidlabs/mosaico.svg)](https://travis-ci.org/voidlabs/mosaico)
 
-You need NodeJS v6.0 or higher + ImageMagick
+You need NodeJS v8.0 or higher + NPM 8.3 (because of "overrides" support in package.json you need npm 8.3 if you want to change/upgrade dependencies, but it should work with older npm, too, if you rely on package-lock.json)
 
 Download/install the dependencies (run again if you get an error, as it probably is a race issues in npm)
 ```
@@ -39,9 +39,6 @@ compile and run a local webserver (http://127.0.0.1:9006) with incremental build
 ```
   grunt
 ```
-*IMPORTANT* in order to use image uploading/processing feature in Node you need imageMagick installed in your environment.
-e.g. running "convert" and "identify" on the command line should output imageMagick command line help (if you are on Windows and install imageMagick 7.x then make sure to install ["legacy utilities"](https://github.com/aheckmann/gm/issues/559)).
-
 *NOTE* we have reports that default Ubuntu node package have issues with building Mosaico via Grunt. If you see a ```Fatal error: watch ENOSPC``` then have a look at https://github.com/voidlabs/mosaico/issues/82
 
 ### Docker
@@ -62,6 +59,8 @@ First you have to build it using grunt, then you MUST read [Serving Mosaico](htt
 [MailTrain](https://github.com/Mailtrain-org/mailtrain) is a full featured newsletter web application written in Node and support email editing via Mosaico since their 1.23.0 release.
 
 [GoodEnough's Mosaico](https://github.com/goodenough/mosaico-backend) born as a Mosaico fork, now have become a full web application product built around Mosaico editing targeting agencies.
+
+[CiviCRM](https://civicrm.org) is an open source CRM built by a community of contributors and supporters, and coordinated by the Core Team. CiviCRM is web-based software used by a diverse range of organisations, particularly not-for-profit organizations (nonprofits and civic sector organizations). CiviCRM offers a complete feature set out of the box and can integrate with your website.
 
 ### Are you having issues with Mosaico?
 

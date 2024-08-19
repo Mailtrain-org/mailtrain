@@ -13,18 +13,19 @@ You can even force mosaico to run the internal translation tool for the template
   };
 ```
 
-Please get in touch with us by sending an email to feedback at mosaico.io including your email and the language you'd like to contribute.
-
 Thanks to translators:
 
-- it (Italian): Mosaico Team
+- ar (Arabian): Nick390
 - de (German): Bernhard Weichel
 - es (Spanish): Carlos Jacobs
 - fr (French): Jonathan Loriaux
+- hu (Hungarian): Marton Marcell
+- it (Italian): Mosaico Team
 - nl (Dutch): Pieter Emeis
-- sv (Swedish): P-H Westman
-- sr_RS (Serbian): Đorđe Kolaković
+- pt_BR (Portuguese): Pedro Humberto Lindner Choeiri
 - ru (Russian): Andrey ANM
+- sr_RS (Serbian): Đorđe Kolaković
+- sv (Swedish): P-H Westman
 - tr (Turkish): Andriya Uçar
 
 Sign-up to POEditor if you want to collaborate or suggest changes to the current languages, or provide PR for full new complete languages.

@@ -851,6 +851,7 @@
   "reportName-1": "Report \"{{name}}\"",
   "output": "Output",
   "templateName": "Template \"{{name}}\"",
+  "sendConfigurationName": "Send configuration \"{{name}}\"",
   "mimeTypeMustBeSelected": "MIME Type must be selected",
   "syntaxErrorInTheUserFieldsSpecification": "Syntax error in the user fields specification",
   "reportTemplateUpdated": "Report template updated",

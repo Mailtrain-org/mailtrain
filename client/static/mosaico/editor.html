@@ -8,8 +8,8 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
-    <script src="rs/mosaico-libs-and-tinymce.min.js?v=0.17.5"></script>
-    <script src="rs/mosaico.min.js?v=0.17.5"></script>
+    <script src="rs/mosaico-libs-and-tinymce.min.js?v=0.18.10"></script>
+    <script src="rs/mosaico.min.js?v=0.18.10"></script>
     <script>
 $(function() {
   if (!Mosaico.isCompatible()) {
@@ -24,6 +24,25 @@ $(function() {
   var plugins;
   // A basic plugin that expose the "viewModel" object as a global variable.
   // plugins = [function(vm) {window.viewModel = vm;}];
+  // An example of a retina plugin (2x images), using custom manipulation function (resizex and coverx instead of resize and cover)
+  /*
+  plugins = [function(vm) {
+    // overrides placeholder text
+    ko.bindingHandlers.wysiwygSrc.placeholderText = function(w, h) {
+      return w && h ? w+'x'+h : w ? '<'+w+'>' : 'h'+h;
+    };
+    // double width and height for placeholder call and call method=placeholder2 so to have larger stripes
+    var origPlaceholderUrl = ko.bindingHandlers.wysiwygSrc.placeholderUrl;
+    ko.bindingHandlers.wysiwygSrc.placeholderUrl = function(w, h, text, method) {
+      return origPlaceholderUrl(w*2, h*2, text, 'placeholder2');
+    };
+    // double width and height and call coverx/resizex instead of cover/resize so to avoid enlarging images
+    var origConvertedUrl = ko.bindingHandlers.wysiwygSrc.convertedUrl;
+    ko.bindingHandlers.wysiwygSrc.convertedUrl = function(src, method, width, height) {
+      return origConvertedUrl(src, method+'x', width ? width*2 : width, height ? height*2 : height);
+    };
+  }];
+  */
   var ok = Mosaico.init({
     imgProcessorBackend: basePath+'/img/',
     emailProcessorBackend: basePath+'/dl/',
@@ -31,7 +50,19 @@ $(function() {
     fileuploadConfig: {
       url: basePath+'/upload/',
       // messages??
+    },
+    /* until mosaico 0.18.7 this was the default functionCaller logging loading times. Now you can pass this as an option if you need the old behaviour
+    functionCaller: function(name, whatToCall) {
+      var res;
+      var start = new Date().getTime();
+      if (typeof console == 'object' && console.time) console.time(name);
+      res = whatToCall();
+      if (typeof console == 'object' && console.time) console.timeEnd(name);
+      var diff = new Date().getTime() - start;
+      if (typeof console == 'object' && !console.time) if (typeof console.debug == 'function') console.debug(name, "took", diff, "ms");
+      return res;
     }
+    */
   }, plugins);
   if (!ok) {
     console.log("Missing initialization hash, redirecting to main entrypoint");
@@ -40,8 +71,8 @@ $(function() {
 });
     </script>
     
-    <link rel="stylesheet" href="rs/mosaico-libs-and-tinymce.min.css?v=0.17.5" />
-    <link rel="stylesheet" href="rs/mosaico-material.min.css?v=0.17.5" />
+    <link rel="stylesheet" href="rs/mosaico-libs-and-tinymce.min.css?v=0.18.10" />
+    <link rel="stylesheet" href="rs/mosaico-material.min.css?v=0.18.10" />
   </head>
   <body class="mo-standalone">
 

@@ -9,6 +9,7 @@
     "Insert here the recipient email address": "Inserisci qui l'indirizzo email a cui spedire",
     "Test email address": "Indirizzo email di test",
     "Block removed: use undo button to restore it...": "Blocco eliminato: usa il pulsante annulla per recuperarlo...",
+    "Block removed: use the visibility flag in the content tab to restore it...": "Blocco eliminato: usa l'opzione di visibilità nella scheda contenuto per recuperarlo...",
     "New block added after the selected one (__pos__)": "Nuovo blocco aggiunto sotto a quello selezionato (__pos__)",
     "New block added at the model bottom (__pos__)": "Nuovo blocco aggiunto in fondo al modello (__pos__)",
     "Undo (#COUNT#)": "Annulla (#COUNT#)",

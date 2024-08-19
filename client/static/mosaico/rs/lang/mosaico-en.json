@@ -9,6 +9,7 @@
     "Insert here the recipient email address": "Insert here the recipient email address",
     "Test email address": "Test email address",
     "Block removed: use undo button to restore it...": "Block removed: use undo button to restore it...",
+    "Block removed: use the visibility flag in the content tab to restore it...": "Block removed: use the visibility flag in the content tab to restore it...",
     "New block added after the selected one (__pos__)": "New block added after the selected one (__pos__)",
     "New block added at the model bottom (__pos__)": "New block added at the model bottom (__pos__)",
     "Undo (#COUNT#)": "Undo (#COUNT#)",

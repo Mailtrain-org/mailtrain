@@ -24,7 +24,7 @@ function getMenus(t) {
             panelRender: props => <List permissions={props.permissions}/>,
             children: {
                 ':sendConfigurationId([0-9]+)': {
-                    title: resolved => t('templateName', {name: ellipsizeBreadcrumbLabel(resolved.sendConfiguration.name)}),
+                    title: resolved => t('sendConfigurationName', {name: ellipsizeBreadcrumbLabel(resolved.sendConfiguration.name)}),
                     resolve: {
                         sendConfiguration: params => `rest/send-configurations-private/${params.sendConfigurationId}`
                     },

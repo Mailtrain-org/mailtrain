@@ -6,7 +6,7 @@ import mjml2html, {BodyComponent, HeadComponent, presetCore, components, depende
 
 export { BodyComponent, HeadComponent };
 
-const initComponents = {...presetCore.components};
+const initComponents = [...presetCore.components];
 const initDependencies = {...presetCore.dependencies};
 
 // MJML uses global state. This class wraps MJML state and provides a custom mjml2html function which sets the right state before calling the original mjml2html
@@ -28,7 +28,7 @@ export class MJML {
     }
 
     registerComponent(Component) {
-        this.components[kebabCase(Component.name)] = Component;
+        this.components.push(Component);
     }
 
     addToHeader(src) {
