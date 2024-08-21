@@ -1,5 +1,10 @@
 exports.up = (knex, Promise) => (async() => {
 
+    const templatesWithUnsupportedType = await knex('templates').whereNotIn('type', ['codeeditor', 'mosaico', 'mosaicoWithFsTemplate']);
+    if (templatesWithUnsupportedType.length) {
+        throw new Error("Only the following template types are supported in v3: codeeditor, mosaico, mosaicoWithFsTemplate. Templates of other types found. Migration not possible. Check all \"templates\" that have other \"type\" than the three listed using an SQL statement: SELECT id FROM `templates` where `type` not in ('codeeditor', 'mosaico', 'mosaicoWithFsTemplate');");
+    }
+
     const campaignsWithSourceURL = await knex('campaigns').where('source', 5);
     if (campaignsWithSourceURL.length) {
         throw new Error('Campaigns with source type "URL" have been deprecated. Migration not possible. Check all "campaigns" that have "source" equal to 5 using an SQL statement: SELECT id FROM `campaigns` where `source` = 5;');

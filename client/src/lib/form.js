@@ -1586,8 +1586,6 @@ const withForm = createComponentMixin({
             const settings = this.state.formSettings;
             await this.waitForFormServerValidated();
 
-            console.log(this.state.formState.toJS());
-
             if (this.isFormWithoutErrors()) {
                 if (settings.getPreSubmitUpdater) {
                     const preSubmitUpdater = await settings.getPreSubmitUpdater();

@@ -87,30 +87,6 @@ class MosaicoSandbox extends Component {
             this.viewModel = viewModel;
         });
 
-        // (Custom) HTML postRenderers
-        plugins.push(viewModel => {
-            viewModel.originalExportHTML = viewModel.exportHTML;
-            viewModel.exportHTML = () => {
-                let html = viewModel.originalExportHTML();
-
-                // Chrome workaround begin -----------------------------------------------------------------------------------
-                // Chrome v. 74 (and likely other versions too) has problem with how KO sets data during export.
-                // As the result, the images that have been in the template from previous editing (i.e. before page refresh)
-                // get lost. The code below refreshes the KO binding, thus effectively reloading the images.
-                const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-                if (isChrome) {
-                    ko.cleanNode(document.body);
-                    ko.applyBindings(viewModel, document.body);
-                }
-                // Chrome workaround end -------------------------------------------------------------------------------------
-
-                for (const portRender of window.mosaicoHTMLPostRenderers) {
-                    html = postRender(html);
-                }
-                return html;
-            };
-        });
-
         // Custom convertedUrl (https://github.com/voidlabs/mosaico/blob/a359e263f1af5cf05e2c2d56c771732f2ef6c8c6/src/js/app.js#L42)
         // which does not complain about mismatch of domains between TRUSTED and PUBLIC
         plugins.push(viewModel => {

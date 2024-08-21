@@ -219,7 +219,7 @@ class MessageSender {
 
         const generateText = !(text || '').trim();
         if (generateText) {
-            text = htmlToText.fromString(html, {wordwrap: 130});
+            text = htmlToText.convert(html, {wordwrap: 130});
         } else {
             // When no list and subscriptionGrouped is provided, formatCampaignTemplate works the same way as formatTemplate
             text = tools.formatCampaignTemplate(text, this.tagLanguage, mergeTags, false, campaign, this.listsById, list, subscriptionGrouped)
@@ -659,7 +659,7 @@ async function queueSubscriptionMessage(sendConfigurationId, to, subject, encryp
     if (textRenderer) {
         text = textRenderer(template.data || {});
     } else if (html) {
-        text = htmlToText.fromString(html, {
+        text = htmlToText.convert(html, {
             wordwrap: 130
         });
     }

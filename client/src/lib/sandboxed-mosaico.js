@@ -20,7 +20,8 @@ export class MosaicoHost extends Component {
         super(props);
 
         this.state = {
-            fullscreen: false
+            fullscreen: false,
+            reloadIdx: 0
         };
 
         this.contentNodeRefHandler = node => this.contentNode = node;
@@ -50,7 +51,15 @@ export class MosaicoHost extends Component {
     }
 
     async exportState() {
-        return await this.contentNode.ask('exportState');
+        const result = await this.contentNode.ask('exportState');
+
+        /* This is a workaround to the fact that if HTML and model is exported from the editor, it
+           makes some images disappear. Reloding the whole editor is crude but efficient way to address it.
+         */
+        this.setState(state => ({
+            reloadIdx: state.reloadIdx + 1
+        }));
+        return result;
     }
 
     render() {
@@ -85,7 +94,7 @@ export class MosaicoHost extends Component {
                         <a className={styles.btn} onClick={::this.toggleFullscreenAsync} title={t('maximizeEditor')}><Icon icon="window-maximize"/></a>
                     </div>
                 </div>
-                <UntrustedContentHost ref={this.contentNodeRefHandler} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="mosaico/editor" tokenMethod="mosaico" tokenParams={tokenData}/>
+                <UntrustedContentHost key={this.state.reloadIdx} ref={this.contentNodeRefHandler} className={styles.host} singleToken={true} contentProps={editorData} contentSrc="mosaico/editor" tokenMethod="mosaico" tokenParams={tokenData}/>
             </div>
         );
     }

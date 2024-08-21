@@ -137,7 +137,7 @@ class MjMosaicoConditionalDisplay extends BodyComponent {
 
         const parentBlock = getParent();
         if (parentBlock) {
-            parentBlock.addMosaicoProperty(this.propertyId);
+            parentBlock.addMosaicoProperty(this.propertyId, "false");
         }
     }
 
@@ -227,7 +227,7 @@ class MjMosaicoBlock extends BodyComponent {
 
         return `
             @supports -ko-blockdefs {
-                ${this.blockId} { label: ${this.getAttribute('label')}${propertiesOut} } 
+                ${this.blockId} { label: ${this.getAttribute('label')}${propertiesOut}; theme: contentTheme;} 
             }
         `;
     };
@@ -239,7 +239,10 @@ class MjMosaicoBlock extends BodyComponent {
         'label': 'string'
     };
 
-    addMosaicoProperty(property) {
+    addMosaicoProperty(property, defaultValue) {
+        if (defaultValue !== undefined) {
+            property = `${property}=${defaultValue}`;
+        }
         this.mosaicoProperties.push(property);
     }
 
@@ -276,7 +279,7 @@ class MjMosaicoInnerBlock extends BodyComponent {
 
         return `
             @supports -ko-blockdefs {
-                ${this.blockId} { label: ${this.getAttribute('label')}${propertiesOut} } 
+                ${this.blockId} { label: ${this.getAttribute('label')}${propertiesOut}; theme: contentTheme; } 
             }
         `;
     };
@@ -288,7 +291,10 @@ class MjMosaicoInnerBlock extends BodyComponent {
         'label': 'string'
     };
 
-    addMosaicoProperty(property) {
+    addMosaicoProperty(property, defaultValue) {
+        if (defaultValue !== undefined) {
+            property = `${property}=${defaultValue}`;
+        }
         this.mosaicoProperties.push(property);
     }
 
@@ -731,7 +737,10 @@ mjmlInstance.addToHeader(`
                 help: Alternative text will be shown on email clients that does not download image automatically;
             }
     
-            template { label: Page }
+            contentTheme { label: Main Style; }
+            frameTheme { label: Frame Style; }
+
+            template { label: Page; theme: frameTheme; }
         }
     </style>
 `);

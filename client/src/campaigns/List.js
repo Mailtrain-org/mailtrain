@@ -176,9 +176,9 @@ export default class List extends Component {
                 <Title>{t('campaigns')}</Title>
 
                 {channel ?
-                    <Table ref={node => this.table = node} withHeader dataUrl={`rest/campaigns-by-channel-table/${channel.id}`} columns={columns} order={[5, 'desc']} />
+                    <Table ref={node => this.table = node} withHeader dataUrl={`rest/campaigns-by-channel-table/${channel.id}`} columns={columns} order={[4, 'desc']} />
                 :
-                    <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} order={[6, 'desc']} />
+                    <Table ref={node => this.table = node} withHeader dataUrl="rest/campaigns-table" columns={columns} order={[5, 'desc']} />
                 }
             </div>
         );
