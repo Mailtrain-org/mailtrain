@@ -6,8 +6,7 @@ Note that some of these may be already obsolete...
 - Add API
 - Some dashboard
 
-- geoip probably does not work - show "opened" detail in campaign statistics
-- quick report in campaign statistics does not work
+- refresh localization
 
 ## Possibly obsolete
 
