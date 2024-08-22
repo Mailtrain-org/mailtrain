@@ -11,7 +11,6 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 const fields = require('./fields');
 const segments = require('./segments');
 const imports = require('./imports');
-const entitySettings = require('../lib/entity-settings');
 const dependencyHelpers = require('../lib/dependency-helpers');
 
 const {EntityActivityType} = require('../../shared/activity-log');

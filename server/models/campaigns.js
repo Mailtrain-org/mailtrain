@@ -20,11 +20,11 @@ const senders = require('../lib/senders');
 const links = require('./links');
 const contextHelpers = require('../lib/context-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
-const messageSender = require('../lib/message-sender');
-const lists = require('./lists');
 
 const {EntityActivityType, CampaignActivityType} = require('../../shared/activity-log');
 const activityLog = require('../lib/activity-log');
+const campaignSubscriptionHelpers = require("./campaign-subscription-handlers");
+const log = require("../lib/log");
 
 const allowedKeysCommon = ['name', 'description', 'namespace', 'channel',
     'send_configuration', 'from_name_override', 'from_email_override', 'reply_to_override', 'subject', 'data', 'click_tracking_disabled', 'open_tracking_disabled', 'unsubscribe_url'];
@@ -560,6 +560,30 @@ async function _validateChannelMoveTx(tx, context, entity, existing) {
     }
 }
 
+async function _gcFilesByEntityTx(tx, cpg) {
+    let html = '';
+    let text = '';
+
+    if (cpg.source === CampaignSource.TEMPLATE) {
+        const template = await templates.getByIdTx(tx, contextHelpers.getAdminContext(), cpg.data.sourceTemplate, false);
+        html = template.html;
+        text = template.text;
+
+    } else if (cpg.source === CampaignSource.CUSTOM || cpg.source === CampaignSource.CUSTOM_FROM_TEMPLATE || cpg.source === CampaignSource.CUSTOM_FROM_CAMPAIGN) {
+        html = cpg.data.sourceCustom.html;
+        text = cpg.data.sourceCustom.text;
+    }
+
+    await files.gcByEntityTx(tx, 'campaign', 'file', cpg.id, file => {
+        if (!html.includes(file.filename) && !text.includes(file.filename)) {
+            log.info(`Removing unused file in campaign "${cpg.name}" (id: ${cpg.id}) - file "${file.originalname}" (id: ${file.id})`);
+            return true;
+        } else {
+            return false;
+        }
+    })
+}
+
 async function updateWithConsistencyCheck(context, entity, content) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'edit');
@@ -606,6 +630,10 @@ async function updateWithConsistencyCheck(context, entity, content) {
         await tx('campaigns').where('id', entity.id).update(filteredEntity);
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'campaign', entityId: entity.id });
+
+        const dbEntity = await tx('campaigns').where('id', entity.id).first();
+        dbEntity.data = JSON.parse(dbEntity.data);
+        await _gcFilesByEntityTx(tx, dbEntity);
 
         await activityLog.logEntityActivity('campaign', EntityActivityType.UPDATE, entity.id, {status: filteredEntity.status});
     });
@@ -724,46 +752,6 @@ async function getMessageByResponseId(responseId) {
         .first();
 }
 
-const statusFieldMapping = new Map();
-statusFieldMapping.set(CampaignMessageStatus.UNSUBSCRIBED, 'unsubscribed');
-statusFieldMapping.set(CampaignMessageStatus.BOUNCED, 'bounced');
-statusFieldMapping.set(CampaignMessageStatus.COMPLAINED, 'complained');
-
-async function _changeStatusByMessageTx(tx, context, message, campaignMessageStatus) {
-    enforce(statusFieldMapping.has(campaignMessageStatus));
-
-    if (message.status === CampaignMessageStatus.SENT) {
-        await shares.enforceEntityPermissionTx(tx, context, 'campaign', message.campaign, 'manageMessages');
-
-        const statusField = statusFieldMapping.get(campaignMessageStatus);
-
-        await tx('campaigns').increment(statusField, 1).where('id', message.campaign);
-
-        await tx('campaign_messages')
-            .where('id', message.id)
-            .update({
-                status: campaignMessageStatus,
-                updated: knex.fn.now()
-            });
-    }
-}
-
-async function changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, subscriptionId, campaignMessageStatus) {
-    const message = await tx('campaign_messages')
-        .innerJoin('campaigns', 'campaign_messages.campaign', 'campaigns.id')
-        .where('campaigns.cid', campaignCid)
-        .where({subscription: subscriptionId, list: listId})
-        .select([
-            'campaign_messages.id', 'campaign_messages.campaign', 'campaign_messages.list', 'campaign_messages.subscription', 'campaign_messages.hash_email', 'campaign_messages.status'
-        ])
-        .first();
-
-    if (message) { // If a test is send before the campaign is sent, the corresponding entry does not exists in campaign_messages. We ignore such situations as the subscriber gets unsubscribed anyway. We just don't account it to the campaign.
-        await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
-    }
-}
-
-
 const campaignMessageStatusToSubscriptionStatusMapping = new Map();
 campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.BOUNCED, SubscriptionStatus.BOUNCED);
 campaignMessageStatusToSubscriptionStatusMapping.set(CampaignMessageStatus.UNSUBSCRIBED, SubscriptionStatus.UNSUBSCRIBED);
@@ -776,7 +764,7 @@ async function changeStatusByMessage(context, message, campaignMessageStatus, up
             await subscriptions.changeStatusTx(tx, context, message.list, message.subscription, campaignMessageStatusToSubscriptionStatusMapping.get(campaignMessageStatus));
         }
 
-        await _changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
+        await campaignSubscriptionHelpers.changeStatusByMessageTx(tx, context, message, campaignMessageStatus);
     });
 }
 
@@ -940,109 +928,15 @@ async function getStatisticsOpened(context, id) {
     });
 }
 
-async function testSend(context, data) {
-    // Though it's a bit counter-intuitive, this handles also test sends of a template (i.e. without any campaign id)
-
-    await knex.transaction(async tx => {
-        const processSubscriber = async (sendConfigurationId, listId, subscriptionId, messageData) => {
-            await messageSender.queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, messageSender.MessageType.TEST, messageData);
-
-            await activityLog.logEntityActivity('campaign', CampaignActivityType.TEST_SEND, campaignId, {list: listId, subscription: subscriptionId});
-        };
-
-        const campaignId = data.campaignId;
-
-        if (campaignId) { // This means we are sending a campaign
-            /*
-                Data coming from the client:
-                - html, text
-                - subjectPrepend, subjectAppend
-                - listCid, subscriptionCid
-                - listId, segmentId
-             */
-
-            const campaign = await getByIdTx(tx, context, campaignId, false);
-            const sendConfigurationId = campaign.send_configuration;
-
-            const messageData = {
-                campaignId: campaignId,
-                subject: data.subjectPrepend + campaign.subject + data.subjectAppend,
-                html: data.html, // The html, text and tagLanguage may be undefined
-                text: data.text,
-                tagLanguage: data.tagLanguage,
-                attachments: []
-            };
-
-            const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', campaignId);
-            for (const attachment of attachments) {
-                messageData.attachments.push({
-                    filename: attachment.originalname,
-                    path: files.getFilePath('campaign', 'attachment', campaign.id, attachment.filename),
-                    id: attachment.id
-                });
-            }
-
-
-            let listId = data.listId;
-            if (!listId && data.listCid) {
-                const list = await lists.getByCidTx(tx, context, data.listCid);
-                listId = list.id;
-            }
-
-            const segmentId = data.segmentId;
-
-            if (listId) {
-                await enforceSendPermissionTx(tx, context, campaign, true, listId);
-
-                if (data.subscriptionCid) {
-                    const subscriber = await subscriptions.getByCidTx(tx, context, listId, data.subscriptionCid, true, true);
-                    await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
-
-                } else {
-                    const subscribers = await subscriptions.listTestUsersTx(tx, context, listId, segmentId);
-                    for (const subscriber of subscribers) {
-                        await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
-                    }
-                }
-
-            } else {
-                for (const lstSeg of campaign.lists) {
-                    await enforceSendPermissionTx(tx, context, campaign, true, lstSeg.list);
-
-                    const subscribers = await subscriptions.listTestUsersTx(tx, context, lstSeg.list, segmentId);
-                    for (const subscriber of subscribers) {
-                        await processSubscriber(sendConfigurationId, lstSeg.list, subscriber.id, messageData);
-                    }
-                }
-            }
-
-        } else { // This means we are sending a template
-            /*
-                Data coming from the client:
-                - html, text
-                - listCid, subscriptionCid, sendConfigurationId
-             */
-
-            const messageData = {
-                subject: 'Test',
-                html: data.html,
-                text: data.text,
-                tagLanguage: data.tagLanguage
-            };
-
-            const list = await lists.getByCidTx(tx, context, data.listCid);
-            const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid, true, true);
-
-            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', data.sendConfigurationId, 'sendWithoutOverrides');
-            await shares.enforceEntityPermissionTx(tx, context, 'template', data.templateId, 'sendToTestUsers');
-            await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'sendToTestUsers');
-
-            await processSubscriber(data.sendConfigurationId, list.id, subscriber.id, messageData);
+async function gcFilesInAllCampaigns() {
+    return await knex.transaction(async tx => {
+        for (const cpg of await tx('campaigns')) {
+            cpg.data = JSON.parse(cpg.data);
+            await _gcFilesByEntityTx(tx, cpg);
         }
     });
-
-    senders.scheduleCheck();
 }
+
 
 module.exports.Content = Content;
 module.exports.hash = hash;
@@ -1071,7 +965,6 @@ module.exports.getMessageCid = getMessageCid;
 module.exports.getMessageByCid = getMessageByCid;
 module.exports.getMessageByResponseId = getMessageByResponseId;
 
-module.exports.changeStatusByCampaignCidAndSubscriptionIdTx = changeStatusByCampaignCidAndSubscriptionIdTx;
 module.exports.changeStatusByMessage = changeStatusByMessage;
 module.exports.updateMessageResponse = updateMessageResponse;
 
@@ -1086,5 +979,4 @@ module.exports.disable = disable;
 module.exports.rawGetByTx = rawGetByTx;
 module.exports.getTrackingSettingsByCidTx = getTrackingSettingsByCidTx;
 module.exports.getStatisticsOpened = getStatisticsOpened;
-
-module.exports.testSend = testSend;
+module.exports.gcFilesInAllCampaigns = gcFilesInAllCampaigns;

@@ -5,6 +5,7 @@ const campaigns = require('../../models/campaigns');
 
 const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
+const messageSender = require("../../lib/message-sender");
 
 
 router.postAsync('/campaigns-table', passport.loggedIn, async (req, res) => {
@@ -122,7 +123,7 @@ router.postAsync('/campaigns-link-clicks-table/:campaignId', passport.loggedIn, 
 
 router.postAsync('/campaign-test-send', passport.loggedIn, passport.csrfProtection, async (req, res) => {
     const data = req.body;
-    const result = await campaigns.testSend(req.context, data);
+    const result = await messageSender.testSendCampaign(req.context, data);
     return res.json(result);
 });
 

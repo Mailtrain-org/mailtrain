@@ -68,7 +68,7 @@ function getMenus(t) {
                             panelRender: props => <Clone cloneFromChannel={props.resolved.channel}/>,
                             children: {
                                 ':existingCampaignId([0-9]+)': {
-                                    title: resolved => createLabels[resolved.existingCampaign.type],
+                                    title: resolved => t('createCampaign'),
                                     resolve: {
                                         existingCampaign: params => `rest/campaigns-settings/${params.existingCampaignId}`
                                     },

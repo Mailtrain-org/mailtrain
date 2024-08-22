@@ -172,7 +172,7 @@ async function getRouter(appType) {
             image.stream.pipe(res.fileCacheResponse);
         });
 
-        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', resp => {
+        fileHelpers.installUploadHandler(router, '/upload/:type/:entityId', files.ReplacementBehavior.RENAME, null, 'file', true, resp => {
             return {
                 files: resp.files.map(f => ({name: f.name, url: f.url, size: f.size, thumbnailUrl: f.thumbnailUrl}))
             };

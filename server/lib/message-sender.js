@@ -24,6 +24,9 @@ const libmime = require('libmime');
 const { enforce } = require('./helpers');
 const senders = require('./senders');
 const shortid = require('./shortid');
+const shares = require("../models/shares");
+const activityLog = require("./activity-log");
+const {CampaignActivityType} = require('../../shared/activity-log');
 
 const MessageType = {
     REGULAR: 0,
@@ -722,6 +725,124 @@ async function getMessage(campaignCid, listCid, subscriptionCid, settings, isTes
     return await cs._getMessage(mergeTags, list, subscriptionGrouped, false);
 }
 
+async function sendTemplateAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments) {
+    const template = await templates.getById(context, templateId, false);
+
+    await shares.enforceEntityPermission(context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
+
+    await knex.transaction(async tx => {
+        for (const email of emails) {
+            await queueAPITransactionalMessageTx(tx, sendConfigurationId, email, subject, template.html, template.text, template.tag_language, {...mergeTags,  EMAIL: email }, attachments);
+        }
+    });
+}
+
+async function testSendCampaign(context, data) {
+    // Though it's a bit counter-intuitive, this handles also test sends of a template (i.e. without any campaign id)
+
+    await knex.transaction(async tx => {
+        const processSubscriber = async (sendConfigurationId, listId, subscriptionId, messageData) => {
+            await queueCampaignMessageTx(tx, sendConfigurationId, listId, subscriptionId, MessageType.TEST, messageData);
+
+            await activityLog.logEntityActivity('campaign', CampaignActivityType.TEST_SEND, campaignId, {list: listId, subscription: subscriptionId});
+        };
+
+        const campaignId = data.campaignId;
+
+        if (campaignId) { // This means we are sending a campaign
+            /*
+                Data coming from the client:
+                - html, text
+                - subjectPrepend, subjectAppend
+                - listCid, subscriptionCid
+                - listId, segmentId
+             */
+
+            const campaign = await campaigns.getByIdTx(tx, context, campaignId, false);
+            const sendConfigurationId = campaign.send_configuration;
+
+            const messageData = {
+                campaignId: campaignId,
+                subject: data.subjectPrepend + campaign.subject + data.subjectAppend,
+                html: data.html, // The html, text and tagLanguage may be undefined
+                text: data.text,
+                tagLanguage: data.tagLanguage,
+                attachments: []
+            };
+
+            const attachments = await files.listTx(tx, contextHelpers.getAdminContext(), 'campaign', 'attachment', campaignId);
+            for (const attachment of attachments) {
+                messageData.attachments.push({
+                    filename: attachment.originalname,
+                    path: files.getFilePath('campaign', 'attachment', campaign.id, attachment.filename),
+                    id: attachment.id
+                });
+            }
+
+
+            let listId = data.listId;
+            if (!listId && data.listCid) {
+                const list = await lists.getByCidTx(tx, context, data.listCid);
+                listId = list.id;
+            }
+
+            const segmentId = data.segmentId;
+
+            if (listId) {
+                await campaigns.enforceSendPermissionTx(tx, context, campaign, true, listId);
+
+                if (data.subscriptionCid) {
+                    const subscriber = await subscriptions.getByCidTx(tx, context, listId, data.subscriptionCid, true, true);
+                    await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
+
+                } else {
+                    const subscribers = await subscriptions.listTestUsersTx(tx, context, listId, segmentId);
+                    for (const subscriber of subscribers) {
+                        await processSubscriber(sendConfigurationId, listId, subscriber.id, messageData);
+                    }
+                }
+
+            } else {
+                for (const lstSeg of campaign.lists) {
+                    await campaigns.enforceSendPermissionTx(tx, context, campaign, true, lstSeg.list);
+
+                    const subscribers = await subscriptions.listTestUsersTx(tx, context, lstSeg.list, segmentId);
+                    for (const subscriber of subscribers) {
+                        await processSubscriber(sendConfigurationId, lstSeg.list, subscriber.id, messageData);
+                    }
+                }
+            }
+
+        } else { // This means we are sending a template
+            /*
+                Data coming from the client:
+                - html, text
+                - listCid, subscriptionCid, sendConfigurationId
+             */
+
+            const messageData = {
+                subject: 'Test',
+                html: data.html,
+                text: data.text,
+                tagLanguage: data.tagLanguage
+            };
+
+            const list = await lists.getByCidTx(tx, context, data.listCid);
+            const subscriber = await subscriptions.getByCidTx(tx, context, list.id, data.subscriptionCid, true, true);
+
+            await shares.enforceEntityPermissionTx(tx, context, 'sendConfiguration', data.sendConfigurationId, 'sendWithoutOverrides');
+            await shares.enforceEntityPermissionTx(tx, context, 'template', data.templateId, 'sendToTestUsers');
+            await shares.enforceEntityPermissionTx(tx, context, 'list', list.id, 'sendToTestUsers');
+
+            await processSubscriber(data.sendConfigurationId, list.id, subscriber.id, messageData);
+        }
+    });
+
+    senders.scheduleCheck();
+}
+
+
+
 module.exports.MessageSender = MessageSender;
 module.exports.MessageType = MessageType;
 module.exports.sendQueuedMessage = sendQueuedMessage;
@@ -730,3 +851,5 @@ module.exports.queueSubscriptionMessage = queueSubscriptionMessage;
 module.exports.dropQueuedMessage = dropQueuedMessage;
 module.exports.getMessage = getMessage;
 module.exports.queueAPITransactionalMessageTx = queueAPITransactionalMessageTx;
+module.exports.sendTemplateAsTransactionalEmail = sendTemplateAsTransactionalEmail;
+module.exports.testSendCampaign = testSendCampaign;

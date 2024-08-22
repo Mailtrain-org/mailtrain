@@ -374,7 +374,7 @@ router.postAsync('/templates/:templateId/send', async (req, res) => {
     const attachments = input.ATTACHMENTS || [];
 
 
-    const result = await templates.sendAsTransactionalEmail(req.context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments);
+    const result = await messageSender.sendTemplateAsTransactionalEmail(req.context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments);
 
     res.json({ data: result });
 });

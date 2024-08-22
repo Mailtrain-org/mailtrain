@@ -22,7 +22,7 @@ router.getAsync('/files/:type/:subType/:fileId', passport.loggedIn, async (req, 
 });
 
 router.deleteAsync('/files/:type/:subType/:fileId', passport.loggedIn, async (req, res) => {
-    await files.removeFile(req.context, req.params.type, req.params.subType, castToInteger(req.params.fileId));
+    await files.remove(req.context, req.params.type, req.params.subType, castToInteger(req.params.fileId));
     return res.json();
 });
 

@@ -14,8 +14,8 @@ const segments = require('./segments');
 const { enforce, filterObject, hashEmail, normalizeEmail } = require('../lib/helpers');
 const moment = require('moment');
 const { formatDate, formatBirthday } = require('../../shared/date');
-const campaigns = require('./campaigns');
 const lists = require('./lists');
+const campaignSubscriptionHelpers = require("./campaign-subscription-handlers");
 
 const allowedKeysBase = new Set(['email', 'tz', 'is_test', 'status']);
 
@@ -785,7 +785,7 @@ async function unsubscribeByCidAndGet(context, listId, subscriptionCid, campaign
         const existing = await tx(getSubscriptionTableName(listId)).where('cid', subscriptionCid).first();
 
         if (campaignCid) {
-            await campaigns.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, CampaignMessageStatus.UNSUBSCRIBED);
+            await campaignSubscriptionHelpers.changeStatusByCampaignCidAndSubscriptionIdTx(tx, context, campaignCid, listId, existing.id, CampaignMessageStatus.UNSUBSCRIBED);
         }
 
         return await _unsubscribeExistingAndGetTx(tx, context, listId, existing);

@@ -11,7 +11,7 @@ const files = require('./files');
 const dependencyHelpers = require('../lib/dependency-helpers');
 const {convertFileURLs} = require('../lib/campaign-content');
 const { allTagLanguages } = require('../../shared/templates');
-const messageSender = require('../lib/message-sender');
+const log = require("../lib/log");
 
 const allowedKeys = new Set(['name', 'description', 'type', 'tag_language', 'data', 'html', 'text', 'namespace']);
 
@@ -113,6 +113,17 @@ async function create(context, entity) {
     });
 }
 
+async function _gcFilesByEntityTx(tx, tmpl) {
+    await files.gcByEntityTx(tx, 'template', 'file', tmpl.id, file => {
+        if (!tmpl.html.includes(file.filename) && !tmpl.text.includes(file.filename)) {
+            log.info(`Removing unused file in template "${tmpl.name}" (id: ${tmpl.id}) - file "${file.originalname}" (id: ${file.id})`);
+            return true;
+        } else {
+            return false;
+        }
+    })
+}
+
 async function updateWithConsistencyCheck(context, entity) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'template', entity.id, 'edit');
@@ -139,6 +150,9 @@ async function updateWithConsistencyCheck(context, entity) {
         await tx('templates').where('id', entity.id).update(filteredEntity);
 
         await shares.rebuildPermissionsTx(tx, { entityTypeId: 'template', entityId: entity.id });
+
+        const dbEntity = await tx('templates').where('id', entity.id).first();
+        await _gcFilesByEntityTx(tx, dbEntity);
     });
 }
 
@@ -162,16 +176,12 @@ async function remove(context, id) {
     });
 }
 
-async function sendAsTransactionalEmail(context, templateId, sendConfigurationId, emails, subject, mergeTags, attachments) {
-    const template = await getById(context, templateId, false);
-
-    await shares.enforceEntityPermission(context, 'sendConfiguration', sendConfigurationId, 'sendWithoutOverrides');
-
-    await knex.transaction(async tx => {
-		for (const email of emails) {
-			await messageSender.queueAPITransactionalMessageTx(tx, sendConfigurationId, email, subject, template.html, template.text, template.tag_language, {...mergeTags,  EMAIL: email }, attachments);
-		}
-	});
+async function gcFilesInAllTemplates() {
+    return await knex.transaction(async tx => {
+        for (const tmpl of await tx('templates')) {
+            await _gcFilesByEntityTx(tx, tmpl);
+        }
+    });
 }
 
 
@@ -183,4 +193,4 @@ module.exports.listByNamespaceDTAjax = listByNamespaceDTAjax;
 module.exports.create = create;
 module.exports.updateWithConsistencyCheck = updateWithConsistencyCheck;
 module.exports.remove = remove;
-module.exports.sendAsTransactionalEmail = sendAsTransactionalEmail;
+module.exports.gcFilesInAllTemplates = gcFilesInAllTemplates;

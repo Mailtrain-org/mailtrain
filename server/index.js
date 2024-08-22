@@ -21,6 +21,8 @@ const {promisify} = require("node:util");
 const { uploadedFilesDir } = require('./lib/file-helpers');
 const { filesDir } = require('./models/files');
 const { initDb } = require("./lib/dbupdate");
+const templates = require("./models/templates");
+const campaigns = require("./models/campaigns");
 
 const trustedPort = config.www.trustedPort;
 const sandboxPort = config.www.sandboxPort;
@@ -86,6 +88,9 @@ async function init() {
     }
 
     await privilegeHelpers.ensureMailtrainDir(uploadedFilesDir);
+
+    await templates.gcFilesInAllTemplates();
+    await campaigns.gcFilesInAllCampaigns();
 
     await testServer.start();
     await verpServer.start();

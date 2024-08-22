@@ -53,7 +53,7 @@ async function listDTAjax(context, type, subType, entityId, params) {
 async function listTx(tx, context, type, subType, entityId) {
     enforceTypePermitted(type, subType);
     await shares.enforceEntityPermissionTx(tx, context, type, entityId, getFilesPermission(type, subType, 'view'));
-    return await tx(getFilesTable(type, subType)).where({entity: entityId, delete_pending: false}).select(['id', 'originalname', 'filename', 'size', 'created']).orderBy('originalname', 'asc');
+    return await tx(getFilesTable(type, subType)).where({entity: entityId, delete_pending: false}).select(['id', 'originalname', 'filename', 'size', 'created', 'gc_allowed']).orderBy('originalname', 'asc');
 }
 
 async function list(context, type, subType, entityId) {
@@ -135,7 +135,7 @@ async function getFileByUrl(context, url) {
 }
 
 // Adds files to an entity. The source data can be either a file (then it's path is contained in file.path) or in-memory data (then it's content is in file.data).
-async function createFiles(context, type, subType, entityId, files, replacementBehavior, transformResponseFn) {
+async function createFiles(context, type, subType, entityId, files, replacementBehavior, gcAllowed, transformResponseFn) {
     enforceTypePermitted(type, subType);
     if (files.length === 0) {
         // No files uploaded
@@ -196,7 +196,8 @@ async function createFiles(context, type, subType, entityId, files, replacementB
                     filename: file.filename,
                     originalname: originalName,
                     mimetype: file.mimetype,
-                    size: file.size
+                    size: file.size,
+                    gc_allowed: gcAllowed
                 });
 
                 const filesRetEntry = {
@@ -301,22 +302,25 @@ async function unlockTx(tx, type, subType, id) {
     }
 }
 
-async function removeFile(context, type, subType, id) {
-    enforceTypePermitted(type, subType);
+async function _removeTx(tx, type, subType, filesTableName, file) {
+    if (!file.lock_count) {
+        await tx(filesTableName).where('id', file.id).del();
 
+        const filePath = getFilePath(type, subType, file.entity, file.filename);
+        await fs.remove(filePath);
+    } else {
+        await tx(filesTableName).where('id', file.id).update({delete_pending: true});
+    }
+}
+
+async function remove(context, type, subType, id) {
+    enforceTypePermitted(type, subType);
     await knex.transaction(async tx => {
         const filesTableName = getFilesTable(type, subType);
         const file = await tx(filesTableName).where('id', id).first();
         await shares.enforceEntityPermissionTx(tx, context, type, file.entity, getFilesPermission(type, subType, 'manage'));
 
-        if (!file.lock_count) {
-            await tx(filesTableName).where('id', file.id).del();
-
-            const filePath = getFilePath(type, subType, file.entity, file.filename);
-            await fs.remove(filePath);
-        } else {
-            await tx(filesTableName).where('id', file.id).update({delete_pending: true});
-        }
+        await _removeTx(tx, type, subType, filesTableName, file);
     });
 }
 
@@ -335,6 +339,7 @@ async function copyAllTx(tx, context, fromType, fromSubType, fromEntityId, toTyp
 
         delete row.id;
         row.entity = toEntityId;
+        row.gc_allowed = true; // copyAll is used solely for cloning campaigns and templates, thus it is safe to assume that gc should be allowed for all files in the newly cloned template/campaign
     }
 
     if (rows.length > 0) {
@@ -356,6 +361,19 @@ async function removeAllTx(tx, context, type, subType, entityId) {
 }
 
 
+async function gcByEntityTx(tx, type, subType, entityId, shouldRemoveFilter) {
+    enforceTypePermitted(type, subType);
+    const filesTableName = getFilesTable(type, subType);
+    const fls = await tx(filesTableName).where({entity: entityId, delete_pending: false}).select(['id', 'originalname', 'filename', 'size', 'created', 'gc_allowed', 'entity', 'lock_count']);
+    for (const fl of fls) {
+        if (fl.gc_allowed && shouldRemoveFilter(fl)) {
+            await _removeTx(tx, type, subType, filesTableName, fl);
+        }
+    }
+}
+
+
+
 module.exports.filesDir = filesDir;
 module.exports.listDTAjax = listDTAjax;
 module.exports.listTx = listTx;
@@ -365,7 +383,7 @@ module.exports.getFileByFilename = getFileByFilename;
 module.exports.getFileByUrl = getFileByUrl;
 module.exports.getFileByOriginalName = getFileByOriginalName;
 module.exports.createFiles = createFiles;
-module.exports.removeFile = removeFile;
+module.exports.remove = remove;
 module.exports.getFileUrl = getFileUrl;
 module.exports.getFilePath = getFilePath;
 module.exports.copyAllTx = copyAllTx;
@@ -373,3 +391,4 @@ module.exports.removeAllTx = removeAllTx;
 module.exports.lockTx = lockTx;
 module.exports.unlockTx = unlockTx;
 module.exports.ReplacementBehavior = ReplacementBehavior;
+module.exports.gcByEntityTx = gcByEntityTx;
