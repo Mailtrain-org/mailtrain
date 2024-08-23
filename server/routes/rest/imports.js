@@ -37,7 +37,7 @@ router.putAsync('/imports/:listId/:importId', passport.loggedIn, passport.csrfPr
     const entity = JSON.parse(req.body.entity);
     entity.id = castToInteger(req.params.importId);
 
-    await imports.updateWithConsistencyCheck(req.context, castToInteger(req.params.listId), entity, req.files);
+    await imports.updateWithConsistencyCheck(req.context, castToInteger(req.params.listId), entity);
     return res.json();
 });
 
