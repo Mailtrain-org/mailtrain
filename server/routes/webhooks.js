@@ -70,8 +70,6 @@ router.postAsync('/sparkpost', async (req, res) => {
     const events = [].concat(req.body || []); // This is just a cryptic way getting an array regardless whether req.body is empty, one item, or array
 
     for (const curEvent of events) {
-        console.log(curEvent);
-
         let msys = curEvent && curEvent.msys;
         let evt;
 
@@ -123,7 +121,6 @@ router.postAsync('/sendgrid', async (req, res) => {
             continue;
         }
 
-        console.log(evt);
         log.verbose('Sendgrid', 'Received issue "%s" for message id "%s"', evt.event, evt.campaign_id);
 
         const message = await campaigns.getMessageByCid(evt.campaign_id);
@@ -160,7 +157,6 @@ router.postAsync('/sendgrid', async (req, res) => {
 router.postAsync('/mailgun', uploads.any(), async (req, res) => {
     const evt = req.body;
 
-    console.log(evt);
     log.verbose('Mailgun', 'Received issue "%s" for message id "%s"', evt.event, evt.campaign_id);
 
     const message = await campaigns.getMessageByCid([].concat(evt && evt.campaign_id || []).shift());
