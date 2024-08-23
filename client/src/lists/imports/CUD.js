@@ -366,7 +366,7 @@ export default class CUD extends Component {
                 if (mappingType === MappingType.BASIC_SUBSCRIBE || mappingType === MappingType.BASIC_UNSUBSCRIBE) {
                     const sampleRow = this.getFormValue('sampleRow');
                     const sourceOpts = [];
-                    sourceOpts.push({key: '', label: t('––Select ––')});
+                    sourceOpts.push({key: '', label: t('select-1')});
                     if (source === ImportSource.CSV_FILE) {
                         for (const csvCol of settings.csv.columns) {
                             let help = '';

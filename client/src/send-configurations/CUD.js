@@ -232,7 +232,7 @@ export default class CUD extends Component {
                         <CheckBox id="from_name_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="reply_to" label={t('defaultReplytoEmail')}/>
                         <CheckBox id="reply_to_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
-                        <InputField id="x_mailer" label={t('xMailer')}/>
+                        <InputField id="x_mailer" label={t('xmailer')}/>
                     </Fieldset>
 
                     {mailerForm}

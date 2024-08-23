@@ -169,8 +169,8 @@ export function getMailerTypes(t) {
 
     const smtpEncryptionOptions = [
         { key: 'NONE', label: t('doNotUseEncryption')},
-        { key: 'TLS', label: t('useTls –UsuallySelectedForPort465')},
-        { key: 'STARTTLS', label: t('useStarttls –UsuallySelectedForPort587')}
+        { key: 'TLS', label: t('useTlsUsuallySelectedForPort465')},
+        { key: 'STARTTLS', label: t('useStarttlsUsuallySelectedForPort587')}
     ];
 
     const sesRegionOptions = [
@@ -207,17 +207,17 @@ export function getMailerTypes(t) {
     zoneMtaTypeOptions.push({ key: ZoneMTAType.REGULAR, label: t('noDynamicConfigurationOfDkimKeys')});
 
     const renderExtraThrottlingMailerSettings = () => (
-        <Fieldset className={styles.extraThrottlingMailerSettings} label={t('extraThrottlingMailerSettings')}>
-            <InputField id="throttlingWarmUpDays" label={t('throttlingWarmUpDays')} placeholder={t('throttlingWarmUpDaysEg10')} help={t('senderWarmUpPeriodInDays')}/>
-            <InputField id="throttlingWarmUpFrom" label={t('throttlingWarmUpFrom')} placeholder={t('throttlingWarmUpFromDateInUnixTimestampEg1648735303000')} help={t('senderWarmUpPeriodStartingDayInUnixTimestamp')}/>
+        <Fieldset className={styles.extraThrottlingMailerSettings} label={t('extraThrottlingSettings')}>
+            <InputField id="throttlingWarmUpDays" label={t('warmupInterval')} placeholder={t('warmupIntervalInDaysEg10')} help={t('graduallyIncreaseTheVolumeEachDayUntil')}/>
+            <InputField id="throttlingWarmUpFrom" label={t('warmupStartingDate')} placeholder={t('eg1648735303000')} help={t('setTheStartingDateAndTimeInUnixEpoch')}/>
             <div className={styles.enableByDay}>
-                <CheckBox id="enableSenderOnDaySun" text={t('enableSenderOnDaySun')}/>
-                <CheckBox id="enableSenderOnDayMon" text={t('enableSenderOnDayMon')}/>
-                <CheckBox id="enableSenderOnDayTue" text={t('enableSenderOnDayTue')}/>
-                <CheckBox id="enableSenderOnDayWed" text={t('enableSenderOnDayWed')}/>
-                <CheckBox id="enableSenderOnDayThu" text={t('enableSenderOnDayThu')}/>
-                <CheckBox id="enableSenderOnDayFri" text={t('enableSenderOnDayFri')}/>
-                <CheckBox id="enableSenderOnDaySat" text={t('enableSenderOnDaySat')}/>
+                <CheckBox id="enableSenderOnDaySun" text={t('sendingEmailsOnSunday')}/>
+                <CheckBox id="enableSenderOnDayMon" text={t('sendingEmailsOnMonday')}/>
+                <CheckBox id="enableSenderOnDayTue" text={t('sendingEmailsOnTuesday')}/>
+                <CheckBox id="enableSenderOnDayWed" text={t('sendingEmailsOnWednesday')}/>
+                <CheckBox id="enableSenderOnDayThu" text={t('sendingEmailsOnThursday')}/>
+                <CheckBox id="enableSenderOnDayFri" text={t('sendingEmailsOnFriday')}/>
+                <CheckBox id="enableSenderOnDaySat" text={t('sendingEmailsOnSaturday')}/>
             </div>
         </Fieldset>
     );
