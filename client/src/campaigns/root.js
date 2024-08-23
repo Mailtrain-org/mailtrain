@@ -17,6 +17,7 @@ import StatisticsLinkClicks from "./StatisticsLinkClicks";
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 import {namespaceCheckPermissions} from "../lib/namespace";
 import Clone from "./Clone";
+import {canShare} from "../lib/permissions";
 
 function getMenus(t) {
     const aggLabels = {
@@ -127,7 +128,7 @@ function getMenus(t) {
                         share: {
                             title: t('share'),
                             link: params => `/campaigns/${params.campaignId}/share`,
-                            visible: resolved => resolved.campaign.permissions.includes('share'),
+                            visible: resolved => canShare(resolved.campaign.permissions),
                             panelRender: props => <Share title={t('share')} entity={props.resolved.campaign} entityTypeId="campaign" />
                         }
                     }

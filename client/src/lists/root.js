@@ -19,6 +19,7 @@ import ImportRunsStatus from './imports/RunStatus';
 import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 import {namespaceCheckPermissions} from "../lib/namespace";
+import {canShare} from "../lib/permissions";
 
 function getMenus(t) {
     return {
@@ -194,7 +195,7 @@ function getMenus(t) {
                         share: {
                             title: t('share'),
                             link: params => `/lists/${params.listId}/share`,
-                            visible: resolved => resolved.list.permissions.includes('share'),
+                            visible: resolved => canShare(resolved.list.permissions),
                             panelRender: props => <Share title={t('share')} entity={props.resolved.list} entityTypeId="list" />
                         }
                     }
@@ -227,7 +228,7 @@ function getMenus(t) {
                                 share: {
                                     title: t('share'),
                                     link: params => `/lists/forms/${params.formsId}/share`,
-                                    visible: resolved => resolved.forms.permissions.includes('share'),
+                                    visible: resolved => canShare(resolved.forms.permissions),
                                     panelRender: props => <Share title={t('share')} entity={props.resolved.forms} entityTypeId="customForm" />
                                 }
                             }

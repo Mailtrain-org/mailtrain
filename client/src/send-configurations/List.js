@@ -11,6 +11,7 @@ import {getMailerTypes} from './helpers';
 import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRender} from "../lib/modals";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import PropTypes from 'prop-types';
+import {canShare} from "../lib/permissions";
 
 
 @withComponentMixins([
@@ -58,7 +59,7 @@ export default class List extends Component {
                         });
                     }
 
-                    if (perms.includes('share')) {
+                    if (canShare(perms)) {
                         actions.push({
                             label: <Icon icon="share" title={t('share')}/>,
                             link: `/send-configurations/${data[0]}/share`

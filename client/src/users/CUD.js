@@ -255,7 +255,7 @@ export default class CUD extends Component {
                             <InputField id="password2" label={t('repeatPassword')} type="password"/>
                         </div>
                     }
-                    <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={'rest/shares-roles-table/global'} columns={rolesColumns} selectionLabelIndex={1}/>
+                    <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={'rest/shares-global-roles-table'} columns={rolesColumns} selectionLabelIndex={1}/>
                     <NamespaceSelect/>
 
                     <ButtonRow>

@@ -265,7 +265,7 @@ async function listDTAjax(context, listId, params) {
 
 async function listIdName(context, listId) {
     return await knex.transaction(async tx => {
-        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, ['viewSegments']);
+        await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'viewSegments');
 
         return await tx('segments').select(['id', 'name']).where('list', listId).orderBy('name', 'asc');
     });

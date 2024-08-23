@@ -67,7 +67,7 @@ i18n
     });
 
 // Show moment text in selected language
-moment.locale(i18n.language);
+moment.locale(i18n.resolvedLanguage);
 
 export default i18n;
 

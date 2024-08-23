@@ -9,6 +9,7 @@ import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers"
 import {namespaceCheckPermissions} from "../lib/namespace";
 import Clone from "../campaigns/Clone";
+import {canShare} from "../lib/permissions";
 
 function getMenus(t) {
     return {
@@ -51,7 +52,7 @@ function getMenus(t) {
                         share: {
                             title: t('share'),
                             link: params => `/channels/${params.channelId}/share`,
-                            visible: resolved => resolved.channel.permissions.includes('share'),
+                            visible: resolved => canShare(resolved.channel.permissions),
                             panelRender: props => <Share title={t('share')} entity={props.resolved.channel} entityTypeId="channel" />
                         }
                     },

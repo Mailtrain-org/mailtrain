@@ -162,7 +162,7 @@ export default class Share extends Component {
                 <h3 className="legend">{t('addUser')}</h3>
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <TableSelect ref={node => this.usersTableSelect = node} id="userId" label={t('user')} withHeader dropdown dataUrl={`rest/shares-unassigned-users-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={usersColumns} selectionLabelIndex={usersLabelIndex}/>
-                    <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={`rest/shares-roles-table/${this.props.entityTypeId}`} columns={rolesColumns} selectionLabelIndex={1}/>
+                    <TableSelect id="role" label={t('role')} withHeader dropdown dataUrl={`rest/shares-roles-table/${this.props.entityTypeId}/${this.props.entity.id}`} columns={rolesColumns} selectionLabelIndex={1}/>
 
                     <ButtonRow>
                         <Button type="submit" className="btn-primary" icon="check" label={t('share')}/>

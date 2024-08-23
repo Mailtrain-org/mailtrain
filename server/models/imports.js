@@ -88,7 +88,6 @@ async function _validateAndPreprocess(tx, listId, entity, isCreate) {
 
 async function create(context, listId, entity, files) {
     const res = await knex.transaction(async tx => {
-        shares.enforceGlobalPermission(context, 'setupAutomation');
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageImports');
 
         await _validateAndPreprocess(tx, listId, entity, true);
@@ -130,7 +129,6 @@ async function create(context, listId, entity, files) {
 
 async function updateWithConsistencyCheck(context, listId, entity) {
     await knex.transaction(async tx => {
-        shares.enforceGlobalPermission(context, 'setupAutomation');
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageImports');
 
         const existing = await tx('imports').where({list: listId, id: entity.id}).first();
@@ -195,7 +193,6 @@ async function removeAllByListIdTx(tx, context, listId) {
 
 async function start(context, listId, id) {
     await knex.transaction(async tx => {
-        shares.enforceGlobalPermission(context, 'setupAutomation');
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageImports');
 
         const entity = await tx('imports').where({list: listId, id}).first();
@@ -225,7 +222,6 @@ async function start(context, listId, id) {
 
 async function stop(context, listId, id) {
     await knex.transaction(async tx => {
-        shares.enforceGlobalPermission(context, 'setupAutomation');
         await shares.enforceEntityPermissionTx(tx, context, 'list', listId, 'manageImports');
 
         const entity = await tx('imports').where({list: listId, id}).first();

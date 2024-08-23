@@ -38,7 +38,6 @@ export function getMailerTypes(t) {
 
     function validateNumber(state, field, label, emptyAllowed = false) {
         const value = state.getIn([field, 'value']);
-        console.log(field, value, emptyAllowed);
         if (typeof value === 'string' && value.trim() === '' && !emptyAllowed) { // After load, the numerical values can be still numbers
             state.setIn([field, 'error'], t('labelMustNotBeEmpty', {label}));
         } else if (isNaN(value)) {

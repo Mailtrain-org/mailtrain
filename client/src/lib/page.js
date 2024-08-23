@@ -699,7 +699,7 @@ export function getLanguageChooser(t) {
         )
     }
 
-    const currentLngCode = getLang(i18n.language).getShortLabel(t);
+    const currentLngCode = getLang(i18n.resolvedLanguage).getShortLabel(t);
 
     const languageChooser = (
         <NavDropdown menuClassName="dropdown-menu-end" label={currentLngCode}>

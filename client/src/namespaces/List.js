@@ -11,6 +11,7 @@ import {getGlobalNamespaceId} from "../../../shared/namespaces";
 import {withComponentMixins} from "../lib/decorator-helpers";
 import mailtrainConfig from 'mailtrainConfig';
 import PropTypes from 'prop-types';
+import {canShare} from "../lib/permissions";
 
 @withComponentMixins([
     withTranslation,
@@ -46,7 +47,7 @@ export default class List extends Component {
                 });
             }
 
-            if (node.data.permissions.includes('share')) {
+            if (canShare(node.data.permissions)) {
                 actions.push({
                     label: <Icon icon="share" title={t('share')}/>,
                     link: `/namespaces/${node.key}/share`

@@ -10,6 +10,7 @@ import MosaicoCUD from './mosaico/CUD';
 import MosaicoList from './mosaico/List';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 import {namespaceCheckPermissions} from "../lib/namespace";
+import {canShare} from "../lib/permissions";
 
 function getMenus(t) {
     return {
@@ -55,7 +56,7 @@ function getMenus(t) {
                         share: {
                             title: t('share'),
                             link: params => `/templates/${params.templateId}/share`,
-                            visible: resolved => resolved.template.permissions.includes('share'),
+                            visible: resolved => canShare(resolved.template.permissions),
                             panelRender: props => <Share title={t('share')} entity={props.resolved.template} entityTypeId="template" />
                         }
                     }
@@ -100,7 +101,7 @@ function getMenus(t) {
                                 share: {
                                     title: t('share'),
                                     link: params => `/templates/mosaico/${params.mosaiceTemplateId}/share`,
-                                    visible: resolved => resolved.mosaicoTemplate.permissions.includes('share'),
+                                    visible: resolved => canShare(resolved.mosaicoTemplate.permissions),
                                     panelRender: props => <Share title={t('share')} entity={props.resolved.mosaicoTemplate} entityTypeId="mosaicoTemplate" />
                                 }
                             }

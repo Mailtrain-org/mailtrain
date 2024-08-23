@@ -6,6 +6,7 @@ import List from './List';
 import Share from '../shares/Share';
 import {ellipsizeBreadcrumbLabel} from "../lib/helpers";
 import {namespaceCheckPermissions} from "../lib/namespace";
+import {canShare} from "../lib/permissions";
 
 function getMenus(t) {
     return {
@@ -37,7 +38,7 @@ function getMenus(t) {
                         share: {
                             title: t('share'),
                             link: params => `/namespaces/${params.namespaceId}/share`,
-                            visible: resolved => resolved.namespace.permissions.includes('share'),
+                            visible: resolved => canShare(resolved.namespace.permissions),
                             panelRender: props => <Share title={t('share')} entity={props.resolved.namespace} entityTypeId="namespace" />
                         }
                     }

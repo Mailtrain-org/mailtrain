@@ -252,29 +252,30 @@ seleniumWebDriver:
 # the custom config.
 defaultRoles:
   global:
-    master:
+    globalMaster:
       name: Global Master
       admin: true
       description: All permissions
-      permissions: [rebuildPermissions, displayManageUsers, manageBlacklist, manageSettings, setupAutomation]
+      permissions: [rebuildPermissions, displayManageUsers, manageBlacklist, manageSettings, assignRole]
       rootNamespaceRole: master
-    branchMaster:
-      name: Branch Master
+    namespaceMaster:
+      name: Namespace Master
       description: All permissions within a namespace
-      permissions: [rebuildPermissions, displayManageUsers, manageBlacklist, manageSettings, setupAutomation]
+      permissions: [rebuildPermissions, displayManageUsers, assignRole:branchMaster, assignRole:campaignsAdmin, assignRole:campaignsAdminWithReshare, assignRole:none]
       ownNamespaceRole: master
+    campaignsAdminWithReshare:
+      name: Campaigns Admin (with re-share)
+      description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations. The user has permissions to re-share.
+      ownNamespaceRole: campaignsAdminWithReshare
+      permissions: []
     campaignsAdmin:
       name: Campaigns Admin
       description: Under the namespace in which the user is located, the user has all permissions for managing lists, templates and campaigns and the permission to send to send configurations.
-      permissions: [setupAutomation]
       ownNamespaceRole: campaignsAdmin
-    campaignsAdminWithoutNamespace:
-      name: Campaigns Admin (multiple namespaces)
-      description: Has basic set of rights to setup campaigns, edit lists and templates. The particular namespaces to which it has access have to be shared individually
-      permissions: [setupAutomation]
-    nobody:
+      permissions: []
+    none:
       name: None
-      description: No permissions
+      description: No permissions by default. Permissions have to be assigned by directly sharing namespaces and other entities.
       permissions: []
 
   namespace:
@@ -292,19 +293,33 @@ defaultRoles:
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
         namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createSendConfiguration, createChannel, createCampaign, manageUsers]
 
-    campaignsAdmin:
-      name: Campaigns Admin
-      description: In the respective namespace, the user has all permissions for managing lists, channels, templates and campaigns and the permission to send to send configurations.
-      permissions: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
+    campaignsAdminWithReshare:
+      name: Campaigns Admin (with re-share)
+      description: In the respective namespace, the user has all permissions for managing lists, channels, templates and campaigns and the permission to send to send configurations. The user has permissions to re-share.
+      permissions: [view, edit, delete, share:campaignsAdminWithReshare, share:campaignsAdmin, share:campaignsCreator, share:campaignsViewer, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
       children:
-        sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
+        sendConfiguration: [viewPublic, share:campaignsCreator, sendWithAllowedOverrides]
         list: [view, edit, delete, share, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
         customForm: [view, edit, delete, share]
         channel: [view, edit, delete, createCampaign, share]
         campaign: [view, edit, delete, share, viewFiles, manageFiles, viewAttachments, manageAttachments, send, sendToTestUsers, viewStats]
         template: [view, edit, delete, share, viewFiles, manageFiles, sendToTestUsers]
         mosaicoTemplate: [view, edit, delete, share, viewFiles, manageFiles]
-        namespace: [view, edit, delete, share, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
+        namespace: [view, edit, delete, share:campaignsAdminWithReshare, share:campaignsAdmin, share:campaignsCreator, share:campaignsViewer, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
+
+    campaignsAdmin:
+      name: Campaigns Admin
+      description: In the respective namespace, the user has all permissions for managing lists, channels, templates and campaigns and the permission to send to send configurations.
+      permissions: [view, edit, delete, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
+      children:
+        sendConfiguration: [viewPublic, sendWithoutOverrides, sendWithAllowedOverrides]
+        list: [view, edit, delete, viewFields, manageFields, viewSubscriptions, viewTestSubscriptions, manageSubscriptions, viewSegments, manageSegments, viewImports, manageImports, send, sendToTestUsers]
+        customForm: [view, edit, delete]
+        channel: [view, edit, delete, createCampaign]
+        campaign: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, send, sendToTestUsers, viewStats]
+        template: [view, edit, delete, viewFiles, manageFiles, sendToTestUsers]
+        mosaicoTemplate: [view, edit, delete, viewFiles, manageFiles]
+        namespace: [view, edit, delete, createNamespace, createList, createCustomForm, createTemplate, createMosaicoTemplate, createChannel, createCampaign]
 
     campaignsCreator:
       name: Campaigns Creator
@@ -316,12 +331,12 @@ defaultRoles:
         campaign: [view, edit, delete, viewFiles, manageFiles, viewAttachments, manageAttachments, sendToTestUsers, viewStats]
         template: [view, edit, delete, viewFiles, manageFiles, sendToTestUsers]
         mosaicoTemplate: [view, viewFiles]
-        namespace: [view, createTemplate, createChannel, createCampaign]
+        namespace: [view, createTemplate, createCampaign]
 
     campaignsViewer:
       name: Campaigns Viewer
       description: In the respective namespace, the user has permissions to view campaigns and templates in order to be able to replicate them.
-      permissions: [view, createTemplate, createCampaign]
+      permissions: [view]
       children:
         channel: [view]
         campaign: [view, viewFiles, viewAttachments]

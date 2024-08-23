@@ -10,6 +10,7 @@ import {tableAddDeleteButton, tableRestActionDialogInit, tableRestActionDialogRe
 import {withComponentMixins} from "../lib/decorator-helpers";
 import {withForm} from "../lib/form";
 import PropTypes from 'prop-types';
+import {canShare} from "../lib/permissions";
 
 @withComponentMixins([
     withTranslation,
@@ -94,7 +95,7 @@ export default class List extends Component {
                         });
                     }
 
-                    if (perms.includes('share')) {
+                    if (canShare(perms)) {
                         actions.push({
                             label: <Icon icon="share" title={t('share')}/>,
                             link: `/lists/${data[0]}/share`

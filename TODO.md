@@ -1,13 +1,16 @@
 Note that some of these may be already obsolete...
 
-## Current
-- Attached images should not show up in the attachments
-- Add API
-- Some dashboard
-- Simplify import
+## Current - blockers
+- Attached images should not show up in the attachments - implemented, needs to be tested
 - create a namespace master that can create users and edit send configurations
   - make sure that the users cannot be given global master roles
 - refresh localization
+
+## Current - low-priority
+- Add API
+- Some dashboard
+- Simplify import
+
 
 ## Possibly obsolete
 

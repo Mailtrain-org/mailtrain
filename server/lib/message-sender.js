@@ -201,10 +201,11 @@ class MessageSender {
         if (replaceDataImgs) {
             // replace data: images with embedded attachments
             html = html.replace(/(<img\b[^>]* src\s*=[\s"']*)(data:[^"'>\s]+)/gi, (match, prefix, dataUri) => {
-                const cid = shortid.generate() + '-attachments';
+                const cid = shortid.generate() + '-inline';
                 attachments.push({
                     path: dataUri,
-                    cid
+                    cid,
+                    contentDisposition: 'inline',
                 });
                 return prefix + 'cid:' + cid;
             });

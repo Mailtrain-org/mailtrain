@@ -59,7 +59,7 @@ export default class List extends Component {
                         refreshTimeout = 1000;
                     }
 
-                    if (mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports')) {
+                    if (this.props.list.permissions.includes('manageImports')) {
                         actions.push({
                             label: <Icon icon="edit" title={t('edit')}/>,
                             link: `/lists/${this.props.list.id}/imports/${data[0]}/edit`
@@ -83,7 +83,7 @@ export default class List extends Component {
         return (
             <div>
                 {tableRestActionDialogRender(this)}
-                {mailtrainConfig.globalPermissions.setupAutomation && this.props.list.permissions.includes('manageImports') &&
+                {this.props.list.permissions.includes('manageImports') &&
                     <Toolbar>
                         <LinkButton to={`/lists/${this.props.list.id}/imports/create`} className="btn-primary" icon="plus" label={t('createImport')}/>
                     </Toolbar>

@@ -86,6 +86,7 @@ export default class API extends Component {
                     </div>
                 </div>
 
+{/*
 <div className="accordion" id="apicalls">
     <div className="card">
         <div className="card-header">
@@ -597,7 +598,7 @@ export default class API extends Component {
         </div>
     </div>
 </div>
-
+*/}
 
 
             </div>

@@ -22,7 +22,7 @@ const namespaceHelpers = require('../lib/namespace-helpers');
 
 const allowedKeys = new Set(['username', 'name', 'email', 'password', 'namespace', 'role']);
 const ownAccountAllowedKeys = new Set(['name', 'email', 'password']);
-const allowedKeysExternal = new Set(['username', 'namespace', 'role', 'name', 'email']);
+const allowedKeysExternal = new Set(['username', 'namespace', 'role']);
 const hashKeys = new Set(['username', 'name', 'email', 'namespace', 'role']);
 const shares = require('./shares');
 const contextHelpers = require('../lib/context-helpers');
@@ -119,7 +119,7 @@ async function listDTAjax(context, params) {
     );
 }
 
-async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
+async function _validateAndPreprocess(tx, context, entity, isCreate, isOwnAccount) {
     enforce(await tools.validateEmail(entity.email) === 0, 'Invalid email');
 
     const otherUserWithSameEmailQuery = tx('users').where('email', entity.email);
@@ -131,10 +131,14 @@ async function _validateAndPreprocess(tx, entity, isCreate, isOwnAccount) {
         throw new interoperableErrors.DuplicitEmailError();
     }
 
-
     if (!isOwnAccount) {
         await namespaceHelpers.validateEntity(tx, entity);
         enforce(entity.role in config.roles.global, 'Unknown role');
+        shares.enforceGlobalPermission(context, ['assignRole', `assignRole:${entity.role}`]);
+
+        if (!shares.checkGlobalPermission(context, 'assignRole') && !shares.checkGlobalPermission(context, 'assignRole:' + entity.role)) {
+            shares.throwPermissionDenied();
+        }
 
         const otherUserWithSameUsernameQuery = tx('users').where('username', entity.username);
         if (!isCreate) {
@@ -167,7 +171,7 @@ async function create(context, user) {
         await shares.enforceEntityPermissionTx(tx, context, 'namespace', user.namespace, 'manageUsers');
 
         if (passport.isAuthMethodLocal) {
-            await _validateAndPreprocess(tx, user, true);
+            await _validateAndPreprocess(tx, context, user, true);
 
             const ids = await tx('users').insert(filterObject(user, allowedKeys));
             id = ids[0];
@@ -206,7 +210,7 @@ async function updateWithConsistencyCheck(context, user, isOwnAccount) {
         }
 
         if (passport.isAuthMethodLocal) {
-            await _validateAndPreprocess(tx, user, false, isOwnAccount);
+            await _validateAndPreprocess(tx, context, user, false, isOwnAccount);
 
             if (isOwnAccount && user.password) {
                 if (!await bcrypt.compare(user.currentPassword, existing.password)) {

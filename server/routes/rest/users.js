@@ -21,7 +21,7 @@ router.putAsync('/users/:userId', passport.loggedIn, passport.csrfProtection, as
     const user = req.body;
     user.id = castToInteger(req.params.userId);
 
-    await users.updateWithConsistencyCheck(req.context, user);
+    await users.updateWithConsistencyCheck(req.context, user, user.id === req.user.id);
     return res.json();
 });
 

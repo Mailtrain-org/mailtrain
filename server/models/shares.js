@@ -17,7 +17,7 @@ const {getAdminId} = require('../../shared/users');
 async function listByEntityDTAjax(context, entityTypeId, entityId, params) {
     return await knex.transaction(async (tx) => {
         const entityType = entitySettings.getEntityType(entityTypeId);
-        await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
+        await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, ['share', 'share:%']);
 
         return await dtHelpers.ajaxListTx(
             tx,
@@ -66,7 +66,7 @@ async function listUnassignedUsersDTAjax(context, entityTypeId, entityId, params
     return await knex.transaction(async (tx) => {
         const entityType = entitySettings.getEntityType(entityTypeId);
 
-        await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, 'share');
+        await enforceEntityPermissionTx(tx, context, entityTypeId, entityId, ['share', 'share:%']);
 
         return await dtHelpers.ajaxListTx(
             tx,
@@ -85,14 +85,53 @@ async function listUnassignedUsersDTAjax(context, entityTypeId, entityId, params
     });
 }
 
-async function listRolesDTAjax(entityTypeId, params) {
+async function listRolesDTAjax(context, entityTypeId, entityId, params) {
+    const entityType = entitySettings.getEntityType(entityTypeId);
     return await dtHelpers.ajaxList(
         params,
         builder => builder
-            .from('generated_role_names')
-            .where({entity_type: entityTypeId}),
-        ['role', 'name', 'description']
+            .from(entityType.permissionsTable)
+            .join('generated_role_names')
+            .where('generated_role_names.entity_type', entityTypeId)
+            .andWhere(`${entityType.permissionsTable}.entity`, entityId)
+            .andWhere(`${entityType.permissionsTable}.user`, context.user.id)
+            .andWhere(function () {
+                this.where(`${entityType.permissionsTable}.operation`, 'share')
+                .orWhereRaw(`${entityType.permissionsTable}.operation = concat('share:', generated_role_names.role)`);
+            }),
+        ['generated_role_names.role', 'generated_role_names.name', 'generated_role_names.description']
     );
+}
+
+async function listGlobalRolesDTAjax(context, params) {
+    const globalPerms = getGlobalPermissions(context);
+
+    if (globalPerms.includes('assignRole')) {
+        return await dtHelpers.ajaxList(
+            params,
+            builder => builder
+                .from('generated_role_names')
+                .where('entity_type', 'global'),
+                ['role', 'name', 'description']
+        );
+
+    } else {
+        const allowedRoles = [];
+        for (const perm of globalPerms) {
+            if (perm.startsWith('assignRole:')) {
+                allowedRoles.push(perm.substring(11));
+            }
+        }
+
+        return await dtHelpers.ajaxList(
+            params,
+            builder => builder
+                .from('generated_role_names')
+                .where('entity_type', 'global')
+                .whereIn('role', allowedRoles),
+                ['role', 'name', 'description']
+        );
+    }
 }
 
 async function assign(context, entityTypeId, entityId, userId, role) {
@@ -469,6 +508,7 @@ async function removeDefaultShares(tx, user) {
     }
 }
 
+// At the moment it checks only equality of required operations (no SQL-style "LIKE" queries)
 function checkGlobalPermission(context, requiredOperations) {
     if (!context.user) {
         return false;
@@ -517,6 +557,7 @@ function enforceGlobalPermission(context, requiredOperations) {
     }
 }
 
+// This allows SQL-style "LIKE" queries. E.g., requiredOperations = ['share', 'share:%']
 async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredOperations) {
     if (!context.user) {
         return false;
@@ -548,7 +589,13 @@ async function _checkPermissionTx(tx, context, entityTypeId, entityId, requiredO
     } else {
         const permsQuery = tx(entityType.permissionsTable)
             .where('user', context.user.id)
-            .whereIn('operation', requiredOperations);
+            .andWhere(function () {
+                this.whereRaw("operation like ? COLLATE utf8mb4_bin", [requiredOperations[0]])
+
+                for (let i = 1; i < requiredOperations.length; i++) {
+                    this.orWhereRaw("operation like ? COLLATE utf8mb4_bin", [requiredOperations[i]]);
+                }
+            });
 
         if (entityId) {
             permsQuery.andWhere('entity', entityId);
@@ -707,6 +754,7 @@ module.exports.listByEntityDTAjax = listByEntityDTAjax;
 module.exports.listByUserDTAjax = listByUserDTAjax;
 module.exports.listUnassignedUsersDTAjax = listUnassignedUsersDTAjax;
 module.exports.listRolesDTAjax = listRolesDTAjax;
+module.exports.listGlobalRolesDTAjax = listGlobalRolesDTAjax;
 module.exports.assign = assign;
 module.exports.rebuildPermissionsTx = rebuildPermissionsTx;
 module.exports.rebuildPermissions = rebuildPermissions;

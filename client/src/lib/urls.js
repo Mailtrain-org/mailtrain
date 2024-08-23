@@ -20,7 +20,7 @@ export function getSandboxUrl(path, customRestrictedAccessToken, opts) {
      const url = new URL(localRestrictedAccessToken + '/' + (path || ''), mailtrainConfig.sandboxUrlBase);
 
     if (opts && opts.withLocale) {
-        url.searchParams.append('locale', i18n.language);
+        url.searchParams.append('locale', i18n.resolvedLanguage);
     }
 
     return url.toString();
@@ -30,7 +30,7 @@ export function getPublicUrl(path, opts) {
     const url = new URL(path || '', mailtrainConfig.publicUrlBase);
 
     if (opts && opts.withLocale) {
-        url.searchParams.append('locale', i18n.language);
+        url.searchParams.append('locale', i18n.resolvedLanguage);
     }
 
     return url.toString();
