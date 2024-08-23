@@ -3,8 +3,10 @@
   "private": true,
   "version": "3.0.0",
   "description": "Extractor for t-functions in the code (client and server)",
-  "main": "extract.js",
-  "scripts": {},
+  "main": "extract.mjs",
+  "scripts": {
+    "extract": "node extract.mjs"
+  },
   "license": "GPL-3.0",
   "homepage": "https://mailtrain.org/",
   "engines": {

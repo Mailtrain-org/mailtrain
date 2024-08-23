@@ -1,19 +1,17 @@
-'use strict';
-
 // Processes statements like these:
 // tUI(/*prefix:account*/'account.passwordChangeRequest', language)
 // /*prefix:helpers*/<Trans i18nKey="userMessagesUnread" count={count}>Hello <strong title={t('nameTitle')}>{{name}}</strong>, you have {{count}} unread message. <Link to="/msgs">Go to messages</Link>.</Trans>
 
-const fs = require('fs');
-const path = require('path');
-const klawSync = require('klaw-sync');
-const acorn = require("acorn");
-const acornJsx = require("acorn-jsx");
-const ellipsize = require('ellipsize');
-const camelCase = require('camelcase');
-const slugify = require('slugify');
-const readline = require('readline');
-const deepKeys = require('deep-keys');
+import fs from 'fs';
+import path from 'path';
+import klawSync from 'klaw-sync';
+import * as acorn from 'acorn';
+import acornJsx from 'acorn-jsx';
+import ellipsize from 'ellipsize';
+import camelCase from 'camelcase';
+import slugify from 'slugify';
+import readline from 'readline';
+import deepKeys from 'deep-keys';
 
 const localeMain = 'en-US/common.json';
 const localeMainPrevious = 'en-US-last-run/common.json';
