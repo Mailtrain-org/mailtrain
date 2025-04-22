@@ -8,7 +8,7 @@ const router = require('../../lib/router-async').create();
 const {castToInteger} = require('../../lib/helpers');
 
 
-router.postAsync('/subscriptions-table/:listId/:segmentId?', passport.loggedIn, async (req, res) => {
+router.postAsync('/subscriptions-table/:listId{/:segmentId}', passport.loggedIn, async (req, res) => {
     return res.json(await subscriptions.listDTAjax(req.context, castToInteger(req.params.listId), req.params.segmentId ? castToInteger(req.params.segmentId) : null, req.body));
 });
 

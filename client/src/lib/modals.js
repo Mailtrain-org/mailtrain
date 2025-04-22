@@ -9,7 +9,7 @@ import {getUrl} from "./urls";
 import {withPageHelpers} from "./page";
 import * as styles from './styles.scss';
 import interoperableErrors from '../../../shared/interoperable-errors';
-import {Link} from "react-router-dom";
+import {Link} from "./router";
 import {withComponentMixins} from "./decorator-helpers";
 import {withAsyncErrorHandler} from "./error-handling";
 import ACEEditorRaw from 'react-ace';

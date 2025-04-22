@@ -19,6 +19,13 @@ export default class List extends Component {
     static propTypes = {
     }
 
+    componentDidMount() {
+        const t = this.props.t;
+        const queryParams = this.props.location.search;
+        if (queryParams.indexOf('cas-login-success') > -1) this.setFlashMessage('success', t('authenticationSuccessful'));
+        if (queryParams.indexOf('cas-logout-success') > -1) this.setFlashMessage('success', t('logoutSuccessful'));
+    }
+
     render() {
         const t = this.props.t;
 

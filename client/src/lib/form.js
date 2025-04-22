@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from './i18n';
 import axios, {HTTPMethod} from './axios';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import interoperableErrors from '../../../shared/interoperable-errors';
 import {withPageHelpers} from './page'

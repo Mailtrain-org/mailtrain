@@ -2,13 +2,11 @@
 
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Redirect} from "./router";
 import {withAsyncErrorHandler, withErrorHandling} from "./error-handling";
 import axios from "../lib/axios";
 import {getUrl} from "./urls";
 import {createComponentMixin, withComponentMixins} from "./decorator-helpers";
-import {withTranslation} from "./i18n";
-import shallowEqual from "shallowequal";
 import {checkPermissions} from "./permissions";
 
 async function resolve(route, match, prevResolverState) {
@@ -143,8 +141,35 @@ async function resolve(route, match, prevResolverState) {
     return { resolved, permissions, resolverState };
 }
 
-export function getRoutes(structure, parentRoute) {
-    function _getRoutes(urlPrefix, resolve, checkPermissions, parents, structure, navs, primaryMenuComponent) {
+export function getRoutes(structure) {
+    function addRouteKeyToRegex(regexPrefix, routeKey) {
+        let regexStr = regexPrefix;
+        if (regexStr !== '') {
+            regexStr += '/';
+        }
+        const routeKeyReMatch = routeKey.match(/^:(\w+)(?:\(([^)]+)\))?(\??)$/);
+        if (routeKeyReMatch) {
+            const paramName = routeKeyReMatch[1];
+            const paramRegex = routeKeyReMatch[2];
+            const isOptional = routeKeyReMatch[3] === '?';
+
+            if (paramRegex) {
+                regexStr += `(?<${paramName}>${paramRegex})`;
+            } else {
+                regexStr += `(?<${paramName}>[^/]+)`;
+            }
+
+            if (isOptional) {
+                regexStr += '?';
+            }
+        } else {
+            regexStr += routeKey;
+        }
+
+        return regexStr;
+    }
+
+    function _getRoutes(urlPrefix, regexPrefix, resolve, checkPermissions, parents, structure, navs, primaryMenuComponent) {
         let routes = [];
         for (let routeKey in structure) {
             const entry = structure[routeKey];
@@ -152,8 +177,13 @@ export function getRoutes(structure, parentRoute) {
             let path = urlPrefix + routeKey;
             let pathWithParams = path;
 
+            let regexStr = addRouteKeyToRegex(regexPrefix, routeKey);
+
             if (entry.extraParams) {
-                pathWithParams = pathWithParams + '/' + entry.extraParams.join('/');
+                for (const extraParam of entry.extraParams) {
+                    pathWithParams += `/${extraParam}`;
+                    regexStr = addRouteKeyToRegex(regexStr, extraParam);
+                }
             }
 
             let entryResolve;
@@ -196,25 +226,17 @@ export function getRoutes(structure, parentRoute) {
 
             const route = {
                 path: (pathWithParams === '' ? '/' : pathWithParams),
-                exact: !entry.structure && entry.exact !== false,
-                structure: entry.structure,
+                regex: new RegExp('^\/' + regexStr + '$'),
                 panelComponent: entry.panelComponent,
                 panelRender: entry.panelRender,
                 primaryMenuComponent: (entry.primaryMenuComponent || entry.primaryMenuComponent === null) ? entry.primaryMenuComponent : primaryMenuComponent,
                 title: entry.title,
                 link: entry.link,
                 panelInFullScreen: entry.panelInFullScreen,
-                insideIframe: entry.insideIframe,
                 resolve: entryResolveWithLocal,
                 checkPermissions: entryCheckPermissions,
                 parents,
                 navs: [...navs, ...entryNavs],
-
-                // This is primarily for route embedding via "structure"
-                routeSpec: entry,
-                urlPrefix,
-                siblingNavs: navs,
-                routeKey
             };
 
             routes.push(route);
@@ -229,36 +251,19 @@ export function getRoutes(structure, parentRoute) {
                     const childNavs = [...entryNavs];
                     childNavs[navKeyIdx] = Object.assign({}, childNavs[navKeyIdx], { active: true });
 
-                    routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, { [navKey]: nav }, childNavs, route.primaryMenuComponent));
+                    routes = routes.concat(_getRoutes(path + '/', regexStr, entryResolve, entryCheckPermissions, childrenParents, { [navKey]: nav }, childNavs, route.primaryMenuComponent));
                 }
             }
 
             if (entry.children) {
-                routes = routes.concat(_getRoutes(path + '/', entryResolve, entryCheckPermissions, childrenParents, entry.children, entryNavs, route.primaryMenuComponent));
+                routes = routes.concat(_getRoutes(path + '/', regexStr, entryResolve, entryCheckPermissions, childrenParents, entry.children, entryNavs, route.primaryMenuComponent));
             }
         }
 
         return routes;
     }
 
-    if (parentRoute) {
-        // This embeds the structure in the parent route.
-
-        const routeSpec = parentRoute.routeSpec;
-
-        const extStructure = {
-            ...routeSpec,
-            structure: undefined,
-            ...structure,
-            navs: { ...(routeSpec.navs || {}), ...(structure.navs || {}) },
-            children: { ...(routeSpec.children || {}), ...(structure.children || {}) }
-        };
-
-        return _getRoutes(parentRoute.urlPrefix, parentRoute.resolve, parentRoute.checkPermissions, parentRoute.parents, { [parentRoute.routeKey]: extStructure }, parentRoute.siblingNavs, parentRoute.primaryMenuComponent);
-
-    } else {
-        return _getRoutes('', {}, {}, [], { "": structure }, [], null, null);
-    }
+    return _getRoutes('', '', {}, {}, [], { "": structure }, [], null, null);
 }
 
 
@@ -272,7 +277,8 @@ export class Resolver extends Component {
         this.state = {
             resolved: null,
             permissions: null,
-            resolverState: null
+            resolverState: null,
+            currentPathname: props.location.pathname,
         };
 
         if (Object.keys(props.route.resolve).length === 0 && Object.keys(props.route.checkPermissions).length === 0) {
@@ -289,26 +295,26 @@ export class Resolver extends Component {
     }
 
     @withAsyncErrorHandler
-    async resolve(prevMatch) {
+    async resolve() {
         const props = this.props;
 
         if (Object.keys(props.route.resolve).length === 0 && Object.keys(props.route.checkPermissions).length === 0) {
             this.setState({
                 resolved: {},
                 permissions: {},
-                resolverState: null
+                resolverState: null,
+                currentPathname: props.location.pathname,
             });
 
         } else {
             const prevResolverState = this.state.resolverState;
 
-            if (this.state.resolverState) {
-                this.setState({
-                    resolved: null,
-                    permissions: null,
-                    resolverState: null
-                });
-            }
+            this.setState({
+                resolved: null,
+                permissions: null,
+                resolverState: null,
+                currentPathname: props.location.pathname,
+            });
 
             const {resolved, permissions, resolverState} = await resolve(props.route, props.match, prevResolverState);
 
@@ -328,18 +334,27 @@ export class Resolver extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.location.state !== prevProps.location.state || !shallowEqual(this.props.match.params, prevProps.match.params)) {
+        if (this.props.location.state !== prevProps.location.state || this.props.location.pathname !== prevProps.location.pathname) {
             // noinspection JSIgnoredPromiseFromCall
-            this.resolve(prevProps.route, prevProps.match);
+            this.resolve();
         }
     }
 
     componentWillUnmount() {
-        this.disregardResolve = true; // This is to prevent the warning about setState on discarded component when we immediatelly redirect.
+        this.disregardResolve = true; // This is to prevent the warning about setState on discarded component when we immediately redirect.
     }
 
     render() {
-        return this.props.render(this.state.resolved, this.state.permissions, this.props);
+        let resolved, permissions;
+        if (this.state.currentPathname === this.props.location.pathname) {
+            resolved = this.state.resolved;
+            permissions = this.state.permissions;
+        } else {
+            resolved = null;
+            permissions = null;
+        }
+
+        return this.props.render(resolved, permissions, this.props);
     }
 }
 
@@ -364,53 +379,8 @@ class RedirectRoute extends Component {
     }
 }
 
-
-@withComponentMixins([
-    withTranslation
-])
-class SubRoute extends Component {
-    static propTypes = {
-        route: PropTypes.object.isRequired,
-        location: PropTypes.object.isRequired,
-        match: PropTypes.object.isRequired,
-        flashMessage: PropTypes.object,
-        panelRouteCtor: PropTypes.func.isRequired,
-        loadingMessageFn: PropTypes.func.isRequired
-    }
-
-    render() {
-        const t = this.props.t;
-        const route = this.props.route;
-        const params = this.props.match.params;
-
-        const render = (resolved, permissions) => {
-            if (resolved && permissions) {
-                const subStructure = route.structure(resolved, permissions, params);
-                const routes = getRoutes(subStructure, route);
-
-                const _renderRoute = route => {
-                    const render = props => renderRoute(route, this.props.panelRouteCtor, this.props.loadingMessageFn, this.props.flashMessage, props);
-                    return <Route key={route.path} exact={route.exact} path={route.path} render={render} />
-                };
-
-                return (
-                    <Switch>{routes.map(x => _renderRoute(x))}</Switch>
-                );
-
-            } else {
-                return this.props.loadingMessageFn();
-            }
-        };
-
-        return <Resolver route={route} render={render} location={this.props.location} match={this.props.match} />;
-    }
-}
-
 export function renderRoute(route, panelRouteCtor, loadingMessageFn, flashMessage, props) {
-    if (route.structure) {
-        return <SubRoute route={route} flashMessage={flashMessage} panelRouteCtor={panelRouteCtor} loadingMessageFn={loadingMessageFn} {...props}/>;
-
-    } else if (!route.panelRender && !route.panelComponent && route.link) {
+    if (!route.panelRender && !route.panelComponent && route.link) {
         return <RedirectRoute route={route} {...props}/>;
 
     } else {

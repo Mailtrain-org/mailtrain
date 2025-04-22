@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Title, withPageHelpers} from '../lib/page'
-import {Link} from 'react-router-dom'
+import {Link} from '../lib/router'
 import {
     Button,
     ButtonRow,
@@ -44,6 +44,10 @@ export default class Login extends Component {
             password: '',
             remember: false
         });
+
+        const t = this.props.t;
+        const queryParams = this.props.location.search;
+        if (queryParams.indexOf('cas-login-error') > -1) this.setFlashMessage('danger', t('authenticationFailed'));
     }
 
     localValidateFormValues(state) {
@@ -76,7 +80,7 @@ export default class Login extends Component {
 
             if (submitSuccessful) {
                 const unsafeUrl = qs.parse(this.props.location.search).next
-                const safeUrl = unsafeUrl.replace(/[^a-zA-Z0-9/\-]/g, "");
+                const safeUrl = unsafeUrl?.replace(/[^a-zA-Z0-9/\-]/g, "");
 
                 const nextUrl = safeUrl || getUrl();
 

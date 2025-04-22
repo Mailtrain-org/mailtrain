@@ -3,15 +3,14 @@
 import React, {Component} from "react";
 import i18n, {withTranslation} from './i18n';
 import PropTypes from "prop-types";
-import {withRouter} from "react-router";
-import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
+import {Link, Routes, navigateTo, navigateBack} from "./router";
 import {withErrorHandling} from "./error-handling";
 import interoperableErrors from "../../../shared/interoperable-errors";
 import {ActionLink, Button, DismissibleAlert, DropdownActionLink, Icon} from "./bootstrap-components";
 import mailtrainConfig from "mailtrainConfig";
 import * as styles from "./styles.scss";
 import {getRoutes, renderRoute, Resolver, SectionContentContext, withPageHelpers} from "./page-common";
-import {getBaseDir, getUrl} from "./urls";
+import {getUrl} from "./urls";
 import {createComponentMixin, withComponentMixins} from "./decorator-helpers";
 import {getLang} from "../../../shared/langs";
 
@@ -235,6 +234,8 @@ class PanelRoute extends Component {
 
         const panelInFullScreen = this.state.panelInFullScreen;
 
+        console.log('Render PanelRoute');
+
         const render = (resolved, permissions) => {
             let primaryMenu = null;
             let content = null;
@@ -324,7 +325,6 @@ export class BeforeUnloadListeners {
     }
 }
 
-@withRouter
 @withComponentMixins([
     withTranslation,
     withErrorHandling
@@ -337,19 +337,20 @@ export class SectionContent extends Component {
             flashMessageText: ''
         };
 
-        this.historyUnlisten = props.history.listen((location, action) => {
-            // I don't think it is ever needed on replace action, or at least it will be better than not showing the msg,
-            // and without it this won't work because first it goes to '/' -> '/workspaces' so replacing immediately
-            if (action === "REPLACE") return;
-            if (location.state && location.state.preserveFlashMessage) return;
-
-            // noinspection JSIgnoredPromiseFromCall
-            this.closeFlashMessage();
-        });
-
+        // TODO
+        // props.history.listen((location, action) => {
+        //     // I don't think it is ever needed on replace action, or at least it will be better than not showing the msg,
+        //     // and without it this won't work because first it goes to '/' -> '/workspaces' so replacing immediately
+        //     if (action === "REPLACE") return;
+        //     if (location.state && location.state.preserveFlashMessage) return;
+        //
+        //     // noinspection JSIgnoredPromiseFromCall
+        //     this.closeFlashMessage();
+        // });
+        //
         this.beforeUnloadListeners = new BeforeUnloadListeners();
-        this.beforeUnloadHandler = ::this.onBeforeUnload;
-        this.historyUnblock = null;
+        // this.beforeUnloadHandler = ::this.onBeforeUnload;
+        // this.historyUnblock = null;
     }
 
     static propTypes = {
@@ -357,38 +358,36 @@ export class SectionContent extends Component {
         root: PropTypes.string.isRequired
     }
 
-    onBeforeUnload(event) {
-        if (this.beforeUnloadListeners.shouldUnloadBeCancelled()) {
-            event.preventDefault();
-            event.returnValue = '';
-        }
-    }
+    // TODO
 
-    onNavigationConfirmationDialog(message, callback) {
-        this.beforeUnloadListeners.shouldUnloadBeCancelledAsync().then(res => {
-            if (res) {
-                const allowTransition = window.confirm(message);
-                callback(allowTransition);
-            } else {
-                callback(true);
-            }
-        });
-    }
+    // onBeforeUnload(event) {
+    //     if (this.beforeUnloadListeners.shouldUnloadBeCancelled()) {
+    //         event.preventDefault();
+    //         event.returnValue = '';
+    //     }
+    // }
+    //
+    // onNavigationConfirmationDialog(message, callback) {
+    //     this.beforeUnloadListeners.shouldUnloadBeCancelledAsync().then(res => {
+    //         if (res) {
+    //             const allowTransition = window.confirm(message);
+    //             callback(allowTransition);
+    //         } else {
+    //             callback(true);
+    //         }
+    //     });
+    // }
 
     componentDidMount() {
-        const t = this.props.t;
-        const queryParams = this.props.location.search;
-        if (queryParams.indexOf('cas-login-success') > -1) this.setFlashMessage('success', t('authenticationSuccessful'));
-        if (queryParams.indexOf('cas-logout-success') > -1) this.setFlashMessage('success', t('logoutSuccessful'));
-        if (queryParams.indexOf('cas-login-error') > -1) this.setFlashMessage('danger', t('authenticationFailed'));
-
-        window.addEventListener('beforeunload', this.beforeUnloadHandler);
-        this.historyUnblock = this.props.history.block('Changes you made may not be saved. Are you sure you want to leave this page?');
+        // TODO
+        // window.addEventListener('beforeunload', this.beforeUnloadHandler);
+        // this.historyUnblock = this.props.history.block('Changes you made may not be saved. Are you sure you want to leave this page?');
     }
 
     componentWillUnmount() {
-        window.removeEventListener('beforeunload', this.beforeUnloadHandler);
-        this.historyUnblock();
+        // TODO
+        // window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+        // this.historyUnblock();
     }
 
     setFlashMessage(severity, text) {
@@ -399,15 +398,15 @@ export class SectionContent extends Component {
     }
 
     navigateTo(path) {
-        this.props.history.push(path);
+        navigateTo(path);
     }
 
     navigateBack() {
-        this.props.history.goBack();
+        navigateBack();
     }
 
     navigateToWithFlashMessage(path, severity, text) {
-        this.props.history.push(path, {preserveFlashMessage: true});
+        navigateTo(path, {preserveFlashMessage: true});
         this.setFlashMessage(severity, text);
     }
 
@@ -450,10 +449,11 @@ export class SectionContent extends Component {
         });
     }
 
-    renderRoute(route) {
-        const t = this.props.t;
+    render() {
+        const routes = getRoutes(this.props.structure);
 
-        const render = props => {
+        const renderRouteWrapper = (route, props) => {
+            const t = this.props.t;
             let flashMessage;
             if (this.state.flashMessageText) {
                 flashMessage = <DismissibleAlert severity={this.state.flashMessageSeverity} onCloseAsync={::this.closeFlashMessage}>{this.state.flashMessageText}</DismissibleAlert>;
@@ -468,15 +468,10 @@ export class SectionContent extends Component {
             );
         };
 
-        return <Route key={route.path} exact={route.exact} path={route.path} render={render} />
-    }
-
-    render() {
-        const routes = getRoutes(this.props.structure);
-
+        console.log('Render SectionContent');
         return (
             <SectionContentContext.Provider value={this}>
-                <Switch>{routes.map(x => this.renderRoute(x))}</Switch>
+                <Routes routes={routes} render={renderRouteWrapper}/>
             </SectionContentContext.Provider>
         );
     }
@@ -488,7 +483,6 @@ export class SectionContent extends Component {
 export class Section extends Component {
     constructor(props) {
         super(props);
-        this.getUserConfirmationHandler = ::this.onGetUserConfirmation;
         this.sectionContent = null;
     }
 
@@ -497,9 +491,10 @@ export class Section extends Component {
         root: PropTypes.string.isRequired
     }
 
-    onGetUserConfirmation(message, callback) {
-        this.sectionContent.onNavigationConfirmationDialog(message, callback);
-    }
+    // TODO
+    // onGetUserConfirmation(message, callback) {
+    //     this.sectionContent.onNavigationConfirmationDialog(message, callback);
+    // }
 
     render() {
         let structure = this.props.structure;
@@ -508,9 +503,7 @@ export class Section extends Component {
         }
 
         return (
-            <Router basename={getBaseDir()} getUserConfirmation={this.getUserConfirmationHandler}>
-                <SectionContent wrappedComponentRef={node => this.sectionContent = node} root={this.props.root} structure={structure} />
-            </Router>
+            <SectionContent wrappedComponentRef={node => this.sectionContent = node} root={this.props.root} structure={structure} />
         );
     }
 }

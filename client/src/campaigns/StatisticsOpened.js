@@ -12,7 +12,7 @@ import Chart from 'react-google-charts';
 
 import * as styles from "./styles.scss";
 import {Table} from "../lib/table";
-import {Link} from "react-router-dom";
+import {Link} from "../lib/router";
 
 import mailtrainConfig from "mailtrainConfig";
 import {withComponentMixins} from "../lib/decorator-helpers";

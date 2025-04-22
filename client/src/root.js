@@ -26,6 +26,7 @@ import {DropdownActionLink, Icon} from "./lib/bootstrap-components";
 import axios from './lib/axios';
 import {getUrl} from "./lib/urls";
 import {withComponentMixins} from "./lib/decorator-helpers";
+import {Router} from "./lib/router";
 
 const topLevelMenuKeys = ['lists', 'channels', 'templates', 'campaigns'];
 
@@ -51,7 +52,7 @@ class Root extends Component {
 
             async logout() {
                 await axios.post(getUrl('rest/logout'));
-                window.location = getUrl();
+                window.location.href = getUrl();
             }
 
             render() {
@@ -111,7 +112,7 @@ class Root extends Component {
         structure = {
             title: t('home'),
             link: '/',
-            panelRender: props => <Home />,
+            panelComponent: Home,
             primaryMenuComponent: MainMenu,
             children: {
                 ...login.getMenus(t),
@@ -127,6 +128,7 @@ class Root extends Component {
                 ...channels.getMenus(t)
             }
         };
+        console.log('Render Root');
 
         return (
             <Section root='/' structure={structure}/>
@@ -138,9 +140,11 @@ export default function() {
     const container = document.getElementById('root');
     const root = createRoot(container); // createRoot(container!) if you use TypeScript
     root.render(
-        <TranslationRoot>
-            <Root/>
-        </TranslationRoot>
+        <Router>
+            <TranslationRoot>
+                <Root/>
+            </TranslationRoot>
+        </Router>
     );
 };
 

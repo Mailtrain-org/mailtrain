@@ -12,7 +12,7 @@ import {AlignedRow} from "../lib/form";
 import {Icon} from "../lib/bootstrap-components";
 
 import * as styles from "./styles.scss";
-import {Link} from "react-router-dom";
+import {Link} from "../lib/router";
 import {withComponentMixins} from "../lib/decorator-helpers";
 
 @withComponentMixins([

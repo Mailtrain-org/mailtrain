@@ -20,7 +20,7 @@ const { SubscriptionStatus, SubscriptionSource } = require('../../shared/lists')
 const openpgp = require('openpgp');
 const cors = require('cors');
 const cache = require('memory-cache');
-const geoip = require('geoip-ultralight');
+const geoip = require('geoip-lite');
 const passport = require('../lib/passport');
 
 const tools = require('../lib/tools');
@@ -104,9 +104,12 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
     const confirmation = await takeConfirmationAndValidate(req, 'subscribe', () => new interoperableErrors.InvalidConfirmationForSubscriptionError('Request invalid or already completed. If your subscription request is still pending, please subscribe again.'));
     const data = confirmation.data;
 
+    const geo = geoip.lookup(confirmation.ip) || null;
+    const country = geo.country;
+
     const meta = {
         ip: confirmation.ip,
-        country: geoip.lookupCountry(confirmation.ip) || null,
+        country,
         updateOfUnsubscribedAllowed: true
     };
 

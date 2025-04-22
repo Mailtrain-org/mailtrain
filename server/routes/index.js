@@ -11,7 +11,7 @@ async function getRouter(appType) {
     const router = routerFactory.create();
 
     if (appType === AppType.TRUSTED) {
-        router.getAsync('/*', passport.csrfProtection, async (req, res) => {
+        router.getAsync('/{*path}', passport.csrfProtection, async (req, res) => {
             const mailtrainConfig = await clientHelpers.getAnonymousConfig(req.context, appType);
             if (req.user) {
                 Object.assign(mailtrainConfig, await clientHelpers.getAuthenticatedConfig(req.context));

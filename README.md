@@ -24,6 +24,11 @@
 Alternatively, when doing the development, run `npm run watch` in client. This builds the client, but keeps
 watching for changes in client source files. It recompiles the client upon any changes in the sources.
 
+## GeoLite2
+```
+cd server/node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY
+```
+
 ## License
 
   **GPL-V3.0**

@@ -18,7 +18,7 @@ import {withErrorHandling} from "../../lib/error-handling";
 import {DeleteModalDialog} from "../../lib/modals";
 
 import * as styles from "./CUD.scss";
-import SortableTree from "@nosferatu500/react-sortable-tree";
+import SortableTree from "@bures/react-sortable-tree";
 import './rst-style.css'; // For whatever strange reason, webpack (possibly css-loader or style-loader) does not correclty
                           // process import '@nosferatu500/react-sortable-tree/style.css'. It reports no error, but the
                           // resulting code lacks the styles. As a workaround, we import it through the rst-style.css.

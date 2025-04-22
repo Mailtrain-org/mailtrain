@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from '../lib/i18n';
 import {Title, withPageHelpers} from '../lib/page'
-import {Link} from 'react-router-dom'
+import {Link} from '../lib/router'
 import {
     Button,
     ButtonRow,

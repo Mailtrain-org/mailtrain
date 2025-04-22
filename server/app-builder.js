@@ -122,7 +122,7 @@ async function createApp(appType) {
             next(new interoperableErrors.NotFoundError());
         });
 
-        app.use(url + '/*', (req, res, next) => {
+        app.use(url + '/{*path}', (req, res, next) => {
             next(new interoperableErrors.NotFoundError());
         });
     }
@@ -162,7 +162,7 @@ async function createApp(appType) {
 
     if (config.redis.enabled) {
         const Redis = require("ioredis");
-        const RedisStore = require('connect-redis').default;
+        const {RedisStore} = require("connect-redis")
 
         const redisClient = new Redis(config.redis);
 
@@ -230,7 +230,7 @@ async function createApp(appType) {
 
     if (appType === AppType.TRUSTED || appType === AppType.SANDBOXED) {
         // Endpoint under /api are authenticated by access token
-        app.all('/api/*', passport.authByAccessToken);
+        app.all('/api/{*path}', passport.authByAccessToken);
     }
 
     useWith404Fallback('/static', express.static(path.join(__dirname, '..', 'client', 'static')));
@@ -250,12 +250,12 @@ async function createApp(appType) {
     });
 
     // Marks the following endpoint to return JSON object when error occurs
-    app.all('/api/*', (req, res, next) => {
+    app.all('/api/{*path}', (req, res, next) => {
         req.needsAPIJSONResponse = true;
         next();
     });
 
-    app.all('/rest/*', (req, res, next) => {
+    app.all('/rest/{*path}', (req, res, next) => {
         req.needsRESTJSONResponse = true;
         next();
     });
