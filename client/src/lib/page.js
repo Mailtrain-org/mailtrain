@@ -358,7 +358,7 @@ export class SectionContent extends Component {
         root: PropTypes.string.isRequired
     }
 
-    // TODO
+    // TODO - add before unload notification (e.g. in campaigns content edit)
 
     // onBeforeUnload(event) {
     //     if (this.beforeUnloadListeners.shouldUnloadBeCancelled()) {
