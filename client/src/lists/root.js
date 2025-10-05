@@ -90,7 +90,7 @@ function getMenus(t) {
                         },
                         fields: {
                             title: t('fields'),
-                            link: params => `/lists/${params.listId}/fields/`,
+                            link: params => `/lists/${params.listId}/fields`,
                             visible: resolved => resolved.list.permissions.includes('viewFields'),
                             panelRender: props => <FieldsList list={props.resolved.list} />,
                             children: {
@@ -150,7 +150,7 @@ function getMenus(t) {
                         },
                         imports: {
                             title: t('imports'),
-                            link: params => `/lists/${params.listId}/imports/`,
+                            link: params => `/lists/${params.listId}/imports`,
                             visible: resolved => resolved.list.permissions.includes('viewImports'),
                             panelRender: props => <ImportsList list={props.resolved.list} />,
                             children: {

@@ -67,7 +67,7 @@ class Root extends Component {
                     const link = entry.link || entry.externalLink;
 
                     if (link && path.startsWith(link)) {
-                        topLevelMenu.push(<NavLink key={entryKey} className="active" to={link}>{entry.title} <span className="sr-only">{t('current')}</span></NavLink>);
+                        topLevelMenu.push(<NavLink key={entryKey} className="active" to={link}>{entry.title}</NavLink>);
                     } else {
                         topLevelMenu.push(<NavLink key={entryKey} to={link}>{entry.title}</NavLink>);
                     }
