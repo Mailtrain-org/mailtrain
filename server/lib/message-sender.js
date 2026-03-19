@@ -452,6 +452,14 @@ class MessageSender {
             encryptionKeys
         };
 
+        if (sendConfiguration.cc) {
+            mail.cc = sendConfiguration.cc;
+        }
+
+        if (sendConfiguration.bcc) {
+            mail.bcc = sendConfiguration.bcc;
+        }
+
 
         let response;
         let responseId = null;
