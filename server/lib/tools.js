@@ -171,10 +171,13 @@ function _formatTemplateSimple(source, mergeTags, isHTML) {
         }
 
         const containsHTML = /<[a-z][\s\S]*>/.test(value);
-        return isHTML ? he.encode((containsHTML ? value : value.replace(/(?:\r\n|\r|\n)/g, '<br/>')), {
-            useNamedReferences: true,
-            allowUnsafeSymbols: true
-        }) : (containsHTML ? htmlToText.fromString(value) : value);
+        // Subscriber-controlled merge tag values must be HTML-escaped before being
+        // inserted into the rendered (HTML) message, otherwise a subscriber can store
+        // active markup (e.g. in a custom field) that executes when the message is
+        // viewed through the public archive. Escape first, then turn newlines into <br/>.
+        return isHTML
+            ? he.encode(value, {useNamedReferences: true}).replace(/(?:\r\n|\r|\n)/g, '<br/>')
+            : (containsHTML ? htmlToText.fromString(value) : value);
     };
 
     return source.replace(/\[([a-z0-9_.]+)(?:\/([^\]]+))?\]/ig, (match, identifier, fallback) => {
