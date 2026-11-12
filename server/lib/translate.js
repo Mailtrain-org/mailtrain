@@ -17,6 +17,7 @@ loadLanguage('es-ES');
 loadLanguage('pt-BR');
 loadLanguage('de-DE');
 loadLanguage('fr-FR');
+loadLanguage('ru-RU');
 loadLanguage('eu');
 resourcesCommon['fk-FK'] = convertToFake(resourcesCommon['en-US']);
 
