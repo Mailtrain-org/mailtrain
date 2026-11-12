@@ -93,7 +93,21 @@ async function smoke(trusted, publicBase, catcher) {
     const response = await fetch(unsubscribe, {signal: AbortSignal.timeout(15000)});
     assert.equal(response.status, 200, 'Public unsubscribe link failed');
     assert.equal((await rest(`subscriptions/${list}/${subscriber}`)).status, SubscriptionStatus.UNSUBSCRIBED);
+    const account = await rest('account');
+    const changedPassword = 'Changed-smoke-password-79!';
+    await rest('account', {
+        name: account.name, email: account.email, originalHash: account.hash,
+        currentPassword: 'smoke-test-password', password: changedPassword
+    });
     console.log(`Exactly one message received with expected subject and recipient; ${unsubscribe} returned 200 and unsubscribed the recipient`);
+    return async () => {
+        cookies.clear();
+        csrf = (await request('/login')).match(/window\.csrfToken = '([^']+)'/)[1];
+        await rest('login', {username: 'admin', password: changedPassword});
+        assert.equal((await rest('account')).username, 'admin');
+        assert.equal((await rest(`subscriptions/${list}/${subscriber}`)).status, SubscriptionStatus.UNSUBSCRIBED);
+        console.log('Changed admin password and unsubscribe state survived restart');
+    };
 }
 
 module.exports = {smoke};

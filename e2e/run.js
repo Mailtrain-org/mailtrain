@@ -46,7 +46,7 @@ async function main() {
     try {
         compose(['up', '-d', '--no-build', '--wait', '--wait-timeout', '240']);
         const catcher = 'http://' + compose(['port', 'smtp', '8025'], true);
-        await smoke(env.URL_BASE_TRUSTED, env.URL_BASE_PUBLIC, catcher);
+        const verifyRestart = await smoke(env.URL_BASE_TRUSTED, env.URL_BASE_PUBLIC, catcher);
         // Restart against the same SQL and file volumes and prove login still works.
         compose(['restart', 'mailtrain']);
         for (let i = 0; ; i++) {
@@ -59,6 +59,7 @@ async function main() {
             assert.ok(i < 119, 'Mailtrain did not become ready after restart');
             await delay(1000);
         }
+        await verifyRestart();
         console.log(`Smoke passed in ${((Date.now() - started) / 1000).toFixed(1)} seconds`);
     } catch (err) {
         compose(['logs', '--no-color', '--tail', '150']);
