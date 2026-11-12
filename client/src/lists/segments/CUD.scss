@@ -51,9 +51,6 @@ $desktopAnimationStartPosition: 300px;
         position: relative;
         z-index: 0;
 
-        :global(.rst__virtualScrollOverride) {
-          overflow: hidden !important;
-        }
       }
     }
 
