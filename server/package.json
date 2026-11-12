@@ -1,7 +1,7 @@
 {
   "name": "mailtrain",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.0-rc.1",
   "description": "Self hosted email newsletter app - server",
   "main": "index.js",
   "repository": {

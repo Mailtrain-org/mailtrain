@@ -3,6 +3,7 @@
 const {canViewArchive} = require('./legacy-v2');
 
 const passport = require('./passport');
+const {version} = require('../package.json');
 const config = require('./config');
 const forms = require('../models/forms');
 const shares = require('../models/shares');
@@ -52,6 +53,7 @@ async function getAuthenticatedConfig(context) {
         verpEnabled: config.verp.enabled,
         mapsApiKey: setts.mapsApiKey,
         builtinZoneMTAEnabled: config.builtinZoneMTA.enabled,
+        version,
         shoutout: setts.shoutout
     }
 }
