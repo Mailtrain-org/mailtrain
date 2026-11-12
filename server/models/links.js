@@ -29,7 +29,7 @@ async function countLink(remoteIp, userAgent, campaignCid, listCid, subscription
         const subscription = await subscriptions.getByCidTx(tx, contextHelpers.getAdminContext(), list.id, subscriptionCid);
 
         const geo = geoip.lookup(remoteIp) || null;
-        const country = geo.country;
+        const country = geo && geo.country;
         const device = uaParser(userAgent, {
             unknownUserAgentDeviceType: 'desktop',
             emptyUserAgentDeviceType: 'desktop'
