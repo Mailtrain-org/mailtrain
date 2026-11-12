@@ -73,6 +73,8 @@ export default class CUD extends Component {
 
     getFormValuesMutator(data) {
         this.mailerTypes[data.mailer_type].afterLoad(data);
+        data.cc = data.cc || '';
+        data.bcc = data.bcc || '';
         data.verpEnabled = !!data.verp_hostname;
         data.verp_hostname = data.verp_hostname || '';
         data.verp_disable_sender_header = data.verpEnabled ? !!data.verp_disable_sender_header : false;
@@ -86,7 +88,7 @@ export default class CUD extends Component {
         }
 
         return filterData(data, ['name', 'description', 'from_email', 'from_email_overridable', 'from_name',
-            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'x_mailer',
+            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'cc', 'bcc', 'x_mailer',
             'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
     }
 
@@ -102,6 +104,8 @@ export default class CUD extends Component {
                 from_email_overridable: false,
                 from_name: '',
                 from_name_overridable: false,
+                cc: '',
+                bcc: '',
                 reply_to: '',
                 reply_to_overridable: false,
                 verpEnabled: false,
@@ -232,6 +236,8 @@ export default class CUD extends Component {
                         <CheckBox id="from_name_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="reply_to" label={t('defaultReplytoEmail')}/>
                         <CheckBox id="reply_to_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
+                        <InputField id="cc" label={t('cc')} help={t('commaSeparatedListOfCcAddresses')}/>
+                        <InputField id="bcc" label={t('bcc')} help={t('commaSeparatedListOfBccAddresses')}/>
                         <InputField id="x_mailer" label={t('xmailer')}/>
                     </Fieldset>
 

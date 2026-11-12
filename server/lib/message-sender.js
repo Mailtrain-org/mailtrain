@@ -327,7 +327,9 @@ class MessageSender {
                 if (this.useVerp) {
                     envelope = {
                         from: campaignAddress + '@' + sendConfiguration.verp_hostname,
-                        to: subscriptionGrouped.email
+                        to: subscriptionGrouped.email,
+                        cc: sendConfiguration.cc,
+                        bcc: sendConfiguration.bcc
                     };
                 }
 
@@ -396,6 +398,13 @@ class MessageSender {
             encryptionKeys
         };
 
+        if (sendConfiguration.cc) {
+            mail.cc = sendConfiguration.cc;
+        }
+
+        if (sendConfiguration.bcc) {
+            mail.bcc = sendConfiguration.bcc;
+        }
 
         let response;
         let responseId = null;
