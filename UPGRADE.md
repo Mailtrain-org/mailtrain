@@ -1,4 +1,10 @@
-# Upgrade to Mailtrain v3
+# Upgrade to Mailtrain 3.0.0-rc.1
+
+This candidate must first be tested on a copy. Use the explicit
+`mailtrain/mailtrain:3.0.0-rc.1` image after publication, or build the reviewed
+release checkout. Do not use `latest` to select the RC. For source installations,
+install the RC lockfiles, rebuild MJML and the client, and run with the same
+production configuration and `server` working directory described in README.
 
 Test the upgrade on an offline copy first. Keep the database, uploaded files,
 configuration and the v2 application/image together as a restorable backup.
@@ -64,7 +70,8 @@ to elevate a previously unprivileged account.
    uploaded-file volume, custom templates/static assets and configuration at the
    same stopped point. Verify that the backups can be restored into a disposable
    installation. Do not combine a database-engine major upgrade with this change.
-3. Build the v3 checkout with its pinned submodule (`git submodule update --init
+3. Stop the v2 source process/service as well as any containers. Install or build
+   the v3 checkout with its pinned submodule (`git submodule update --init
    --recursive`). Follow README for Node/Docker prerequisites. Adapt the v2
    configuration against `server/config/default.yaml`, especially roles, URL bases,
    authentication and sending. Preserve secrets in the deployment's configuration.

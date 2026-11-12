@@ -1,6 +1,31 @@
 # Mailtrain v3
 
-## Run it
+Mailtrain **3.0.0-rc.1** is a release candidate. Test upgrades on a copy and read
+[UPGRADE.md](UPGRADE.md); v3 deliberately removes some v2 features. Release
+publication and registry availability are controlled by the maintainers; see
+[RELEASING.md](RELEASING.md). During qualification, use the reviewed release
+commit in place of an unpublished tag.
+
+## Install with Docker
+
+Docker Engine/Desktop with Compose v2 supports both `linux/amd64` and
+`linux/arm64`. Once the release is published, use its pinned version:
+
+```sh
+git clone --branch v3.0.0-rc.1 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
+cd mailtrain
+export MAILTRAIN_IMAGE=mailtrain/mailtrain:3.0.0-rc.1
+docker compose pull mysql redis mailtrain
+docker compose up -d --no-build --wait
+```
+
+The RC never updates `latest`. Keep the explicit version in deployment
+configuration. The Compose file includes a source build, so `--no-build` selects
+the pulled release artifact. For a local build of a reviewed checkout, follow
+"Run the source with Docker" below. Existing v2 installations must follow the
+upgrade procedure before attaching their data.
+
+## Run the source with Docker
 
 The container uses Node 24 LTS. The native `posix` dependency does not compile on Node 26.
 
@@ -9,6 +34,7 @@ Install Docker with Compose v2, then clone v3 including its public submodule:
 ```sh
 git clone --branch v3 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
 cd mailtrain
+unset MAILTRAIN_IMAGE
 docker compose up --build
 ```
 
@@ -72,33 +98,73 @@ v2/v3 pushes, and also builds arm64 on pushes to v3. Set `E2E_EVIDENCE_DIR` to r
 upgrade SQL snapshots and results locally; these contain disposable fixture data
 and should not be published as production backups.
 
-## Building it
+## Install and run from source
 
-1. Install Node.js 24 and npm, plus Python 3, make and a C++ compiler for native dependencies. Mosaico placeholder rendering also needs ImageMagick with the DejaVu-Sans font; the Docker image includes both.
+Use Node.js **24** and its npm on Linux, Git, Python 3, make and a C++ compiler
+for native dependencies. Install ImageMagick and the DejaVu-Sans font (Debian:
+`imagemagick fonts-dejavu-core`). Provision MariaDB 11.4 and Redis 7, reachable
+from the host. The Compose database defaults are private to its Docker network;
+source processes need host-reachable services. MongoDB is unnecessary when
+`builtinZoneMTA.enabled` is false; select an external SMTP provider instead.
 
-2. Get Mailtrain from git
-    ```
-    git clone --branch v3 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
-    cd mailtrain
-    git checkout v3
-    ```
+After publication, clone the release with its pinned submodule, then build:
 
-3. Build the pinned MJML browser dependency and install packages from their lockfiles.
-   ```
-   sh client/build-mjml.sh
-   for dir in client shared server zone-mta; do (cd "$dir" && npm ci); done
-   ```
+```sh
+git clone --branch v3.0.0-rc.1 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
+cd mailtrain
+sh client/build-mjml.sh
+for dir in shared client server zone-mta; do (cd "$dir" && npm ci); done
+(cd client && npm run build)
+```
 
-4. Build the client.
-   ```
-   (cd client && npm run build)
-   ```
+Create an empty `mailtrain` SQL database and a dedicated user with privileges
+on that database, including schema migrations. Do not use the root database
+account. Write `server/config/production.json` with your database credentials,
+Redis address, URL bases and a random session secret. For a local installation
+with services on the default localhost ports, this creates the file once:
 
-Alternatively, when doing the development, run `npm run watch` in client. This builds the client, but keeps
-watching for changes in client source files. It recompiles the client upon any changes in the sources.
+```sh
+node <<'NODE'
+const fs = require('node:fs');
+const crypto = require('node:crypto');
+fs.writeFileSync('server/config/production.json', JSON.stringify({
+    mysql: {host: '127.0.0.1', port: 3306, database: 'mailtrain', user: 'mailtrain', password: 'replace-with-database-password'},
+    redis: {enabled: true, host: '127.0.0.1', port: 6379},
+    builtinZoneMTA: {enabled: false},
+    www: {
+        host: '127.0.0.1', secret: crypto.randomBytes(32).toString('hex'),
+        trustedUrlBase: 'http://localhost:3000',
+        sandboxUrlBase: 'http://localhost:3003',
+        publicUrlBase: 'http://localhost:3004'
+    }
+}, null, 2), {flag: 'wx', mode: 0o600});
+NODE
+```
 
-The Docker entrypoint accepts `ENABLED_LANGUAGES` as a comma-separated list of registered language codes,
-for example `en-US, de-DE, eu`. If unset, the default enabled languages are used.
+Replace the sample SQL password before starting. Keep the configuration and
+`server/files` writable by the service user and retain both with database backups.
+Use one production configuration file; adapt other settings against
+`server/config/default.yaml`. For a new installation only, initialize an admin
+password, then start the server:
+
+```sh
+cd server
+NODE_ENV=production node setup/docker-entrypoint-db-setup.js 'replace-with-initial-password' ''
+NODE_ENV=production node index.js
+```
+
+Open <http://localhost:3000> and sign in as `admin` with that password. The server
+runs in the foreground; stop with Ctrl-C. A service manager must use the same
+`server` working directory, production environment, configuration and file paths.
+Initialization is automatic on startup too; without the explicit bootstrap the
+fresh-database login is `admin` / `test`. Existing account credentials survive
+startup. Run `npm test --prefix server` and `npm test --prefix zone-mta` from the
+repository root for regression checks.
+
+For development, run `npm run watch --prefix client` in a second terminal. The
+Docker entrypoint accepts `ENABLED_LANGUAGES` as a comma-separated list of registered
+codes, for example `en-US, de-DE, eu`; source installs use `enabledLanguages` in
+their production configuration.
 
 ## GeoLite2
 ```
