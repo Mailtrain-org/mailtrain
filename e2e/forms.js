@@ -87,6 +87,13 @@ async function publicWalk(page, publicBase, catcher, list) {
         throw new Error('Public subscription email/link was not received');
     }
     await page.goto(publicBase + '/subscription/' + list.cid);
+    const placeholder = await page.evaluate(async url => {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        return {width: image.naturalWidth, height: image.naturalHeight};
+    }, publicBase + '/mosaico/img?method=placeholder&params=321,123');
+    assert.deepEqual(placeholder, {width: 321, height: 123});
     await page.locator('input[name="EMAIL"]').fill(email);
     await page.locator('form [type="submit"]').click();
     await page.waitForURL(/confirm-subscription-notice/);

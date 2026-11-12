@@ -37,7 +37,7 @@ async function freePort() {
 }
 
 async function main() {
-    const started = Date.now();
+    const started = performance.now();
     // Choose all three published ports before the entrypoint generates URLs.
     env.PORT_TRUSTED = String(await freePort());
     env.PORT_SANDBOX = String(await freePort());
@@ -49,7 +49,7 @@ async function main() {
     try {
         if (process.argv.includes('--upgrade')) {
             await upgrade({compose, env, project, freePort});
-            console.log(`Upgrade suite passed in ${((Date.now() - started) / 1000).toFixed(1)} seconds`);
+            console.log(`Upgrade suite passed in ${((performance.now() - started) / 1000).toFixed(1)} seconds`);
             return;
         }
         compose(['up', '-d', '--no-build', '--wait', '--wait-timeout', '240']);
@@ -72,7 +72,7 @@ async function main() {
             await delay(1000);
         }
         await verifyRestart();
-        console.log(`Fresh install, SMTP and browser suite passed in ${((Date.now() - started) / 1000).toFixed(1)} seconds`);
+        console.log(`Fresh install, SMTP and browser suite passed in ${((performance.now() - started) / 1000).toFixed(1)} seconds`);
     } catch (err) {
         compose(['logs', '--no-color', '--tail', '150']);
         throw err;

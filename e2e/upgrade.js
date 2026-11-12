@@ -236,6 +236,7 @@ async function upgrade({compose, env, project, freePort}) {
         const filesBefore = compose(['run', '--rm', '--no-deps', '--user', 'root', '--entrypoint', 'sh', 'mailtrain', '-c', 'find /app/server/files -type f -exec sha256sum {} + | sort'], true);
         compose(['run', '--rm', '--no-deps', '--user', 'root', '--entrypoint', 'chown', 'mailtrain', '-R', '1000:1000', '/app/server/files']);
         compose(['up', '-d', '--no-build', '--wait', '--wait-timeout', '240', 'mailtrain']);
+        await ready(env.URL_BASE_TRUSTED);
         assert.deepEqual(await capture(env.URL_BASE_TRUSTED, ids), before, 'Supported v2 entities changed');
         const filesAfter = compose(['exec', '-T', 'mailtrain', 'sh', '-c', 'find /app/server/files -type f -exec sha256sum {} + | sort'], true);
         assert.equal(filesAfter, filesBefore, 'Uploaded files changed during upgrade');

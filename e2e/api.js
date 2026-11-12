@@ -16,7 +16,7 @@ async function login(trusted, password = 'smoke-test-password', username = 'admi
             },
             ...(body === undefined ? {} : {body: multipart ? body : JSON.stringify(body)}),
             signal: AbortSignal.timeout(30000)
-        });
+        }).catch(error => { throw new Error(requestMethod + ' ' + route + ': ' + error.message, {cause: error}); });
         for (const cookie of response.headers.getSetCookie()) {
             const pair = cookie.split(';')[0];
             const index = pair.indexOf('=');
