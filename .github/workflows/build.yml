@@ -28,6 +28,7 @@ jobs:
           cache-dependency-path: |
             shared/package-lock.json
             server/package-lock.json
+            zone-mta/package-lock.json
             e2e/package-lock.json
       - name: Test server boundaries
         if: matrix.platform == 'amd64'
@@ -35,6 +36,8 @@ jobs:
           npm ci --prefix shared --omit=dev --no-audit --no-fund
           npm ci --prefix server --omit=dev --no-audit --no-fund
           npm test --prefix server
+          npm ci --prefix zone-mta --omit=dev --no-audit --no-fund
+          npm test --prefix zone-mta
           npm ci --prefix e2e --no-audit --no-fund
       - uses: docker/setup-qemu-action@v3
         if: matrix.platform == 'arm64'
