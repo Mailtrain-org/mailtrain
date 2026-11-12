@@ -164,7 +164,7 @@ router.getAsync('/confirm/unsubscribe/:cid', async (req, res) => {
 
 async function _renderSubscribe(req, res, list, subscription) {
     const data = {};
-    data.email = subscription && subscription.email;
+    data.email = subscription ? subscription.email : req.query.email;
     data.layout = 'subscription/layout';
     data.title = list.name;
     data.cid = list.cid;
