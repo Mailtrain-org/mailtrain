@@ -59,7 +59,8 @@ async function prepareMigrations(knex) {
         await collect('queued (triggered)', knex('queued').where('type', 1), ['id', 'type']);
         for (const table of ['campaigns', 'channels']) {
             if (await knex.schema.hasTable(table)) {
-                for (const row of await knex(table).select('id', 'name', 'data')) {
+                for (const row of await knex(table).select('id', 'name', 'data', 'source')) {
+                    if (table === 'channels' && row.source === 5) blockers.push(`${table} (source URL): ${JSON.stringify({id: row.id, name: row.name})}`);
                     const data = JSON.parse(row.data || '{}');
                     const type = data.sourceCustom && data.sourceCustom.type;
                     if (type && !['codeeditor', 'mosaico', 'mosaicoWithFsTemplate'].includes(type)) {
