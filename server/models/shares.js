@@ -14,6 +14,30 @@ const {getAdminId} = require('../../shared/users');
 // A bit of the problem is that the cache would have to expunged as the result of other processes modifying entites/permissions
 
 
+// Only the default role set has known v2 built-in identities. A complete
+// custom "roles" override must supply its own missing-role adaptations.
+function getV2RoleUpdates(users) {
+    const updates = [];
+    const missing = [];
+    for (const user of users) {
+        if (config.roles.global[user.role]) continue;
+        const target = {master: 'globalMaster', nobody: 'none', campaignsAdminWithoutNamespace: 'none'}[user.role];
+        const role = target && config.roles.global[target];
+        const safeTarget = role && (target === 'globalMaster' ? role.admin === true :
+            !role.admin && !(role.permissions || []).length && !role.rootNamespaceRole &&
+            !role.ownNamespaceRole && !Object.keys(role.sharedNamespaces || {}).length);
+        if (config.roles === config.defaultRoles && safeTarget) {
+            updates.push({id: user.id, role: target});
+        } else {
+            missing.push({id: user.id, username: user.username, role: user.role});
+        }
+    }
+    if (missing.length) {
+        throw new Error('Define these user roles in the v3 configuration before upgrading: ' + JSON.stringify(missing));
+    }
+    return updates;
+}
+
 async function listByEntityDTAjax(context, entityTypeId, entityId, params) {
     return await knex.transaction(async (tx) => {
         const entityType = entitySettings.getEntityType(entityTypeId);
@@ -774,3 +798,4 @@ module.exports.getGlobalPermissions = getGlobalPermissions;
 module.exports.getPermissionsTx = getPermissionsTx;
 module.exports.filterPermissionsByRestrictedAccessHandler = filterPermissionsByRestrictedAccessHandler;
 module.exports.isAccessibleByRestrictedAccessHandler = isAccessibleByRestrictedAccessHandler;
+module.exports.getV2RoleUpdates = getV2RoleUpdates;
