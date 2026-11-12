@@ -6,3 +6,12 @@ Dockerfile
 .gitignore
 .gitmodules
 docker-compose.yml
+
+**/.git
+client/dist/
+client/mjml/packages/*/lib/
+server/config/production.*
+server/config/local.*
+server/files/
+e2e/
+.github/

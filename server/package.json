@@ -77,5 +77,13 @@
     "smtp-server": "^3.13.6",
     "tmp-promise": "^3.0.3",
     "try-require": "^1.2.1"
+  },
+  "optionalDependencies": {
+    "passport-cas2": "0.0.12",
+    "passport-ldapauth": "3.0.1",
+    "passport-ldapjs": "2.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
   }
 }

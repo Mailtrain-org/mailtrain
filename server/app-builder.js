@@ -133,6 +133,11 @@ async function createApp(appType) {
         install404Fallback(url);
     }
 
+    // Use the same readiness state as request admission on all three listeners.
+    app.get('/health', (req, res) => {
+        res.sendStatus(isReady ? 200 : 503);
+    });
+
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'hbs');

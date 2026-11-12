@@ -41,7 +41,7 @@ MYSQL_PORT=${MYSQL_PORT:-'3306'}
 MYSQL_DATABASE=${MYSQL_DATABASE:-'mailtrain'}
 MYSQL_USER=${MYSQL_USER:-'mailtrain'}
 MYSQL_PASSWORD=${MYSQL_PASSWORD:-'mailtrain'}
-WITH_ZONE_MTA=${WITH_ZONE_MTA:-'true'}
+WITH_ZONE_MTA=${WITH_ZONE_MTA:-'false'}
 POOL_NAME=${POOL_NAME:-$(hostname)}
 LOG_LEVEL=${LOG_LEVEL:-'info'}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-'test'}
@@ -189,23 +189,6 @@ if [ "$WITH_ZONE_MTA" = "true" ]; then
 fi
 
 cd server
-# Install passport-cas2 node package if CAS selected
-if [ "$WITH_CAS" = "true" ]; then
-  echo 'Info: Installing passport-cas2'
-  NODE_ENV=production npm install passport-cas2
-fi
-
-if [ "$WITH_LDAP" = "true" ]; then
-  if [ "$LDAP_METHOD" = "ldapjs" ]; then
-    echo 'Info: Install passport-ldapjs'
-    npm install passport-ldapjs
-  fi
-  if [ "$LDAP_METHOD" = "ldapauth" ]; then
-    echo 'Info: Install passport-ldapauth'
-    npm install passport-ldapauth
-  fi
-fi
-
 NODE_ENV=production node setup/docker-entrypoint-db-setup.js "$ADMIN_PASSWORD" "$ADMIN_ACCESS_TOKEN"
 
-NODE_ENV=production node index.js
+exec node index.js
