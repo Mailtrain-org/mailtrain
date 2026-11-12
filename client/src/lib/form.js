@@ -940,16 +940,7 @@ class DateTimePicker extends Component {
         const owner = this.getFormStateOwner();
         const htmlId = 'form_' + id;
 
-        function BirthdayPickerCaption({date, localeUtils, onChange}) {
-            const months = localeUtils.getMonths();
-            return (
-                <div className="DayPicker-Caption">
-                    {months[date.getMonth()]}
-                </div>
-            );
-        }
-
-        let selectedDate, captionElement, fromMonth, toMonth, placeholder;
+        let selectedDate, fromMonth, toMonth, placeholder;
         const selectedDateStr = owner.getFormValue(id) || '';
         if (props.birthday) {
             if (props.parseDate) {
@@ -965,7 +956,6 @@ class DateTimePicker extends Component {
                 selectedDate = moment().set('year', birthdayYear).toDate();
             }
 
-            captionElement = <BirthdayPickerCaption/>;
             fromMonth = new Date(birthdayYear, 0, 1);
             toMonth = new Date(birthdayYear, 11, 31);
             placeholder = getBirthdayFormatString(props.dateFormat);
@@ -984,6 +974,10 @@ class DateTimePicker extends Component {
             placeholder = getDateFormatString(props.dateFormat);
         }
 
+        // Persisted dates use UTC calendar components; DayPicker uses local
+        // calendar dates. Convert only at that boundary, not by shifting days.
+        const pickerDate = props.parseDate ? selectedDate :
+            new Date(selectedDate.getUTCFullYear(), selectedDate.getUTCMonth(), selectedDate.getUTCDate());
         const className = owner.addFormValidationClass('form-control', id);
 
         const time = {
@@ -1009,12 +1003,14 @@ class DateTimePicker extends Component {
                 {this.state.dateOpened &&
                 <div className={styles.dayPickerWrapper}>
                     <DayPicker
-                        onDayClick={date => this.dateTimeChange(date, time)}
-                        selectedDays={selectedDate}
-                        initialMonth={selectedDate}
-                        fromMonth={fromMonth}
-                        toMonth={toMonth}
-                        captionElement={captionElement}
+                        onDayClick={date => this.dateTimeChange(props.formatDate ? date :
+                            new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())), time)}
+                        mode="single"
+                        selected={pickerDate}
+                        defaultMonth={pickerDate}
+                        startMonth={fromMonth}
+                        endMonth={toMonth}
+                        formatters={props.birthday ? {formatCaption: date => moment(date).format('MMMM')} : undefined}
                     />
                     {showTime &&
                     <TimePicker
