@@ -107,6 +107,10 @@ defaultLanguage: $DEFAULT_LANGUAGE
 
 EOT
 
+    if [ -n "${ENABLED_LANGUAGES:-}" ]; then
+        printf '\nenabledLanguages: [%s]\n' "$ENABLED_LANGUAGES" >> server/config/production.yaml
+    fi
+
     # Manage LDAP if enabled
     if [ "$WITH_LDAP" = "true" ]; then
         echo 'Info: LDAP enabled'

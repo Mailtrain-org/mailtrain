@@ -81,6 +81,9 @@ on pull requests and pushes to v2/v3, and also builds arm64 on pushes to v3.
 Alternatively, when doing the development, run `npm run watch` in client. This builds the client, but keeps
 watching for changes in client source files. It recompiles the client upon any changes in the sources.
 
+The Docker entrypoint accepts `ENABLED_LANGUAGES` as a comma-separated list of registered language codes,
+for example `en-US, de-DE, eu`. If unset, the default enabled languages are used.
+
 ## GeoLite2
 ```
 cd server/node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY
