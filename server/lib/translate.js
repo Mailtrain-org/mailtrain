@@ -20,6 +20,7 @@ loadLanguage('de-AT');
 loadLanguage('fr-FR');
 loadLanguage('ru-RU');
 loadLanguage('eu');
+loadLanguage('nl-NL');
 resourcesCommon['fk-FK'] = convertToFake(resourcesCommon['en-US']);
 
 const resources = {};

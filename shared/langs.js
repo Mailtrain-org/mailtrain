@@ -81,6 +81,11 @@ const langCodes = {
         getLabel: t => 'Euskara',
         longCode: 'eu'
     },
+    'nl-NL': {
+        getShortLabel: t => 'NL',
+        getLabel: t => 'Nederlands',
+        longCode: 'nl-NL'
+    },
     'fk-FK': {
         getShortLabel: t => 'FK',
         getLabel: t => 'Fake',
