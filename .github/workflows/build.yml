@@ -34,7 +34,7 @@ jobs:
         run: |
           npm ci --prefix shared --omit=dev --no-audit --no-fund
           npm ci --prefix server --omit=dev --no-audit --no-fund
-          (cd server && node --test test/*.js)
+          npm test --prefix server
           npm ci --prefix e2e --no-audit --no-fund
       - uses: docker/setup-qemu-action@v3
         if: matrix.platform == 'arm64'
