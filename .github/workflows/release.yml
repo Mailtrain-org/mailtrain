@@ -1,0 +1,146 @@
+name: Release Mailtrain v3
+
+on:
+  push:
+    tags: ['v3.*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mailtrain-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'Mailtrain-org/mailtrain'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: mailtrain-release
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+      RELEASE_ENVIRONMENT: mailtrain-release
+      RELEASE_APPROVED_TAG: ${{ vars.RELEASE_APPROVED_TAG }}
+      DOCKERHUB_OIDC_CONNECTIONID: ${{ vars.DOCKERHUB_OIDC_CONNECTIONID }}
+      DOCKERHUB_OIDC_SUBJECT: ${{ vars.DOCKERHUB_OIDC_SUBJECT }}
+      PLAYWRIGHT_BROWSERS_PATH: /tmp/mailtrain-e2e-browsers
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+      - name: Validate release identity, notes and publisher configuration
+        id: prepare
+        run: |
+          node --test scripts/release.test.js
+          node scripts/release.js "$RELEASE_TAG" --require-publisher --output "$RUNNER_TEMP/mailtrain-release"
+      - name: Refuse an existing release or a moved tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {execFileSync} = require('node:child_process');
+            const commit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
+            const tagged = await github.rest.repos.getCommit({...context.repo, ref: process.env.RELEASE_TAG});
+            if (tagged.data.sha !== commit) throw new Error('Release tag no longer matches checkout');
+            try {
+              await github.rest.repos.getReleaseByTag({...context.repo, tag: process.env.RELEASE_TAG});
+              throw new Error('Release already exists; inspect it rather than overwriting');
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      # Load each image once; publish these qualified images without rebuilding.
+      - name: Build amd64
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: mailtrain-release:amd64
+          cache-from: type=gha,scope=mailtrain-amd64
+          cache-to: type=gha,mode=max,scope=mailtrain-amd64
+      - name: Build arm64
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          load: true
+          push: false
+          tags: mailtrain-release:arm64
+          cache-from: type=gha,scope=mailtrain-arm64
+          cache-to: type=gha,mode=max,scope=mailtrain-arm64
+      - name: Qualify the release images
+        run: |
+          npm ci --prefix e2e --no-audit --no-fund
+          node e2e/node_modules/playwright/cli.js install --with-deps chromium
+          for arch in amd64 arm64; do
+            docker run --rm --entrypoint npm -w /app/server "mailtrain-release:$arch" test
+            docker run --rm --entrypoint npm -w /app/zone-mta "mailtrain-release:$arch" test
+            MAILTRAIN_IMAGE="mailtrain-release:$arch" MAILTRAIN_PLATFORM="linux/$arch" npm test --prefix e2e
+          done
+          MAILTRAIN_IMAGE=mailtrain-release:amd64 MAILTRAIN_PLATFORM=linux/amd64 npm run test:upgrade --prefix e2e
+      - name: Check the issued OIDC claims before Docker login
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+            const expected = {
+              sub: process.env.DOCKERHUB_OIDC_SUBJECT,
+              repository: 'Mailtrain-org/mailtrain',
+              environment: 'mailtrain-release',
+              ref: context.ref,
+              workflow_ref: `Mailtrain-org/mailtrain/.github/workflows/release.yml@${context.ref}`
+            };
+            for (const [key, value] of Object.entries(expected)) {
+              if (claims[key] !== value) throw new Error(`OIDC ${key} mismatch; check the repository subject template and Docker ruleset`);
+            }
+      - name: Sign in to Docker Hub with organization OIDC
+        uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1
+        with:
+          username: mailtrain
+      - name: Publish the tested multi-platform image
+        env:
+          VERSION: ${{ steps.prepare.outputs.version }}
+          PRERELEASE: ${{ steps.prepare.outputs.prerelease }}
+        run: |
+          for arch in amd64 arm64; do
+            docker tag "mailtrain-release:$arch" "mailtrain/mailtrain:$VERSION-$arch"
+            docker push "mailtrain/mailtrain:$VERSION-$arch"
+          done
+          docker buildx imagetools create --tag "mailtrain/mailtrain:$VERSION" \
+            "mailtrain/mailtrain:$VERSION-amd64" "mailtrain/mailtrain:$VERSION-arm64"
+          docker buildx imagetools inspect "mailtrain/mailtrain:$VERSION" --raw > "$RUNNER_TEMP/mailtrain-release/manifest.json"
+          jq -e '[.manifests[] | select(.annotations["vnd.docker.reference.type"] != "attestation-manifest") | .platform | .os + "/" + .architecture] | sort == ["linux/amd64", "linux/arm64"]' "$RUNNER_TEMP/mailtrain-release/manifest.json"
+          if [ "$PRERELEASE" = false ]; then
+            docker buildx imagetools create --tag mailtrain/mailtrain:latest "mailtrain/mailtrain:$VERSION"
+            docker buildx imagetools inspect mailtrain/mailtrain:latest --raw > "$RUNNER_TEMP/mailtrain-release/latest.json"
+            cmp "$RUNNER_TEMP/mailtrain-release/manifest.json" "$RUNNER_TEMP/mailtrain-release/latest.json"
+          fi
+      - name: Create the GitHub release with the prepared notes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const {execFileSync} = require('node:child_process');
+            const payload = JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'mailtrain-release/github-release.json')));
+            const commit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
+            const tagged = await github.rest.repos.getCommit({...context.repo, ref: payload.tag_name});
+            if (tagged.data.sha !== commit) throw new Error('Release tag moved after qualification');
+            const created = await github.rest.repos.createRelease({...context.repo, ...payload, target_commitish: commit});
+            const readback = await github.rest.repos.getRelease({...context.repo, release_id: created.data.id});
+            for (const key of ['tag_name', 'name', 'body', 'draft', 'prerelease']) {
+              if (readback.data[key] !== payload[key]) throw new Error(`Published release ${key} mismatch; inspect before retrying`);
+            }
+            core.info(readback.data.html_url);
