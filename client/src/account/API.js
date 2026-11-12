@@ -71,20 +71,7 @@ export default class API extends Component {
                     </div>
                 </div>
 
-                <div className="card mb-3">
-                    <div className="card-body">
-                        <h4 className="card-title">{t('notesAboutTheApi')}</h4>
-
-                        <ul className="card-text">
-                            <li>
-                                <Trans i18nKey="apiResponseIsAJsonStructureWithErrorAnd">API response is a JSON structure with <code>error</code> and <code>data</code> properties. If the response <code>error</code> has a value set then the request failed.</Trans>
-                            </li>
-                            <li>
-                                <Trans i18nKey="youNeedToDefineProperContentTypeWhen">You need to define proper <code>Content-Type</code> when making a request. You can either use <code>application/x-www-form-urlencoded</code> for normal form data or <code>application/json</code> for a JSON payload. Using <code>multipart/form-data</code> is not supported.</Trans>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <p><Trans i18nKey="legacyTokenApiDisabled">The external v2 token API is disabled in v3. Your token is preserved, but existing API integrations need a supported replacement before upgrading.</Trans></p>
 
 {/*
 <div className="accordion" id="apicalls">
