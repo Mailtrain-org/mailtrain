@@ -14,7 +14,7 @@
   "dependencies": {
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.48",
-    "owasp-password-strength-test": "github:bures/owasp-password-strength-test"
+    "owasp-password-strength-test": "git+https://github.com/bures/owasp-password-strength-test.git#043711c4ee78899963ef51a56e8b5e395fd1c361"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.0",
