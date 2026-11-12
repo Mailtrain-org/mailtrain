@@ -12,6 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/mailtrain-browsers
     strategy:
       fail-fast: false
       matrix:
@@ -39,6 +41,7 @@ jobs:
           npm ci --prefix zone-mta --omit=dev --no-audit --no-fund
           npm test --prefix zone-mta
           npm ci --prefix e2e --no-audit --no-fund
+          node e2e/node_modules/playwright/cli.js install --with-deps chromium
       - uses: docker/setup-qemu-action@v3
         if: matrix.platform == 'arm64'
       - uses: docker/setup-buildx-action@v3
@@ -54,3 +57,6 @@ jobs:
       - name: Send a campaign and unsubscribe
         if: matrix.platform == 'amd64'
         run: npm test --prefix e2e
+      - name: Upgrade the pinned v2 image and reject unsupported data
+        if: matrix.platform == 'amd64'
+        run: npm run test:upgrade --prefix e2e

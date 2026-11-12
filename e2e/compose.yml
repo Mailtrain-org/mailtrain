@@ -1,5 +1,6 @@
 services:
   mailtrain:
+    platform: ${MAILTRAIN_PLATFORM:-linux/amd64}
     environment:
       ADMIN_PASSWORD: smoke-test-password
       WITH_ZONE_MTA: "false"

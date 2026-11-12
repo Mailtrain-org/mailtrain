@@ -3,9 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "test": "node run.js"
+    "test": "node run.js",
+    "test:upgrade": "node run.js --upgrade"
   },
   "engines": {
     "node": ">=24"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
   }
 }
