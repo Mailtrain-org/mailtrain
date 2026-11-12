@@ -40,25 +40,41 @@ locked optional production dependencies installed at image build time; startup
 never downloads packages. Their existing `WITH_LDAP` / `WITH_CAS` environment
 settings remain available when running the image or using a Compose override.
 
-To run the isolated campaign smoke test (Docker and Node 24 required):
+To run the isolated browser and upgrade tests (Docker and Node 24 required):
 
 ```sh
 docker compose build
 npm ci --prefix e2e
+export PLAYWRIGHT_BROWSERS_PATH=/tmp/mailtrain-e2e-browsers
+node e2e/node_modules/playwright/cli.js install chromium
 npm test --prefix e2e
+npm run test:upgrade --prefix e2e
 ```
 
-The test uses the built `mailtrain-local:v3` image (or `MAILTRAIN_IMAGE`), chooses
-free local ports, logs in through authenticated REST, creates a template and
-campaign, and sends one message to a local Mailpit catcher. It checks the subject,
-recipient and public unsubscribe link, verifies the subscription changed, and
-restarts Mailtrain on the same data. Its unique Compose project and volumes are
-removed on exit. No external SMTP provider or secrets are needed. CI runs this
-on pull requests and pushes to v2/v3, and also builds arm64 on pushes to v3.
+The tests use the built `mailtrain-local:v3` image (or `MAILTRAIN_IMAGE`) and choose
+free local ports. Set `MAILTRAIN_PLATFORM=linux/arm64` for a locally built arm64
+image; the upgrade test always starts the pinned 2021 v2 image as amd64.
+On Linux, Playwright's `install --with-deps chromium` also installs browser system
+libraries.
+
+The fresh-install test first checks exactly one smoke campaign message in a local
+Mailpit catcher, including its recipient, subject and public unsubscribe link.
+It then exercises the v3 browser areas, both editors, real segment drags, imports,
+exports, public subscriptions and dirty navigation, and checks restart persistence.
+The upgrade test creates supported data through the pinned v2 image's REST and
+browser interfaces, upgrades the same database/file volumes, and checks independent
+unsupported-data and role fixtures against MariaDB. See [UPGRADE.md](UPGRADE.md)
+before upgrading an existing deployment.
+
+Each test removes its own Compose project and volumes on exit. No external SMTP
+provider or secrets are needed. CI runs both suites on amd64 on pull requests and
+v2/v3 pushes, and also builds arm64 on pushes to v3. Set `E2E_EVIDENCE_DIR` to retain
+upgrade SQL snapshots and results locally; these contain disposable fixture data
+and should not be published as production backups.
 
 ## Building it
 
-1. Install Node.js 24 and npm, plus Python 3, make and a C++ compiler for native dependencies.
+1. Install Node.js 24 and npm, plus Python 3, make and a C++ compiler for native dependencies. Mosaico placeholder rendering also needs ImageMagick with the DejaVu-Sans font; the Docker image includes both.
 
 2. Get Mailtrain from git
     ```
