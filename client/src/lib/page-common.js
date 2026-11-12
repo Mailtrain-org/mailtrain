@@ -143,30 +143,15 @@ async function resolve(route, match, prevResolverState) {
 
 export function getRoutes(structure) {
     function addRouteKeyToRegex(regexPrefix, routeKey) {
-        let regexStr = regexPrefix;
-        if (regexStr !== '') {
-            regexStr += '/';
-        }
+        const separator = regexPrefix !== '' ? '/' : '';
         const routeKeyReMatch = routeKey.match(/^:(\w+)(?:\(([^)]+)\))?(\??)$/);
         if (routeKeyReMatch) {
             const paramName = routeKeyReMatch[1];
-            const paramRegex = routeKeyReMatch[2];
-            const isOptional = routeKeyReMatch[3] === '?';
-
-            if (paramRegex) {
-                regexStr += `(?<${paramName}>${paramRegex})`;
-            } else {
-                regexStr += `(?<${paramName}>[^/]+)`;
-            }
-
-            if (isOptional) {
-                regexStr += '?';
-            }
-        } else {
-            regexStr += routeKey;
+            const paramRegex = routeKeyReMatch[2] || '[^/]+';
+            const parameter = `${separator}(?<${paramName}>${paramRegex})`;
+            return regexPrefix + (routeKeyReMatch[3] === '?' ? `(?:${parameter})?` : parameter);
         }
-
-        return regexStr;
+        return regexPrefix + separator + routeKey;
     }
 
     function _getRoutes(urlPrefix, regexPrefix, resolve, checkPermissions, parents, structure, navs, primaryMenuComponent) {
