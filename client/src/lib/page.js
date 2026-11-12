@@ -3,7 +3,7 @@
 import React, {Component} from "react";
 import i18n, {withTranslation} from './i18n';
 import PropTypes from "prop-types";
-import {Link, Routes, navigateTo, navigateBack} from "./router";
+import {Link, Routes, navigateTo, navigateBack, setNavigationConfirmation} from "./router";
 import {withErrorHandling} from "./error-handling";
 import interoperableErrors from "../../../shared/interoperable-errors";
 import {ActionLink, Button, DismissibleAlert, DropdownActionLink, Icon} from "./bootstrap-components";
@@ -337,20 +337,11 @@ export class SectionContent extends Component {
             flashMessageText: ''
         };
 
-        // TODO
-        // props.history.listen((location, action) => {
-        //     // I don't think it is ever needed on replace action, or at least it will be better than not showing the msg,
-        //     // and without it this won't work because first it goes to '/' -> '/workspaces' so replacing immediately
-        //     if (action === "REPLACE") return;
-        //     if (location.state && location.state.preserveFlashMessage) return;
-        //
-        //     // noinspection JSIgnoredPromiseFromCall
-        //     this.closeFlashMessage();
-        // });
-        //
         this.beforeUnloadListeners = new BeforeUnloadListeners();
-        // this.beforeUnloadHandler = ::this.onBeforeUnload;
-        // this.historyUnblock = null;
+        this.beforeUnloadHandler = ::this.onBeforeUnload;
+        this.locationChangeHandler = () => {
+            if (!window.history.state?.preserveFlashMessage) this.closeFlashMessage();
+        };
     }
 
     static propTypes = {
@@ -358,36 +349,30 @@ export class SectionContent extends Component {
         root: PropTypes.string.isRequired
     }
 
-    // TODO - add before unload notification (e.g. in campaigns content edit)
+    onBeforeUnload(event) {
+        if (this.beforeUnloadListeners.shouldUnloadBeCancelled()) {
+            event.preventDefault();
+            event.returnValue = '';
+        }
+    }
 
-    // onBeforeUnload(event) {
-    //     if (this.beforeUnloadListeners.shouldUnloadBeCancelled()) {
-    //         event.preventDefault();
-    //         event.returnValue = '';
-    //     }
-    // }
-    //
-    // onNavigationConfirmationDialog(message, callback) {
-    //     this.beforeUnloadListeners.shouldUnloadBeCancelledAsync().then(res => {
-    //         if (res) {
-    //             const allowTransition = window.confirm(message);
-    //             callback(allowTransition);
-    //         } else {
-    //             callback(true);
-    //         }
-    //     });
-    // }
+    async onNavigationConfirmationDialog() {
+        return !await this.beforeUnloadListeners.shouldUnloadBeCancelledAsync() ||
+            window.confirm(this.props.t('unsavedChangesLeaveConfirmation', {
+                defaultValue: 'Changes you made may not be saved. Are you sure you want to leave this page?'
+            }));
+    }
 
     componentDidMount() {
-        // TODO
-        // window.addEventListener('beforeunload', this.beforeUnloadHandler);
-        // this.historyUnblock = this.props.history.block('Changes you made may not be saved. Are you sure you want to leave this page?');
+        window.addEventListener('beforeunload', this.beforeUnloadHandler);
+        window.addEventListener('pushstate', this.locationChangeHandler);
+        this.historyUnblock = setNavigationConfirmation(::this.onNavigationConfirmationDialog);
     }
 
     componentWillUnmount() {
-        // TODO
-        // window.removeEventListener('beforeunload', this.beforeUnloadHandler);
-        // this.historyUnblock();
+        window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+        window.removeEventListener('pushstate', this.locationChangeHandler);
+        this.historyUnblock();
     }
 
     setFlashMessage(severity, text) {
@@ -490,11 +475,6 @@ export class Section extends Component {
         structure: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
         root: PropTypes.string.isRequired
     }
-
-    // TODO
-    // onGetUserConfirmation(message, callback) {
-    //     this.sectionContent.onNavigationConfirmationDialog(message, callback);
-    // }
 
     render() {
         let structure = this.props.structure;
