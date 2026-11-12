@@ -15,7 +15,7 @@ import deepKeys from 'deep-keys';
 
 const localeMain = 'en-US/common.json';
 const localeMainPrevious = 'en-US-last-run/common.json';
-const localeTranslations = ['de-DE/common.json', 'es-ES/common.json', 'fr-FR/common.json', 'pt-BR/common.json', 'ru-RU/common.json', 'eu/common.json'];
+const localeTranslations = ['de-DE/common.json', 'de-AT/common.json', 'es-ES/common.json', 'fr-FR/common.json', 'pt-BR/common.json', 'ru-RU/common.json', 'eu/common.json'];
 const searchDirs = [
     '../client/src',
     '../server',

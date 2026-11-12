@@ -20,11 +20,14 @@ import lang_ru_RU_common from "../../../locales/ru-RU/common";
 
 import lang_eu_common from "../../../locales/eu/common";
 
+import lang_de_AT_common from "../../../locales/de-AT/common";
+
 const resourcesCommon = {
     'en-US': lang_en_US_common,
     'es-ES': lang_es_ES_common,
     'pt-BR': lang_pt_BR_common,
     'de-DE': lang_de_DE_common,
+    'de-AT': lang_de_AT_common,
     'fr-FR': lang_fr_FR_common,
     'ru-RU': lang_ru_RU_common,
     'eu': lang_eu_common,

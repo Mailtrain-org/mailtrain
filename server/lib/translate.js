@@ -16,6 +16,7 @@ loadLanguage('en-US');
 loadLanguage('es-ES');
 loadLanguage('pt-BR');
 loadLanguage('de-DE');
+loadLanguage('de-AT');
 loadLanguage('fr-FR');
 loadLanguage('ru-RU');
 loadLanguage('eu');
