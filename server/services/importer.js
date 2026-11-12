@@ -19,7 +19,7 @@ const activityLog = require('../lib/activity-log');
 require('../lib/fork');
 
 
-const csvparse = require('csv-parse');
+const {parse: csvparse} = require('csv-parse');
 const fs = require('fs');
 
 let running = false;
@@ -45,7 +45,7 @@ function prepareCsv(impt) {
 
         await activityLog.logEntityActivity('list', ListActivityType.IMPORT_STATUS_CHANGE, impt.list, {importId: impt.id, importStatus: ImportStatus.PREP_FAILED});
 
-        await fsExtra.removeAsync(filePath);
+        await fsExtra.remove(filePath);
     };
 
     const finishWithSuccess = async () => {
@@ -62,7 +62,7 @@ function prepareCsv(impt) {
 
         await activityLog.logEntityActivity('list', ListActivityType.IMPORT_STATUS_CHANGE, impt.list, {importId: impt.id, importStatus: ImportStatus.PREP_FINISHED});
 
-        await fsExtra.removeAsync(filePath);
+        await fsExtra.remove(filePath);
     };
 
     const processRows = async (chunks) => {
