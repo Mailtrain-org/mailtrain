@@ -22,7 +22,7 @@ async function browserWalk(trusted, publicBase, ids, password = 'smoke-test-pass
         await page.goto(trusted + '/login');
         await page.locator('#form_username').fill('admin');
         await page.locator('#form_password').fill(password);
-        await page.getByRole('button', {name: 'Sign in', exact: true}).click();
+        await page.locator('form button[type="submit"]').click();
         await page.waitForURL(trusted + '/');
         const areas = [
             ['/lists', 'table'],
@@ -45,6 +45,7 @@ async function browserWalk(trusted, publicBase, ids, password = 'smoke-test-pass
             ['/templates', 'table'],
             ['/templates/create', '#form_name'],
             [`/templates/${ids.code}/edit`, '#form_name'],
+            ...(ids.mjml ? [[`/templates/${ids.mjml}/edit`, '#form_name']] : []),
             [`/templates/${ids.mosaico}/edit`, '#form_name'],
             [`/templates/${ids.mosaicoCustom}/edit`, '#form_name'],
             [`/templates/${ids.code}/files`, 'table'],
@@ -88,6 +89,14 @@ async function browserWalk(trusted, publicBase, ids, password = 'smoke-test-pass
         for (const [route, selector] of areas) {
             await page.goto(trusted + route);
             await page.locator(selector).first().waitFor({state: 'visible'});
+            if ([`/templates/${ids.mosaico}/edit`, `/templates/${ids.mosaicoCustom}/edit`].includes(route)) {
+                await page.frameLocator('iframe').first().locator('.block-list .block').first().waitFor({state: 'visible'});
+            }
+            if (ids.mjml && route === `/templates/${ids.mjml}/edit`) {
+                const editor = page.frameLocator('iframe').first();
+                await editor.locator('.ace_editor').waitFor({state: 'visible'});
+                await editor.frameLocator('iframe').locator('body').filter({hasText: 'Preserved MJML body'}).waitFor({state: 'visible'});
+            }
             await page.waitForTimeout(150);
             assert.equal(new URL(page.url()).pathname, route, 'Unexpected redirect at ' + route);
             assert.deepEqual(errors, [], 'Browser errors at ' + route);
@@ -140,7 +149,7 @@ async function seedEditors(trusted, ids, password = 'smoke-test-password') {
         await page.goto(trusted + '/login');
         await page.locator('#form_username').fill('admin');
         await page.locator('#form_password').fill(password);
-        await page.getByRole('button', {name: 'Sign in', exact: true}).click();
+        await page.locator('form button[type="submit"]').click();
         await page.waitForURL(trusted + '/');
         for (const id of [ids.mosaico, ids.mosaicoCustom]) {
             await page.goto(`${trusted}/templates/${id}/edit`);
@@ -148,7 +157,7 @@ async function seedEditors(trusted, ids, password = 'smoke-test-password') {
             await editor.locator('.block-list .block:has(img[alt="Block singleArticleBlock"]) .handle').click();
             const saved = page.waitForResponse(r => r.url().endsWith('/rest/templates/' + id) && r.request().method() === 'PUT');
             saved.catch(() => {});
-            await page.getByRole('button', {name: 'Save', exact: true}).click();
+            await page.locator('form:has(#form_name) button[type="submit"]').first().click();
             assert.equal((await saved).status(), 200);
         }
         await page.goto(`${trusted}/templates/${ids.code}/edit`);
@@ -158,15 +167,28 @@ async function seedEditors(trusted, ids, password = 'smoke-test-password') {
         await page.keyboard.insertText('<p>Preserved code editor content</p><a href="[LINK_UNSUBSCRIBE]">Unsubscribe</a>');
         const saved = page.waitForResponse(r => r.url().endsWith('/rest/templates/' + ids.code) && r.request().method() === 'PUT');
         saved.catch(() => {});
-        await page.getByRole('button', {name: 'Save', exact: true}).click();
+        await page.locator('form:has(#form_name) button[type="submit"]').first().click();
         assert.equal((await saved).status(), 200);
+        if (ids.mjml) {
+            await page.goto(`${trusted}/templates/${ids.mjml}/edit`);
+            const mjmlEditor = page.frameLocator('iframe').first();
+            await mjmlEditor.frameLocator('iframe').locator('body').filter({hasText: 'Preserved MJML body'}).waitFor({state: 'visible'});
+            const mjmlSaved = page.waitForResponse(r => r.url().endsWith('/rest/templates/' + ids.mjml) && r.request().method() === 'PUT');
+            mjmlSaved.catch(() => {});
+            await page.locator('form:has(#form_name) button[type="submit"]').first().click();
+            assert.equal((await mjmlSaved).status(), 200);
+        }
         const {rest} = await login(trusted, password);
         for (const id of [ids.mosaico, ids.mosaicoCustom]) {
             const template = await rest('templates/' + id);
             assert.ok(template.data.model && template.html.length > 1000, 'Mosaico must save real editor content');
         }
         assert.match((await rest('templates/' + ids.code)).data.source, /Preserved code editor content/);
+        if (ids.mjml) assert.match((await rest('templates/' + ids.mjml)).html, /Preserved MJML body/);
         console.log('Both Mosaico modes and the code editor saved real content through the browser');
+    } catch (error) {
+        console.error('Editor fixture URL:', page.url(), (await page.locator('body').innerText()).slice(0, 1800));
+        throw error;
     } finally {
         await browser.close();
     }

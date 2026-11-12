@@ -67,7 +67,7 @@ function databaseTools(mysql, network, image, mounts = []) {
     const sql = (db, statement) => docker(['exec', '-i', mysql, 'mariadb', '-uroot', '-pmailtrain', '--batch', '--raw', '--skip-column-names', db], statement).stdout;
     const dump = db => docker(['exec', mysql, 'mariadb-dump', '-uroot', '-pmailtrain', '--skip-comments', '--skip-dump-date', '--skip-extended-insert', '--order-by-primary', '--hex-blob', db]).stdout;
     function clone(db, snapshot) {
-        assert.match(db, /^fixture_[a-z_]+$/);
+        assert.match(db, /^fixture_[a-z0-9_]+$/);
         sql('mysql', `DROP DATABASE IF EXISTS \`${db}\`; CREATE DATABASE \`${db}\`;`);
         sql(db, snapshot);
     }
@@ -120,14 +120,23 @@ async function capture(trusted, ids) {
         draftFiles: `files-list/campaign/file/${ids.draft}`, attachments: `files-list/campaign/attachment/${ids.draft}`,
         content: `campaigns-content/${ids.draft}`, subscriber: `subscriptions/${ids.list}/${ids.subscriber}`
     };
+    if (ids.mjml) routes.mjml = `templates/${ids.mjml}`;
     const ignored = new Set(['hash', 'permissions', 'role', 'type', 'parent', 'last_check', 'cc', 'bcc']);
     // Only top-level removed campaign fields/role identities differ. Template
     // editor types, nested rules, custom data and source content remain exact.
     for (const [key, route] of Object.entries(routes)) {
         const value = await rest(route);
+        if (Array.isArray(value) && (key.endsWith('Files') || key === 'baseBlocks' || key === 'attachments')) {
+            result[key] = value.map(file => {
+                if (file.gc_allowed !== undefined) assert.equal(Boolean(file.gc_allowed), false, 'Upgraded files must not be garbage collected');
+                const {gc_allowed, ...metadata} = file;
+                return metadata;
+            });
+            continue;
+        }
         result[key] = value && typeof value === 'object' && !Array.isArray(value)
             ? Object.fromEntries(Object.entries(value).filter(([name]) => !ignored.has(name))) : value;
-        if (['code', 'mosaico', 'mosaicoCustom', 'mosaicoBase'].includes(key)) result[key].type = value.type;
+        if (['code', 'mjml', 'mosaico', 'mosaicoCustom', 'mosaicoBase'].includes(key)) result[key].type = value.type;
     }
     return result;
 }

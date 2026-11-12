@@ -65,6 +65,12 @@ async function supportedFixture(trusted, v2 = false, password = 'smoke-test-pass
         type: 'codeeditor', tag_language: 'simple', data: {sourceType: 'html', source: '<p>Preserved code</p>'},
         html: '<p>Preserved code</p><a href="[LINK_UNSUBSCRIBE]">Unsubscribe</a>', text: 'Preserved code [LINK_UNSUBSCRIBE]'
     });
+    ids.mjml = await rest('templates', {
+        name: 'Upgrade MJML code template', description: '', namespace: ids.namespace,
+        type: 'codeeditor', tag_language: 'simple',
+        data: {sourceType: 'mjml', source: '<mjml><mj-body><mj-section><mj-column><mj-text>Preserved MJML body</mj-text></mj-column></mj-section></mj-body></mjml>'},
+        html: '<p>Preserved MJML body</p>', text: 'Preserved MJML body'
+    });
     ids.mosaico = await rest('templates', {
         name: 'Upgrade Mosaico template', description: '', namespace: ids.namespace,
         type: 'mosaicoWithFsTemplate', tag_language: 'simple', data: {mosaicoFsTemplate: 'versafix-1'}, html: '', text: ''
@@ -80,7 +86,7 @@ async function supportedFixture(trusted, v2 = false, password = 'smoke-test-pass
     });
     for (const [type, subType, id] of [['template', 'file', ids.code], ['template', 'file', ids.mosaico], ['mosaicoTemplate', 'file', ids.mosaicoBase], ['mosaicoTemplate', 'block', ids.mosaicoBase]]) {
         const upload = new FormData();
-        upload.append('files[]', new Blob(['Preserved upload for ' + id], {type: 'text/plain'}), 'upgrade-file.txt');
+        upload.append('files[]', new Blob([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=', 'base64')], {type: 'image/png'}), 'upgrade-file.png');
         await request(`/rest/files/${type}/${subType}/${id}`, upload, 'POST', true);
     }
     ids.channel = await rest('channels', {
