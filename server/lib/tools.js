@@ -159,7 +159,7 @@ function _formatTemplateSimple(source, mergeTags, isHTML) {
         let value = mergeTags;
         while (keys.length > 0) {
             let key = keys.shift();
-            if (value.hasOwnProperty(key)) {
+            if (value != null && Object.prototype.hasOwnProperty.call(value, key)) {
                 value = value[key];
             } else {
                 return false;
@@ -170,6 +170,7 @@ function _formatTemplateSimple(source, mergeTags, isHTML) {
             return '';
         }
 
+        value = String(value);
         const containsHTML = /<[a-z][\s\S]*>/.test(value);
         // Subscriber-controlled merge tag values must be HTML-escaped before being
         // inserted into the rendered (HTML) message, otherwise a subscriber can store
