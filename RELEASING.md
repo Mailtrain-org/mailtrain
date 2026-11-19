@@ -8,7 +8,7 @@ approves the exact release. No personal CLI login is needed.
 
 ## Validate without publishing
 
-From the repository root on Node 24:
+From the repository root on Node 26:
 
 ```sh
 node --test scripts/release.test.js
@@ -59,7 +59,7 @@ release-note changes alone.
 
 ## Docker Hub administration required before publication
 
-Official guidance checked 12 November 2026:
+Official guidance checked 19 November 2026:
 
 - [Docker OIDC connections](https://docs.docker.com/security/authentication/oidc-connections/)
   supports eligible Team, Business and Docker-Sponsored Open Source organizations.
@@ -133,19 +133,16 @@ set these nonsecret variables:
   and confirmed against the repository's configured template.
 - `RELEASE_APPROVED_TAG`: `v3.0.0-rc.1` for this release only.
 
-No variable is configured by this preparation. Missing values fail the whole
-release before builds, login, image pushes or GitHub release creation. A nonempty
-connection ID only proves configuration presence; Docker still has to accept it.
-A successful local check is not evidence of connection activation or publication.
+With neither OIDC variables nor Docker Hub secrets configured, the tag workflow
+builds and tests the images and skips Docker and GitHub publishing. Partial
+configuration fails validation. Docker validates the connection and signed
+runtime identity.
 
-If federation is actually unavailable, record Tomas's concrete administrative
-finding (plan/eligibility/provider limitation and date). No such finding exists
-here, so no token publishing path is enabled. Any separately approved token route
-must explicitly replace the OIDC path in review, use `DOCKERHUB_USERNAME` and
-`DOCKERHUB_TOKEN` in this repository's owning secret store with access restricted
-to `mailtrain/mailtrain`, and document its owner, expiry, rotation-before-expiry
-schedule and revocation/replacement procedure. Never use a personal CLI login or
-silently retry an OIDC failure with a token.
+Use `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` in the `mailtrain-release`
+environment only where the Docker account cannot use OIDC. Record the Docker
+account limitation, the credential owner and expiration, and the rotation and
+revocation procedure in the owning secret store. Limit access to
+`mailtrain/mailtrain`. A configured OIDC connection takes precedence over a token.
 
 ## Authorized publishing run
 

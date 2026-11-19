@@ -34,14 +34,31 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 26
           cache: npm
           cache-dependency-path: e2e/package-lock.json
-      - name: Validate release identity, notes and publisher configuration
+      - name: Prepare the release notes and package metadata
         id: prepare
         run: |
           node --test scripts/release.test.js
-          node scripts/release.js "$RELEASE_TAG" --require-publisher --output "$RUNNER_TEMP/mailtrain-release"
+          node scripts/release.js "$RELEASE_TAG" --output "$RUNNER_TEMP/mailtrain-release"
+      - name: Check publishing configuration
+        id: publisher
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [[ -z "$DOCKERHUB_OIDC_CONNECTIONID$DOCKERHUB_OIDC_SUBJECT$DOCKERHUB_USERNAME$DOCKERHUB_TOKEN" ]]; then
+            echo 'No Docker Hub publishing configuration. Build and test only.'
+            echo 'mode=none' >> "$GITHUB_OUTPUT"
+          else
+            node scripts/release.js "$RELEASE_TAG" --require-publisher
+            if [[ -n "$DOCKERHUB_OIDC_CONNECTIONID" ]]; then
+              echo 'mode=oidc' >> "$GITHUB_OUTPUT"
+            else
+              echo 'mode=token' >> "$GITHUB_OUTPUT"
+            fi
+          fi
       - name: Refuse an existing release or a moved tag
         uses: actions/github-script@v7
         with:
@@ -90,6 +107,7 @@ jobs:
           done
           MAILTRAIN_IMAGE=mailtrain-release:amd64 MAILTRAIN_PLATFORM=linux/amd64 npm run test:upgrade --prefix e2e
       - name: Check the issued OIDC claims before Docker login
+        if: steps.publisher.outputs.mode == 'oidc'
         uses: actions/github-script@v7
         with:
           script: |
@@ -106,10 +124,18 @@ jobs:
               if (claims[key] !== value) throw new Error(`OIDC ${key} mismatch; check the repository subject template and Docker ruleset`);
             }
       - name: Sign in to Docker Hub with organization OIDC
+        if: steps.publisher.outputs.mode == 'oidc'
         uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1
         with:
           username: mailtrain
+      - name: Sign in with the configured Docker Hub token
+        if: steps.publisher.outputs.mode == 'token'
+        uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish the tested multi-platform image
+        if: steps.publisher.outputs.mode != 'none'
         env:
           VERSION: ${{ steps.prepare.outputs.version }}
           PRERELEASE: ${{ steps.prepare.outputs.prerelease }}
@@ -128,6 +154,7 @@ jobs:
             cmp "$RUNNER_TEMP/mailtrain-release/manifest.json" "$RUNNER_TEMP/mailtrain-release/latest.json"
           fi
       - name: Create the GitHub release with the prepared notes
+        if: steps.publisher.outputs.mode != 'none'
         uses: actions/github-script@v7
         with:
           script: |

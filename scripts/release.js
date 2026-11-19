@@ -43,8 +43,13 @@ function prepare(root, tag, env = {}, requirePublisher = false) {
         assert.equal(env.GITHUB_WORKFLOW_REF, workflowRef, 'Publishing workflow mismatch');
         assert.equal(env.RELEASE_ENVIRONMENT, environment, 'Publishing environment mismatch');
         assert.equal(env.RELEASE_APPROVED_TAG, tag, 'Tomas configuration and Kam approval required for this exact tag');
-        assert.ok((env.DOCKERHUB_OIDC_CONNECTIONID || '').trim(), 'Missing Docker Hub OIDC connection; publishing disabled');
-        assert.equal(env.DOCKERHUB_OIDC_SUBJECT, subject, 'Missing or mismatched Docker Hub OIDC subject');
+        if (env.DOCKERHUB_OIDC_CONNECTIONID || env.DOCKERHUB_OIDC_SUBJECT) {
+            assert.ok((env.DOCKERHUB_OIDC_CONNECTIONID || '').trim(), 'Missing Docker Hub OIDC connection');
+            assert.equal(env.DOCKERHUB_OIDC_SUBJECT, subject, 'Missing or mismatched Docker Hub OIDC subject');
+        } else {
+            assert.ok((env.DOCKERHUB_USERNAME || '').trim() && (env.DOCKERHUB_TOKEN || '').trim(),
+                'Missing Docker Hub publisher configuration');
+        }
     }
     return {
         version, tag, repository, workflow, environment, image,

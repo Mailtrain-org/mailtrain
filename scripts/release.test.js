@@ -101,6 +101,19 @@ test('missing publisher configuration blocks all publication; dry run remains av
     }
 });
 
+test('both fallback credentials are required and an invalid OIDC configuration cannot fall back', t => {
+    const root = fixture(t);
+    const plan = prepare(root, 'v3.0.0-rc.1');
+    const env = publisher(plan);
+    delete env.DOCKERHUB_OIDC_CONNECTIONID;
+    delete env.DOCKERHUB_OIDC_SUBJECT;
+    const token = {...env, DOCKERHUB_USERNAME: 'fixture-user', DOCKERHUB_TOKEN: 'fixture-token'};
+    assert.deepEqual(prepare(root, plan.tag, token, true), plan);
+    assert.throws(() => prepare(root, plan.tag, {...token, DOCKERHUB_TOKEN: ''}, true), /publisher configuration/);
+    assert.throws(() => prepare(root, plan.tag, {...token, DOCKERHUB_USERNAME: ''}, true), /publisher configuration/);
+    assert.throws(() => prepare(root, plan.tag, {...token, DOCKERHUB_OIDC_CONNECTIONID: 'incomplete'}, true), /OIDC subject/);
+});
+
 test('CLI dry run performs no writes and missing configuration leaves no apparent release files', t => {
     const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'mailtrain-release-cli-'));
     t.after(() => fs.rmSync(temporary, {recursive: true, force: true}));
