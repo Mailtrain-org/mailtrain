@@ -1071,5 +1071,10 @@
   "thePasswordMustContainAtLeastOne": "The password must contain at least one lowercase letter",
   "thePasswordMustContainAtLeastOne-1": "The password must contain at least one uppercase letter",
   "thePasswordMustContainAtLeastOneNumber": "The password must contain at least one number",
-  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character"
+  "thePasswordMustContainAtLeastOneSpecial": "The password must contain at least one special character",
+  "weNeedToConfirmYourEmailAddressToUnsubscribe": "We need to confirm your email address. To complete the unsubscription process, please click the link in the email we just sent you.",
+  "cc": "CC",
+  "bcc": "BCC",
+  "commaSeparatedListOfCcAddresses": "Comma-separated list of CC email addresses that will receive a copy of every outgoing email",
+  "commaSeparatedListOfBccAddresses": "Comma-separated list of BCC email addresses that will receive a blind copy of every outgoing email"
 }

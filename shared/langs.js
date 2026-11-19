@@ -61,6 +61,11 @@ const langCodes = {
         getLabel: t => 'Deutsch',
         longCode: 'de-DE'
     },
+    'de-AT': {
+        getShortLabel: t => 'AT',
+        getLabel: t => 'Deutsch (Österreich)',
+        longCode: 'de-AT'
+    },
     'fr-FR': {
         getShortLabel: t => 'FR',
         getLabel: t => 'Francais',
@@ -70,6 +75,16 @@ const langCodes = {
         getShortLabel: t => 'RU',
         getLabel: t => 'Russian',
         longCode: 'ru-RU'
+    },
+    'eu': {
+        getShortLabel: t => 'EU',
+        getLabel: t => 'Euskara',
+        longCode: 'eu'
+    },
+    'nl-NL': {
+        getShortLabel: t => 'NL',
+        getLabel: t => 'Nederlands',
+        longCode: 'nl-NL'
     },
     'fk-FK': {
         getShortLabel: t => 'FK',

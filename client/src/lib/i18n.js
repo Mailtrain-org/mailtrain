@@ -15,16 +15,22 @@ import lang_en_US_common from "../../../locales/en-US/common";
 import lang_es_ES_common from "../../../locales/es-ES/common";
 import lang_pt_BR_common from "../../../locales/pt-BR/common";
 import lang_de_DE_common from "../../../locales/de-DE/common";
+import lang_de_AT_common from "../../../locales/de-AT/common";
 import lang_fr_FR_common from "../../../locales/fr-FR/common";
 import lang_ru_RU_common from "../../../locales/ru-RU/common";
+import lang_eu_common from "../../../locales/eu/common";
+import lang_nl_NL_common from "../../../locales/nl-NL/common";
 
 const resourcesCommon = {
     'en-US': lang_en_US_common,
     'es-ES': lang_es_ES_common,
     'pt-BR': lang_pt_BR_common,
     'de-DE': lang_de_DE_common,
+    'de-AT': lang_de_AT_common,
     'fr-FR': lang_fr_FR_common,
-    'ru_RU': lang_ru_RU_common,
+    'ru-RU': lang_ru_RU_common,
+    'eu': lang_eu_common,
+    'nl-NL': lang_nl_NL_common,
     'fk-FK': convertToFake(lang_en_US_common)
 };
 

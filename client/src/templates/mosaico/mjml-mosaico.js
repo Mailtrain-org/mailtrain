@@ -599,7 +599,7 @@ class MjMosaicoButton extends BodyComponent {
         border: 'none',
         'border-radius': '3px',
         color: '#ffffff',
-        'font-family': 'Ubuntu, Helvetica, Arial, sans-serif',
+        'font-family': 'Helvetica, Arial, sans-serif',
         'font-size': '13px',
         'font-weight': 'normal',
         'inner-padding': '10px 25px',

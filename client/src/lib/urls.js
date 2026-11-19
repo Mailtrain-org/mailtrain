@@ -27,7 +27,11 @@ export function getSandboxUrl(path, customRestrictedAccessToken, opts) {
 }
 
 export function getPublicUrl(path, opts) {
-    const url = new URL(path || '', mailtrainConfig.publicUrlBase);
+    const base = new URL(mailtrainConfig.publicUrlBase);
+    if (!base.pathname.endsWith('/')) {
+        base.pathname += '/';
+    }
+    const url = new URL((path || '').replace(/^\/+/, ''), base);
 
     if (opts && opts.withLocale) {
         url.searchParams.append('locale', i18n.resolvedLanguage);

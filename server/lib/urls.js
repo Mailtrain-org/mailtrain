@@ -18,7 +18,11 @@ function getPublicUrlBase() {
 }
 
 function _getUrl(urlBase, path, opts) {
-    const url = new URL(path || '', urlBase);
+    const base = new URL(urlBase);
+    if (!base.pathname.endsWith('/')) {
+        base.pathname += '/';
+    }
+    const url = new URL((path || '').replace(/^\/+/, ''), base);
 
     if (opts && opts.locale) {
         url.searchParams.append('locale', getLangCodeFromExpressLocale(opts.locale));
