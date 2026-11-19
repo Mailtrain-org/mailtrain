@@ -274,8 +274,9 @@ async function upgrade({compose, env, project, freePort}) {
         env.MAILTRAIN_PLATFORM = 'linux/' + architecture;
         const filesBefore = compose(['run', '--rm', '--no-deps', '--user', 'root', '--entrypoint', 'sh', 'mailtrain', '-c', 'find /app/server/files -type f -exec sha256sum {} + | sort'], true);
         compose(['run', '--rm', '--no-deps', '--user', 'root', '--entrypoint', 'chown', 'mailtrain', '-R', '1000:1000', '/app/server/files']);
-        compose(['up', '-d', '--no-build', '--wait', '--wait-timeout', '240', 'mailtrain']);
+        compose(['up', '-d', '--no-build', '--no-deps', '--wait', '--wait-timeout', '240', 'mailtrain']);
         await ready(env.URL_BASE_TRUSTED);
+        assert.equal(compose(['ps', '-q', 'mysql'], true), mysql, 'Upgrade must keep the original database container');
         assert.deepEqual(await capture(env.URL_BASE_TRUSTED, ids), before, 'Supported v2 entities changed');
         await checkLegacy(env.URL_BASE_TRUSTED, db, legacy, ids);
         ids.legacy = legacy;

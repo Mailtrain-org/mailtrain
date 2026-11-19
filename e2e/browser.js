@@ -143,8 +143,11 @@ async function browserWalk(trusted, publicBase, ids, password = 'smoke-test-pass
         return {errors, failed};
     } catch (error) {
         console.error('Browser URL:', page.url(), 'errors:', errors, 'HTTP:', failed);
-        console.error((await page.locator('body').innerText()).slice(0, 3000));
-        if (process.env.E2E_SCREENSHOT) await page.screenshot({path: process.env.E2E_SCREENSHOT, fullPage: true});
+        const body = await page.locator('body').innerText({timeout: 2000}).catch(() => '');
+        console.error(body.slice(0, 3000));
+        if (process.env.E2E_SCREENSHOT) {
+            await page.screenshot({path: process.env.E2E_SCREENSHOT, fullPage: true, timeout: 2000}).catch(() => {});
+        }
         throw error;
     } finally {
         await browser.close();
