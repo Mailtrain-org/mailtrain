@@ -28,39 +28,76 @@ async function ready(base) {
     throw new Error('Mailtrain did not start at ' + base);
 }
 
-function rejectionCases(ids) {
-    const c = ids.draft;
-    const t = ids.code;
-    return {
-        grapesjs: [`UPDATE templates SET type='grapesjs' WHERE id=${t}`, 'templates:'],
-        ckeditor: [`UPDATE templates SET type='ckeditor4' WHERE id=${t}`, 'templates:'],
-        rss_campaign: [`UPDATE campaigns SET type=2 WHERE id=${c}`, 'campaigns (nonregular)'],
-        triggered_campaign: [`UPDATE campaigns SET type=3 WHERE id=${c}`, 'campaigns (nonregular)'],
-        source_url: [`UPDATE campaigns SET source=5 WHERE id=${c}`, 'campaigns (source URL)'],
-        rss_status: [`UPDATE campaigns SET status=5 WHERE id=${c}`, 'campaigns (legacy status)'],
-        triggered_status: [`UPDATE campaigns SET status=6 WHERE id=${c}`, 'campaigns (legacy status)'],
-        parent: [`UPDATE campaigns SET parent=${ids.sent} WHERE id=${c}`, 'campaigns (legacy parent)'],
-        last_check: [`UPDATE campaigns SET last_check='2021-07-26 01:02:03' WHERE id=${c}`, 'campaigns (legacy last_check)'],
-        campaign_editor: [`UPDATE campaigns SET data=JSON_SET(data,'$.sourceCustom.type','grapesjs') WHERE id=${c}`, 'campaigns (editor)'],
-        channel_source_url: ["INSERT INTO channels(name,namespace,source,data) VALUES('URL channel',1,5,'{}')", 'channels (source URL)'],
-        channel_editor: ["INSERT INTO channels(name,namespace,source,data) VALUES('Legacy channel',1,2,'{\"sourceCustom\":{\"type\":\"ckeditor4\"}}')", 'channels (editor)'],
-        trigger_queue: [`INSERT INTO queued(send_configuration,type,data) VALUES(${ids.sendConfiguration},1,'{}'); UPDATE campaigns SET status=7 WHERE id=${c}`, 'queued (triggered)'],
-        rss: [`INSERT INTO rss(parent,guid) VALUES(${c},'legacy-feed')`, 'rss:'],
-        triggers: [`INSERT INTO triggers(name,campaign) VALUES('legacy-trigger',${c})`, 'triggers:'],
-        trigger_messages: [`INSERT INTO trigger_messages(\`trigger\`,list,subscription) VALUES(99,${ids.list},${ids.subscriber})`, 'trigger_messages:'],
-        reports: ["SET FOREIGN_KEY_CHECKS=0; INSERT INTO reports(name,report_template,namespace) VALUES('legacy-report',99,1)", 'reports:'],
-        report_templates: ["INSERT INTO report_templates(name,namespace) VALUES('legacy-template',1)", 'report_templates:'],
-        shares_report: ["SET FOREIGN_KEY_CHECKS=0; INSERT INTO shares_report(entity,user,role) VALUES(99,1,'master')", 'shares_report:'],
-        shares_report_template: ["SET FOREIGN_KEY_CHECKS=0; INSERT INTO shares_report_template(entity,user,role) VALUES(99,1,'master')", 'shares_report_template:'],
-        permissions_report: ["SET FOREIGN_KEY_CHECKS=0; INSERT INTO permissions_report(entity,user,operation) VALUES(99,1,'view')", 'permissions_report:'],
-        permissions_report_template: ["SET FOREIGN_KEY_CHECKS=0; INSERT INTO permissions_report_template(entity,user,operation) VALUES(99,1,'view')", 'permissions_report_template:'],
-        related_reports: ["INSERT INTO report_templates(id,name,namespace,user_fields,js,hbs) VALUES(999,'Related report template',1,'[]','',''); INSERT INTO reports(id,name,report_template,namespace,params) VALUES(999,'Related report',999,1,'{}'); INSERT INTO shares_report(entity,user,role) VALUES(999,1,'master'); INSERT INTO permissions_report(entity,user,operation) VALUES(999,1,'view')", ['reports:', 'report_templates:', 'shares_report:', 'permissions_report:']],
-        related_trigger: [`UPDATE campaigns SET type=3 WHERE id=${c}; INSERT INTO triggers(id,name,campaign,entity,event,enabled) VALUES(999,'Related trigger',${c},'subscription','created',0); INSERT INTO trigger_messages(\`trigger\`,list,subscription) VALUES(999,${ids.list},${ids.subscriber})`, ['campaigns (nonregular)', 'triggers:', 'trigger_messages:']],
-        related_rss: [`UPDATE campaigns SET type=2,status=5 WHERE id=${c}; INSERT INTO rss(parent,guid,campaign) VALUES(${c},'related-feed',${ids.sent})`, ['campaigns (nonregular)', 'campaigns (legacy status)', 'rss:']],
-        missing_lock: [`DROP TABLE knex_migrations_lock; UPDATE templates SET type='grapesjs' WHERE id=${t}`, 'templates:'],
-        combined: [`UPDATE templates SET type='grapesjs' WHERE id=${t}; INSERT INTO queued(send_configuration,type,data) VALUES(${ids.sendConfiguration},1,'{}'); INSERT INTO report_templates(name,namespace) VALUES('combined',1)`, ['templates:', 'queued (triggered)', 'report_templates:']],
-        incomplete_v2: ["DELETE FROM knex_migrations WHERE name='20200830140000_required_custom_fields.js'", 'Finish all Mailtrain v2 migrations']
-    };
+async function createLegacyFixture(trusted, ids) {
+    const {rest} = await login(trusted);
+    const legacy = {};
+    for (const [name, type] of [['GrapesJS template', 'grapesjs'], ['CKEditor template', 'ckeditor4']]) {
+        legacy[type] = await rest('templates', {
+            name, namespace: ids.namespace, description: '', type, tag_language: 'simple',
+            data: {source: '<p>Original ' + name + '</p>'},
+            html: '<p>Rendered ' + name + '</p>', text: 'Rendered ' + name
+        });
+    }
+    for (const [name, type] of [['Archived RSS campaign', 2], ['Archived triggered campaign', 4]]) {
+        legacy[type] = await rest('campaigns', {
+            name, namespace: ids.namespace, description: '', type, source: 3,
+            data: {sourceTemplate: ids.code, feedUrl: 'https://example.test/feed.xml'},
+            lists: [{list: ids.list}], subject: name, send_configuration: ids.sendConfiguration,
+            from_name_override: null, from_email_override: null, reply_to_override: null,
+            click_tracking_disabled: true, open_tracking_disabled: true
+        });
+    }
+    return legacy;
+}
+
+function seedLegacyState(db, ids, legacy) {
+    db.sql('mailtrain', `
+        UPDATE campaigns SET status=6, last_check='2021-07-26 01:02:03' WHERE id=${legacy[2]};
+        UPDATE campaigns SET status=2, scheduled='2030-01-01 08:00:00', start_at='2030-01-01 08:00:00' WHERE id=${legacy[4]};
+        INSERT INTO rss(parent,guid,campaign) VALUES(${legacy[2]},'archived-feed-entry',${ids.sent});
+        INSERT INTO triggers(id,name,campaign,entity,event,enabled)
+            VALUES(999,'Archived subscription trigger',${legacy[4]},'subscription','created',1);
+        INSERT INTO trigger_messages(\`trigger\`,list,subscription) VALUES(999,${ids.list},${ids.subscriber});
+        INSERT INTO queued(send_configuration,type,data)
+            VALUES(${ids.sendConfiguration},1,'{"legacy":"archived triggered delivery"}');
+        INSERT INTO report_templates(id,name,namespace,user_fields,js,hbs)
+            VALUES(999,'Archived report template',${ids.namespace},'[]','','Report summary');
+        INSERT INTO reports(id,name,report_template,namespace,params)
+            VALUES(999,'Archived report',999,${ids.namespace},'{}');
+        INSERT INTO shares_report(entity,user,role) VALUES(999,${ids.user},'master');
+        INSERT INTO permissions_report(entity,user,operation) VALUES(999,${ids.user},'view');
+    `);
+}
+
+async function checkLegacy(trusted, db, legacy, ids) {
+    const {rest} = await login(trusted);
+    const outsider = await login(trusted, 'Upgrade-user-password-79!', 'upgrade-nobody');
+    await assert.rejects(outsider.request('/legacy-v2'), /\/legacy-v2: (403|404)/);
+    const archived = (kind, key) => JSON.parse(db.sql('mailtrain',
+        `SELECT record FROM legacy_v2_records WHERE kind='${kind}' AND source_key='${key}'`));
+    assert.equal(archived('templates', legacy.grapesjs).type, 'grapesjs');
+    assert.equal(archived('templates', legacy.ckeditor4).type, 'ckeditor4');
+    for (const id of [legacy.grapesjs, legacy.ckeditor4]) {
+        const template = await rest('templates/' + id);
+        assert.equal(template.type, 'codeeditor');
+        assert.match(template.data.source, /Rendered/);
+    }
+    assert.equal(archived('campaigns', legacy[2]).status, 6);
+    assert.equal(archived('campaigns', legacy[4]).status, 2);
+    assert.equal(archived('rss', db.sql('mailtrain', "SELECT source_key FROM legacy_v2_records WHERE kind='rss'").trim()).campaign, ids.sent);
+    assert.equal(archived('triggers', 999).campaign, legacy[4]);
+    assert.equal(archived('trigger_messages', `999:${ids.list}:${ids.subscriber}`).subscription, ids.subscriber);
+    assert.equal(archived('reports', 999).report_template, 999);
+    assert.equal(archived('report_templates', 999).hbs, 'Report summary');
+    assert.equal(archived('shares_report', `999:${ids.user}`).role, 'master');
+    assert.equal(archived('permissions_report', `999:${ids.user}:view`).operation, 'view');
+    assert.equal(Number(db.sql('mailtrain', "SELECT COUNT(*) FROM legacy_v2_records WHERE kind='queued'")), 1);
+    assert.equal(Number(db.sql('mailtrain', "SELECT COUNT(*) FROM queued WHERE data LIKE '%archived triggered delivery%'")), 0);
+    for (const id of [legacy[2], legacy[4]]) {
+        assert.equal((await rest('campaigns-stats/' + id)).status, 3);
+        await assert.rejects(rest('campaign-start/' + id, {}), /archived from Mailtrain v2/i);
+    }
+    console.log('Retired templates, campaigns, report data and triggers survived without restarting legacy jobs');
 }
 
 function databaseTools(mysql, network, image, mounts = []) {
@@ -79,14 +116,14 @@ function databaseTools(mysql, network, image, mounts = []) {
     return {sql, dump, clone, execute};
 }
 
-function rejectionChecks(db, snapshot, ids, record, evidence) {
+function rejectionChecks(db, snapshot, record, evidence) {
     const lanes = {
         startup: ['-e', "require('./lib/dbupdate').initDb().then(()=>process.exit(0)).catch(e=>{console.error(e.message);process.exit(1)})"],
         bootstrap: ['setup/docker-entrypoint-db-setup.js', 'fixture-password', ''],
         direct: ['-e', "require('./setup/knex/migrations/20240421161200_v2_to_v3').up(require('./lib/knex')).then(()=>process.exit(0)).catch(e=>{console.error(e.message);process.exit(1)})"],
         cli: ['node_modules/knex/bin/cli.js', '--knexfile', 'setup/knex/knexfile.js', 'migrate:latest']
     };
-    for (const [name, [statement, messages]] of Object.entries(rejectionCases(ids))) {
+    for (const [name, [statement, messages]] of Object.entries({incomplete_v2: ["DELETE FROM knex_migrations WHERE name='20200830140000_required_custom_fields.js'", 'Finish all Mailtrain v2 migrations']})) {
         const fixture = 'fixture_' + name;
         db.clone(fixture, snapshot);
         db.sql(fixture, statement);
@@ -224,13 +261,15 @@ async function upgrade({compose, env, project, freePort}) {
         await ready(env.URL_BASE_TRUSTED);
         const ids = await supportedFixture(env.URL_BASE_TRUSTED, true);
         await seedEditors(env.URL_BASE_TRUSTED, ids);
+        const legacy = await createLegacyFixture(env.URL_BASE_TRUSTED, ids);
         const before = await capture(env.URL_BASE_TRUSTED, ids);
         compose(['stop', 'mailtrain']);
         const mysql = compose(['ps', '-q', 'mysql'], true);
         const db = databaseTools(mysql, project + '_default', image);
+        seedLegacyState(db, ids, legacy);
         const snapshot = db.dump('mailtrain');
         fs.writeFileSync(path.join(temporary, 'v2.sql'), snapshot);
-        rejectionChecks(db, snapshot, ids, records, process.env.E2E_EVIDENCE_DIR ? temporary : undefined);
+        rejectionChecks(db, snapshot, records, process.env.E2E_EVIDENCE_DIR ? temporary : undefined);
         env.MAILTRAIN_IMAGE = image;
         env.MAILTRAIN_PLATFORM = 'linux/' + architecture;
         const filesBefore = compose(['run', '--rm', '--no-deps', '--user', 'root', '--entrypoint', 'sh', 'mailtrain', '-c', 'find /app/server/files -type f -exec sha256sum {} + | sort'], true);
@@ -238,6 +277,8 @@ async function upgrade({compose, env, project, freePort}) {
         compose(['up', '-d', '--no-build', '--wait', '--wait-timeout', '240', 'mailtrain']);
         await ready(env.URL_BASE_TRUSTED);
         assert.deepEqual(await capture(env.URL_BASE_TRUSTED, ids), before, 'Supported v2 entities changed');
+        await checkLegacy(env.URL_BASE_TRUSTED, db, legacy, ids);
+        ids.legacy = legacy;
         const filesAfter = compose(['exec', '-T', 'mailtrain', 'sh', '-c', 'find /app/server/files -type f -exec sha256sum {} + | sort'], true);
         assert.equal(filesAfter, filesBefore, 'Uploaded files changed during upgrade');
         const oldLedger = snapshot.split('\n').filter(line => line.startsWith('INSERT INTO `knex_migrations`'));
@@ -257,7 +298,7 @@ async function upgrade({compose, env, project, freePort}) {
         await browserWalk(env.URL_BASE_TRUSTED, env.URL_BASE_PUBLIC, ids, 'smoke-test-password', catcher);
         records.push({supportedEntities: 'preserved', uploadedFiles: 'identical', history: 'preserved', alreadyV3: 'unchanged'});
         fs.writeFileSync(path.join(temporary, 'results.json'), JSON.stringify(records, null, 2));
-        console.log('Supported v2 upgrade and rejection matrix passed; evidence: ' + temporary);
+        console.log('v2 upgrade, retired records and role checks passed; evidence: ' + temporary);
     } finally {
         env.MAILTRAIN_IMAGE = image;
         env.MAILTRAIN_PLATFORM = 'linux/' + architecture;

@@ -63,7 +63,7 @@ It then exercises the v3 browser areas, both editors, real segment drags, import
 exports, public subscriptions and dirty navigation, and checks restart persistence.
 The upgrade test creates supported data through the pinned v2 image's REST and
 browser interfaces, upgrades the same database/file volumes, and checks independent
-unsupported-data and role fixtures against MariaDB. See [UPGRADE.md](UPGRADE.md)
+legacy archive, incomplete-history and role fixtures against MariaDB. See [UPGRADE.md](UPGRADE.md)
 before upgrading an existing deployment.
 
 Each test removes its own Compose project and volumes on exit. No external SMTP

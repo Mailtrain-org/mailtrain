@@ -112,6 +112,17 @@ async function browserWalk(trusted, publicBase, ids, password = 'smoke-test-pass
         await page.goto(publicBase + '/subscription/' + list.cid);
         await page.locator('input[name="EMAIL"]').waitFor({state: 'visible'});
         if (catcher) await require('./forms').publicWalk(page, publicBase, catcher, list);
+        if (ids.legacy) {
+            await page.goto(trusted + '/settings');
+            await page.getByRole('link', {name: 'Archived v2 records'}).click();
+            for (const name of ['GrapesJS template', 'CKEditor template', 'Archived RSS campaign',
+                'Archived triggered campaign', 'Archived report', 'Archived report template', 'Archived subscription trigger']) {
+                await page.getByRole('link', {name, exact: true}).click();
+                await page.locator('pre').filter({hasText: name}).waitFor({state: 'visible'});
+                await page.getByRole('link', {name: 'All archived records'}).click();
+            }
+            console.log('Browser opened all representative archived v2 record types');
+        }
         await page.goto(trusted + '/');
         await page.getByRole('button', {name: 'admin', exact: true}).click();
         const logout = page.waitForResponse(r => r.url().endsWith('/rest/logout'));

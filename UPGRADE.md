@@ -16,19 +16,21 @@ static assets. The external v2 token API is disabled in v3: preserving its token
 does not make old API integrations work. Installations needing that API should
 stay on v2 until their integrations have a supported replacement.
 
-v3 deliberately removes GrapesJS, CKEditor, RSS/triggered/source-URL campaigns,
-custom reports, report templates and triggers. Before migration, startup,
-Docker bootstrap and the Knex CLI inspect existing v2 records and report all
-unsupported classes with entity/table identities. They refuse the upgrade before
-changing schema, rows, migration history or migration locks. This includes
-legacy campaign statuses/metadata, triggered queued messages, report shares and
-permissions, and unsupported editors embedded in campaigns or channels.
+## Records from retired features
 
-If admission fails, keep running v2. Resolve or export the listed data in v2 on a
-copy, with backups retained, before trying again. Do not delete ledger entries or
-unsupported rows merely to bypass admission. Removed features are not restored
-by v3. Keep the maintained v2 security branch available for installations using
-them.
+Open **Archived v2 records** from **Global settings** as an administrator.
+The archive preserves the original fields, IDs and relationships for GrapesJS
+and CKEditor templates, RSS and triggered campaigns, report templates and
+reports, and trigger and queue records. Archived reports show their saved
+definition and parameters. A legacy template's rendered HTML also opens in the
+code editor, with its original editor data available in the archive.
+
+Retired campaign types and remote-source campaigns remain inactive. Their
+original schedules are preserved in the archive. Pending triggered sends are
+archived and removed from the active queue. Sent history for those campaigns
+stays attached to the original campaign ID. Regular campaign schedules and
+delivery history carry forward. Keep the v2 backup if you need the old editors,
+automations or report execution.
 
 ## Roles and permissions
 
@@ -103,9 +105,9 @@ first write. Do not use rollback as an upgrade recovery procedure.
 and restart persistence. `npm run test:upgrade --prefix e2e` creates the supported
 fixture using the July 2021 amd64 v2 image pinned at
 `mailtrain/mailtrain@sha256:6a956970c81a20274198cb31237260382f33fe503ec3981e9cac5ae581bcaab1`,
-then upgrades its database and file volumes. Unsupported fixtures compare logical
-schema, rows and the migration ledger before/after rejection; role checks include
-real logins and permission denials. These disposable fixtures are regression
+then upgrades its database and file volumes. Upgrade fixtures verify archival access and confirm that retired campaign and
+queue records remain inactive. An incomplete v2 fixture must be rejected without
+changing schema, rows or history. Role checks include real logins and denials. These disposable fixtures are regression
 coverage, not a substitute for testing a copy of a production deployment.
 
 ---
