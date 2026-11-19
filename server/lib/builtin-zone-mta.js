@@ -8,6 +8,7 @@ const fs = require('fs-extra');
 const crypto = require('crypto');
 const bluebird = require('bluebird');
 const os = require('os');
+const {URL} = require('url');
 
 let zoneMtaProcess = null;
 
@@ -39,6 +40,12 @@ function getPassword() {
 }
 
 async function createConfig() {
+    const bounceUrl = new URL(`${config.www.trustedUrlBase}/webhooks/zone-mta`);
+    if (config.webhooks.zoneMtaToken) {
+        bounceUrl.username = 'mailtrain';
+        bounceUrl.password = encodeURIComponent(config.webhooks.zoneMtaToken);
+    }
+
     const cnf = {    // This is the main config file
         name: 'ZoneMTA',
 
@@ -103,7 +110,7 @@ async function createConfig() {
             "core/email-bounce": false,
             "core/http-bounce": {
                 enabled: "main",
-                url: `${config.www.trustedUrlBase}/webhooks/zone-mta`
+                url: bounceUrl.href
             },
             "core/default-headers": {
                 enabled: ["receiver", "main", "sender"],
