@@ -584,12 +584,19 @@ async function _gcFilesByEntityTx(tx, cpg) {
     })
 }
 
+function enforceNotArchived(data) {
+    if (data && data.archivedFromV2) {
+        throw new interoperableErrors.InvalidStateError('This campaign is archived from Mailtrain v2');
+    }
+}
+
 async function updateWithConsistencyCheck(context, entity, content) {
     await knex.transaction(async tx => {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', entity.id, 'edit');
 
         const existing = await rawGetByTx(tx, 'id', entity.id);
 
+        enforceNotArchived(existing.data);
         const existingHash = hash(existing, content);
         if (existingHash !== entity.originalHash) {
             throw new interoperableErrors.ChangedError();
@@ -639,15 +646,14 @@ async function updateWithConsistencyCheck(context, entity, content) {
     });
 }
 
-async function _removeTx(tx, context, id, existing = null, overrideTypeCheck = false) {
+async function _removeTx(tx, context, id) {
     await shares.enforceEntityPermissionTx(tx, context, 'campaign', id, 'delete');
 
-    if (!existing) {
-        existing = await tx('campaigns').where('id', id).select(['id', 'status', 'type']).first();
-    }
+    const existing = await tx('campaigns').where('id', id).select('status', 'data').first();
+    enforceNotArchived(JSON.parse(existing.data || '{}'));
 
     if (existing.status === CampaignStatus.SENDING) {
-        return new interoperableErrors.InvalidStateError;
+        throw new interoperableErrors.InvalidStateError();
     }
 
     await files.removeAllTx(tx, context, 'campaign', 'file', id);
@@ -683,6 +689,8 @@ async function enforceSendPermissionTx(tx, context, campaignOrCampaignId, isToTe
     } else {
         campaign = await getByIdTx(tx, context, campaignOrCampaignId, false);
     }
+
+    enforceNotArchived(campaign.data);
 
     const sendConfiguration = await sendConfigurations.getByIdTx(tx, contextHelpers.getAdminContext(), campaign.send_configuration, false, false);
 
@@ -883,6 +891,8 @@ async function reset(context, campaignId) {
         await shares.enforceEntityPermissionTx(tx, context, 'campaign', campaignId, 'send');
 
         const entity = await tx('campaigns').where('id', campaignId).first();
+
+        enforceNotArchived(JSON.parse(entity.data || '{}'));
 
         if (entity.status !== CampaignStatus.FINISHED && entity.status !== CampaignStatus.PAUSED) {
             throw new interoperableErrors.InvalidStateError('Cannot reset campaign until it is FINISHED or PAUSED state');

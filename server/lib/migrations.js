@@ -46,40 +46,8 @@ async function prepareMigrations(knex) {
             const missing = await knex(settings.sharesTable).whereNotIn('role', roles).select('entity', 'user', 'role');
             if (missing.length) blockers.push(`${settings.sharesTable} (undefined roles): ${JSON.stringify(missing)}`);
         }
-        async function collect(table, query, columns) {
-            const rows = await query.select(columns);
-            if (rows.length) blockers.push(`${table}: ${JSON.stringify(rows)}`);
-        }
-        await collect('templates', knex('templates').whereNotIn('type', ['codeeditor', 'mosaico', 'mosaicoWithFsTemplate']), ['id', 'name', 'type']);
-        await collect('campaigns (source URL)', knex('campaigns').where('source', 5), ['id', 'name', 'source']);
-        await collect('campaigns (nonregular)', knex('campaigns').whereNot('type', 1), ['id', 'name', 'type']);
-        await collect('campaigns (legacy status)', knex('campaigns').whereIn('status', [5, 6]), ['id', 'name', 'status']);
-        await collect('campaigns (legacy last_check)', knex('campaigns').whereNotNull('last_check'), ['id', 'name', 'last_check']);
-        await collect('campaigns (legacy parent)', knex('campaigns').whereNotNull('parent'), ['id', 'name', 'parent']);
-        await collect('queued (triggered)', knex('queued').where('type', 1), ['id', 'type']);
-        for (const table of ['campaigns', 'channels']) {
-            if (await knex.schema.hasTable(table)) {
-                for (const row of await knex(table).select('id', 'name', 'data', 'source')) {
-                    if (table === 'channels' && row.source === 5) blockers.push(`${table} (source URL): ${JSON.stringify({id: row.id, name: row.name})}`);
-                    const data = JSON.parse(row.data || '{}');
-                    const type = data.sourceCustom && data.sourceCustom.type;
-                    if (type && !['codeeditor', 'mosaico', 'mosaicoWithFsTemplate'].includes(type)) {
-                        blockers.push(`${table} (editor): ${JSON.stringify({id: row.id, name: row.name, type})}`);
-                    }
-                }
-            }
-        }
-        for (const table of ['rss', 'triggers', 'trigger_messages', 'reports', 'report_templates',
-            'shares_report', 'shares_report_template', 'permissions_report', 'permissions_report_template']) {
-            if (await knex.schema.hasTable(table)) {
-                const columns = table === 'trigger_messages' ? ['trigger', 'list', 'subscription']
-                    : table.startsWith('shares_') ? ['entity', 'user']
-                    : table.startsWith('permissions_') ? ['entity', 'user', 'operation'] : ['id'];
-                await collect(table, knex(table), columns);
-            }
-        }
         if (blockers.length) {
-            throw new Error('Mailtrain v3 cannot upgrade unsupported v2 data. No migrations have been run. ' +
+            throw new Error('Mailtrain v3 cannot upgrade undefined or unsafe v2 roles. No migrations have been run. ' +
                 'Keep using v2 or resolve these records in v2 after backing up the database and files:\n' + blockers.join('\n'));
         }
     }

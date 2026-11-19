@@ -28,6 +28,7 @@ const sandboxedCodeEditor = require('./routes/sandboxed-codeeditor');
 const files = require('./routes/files');
 const links = require('./routes/links');
 const archive = require('./routes/archive');
+const legacyV2 = require('./routes/legacy-v2');
 const webhooks = require('./routes/webhooks');
 const {captureSignedBody} = require('./lib/webhook-auth');
 
@@ -284,6 +285,10 @@ async function createApp(appType) {
         useWith404Fallback('/links', links);
         useWith404Fallback('/archive', archive);
         useWith404Fallback('/files', files);
+    }
+
+    if (appType === AppType.TRUSTED) {
+        useWith404Fallback('/legacy-v2', legacyV2);
     }
 
     useWith404Fallback('/mosaico', await sandboxedMosaico.getRouter(appType));
