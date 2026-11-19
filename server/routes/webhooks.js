@@ -3,6 +3,7 @@
 const router = require('../lib/router-async').create();
 const config = require('../lib/config');
 const sns = require('../lib/sns');
+const webhookAuth = require('../lib/webhook-auth');
 const campaigns = require('../models/campaigns');
 const sendConfigurations = require('../models/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
@@ -10,7 +11,12 @@ const {CampaignMessageStatus} = require('../../shared/campaigns');
 const {MailerType} = require('../../shared/send-configurations');
 const log = require('../lib/log');
 const multer = require('multer');
-const uploads = multer();
+const uploads = multer({limits: {fields: 1000}});
+
+function rejectWebhook(res, provider) {
+    log.warn(provider, 'Rejected webhook authentication');
+    return res.status(403).json({error: 'Invalid webhook authentication'});
+}
 
 
 router.postAsync('/aws', async (req, res) => {
@@ -20,8 +26,7 @@ router.postAsync('/aws', async (req, res) => {
         message = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         subscribeUrl = await sns.verifyMessage(message, config.webhooks.awsTopicArns);
     } catch (err) {
-        log.warn('AWS', 'Rejected SNS webhook: %s', err.message);
-        return res.status(403).json({error: 'Invalid SNS message'});
+        return rejectWebhook(res, 'AWS');
     }
 
     switch (message.Type) {
@@ -59,11 +64,14 @@ router.postAsync('/aws', async (req, res) => {
 
 
 router.postAsync('/sparkpost', async (req, res) => {
+    const token = config.webhooks.sparkpostToken;
+    if (token && !webhookAuth.secretsMatch(req.get('X-Mailtrain-Webhook-Token'), token)) {
+        return rejectWebhook(res, 'SparkPost');
+    }
+
     const events = [].concat(req.body || []); // This is just a cryptic way getting an array regardless whether req.body is empty, one item, or array
 
     for (const curEvent of events) {
-        console.log(curEvent);
-
         let msys = curEvent && curEvent.msys;
         let evt;
 
@@ -75,7 +83,7 @@ router.postAsync('/sparkpost', async (req, res) => {
             continue;
         }
 
-        log.verbose('Sendgrid', 'Received issue "%s" for message id "%s"', evt.type, evt.campaign_id);
+        log.verbose('Sparkpost', 'Received issue "%s" for message id "%s"', evt.type, evt.campaign_id);
 
         const message = await campaigns.getMessageByCid(evt.campaign_id);
         if (!message) {
@@ -108,6 +116,11 @@ router.postAsync('/sparkpost', async (req, res) => {
 
 
 router.postAsync('/sendgrid', async (req, res) => {
+    const key = config.webhooks.sendgridPublicKey;
+    if (key && !webhookAuth.verifySendgrid(req, key)) {
+        return rejectWebhook(res, 'SendGrid');
+    }
+
     let events = [].concat(req.body || []);
 
     for (const evt of events) {
@@ -115,7 +128,6 @@ router.postAsync('/sendgrid', async (req, res) => {
             continue;
         }
 
-        console.log(evt);
         log.verbose('Sendgrid', 'Received issue "%s" for message id "%s"', evt.event, evt.campaign_id);
 
         const message = await campaigns.getMessageByCid(evt.campaign_id);
@@ -149,10 +161,14 @@ router.postAsync('/sendgrid', async (req, res) => {
 });
 
 
-router.postAsync('/mailgun', uploads.any(), async (req, res) => {
+router.postAsync('/mailgun', uploads.none(), async (req, res) => {
+    const key = config.webhooks.mailgunSigningKey;
+    if (key && !webhookAuth.verifyMailgun(req.body, key)) {
+        return rejectWebhook(res, 'Mailgun');
+    }
+
     const evt = req.body;
 
-    console.log(evt);
     log.verbose('Mailgun', 'Received issue "%s" for message id "%s"', evt.event, evt.campaign_id);
 
     const message = await campaigns.getMessageByCid([].concat(evt && evt.campaign_id || []).shift());
@@ -182,6 +198,11 @@ router.postAsync('/mailgun', uploads.any(), async (req, res) => {
 
 
 router.postAsync('/zone-mta', async (req, res) => {
+    const token = config.webhooks.zoneMtaToken;
+    if (token && !webhookAuth.secretsMatch(req.get('Authorization'), webhookAuth.zoneMtaAuthorization(token))) {
+        return rejectWebhook(res, 'ZoneMTA');
+    }
+
     try {
         if (typeof req.body === 'string') {
             req.body = JSON.parse(req.body);
@@ -207,18 +228,18 @@ router.postAsync('/zone-mta', async (req, res) => {
 
 
 router.postAsync('/zone-mta/sender-config/:sendConfigurationCid', async (req, res) => {
-    if (!req.query.api_token) {
-        return res.json({
-            error: 'api_token value not set'
-        });
+    res.set('Cache-Control', 'no-store');
+
+    const token = req.query.api_token;
+    if (typeof token !== 'string' || !token) {
+        return rejectWebhook(res, 'ZoneMTA');
     }
 
     const sendConfiguration = await sendConfigurations.getByCid(contextHelpers.getAdminContext(), req.params.sendConfigurationCid, false, true);
 
-    if (sendConfiguration.mailer_type !== MailerType.ZONE_MTA || sendConfiguration.mailer_settings.dkimApiKey !== req.query.api_token) {
-        return res.json({
-            error: 'invalid api_token value'
-        });
+    if (sendConfiguration.mailer_type !== MailerType.ZONE_MTA ||
+        !webhookAuth.secretsMatch(token, sendConfiguration.mailer_settings.dkimApiKey)) {
+        return rejectWebhook(res, 'ZoneMTA');
     }
 
     const dkimDomain = sendConfiguration.mailer_settings.dkimDomain;
@@ -246,6 +267,11 @@ router.postAsync('/zone-mta/sender-config/:sendConfigurationCid', async (req, re
 
 
 router.postAsync('/postal', async (req, res) => {
+    const key = config.webhooks.postalPublicKey;
+    if (key && !webhookAuth.verifyPostal(req, key)) {
+        return rejectWebhook(res, 'Postal');
+    }
+
 
     if (typeof req.body === 'string') {
         req.body = JSON.parse(req.body);
