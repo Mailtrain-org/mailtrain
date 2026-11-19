@@ -112,6 +112,17 @@ www:
 webhooks:
   # List the SNS topic ARNs that can send callbacks. An empty list accepts any signed SNS topic.
   awsTopicArns: []
+  # Set the X-Mailtrain-Webhook-Token custom header on the SparkPost webhook.
+  sparkpostToken: ''
+  # Paste the SendGrid Signed Event Webhook verification key (base64, without PEM headers).
+  sendgridPublicKey: ''
+  # Use Mailgun's HTTP webhook signing key for legacy event callbacks.
+  mailgunSigningKey: ''
+  # ZoneMTA HTTP bounce callbacks use Basic authentication with username mailtrain.
+  # The built-in ZoneMTA uses this automatically. Set the external callback URL accordingly.
+  zoneMtaToken: ''
+  # Set the Postal signing public key as a PEM block.
+  postalPublicKey: ''
 
 mysql:
   host: localhost

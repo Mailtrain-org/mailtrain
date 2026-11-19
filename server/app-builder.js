@@ -29,6 +29,7 @@ const files = require('./routes/files');
 const links = require('./routes/links');
 const archive = require('./routes/archive');
 const webhooks = require('./routes/webhooks');
+const {captureSignedBody} = require('./lib/webhook-auth');
 
 const namespacesRest = require('./routes/rest/namespaces');
 const sendConfigurationsRest = require('./routes/rest/send-configurations');
@@ -147,6 +148,11 @@ async function createApp(appType) {
     app.use(compression());
     app.use(favicon(path.join(__dirname, '..', 'client', 'static', 'favicon.ico')));
 
+    logger.token('url', req => {
+        const url = req.originalUrl || req.url;
+        // This callback still accepts the ZoneMTA DKIM key in the query string.
+        return /^\/webhooks\/zone-mta\/sender-config\//i.test(url) ? url.split('?')[0] : url;
+    });
     app.use(logger(config.www.log, {
         stream: {
             write: message => {
@@ -202,10 +208,12 @@ async function createApp(appType) {
     }));
 
     app.use(bodyParser.text({
+        verify: captureSignedBody,
         limit: config.www.postSize
     }));
 
     app.use(bodyParser.json({
+        verify: captureSignedBody,
         limit: config.www.postSize
     }));
 
