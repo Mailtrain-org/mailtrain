@@ -1,0 +1,35 @@
+{
+    "notificationV1": {
+        "Type": "Notification",
+        "Message": "{\"mail\":{\"messageId\":\"test-message\"},\"notificationType\":\"Bounce\",\"bounce\":{\"bounceType\":\"Permanent\"}}",
+        "MessageId": "11111111-1111-4111-8111-111111111111",
+        "Timestamp": "2026-01-01T00:00:00.000Z",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:mailtrain-test",
+        "SigningCertURL": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-11111111111111111111111111111111.pem",
+        "SignatureVersion": "1",
+        "Signature": "vEU1slY05+m41JoJUlMhkhZ7Uqp6LCkewD7nPRVsYwabZPtI+3xwlEmbjRIM9/1HYPBC+AcwjpfFNxW6T7Z4i/mA+bWvP/fQ/saBSsXv7FlB6NrrMNq4xt7HvGleE7IaSOKHUjn+Hr2/zC7n5FVbC8LeV/ivNF/TBQD//qD6GsDkLBj6jQjEBfGb+LCCZyH1mzpV5wsLAHO1gfRvjeG+4MPkQkQkpngAWitEamulxsRLQItMfw1uFbVC4qGDp+RSTXG4K/hulBviyvp68Q33NTlC/dyV4aH2Ux081uJFIB3dAlJYgsFJlObuNLnKRPkAG1IstgmkZ0s29dF5V1rDVQ=="
+    },
+    "notificationV2": {
+        "Type": "Notification",
+        "Message": "{\"mail\":{\"messageId\":\"test-message\"},\"notificationType\":\"Bounce\",\"bounce\":{\"bounceType\":\"Permanent\"}}",
+        "MessageId": "11111111-1111-4111-8111-111111111111",
+        "Timestamp": "2026-01-01T00:00:00.000Z",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:mailtrain-test",
+        "SigningCertURL": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-11111111111111111111111111111111.pem",
+        "SignatureVersion": "2",
+        "Signature": "Z8LDW5MjCUt5yf17A2UtZi1/Dckhh3KrMtJcuJHfe+G36ZHWyJKsPbflhd7jIfclMeQYivbzuIE0VfEvIWXsUh9xPT9IJmPbJHgbXjLIstAqV+Kk9SLPztUIDMwABFDSNbDGrDvaJ9bEMmhbmUPpggk++yM5/kt+xffT0cMDmB+1SrOA77coW/2R94duSR4JNmtq4Rao138/9uavw5DvCPcyug1MHSYwfNj7Y2Skh1NqFMD89chBrotIr1P2riaBDwLRz3Y9x+GbM+izaIdU+vjN540PAoSvquZ8eKoXo/F+6i4FVy5o1c0EQ1hIUUQMIVshWNLWr5mh5qJ1Mi6c0A==",
+        "Subject": "Delivery update: café"
+    },
+    "confirmation": {
+        "Type": "SubscriptionConfirmation",
+        "Message": "Please confirm.\nThis is a local fixture.",
+        "MessageId": "22222222-2222-4222-8222-222222222222",
+        "Timestamp": "2026-01-01T00:00:00.000Z",
+        "TopicArn": "arn:aws-cn:sns:cn-north-1:123456789012:mailtrain-test",
+        "SignatureVersion": "2",
+        "SigningCertURL": "https://sns.cn-north-1.amazonaws.com.cn/SimpleNotificationService-11111111111111111111111111111111.pem",
+        "Token": "local-test-only",
+        "SubscribeURL": "https://sns.cn-north-1.amazonaws.com.cn/?Action=ConfirmSubscription&TopicArn=arn:aws-cn:sns:cn-north-1:123456789012:mailtrain-test&Token=local-test-only",
+        "Signature": "wobRKQ46QQDve2c72aqncfSvOm7XyIPQ95Kt5qpnNliMApbZcYmKkr4kQE8Ek7oGXU2Gh0dE1MLgqvYt2NhrVV4Adl/05KYaI2JMo6GgCiyj5BIaJv+6bUkl6Ik42GA2PApq2DWpASJMeHmERIwdVbVHIbUTaRCV6msXINrtfzifylSMjEucA4V8+jfS2qtrHbKk04JPDcXHEQ1qemPudmNojmGruimoGM5eyNxVMeB70Jf+E0WQbxEcMYFmp3ieWntE1y5yFeZSUZf5R5iveJ1kE9ASqys39dH6jah24elWcZr7wb8nRSC+K9AUCyOxwUtHD6V5axIP3p1C9pnGnA=="
+    }
+}
