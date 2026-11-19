@@ -1,5 +1,7 @@
+ARG NODE_VERSION=26
+
 # Build browser assets once on the builder's native architecture.
-FROM --platform=$BUILDPLATFORM node:24-bookworm-slim AS client-builder
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-bookworm-slim AS client-builder
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -15,7 +17,7 @@ COPY locales ./locales
 RUN cd client && npm run build
 
 # Compile native production dependencies for the target architecture.
-FROM node:24-bookworm-slim AS dependencies
+FROM node:${NODE_VERSION}-bookworm-slim AS dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 make g++ git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -27,7 +29,7 @@ RUN cd server && npm ci --omit=dev --no-audit --no-fund
 RUN cd shared && npm ci --omit=dev --no-audit --no-fund
 RUN cd zone-mta && npm ci --omit=dev --no-audit --no-fund
 
-FROM node:24-bookworm-slim
+FROM node:${NODE_VERSION}-bookworm-slim
 ENV NODE_ENV=production
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
