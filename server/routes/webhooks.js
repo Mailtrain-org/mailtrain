@@ -1,7 +1,8 @@
 'use strict';
 
 const router = require('../lib/router-async').create();
-const request = require('request-promise');
+const config = require('../lib/config');
+const sns = require('../lib/sns');
 const campaigns = require('../models/campaigns');
 const sendConfigurations = require('../models/send-configurations');
 const contextHelpers = require('../lib/context-helpers');
@@ -13,51 +14,42 @@ const uploads = multer();
 
 
 router.postAsync('/aws', async (req, res) => {
-    if (typeof req.body === 'string') {
-        req.body = JSON.parse(req.body);
+    let message;
+    let subscribeUrl;
+    try {
+        message = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        subscribeUrl = await sns.verifyMessage(message, config.webhooks.awsTopicArns);
+    } catch (err) {
+        log.warn('AWS', 'Rejected SNS webhook: %s', err.message);
+        return res.status(403).json({error: 'Invalid SNS message'});
     }
 
-    switch (req.body.Type) {
-
+    switch (message.Type) {
         case 'SubscriptionConfirmation':
-            if (req.body.SubscribeURL) {
-                await request(req.body.SubscribeURL);
+            await sns.confirmSubscription(subscribeUrl);
+            break;
+
+        case 'Notification': {
+            const event = JSON.parse(message.Message);
+            const responseId = event && event.mail && event.mail.messageId;
+            if (typeof responseId !== 'string' || !responseId) {
                 break;
-            } else {
-                const err = new Error('SubscribeURL not set');
-                err.status = 400;
-                throw err;
             }
 
-        case 'Notification':
-            if (req.body.Message) {
-                if (typeof req.body.Message === 'string') {
-                    req.body.Message = JSON.parse(req.body.Message);
-                }
+            const campaignMessage = await campaigns.getMessageByResponseId(responseId);
+            if (!campaignMessage) {
+                break;
+            }
 
-                if (req.body.Message.mail && req.body.Message.mail.messageId) {
-                    const message = await campaigns.getMessageByResponseId(req.body.Message.mail.messageId);
-
-                    if (!message) {
-                        return;
-                    }
-
-                    switch (req.body.Message.notificationType) {
-                        case 'Bounce':
-                            await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.BOUNCED, req.body.Message.bounce.bounceType === 'Permanent');
-                            log.verbose('AWS', 'Marked message %s as bounced', req.body.Message.mail.messageId);
-                            break;
-
-                        case 'Complaint':
-                            if (req.body.Message.complaint) {
-                                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), message, CampaignMessageStatus.COMPLAINED, true);
-                                log.verbose('AWS', 'Marked message %s as complaint', req.body.Message.mail.messageId);
-                            }
-                            break;
-                    }
-                }
+            if (event.notificationType === 'Bounce' && event.bounce) {
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), campaignMessage, CampaignMessageStatus.BOUNCED, event.bounce.bounceType === 'Permanent');
+                log.verbose('AWS', 'Marked message %s as bounced', responseId);
+            } else if (event.notificationType === 'Complaint' && event.complaint) {
+                await campaigns.changeStatusByMessage(contextHelpers.getAdminContext(), campaignMessage, CampaignMessageStatus.COMPLAINED, true);
+                log.verbose('AWS', 'Marked message %s as complaint', responseId);
             }
             break;
+        }
     }
 
     res.json({

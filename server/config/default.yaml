@@ -117,6 +117,10 @@ www:
   # maximum POST body size
   postSize: 2MB
 
+webhooks:
+  # List the SNS topic ARNs that can send callbacks. An empty list accepts any signed SNS topic.
+  awsTopicArns: []
+
 mysql:
   host: localhost
   user: mailtrain
