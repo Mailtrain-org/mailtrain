@@ -1,0 +1,9 @@
+services:
+  mailtrain:
+    environment:
+      ADMIN_PASSWORD: smoke-test-password
+      WITH_ZONE_MTA: "false"
+  smtp:
+    image: axllent/mailpit:v1.27.8
+    ports:
+      - "127.0.0.1::8025"

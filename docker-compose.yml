@@ -1,38 +1,59 @@
-version: '3'
-
 services:
   mysql:
-    image: mariadb:11.3
+    image: mariadb:11.4
     environment:
-    - MYSQL_ROOT_PASSWORD=mailtrain
-    - MYSQL_DATABASE=mailtrain
-    - MYSQL_USER=mailtrain
-    - MYSQL_PASSWORD=mailtrain
+      MARIADB_ROOT_PASSWORD: mailtrain
+      MARIADB_DATABASE: mailtrain
+      MARIADB_USER: mailtrain
+      MARIADB_PASSWORD: mailtrain
     volumes:
-    - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
 
   redis:
-    image: redis:7
+    image: redis:7-alpine
     volumes:
-    - redis-data:/data
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
 
   mongo:
-    image: mongo:5
+    image: mongo:7
+    profiles: ["builtin-mta"]
     volumes:
-    - mongo-data:/data/db
+      - mongo-data:/data/db
 
   mailtrain:
-    image: mailtrain/mailtrain:latest
+    build: .
+    image: ${MAILTRAIN_IMAGE:-mailtrain-local:v3}
+    init: true
+    environment:
+      WITH_ZONE_MTA: ${WITH_ZONE_MTA:-false}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-test}
+      URL_BASE_TRUSTED: ${URL_BASE_TRUSTED:-http://localhost:3000}
+      URL_BASE_SANDBOX: ${URL_BASE_SANDBOX:-http://localhost:3003}
+      URL_BASE_PUBLIC: ${URL_BASE_PUBLIC:-http://localhost:3004}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
-    - "3000:3000"
-    - "3003:3003"
-    - "3004:3004"
+      - "127.0.0.1:${PORT_TRUSTED:-3000}:3000"
+      - "127.0.0.1:${PORT_SANDBOX:-3003}:3003"
+      - "127.0.0.1:${PORT_PUBLIC:-3004}:3004"
     volumes:
-    - mailtrain-files:/app/server/files
+      - mailtrain-files:/app/server/files
 
 volumes:
   mysql-data:
   redis-data:
   mongo-data:
   mailtrain-files:
-

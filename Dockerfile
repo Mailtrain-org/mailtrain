@@ -1,47 +1,54 @@
-# Mutistaged Node.js Build
-FROM node:10-alpine as builder
+# posix 4.2.0 fails to compile against Node 26/V8 on Linux.
+ARG NODE_VERSION=24
 
-# Install system dependencies
-RUN set -ex; \
-    apk add --update --no-cache \
-    make gcc g++ git python
+# Build browser assets once on the builder's native architecture.
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-bookworm-slim AS client-builder
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY shared/package*.json ./shared/
+RUN cd shared && npm ci --omit=dev --no-audit --no-fund
+COPY client/package*.json client/mjml-package-lock.json ./client/
+COPY client/mjml ./client/mjml
+COPY client/build-mjml.sh ./client/
+RUN cd client && sh build-mjml.sh && npm ci --no-audit --no-fund
+COPY client ./client
+COPY shared ./shared
+COPY locales ./locales
+RUN cd client && npm run build
 
-# Copy package.json dependencies
-COPY server/package.json /app/server/package.json
-COPY server/package-lock.json /app/server/package-lock.json
-COPY client/package.json /app/client/package.json
-COPY client/package-lock.json /app/client/package-lock.json
-COPY shared/package.json /app/shared/package.json
-COPY shared/package-lock.json /app/shared/package-lock.json
-COPY zone-mta/package.json /app/zone-mta/package.json
-COPY zone-mta/package-lock.json /app/zone-mta/package-lock.json
+# Compile native production dependencies for the target architecture.
+FROM node:${NODE_VERSION}-bookworm-slim AS dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY server/package*.json ./server/
+COPY shared/package*.json ./shared/
+COPY zone-mta/package*.json ./zone-mta/
+RUN cd server && npm ci --omit=dev --no-audit --no-fund
+RUN cd shared && npm ci --omit=dev --no-audit --no-fund
+RUN cd zone-mta && npm ci --omit=dev --no-audit --no-fund
 
-# Install dependencies in each directory
-RUN cd /app/client && npm install
-RUN cd /app/shared && npm install --production
-RUN cd /app/server && npm install --production
-RUN cd /app/zone-mta && npm install --production
-
-# Later, copy the app files. That improves development speed as building the Docker image will not have
-# to download and install all the NPM dependencies every time there's a change in the source code
-COPY . /app
-
-RUN set -ex; \
-   cd /app/client && \
-   npm run build && \
-   rm -rf node_modules
-
-# Final Image
-FROM node:10-alpine
-
-WORKDIR /app/
-
-# Install system dependencies
-RUN set -ex; \
-    apk add --update --no-cache \
-    pwgen netcat-openbsd bash imagemagick
-
-COPY --from=builder /app/ /app/
-
+FROM node:${NODE_VERSION}-bookworm-slim
+ENV NODE_ENV=production
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash pwgen netcat-openbsd imagemagick ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY server ./server
+COPY shared ./shared
+COPY zone-mta ./zone-mta
+COPY locales ./locales
+COPY client/static ./client/static
+COPY --from=client-builder /app/client/dist ./client/dist
+COPY --from=dependencies /app/server/node_modules ./server/node_modules
+COPY --from=dependencies /app/shared/node_modules ./shared/node_modules
+COPY --from=dependencies /app/zone-mta/node_modules ./zone-mta/node_modules
+COPY docker-entrypoint.sh ./
+RUN mkdir -p server/files && chown -R node:node /app
+USER node
 EXPOSE 3000 3003 3004
+HEALTHCHECK --interval=10s --timeout=5s --start-period=120s --retries=6 \
+    CMD node -e 'Promise.all([process.env.PORT_TRUSTED || 3000,process.env.PORT_SANDBOX || 3003,process.env.PORT_PUBLIC || 3004].map(port => fetch(`http://127.0.0.1:${port}/health`).then(r => {if (!r.ok) throw Error(r.status)}))).catch(() => process.exit(1))'
 ENTRYPOINT ["bash", "/app/docker-entrypoint.sh"]

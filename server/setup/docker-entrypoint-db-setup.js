@@ -1,7 +1,7 @@
 'use strict';
 
 const log = require('../lib/log');
-const dbcheck = require('../lib/dbcheck');
+const {initDb} = require('../lib/dbupdate');
 const knex = require('../lib/knex');
 const {getAdminId} = require("../../shared/users");
 const bcrypt = require('bcrypt');
@@ -17,9 +17,14 @@ async function init() {
     const passwd = args[0];
     const accessToken = args[1];
 
-    await dbcheck();
-    await knex.migrate.latest();
+    const initialized = await knex.schema.hasTable('users');
+    await initDb();
 
+    // Environment credentials bootstrap a new database only. Preserve account
+    // changes made through Mailtrain when the container restarts.
+    if (initialized) {
+        process.exit(0);
+    }
 
     const hashedPasswd = await bcrypt.hash(passwd, 10);
     await knex('users').where({id: getAdminId()}).update({password: hashedPasswd});
