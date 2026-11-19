@@ -91,7 +91,8 @@ async function verifyMessage(message, topicArns) {
 
     // SNS signs the named fields in byte order, with a newline after each key and value.
     const text = fields.map(field => {
-        if (typeof message[field] !== 'string') {
+        if (typeof message[field] !== 'string' ||
+            (field !== 'Message' && field !== 'Subject' && /[\r\n]/.test(message[field]))) {
             throw new Error('Invalid SNS field: ' + field);
         }
         return field + '\n' + message[field] + '\n';
