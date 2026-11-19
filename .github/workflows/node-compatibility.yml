@@ -1,0 +1,23 @@
+name: Check Node 10 compatibility
+
+on:
+  pull_request:
+    branches: [v2]
+  push:
+    branches: [v2]
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 10
+      - name: Check server JavaScript
+        run: git ls-files -z 'server/*.js' 'server/**/*.js' | xargs -0 -n 1 node --check
