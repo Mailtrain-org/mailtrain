@@ -34,7 +34,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: 26
+          node-version: 24
           cache: npm
           cache-dependency-path: e2e/package-lock.json
       - name: Prepare the release notes and package metadata

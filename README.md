@@ -1,10 +1,8 @@
 # Mailtrain v3
 
-Mailtrain **3.0.0-rc.1** is a release candidate. Test upgrades on a copy and read
-[UPGRADE.md](UPGRADE.md); v3 deliberately removes some v2 features. Release
-publication and registry availability are controlled by the maintainers; see
-[RELEASING.md](RELEASING.md). During qualification, use the reviewed release
-commit in place of an unpublished tag.
+Test Mailtrain **3.0.0-rc.1** upgrades on a copy. Read [UPGRADE.md](UPGRADE.md)
+for the procedure and the legacy records available in the archive.
+[RELEASING.md](RELEASING.md) covers release preparation.
 
 ## Install with Docker
 

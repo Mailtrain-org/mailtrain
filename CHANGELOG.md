@@ -16,10 +16,10 @@ and [UPGRADE.md](https://github.com/Mailtrain-org/mailtrain/blob/v3.0.0-rc.1/UPG
     @p-w). Verify SNS signatures and restrict confirmation/certificate URLs
     (#1389); add optional provider webhook verification and private reporting
     guidance. Read SECURITY.md for configuration and remaining limits.
-  * Preserve supported v2 data, files and migration history. Refuse unsupported
-    editors, campaign sources, reports/triggers and undefined or unsafe role
-    mappings before changing the database. The external v2 token API remains
-    disabled; saved tokens do not restore that integration.
+  * Preserve v2 data, files and migration history. The administrator archive
+    opens original GrapesJS and CKEditor templates, retired campaigns,
+    triggers and reports. Templates also open as HTML in the code editor.
+    Retired campaigns and queued triggers stay inactive.
   * Fix segment nesting/reordering, dirty-page navigation, date controls,
     Mosaico placeholders and v3 forms. Exercise real campaign delivery,
     unsubscribe, browser areas, restart persistence and v2 admission in CI.
@@ -39,12 +39,9 @@ their original changes, and @auscaster for integration, security hardening,
 builds, regression coverage and release preparation. Original commit authorship
 is retained for the community ports.
 
-Breaking changes: v3 removes GrapesJS/CKEditor, RSS/triggered/source-URL campaigns,
-custom reports/report templates and triggers, and does not serve the external
-v2 token API. Existing deployments using these features should stay on the v2
-security line. Upgrade admission reports incompatible data; there is no automatic
-conversion or rollback. Review configured roles and non-root file ownership.
-
+The external v2 token API, retired editors, automated campaign execution and
+custom reporting remain inactive in v3. See the upgrade guide for role checks,
+file ownership and backup recovery.
 
 ## 2.0.0-rc1 2018-12-25
 

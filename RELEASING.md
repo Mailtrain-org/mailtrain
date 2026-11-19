@@ -8,7 +8,7 @@ approves the exact release. No personal CLI login is needed.
 
 ## Validate without publishing
 
-From the repository root on Node 26:
+From the repository root on Node 24:
 
 ```sh
 node --test scripts/release.test.js
