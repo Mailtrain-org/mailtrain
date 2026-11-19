@@ -13,6 +13,7 @@ router.use(passport.loggedIn, (req, res, next) => {
         return next(new PermissionDeniedError());
     }
     res.set('Cache-Control', 'no-store');
+    res.locals.publicPath = getTrustedUrl('');
     res.locals.settingsUrl = getTrustedUrl('settings');
     res.locals.archiveUrl = getTrustedUrl('legacy-v2');
     next();
