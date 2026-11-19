@@ -142,9 +142,11 @@ module.exports.setupRegularAuth = app => {
     app.use(passport.session());
 };
 
-module.exports.restLogout = (req, res) => {
-    req.logout(() => {});
-    res.json();
+module.exports.restLogout = (req, res, next) => {
+    req.logout(err => {
+        if (err) return next(err);
+        res.json();
+    });
 };
 
 module.exports.restLogin = (req, res, next) => {

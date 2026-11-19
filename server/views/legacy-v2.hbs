@@ -1,0 +1,25 @@
+<main class="container py-4">
+    <p><a href="{{settingsUrl}}">Global settings</a></p>
+    <h1>Archived v2 records</h1>
+    {{#if record}}
+        <p><a href="{{archiveUrl}}">All archived records</a></p>
+        <h2>{{record.name}}</h2>
+        <p>{{record.kind}} · {{record.source_key}} · Read only</p>
+        <pre>{{record.record}}</pre>
+    {{else}}
+        <p>These records were preserved during the upgrade from Mailtrain v2. Archived campaigns, triggers and reports are inactive.</p>
+        {{#if records}}
+            <table class="table">
+                <thead><tr><th>Name</th><th>Record type</th><th>Original ID</th></tr></thead>
+                <tbody>
+                {{#each records}}
+                    <tr><td><a href="{{url}}">{{name}}</a></td><td>{{kind}}</td><td>{{source_key}}</td></tr>
+                {{/each}}
+                </tbody>
+            </table>
+        {{else}}
+            <p>No archived records.</p>
+        {{/if}}
+        {{#if nextUrl}}<p><a href="{{nextUrl}}">Next page</a></p>{{/if}}
+    {{/if}}
+</main>

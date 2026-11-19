@@ -105,7 +105,7 @@ router.getAsync('/confirm/subscribe/:cid', async (req, res) => {
     const data = confirmation.data;
 
     const geo = geoip.lookup(confirmation.ip) || null;
-    const country = geo.country;
+    const country = geo && geo.country;
 
     const meta = {
         ip: confirmation.ip,

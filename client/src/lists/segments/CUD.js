@@ -18,7 +18,7 @@ import {withErrorHandling} from "../../lib/error-handling";
 import {DeleteModalDialog} from "../../lib/modals";
 
 import * as styles from "./CUD.scss";
-import SortableTree from "@nosferatu500/react-sortable-tree"; // Due to react-sortable-tree being outdated (and unsupported), we have to stick with React 18
+import SortableTree, {getVisibleNodeCount} from "@nosferatu500/react-sortable-tree"; // Due to react-sortable-tree being outdated (and unsupported), we have to stick with React 18
 import './rst-style.css'; // For whatever strange reason, webpack (possibly css-loader or style-loader) does not correclty
                           // process import '@nosferatu500/react-sortable-tree/style.css'. It reports no error, but the
                           // resulting code lacks the styles. As a workaround, we import it through the rst-style.css.
@@ -360,7 +360,7 @@ export default class CUD extends Component {
                                 <SortableTree
                                     treeData={this.state.rulesTree}
                                     onChange={rulesTree => this.onRulesChanged(rulesTree)}
-                                    isVirtualized={false}
+                                    style={{height: Math.min(500, Math.max(62, getVisibleNodeCount({treeData: this.state.rulesTree}) * 62))}}
                                     canDrop={data => !data.nextParent || (ruleHelpers.isCompositeRuleType(data.nextParent.rule.type))}
                                     generateNodeProps={data => ({
                                         buttons: [
@@ -374,7 +374,6 @@ export default class CUD extends Component {
                                                                                         title={t('delete')}/></ActionLink>
                                         ]
                                     })}
-                                    virtuosoProps={{useWindowScroll: true}}
                                 />
                             </div>
                         </div>

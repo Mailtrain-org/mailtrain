@@ -3,6 +3,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Trans} from 'react-i18next';
+import mailtrainConfig from 'mailtrainConfig';
+import {getUrl} from '../lib/urls';
 import {withTranslation} from '../lib/i18n';
 import {requiresAuthenticatedUser, Title, withPageHelpers} from '../lib/page';
 import {
@@ -77,6 +79,7 @@ export default class Update extends Component {
         return (
             <div>
                 <Title>{t('globalSettings')}</Title>
+                {mailtrainConfig.canViewLegacyArchive && <p><a href={getUrl('legacy-v2')}>Archived v2 records</a></p>}
 
                 <Form stateOwner={this} onSubmitAsync={::this.submitHandler}>
                     <InputField id="adminEmail" label={t('adminEmail')} help={t('thisEmailIsUsedAsTheMainContactAndAsA')}/>

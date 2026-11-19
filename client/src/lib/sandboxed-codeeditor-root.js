@@ -123,10 +123,18 @@ class CodeEditorSandbox extends Component {
         parentRPC.setMethodHandler('setWrap', ::this.setWrap);
 
         window.addEventListener('message', this.onMessageFromPreviewHandler, false);
+        this.updatePreview();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.preview && (!prevState.preview || prevState.previewContents !== this.state.previewContents)) {
+            this.updatePreview();
+        }
     }
 
     componentWillUnmount() {
         clearTimeout(this.refreshTimeoutId);
+        window.removeEventListener('message', this.onMessageFromPreviewHandler, false);
     }
 
     getHtml() {
@@ -169,7 +177,8 @@ class CodeEditorSandbox extends Component {
         });
     }
 
-    render() {
+    updatePreview() {
+        if (!this.previewNode) return;
         const previewScript =
             '(function() {\n' +
             '    function reportScroll() { window.parent.postMessage({type: \'scroll\', data: {x: window.scrollX, y: window.scrollY}}, \'*\'); }\n' +
@@ -180,6 +189,12 @@ class CodeEditorSandbox extends Component {
 
         const previewContents = this.state.previewContents.replace(/<\s*head\s*>/i, `<head><script>${previewScript}</script>`);
 
+        // Re-rendering an iframe src adds joint browser-history entries. Replace
+        // this preview entry so Back/Forward still navigate between Mailtrain pages.
+        this.previewNode.contentWindow.location.replace("data:text/html;charset=utf-8," + encodeURIComponent(previewContents));
+    }
+
+    render() {
         return (
             <div className={styles.sandbox}>
                 <div className={this.state.preview ? styles.aceEditorWithPreview : styles.aceEditorWithoutPreview}>
@@ -200,7 +215,7 @@ class CodeEditorSandbox extends Component {
                 {
                     this.state.preview &&
                     <div className={styles.preview}>
-                        <iframe ref={node => this.previewNode = node} src={"data:text/html;charset=utf-8," + encodeURIComponent(previewContents)}></iframe>
+                        <iframe ref={node => this.previewNode = node} src="about:blank"></iframe>
                     </div>
                 }
             </div>

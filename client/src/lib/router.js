@@ -1,7 +1,15 @@
 'use strict';
 
 import React, {useCallback, useContext, useEffect, useMemo} from 'react';
-import {getRoutes} from "./page-common";
+let confirmNavigation = async () => true;
+let navigationPending = false;
+let historyIndex = 0;
+
+export function setNavigationConfirmation(handler) {
+    confirmNavigation = handler;
+    return () => { confirmNavigation = async () => true; };
+}
+
 export const LocationContext = React.createContext(null);
 
 function getLocationObject() {
@@ -15,18 +23,55 @@ function getLocationObject() {
 export function Router(props) {
     const [location, setLocation] = React.useState(null);
     useEffect(() => {
-        const onLocationChange = () => {
-            setLocation(getLocationObject());
+        historyIndex = window.history.state?.mailtrainHistoryIndex || 0;
+        window.history.replaceState({...window.history.state, mailtrainHistoryIndex: historyIndex}, '');
+        let traversal = null;
+        const onLocationChange = () => setLocation(getLocationObject());
+        const onPopState = () => {
+            const nextIndex = window.history.state?.mailtrainHistoryIndex || 0;
+            if (traversal?.phase === 'approved') {
+                if (nextIndex !== traversal.destination) {
+                    window.history.go(traversal.destination - nextIndex);
+                    return;
+                }
+                traversal = null;
+                navigationPending = false;
+                historyIndex = nextIndex;
+                window.dispatchEvent(new Event('pushstate'));
+                return;
+            }
+            if (!traversal && nextIndex === historyIndex) return;
+            if (!traversal) {
+                traversal = {destination: nextIndex, phase: 'restore'};
+                navigationPending = true;
+            }
+            // Rapid traversals may deliver another popstate before restoration.
+            // Only the original native entry can complete that restoration.
+            if (nextIndex !== historyIndex) {
+                window.history.go(historyIndex - nextIndex);
+                return;
+            }
+            if (traversal.phase !== 'restore') return;
+            traversal.phase = 'confirm';
+            confirmNavigation().then(allowed => {
+                if (allowed) {
+                    traversal.phase = 'approved';
+                    window.history.go(traversal.destination - historyIndex);
+                } else {
+                    traversal = null;
+                    navigationPending = false;
+                }
+            }).catch(error => {
+                traversal = null;
+                navigationPending = false;
+                console.error(error);
+            });
         };
-
-        window.addEventListener('popstate', onLocationChange);
+        window.addEventListener('popstate', onPopState);
         window.addEventListener('pushstate', onLocationChange);
-
         setLocation(getLocationObject());
-
         return () => {
-            console.log('Location handlers to be removed')
-            window.removeEventListener('popstate', onLocationChange);
+            window.removeEventListener('popstate', onPopState);
             window.removeEventListener('pushstate', onLocationChange);
         };
     }, []);
@@ -76,6 +121,7 @@ export function Routes({routes, render}) {
 
 export function Link({to, className, onClick, children}) {
     const onClickHandler = useCallback(ev => {
+        if (ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
         ev.preventDefault();
         ev.stopPropagation();
 
@@ -94,19 +140,19 @@ export function Redirect({to}) {
     return null;
 }
 
-export function navigateTo(path, state) {
-    window.history.pushState(state, '', path);
-    window.dispatchEvent(new Event('pushstate'));
+export async function navigateTo(path, state) {
+    if (navigationPending) return false;
+    navigationPending = true;
+    try {
+        if (!await confirmNavigation()) return false;
+        window.history.pushState({...state, mailtrainHistoryIndex: ++historyIndex}, '', path);
+        window.dispatchEvent(new Event('pushstate'));
+        return true;
+    } finally {
+        navigationPending = false;
+    }
 }
 
 export function navigateBack() {
     window.history.back();
 }
-
-// const baseDir = getBaseDir();
-
-/*
-location.search
-location.pathname
-
- */

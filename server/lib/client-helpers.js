@@ -1,5 +1,7 @@
 'use strict';
 
+const {canViewArchive} = require('./legacy-v2');
+
 const passport = require('./passport');
 const config = require('./config');
 const forms = require('../models/forms');
@@ -43,6 +45,7 @@ async function getAuthenticatedConfig(context) {
             namespace: context.user.namespace
         },
         globalPermissions,
+        canViewLegacyArchive: canViewArchive(context),
         editors: config.editors,
         tagLanguages: config.tagLanguages,
         mosaico: config.mosaico,

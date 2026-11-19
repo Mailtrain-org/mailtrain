@@ -80,6 +80,7 @@ async function placeholderImage(width, height, labelText, labelColor) {
     // text
     magick
         .fill(labelColor)
+        .font('DejaVu-Sans')
         .fontSize(20)
         .drawText(0, 0, labelText, 'center');
 
