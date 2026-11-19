@@ -91,8 +91,9 @@ legacy archive, incomplete-history and role fixtures against MariaDB. See [UPGRA
 before upgrading an existing deployment.
 
 Each test removes its own Compose project and volumes on exit. No external SMTP
-provider or secrets are needed. CI runs both suites on amd64 on pull requests and
-v2/v3 pushes, and also builds arm64 on pushes to v3. Set `E2E_EVIDENCE_DIR` to retain
+provider or secrets are needed. v3 CI runs both suites on amd64 for pull requests
+and pushes. Pushes to v3 also build arm64. v2 uses a separate Node 10 compatibility
+check. Set `E2E_EVIDENCE_DIR` to retain
 upgrade SQL snapshots and results locally; these contain disposable fixture data
 and should not be published as production backups.
 
