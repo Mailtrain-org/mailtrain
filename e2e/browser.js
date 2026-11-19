@@ -24,6 +24,9 @@ async function browserWalk(trusted, publicBase, ids, password = 'smoke-test-pass
         await page.locator('#form_password').fill(password);
         await page.locator('form button[type="submit"]').click();
         await page.waitForURL(trusted + '/');
+        const version = require('../server/package.json').version;
+        await page.getByText('Build ' + version, {exact: true}).waitFor({state: 'visible'});
+        console.log('Home displays packaged version ' + version);
         const areas = [
             ['/lists', 'table'],
             ['/lists/create', '#form_name'],
