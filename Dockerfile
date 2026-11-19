@@ -1,4 +1,5 @@
-ARG NODE_VERSION=26
+# posix 4.2.0 fails to compile against Node 26/V8 on Linux.
+ARG NODE_VERSION=24
 
 # Build browser assets once on the builder's native architecture.
 FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-bookworm-slim AS client-builder

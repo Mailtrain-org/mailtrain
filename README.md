@@ -2,6 +2,8 @@
 
 ## Run it
 
+The container uses Node 24 LTS. The native `posix` dependency does not compile on Node 26.
+
 Install Docker with Compose v2, then clone v3 including its public submodule:
 
 ```sh
