@@ -76,6 +76,8 @@ export default class CUD extends Component {
         data.verpEnabled = !!data.verp_hostname;
         data.verp_hostname = data.verp_hostname || '';
         data.verp_disable_sender_header = data.verpEnabled ? !!data.verp_disable_sender_header : false;
+        data.cc = data.cc || '';
+        data.bcc = data.bcc || '';
     }
 
     submitFormValuesMutator(data) {
@@ -86,7 +88,7 @@ export default class CUD extends Component {
         }
 
         return filterData(data, ['name', 'description', 'from_email', 'from_email_overridable', 'from_name',
-            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'x_mailer',
+            'from_name_overridable', 'reply_to', 'reply_to_overridable', 'cc', 'bcc', 'x_mailer',
             'verp_hostname', 'verp_disable_sender_header', 'mailer_type', 'mailer_settings', 'namespace']);
     }
 
@@ -104,6 +106,8 @@ export default class CUD extends Component {
                 from_name_overridable: false,
                 reply_to: '',
                 reply_to_overridable: false,
+                cc: '',
+                bcc: '',
                 verpEnabled: false,
                 verp_hostname: '',
                 verp_disable_sender_header: false,
@@ -232,6 +236,8 @@ export default class CUD extends Component {
                         <CheckBox id="from_name_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
                         <InputField id="reply_to" label={t('defaultReplytoEmail')}/>
                         <CheckBox id="reply_to_overridable" text={t('overridable')} className={sendConfigurationsStyles.overridableCheckbox}/>
+                        <InputField id="cc" label={t('cc')} help={t('commaSeperatedListOfCcAddresses')}/>
+                        <InputField id="bcc" label={t('bcc')} help={t('commaSeperatedListOfBccAddresses')}/>
                         <InputField id="x_mailer" label={t('xMailer')}/>
                     </Fieldset>
 
