@@ -108,6 +108,12 @@ Thus, by running this script below, you agree with the Let's Encrypt's Terms of 
 
 10. If you intend to sign your email by DKIM, set the DKIM key and DKIM selector under Administration/Send Configurations.
 
+11. Send a test campaign before your first real one and check where it lands. A new installation means a new sending
+IP with no reputation, so mail can be configured correctly and still be filed as spam by some providers for the first
+weeks. Sending to your own mailbox is not a reliable check, because that mailbox usually knows you already. A free
+placement test such as [Email Spam Tester](https://email-spam-tester.com/) reports the folder at a set of providers
+and verifies SPF and DKIM on the message as delivered, which also confirms that step 10 took effect.
+
 
 ### Installation on fresh CentOS 7 or Ubuntu 18.04 LTS (local installation)
 
