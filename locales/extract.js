@@ -17,7 +17,7 @@ const deepKeys = require('deep-keys');
 
 const localeMain = 'en-US/common.json';
 const localeMainPrevious = 'en-US-last-run/common.json';
-const localeTranslations = ['es-ES/common.json', 'fr-FR/common.json', 'pt-BR/common.json', 'de-DE/common.json', 'ru-RU/common.json'];
+const localeTranslations = ['es-ES/common.json', 'fr-FR/common.json', 'pt-BR/common.json', 'de-DE/common.json', 'ru-RU/common.json', 'eu/common.json'];
 const searchDirs = [
     '../client/src',
     '../server',
