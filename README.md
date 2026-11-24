@@ -297,7 +297,253 @@ services:
     - URL_BASE_PUBLIC
 ```
 
+## New multi-campaign reports
+
+### Get quick statistics for multiple campaings
+
+getMultiCampaignQuickStatistics(campaign)
+
+#### How to use
+
+##### 1) Create template and set the following fields values to:
+
+Name: `Custom multi-campaigns quick total stats`
+Type: `html`
+Namespace: choose your namespace
+User selectable fields:
+
+```
+[
+  {
+    "id": "campaign",
+    "name": "Campaign",
+    "type": "campaign",
+    "minOccurences": 1,
+    "maxOccurences": 1000
+  }
+]
+```
+
+Data processing code:
+
+```
+const results = await campaigns.getMultiCampaignQuickStatistics(inputs.campaign, ["*"]);
+// Uncomment to see results data
+//console.log(`results: ${JSON.stringify(results)}`)
+render({ results })
+```
+
+Rendering template:
+
+```
+<h2>{{title}}</h2>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover" width="100%">
+    <thead>
+      <th>
+        Campaign
+      </th>
+      <th>
+        Subject
+      </th>
+      <th>
+        Send configuration
+      </th>
+      <th>
+        Delivered
+      </th>
+      <th>
+        Opened
+      </th>
+      <th>
+        Clicked
+      </th>
+      <th>
+        Unsubscribed
+      </th>
+      <th>
+        Bounced
+      </th>
+      <th>
+        Complained
+      </th>
+    </thead>
+    {{#if results}}
+    <tbody>
+    {{#each results}}
+      <tr>
+        <th scope="row">
+          <a href="https://mailtrain.grasii.club/campaigns/{{id}}/status">{{name}}</a>
+        </th>
+        <td style="width: 12%;">
+          {{subject}}
+        </td>
+        <td style="width: 12%;">
+          {{send_configuration}}
+        </td>
+        <td style="width: 12%;">
+          {{delivered}}
+        </td>
+        <td style="width: 12%;">
+          {{opened_percent}}% ({{opened}})
+        </td>
+        <td style="width: 12%;">
+          {{clicks_percent}}% ({{clicks}})
+        </td>
+        <td style="width: 12%;">
+          {{unsubscribed_percent}}% ({{unsubscribed}})
+        </td>
+        <td style="width: 12%;">
+          {{bounced_percent}}% ({{bounced}})
+        </td>
+        <td style="width: 12%;">
+          {{complained_percent}}% ({{complained}})
+        </td>
+      </tr>
+    {{/each}}
+    </tbody>
+    {{/if}}
+  </table>
+</div>
+```
+
+##### 2) Create report based on the created templated
+
+Name: `Custom multi-campaigns quick total stats`
+Report template: `Custom multi-campaigns quick total stats`
+Campaing: Allows you to select mutliple campaings
+
+Clikcs on `Save and leave` and then `Refresh report` to see the magic
+
+### Get detailed statistics based on delivered campaigns messages
+
+getMultiCampaignMessagesStatistics(campaign, startBeforeDays, endBeforeDays, groupByCampaingIds = true, debug = false)
+
+#### Sample usage
+
+##### 1) Create template and set the following fields values to:
+
+Name: `Custom getMultiCampaignMessagesStatistics, 0-30 days before`
+Type: `html`
+Namespace: choose your namespace
+User selectable fields:
+
+```
+[
+  {
+    "id": "campaign",
+    "name": "Campaign",
+    "type": "campaign",
+    "minOccurences": 1,
+    "maxOccurences": 1000
+  }
+]
+```
+
+Data processing code:
+
+```
+const startBeforeDays = 30;
+const endBeforeDays = 0;
+const debug = false;
+const groupByCampaingIds = true;
+const results = await campaigns.getMultiCampaignMessagesStatistics(inputs.campaign, startBeforeDays, endBeforeDays, groupByCampaingIds, debug);
+// Uncomment to see results
+//console.log(`results: ${JSON.stringify(results)}`)
+render({ results })
+```
+
+Rendering template:
+
+```
+<h2>{{title}}</h2>
+<p>*represents the values since the beginning of the campaign</p>
+</br>
+<div class="table-responsive">
+  <table class="table table-bordered table-hover" width="100%">
+    <thead>
+      <th>
+        Campaign
+      </th>
+      <th>
+        Subject
+      </th>
+      <th>
+        Send configuration
+      </th>
+      <th>
+        Delivered
+      </th>
+      <th>
+        Opened
+      </th>
+      <th>
+        Clicked
+      </th>
+        <th>
+        Delivered*
+      </th>
+      <th>
+        Unsubscribed*
+      </th>
+      <th>
+        Bounced*
+      </th>
+      <th>
+        Complained*
+      </th>
+    </thead>
+    {{#if results}}
+    <tbody>
+    {{#each results}}
+      <tr>
+        <th scope="row">
+          <a href="https://mailtrain.grasii.club/campaigns/{{id}}/status">{{name}}</a>
+        </th>
+        <td style="width: 12%;">
+          {{subject}}
+        </td>
+        <td style="width: 12%;">
+          {{send_configuration}}
+        </td>
+        <td style="width: 12%;">
+          {{delivered}}
+        </td>
+        <td style="width: 12%;">
+          {{opened_percent}}% ({{opened}})
+        </td>
+        <td style="width: 12%;">
+          {{clicks_percent}}% ({{clicks}})
+        </td>
+        <td style="width: 12%;">
+          {{delivered_total_from_beginning}}
+        </td>
+        <td style="width: 12%;">
+          {{unsubscribed_total_from_beginning_percent}}% ({{unsubscribed_total_from_beginning}})
+        </td>
+        <td style="width: 12%;">
+          {{bounced_total_from_beginning_percent}}% ({{bounced_total_from_beginning}})
+        </td>
+        <td style="width: 12%;">
+          {{complained_total_from_beginning_percent}}% ({{complained_total_from_beginning}})
+        </td>
+      </tr>
+    {{/each}}
+    </tbody>
+    {{/if}}
+  </table>
+</div>
+```
+
+##### 2) Create report based on the created templated
+
+Name: `Custom getMultiCampaignMessagesStatistics, 0-30 days before`
+Report template: `Custom getMultiCampaignMessagesStatistics, 0-30 days before`
+Campaing: Allows you to select mutliple campaings
+
+Clikcs on `Save and leave` and then `Refresh report` to see the magic
 
 ## License
 
-  **GPL-V3.0**
+**GPL-V3.0**

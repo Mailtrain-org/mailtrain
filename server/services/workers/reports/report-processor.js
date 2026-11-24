@@ -56,6 +56,11 @@ async function main() {
             getCampaignOpenStatisticsStream: reports.getCampaignOpenStatisticsStream,
             getCampaignClickStatisticsStream: reports.getCampaignClickStatisticsStream,
             getCampaignLinkClickStatisticsStream: reports.getCampaignLinkClickStatisticsStream,
+            // Get quick statistics for multiple campaings 
+            getMultiCampaignQuickStatistics: reports.getMultiCampaignQuickStatistics,
+            // Get detailed statistics based on delivered campaigns messages 
+            getMultiCampaignMessagesStatistics: reports.getMultiCampaignMessagesStatistics,
+
             getById: campaignId => campaigns.getById(context, campaignId, false, campaigns.Content.ALL)
         };
 
