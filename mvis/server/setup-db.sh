@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MYSQL_PASSWORD=`pwgen 12 -1`
+MYSQL_PASSWORD=`pwgen -1 -s 32`
 
 # Setup MySQL user for Mailtrain
 mysql -u root -p -e "CREATE USER 'mvis'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
