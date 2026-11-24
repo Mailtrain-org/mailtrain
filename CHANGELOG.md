@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.0.0-rc.2
+
+Test this candidate on a fresh installation or an upgrade of a backup copy.
+See [README.md](https://github.com/Mailtrain-org/mailtrain/blob/v3.0.0-rc.2/README.md)
+for installation and [UPGRADE.md](https://github.com/Mailtrain-org/mailtrain/blob/v3.0.0-rc.2/UPGRADE.md)
+for backups, supported upgrades and recovery.
+
+  * Update production dependencies for template rendering, uploads, HTTP,
+    password hashing and SMTP delivery. Amazon SES sending now uses the SES v2
+    API. Confirm that the configured IAM identity can use `ses:SendEmail`.
+  * Refresh the Debian base in the Node 24 Docker images and restrict legacy
+    Mosaico image rendering to the uploads directory. Server-side MJML forms
+    now use inline markup in place of file includes.
+  * Document verification for provider webhooks. Configure the providers you
+    use before exposing callbacks and verify their delivery in a test list.
+  * Make Docker's `latest` channel an explicit release decision.
+
 ## 3.0.0-rc.1
 
 This release candidate is for testing fresh installations and supported v2

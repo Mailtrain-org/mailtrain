@@ -1,7 +1,7 @@
 {
     "name": "mailtrain-zone-mta",
     "private": true,
-    "version": "3.0.0-rc.1",
+    "version": "3.0.0-rc.2",
     "description": "Mailtrain builtin ZoneMTA instance",
     "main": "index.js",
     "scripts": {
@@ -15,11 +15,24 @@
         "node": ">=22.0.0"
     },
     "dependencies": {
-        "zone-mta": "^3.10.1"
+        "zone-mta": "3.10.1"
     },
     "overrides": {
+        "brace-expansion@2": "2.1.6",
+        "fast-xml-parser@4": "4.5.7",
+        "form-data@2": "2.5.6",
+        "joi@17": "17.13.9",
+        "joi@18": "18.3.1",
+        "lodash@4": "4.18.1",
+        "minimatch@5": "5.1.8",
+        "nodemailer@6": "10.6.1",
+        "nodemailer@7": "10.6.1",
+        "undici@7": "7.30.2",
         "zone-mta": {
-            "restify": "12.1.0"
+            "js-yaml": "4.3.2",
+            "nodemailer": "10.6.1",
+            "restify": "12.1.0",
+            "smtp-server": "3.21.7"
         }
     }
 }

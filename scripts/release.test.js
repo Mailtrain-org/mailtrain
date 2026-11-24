@@ -40,7 +40,7 @@ test('checkout manifests, lock roots and release notes agree', () => {
     const version = require('../server/package.json').version;
     const plan = prepare(source, 'v' + version);
     assert.ok(plan.release.body.length > 0);
-    assert.equal(plan.imageTags.includes('mailtrain/mailtrain:latest'), !version.includes('-'));
+    assert.deepEqual(plan.imageTags, ['mailtrain/mailtrain:' + version]);
 });
 
 test('RC produces exact notes without a latest tag', t => {
@@ -51,13 +51,22 @@ test('RC produces exact notes without a latest tag', t => {
     assert.equal(plan.release.body, 'Exact notes from @contributor.');
 });
 
-test('stable release adds latest and extracts only that release entry', t => {
+test('stable release defaults to a versioned image and extracts only that release entry', t => {
     const plan = prepare(fixture(t, '3.0.0'), 'v3.0.0');
-    assert.deepEqual(plan.imageTags, ['mailtrain/mailtrain:3.0.0', 'mailtrain/mailtrain:latest']);
+    assert.deepEqual(plan.imageTags, ['mailtrain/mailtrain:3.0.0']);
     assert.equal(plan.release.prerelease, false);
     assert.equal(plan.release.make_latest, 'true');
     assert.equal(plan.release.body, 'Exact notes from @contributor.');
     assert.deepEqual(prepare(fixture(t, '3.0.0'), plan.tag, publisher(plan), true), plan);
+});
+
+test('Docker latest requires explicit approval on a stable release', t => {
+    const env = {RELEASE_PROMOTE_LATEST: 'true'};
+    const plan = prepare(fixture(t, '3.0.0'), 'v3.0.0', env);
+    assert.deepEqual(plan.imageTags, ['mailtrain/mailtrain:3.0.0', 'mailtrain/mailtrain:latest']);
+    assert.equal(plan.promoteLatest, true);
+    assert.throws(() => prepare(fixture(t), 'v3.0.0-rc.1', env), /Only a stable release/);
+    assert.throws(() => prepare(fixture(t), 'v3.0.0-rc.1', {RELEASE_PROMOTE_LATEST: 'yes'}), /must be true or false/);
 });
 
 test('tag and every manifest/lock version must agree', t => {
@@ -131,6 +140,7 @@ test('CLI dry run performs no writes and missing configuration leaves no apparen
     assert.deepEqual(fs.readdirSync(temporary), []);
     const saved = spawnSync(process.execPath, [...command, '--output', path.join(temporary, 'release')], options);
     assert.equal(saved.status, 0, saved.stderr);
+    assert.match(fs.readFileSync(path.join(temporary, 'outputs'), 'utf8'), /^promote_latest=false$/m);
     const payload = JSON.parse(fs.readFileSync(path.join(temporary, 'release/github-release.json')));
     assert.deepEqual(payload, JSON.parse(dry.stdout).release);
     assert.equal(fs.readFileSync(path.join(temporary, 'release/release-notes.md'), 'utf8'), payload.body + '\n');

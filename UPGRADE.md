@@ -1,7 +1,7 @@
-# Upgrade to Mailtrain 3.0.0-rc.1
+# Upgrade to Mailtrain 3.0.0-rc.2
 
 This candidate must first be tested on a copy. Use the explicit
-`mailtrain/mailtrain:3.0.0-rc.1` image after publication, or build the reviewed
+`mailtrain/mailtrain:3.0.0-rc.2` image after publication, or build the reviewed
 release checkout. Do not use `latest` to select the RC. For source installations,
 install the RC lockfiles, rebuild MJML and the client, and run with the same
 production configuration and `server` working directory described in README.
@@ -10,6 +10,17 @@ Test the upgrade on an offline copy first. Keep the database, uploaded files,
 configuration and the v2 application/image together as a restorable backup.
 MySQL/MariaDB schema changes are not transactional. Restoring that backup is the
 recovery path; Knex rollback does not restore v2.
+
+## Webhook and Amazon SES configuration
+
+Review [webhook verification](README.md#webhook-verification) before exposing
+provider callback URLs. Amazon SES sending uses the SES v2 API. Existing region
+and credential settings carry over. If the configured IAM policy only grants
+`ses:SendRawEmail`, grant `ses:SendEmail` for the sending identity before
+cutover and confirm delivery to a test inbox.
+
+Copy any content referenced by `mj-include` into your custom subscription
+forms before upgrading. Server-side form rendering no longer reads include files.
 
 ## Supported data
 

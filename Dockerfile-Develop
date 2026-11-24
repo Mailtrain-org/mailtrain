@@ -1,12 +1,12 @@
 # Final Develop Image
-FROM node:10-alpine
+FROM node:24-trixie-slim
 
 WORKDIR /app/
 
 # Install system dependencies
-RUN set -ex; \
-    apk add --update --no-cache \
-    make gcc g++ git python pwgen netcat-openbsd bash imagemagick
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    make gcc g++ git python3 pwgen netcat-openbsd bash imagemagick fonts-dejavu-core ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 3000 3003 3004
 

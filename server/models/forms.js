@@ -239,7 +239,7 @@ function checkForMjmlErrors(form) {
         let compiled;
 
         try {
-            compiled = mjml2html(source);
+            compiled = mjml2html(source, {ignoreIncludes: true});
         } catch (err) {
             return err;
         }
