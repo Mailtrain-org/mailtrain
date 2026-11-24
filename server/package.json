@@ -61,7 +61,7 @@
     "device": "^0.3.9",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^1.0.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-locale": "^1.0.5",
     "express-session": "^1.17.0",
     "faker": "^4.1.0",
