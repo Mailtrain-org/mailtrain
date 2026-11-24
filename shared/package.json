@@ -27,7 +27,7 @@
     "babel-loader": "^8.2.2",
     "css-loader": "^2.1.0",
     "file-loader": "^3.0.1",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.3.1",
     "style-loader": "^0.23.1",
