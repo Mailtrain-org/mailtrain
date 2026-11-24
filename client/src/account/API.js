@@ -325,11 +325,10 @@ export default class API extends Component {
                 </p>
                 <ul>
                     <li><strong>access_token</strong> – {t('yourPersonalAccessToken')}
-                        <ul>
-                        <li><strong>start</strong> – {t('startPosition')} (<em>{t('optionalDefault0')}</em>)</li>
-                        <li><strong>limit</strong> – {t('limitEmailsCountInResponse')} (<em>{t('optionalDefault10000')}</em>)</li>
-                        <li><strong>search</strong> – {t('filterByPartOfEmail')} (<em>{t('optionalDefault')}</em>)</li>
-                        </ul>
+                    <li><strong>start</strong> – {t('startPosition')} (<em>{t('optionalDefault0')}</em>)</li>
+                    <li><strong>limit</strong> – {t('limitEmailsCountInResponse')} (<em>{t('optionalDefault10000')}</em>)</li>
+                    <li><strong>search</strong> – {t('filterByPartOfEmail')} (<em>{t('optionalDefault')}</em>)</li>
+                    <li><strong>where</strong> – {t('filterByData')} (<em>{t('optionalDefault')}</em>)</li>
                     </li>
                 </ul>
 
@@ -337,7 +336,7 @@ export default class API extends Component {
                     <strong>{t('example')}</strong>
                 </p>
 
-                <pre>curl -XGET '{getUrl(`api/blacklist/get?access_token=${accessToken}&limit=10&start=10&search=gmail`)}' </pre>
+                <pre>curl -XGET '{getUrl(`api/blacklist/get?access_token=${accessToken}&limit=10&start=10&search=gmail&where[0][0]=status&where[0][1]=%3D&where[0][2]=1`)}' </pre>
 
             </div>
         </div>
