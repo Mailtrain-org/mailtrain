@@ -33,13 +33,15 @@ jobs:
             zone-mta/package-lock.json
             e2e/package-lock.json
       - name: Test server boundaries
-        if: matrix.platform == 'amd64'
+        if: github.ref != 'refs/heads/v3' && matrix.platform == 'amd64'
         run: |
           npm ci --prefix shared --omit=dev --no-audit --no-fund
           npm ci --prefix server --omit=dev --no-audit --no-fund
           npm test --prefix server
           npm ci --prefix zone-mta --omit=dev --no-audit --no-fund
           npm test --prefix zone-mta
+      - name: Prepare the browser tests
+        run: |
           npm ci --prefix e2e --no-audit --no-fund
           node e2e/node_modules/playwright/cli.js install --with-deps chromium
       - uses: docker/setup-qemu-action@v3
@@ -54,9 +56,17 @@ jobs:
           tags: mailtrain-local:v3
           cache-from: type=gha,scope=mailtrain-${{ matrix.platform }}
           cache-to: type=gha,mode=max,scope=mailtrain-${{ matrix.platform }}
+      - name: Validate candidate metadata
+        if: github.ref == 'refs/heads/v3' && matrix.platform == 'amd64'
+        run: |
+          node --test scripts/release.test.js
+          node scripts/release.js "v$(node -p "require('./server/package.json').version")"
+      - name: Qualify image before tagging
+        if: github.ref == 'refs/heads/v3'
+        run: bash scripts/test-release-image.sh "${{ matrix.platform }}" mailtrain-local:v3
       - name: Send a campaign and unsubscribe
-        if: matrix.platform == 'amd64'
+        if: github.ref != 'refs/heads/v3' && matrix.platform == 'amd64'
         run: npm test --prefix e2e
       - name: Upgrade the pinned v2 image and reject unsupported data
-        if: matrix.platform == 'amd64'
+        if: github.ref != 'refs/heads/v3' && matrix.platform == 'amd64'
         run: npm run test:upgrade --prefix e2e
