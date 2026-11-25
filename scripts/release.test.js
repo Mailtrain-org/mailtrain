@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const {spawnSync} = require('node:child_process');
 const {test} = require('node:test');
-const {prepare, packages} = require('./release');
+const {prepare, packages, assertQualified} = require('./release');
 
 const source = path.resolve(__dirname, '..');
 
@@ -144,4 +144,23 @@ test('CLI dry run performs no writes and missing configuration leaves no apparen
     const payload = JSON.parse(fs.readFileSync(path.join(temporary, 'release/github-release.json')));
     assert.deepEqual(payload, JSON.parse(dry.stdout).release);
     assert.equal(fs.readFileSync(path.join(temporary, 'release/release-notes.md'), 'utf8'), payload.body + '\n');
+});
+
+test('tagging requires a green qualification at the exact v3 commit on both architectures', () => {
+    const commit = 'a'.repeat(40);
+    const run = {head_sha: commit, head_branch: 'v3', event: 'push', conclusion: 'success'};
+    const jobs = ['amd64', 'arm64'].map(arch => ({
+        name: 'build (' + arch + ')',
+        conclusion: 'success',
+        steps: [{name: 'Qualify image before tagging', conclusion: 'success'}]
+    }));
+
+    assert.doesNotThrow(() => assertQualified(run, jobs, commit));
+    assert.throws(() => assertQualified(run, jobs, 'b'.repeat(40)), /tagged commit/);
+    assert.throws(() => assertQualified({...run, head_branch: 'v2'}, jobs, commit), /v3 branch/);
+    assert.throws(() => assertQualified({...run, event: 'pull_request'}, jobs, commit), /after the merge/);
+    assert.throws(() => assertQualified({...run, conclusion: 'failure'}, jobs, commit), /must pass/);
+    assert.throws(() => assertQualified(run, jobs.slice(0, 1), commit), /arm64 build/);
+    const oldJobs = jobs.map(job => ({...job, steps: [{name: 'Build image', conclusion: 'success'}]}));
+    assert.throws(() => assertQualified(run, oldJobs, commit), /release qualification/);
 });

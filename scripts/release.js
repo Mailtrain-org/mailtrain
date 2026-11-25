@@ -65,6 +65,19 @@ function prepare(root, tag, env = {}, requirePublisher = false) {
     };
 }
 
+function assertQualified(run, jobs, commit) {
+    assert.equal(run.head_sha, commit, 'Qualification must use the tagged commit');
+    assert.equal(run.head_branch, 'v3', 'Qualification must use the v3 branch');
+    assert.equal(run.event, 'push', 'Qualification must run after the merge to v3');
+    assert.equal(run.conclusion, 'success', 'The v3 qualification workflow must pass before tagging');
+    for (const arch of ['amd64', 'arm64']) {
+        const job = jobs.find(candidate => candidate.name === 'build (' + arch + ')');
+        assert.equal(job?.conclusion, 'success', 'Missing successful ' + arch + ' build');
+        const qualification = job.steps?.find(step => step.name === 'Qualify image before tagging');
+        assert.equal(qualification?.conclusion, 'success', 'Missing successful ' + arch + ' release qualification');
+    }
+}
+
 if (require.main === module) {
     try {
         const args = process.argv.slice(2);
@@ -92,4 +105,4 @@ if (require.main === module) {
     }
 }
 
-module.exports = {prepare, packages};
+module.exports = {prepare, packages, assertQualified};

@@ -41,11 +41,8 @@ npm ci --prefix e2e
 export PLAYWRIGHT_BROWSERS_PATH=/tmp/mailtrain-e2e-browsers
 node e2e/node_modules/playwright/cli.js install chromium
 for arch in amd64 arm64; do
-    docker run --rm --entrypoint npm -w /app/server "mailtrain-release:$arch" test
-    docker run --rm --entrypoint npm -w /app/zone-mta "mailtrain-release:$arch" test
-    MAILTRAIN_IMAGE="mailtrain-release:$arch" MAILTRAIN_PLATFORM="linux/$arch" npm test --prefix e2e
+    bash scripts/test-release-image.sh "$arch" "mailtrain-release:$arch"
 done
-MAILTRAIN_IMAGE=mailtrain-release:amd64 MAILTRAIN_PLATFORM=linux/amd64 npm run test:upgrade --prefix e2e
 ```
 
 Linux hosts may need Playwright's `install --with-deps chromium`. Cross-platform
@@ -148,16 +145,26 @@ revocation procedure in the owning secret store. Limit access to
 
 ## Authorized publishing run
 
-After review, merge the release preparation into the intended upstream v3
-history, preserving contributor authorship. Recheck that all first-party versions
-and lock roots match the tag, inspect the exact generated notes, and qualify
-runtime/package changes. Only with Kam's go and completed publishing configuration
-may a maintainer create/push the exact annotated release tag. This preparation
-creates neither v2 nor v3 tags.
+After review, merge the candidate into `v3`, preserving contributor authorship.
+The branch workflow builds and tests amd64 and arm64, validates metadata and runs
+the supported v2 upgrade on amd64. Wait for both **Qualify image before tagging**
+steps to pass on the exact merged commit. Record the branch workflow URL in the
+release handoff and recheck the remote branch head immediately before tagging.
 
-The tag workflow validates identity/configuration, refuses an existing GitHub
-release or moved tag, builds/loads each platform once, tests those same images,
-and then checks the actual issued OIDC claims and logs in. It pushes the tested
+To find the qualifying workflow for the merged commit:
+
+```sh
+git fetch origin v3
+commit="$(git rev-parse FETCH_HEAD)"
+gh run list --repo Mailtrain-org/mailtrain --workflow build.yml --branch v3 --event push \
+    --commit "$commit" --limit 1 --json url,status,conclusion,headSha
+```
+
+Inspect the generated prerelease or release notes and verify the distribution
+plan before requesting approval of the annotated tag and publication. The tag
+workflow requires the branch qualification on its exact checkout. It verifies
+publishing configuration and the tag, builds and tests the images it will
+publish, and checks the issued OIDC claims before sign-in. It pushes the tested
 platform tags (`3.0.0-rc.2-amd64`, `3.0.0-rc.2-arm64`), assembles
 `mailtrain/mailtrain:3.0.0-rc.2`, and reads back the manifest's exact amd64/arm64
 platform set. It never updates `latest` for an alpha, beta or RC. It creates the
