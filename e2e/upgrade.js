@@ -21,11 +21,21 @@ function docker(args, input, allowFailure = false) {
 }
 
 async function ready(base) {
-    for (let i = 0; i < 120; i++) {
-        try { if ((await fetch(base + '/login')).ok) return; } catch (error) {}
+    // The pinned v2 image can accept connections before its workers finish starting.
+    const deadline = performance.now() + 240000;
+    let lastResult;
+    while (performance.now() < deadline) {
+        try {
+            const response = await fetch(base + '/login', {signal: AbortSignal.timeout(5000)});
+            await response.body?.cancel();
+            if (response.ok) return;
+            lastResult = 'HTTP ' + response.status;
+        } catch (error) {
+            lastResult = error.cause?.code || error.message;
+        }
         await delay(500);
     }
-    throw new Error('Mailtrain did not start at ' + base);
+    throw new Error('Mailtrain did not start at ' + base + ' (' + lastResult + ')');
 }
 
 async function createLegacyFixture(trusted, ids) {
