@@ -91,7 +91,17 @@ test('Send a transactional message through the Amazon SES v2 transport', async t
     const settings = require('../models/settings');
     const {MailerType} = require('../../shared/send-configurations');
     const credentials = {accessKeyId: 'fixture-key', secretAccessKey: 'fixture-secret'};
-    const started = [];
+    const {default: PQueue} = await import('p-queue');
+    const admissions = [];
+    const add = PQueue.prototype.add;
+    t.mock.timers.enable({apis: ['Date', 'setTimeout'], now: 0});
+    // SES message assembly can move the SDK call away from the queue admission time.
+    t.mock.method(PQueue.prototype, 'add', function (task, options) {
+        return add.call(this, context => {
+            admissions.push(Date.now());
+            return task(context);
+        }, options);
+    });
 
     t.mock.method(sendConfigurations, 'getSystemSendConfiguration', async () => ({
         id: 2,
@@ -104,7 +114,6 @@ test('Send a transactional message through the Amazon SES v2 transport', async t
     t.mock.method(settings, 'get', async () => ({}));
 
     const send = t.mock.method(SESv2Client.prototype, 'send', async function (command) {
-        started.push(performance.now());
         assert.ok(command instanceof SendEmailCommand);
         assert.equal(await this.config.region(), 'us-east-1');
         const resolved = await this.config.credentials();
@@ -119,11 +128,16 @@ test('Send a transactional message through the Amazon SES v2 transport', async t
     const message = () => ({
         from: 'sender@example.com', to: 'reader@example.com', subject: 'Transactional fixture', text: 'Hello'
     });
-    const results = await Promise.all([
-        mailer.sendTransactionalMail(message()),
-        mailer.sendTransactionalMail(message())
-    ]);
-    assert.deepEqual(results.map(result => result.response), ['fixture-message', 'fixture-message']);
+    const first = mailer.sendTransactionalMail(message());
+    const second = mailer.sendTransactionalMail(message());
+
+    assert.equal((await first).response, 'fixture-message');
+    assert.deepEqual(admissions, [0]);
+    t.mock.timers.tick(999);
+    assert.deepEqual(admissions, [0]);
+    t.mock.timers.tick(1);
+
+    assert.equal((await second).response, 'fixture-message');
+    assert.deepEqual(admissions, [0, 1000]);
     assert.equal(send.mock.callCount(), 2);
-    assert.ok(started[1] - started[0] >= 950, 'SES sends must respect the configured rate');
 });
