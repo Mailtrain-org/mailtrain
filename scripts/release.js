@@ -32,6 +32,10 @@ function prepare(root, tag, env = {}, requirePublisher = false) {
     const body = changelog.slice(heading.index + heading[0].length, next ? next.index : undefined).trim();
     assert.ok(body.length > 0, 'Release notes must not be empty');
     const prerelease = version.includes('-');
+    const latestSetting = env.RELEASE_PROMOTE_LATEST || 'false';
+    assert.match(latestSetting, /^(true|false)$/, 'RELEASE_PROMOTE_LATEST must be true or false');
+    const promoteLatest = latestSetting === 'true';
+    assert.ok(!promoteLatest || !prerelease, 'Only a stable release can promote Docker latest');
     const ref = 'refs/tags/' + tag;
     const workflowRef = repository + '/' + workflow + '@' + ref;
     // Requires the repository custom subject template documented in RELEASING.md.
@@ -42,7 +46,7 @@ function prepare(root, tag, env = {}, requirePublisher = false) {
         assert.equal(env.GITHUB_REF, ref, 'Publishing tag mismatch');
         assert.equal(env.GITHUB_WORKFLOW_REF, workflowRef, 'Publishing workflow mismatch');
         assert.equal(env.RELEASE_ENVIRONMENT, environment, 'Publishing environment mismatch');
-        assert.equal(env.RELEASE_APPROVED_TAG, tag, 'Tomas configuration and Kam approval required for this exact tag');
+        assert.equal(env.RELEASE_APPROVED_TAG, tag, 'Publishing approval required for this exact tag');
         if (env.DOCKERHUB_OIDC_CONNECTIONID || env.DOCKERHUB_OIDC_SUBJECT) {
             assert.ok((env.DOCKERHUB_OIDC_CONNECTIONID || '').trim(), 'Missing Docker Hub OIDC connection');
             assert.equal(env.DOCKERHUB_OIDC_SUBJECT, subject, 'Missing or mismatched Docker Hub OIDC subject');
@@ -54,7 +58,8 @@ function prepare(root, tag, env = {}, requirePublisher = false) {
     return {
         version, tag, repository, workflow, environment, image,
         platforms: ['linux/amd64', 'linux/arm64'],
-        imageTags: [image + ':' + version, ...(!prerelease ? [image + ':latest'] : [])],
+        promoteLatest,
+        imageTags: [image + ':' + version, ...(promoteLatest ? [image + ':latest'] : [])],
         oidcSubject: subject,
         release: {tag_name: tag, name: 'Mailtrain ' + version, body, draft: false, prerelease, make_latest: prerelease ? 'false' : 'true'}
     };
@@ -77,7 +82,7 @@ if (require.main === module) {
             fs.writeFileSync(path.join(output, 'release-notes.md'), plan.release.body + '\n');
             fs.writeFileSync(path.join(output, 'github-release.json'), JSON.stringify(plan.release, null, 2) + '\n');
             if (process.env.GITHUB_OUTPUT) {
-                fs.appendFileSync(process.env.GITHUB_OUTPUT, 'version=' + plan.version + '\nprerelease=' + plan.release.prerelease + '\n');
+                fs.appendFileSync(process.env.GITHUB_OUTPUT, 'version=' + plan.version + '\npromote_latest=' + plan.promoteLatest + '\n');
             }
         }
         process.stdout.write(JSON.stringify(plan, null, 2) + '\n');

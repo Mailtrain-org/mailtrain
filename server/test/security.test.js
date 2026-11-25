@@ -14,7 +14,7 @@ const hbs = require('hbs');
 const path = require('path');
 const config = require('../lib/config');
 const webhookAuth = require('../lib/webhook-auth');
-const {formatTemplate} = require('../lib/tools');
+const {formatTemplate, getTemplate} = require('../lib/tools');
 const {TagLanguages} = require('../../shared/templates');
 const {CampaignMessageStatus} = require('../../shared/campaigns');
 const {MailerType} = require('../../shared/send-configurations');
@@ -250,4 +250,21 @@ test('ZoneMTA only returns DKIM material for the configured key and sets no-stor
     assert.deepEqual(JSON.parse(accepted.text).dkim.keys, [
         {domainName: 'example.invalid', keySelector: 'test', privateKey: 'test-only-key'}
     ]);
+});
+
+test('MJML forms render without reading include files', async t => {
+    const directory = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'mailtrain-mjml-'));
+    t.after(() => fs.rmSync(directory, {recursive: true, force: true}));
+    const fixture = path.join(directory, 'fragment.mjml');
+    fs.writeFileSync(fixture, '<mj-section><mj-column><mj-text>Local fixture fragment</mj-text></mj-column></mj-section>');
+
+    const render = await getTemplate({
+        type: 'mjml',
+        template: '<mj-section><mj-column><mj-text>Inline content</mj-text></mj-column></mj-section>' +
+            '<mj-include path="' + fixture + '" />',
+        layout: '<mjml><mj-body>{{{body}}}</mj-body></mjml>'
+    }, 'en-US');
+    const html = render({});
+    assert.match(html, /Inline content/);
+    assert.doesNotMatch(html, /Local fixture fragment/);
 });

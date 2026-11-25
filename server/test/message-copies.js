@@ -84,3 +84,46 @@ test('Send copies to SMTP recipients with and without VERP', async t => {
             ['transactional@example.com', 'copy@example.com', 'second@example.com', 'hidden@example.com'].sort());
     }
 });
+
+test('Send a transactional message through the Amazon SES v2 transport', async t => {
+    const {SESv2Client, SendEmailCommand} = require('@aws-sdk/client-sesv2');
+    const sendConfigurations = require('../models/send-configurations');
+    const settings = require('../models/settings');
+    const {MailerType} = require('../../shared/send-configurations');
+    const credentials = {accessKeyId: 'fixture-key', secretAccessKey: 'fixture-secret'};
+    const started = [];
+
+    t.mock.method(sendConfigurations, 'getSystemSendConfiguration', async () => ({
+        id: 2,
+        mailer_type: MailerType.AWS_SES,
+        mailer_settings: {
+            key: credentials.accessKeyId, secret: credentials.secretAccessKey, region: 'us-east-1',
+            maxConnections: 1, throttling: 3600
+        }
+    }));
+    t.mock.method(settings, 'get', async () => ({}));
+
+    const send = t.mock.method(SESv2Client.prototype, 'send', async function (command) {
+        started.push(performance.now());
+        assert.ok(command instanceof SendEmailCommand);
+        assert.equal(await this.config.region(), 'us-east-1');
+        const resolved = await this.config.credentials();
+        assert.equal(resolved.accessKeyId, credentials.accessKeyId);
+        assert.equal(resolved.secretAccessKey, credentials.secretAccessKey);
+        assert.deepEqual(command.input.Destination.ToAddresses, ['reader@example.com']);
+        assert.match(Buffer.from(command.input.Content.Raw.Data).toString(), /^Subject: Transactional fixture\r?$/m);
+        return {MessageId: 'fixture-message'};
+    });
+
+    const mailer = await mailers.getOrCreateMailer();
+    const message = () => ({
+        from: 'sender@example.com', to: 'reader@example.com', subject: 'Transactional fixture', text: 'Hello'
+    });
+    const results = await Promise.all([
+        mailer.sendTransactionalMail(message()),
+        mailer.sendTransactionalMail(message())
+    ]);
+    assert.deepEqual(results.map(result => result.response), ['fixture-message', 'fixture-message']);
+    assert.equal(send.mock.callCount(), 2);
+    assert.ok(started[1] - started[0] >= 950, 'SES sends must respect the configured rate');
+});

@@ -24,6 +24,7 @@ jobs:
       RELEASE_TAG: ${{ github.ref_name }}
       RELEASE_ENVIRONMENT: mailtrain-release
       RELEASE_APPROVED_TAG: ${{ vars.RELEASE_APPROVED_TAG }}
+      RELEASE_PROMOTE_LATEST: ${{ vars.RELEASE_PROMOTE_LATEST }}
       DOCKERHUB_OIDC_CONNECTIONID: ${{ vars.DOCKERHUB_OIDC_CONNECTIONID }}
       DOCKERHUB_OIDC_SUBJECT: ${{ vars.DOCKERHUB_OIDC_SUBJECT }}
       PLAYWRIGHT_BROWSERS_PATH: /tmp/mailtrain-e2e-browsers
@@ -138,7 +139,7 @@ jobs:
         if: steps.publisher.outputs.mode != 'none'
         env:
           VERSION: ${{ steps.prepare.outputs.version }}
-          PRERELEASE: ${{ steps.prepare.outputs.prerelease }}
+          PROMOTE_LATEST: ${{ steps.prepare.outputs.promote_latest }}
         run: |
           for arch in amd64 arm64; do
             docker tag "mailtrain-release:$arch" "mailtrain/mailtrain:$VERSION-$arch"
@@ -148,7 +149,7 @@ jobs:
             "mailtrain/mailtrain:$VERSION-amd64" "mailtrain/mailtrain:$VERSION-arm64"
           docker buildx imagetools inspect "mailtrain/mailtrain:$VERSION" --raw > "$RUNNER_TEMP/mailtrain-release/manifest.json"
           jq -e '[.manifests[] | select(.annotations["vnd.docker.reference.type"] != "attestation-manifest") | .platform | .os + "/" + .architecture] | sort == ["linux/amd64", "linux/arm64"]' "$RUNNER_TEMP/mailtrain-release/manifest.json"
-          if [ "$PRERELEASE" = false ]; then
+          if [ "$PROMOTE_LATEST" = true ]; then
             docker buildx imagetools create --tag mailtrain/mailtrain:latest "mailtrain/mailtrain:$VERSION"
             docker buildx imagetools inspect mailtrain/mailtrain:latest --raw > "$RUNNER_TEMP/mailtrain-release/latest.json"
             cmp "$RUNNER_TEMP/mailtrain-release/manifest.json" "$RUNNER_TEMP/mailtrain-release/latest.json"

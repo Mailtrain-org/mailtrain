@@ -272,7 +272,19 @@ async function getRouter(appType) {
 
                 const mosaicoLegacyUrlPrefix = getTrustedUrl(`mosaico/uploads/`);
                 if (url.startsWith(mosaicoLegacyUrlPrefix)) {
-                    filePath = path.join(__dirname, '..', '..', 'client', 'static' , 'mosaico', 'uploads', url.substring(mosaicoLegacyUrlPrefix.length));
+                    const uploads = path.join(__dirname, '..', '..', 'client', 'static', 'mosaico', 'uploads');
+                    try {
+                        const root = await fs.realpath(uploads);
+                        filePath = await fs.realpath(path.resolve(root, url.substring(mosaicoLegacyUrlPrefix.length)));
+                        if (!filePath.startsWith(root + path.sep)) {
+                            throw new interoperableErrors.NotFoundError();
+                        }
+                    } catch (err) {
+                        if (err.code === 'ENOENT' || err.code === 'ENOTDIR' || err.code === 'ERR_INVALID_ARG_VALUE') {
+                            throw new interoperableErrors.NotFoundError();
+                        }
+                        throw err;
+                    }
                 } else {
                     const file = await files.getFileByUrl(contextHelpers.getAdminContext(), url);
                     filePath = file.path;

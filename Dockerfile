@@ -30,23 +30,23 @@ RUN cd server && npm ci --omit=dev --no-audit --no-fund
 RUN cd shared && npm ci --omit=dev --no-audit --no-fund
 RUN cd zone-mta && npm ci --omit=dev --no-audit --no-fund
 
-FROM node:${NODE_VERSION}-bookworm-slim
+FROM node:${NODE_VERSION}-trixie-slim
 ENV NODE_ENV=production
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash pwgen netcat-openbsd imagemagick ca-certificates \
+    bash pwgen netcat-openbsd imagemagick fonts-dejavu-core ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-COPY server ./server
-COPY shared ./shared
-COPY zone-mta ./zone-mta
-COPY locales ./locales
-COPY client/static ./client/static
-COPY --from=client-builder /app/client/dist ./client/dist
-COPY --from=dependencies /app/server/node_modules ./server/node_modules
-COPY --from=dependencies /app/shared/node_modules ./shared/node_modules
-COPY --from=dependencies /app/zone-mta/node_modules ./zone-mta/node_modules
-COPY docker-entrypoint.sh ./
-RUN mkdir -p server/files && chown -R node:node /app
+COPY --chown=node:node server ./server
+COPY --chown=node:node shared ./shared
+COPY --chown=node:node zone-mta ./zone-mta
+COPY --chown=node:node locales ./locales
+COPY --chown=node:node client/static ./client/static
+COPY --chown=node:node --from=client-builder /app/client/dist ./client/dist
+COPY --chown=node:node --from=dependencies /app/server/node_modules ./server/node_modules
+COPY --chown=node:node --from=dependencies /app/shared/node_modules ./shared/node_modules
+COPY --chown=node:node --from=dependencies /app/zone-mta/node_modules ./zone-mta/node_modules
+COPY --chown=node:node docker-entrypoint.sh ./
+RUN install -d -o node -g node server/files && chown node:node /app
 USER node
 EXPOSE 3000 3003 3004
 HEALTHCHECK --interval=10s --timeout=5s --start-period=120s --retries=6 \

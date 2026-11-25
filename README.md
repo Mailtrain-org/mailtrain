@@ -1,6 +1,6 @@
 # Mailtrain v3
 
-Test Mailtrain **3.0.0-rc.1** upgrades on a copy. Read [UPGRADE.md](UPGRADE.md)
+Test Mailtrain **3.0.0-rc.2** upgrades on a copy. Read [UPGRADE.md](UPGRADE.md)
 for the procedure and the legacy records available in the archive.
 [RELEASING.md](RELEASING.md) covers release preparation.
 
@@ -10,9 +10,9 @@ Docker Engine/Desktop with Compose v2 supports both `linux/amd64` and
 `linux/arm64`. Once the release is published, use its pinned version:
 
 ```sh
-git clone --branch v3.0.0-rc.1 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
+git clone --branch v3.0.0-rc.2 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
 cd mailtrain
-export MAILTRAIN_IMAGE=mailtrain/mailtrain:3.0.0-rc.1
+export MAILTRAIN_IMAGE=mailtrain/mailtrain:3.0.0-rc.2
 docker compose pull mysql redis mailtrain
 docker compose up -d --no-build --wait
 ```
@@ -109,7 +109,7 @@ source processes need host-reachable services. MongoDB is unnecessary when
 After publication, clone the release with its pinned submodule, then build:
 
 ```sh
-git clone --branch v3.0.0-rc.1 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
+git clone --branch v3.0.0-rc.2 --recurse-submodules https://github.com/Mailtrain-org/mailtrain.git
 cd mailtrain
 sh client/build-mjml.sh
 for dir in shared client server zone-mta; do (cd "$dir" && npm ci); done
@@ -164,6 +164,27 @@ For development, run `npm run watch --prefix client` in a second terminal. The
 Docker entrypoint accepts `ENABLED_LANGUAGES` as a comma-separated list of registered
 codes, for example `en-US, de-DE, eu`; source installs use `enabledLanguages` in
 their production configuration.
+
+## Webhook verification
+
+Configure the callbacks used by your sending providers under `webhooks` in
+`server/config/production.yaml` (`/app/server/config/production.yaml` in Docker).
+Keep shared secrets in that deployment's configuration and use HTTPS on all
+public callback URLs. Restart Mailtrain after changing the settings.
+
+| Provider | Mailtrain setting | Provider configuration |
+| --- | --- | --- |
+| Amazon SES via SNS | `awsTopicArns` | List the exact SNS topic ARNs for this installation. Mailtrain always verifies the SNS signature. An empty list accepts any correctly signed SNS topic. |
+| SparkPost | `sparkpostToken` | Send the matching secret in the `X-Mailtrain-Webhook-Token` custom header. |
+| SendGrid | `sendgridPublicKey` | Enable Signed Event Webhook and paste the base64 verification key without PEM headers. |
+| Mailgun | `mailgunSigningKey` | Use the HTTP webhook signing key for legacy events. |
+| ZoneMTA | `zoneMtaToken` | For an external ZoneMTA configure HTTP Basic credentials with username `mailtrain` and the matching secret as password. The builtin ZoneMTA uses this setting automatically for bounce callbacks. |
+| Postal | `postalPublicKey` | Paste the signing public key as a PEM block. |
+
+For providers other than SNS, leaving the listed key or token empty leaves
+verification disabled for that provider. Set the key or token on both sides
+before exposing a callback. Verify delivery and bounce handling using a test list
+before switching a production integration.
 
 ## GeoLite2
 ```

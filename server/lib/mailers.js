@@ -4,7 +4,7 @@ const log = require('./log');
 const config = require('./config');
 
 const nodemailer = require('nodemailer');
-let aws = require("@aws-sdk/client-ses");
+const {SESv2Client, SendEmailCommand} = require('@aws-sdk/client-sesv2');
 const openpgpEncrypt = require('nodemailer-openpgp').openpgpEncrypt;
 const sendConfigurations = require('../models/send-configurations');
 const { ZoneMTAType, MailerType } = require('../../shared/send-configurations');
@@ -193,6 +193,7 @@ async function _createTransport(sendConfiguration) {
 
 
     let transportOptions;
+    let sesQueue;
 
     if (mailerType === MailerType.GENERIC_SMTP || mailerType === MailerType.ZONE_MTA) {
         transportOptions = {
@@ -231,27 +232,33 @@ async function _createTransport(sendConfiguration) {
         }
 
     } else if (mailerType === MailerType.AWS_SES) {
-        const sendingRate = mailerSettings.throttling / 3600;  // convert to messages/second
-
-
+        const {default: PQueue} = await import('p-queue');
+        const concurrency = Math.ceil(mailerSettings.maxConnections) || Infinity;
+        const intervalCap = Math.ceil(mailerSettings.throttling / 3600) || Infinity;
+        sesQueue = new PQueue({
+            concurrency,
+            intervalCap,
+            interval: 1000,
+            strict: Number.isFinite(intervalCap)
+        });
 
         transportOptions = {
-            SES: new aws.SES({
-                apiVersion: '2010-12-01',
-                credentials: {
-                    accessKeyId: mailerSettings.key,
-                    secretAccessKey: mailerSettings.secret,
-                },
-                region: mailerSettings.region,
-            }),
+            SES: {
+                sesClient: new SESv2Client({
+                    credentials: {
+                        accessKeyId: mailerSettings.key,
+                        secretAccessKey: mailerSettings.secret
+                    },
+                    region: mailerSettings.region
+                }),
+                SendEmailCommand
+            },
             debug: mailerSettings.logTransactions,
             logger: mailerSettings.logTransactions ? {
                 debug: logFunc.bind(null, 'verbose'),
                 info: logFunc.bind(null, 'info'),
                 error: logFunc.bind(null, 'error')
-            } : false,
-            maxConnections: mailerSettings.maxConnections,
-            sendingRate
+            } : false
         };
 
     } else {
@@ -259,7 +266,8 @@ async function _createTransport(sendConfiguration) {
     }
 
     const transport = nodemailer.createTransport(transportOptions, config.nodemailer);
-    transport.sendMailAsync = promisify(transport.sendMail.bind(transport));
+    const sendMail = promisify(transport.sendMail.bind(transport));
+    transport.sendMailAsync = sesQueue ? mail => sesQueue.add(() => sendMail(mail)) : sendMail;
 
     transport.use('stream', openpgpEncrypt({
         signingKey: configItems.pgpPrivateKey,

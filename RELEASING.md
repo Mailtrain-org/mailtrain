@@ -3,8 +3,8 @@
 Release preparation is local. Creating/pushing a tag, running a publishing job,
 changing accounts, and creating a GitHub release require the maintainers' go.
 The prepared workflow has not activated or publication-verified Docker trust.
-Tomas administers Docker Hub and the repository's publishing configuration; Kam
-approves the exact release. No personal CLI login is needed.
+A repository administrator configures GitHub publishing and private vulnerability
+reporting. A Docker Hub organization owner configures registry publishing.
 
 ## Validate without publishing
 
@@ -12,7 +12,7 @@ From the repository root on Node 24:
 
 ```sh
 node --test scripts/release.test.js
-node scripts/release.js v3.0.0-rc.1
+node scripts/release.js v3.0.0-rc.2
 ```
 
 The second command reads the five first-party manifests and lock roots plus the
@@ -74,7 +74,7 @@ Official guidance checked 19 November 2026:
 
 The public Docker profile identifies `mailtrain` as an Organization. Its eligible
 subscription, available connection slots and existing trust are not established
-by that public metadata. Tomas must confirm eligibility in Docker Home first.
+by that public metadata. A Docker Hub organization owner can confirm eligibility in Docker Home.
 Do not set approval variables merely to make a dry run pass.
 
 The intended binding is deliberately exact:
@@ -83,14 +83,14 @@ The intended binding is deliberately exact:
 | --- | --- |
 | GitHub repository | `Mailtrain-org/mailtrain` |
 | Workflow | `.github/workflows/release.yml` from that same release tag |
-| Trigger | Push of `refs/tags/v3.0.0-rc.1` for this RC |
+| Trigger | Push of `refs/tags/v3.0.0-rc.2` for this RC |
 | GitHub environment | `mailtrain-release` |
 | Issuer | `https://token.actions.githubusercontent.com` (GitHub.com) |
 | Docker organization/login | `mailtrain` |
 | Docker resource | Repository `mailtrain/mailtrain`, Image Pull and Image Push only |
 | Login action | `docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7` (4.5.1) |
 
-Tomas must configure a repository-level custom OIDC subject template with this
+A repository administrator configures a custom OIDC subject template with this
 ordered claim list (administrative payload, not executed by this run):
 
 ```json
@@ -101,7 +101,7 @@ For the RC, the intended subject/ruleset is the following single exact string,
 without wildcards:
 
 ```text
-repo:Mailtrain-org/mailtrain:environment:mailtrain-release:workflow_ref:Mailtrain-org/mailtrain/.github/workflows/release.yml@refs/tags/v3.0.0-rc.1:ref:refs/tags/v3.0.0-rc.1
+repo:Mailtrain-org/mailtrain:environment:mailtrain-release:workflow_ref:Mailtrain-org/mailtrain/.github/workflows/release.yml@refs/tags/v3.0.0-rc.2:ref:refs/tags/v3.0.0-rc.2
 ```
 
 An environment's default subject omits the workflow and tag. It is insufficient
@@ -131,7 +131,9 @@ set these nonsecret variables:
 - `DOCKERHUB_OIDC_CONNECTIONID`: the actual connection ID from Docker Home.
 - `DOCKERHUB_OIDC_SUBJECT`: the exact subject printed by the local release script
   and confirmed against the repository's configured template.
-- `RELEASE_APPROVED_TAG`: `v3.0.0-rc.1` for this release only.
+- `RELEASE_APPROVED_TAG`: the exact approved tag for this release only.
+- `RELEASE_PROMOTE_LATEST`: set to `true` only for an approved stable Docker
+  `latest` channel cutover. Leave it unset for a versioned image.
 
 With neither OIDC variables nor Docker Hub secrets configured, the tag workflow
 builds and tests the images and skips Docker and GitHub publishing. Partial
@@ -149,24 +151,26 @@ revocation procedure in the owning secret store. Limit access to
 After review, merge the release preparation into the intended upstream v3
 history, preserving contributor authorship. Recheck that all first-party versions
 and lock roots match the tag, inspect the exact generated notes, and qualify
-runtime/package changes. Only with Kam's go and Tomas's completed configuration
+runtime/package changes. Only with Kam's go and completed publishing configuration
 may a maintainer create/push the exact annotated release tag. This preparation
 creates neither v2 nor v3 tags.
 
 The tag workflow validates identity/configuration, refuses an existing GitHub
 release or moved tag, builds/loads each platform once, tests those same images,
 and then checks the actual issued OIDC claims and logs in. It pushes the tested
-platform tags (`3.0.0-rc.1-amd64`, `3.0.0-rc.1-arm64`), assembles
-`mailtrain/mailtrain:3.0.0-rc.1`, and reads back the manifest's exact amd64/arm64
+platform tags (`3.0.0-rc.2-amd64`, `3.0.0-rc.2-arm64`), assembles
+`mailtrain/mailtrain:3.0.0-rc.2`, and reads back the manifest's exact amd64/arm64
 platform set. It never updates `latest` for an alpha, beta or RC. It creates the
 GitHub prerelease last, with the exact CHANGELOG body and `make_latest: false`.
 There is no automatic notes generator or independent version source.
 
 For `3.0.0`, update the five package roots and their locks, write that CHANGELOG
-entry, repeat qualification, and have Tomas bind the exact new subject/tag with
-Kam's go. Only a stable release updates Docker `latest` (with manifest readback)
-and GitHub's latest release. Review the existing Docker `latest` v2 users before
-approving this intentional major-version channel change.
+entry, review tester results, repeat qualification and bind the exact new
+subject/tag with Kam's go. Stable releases become the latest GitHub release.
+The Docker version tag is published independently of `latest`. Review the
+upgrade path for existing Docker `latest` users and get explicit approval
+before setting `RELEASE_PROMOTE_LATEST=true`. The workflow verifies the new
+Docker `latest` manifest after a promotion.
 
 GitHub and Docker do not provide a shared transaction. A failure after a push
 can leave platform/version tags; the workflow fails and does not create a GitHub
@@ -176,7 +180,7 @@ release. Concurrent runs are serialized. Actual trust acceptance and publication
 must be verified through an authorized real run and independent Docker/GitHub
 readback, including pull/install of both architectures. Until then, report the
 configuration as prepared, not publication-verified. Remove/reset the exact-tag
-approval variable after completion.
+approval variable and any `RELEASE_PROMOTE_LATEST` setting after completion.
 
 ## v2 security patch (separate approval)
 
